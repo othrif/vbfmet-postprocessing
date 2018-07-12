@@ -1,11 +1,11 @@
-First time setup
+`First time setup
 cd $TestArea
 git clone ssh://git@gitlab.cern.ch:7999/VBFInv/STPostProcessing.git source/
 mkdir build;cd build
 acmSetup AthAnalysis,21.2.35
-acmCompile 
+acmCompile `
 
 Future setup 
-cd $TestArea/build
-acmSetup
+`cd $TestArea/build
+acmSetup`
 
