@@ -1,6 +1,7 @@
 // VBFAnalysis includes
 #include "VBFAnalysisAlg.h"
-
+#include "SUSYTools/SUSYCrossSection.h"
+#include "PathResolver/PathResolver.h"
 //#include "xAODEventInfo/EventInfo.h"
 
 
@@ -31,7 +32,43 @@ StatusCode VBFAnalysisAlg::initialize() {
   //CHECK( histSvc()->regHist("/MYSTREAM/myHist", m_myHist) ); //registers histogram to output stream
   //m_myTree = new TTree("myTree","myTree");
   //CHECK( histSvc()->regTree("/MYSTREAM/SubDirectory/myTree", m_myTree) ); //registers tree to output stream inside a sub-directory
+  
+  bool isMC = true;
+  currentVariation = "Nominal";
+  cout<<"NAME of input tree in intialize ======="<<currentVariation<<endl;
+  //  cout<<"NAME of output before ======="<<newtree->GetName()<<endl;                                                                                                                                             
+  currentSample = "ttbar";
+  cout<< "CURRENT  sample === "<< currentSample<<endl;
 
+  TString histoName="";
+  histoName = "_" + currentSample;
+  cout<<"currentVariation.substr(currentVariation.find_first_of(_)+1); "<<currentVariation.substr(currentVariation.find_first_of("_")+1)<<endl;
+  double crossSection;
+  if(isMC)
+    {
+      SUSY::CrossSectionDB *my_XsecDB;
+      std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+      xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
+      my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
+      crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb                                                                                                                                      
+    }
+
+  else
+    {
+      if(runNumber >= 276262 && runNumber <= 284484) is2015 =true;
+      else if(runNumber >= 296939 && runNumber <= 311481) is2016 =true;
+      else throw std::invalid_argument("runNumber could not be identified with a dataset :o");
+    }
+  //  hist.xshist->SetBinContent(1,crossSection); //in pb
+
+  m_tree->Clear();
+
+  TFile outputFile(outputFileName);
+  m_tree_out = new TTree(treeNameOut, treeTitleOut);
+  //  m_tree_out->SetDirectory(outputFile);
+  
+  m_tree_out->Branch("met_tst_et", &met_tst_et);
+  m_tree_out->Branch("xs", &crossSection);
 
   return StatusCode::SUCCESS;
 }
@@ -48,9 +85,12 @@ StatusCode VBFAnalysisAlg::finalize() {
 
 StatusCode VBFAnalysisAlg::execute() {  
   ATH_MSG_DEBUG ("Executing " << name() << "...");
-  setFilterPassed(false); //optional: start with algorithm not passed
+  //setFilterPassed(false); //optional: start with algorithm not passed
 
-
+  
+  m_tree->GetEntry(m_tree->GetReadEntry());
+  if (met_tst_et < 150e3) return StatusCode::SUCCESS;
+  //  if (!(passGRL) || !(trigger_decision)) return StatusCode::SUCCESS;
 
   //
   //Your main analysis code goes here
@@ -67,7 +107,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //m_myHist->Fill( ei->averageInteractionsPerCrossing() ); //fill mu into histogram
 
 
-  setFilterPassed(true); //if got here, assume that means algorithm passed
+  //setFilterPassed(true); //if got here, assume that means algorithm passed
   return StatusCode::SUCCESS;
 }
 
@@ -85,9 +125,50 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   //float beamEnergy(0); CHECK( retrieveMetadata("/TagInfo","beam_energy",beamEnergy) );
   //std::vector<float> bunchPattern; CHECK( retrieveMetadata("/Digitiation/Parameters","BeamIntensityPattern",bunchPattern) );
 
-
-
+  m_treeName = "MiniNtuple";
+  m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
+  m_tree->SetBranchStatus("*",0);
+  m_tree->SetBranchStatus("runNumber", 1);
+  m_tree->SetBranchStatus("averageIntPerXing", 1);
+  m_tree->SetBranchStatus("mcEventWeight", 1);
+  m_tree->SetBranchStatus("puWeight", 1);
+  m_tree->SetBranchStatus("jvtSFWeight", 1);
+  m_tree->SetBranchStatus("elSFWeight", 1);
+  m_tree->SetBranchStatus("muSFWeight", 1);
+  m_tree->SetBranchStatus("elSFTrigWeight", 1);
+  m_tree->SetBranchStatus("muSFTrigWeight", 1);
+  m_tree->SetBranchStatus("trigger_HLT_mu*", 1);
+  m_tree->SetBranchStatus("trigger_HLT_e*", 1);
+  m_tree->SetBranchStatus("trigger_HLT_xe*", 1);
+  m_tree->SetBranchStatus("passJetClean", 1);
+  m_tree->SetBranchStatus("passJetCleanTight", 1);
+  m_tree->SetBranchStatus("muSFWeight", 1);
+  m_tree->SetBranchStatus("muSFWeight", 1);
+  m_tree->SetBranchStatus("muSFWeight", 1);
+  m_tree->SetBranchStatus("met_tst_et", 1);
+  // m_tree->SetBranchStatus("", 1);
+  // m_tree->SetBranchStatus("", 1);
+  // m_tree->SetBranchStatus("", 1);
+  // m_tree->SetBranchStatus("", 1);
+  // m_tree->SetBranchStatus("", 1);
+  // m_tree->SetBranchStatus("", 1);
+  
+  m_tree->SetBranchAddress("runNumber", &runNumber);
+  m_tree->SetBranchAddress("averageIntPerXing", &averageIntPerXing);
+  m_tree->SetBranchAddress("mcEventWeight", &mcEventWeight);
+  m_tree->SetBranchAddress("puWeight", &puWeight);
+  m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);
+  m_tree->SetBranchAddress("elSFWeight", &elSFWeight);
+  m_tree->SetBranchAddress("muSFWeight", &muSFWeight);
+  m_tree->SetBranchAddress("elSFTrigWeight", &elSFTrigWeight);
+  m_tree->SetBranchAddress("muSFTrigWeight", &muSFTrigWeight);
+  //  m_tree->SetBranchAddress("trigger_HLT_mu*", );
+  //  m_tree->SetBranchAddress("trigger_HLT_e*", 1);
+  //  m_tree->SetBranchAddress("trigger_HLT_xe*", 1);
+  m_tree->SetBranchAddress("passJetClean", &passJetClean);
+  m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
+  m_tree->SetBranchAddress("met_tst_et", &met_tst_et);
+  
   return StatusCode::SUCCESS;
 }
-
 
