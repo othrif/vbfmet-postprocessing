@@ -7,7 +7,12 @@
 //#include "TTree.h"
 //#include "TH1D.h"
 
+#include "TTree.h"
+#include "TH1D.h"
+#include <vector>
+#include <iostream>
 
+using namespace std;
 
 class VBFAnalysisAlg: public ::AthAnalysisAlgorithm { 
  public: 
@@ -37,6 +42,13 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
 
  private: 
 
+  bool is2015;
+  bool is2016;
+  TTree *m_tree = 0;
+  TTree *m_tree_out = 0;
+  //  const TFile outputFile;
+  TString m_treeName = "MiniNtuple";
+  TString outputFileName = "ntuple";
    //Example algorithm property, see constructor for declaration:
    //int m_nProperty = 0;
 
@@ -44,6 +56,25 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
    //TH1D* m_myHist = 0;
    //TTree* m_myTree = 0;
 
+  //output tree                                                                                                                                                                                                   
+  std::string outputName;
+  std::string currentVariation;
+  TString currentSample;
+  TString treeNameOut="nominal";
+  TString treeTitleOut="nominal";
+
+  Int_t runNumber;
+  Int_t averageIntPerXing;
+  Float_t mcEventWeight;
+  Float_t puWeight;
+  Float_t jvtSFWeight;
+  Float_t elSFWeight;
+  Float_t muSFWeight;
+  Float_t elSFTrigWeight;
+  Float_t muSFTrigWeight;
+  Int_t passJetClean;
+  Int_t passJetCleanTight;
+  Float_t met_tst_et;
 }; 
 
 #endif //> !VBFANALYSIS_VBFANALYSISALG_H

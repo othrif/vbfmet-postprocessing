@@ -3,6 +3,19 @@
 # Declare the package
 atlas_subdir( VBFAnalysis )
 
+# Declare the package's dependencies:
+atlas_depends_on_subdirs( PUBLIC
+                          Control/AthToolSupport/AsgTools
+                          Control/xAODRootAccess
+                          Event/xAOD/xAODEventInfo
+                          Event/xAOD/xAODJet
+                          Event/xAOD/xAODMissingET
+#                          xAODAnaHelpers
+                          PRIVATE
+                          Event/xAOD/xAODEgamma
+                          Event/xAOD/xAODMuon
+                          Tools/PathResolver )
+
 # Declare external dependencies ... default here is to include ROOT
 find_package( ROOT COMPONENTS MathCore RIO Core Tree Hist )
 
@@ -15,6 +28,15 @@ atlas_add_library( VBFAnalysisLib src/*.cxx
                    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
                    LINK_LIBRARIES ${ROOT_LIBRARIES}
                                     AthAnalysisBaseCompsLib
+				      AsgTools
+  xAODEgamma
+  xAODEventInfo
+  xAODJet
+  xAODMissingET
+  xAODMuon
+  xAODRootAccess
+  PathResolver
+  SUSYToolsLib 
 )
 
 # if you add athena components (tools, algorithms) to this package
