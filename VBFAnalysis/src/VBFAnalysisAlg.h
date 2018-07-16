@@ -2,6 +2,7 @@
 #define VBFANALYSIS_VBFANALYSISALG_H 1
 
 #include "AthAnalysisBaseComps/AthAnalysisAlgorithm.h"
+#include "SUSYTools/SUSYCrossSection.h"
 
 //Example ROOT Includes
 //#include "TTree.h"
@@ -46,6 +47,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool is2016;
   TTree *m_tree = 0;
   TTree *m_tree_out = 0;
+  SUSY::CrossSectionDB *my_XsecDB; 
   //  const TFile outputFile;
   TString m_treeName = "MiniNtuple";
   TString outputFileName = "ntuple";
@@ -62,6 +64,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TString currentSample;
   TString treeNameOut="nominal";
   TString treeTitleOut="nominal";
+
+  Float_t crossSection;
 
   Int_t runNumber;
   Int_t averageIntPerXing;

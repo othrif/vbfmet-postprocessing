@@ -23,15 +23,6 @@ StatusCode VBFAnalysisAlg::initialize() {
   //This is called once, before the start of the event loop
   //Retrieves of tools you have configured in the joboptions go here
   //
-
-  //HERE IS AN EXAMPLE
-  //We will create a histogram and a ttree and register them to the histsvc
-  //Remember to configure the histsvc stream in the joboptions
-  //
-  //m_myHist = new TH1D("myHist","myHist",100,0,100);
-  //CHECK( histSvc()->regHist("/MYSTREAM/myHist", m_myHist) ); //registers histogram to output stream
-  //m_myTree = new TTree("myTree","myTree");
-  //CHECK( histSvc()->regTree("/MYSTREAM/SubDirectory/myTree", m_myTree) ); //registers tree to output stream inside a sub-directory
   
   bool isMC = true;
   currentVariation = "Nominal";
@@ -43,33 +34,25 @@ StatusCode VBFAnalysisAlg::initialize() {
   TString histoName="";
   histoName = "_" + currentSample;
   cout<<"currentVariation.substr(currentVariation.find_first_of(_)+1); "<<currentVariation.substr(currentVariation.find_first_of("_")+1)<<endl;
-  double crossSection;
-  if(isMC)
-    {
-      SUSY::CrossSectionDB *my_XsecDB;
+  //double crossSection;
+  if(isMC){
+    //SUSY::CrossSectionDB *my_XsecDB;
       std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
       xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
       my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
-      crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb                                                                                                                                      
-    }
-
-  else
-    {
+  }//iSMC
+  else  {
       if(runNumber >= 276262 && runNumber <= 284484) is2015 =true;
       else if(runNumber >= 296939 && runNumber <= 311481) is2016 =true;
       else throw std::invalid_argument("runNumber could not be identified with a dataset :o");
-    }
-  //  hist.xshist->SetBinContent(1,crossSection); //in pb
+  }//Not MC 
 
-  m_tree->Clear();
-
-  TFile outputFile(outputFileName);
+  //Create new output TTree
   m_tree_out = new TTree(treeNameOut, treeTitleOut);
-  //  m_tree_out->SetDirectory(outputFile);
-  
   m_tree_out->Branch("met_tst_et", &met_tst_et);
   m_tree_out->Branch("xs", &crossSection);
-
+  //Register the output TTree 
+  CHECK(histSvc()->regTree("/MYSTREAM/nominal",m_tree_out));
   return StatusCode::SUCCESS;
 }
 
@@ -87,9 +70,11 @@ StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG ("Executing " << name() << "...");
   //setFilterPassed(false); //optional: start with algorithm not passed
 
-  
+  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
+  //cout << "runNumber " << runNumber << " xs " << crossSection << endl; 
   m_tree->GetEntry(m_tree->GetReadEntry());
   if (met_tst_et < 150e3) return StatusCode::SUCCESS;
+  m_tree_out->Fill();
   //  if (!(passGRL) || !(trigger_decision)) return StatusCode::SUCCESS;
 
   //
