@@ -25,7 +25,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   virtual StatusCode  initialize();     //once, before any input is loaded
   virtual StatusCode  beginInputFile(); //start of each input file, only metadata loaded
   //virtual StatusCode  firstExecute();   //once, after first eventdata is loaded (not per file)
-  const char* HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst);
+  std::string HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst);
   virtual StatusCode  execute();        //per event
   //virtual StatusCode  endInputFile();   //end of each input file
   //virtual StatusCode  metaDataStop();   //when outputMetaStore is populated by MetaDataTools
@@ -42,7 +42,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
 
 
  private: 
-
+  int npevents = 0;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
@@ -85,7 +85,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Float_t jj_deta;
   Float_t Inv_mass;
   Float_t metjet_CST;
-  Int_t MET_trig;
+  Bool_t MET_trig;
   Float_t met_et;
   Int_t el_n;
   Int_t mu_n;
