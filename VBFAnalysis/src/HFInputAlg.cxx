@@ -40,30 +40,29 @@ StatusCode HFInputAlg::initialize() {
   currentSample = "W_strong";
   cout<< "CURRENT  sample === "<< currentSample<<endl;
 
-  //  hist.xshist->SetBinContent(1,crossSection); //in pb
-
-  m_tree->Clear();
-
-  //  //  TFile outputFile(outputFileName);
-  // m_tree_out = new TTree(treeNameOut, treeTitleOut);
-  //  m_tree_out->SetDirectory(outputFile);
   std::string syst;
   if (currentVariation == "NONE") syst="Nom"; else syst=currentVariation;
   for (int c=1;c<4;c++) {
-    hSR.push_back( new TH1F(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst), ";;", 1, 0.5, 1.5));
-    hCRWep.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEelCR"+to_string(c)+"pos"),to_string(c), syst), ";;", 1, 0.5, 1.5));
-    hCRWen.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEelCR"+to_string(c)+"neg"),to_string(c), syst), ";;", 1, 0.5, 1.5));
-    hCRWmp.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"pos"),to_string(c), syst), ";;", 1, 0.5, 1.5));
-    hCRWmn.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst), ";;", 1, 0.5, 1.5));
-    hCRZee.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOelCR"+to_string(c)),to_string(c), syst), ";;", 1, 0.5, 1.5));
-    hCRZmm.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst), ";;", 1, 0.5, 1.5));
+    hSR.push_back( new TH1F(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst).c_str(), ";;", 1, 0.5, 1.5));
+    hCRWep.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEelCR"+to_string(c)+"pos"),to_string(c), syst).c_str(), ";;", 1, 0.5, 1.5));
+    hCRWen.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEelCR"+to_string(c)+"neg"),to_string(c), syst).c_str(), ";;", 1, 0.5, 1.5));
+    hCRWmp.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"pos"),to_string(c), syst).c_str(), ";;", 1, 0.5, 1.5));
+    hCRWmn.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst).c_str(), ";;", 1, 0.5, 1.5));
+    hCRZee.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOelCR"+to_string(c)),to_string(c), syst).c_str(), ";;", 1, 0.5, 1.5));
+    hCRZmm.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst).c_str(), ";;", 1, 0.5, 1.5));
+    CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst), hSR[c-1]));  
+    CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEelCR"+to_string(c)+"pos"),to_string(c), syst), hCRWep[c-1]));
+    CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEelCR"+to_string(c)+"neg"),to_string(c), syst), hCRWen[c-1]));
+    CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"pos"),to_string(c), syst), hCRWmp[c-1]));
+    CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst), hCRWmn[c-1]));
+    CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("TWOelCR"+to_string(c)),to_string(c), syst), hCRZee[c-1]));
+    CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst), hCRZmm[c-1]));
   }
   return StatusCode::SUCCESS;
 }
-
-const char* HFInputAlg::HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst) {
-  if (bin == "") return ("h"+currentSample+ "_"+syst+"_"+currentCR + "_obs_cuts").c_str();
-  else return ("h"+currentSample+ "_bin"+bin+syst+"_"+currentCR + "_obs_cuts").c_str();
+std::string HFInputAlg::HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst) {
+  if (bin == "") return "h"+currentSample+ "_"+syst+"_"+currentCR + "_obs_cuts";
+  else return "h"+currentSample+ "_bin"+bin+syst+"_"+currentCR + "_obs_cuts";
 }
 
 StatusCode HFInputAlg::finalize() {
@@ -79,6 +78,10 @@ StatusCode HFInputAlg::finalize() {
 StatusCode HFInputAlg::execute() {  
   ATH_MSG_DEBUG ("Executing " << name() << "...");
   setFilterPassed(false); //optional: start with algorithm not passed
+
+  npevents++;
+  if( (npevents%10000) ==0) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
+
   bool SR = false;
   bool CRWep = false;
   bool CRWen = false;
@@ -139,7 +142,6 @@ StatusCode HFInputAlg::execute() {
   //CHECK( evtStore()->retrieve( ei , "EventInfo" ) );
   //ATH_MSG_INFO("eventNumber=" << ei->eventNumber() );
   //m_myHist->Fill( ei->averageInteractionsPerCrossing() ); //fill mu into histogram
-
 
   setFilterPassed(true); //if got here, assume that means algorithm passed
   return StatusCode::SUCCESS;
