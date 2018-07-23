@@ -15,3 +15,9 @@ cd $TestArea/build
 acmSetup
 ```
 
+Run HF Input Maker
+
+```bash
+cd run
+athena VBFAnalysis/HFInputJobOptions.py --evtMax 10 --filesInput ~/eosvbfinv/FinalNtuplesJuly18/VBFHiggsInv_Ztot_bkg_fixednom.root - --currentSamples Z_EWK --currentVariation NONE
+```
