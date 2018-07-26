@@ -51,8 +51,16 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out = new TTree(treeNameOut, treeTitleOut);
   m_tree_out->Branch("met_tst_et", &met_tst_et);
   m_tree_out->Branch("xs", &crossSection);
+  m_tree_out->Branch("weight",&weight); 
   //Register the output TTree 
   CHECK(histSvc()->regTree("/MYSTREAM/nominal",m_tree_out));
+
+  TFile *f = new TFile("f_out_total.root","READ");
+  h_Gen = (TH1F*) f->Get("h_total"); 
+  if(!h_Gen)ATH_MSG_WARNING("Number of events not found"); 
+
+  MapNgen(); //fill std::map with dsid->Ngen 
+
   return StatusCode::SUCCESS;
 }
 
@@ -66,11 +74,25 @@ StatusCode VBFAnalysisAlg::finalize() {
   return StatusCode::SUCCESS;
 }
 
+StatusCode VBFAnalysisAlg::MapNgen(){
+  for(int i=1; i<=h_Gen->GetNbinsX();i++){
+    TString tmp = h_Gen->GetXaxis()->GetBinLabel(i);
+    int dsid = tmp.Atoi(); 
+    float N = h_Gen->GetBinContent(i); 
+    Ngen[dsid]=N; 
+   }
+  
+  return StatusCode::SUCCESS; 
+
+}
+
 StatusCode VBFAnalysisAlg::execute() {  
   ATH_MSG_DEBUG ("Executing " << name() << "...");
   //setFilterPassed(false); //optional: start with algorithm not passed
 
   crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
+  if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
+  else ATH_MSG_WARNING("Ngen " << Ngen[runNumber]); 
   //cout << "runNumber " << runNumber << " xs " << crossSection << endl; 
   m_tree->GetEntry(m_tree->GetReadEntry());
   if (met_tst_et < 150e3) return StatusCode::SUCCESS;

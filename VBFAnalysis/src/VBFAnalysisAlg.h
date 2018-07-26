@@ -11,6 +11,7 @@
 #include "TTree.h"
 #include "TH1D.h"
 #include <vector>
+#include <map> 
 #include <iostream>
 
 using namespace std;
@@ -25,6 +26,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
                                         //IS EXECUTED:
   virtual StatusCode  initialize();     //once, before any input is loaded
   virtual StatusCode  beginInputFile(); //start of each input file, only metadata loaded
+  virtual StatusCode  MapNgen();
   //virtual StatusCode  firstExecute();   //once, after first eventdata is loaded (not per file)
   virtual StatusCode  execute();        //per event
   //virtual StatusCode  endInputFile();   //end of each input file
@@ -51,6 +53,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   //  const TFile outputFile;
   TString m_treeName = "MiniNtuple";
   TString outputFileName = "ntuple";
+
+  TH1F *h_Gen; 
+  std::map<int,float> Ngen; 
+
    //Example algorithm property, see constructor for declaration:
    //int m_nProperty = 0;
 
@@ -66,9 +72,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TString treeTitleOut="nominal";
 
   Float_t crossSection;
+  Float_t weight; 
 
   Int_t runNumber;
-  Int_t averageIntPerXing;
+  Float_t averageIntPerXing;
   Float_t mcEventWeight;
   Float_t puWeight;
   Float_t jvtSFWeight;
