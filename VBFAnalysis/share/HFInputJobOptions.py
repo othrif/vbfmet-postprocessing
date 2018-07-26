@@ -10,6 +10,7 @@ config = JobConfigurationBase("JobOptions")
 arg_group = config.parser.add_argument_group("JobOptions", "Extra arguments specific to HFInputJobOptions")
 arg_group.add_argument("--currentVariation", dest='currentVariation',default="NONE", help="current systematics, default: NONE")
 arg_group.add_argument("--currentSamples",dest='currentSample',default="Z_EWK", help="current sample, default: Z_strong")
+arg_group.add_argument("--isData",action="store_true",dest='isData',default=False, help="isData, default: False")
 # parse the commandline options
 args = config.parse_args()
 
@@ -19,7 +20,8 @@ jps.AthenaCommonFlags.HistOutputs = ["MYSTREAM:"+args.currentSample+args.current
 
 athAlgSeq += CfgMgr.HFInputAlg("HFInputAlg",
                                currentVariation = args.currentVariation,#"NONE",                                
-                               currentSample = args.currentSample);#"Z_strong");  
+                               currentSample = args.currentSample,
+                               isMC = not args.isData);#"Z_strong");  
 
 
 include("AthAnalysisBaseComps/SuppressLogging.py")              #Optional include to suppress as much athena output as possible. Keep at bottom of joboptions so that it doesn't suppress the logging of the things you have configured above

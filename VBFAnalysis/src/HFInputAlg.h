@@ -25,7 +25,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   virtual StatusCode  initialize();     //once, before any input is loaded
   virtual StatusCode  beginInputFile(); //start of each input file, only metadata loaded
   //virtual StatusCode  firstExecute();   //once, after first eventdata is loaded (not per file)
-  std::string HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst);
+  std::string HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst, Bool_t isMC);
   virtual StatusCode  execute();        //per event
   //virtual StatusCode  endInputFile();   //end of each input file
   //virtual StatusCode  metaDataStop();   //when outputMetaStore is populated by MetaDataTools
@@ -43,6 +43,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
 
  private: 
   int npevents = 0;
+  Bool_t isMC = true;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
@@ -58,15 +59,14 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
    //TTree* m_myTree = 0;
 
   //output tree                                                                                                                                                                                                   
-  std::string outputName;
-  std::string currentVariation;
-  std::string currentSample;
-  TString treeNameOut="nominal";
-  TString treeTitleOut="nominal";
+  std::string currentVariation = "NONE";
+  std::string currentSample = "Z_strong";//"W_strong";
 
   vector <TH1F*> hSR;
   vector <TH1F*> hCRWep;
   vector <TH1F*> hCRWen;
+  vector <TH1F*> hCRWepLowSig;
+  vector <TH1F*> hCRWenLowSig;
   vector <TH1F*> hCRWmp;
   vector <TH1F*> hCRWmn;
   vector <TH1F*> hCRZee;
