@@ -57,6 +57,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TH1F *h_Gen; 
   std::map<int,float> Ngen; 
 
+  //Maps for types of Tree things 
+  std::map<TString, int>   tMapInt; 
+  std::map<TString, float> tMapFloat;
+
+
    //Example algorithm property, see constructor for declaration:
    //int m_nProperty = 0;
 

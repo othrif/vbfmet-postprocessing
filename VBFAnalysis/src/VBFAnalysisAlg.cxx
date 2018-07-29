@@ -55,10 +55,6 @@ StatusCode VBFAnalysisAlg::initialize() {
   //Register the output TTree 
   CHECK(histSvc()->regTree("/MYSTREAM/nominal",m_tree_out));
 
-  TFile *f = new TFile("f_out_total.root","READ");
-  h_Gen = (TH1F*) f->Get("h_total"); 
-  if(!h_Gen)ATH_MSG_WARNING("Number of events not found"); 
-
   MapNgen(); //fill std::map with dsid->Ngen 
 
   return StatusCode::SUCCESS;
@@ -75,6 +71,10 @@ StatusCode VBFAnalysisAlg::finalize() {
 }
 
 StatusCode VBFAnalysisAlg::MapNgen(){
+  TFile *f = new TFile("f_out_total.root","READ");
+  h_Gen = (TH1F*) f->Get("h_total");
+  if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
+
   for(int i=1; i<=h_Gen->GetNbinsX();i++){
     TString tmp = h_Gen->GetXaxis()->GetBinLabel(i);
     int dsid = tmp.Atoi(); 
@@ -89,30 +89,15 @@ StatusCode VBFAnalysisAlg::MapNgen(){
 StatusCode VBFAnalysisAlg::execute() {  
   ATH_MSG_DEBUG ("Executing " << name() << "...");
   //setFilterPassed(false); //optional: start with algorithm not passed
+  m_tree->GetEntry(m_tree->GetReadEntry());
 
   crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
   if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
-  else ATH_MSG_WARNING("Ngen " << Ngen[runNumber]); 
-  //cout << "runNumber " << runNumber << " xs " << crossSection << endl; 
-  m_tree->GetEntry(m_tree->GetReadEntry());
+  else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 
+
   if (met_tst_et < 150e3) return StatusCode::SUCCESS;
   m_tree_out->Fill();
   //  if (!(passGRL) || !(trigger_decision)) return StatusCode::SUCCESS;
-
-  //
-  //Your main analysis code goes here
-  //If you will use this algorithm to perform event skimming, you
-  //should ensure the setFilterPassed method is called
-  //If never called, the algorithm is assumed to have 'passed' by default
-  //
-
-
-  //HERE IS AN EXAMPLE
-  //const xAOD::EventInfo* ei = 0;
-  //CHECK( evtStore()->retrieve( ei , "EventInfo" ) );
-  //ATH_MSG_INFO("eventNumber=" << ei->eventNumber() );
-  //m_myHist->Fill( ei->averageInteractionsPerCrossing() ); //fill mu into histogram
-
 
   //setFilterPassed(true); //if got here, assume that means algorithm passed
   return StatusCode::SUCCESS;
