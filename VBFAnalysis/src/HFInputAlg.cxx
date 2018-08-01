@@ -43,15 +43,15 @@ StatusCode HFInputAlg::initialize() {
   if (isMC) {
   if (currentVariation == "NONE") syst="Nom"; else syst=currentVariation;
   for (int c=1;c<4;c++) {
-    hSR.push_back( new TH1F(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-    hCRWep.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"pos"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-    hCRWen.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"neg"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-    hCRWepLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"posLowSig"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-    hCRWenLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"negLowSig"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-    hCRWmp.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"pos"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-    hCRWmn.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-    hCRZee.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOeleCR"+to_string(c)),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-    hCRZmm.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
+    hSR.push_back( new TH1F(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+    hCRWep.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"pos"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"pos"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+    hCRWen.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"neg"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"neg"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+    hCRWepLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"posLowSig"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"posLowSig"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+    hCRWenLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"negLowSig"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"negLowSig"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+    hCRWmp.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"pos"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"pos"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+    hCRWmn.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+    hCRZee.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOeleCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("TWOeleCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+    hCRZmm.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
     CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC), hSR[c-1]));  
     CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"pos"),to_string(c), syst, isMC), hCRWep[c-1]));
     CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"neg"),to_string(c), syst, isMC), hCRWen[c-1]));
@@ -61,17 +61,26 @@ StatusCode HFInputAlg::initialize() {
     CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst, isMC), hCRWmn[c-1]));
     CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("TWOeleCR"+to_string(c)),to_string(c), syst, isMC), hCRZee[c-1]));
     CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst, isMC), hCRZmm[c-1]));
+    hSR[c-1]->GetXaxis()->SetBinLabel(1,("SR"+to_string(c)).c_str());
+    hCRWep[c-1]->GetXaxis()->SetBinLabel(1,("ONEeleCR"+to_string(c)+"pos").c_str());
+    hCRWen[c-1]->GetXaxis()->SetBinLabel(1,("ONEeleCR"+to_string(c)+"neg").c_str());
+    hCRWepLowSig[c-1]->GetXaxis()->SetBinLabel(1,("ONEeleCR"+to_string(c)+"posLowSig").c_str());
+    hCRWenLowSig[c-1]->GetXaxis()->SetBinLabel(1,("ONEeleCR"+to_string(c)+"negLowSig").c_str());
+    hCRWmp[c-1]->GetXaxis()->SetBinLabel(1,("ONEmuCR"+to_string(c)+"pos").c_str());
+    hCRWmn[c-1]->GetXaxis()->SetBinLabel(1,("ONEmuCR"+to_string(c)+"neg").c_str());
+    hCRZee[c-1]->GetXaxis()->SetBinLabel(1,("TWOeleCR"+to_string(c)).c_str());
+    hCRZmm[c-1]->GetXaxis()->SetBinLabel(1,("TWOmuCR"+to_string(c)).c_str());
   }} else {
     for (int c=1;c<4;c++) {
-      hSR.push_back( new TH1F(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-      hCRWep.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"pos"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-      hCRWen.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"neg"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-      hCRWepLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"posLowSig"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-      hCRWenLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"negLowSig"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-      hCRWmp.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"pos"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-      hCRWmn.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-      hCRZee.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOeleCR"+to_string(c)),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
-      hCRZmm.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst, isMC).c_str(), ";;", 1, 0.5, 1.5));
+      hSR.push_back( new TH1F(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+      hCRWep.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"pos"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"pos"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+      hCRWen.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"neg"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"neg"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+      hCRWepLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"posLowSig"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"posLowSig"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+      hCRWenLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"negLowSig"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"negLowSig"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+      hCRWmp.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"pos"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"pos"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+      hCRWmn.push_back(new TH1F(HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+      hCRZee.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOeleCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("TWOeleCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
+      hCRZmm.push_back(new TH1F(HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
       CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC), hSR[c-1]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"pos"),to_string(c), syst, isMC), hCRWep[c-1]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEeleCR"+to_string(c)+"neg"),to_string(c), syst, isMC), hCRWen[c-1]));
@@ -81,6 +90,15 @@ StatusCode HFInputAlg::initialize() {
       CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("ONEmuCR"+to_string(c)+"neg"),to_string(c), syst, isMC), hCRWmn[c-1]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("TWOeleCR"+to_string(c)),to_string(c), syst, isMC), hCRZee[c-1]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("TWOmuCR"+to_string(c)),to_string(c), syst, isMC), hCRZmm[c-1]));
+      hSR[c-1]->GetXaxis()->SetBinLabel(1,("SR"+to_string(c)).c_str());
+      hCRWep[c-1]->GetXaxis()->SetBinLabel(1,("ONEeleCR"+to_string(c)+"pos").c_str());
+      hCRWen[c-1]->GetXaxis()->SetBinLabel(1,("ONEeleCR"+to_string(c)+"neg").c_str());
+      hCRWepLowSig[c-1]->GetXaxis()->SetBinLabel(1,("ONEeleCR"+to_string(c)+"posLowSig").c_str());
+      hCRWenLowSig[c-1]->GetXaxis()->SetBinLabel(1,("ONEeleCR"+to_string(c)+"negLowSig").c_str());
+      hCRWmp[c-1]->GetXaxis()->SetBinLabel(1,("ONEmuCR"+to_string(c)+"pos").c_str());
+      hCRWmn[c-1]->GetXaxis()->SetBinLabel(1,("ONEmuCR"+to_string(c)+"neg").c_str());
+      hCRZee[c-1]->GetXaxis()->SetBinLabel(1,("TWOeleCR"+to_string(c)).c_str());
+      hCRZmm[c-1]->GetXaxis()->SetBinLabel(1,("TWOmuCR"+to_string(c)).c_str());
     }
   }
   return StatusCode::SUCCESS;
@@ -88,7 +106,8 @@ StatusCode HFInputAlg::initialize() {
 std::string HFInputAlg::HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst, Bool_t isMC) {
   if (isMC) {
     if (bin == "") return "h"+currentSample+ "_"+syst+"_"+currentCR + "_obs_cuts";
-    else return "h"+currentSample+ "_bin"+bin+syst+"_"+currentCR + "_obs_cuts";
+    else if (currentSample.find("signal") != std::string::npos) return "h"+currentSample+syst+"_"+currentCR + "_obs_cuts";
+    else return "h"+currentSample+ "_VBFjetSel_bin"+bin+syst+"_"+currentCR + "_obs_cuts";
   } else {
     return "h"+currentSample+ "_NONE_"+currentCR + "_obs_cuts";
   }
