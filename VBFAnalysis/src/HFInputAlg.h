@@ -26,6 +26,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   virtual StatusCode  beginInputFile(); //start of each input file, only metadata loaded
   //virtual StatusCode  firstExecute();   //once, after first eventdata is loaded (not per file)
   std::string HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst, Bool_t isMC);
+  bool replace(std::string& str, const std::string& from, const std::string& to);
   virtual StatusCode  execute();        //per event
   //virtual StatusCode  endInputFile();   //end of each input file
   //virtual StatusCode  metaDataStop();   //when outputMetaStore is populated by MetaDataTools
@@ -44,6 +45,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
  private: 
   int npevents = 0;
   Bool_t isMC = true;
+  Bool_t doLowNom = false; //put nominal yields for "Low" histogram for asymmetric systematics for HistFitter
+  Bool_t isHigh = true;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
