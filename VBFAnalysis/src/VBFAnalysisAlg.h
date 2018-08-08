@@ -45,6 +45,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
 
  private: 
 
+  int npevents = 0;
+  Bool_t isMC = true;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
@@ -77,7 +79,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TString treeTitleOut="nominal";
 
   Float_t crossSection;
-  Float_t weight; 
+  Float_t weight;
+  Float_t w;
+  Float_t met_significance;
+  Int_t trigger_met;
 
   Int_t runNumber;
   Float_t averageIntPerXing;
@@ -88,9 +93,52 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t muSFWeight;
   Float_t elSFTrigWeight;
   Float_t muSFTrigWeight;
-  Int_t passJetClean;
+  Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
+  Int_t trigger_HLT_xe100_mht_L1XE50;
+  Int_t trigger_HLT_xe110_mht_L1XE50;
+  Int_t trigger_HLT_xe90_mht_L1XE50;
+  Int_t trigger_lep;
+  Int_t passGRL;
+  Int_t passPV;
+  Int_t passDetErr;
+  Int_t n_jet;
+  Int_t n_el;
+  Int_t n_mu;
+  Double_t jj_mass;
+  Double_t jj_deta;
+  Double_t jj_dphi;
+  Double_t met_tst_j1_dphi;
+  Double_t met_tst_j2_dphi;
+  Double_t met_tst_nolep_j1_dphi;
+  Double_t met_tst_nolep_j2_dphi;
   Float_t met_tst_et;
+  Float_t met_tst_nolep_et;
+  std::vector<Float_t>* mu_charge;
+  std::vector<Float_t>* mu_pt;
+  std::vector<Float_t>* mu_phi;
+  std::vector<Float_t>* el_charge;
+  std::vector<Float_t>* el_pt;
+  std::vector<Float_t>* el_phi;
+  std::vector<Float_t>* jet_pt;
+  std::vector<Float_t>* jet_phi;
+  std::vector<Float_t>* jet_eta;
+  std::vector<Float_t>* jet_jvt;
+  std::vector<Float_t>* jet_timing;
+  std::vector<Int_t>* jet_passJvt;
+
+  TBranch    *b_mu_charge;
+  TBranch    *b_mu_pt;
+  TBranch    *b_mu_phi;
+  TBranch    *b_el_charge;
+  TBranch    *b_el_pt;
+  TBranch    *b_el_phi;
+  TBranch    *b_jet_pt;
+  TBranch    *b_jet_phi;
+  TBranch    *b_jet_eta;
+  TBranch    *b_jet_jvt;
+  TBranch    *b_jet_timing;
+  TBranch    *b_jet_passJvt;
 }; 
 
 #endif //> !VBFANALYSIS_VBFANALYSISALG_H
