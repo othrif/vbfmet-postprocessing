@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import VBFAnalysis.sample
 
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
@@ -22,14 +23,12 @@ workDir = os.getcwd()+"/"+args.submitDir
 os.system("rm -rf "+workDir)
 os.system("mkdir "+workDir)                
 
-def writeCondorSub(subDir, sys, runNumber,isMC, sample, insample):
+def writeCondorSub(subDir, sys, runNumber,isMC, sample, sampledir):
     if isMC:
-        isData = ""
         mc = "MC"
     else:
-        isData = " --isData"
         mc = ""
-    print 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py - --currentSample '+sample+' --currentVariation '+syst+' --runNumber '+str(runNumber)+isData+' --inputDir '+insample
+    print 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py - --currentVariation '+syst+' --inputDir '+sampledir
     if isMC or sys == "Nominal":
         os.system('''echo "#!/bin/bash" > '''+subDir+'''/VBFAnalysisCondorSub'''+mc+sys+str(runNumber)+'''.sh''')
         os.system("echo 'export HOME=$(pwd)' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
@@ -37,10 +36,10 @@ def writeCondorSub(subDir, sys, runNumber,isMC, sample, insample):
         os.system("echo 'source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
         os.system("echo 'asetup AthAnalysis,21.2.35,here' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
         os.system("echo 'source "+workDir+"/../../build/${CMTCONFIG}/setup.sh' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
-        os.system("echo 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py - --currentSample "+sample+" --currentVariation "+syst+" --runNumber "+str(runNumber)+isData+" --inputDir "+insample+" ' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
+        os.system("echo 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py - --currentVariation "+syst+" --inputDir "+sampledir+" ' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
         os.system("chmod 777 "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
         os.system("echo 'universe                = vanilla' > "+subDir+"/submit_this_python"+mc+sys+str(runNumber)+".sh")
-        os.system("echo 'executable              = "+workDir+"/VBFAnalysisCondorSub"+sys+str(runNumber)+".sh' >> "+subDir+"/submit_this_python"+mc+sys+str(runNumber)+".sh")
+        os.system("echo 'executable              = "+workDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh' >> "+subDir+"/submit_this_python"+mc+sys+str(runNumber)+".sh")
         os.system("echo 'output                  = "+workDir+"/output"+mc+sys+str(runNumber)+"' >> "+subDir+"/submit_this_python"+mc+sys+str(runNumber)+".sh")
         os.system("echo 'error                   = "+workDir+"/error"+mc+sys+str(runNumber)+"' >> "+subDir+"/submit_this_python"+mc+sys+str(runNumber)+".sh") 
         os.system("echo 'log                     = "+workDir+"/log"+mc+sys+str(runNumber)+"' >> "+subDir+"/submit_this_python"+mc+sys+str(runNumber)+".sh") 
@@ -52,77 +51,11 @@ def writeCondorSub(subDir, sys, runNumber,isMC, sample, insample):
     
 
 for syst in systlist:
-    for sample in list_file:
-        samplesplit = sample.split(".")
-        for p,s in enumerate(samplesplit):
-            if s[0]=="v":
-                runNumber = int(samplesplit[p+1]) 
-            
-        if "physics_Main" in samplesplit:
-            isMC = False
-        else:
-            isMC = True
-        if (isMC):
-            if ((runNumber >= 308096 and runNumber <= 308098) or (runNumber == 363359) or (runNumber == 363360) or (runNumber == 363489)):
-                currentSample = "W_EWK"
-            elif (runNumber >= 364156 and runNumber <= 364197):
-                currentSample = "W_strong"
-            elif ((runNumber >= 308092 and runNumber <= 308095) or (runNumber >= 363355 and runNumber <= 363358)):
-                currentSample = "Z_EWK"
-            elif (runNumber >= 364100 and runNumber <= 364155):
-                currentSample = "Z_strong"
-            elif ((runNumber >= 410011 and runNumber <= 410014) or (runNumber == 410025) or (runNumber == 410026) or (runNumber == 410470) or (runNumber == 410471)):
-                currentSample = "ttbar"
-            elif ((runNumber == 308276) or (runNumber == 308567)):
-                currentSample = "VBFH125"
-            elif (runNumber == 308284):
-                currentSample = "ggFH125"
-            elif ((runNumber == 308071) or (runNumber == 308072)):
-                currentSample = "VH125"
-            else:
-                print "runNumber "+str(runNumber)+" could not be identified as a valid MC :o"
-                break
-  #                                                                                                                                                                                                               
-  # Signal:  VBF: 308276,308567, ggF: 308284, VH: 308071,308072                                                                                                                                                   
-  # Diboson: W: 363359-363360, 363489, Z: 363355-363358                                                                                                                                                           
-  # Wenu:    strong 364170-364183, EWK 308096                                                                                                                                                                     
-  # Wmunu:   strong 364156-364169, EWK 308097                                                                                                                                                                     
-  # Wtaunu:  strong 364184-364197, EWK 308098                                                                                                                                                                     
-  # Zee:     strong 364114-364127, EWK 308092                                                                                                                                                                     
-  # Zmumu:   strong 364100-364113, EWK 308093                                                                                                                                                                     
-  # Ztautau: strong 364128-364141, EWK 308094                                                                                                                                                                     
-  # Znunu:   strong 364142-364155, EWK 308095                                                                                                                                                                     
-  # SingleTop: 410011-410014,410025,410026,ttbar:410470,410471                                                                                                                                                    
-  # Other higgs: 308275-308283                                                                                                                                                                                    
-  #                                                                                                                                                                                                               
-        else:
-            currentSample = "data"
-        writeCondorSub(args.submitDir, syst, runNumber, isMC, currentSample, sample)
+    for sampledir in list_file:
+        s=VBFAnalysis.sample.sample(sampledir)
+        currentSample = s.getsampleType()
+        isMC = s.getisMC()
+        runNumber = s.getrunNumber()
+        if isMC or syst == "Nominal":
+            writeCondorSub(args.submitDir, syst, runNumber, isMC, currentSample, sampledir)
 #        print "athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "+sample+" - --currentSample "+currentSample+" --currentVariation "+syst+" --runNumber "+str(runNumber)
-
-# workDir = os.getcwd()+"/"+args.submitDir
-# os.system("rm -rf "+workDir)
-# os.system("mkdir "+workDir)
-# for sys in systlist:
-#     isLow = ""
-#     if "__1down" in sys or "Down" in sys:
-#         isLow = " --isLow"
-#     os.system('''echo "#!/bin/bash" > '''+args.submitDir+'''/VBFAnalysisCondorSub'''+sys+str(runNumber)+'''.sh''')
-#     os.system("echo 'export HOME=$(pwd)' >> "+args.submitDir+"/VBFAnalysisCondorSub"+sys+str(runNumber)+".sh")
-#     os.system("echo 'export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase' >> "+args.submitDir+"/VBFAnalysisCondorSub"+sys+str(runNumber)+".sh")
-#     os.system("echo 'source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet' >> "+args.submitDir+"/VBFAnalysisCondorSub"+sys+str(runNumber)+".sh")
-#     os.system("echo 'asetup AthAnalysis,21.2.35,here' >> "+args.submitDir+"/VBFAnalysisCondorSub"+sys+str(runNumber)+".sh")
-#     os.system("echo 'source "+workDir+"/../../build/${CMTCONFIG}/setup.sh' >> "+args.submitDir+"/VBFAnalysisCondorSub"+sys+str(runNumber)+".sh")
-#     os.system("echo 'python "+workDir+"/../../source/STPostProcessing/VBFAnalysis/scripts/LoopOverHF.py -s "+sys+isLow+"' >> "+args.submitDir+"/VBFAnalysisCondorSub"+sys+str(runNumber)+".sh")
-#     os.system("chmod 777 "+args.submitDir+"/VBFAnalysisCondorSub"+sys+str(runNumber)+".sh")
-#     os.system("echo 'universe                = vanilla' > "+args.submitDir+"/submit_this_python"+sys+str(runNumber)+".sh")
-#     os.system("echo 'executable              = "+workDir+"/VBFAnalysisCondorSub"+sys+".sh' >> "+args.submitDir+"/submit_this_python"+sys+str(runNumber)+".sh")
-#     os.system("echo 'output                  = "+workDir+"/output"+sys+"' >> "+args.submitDir+"/submit_this_python"+sys+str(runNumber)+".sh")
-#     os.system("echo 'error                   = "+workDir+"/error"+sys+"' >> "+args.submitDir+"/submit_this_python"+sys+str(runNumber)+".sh")
-#     os.system("echo 'log                     = "+workDir+"/log"+sys+"' >> "+args.submitDir+"/submit_this_python"+sys+str(runNumber)+".sh")
-#     os.system('''echo "+JobFlavour = 'tomorrow'" >> '''+args.submitDir+'''/submit_this_python'''+sys+str(runNumber)+'''.sh''')
-#     os.system("echo '' >> "+args.submitDir+"/submit_this_python"+sys+str(runNumber)+".sh")
-#     os.system("echo 'queue' >> "+args.submitDir+"/submit_this_python"+sys+str(runNumber)+".sh")
-#     os.system("chmod 777 "+args.submitDir+"/submit_this_python"+sys+str(runNumber)+".sh")
-
-#     os.system("condor_submit "+args.submitDir+"/submit_this_python"+sys+str(runNumber)+".sh")

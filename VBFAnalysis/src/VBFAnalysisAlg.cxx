@@ -135,9 +135,13 @@ StatusCode VBFAnalysisAlg::execute() {
   bool CRZee = false;
   bool CRZmm = false;
 
-  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
-  if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
-  else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 
+  if (m_isMC){
+    crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
+    if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
+    else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 
+  } else {
+    weight = 1;
+  }
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
