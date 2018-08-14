@@ -3,9 +3,11 @@ Algorithms included: VBFAnalysisAlg, HFInputAlg.
 
 In order to run the algorithms all the samples should have the name pattern: user.ANYNAME.vTAG.RUNNUMBER. Data samples should in addition has physics_Main in the name.
 
-The list of systematics is defined in VBFAnalysis/python/systematics.py.
+The list of systematics is defined in VBFAnalysis/python/systematics.py. See VBFAnalysis/scripts/submitHFInputCondor.py as an example of how to use it.
 
-The grouping of samples is based on RUNNUMBER and "physics_Main". It is defined in VBFAnalysis/python/sample.py.
+The grouping of samples is based on RUNNUMBER and "physics_Main". It is defined in VBFAnalysis/python/sample.py. See VBFAnalysis/share/VBFAnalysisAlgJobOptions.py as an example of how to use it.
+
+VBFAnalysis/python/job_configurations package allows users to add user defined flags to athena job options. See VBFAnalysis/share/HFInputJobOptions.py as an example of how to use it.
 
 
 ## First time setup ##
