@@ -28,7 +28,7 @@ def writeCondorSub(subDir, sys, runNumber,isMC, sample, sampledir):
         mc = "MC"
     else:
         mc = ""
-    print 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py - --currentVariation '+syst+' --inputDir '+sampledir
+    print 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput '+sampledir+' - --currentVariation '+syst
     if isMC or sys == "Nominal":
         os.system('''echo "#!/bin/bash" > '''+subDir+'''/VBFAnalysisCondorSub'''+mc+sys+str(runNumber)+'''.sh''')
         os.system("echo 'export HOME=$(pwd)' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
@@ -36,7 +36,7 @@ def writeCondorSub(subDir, sys, runNumber,isMC, sample, sampledir):
         os.system("echo 'source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
         os.system("echo 'asetup AthAnalysis,21.2.35,here' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
         os.system("echo 'source "+workDir+"/../../build/${CMTCONFIG}/setup.sh' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
-        os.system("echo 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py - --currentVariation "+syst+" --inputDir "+sampledir+" ' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
+        os.system("echo 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "+sampledir+" - --currentVariation "+syst+"' >> "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
         os.system("chmod 777 "+subDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh")
         os.system("echo 'universe                = vanilla' > "+subDir+"/submit_this_python"+mc+sys+str(runNumber)+".sh")
         os.system("echo 'executable              = "+workDir+"/VBFAnalysisCondorSub"+mc+sys+str(runNumber)+".sh' >> "+subDir+"/submit_this_python"+mc+sys+str(runNumber)+".sh")
@@ -57,5 +57,5 @@ for syst in systlist:
         isMC = s.getisMC()
         runNumber = s.getrunNumber()
         if isMC or syst == "Nominal":
-            writeCondorSub(args.submitDir, syst, runNumber, isMC, currentSample, sampledir)
+            writeCondorSub(args.submitDir, syst, runNumber, isMC, currentSample, sampledir+"/*")
 #        print "athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "+sample+" - --currentSample "+currentSample+" --currentVariation "+syst+" --runNumber "+str(runNumber)
