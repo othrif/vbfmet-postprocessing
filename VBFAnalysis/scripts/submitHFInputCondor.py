@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import VBFAnalysis.systematics
 
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
@@ -11,12 +12,17 @@ parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", defau
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/FinalNtuplesJuly18", help = "dir for input file")
 args, unknown = parser.parse_known_args()
 
-if args.nominal:
-    systlist = ["NONE"]
-else:
-    systlist = ["NONE", "EG_RESOLUTION_ALL__1down", "EG_RESOLUTION_ALL__1up", "EG_SCALE_ALL__1down", "EG_SCALE_ALL__1up", "EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down",  "EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1up", "JET_EtaIntercalibration_NonClosure__1down", "JET_EtaIntercalibration_NonClosure__1up", "JET_BJES_Response__1up",   "JET_BJES_Response__1down",   "JET_EffectiveNP_Detector1__1up",   "JET_EffectiveNP_Detector1__1down",   "JET_EffectiveNP_Detector2__1up",   "JET_EffectiveNP_Detector2__1down",   "JET_EffectiveNP_Mixed1__1up",   "JET_EffectiveNP_Mixed1__1down",   "JET_EffectiveNP_Mixed2__1up",   "JET_EffectiveNP_Mixed2__1down",   "JET_EffectiveNP_Mixed3__1up",   "JET_EffectiveNP_Mixed3__1down",   "JET_EffectiveNP_Modelling1__1up",   "JET_EffectiveNP_Modelling1__1down",   "JET_EffectiveNP_Modelling2__1up",   "JET_EffectiveNP_Modelling2__1down",   "JET_EffectiveNP_Modelling3__1up",   "JET_EffectiveNP_Modelling3__1down",   "JET_EffectiveNP_Modelling4__1up",   "JET_EffectiveNP_Modelling4__1down",   "JET_EffectiveNP_Statistical1__1up",   "JET_EffectiveNP_Statistical1__1down",   "JET_EffectiveNP_Statistical2__1up",   "JET_EffectiveNP_Statistical2__1down",   "JET_EffectiveNP_Statistical3__1up",   "JET_EffectiveNP_Statistical3__1down",   "JET_EffectiveNP_Statistical4__1up",   "JET_EffectiveNP_Statistical4__1down",   "JET_EffectiveNP_Statistical5__1up",   "JET_EffectiveNP_Statistical5__1down",   "JET_EffectiveNP_Statistical6__1up",   "JET_EffectiveNP_Statistical6__1down",   "JET_EffectiveNP_Statistical7__1up",   "JET_EffectiveNP_Statistical7__1down",   "JET_EtaIntercalibration_Modelling__1up",   "JET_EtaIntercalibration_Modelling__1down", "JET_EtaIntercalibration_TotalStat__1up",   "JET_EtaIntercalibration_TotalStat__1down",   "JET_Flavor_Composition__1up",   "JET_Flavor_Composition__1down",   "JET_Flavor_Response__1up",   "JET_Flavor_Response__1down", "JET_Pileup_OffsetMu__1up",   "JET_Pileup_OffsetMu__1down",   "JET_Pileup_OffsetNPV__1up",   "JET_Pileup_OffsetNPV__1down",   "JET_Pileup_PtTerm__1up",   "JET_Pileup_PtTerm__1down",   "JET_Pileup_RhoTopology__1up",   "JET_Pileup_RhoTopology__1down",   "JET_PunchThrough_MC15__1up",   "JET_PunchThrough_MC15__1down",   "JET_SingleParticle_HighPt__1up",   "JET_SingleParticle_HighPt__1down", "JET_JER_SINGLE_NP__1up", "JET_JvtEfficiency__1down", "JET_JvtEfficiency__1up", "MUON_EFF_STAT__1down", "MUON_EFF_STAT__1up", "MUON_EFF_SYS__1down", "MUON_EFF_SYS__1up", "MUON_EFF_TrigStatUncertainty__1down", "MUON_EFF_TrigStatUncertainty__1up", "MUON_EFF_TrigSystUncertainty__1down", "MUON_EFF_TrigSystUncertainty__1up", "MUON_ID__1down", "MUON_ID__1up", "MUON_ISO_STAT__1down", "MUON_ISO_STAT__1up", "MUON_ISO_SYS__1down", "MUON_ISO_SYS__1up", "MUON_MS__1down", "MUON_MS__1up", "MUON_SAGITTA_RESBIAS__1down", "MUON_SAGITTA_RESBIAS__1up", "MUON_SAGITTA_RHO__1down", "MUON_SAGITTA_RHO__1up", "MUON_SCALE__1down", "MUON_SCALE__1up", "MUON_TTVA_STAT__1down", "MUON_TTVA_STAT__1up", "MUON_TTVA_SYS__1down", "MUON_TTVA_SYS__1up", "PRW_DATASF__1down", "PRW_DATASF__1up", "MET_SoftTrk_ResoPara", "MET_SoftTrk_ResoPerp", "MET_SoftTrk_ScaleDown", "MET_SoftTrk_ScaleUp"]
 
-asy_systlist = ["JET_JER_SINGLE_NP__1up", "MET_SoftTrk_ResoPara", "MET_SoftTrk_ResoPerp"]
+### Load systematics list from VBFAnalysis/python/systematics.py ###
+if args.nominal:
+    sys = VBFAnalysis.systematics.systematics("Nominal")
+else:
+    sys = VBFAnalysis.systematics.systematics("All")
+systlist = sys.getsystematicsList()
+print systlist
+
+asys = VBFAnalysis.systematics.systematics("Asym")
+asy_systlist = asys.getsystematicsList()
 
 workDir = os.getcwd()+"/"+args.submitDir
 os.system("rm -rf "+workDir)
