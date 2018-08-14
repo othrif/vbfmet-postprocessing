@@ -32,7 +32,6 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   //virtual StatusCode  endInputFile();   //end of each input file
   //virtual StatusCode  metaDataStop();   //when outputMetaStore is populated by MetaDataTools
   virtual StatusCode  finalize();       //once, after all events processed
-  
 
   ///Other useful methods provided by base class are:
   ///evtStore()        : ServiceHandle to main event data storegate
@@ -46,7 +45,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
  private: 
 
   int npevents = 0;
-  Bool_t isMC = true;
+  Bool_t m_isMC = true;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
@@ -73,10 +72,12 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
 
   //output tree                                                                                                                                                                                                   
   std::string outputName;
-  std::string currentVariation;
-  TString currentSample;
-  TString treeNameOut="nominal";
-  TString treeTitleOut="nominal";
+  std::string m_currentVariation;
+  std::string m_currentSample;
+  Int_t m_runNumberInput;
+  std::string treeNameOut="nominal";
+  std::string treeTitleOut="nominal";
+  std::string m_mcCampaign;
 
   Float_t crossSection;
   Float_t weight;

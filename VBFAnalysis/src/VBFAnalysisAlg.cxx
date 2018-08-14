@@ -8,9 +8,11 @@
 
 
 VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ){
-
-  //declareProperty( "Property", m_nProperty = 0, "My Example Integer Property" ); //example property declaration
-
+  declareProperty( "currentSample", m_currentSample = "W_strong", "current sample");
+  declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
+  declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
+  declareProperty( "currentVariation", m_currentVariation = "Nominal", "current sytematics of the tree" );
+  declareProperty( "mcCampaign", m_mcCampaign = "mc16a", "mcCampaign of the mc sample. only read if isMC is true" );
 }
 
 
@@ -24,33 +26,32 @@ StatusCode VBFAnalysisAlg::initialize() {
   //Retrieves of tools you have configured in the joboptions go here
   //
   
-  bool isMC = true;
-  currentVariation = "Nominal";
-  cout<<"NAME of input tree in intialize ======="<<currentVariation<<endl;
+  cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   //  cout<<"NAME of output before ======="<<newtree->GetName()<<endl;
+  cout<< "CURRENT  sample === "<< m_currentSample<<endl;
 
-
-  currentSample = "ttbar";
-  cout<< "CURRENT  sample === "<< currentSample<<endl;
-
-  TString histoName="";
-  histoName = "_" + currentSample;
-  cout<<"currentVariation.substr(currentVariation.find_first_of(_)+1); "<<currentVariation.substr(currentVariation.find_first_of("_")+1)<<endl;
   //double crossSection;
-  if(isMC){
+  if(m_isMC){
     //SUSY::CrossSectionDB *my_XsecDB;
-      std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
-      xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
-      my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
-  }//iSMC
-  else  {
-      if(runNumber >= 276262 && runNumber <= 284484) is2015 =true;
-      else if(runNumber >= 296939 && runNumber <= 311481) is2016 =true;
-      else throw std::invalid_argument("runNumber could not be identified with a dataset :o");
-  }//Not MC 
+    std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+    xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
+    my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
+    // if( (runNumber == 308567 || runNumber == 308276 ) ){
+    //   if(truthHiggs_pt->size() > 0) w_VBFhiggs =  -0.000342 * truthHiggs_pt->at(0)/GeV - 0.0708;
+    // }else {
+    //   w_VBFhiggs =1.;
+    // }
+  }
+  //    if(runNumber >= 276262 && runNumber <= 284484) is2015 =true;
+  //    else if(runNumber >= 296939 && runNumber <= 311481) is2016 =true;
+  //    else throw std::invalid_argument("runNumber could not be identified with a dataset :o");
+
   //Create new output TTree
-  m_tree_out = new TTree(treeNameOut, treeTitleOut);
+  treeTitleOut = m_currentSample+m_currentVariation;
+  treeNameOut = m_currentSample+m_currentVariation;
+  m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w); 
+  m_tree_out->Branch("runNumber",&runNumber);
   m_tree_out->Branch("trigger_met", &trigger_met);
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
@@ -78,9 +79,13 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("jet_eta",&jet_eta);
 
   //Register the output TTree 
-  CHECK(histSvc()->regTree("/MYSTREAM/nominal",m_tree_out));
+  CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
   MapNgen(); //fill std::map with dsid->Ngen 
   ATH_MSG_DEBUG ("Done Initializing");
+  
+  std::ostringstream runNumberss;
+  runNumberss << runNumber;
+  outputName = m_currentSample+m_currentVariation+runNumberss.str();
   return StatusCode::SUCCESS;
 }
 
@@ -95,7 +100,7 @@ StatusCode VBFAnalysisAlg::finalize() {
 }
 
 StatusCode VBFAnalysisAlg::MapNgen(){
-  TFile *f = new TFile("f_out_total.root","READ");
+  TFile *f = new TFile("/eos/user/r/rzou/v04/f_out_total.root","READ");
   h_Gen = (TH1F*) f->Get("h_total");
   if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
 
@@ -115,6 +120,8 @@ StatusCode VBFAnalysisAlg::execute() {
   //setFilterPassed(false); //optional: start with algorithm not passed
   m_tree->GetEntry(m_tree->GetReadEntry());
 
+  if (runNumber != m_runNumberInput) ATH_MSG_ERROR("VBFAnaysisAlg::execute: runNumber " << runNumber << " != m_runNumberInput " << m_runNumberInput);
+
   npevents++;
   if( (npevents%10000) ==0) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
 
@@ -132,27 +139,41 @@ StatusCode VBFAnalysisAlg::execute() {
   if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
   else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 
 
-  if ((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1)) return StatusCode::SUCCESS;
+  if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
+  ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (!(n_jet == 2)) return StatusCode::SUCCESS;
-  if (!(n_jet == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet=" <<n_jet << " jet_pt->size(): " << jet_pt->size());
-  if (!(n_jet == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet=" <<n_jet << " jet_eta->size(): " << jet_eta->size());
+  ATH_MSG_DEBUG ("n_jet = 2!");
+  if (!(n_jet == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
+  if (!(n_jet == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
   if (!((jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > 4.8) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > 1e6))) return StatusCode::SUCCESS;
+  ATH_MSG_DEBUG ("Pass VBF cuts!");
   if (trigger_HLT_xe100_mht_L1XE50 == 1 || trigger_HLT_xe110_mht_L1XE50 == 1 || trigger_HLT_xe90_mht_L1XE50 == 1) trigger_met = 1; else trigger_met = 0;
+  ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt(sqrt(el_pt->at(0)*el_pt->at(0)*cos(el_phi->at(0))*cos(el_phi->at(0))+el_pt->at(0)*el_pt->at(0)*sin(el_phi->at(0))*sin(el_phi->at(0))+jet_pt->at(0)*jet_pt->at(0)*sin(jet_phi->at(0))*sin(jet_phi->at(0))+jet_pt->at(0)*jet_pt->at(0)*cos(jet_phi->at(0))*cos(jet_phi->at(0))+jet_pt->at(1)*jet_pt->at(1)*sin(jet_phi->at(1))*sin(jet_phi->at(1))+jet_pt->at(1)*jet_pt->at(1)*cos(jet_phi->at(1))*cos(jet_phi->at(1)))/1000);
   } else {
     met_significance = 0;
   }
-
+  ATH_MSG_DEBUG ("met_significance calculated");
+  
   if ((trigger_met == 1) & (met_tst_et > 180e3) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0) & (el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0) & (el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0) & (el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0) & (el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1) & (mu_charge->at(0) > 0)) CRWmp = true;
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1) & (mu_charge->at(0) < 0)) CRWmn = true;
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0) & (el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2) & (mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;
+  if (SR) ATH_MSG_DEBUG ("It's SR!"); else ATH_MSG_DEBUG ("It's NOT SR");
+  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
+  if (CRWep) ATH_MSG_DEBUG ("It's CRWep!"); else ATH_MSG_DEBUG ("It's NOT CRWep");
+  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
+  if (CRWen) ATH_MSG_DEBUG ("It's CRWen!"); else ATH_MSG_DEBUG ("It's NOT CRWen");
+  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
+  if (CRWepLowSig) ATH_MSG_DEBUG ("It's CRWepLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWepLowSig");
+  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
+  if (CRWenLowSig) ATH_MSG_DEBUG ("It's CRWenLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWenLowSig");
+  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
+  if (CRWmp) ATH_MSG_DEBUG ("It's CRWmp!"); else ATH_MSG_DEBUG ("It's NOT CRWmp");
+  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
+  if (CRWmn) ATH_MSG_DEBUG ("It's CRWmn!"); else ATH_MSG_DEBUG ("It's NOT CRWmn");
+  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
+  if (CRZee) ATH_MSG_DEBUG ("It's CRZee!"); else ATH_MSG_DEBUG ("It's NOT CRZee");
+  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
+  if (CRZmm) ATH_MSG_DEBUG ("It's CRZmm!"); else ATH_MSG_DEBUG ("It's NOT CRZmm");
 
   w = weight*mcEventWeight*puWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight;
 
@@ -222,6 +243,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("el_phi",1);
   m_tree->SetBranchStatus("jet_pt",1);
   m_tree->SetBranchStatus("jet_phi",1);
+  m_tree->SetBranchStatus("jet_eta",1);
   m_tree->SetBranchStatus("jet_jvt",1);
   m_tree->SetBranchStatus("jet_timing",1);
   m_tree->SetBranchStatus("jet_passJvt",1);
