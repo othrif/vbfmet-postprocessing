@@ -21,7 +21,8 @@ jps.AthenaCommonFlags.TreeName = "MiniNtuple"
 
 from glob import glob
 jps.AthenaCommonFlags.FilesInput = glob(vars().get("input", "/eos/user/r/rzou/v04/user.othrif.v04.364106.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CVetoBVeto.e5271_s3126_r9364_r9315_p3575_MiniNtuple.root/*"))
-#print str(jps.AthenaCommonFlags.FilesInput)
+
+### Build sample from FilesInput and read its properties ###
 inputDir = str(jps.AthenaCommonFlags.FilesInput)
 s=VBFAnalysis.sample.sample(inputDir)
 currentSample = s.getsampleType()

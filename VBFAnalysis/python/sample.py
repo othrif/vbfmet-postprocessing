@@ -3,6 +3,7 @@ class sample(object):
         self.sampleType=""
         self.isMC=False
         self.runNumber=0
+        self.runNumberS=""
         self.load(samplename)
 
     def load(self,samplename):
@@ -10,7 +11,7 @@ class sample(object):
         for p,s in enumerate(samplesplit):
             if s[0]=="v":
                 self.runNumber = int(samplesplit[p+1])
-
+                self.runNumberS = samplesplit[p+1]
         if "physics_Main" in samplesplit:
             self.isMC = False
         else:
@@ -44,9 +45,13 @@ class sample(object):
         return self.sampleType
     def getrunNumber(self):
         return self.runNumber
+    def getrunNumberS(self):
+        return self.runNumberS
 
 
 
+
+  # we assume the samplename has the format user.**.v**.runNumber.
   #                                                                                                                                                                                                               
   # Signal:  VBF: 308276,308567, ggF: 308284, VH: 308071,308072                                                                                                                                                   
   # Diboson: W: 363359-363360, 363489, Z: 363355-363358                                                                                                                                                           
