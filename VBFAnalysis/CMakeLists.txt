@@ -53,6 +53,7 @@ atlas_add_component( VBFAnalysis src/components/*.cxx
 # Install python modules, joboptions, and share content
 atlas_install_python_modules( python/*.py )
 atlas_install_python_modules( python/*/*.py )
+atlas_install_scripts( scripts/*.py )
 atlas_install_joboptions( share/*.py )
 atlas_install_data( data/* )
 # You can access your data from code using path resolver, e.g.
