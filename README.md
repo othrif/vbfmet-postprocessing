@@ -23,7 +23,7 @@ cd run
 # run locally on 10 events over a file
 athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/user/r/rzou/v04/user.othrif.v04.364162.Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV140_280_CVetoBVeto.e5340_s3126_r9364_r9315_p3575_MiniNtuple.root/user.othrif.14790250._000001.MiniNtuple.root - --currentVariation Nominal
 # run locally over a dir
-athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --evtMax 10 - --currentVariation Nominal --inputDir /eos/user/r/rzou/v04/user.othrif.v04.364106.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CVetoBVeto.e5271_s3126_r9364_r9315_p3575_MiniNtuple.root/
+athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/user/r/rzou/v04/user.othrif.v04.364106.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CVetoBVeto.e5271_s3126_r9364_r9315_p3575_MiniNtuple.root/* - --currentVariation Nominal
 ```
 For running on condor:
 ```bash
