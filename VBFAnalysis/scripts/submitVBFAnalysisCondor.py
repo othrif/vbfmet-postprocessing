@@ -29,14 +29,14 @@ os.system("rm -rf "+workDir)
 os.system("mkdir "+workDir)                
 
 def writeCondorShell(subDir, syst, sampledir):
-    print 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput '+sampledir+' - --currentVariation '+syst
+    print "athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput '"+sampledir+"' - --currentVariation "+syst
     os.system('''echo "#!/bin/bash" > '''+subDir+'''/VBFAnalysisCondorSub'''+syst+'''.sh''')
     os.system("echo 'export HOME=$(pwd)' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
     os.system("echo 'export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
     os.system("echo 'source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
     os.system("echo 'asetup AthAnalysis,21.2.35,here' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
     os.system("echo 'source "+buildDir+"/${CMTCONFIG}/setup.sh' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
-    os.system("echo 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "+sampledir+" - --currentVariation "+syst+"' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
+    os.system('''echo 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "'''+sampledir+'''" - --currentVariation '''+syst+'''' >> '''+subDir+'''/VBFAnalysisCondorSub'''+syst+'''.sh''')
     os.system("chmod 777 "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
 
 def writeCondorSub(workDir, syst):
@@ -52,7 +52,8 @@ def writeCondorSub(workDir, syst):
     else:
         os.system("echo 'queue arguments from '"+listofrunNMC+" >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("chmod 777 "+workDir+"/submit_this_python"+syst+".sh")
-    os.system("condor_submit "+workDir+"/submit_this_python"+syst+".sh")
+    os.system("cd "+workDir)
+    os.system("condor_submit submit_this_python"+syst+".sh")
 
 listofrunN = workDir+"/filelist"
 listofrunNMC = workDir+"/filelistMC"
@@ -72,12 +73,12 @@ for sampledir in list_file:
         if s[0]=="v":
             samplePattern+="."+s
             foundV = True
-        if not(foundV):
-            print "ERROR: samples have different names than assumed!"
-            break
-        if (samplePatternGlobal != samplePattern) and (samplePatternGlobal != ""):
-            print "ERROR: samples have different patterns!"
-            break
+    if not(foundV):
+        print "ERROR: samples have different names than assumed!"
+        break
+    if (samplePatternGlobal != samplePattern) and (samplePatternGlobal != ""):
+        print "ERROR: samples have different patterns!"
+        break
     samplePatternGlobal = samplePattern
 f.close()
 fMC.close()
