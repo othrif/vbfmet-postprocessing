@@ -15,6 +15,13 @@ cd $TestArea/build
 acmSetup
 ```
 
+## General Description ##
+Algorithms included: VBFAnalysisAlg, HFInputAlg.
+In order to run the algorithms all the samples should have the name pattern: user.ANYNAME.vTAG.RUNNUMBER. Data samples should in addition has physics_Main in the name.
+The list of systematics is defined in VBFAnalysis/python/systematics.py.
+The grouping of samples is based on RUNNUMBER and "physics_Main". It is defined in VBFAnalysis/python/sample.py.
+
+
 ## Run VBFAnalysisAlg ##
 This generates the micro ntuples.
 For running locally with athena:
