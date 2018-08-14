@@ -12,7 +12,6 @@ jps.AthenaCommonFlags.EvtMax =vars().get("nEvents", -1)                         
 config = JobConfigurationBase("JobOptions")
 arg_group = config.parser.add_argument_group("JobOptions", "Extra arguments specific to VBFAnalysisAlgJobOptions")
 arg_group.add_argument("--currentVariation", dest='currentVariation', default="Nominal", help="current systematics, default: Nominal")
-arg_group.add_argument("--inputDir", dest='inputDir', default="/eos/user/r/rzou/v04/user.othrif.v04.364106.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CVetoBVeto.e5271_s3126_r9364_r9315_p3575_MiniNtuple.root", help="inputDir")
 # parse the commandline options
 
 args = config.parse_args()
@@ -21,12 +20,10 @@ args = config.parse_args()
 jps.AthenaCommonFlags.TreeName = "MiniNtuple" 
 
 from glob import glob
-print glob(args.inputDir+'/*.root*')
-INPUT = glob(args.inputDir+'/*.root*')
-jps.AthenaCommonFlags.FilesInput = INPUT #[vars().get("input", INPUT)]
-
-        
-s=VBFAnalysis.sample.sample(args.inputDir)
+jps.AthenaCommonFlags.FilesInput = glob(vars().get("input", "/eos/user/r/rzou/v04/user.othrif.v04.364106.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CVetoBVeto.e5271_s3126_r9364_r9315_p3575_MiniNtuple.root/*"))
+#print str(jps.AthenaCommonFlags.FilesInput)
+inputDir = str(jps.AthenaCommonFlags.FilesInput)
+s=VBFAnalysis.sample.sample(inputDir)
 currentSample = s.getsampleType()
 isMC = s.getisMC()
 runNumber = s.getrunNumber()
