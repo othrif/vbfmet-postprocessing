@@ -52,8 +52,7 @@ def writeCondorSub(workDir, syst):
     else:
         os.system("echo 'queue arguments from '"+listofrunNMC+" >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("chmod 777 "+workDir+"/submit_this_python"+syst+".sh")
-    os.system("cd "+workDir)
-    os.system("condor_submit submit_this_python"+syst+".sh")
+    os.system("condor_submit "+workDir+"/submit_this_python"+syst+".sh")
 
 listofrunN = workDir+"/filelist"
 listofrunNMC = workDir+"/filelistMC"
