@@ -1,0 +1,4 @@
+include = include
+cxxflags = -g
+cxxflags = -DROOTCORE
+lib = libHInvPlot

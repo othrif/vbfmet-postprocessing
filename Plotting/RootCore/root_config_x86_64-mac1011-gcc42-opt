@@ -1,0 +1,10 @@
+ROOTSYS = /Users/schae/root_6_04
+PLATFORM = macosx
+CXX = clang++
+CXXFLAGS = -O2 -pipe -Wall -W -Woverloaded-virtual -pthread -stdlib=libc++ -std=c++11 -m64 -I/Users/schae/root_6_04/include
+CXXFLAGS_NOOPT = -pipe -Wall -W -Woverloaded-virtual -pthread -stdlib=libc++ -std=c++11 -m64 -I/Users/schae/root_6_04/include
+SOFLAGS = -dynamiclib -single_module -install_name /Users/schae/testarea/SUSY/
+LD = clang++
+LDFLAGS = -mmacosx-version-min=10.11 -m64
+ROOTLIBS = -L/Users/schae/root_6_04/lib -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lpthread -stdlib=libc++ -lm -ldl
+ROOT_VERSION =
