@@ -6,7 +6,8 @@ rc find_packages
 rc compile
 
 # place the ntuples into a line separated text file
-ls /eos/user/r/rzou/v04/merged/* &> input.txt
+#ls /eos/user/r/rzou/v04/merged/* &> input.txt
+ls /afs/cern.ch/user/r/rzou/workspace/public/STPostProcessing/run/newmicro/microtuples/* &> input.txt
 
 # NOTE: data is not blinded in this setup. So comment it out in the input file.
 
