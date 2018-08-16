@@ -149,7 +149,7 @@ def getZCRCuts(cut = '', basic_cuts=None, ignore_met=False):
     return GetCuts(cuts)
 
 #-------------------------------------------------------------------------
-def getWCRCuts(cut = '', basic_cuts=None, ignore_met=False):
+def getWCRCuts(cut = '', basic_cuts=None, ignore_met=False, do_met_signif=False):
 
     cuts = []
 
@@ -165,7 +165,8 @@ def getWCRCuts(cut = '', basic_cuts=None, ignore_met=False):
         return GetCuts(cuts)    
     if not ignore_met:
         cuts += [CutItem('CutMet',  'met_tst_nolep_et > 180.0')]
-
+    if do_met_signif:
+        cuts += [CutItem('CutMetSignif','met_significance > 4.0')]
     cuts += [CutItem('CutDPhijj',   'jj_dphi < 1.8')]        
     cuts += [CutItem('CutDPhiMetj0','met_tst_nolep_j1_dphi > 1.0')]        
     cuts += [CutItem('CutDPhiMetj1','met_tst_nolep_j2_dphi > 1.0')]        
@@ -302,11 +303,11 @@ def preparePassEventForZCR(alg_name, options, basic_cuts, cut='BASIC'):
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
 
 #-------------------------------------------------------------------------
-def preparePassEventForWCR(alg_name, options, basic_cuts, cut='BASIC'):
+def preparePassEventForWCR(alg_name, options, basic_cuts, cut='BASIC', do_met_signif=False):
 
     reg  = ROOT.Msl.Registry()
 
-    cuts = getWCRCuts(cut, basic_cuts, ignore_met=options.ignore_met)
+    cuts = getWCRCuts(cut, basic_cuts, ignore_met=options.ignore_met, do_met_signif=do_met_signif)
 
     #
     # Fill Registry with cuts and samples for cut-flow
