@@ -91,11 +91,15 @@ def prepareSeqWCR(basic_cuts, region, alg_take=None):
 
     selkey = basic_cuts.GetSelKey()
     region = 'wcr'
+
+    do_met_signif=False
+    if basic_cuts.chan in ['ep','em','e']:
+        do_met_signif=True
     
     if basic_cuts.chan in ['ee','uu','ll','nn'] or not passRegion(region):
         return ('', [])
     
-    pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s' %(region, selkey), options, basic_cuts, cut=options.cut)
+    pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s' %(region, selkey), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region)
 
     # return normal plotting

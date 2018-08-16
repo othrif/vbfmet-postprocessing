@@ -1,4 +1,3 @@
-
 // Local
 #include "HInvPlot/Registry.h"
 #include "HInvPlot/VarEvent.h"
@@ -27,6 +26,8 @@ std::string Msl::Mva::Convert2Str(Var var)
     case met_tst_et:	          return "met_tst_et";
     case met_tst_phi:	          return "met_tst_phi";
     case met_tst_nolep_et:	  return "met_tst_nolep_et";
+    case met_tst_nolep_phi:	  return "met_tst_nolep_phi";
+    case met_significance:	  return "met_significance";
     case n_jet:	                  return "n_jet";
     case n_el:	                  return "n_el";
     case n_mu:	                  return "n_mu";
@@ -71,6 +72,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "met_tst_et")    return met_tst_et;
   if(var == "met_tst_phi")    return met_tst_phi;  
   if(var == "met_tst_nolep_et")  return met_tst_nolep_et;
+  if(var == "met_tst_nolep_phi")  return met_tst_nolep_phi;
+  if(var == "met_significance")  return met_significance;
   if(var == "n_jet")             return n_jet;
   if(var == "n_el")              return n_el;
   if(var == "n_mu")              return n_mu;
@@ -106,7 +109,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(unsigned long int key)
   //
   // Find matching enum by value
   //
-  const vector<Var>::const_iterator vit = std::find(vars.begin(), vars.end(), Convert2Var(key));
+  //const vector<Var>::const_iterator vit = std::find(vars.begin(), vars.end(), Convert2Var(key));
+  const vector<Var>::const_iterator vit = std::find(vars.begin(), vars.end(), key);
   
   if(vit != vars.end()) {
     return *vit;
@@ -201,7 +205,9 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     
     vars.push_back(met_tst_et);
     vars.push_back(met_tst_phi);
-    vars.push_back(met_tst_nolep_et);    
+    vars.push_back(met_tst_nolep_et);
+    vars.push_back(met_tst_nolep_phi);
+    vars.push_back(met_significance);
     vars.push_back(n_jet);    
     vars.push_back(n_el);    
     vars.push_back(n_mu);    

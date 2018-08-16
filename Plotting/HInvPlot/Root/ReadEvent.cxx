@@ -64,6 +64,7 @@ Msl::ReadEvent::~ReadEvent()
 void Msl::ReadEvent::Conf(const Registry &reg)
 {
   evt_map.clear();
+
   //
   // Read configuration
   //
@@ -464,7 +465,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Clear event
     //
     event->Clear();
-
+    
     // read in tree
     rtree->GetEntry(i);
 
@@ -472,9 +473,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     for(unsigned a=0; a<fVarVec.size(); ++a){
       event->AddVar(fVarVec.at(a).var, fVarVec.at(a).GetVal());
     }
+
     event->RunNumber = fRunNumber;
     event->isMC = isMC;
-
     // identify the sample
     if(!isMC){
       event->sample = Mva::kData;
@@ -495,8 +496,6 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	event->sample = fCurrSample;
       }
     }
-
-
     // Fill Electrons
     for(unsigned iEle=0; iEle<el_pt->size(); ++iEle){
       RecParticle new_ele;
@@ -536,7 +535,6 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if(event->HasVar(Mva::met_tst_phi))
       event->met.SetPtEtaPhiM(event->GetVar(Mva::met_tst_et),0.0,event->GetVar(Mva::met_tst_phi),0.0);
     
-
     // Fill remaining variables
     FillEvent(*event);
 
@@ -545,6 +543,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }
 
     ++fCountEvents;
+
     //
     // Process sub-algorithms
     //
@@ -633,8 +632,8 @@ void Msl::ReadEvent::FillEvent(Event &event)
   if(event.electrons.size()>0){
     event.AddVar(Mva::lepPt0,  event.electrons.at(0).pt);
     event.AddVar(Mva::lepCh0,  event.electrons.at(0).GetVar(Mva::charge));
-    TLorentzVector W = event.electrons.at(0).GetLVec()+event.met;
-    event.AddVar(Mva::mt, W.M());    
+    double MT = sqrt(2. * event.electrons.at(0).pt * event.met.Pt() * (1. - cos(event.electrons.at(0).phi - event.met.Phi())));
+    event.AddVar(Mva::mt, MT);    
   }
   if(event.electrons.size()>1){
     event.AddVar(Mva::lepPt1,  event.electrons.at(1).pt);
@@ -647,8 +646,8 @@ void Msl::ReadEvent::FillEvent(Event &event)
   if(event.muons.size()>0){
     event.AddVar(Mva::lepPt0,  event.muons.at(0).pt);
     event.AddVar(Mva::lepCh0,  event.muons.at(0).GetVar(Mva::charge));
-    TLorentzVector W = event.muons.at(0).GetLVec()+event.met;
-    event.AddVar(Mva::mt, W.M());    
+    double MT = sqrt(2. * event.muons.at(0).pt * event.met.Pt() * (1. - cos(event.muons.at(0).phi - event.met.Phi())));
+    event.AddVar(Mva::mt, MT);  
   }
   if(event.muons.size()>1){
     event.AddVar(Mva::lepPt1, event.muons.at(1).pt);
@@ -680,9 +679,10 @@ void Msl::ReadEvent::ProcessAlgs(Event &top_event, Event &alg_event)
   //
   // Print debug info
   //
-  if(fDebug) {
+  //if(fDebug) {
     top_event.Print();
-  }
+    //}
+
   //
   // Run top common algorithm(s)
   //
