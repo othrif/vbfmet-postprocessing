@@ -2,7 +2,7 @@
 #define MSL_PLOTEVENT_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : PlotEvent
  * @Author : Doug Schaefer
  *

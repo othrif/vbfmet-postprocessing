@@ -2,7 +2,7 @@
 #define MSL_VARHOLDER_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : VarHolder
  * @Author : Rustem Ospanov
  *

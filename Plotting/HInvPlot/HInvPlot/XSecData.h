@@ -2,7 +2,7 @@
 #define MSL_XSecData_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : XSecData
  * @Author : Doug Schaefer
  *

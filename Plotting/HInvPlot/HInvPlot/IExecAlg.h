@@ -2,7 +2,7 @@
 #define MSL_IEXECALG_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : IExecAlg
  * @Author : Rustem Ospanov
  *

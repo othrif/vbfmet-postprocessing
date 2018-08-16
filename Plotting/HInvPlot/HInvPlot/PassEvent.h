@@ -2,7 +2,7 @@
 #define MSL_PASSEVENT_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : PassEvent
  * @Author : Rustem Ospanov
  *
