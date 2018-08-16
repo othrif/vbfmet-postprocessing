@@ -2,7 +2,7 @@
 #define MSL_READEVENT_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : ReadEvent
  * @Author : Doug Schaefer
  *

@@ -2,7 +2,7 @@
 #define MSL_SAMPLE_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : Sample
  * @Author : Rustem Ospanov, Doug Schaefer
  *

@@ -2,7 +2,7 @@
 #define MSL_CUTITEM_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : CutItem
  * @Author : Rustem Ospanov
  *

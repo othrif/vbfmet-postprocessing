@@ -2,7 +2,7 @@
 #define MSL_VARSTORE_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : VarStore
  * @Author : Rustem Ospanov
  *

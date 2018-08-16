@@ -2,7 +2,7 @@
 #define MSL_REGISTRY_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : Registry
  * @Author : Rustem Ospanov
  *

@@ -2,7 +2,7 @@
 #define MSL_VAREVENT_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Author : Rustem Ospanov, Doug Schaefer
  *
  * @Brief  :

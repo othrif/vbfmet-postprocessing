@@ -4,7 +4,6 @@
 // Data
 #include "HInvPlot/Event.h"
 #include "HInvPlot/RecParticle.h"
-//#include "HInvPlot/Monojet2LepCutflow.h"
 #include "HInvPlot/Registry.h"
 #include "HInvPlot/VarHolder.h"
 #include "HInvPlot/VarEvent.h"
@@ -16,15 +15,13 @@
 
 // Algorithms inheriting from IExecAlg
 #include "HInvPlot/IExecAlg.h"
-//#include "MonojetSoftLepton/FillEvent.h"
-//#include "MonojetSoftLepton/SetSysWeight.h"
 #include "HInvPlot/PassEvent.h"
 #include "HInvPlot/PlotEvent.h"
 
 // Limit setting code
-//#include "MonojetSoftLepton/Systematics.h"
-//#include "MonojetSoftLepton/Liklihood.h"
-//#include "MonojetSoftLepton/ReadLimit.h"
+//#include "HInvPlot/Systematics.h"
+//#include "HInvPlot/Liklihood.h"
+//#include "HInvPlot/ReadLimit.h"
 
 #ifndef __CINT__
 

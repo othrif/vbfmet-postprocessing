@@ -2,7 +2,7 @@
 #define MSL_CUTPOLL_H
 
 /**********************************************************************************
- * @Package: MonojetSoftLepton
+ * @Package: HInvPlot
  * @Class  : CutPoll
  * @Author : Rustem Ospanov
  *
