@@ -1,4 +1,3 @@
-
 // Local
 #include "HInvPlot/Registry.h"
 #include "HInvPlot/VarEvent.h"
@@ -106,7 +105,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(unsigned long int key)
   //
   // Find matching enum by value
   //
-  const vector<Var>::const_iterator vit = std::find(vars.begin(), vars.end(), Convert2Var(key));
+  //const vector<Var>::const_iterator vit = std::find(vars.begin(), vars.end(), Convert2Var(key));
+  const vector<Var>::const_iterator vit = std::find(vars.begin(), vars.end(), key);
   
   if(vit != vars.end()) {
     return *vit;

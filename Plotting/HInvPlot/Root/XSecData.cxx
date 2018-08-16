@@ -1,4 +1,3 @@
-// C/C++
 #include <set>
 #include <math.h>
 #include <cstdlib>

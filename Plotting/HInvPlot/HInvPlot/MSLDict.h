@@ -40,8 +40,8 @@ namespace Msl
 {
   template void Registry::Set<int>        (const std::string &, const int &);
   template void Registry::Set<double>     (const std::string &, const double &);
-  template void Registry::Set<std::string>(const std::string &, const std::string &);
-  template void Registry::Set<Registry>   (const std::string &, const Registry &);
+  //template void Registry::Set<std::string>(const std::string &, const std::string &);
+  //template void Registry::Set<Registry>   (const std::string &, const Registry &);
 }
 
 #endif
