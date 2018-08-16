@@ -1,0 +1,7 @@
+workareaRelative = ..
+rootcoredir = RootCore
+rootcoreobj = RootCore/obj
+rootcoreconf = generic
+CXXFLAGS = 
+LDFLAGS = 
+use_pedantic = 1
