@@ -25,9 +25,10 @@ s=VBFAnalysis.sample.sample(inputDir)
 currentSample = s.getsampleType()
 isMC = s.getisMC()
 runNumber = s.getrunNumber()
+subfileN = s.getsubfileN()
 
 print inputDir, " ", currentSample, " ", str(runNumber)
-jps.AthenaCommonFlags.HistOutputs = ["MYSTREAM:"+currentSample+args.currentVariation+str(runNumber)+".root"]  #optional, register output files like this. MYSTREAM is used in the code
+jps.AthenaCommonFlags.HistOutputs = ["MYSTREAM:"+currentSample+args.currentVariation+str(runNumber)+subfileN+".root"]  #optional, register output files like this. MYSTREAM is used in the code
 
 athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                currentVariation = args.currentVariation,
@@ -35,4 +36,4 @@ athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                isMC = isMC,
                                runNumberInput = runNumber);
 
-#include("AthAnalysisBaseComps/SuppressLogging.py") #optional line
+include("AthAnalysisBaseComps/SuppressLogging.py") #optional line
