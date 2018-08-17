@@ -47,15 +47,19 @@ submitVBFAnalysisCondor.py -l list
 # run on condor over a list of files for all sys with log files saved to a specific dir
 submitVBFAnalysisCondor.py -l list -d dir
 ```
-You can change the list of systematics in VBFAnalysis/scripts/submitVBFAnalysisCondor.py.
+You can change the list of systematics in VBFAnalysis/python/systematics.py.
+To merge the samples, in the dir where microtuples live do:
+```bash
+mergeVBFAnalysisAlg.sh
+```
 
 
 ## Run HF Input Maker ##
-This generates histograms for HistFitter to read from. It currently reads from Merged Ntuples for 2nd circulation of 36.1 fb-1 paper.
+This generates histograms for HistFitter to read from. It reads from the microtuples produced by VBFAnalysisAlg.
 ```bash
 cd run
-# run locally over 10 events for Z_EWK contribution nominal
-athena VBFAnalysis/HFInputJobOptions.py --evtMax 10 --filesInput /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/FinalNtuplesJuly18/VBFHiggsInv_Ztot_bkg_fixednom.root - --currentSamples Z_EWK --currentVariation NONE
+# run locally over 10 events for nominal
+athena VBFAnalysis/HFInputJobOptions.py --evtMax 10 --filesInput /eos/user/r/rzou/v04/microtuples/Z_strongNominal364100_000001.root - --currentVariation Nominal
 ```
 For running on condor:
 ```bash
@@ -64,4 +68,4 @@ submitHFInputCondor.py -n
 # run on condor over all the contributions and systematics 
 submitHFInputCondor.py
 ```
-You can change the list of systematics in VBFAnalysis/scripts/submitHFInputCondor.py and list of contributions in VBFAnalysis/scripts/LoopOverHF.py (this can be improved).
+You can change the list of systematics in VBFAnalysis/python/systematics.py and list of contributions in VBFAnalysis/python/sample.py.
