@@ -2,9 +2,11 @@
 
 import os
 import sys
+import subprocess
 import argparse
 import VBFAnalysis.sample
 import VBFAnalysis.systematics
+from VBFAnalysis.buildCondorScript import *
 
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
@@ -28,32 +30,6 @@ buildDir = workDir[:workDir.find("/run/")]+"/build"
 os.system("rm -rf "+workDir)
 os.system("mkdir "+workDir)                
 
-def writeCondorShell(subDir, syst, sampledir):
-    print "athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput '"+sampledir+"' - --currentVariation "+syst
-    os.system('''echo "#!/bin/bash" > '''+subDir+'''/VBFAnalysisCondorSub'''+syst+'''.sh''')
-    os.system("echo 'export HOME=$(pwd)' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
-    os.system("echo 'export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
-    os.system("echo 'source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
-    os.system("echo 'asetup AthAnalysis,21.2.35,here' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
-    os.system("echo 'source "+buildDir+"/${CMTCONFIG}/setup.sh' >> "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
-    os.system('''echo 'athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "'''+sampledir+'''" - --currentVariation '''+syst+'''' >> '''+subDir+'''/VBFAnalysisCondorSub'''+syst+'''.sh''')
-    os.system("chmod 777 "+subDir+"/VBFAnalysisCondorSub"+syst+".sh")
-
-def writeCondorSub(workDir, syst):
-    os.system("echo 'universe                = vanilla' > "+workDir+"/submit_this_python"+syst+".sh")
-    os.system("echo 'executable              = "+workDir+"/VBFAnalysisCondorSub"+syst+".sh' >> "+workDir+"/submit_this_python"+syst+".sh")
-    os.system("echo 'output                  = "+workDir+"/output$(ClusterId).$(ProcId)' >> "+workDir+"/submit_this_python"+syst+".sh")
-    os.system("echo 'error                   = "+workDir+"/error$(ClusterId).$(ProcId)' >> "+workDir+"/submit_this_python"+syst+".sh")
-    os.system("echo 'log                     = "+workDir+"/log$(ClusterId)' >> "+workDir+"/submit_this_python"+syst+".sh")
-    os.system('''echo "+JobFlavour = 'tomorrow'" >> '''+workDir+'''/submit_this_python'''+syst+'''.sh''')
-    os.system("echo '' >> "+workDir+"/submit_this_python"+syst+".sh")
-    if syst == "Nominal":
-        os.system("echo 'queue arguments from '"+listofrunN+" >> "+workDir+"/submit_this_python"+syst+".sh")
-    else:
-        os.system("echo 'queue arguments from '"+listofrunNMC+" >> "+workDir+"/submit_this_python"+syst+".sh")
-    os.system("chmod 777 "+workDir+"/submit_this_python"+syst+".sh")
-    os.system("condor_submit "+workDir+"/submit_this_python"+syst+".sh")
-
 listofrunN = workDir+"/filelist"
 listofrunNMC = workDir+"/filelistMC"
 f = open(listofrunN, 'w')
@@ -63,9 +39,12 @@ for sampledir in list_file:
     s=VBFAnalysis.sample.sample(sampledir)
     isMC = s.getisMC()
     runNumberS = s.getrunNumberS()
-    f.write(runNumberS+"\n")
-    if isMC:
-        fMC.write(runNumberS+"\n")
+    p = subprocess.Popen("ls "+sampledir.strip()+"*/*root", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in p.stdout.readlines():
+        filepath = line.strip()
+        f.write(filepath[filepath.find(runNumberS):]+"\n")
+        if isMC:
+            fMC.write(filepath[filepath.find(runNumberS):]+"\n")
     samplePattern = sampledir[:sampledir.find(".v")]
     foundV = False
     for p,s in enumerate(sampledir.split(".")):
@@ -83,5 +62,7 @@ f.close()
 fMC.close()
 
 for syst in systlist:
-    writeCondorShell(workDir, syst, samplePatternGlobal+".$1.*/*")
-    writeCondorSub(workDir, syst)
+    runCommand = '''athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "'''+samplePatternGlobal+'''.$1" - --currentVariation '''+syst
+    writeCondorShell(workDir, buildDir, runCommand, syst, "VBFAnalysisCondorSub") #writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="VBFAnalysisCondorSub")
+    print listofrunN
+    writeCondorSub(workDir, syst, "VBFAnalysisCondorSub", listofrunN, listofrunNMC)

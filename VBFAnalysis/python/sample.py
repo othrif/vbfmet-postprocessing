@@ -1,21 +1,41 @@
 class sample(object):
-    def __init__(self,samplename):
+    def __init__(self,samplename="",syst=""):
         self.sampleType=""
+        self.sampleTypeList= []
         self.isMC=False
         self.runNumber=0
         self.runNumberS=""
-        self.load(samplename)
+        self.subfileN=""
+        self.load(samplename,syst)
 
-    def load(self,samplename):
-        samplesplit = samplename.split(".")
-        for p,s in enumerate(samplesplit):
-            if s[0]=="v":
-                self.runNumber = int(samplesplit[p+1])
-                self.runNumberS = samplesplit[p+1]
-        if "physics_Main" in samplesplit:
-            self.isMC = False
+    def load(self,samplename,syst):
+        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK","Z_strong","ttbar","VBFH125","ggFH125","VH125","data"]
+        if samplename == "":
+            return
+        if syst == "":
+            samplesplit = samplename.split(".")
+            for p,s in enumerate(samplesplit):
+                if s[0]=="v":
+                    self.runNumber = int(samplesplit[p+1])
+                    self.runNumberS = samplesplit[p+1]
+            if "MiniNtuple.root/user" in samplename:
+                self.subfileN = samplename.split(".")[-3]
+            if "physics_Main" in samplesplit:
+                self.isMC = False
+            else:
+                self.isMC = True
         else:
-            self.isMC = True
+            samplesplit = samplename.split("_")
+            for p,s in enumerate(samplesplit):
+                if syst in s:
+                    self.runNumber = int(s[s.find(syst)+len(syst):])
+                    self.runNumberS = s[s.find(syst)+len(syst):]
+            if self.runNumberS+"_" in samplename:
+                self.subfileN = samplename.split("_")[-1][:samplename.split("_")[-1].find(".root")]
+            if "/data" in samplename:
+                self.isMC = False
+            else:
+                self.isMC = True
         if (self.isMC):
             if ((self.runNumber >= 308096 and self.runNumber <= 308098) or (self.runNumber == 363359) or (self.runNumber == 363360) or (self.runNumber == 363489)):
                 self.sampleType = "W_EWK"
@@ -47,8 +67,10 @@ class sample(object):
         return self.runNumber
     def getrunNumberS(self):
         return self.runNumberS
-
-
+    def getsubfileN(self):
+        return self.subfileN
+    def getsampleTypeList(self):
+        return self.sampleTypeList
 
 
   # we assume the samplename has the format user.**.v**.runNumber.

@@ -62,7 +62,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
    //TTree* m_myTree = 0;
 
   //output tree                                                                                                                                                                                                   
-  std::string currentVariation = "NONE";
+  std::string currentVariation = "Nominal";
   std::string currentSample = "Z_strong";//"W_strong";
 
   vector <TH1F*> hSR;
@@ -74,72 +74,40 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   vector <TH1F*> hCRWmn;
   vector <TH1F*> hCRZee;
   vector <TH1F*> hCRZmm;
-  
-  Float_t w;
-  Int_t pass_JetCleaning_tight;
-  Int_t jet_n;
-  Float_t j1_pt;
-  Float_t j2_pt;
-  Float_t deltaPhi_j1_met;
-  Float_t deltaPhi_j2_met;
-  Float_t jj_dphi;
-  Float_t j1_eta;
-  Float_t j2_eta;
-  Float_t jj_deta;
-  Float_t Inv_mass;
-  Float_t metjet_CST;
-  Bool_t MET_trig;
-  Float_t met_et;
-  Int_t el_n;
-  Int_t mu_n;
-  Float_t el1_pt;
-  Float_t el2_pt;
-  Float_t mu1_pt;
-  Float_t mu2_pt;
-  Float_t el1_charge;
-  Float_t el2_charge;
-  Float_t mu1_charge;
-  Float_t mu2_charge;
-  Int_t elTrig;
-  Float_t lepmet_et;
-  Float_t met_significance;
-  Int_t muTrig;
-  Float_t deltaPhi_j1_lepmet;
-  Float_t deltaPhi_j2_lepmet;
-  Float_t Zll_m;
 
-  /* TBranch *b_w; */
-  /* TBranch *b_pass_JetCleaning_tight; */
-  /* TBranch *b_jet_n; */
-  /* TBranch *b_j1_pt; */
-  /* TBranch *b_j2_pt; */
-  /* TBranch *b_deltaPhi_j1_met; */
-  /* TBranch *b_deltaPhi_j2_met; */
-  /* TBranch *b_jj_dphi; */
-  /* TBranch *b_j1_eta; */
-  /* TBranch *b_j2_eta; */
-  /* TBranch *b_jj_deta; */
-  /* TBranch *b_Inv_mass; */
-  /* TBranch *b_metjet_CST; */
-  /* TBranch *b_MET_trig; */
-  /* TBranch *b_met_et; */
-  /* TBranch *b_el_n; */
-  /* TBranch *b_mu_n; */
-  /* TBranch *b_el1_pt; */
-  /* TBranch *b_el2_pt; */
-  /* TBranch *b_mu1_pt; */
-  /* TBranch *b_mu2_pt; */
-  /* TBranch *b_el1_charge; */
-  /* TBranch *b_el2_charge; */
-  /* TBranch *b_mu1_charge; */
-  /* TBranch *b_mu2_charge; */
-  /* TBranch *b_elTrig; */
-  /* TBranch *b_lepmet_et; */
-  /* TBranch *b_met_significance; */
-  /* TBranch *b_muTrig; */
-  /* TBranch *b_deltaPhi_j1_lepmet; */
-  /* TBranch *b_deltaPhi_j2_lepmet; */
-  /* TBranch *b_Zll_m; */
+  Float_t met_significance;
+  Int_t trigger_met;
+  Float_t w;
+  Int_t runNumber;
+  Int_t passJetCleanLoose;
+  Int_t passJetCleanTight;
+  Int_t trigger_lep;
+  Int_t n_jet;
+  Int_t n_el;
+  Int_t n_mu;
+  Double_t jj_mass;
+  Double_t jj_deta;
+  Double_t jj_dphi;
+  Double_t met_tst_j1_dphi;
+  Double_t met_tst_j2_dphi;
+  Double_t met_tst_nolep_j1_dphi;
+  Double_t met_tst_nolep_j2_dphi;
+  Float_t met_tst_et;
+  Float_t met_tst_nolep_et;
+  std::vector<Int_t>* mu_charge;
+  std::vector<Float_t>* mu_pt;
+  std::vector<Float_t>* mu_phi;
+  std::vector<Float_t>* mu_eta;
+  std::vector<Int_t>* el_charge;
+  std::vector<Float_t>* el_pt;
+  std::vector<Float_t>* el_phi;
+  std::vector<Float_t>* el_eta;
+  std::vector<Float_t>* jet_pt;
+  std::vector<Float_t>* jet_phi;
+  std::vector<Float_t>* jet_eta;
+  std::vector<Float_t>* jet_jvt;
+  std::vector<Float_t>* jet_timing;
+  std::vector<Int_t>* jet_passJvt;
 }; 
 
 #endif //> !VBFANALYSIS_HFINPUTALG_H
