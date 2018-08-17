@@ -1,0 +1,30 @@
+<lcgdict>
+
+<function name="Msl::Mva::GetAllVarNames"/>
+<function name="Msl::Mva::GetAllVarEnums"/>
+
+<class name="Msl::ReadEvent"/>
+<class name="Msl::Event"/>
+<class name="Msl::RecParticle"/>
+
+<class name="Msl::IExecAlg"/>
+<class name="Msl::Registry"/>
+<class name="Msl::VarEntry"/>
+<class name="Msl::VarHolder"/>
+
+<class name="Msl::SelectZjetFF"/>
+<class name="Msl::MakeLDPairs"/>
+<class name="Msl::WriteNtuple"/>
+<class name="Msl::SkimSusyNt"/>
+<class name="Msl::PassEvent"/>
+<class name="Msl::PlotEvent"/>
+<class name="Msl::PlotZFF"/>
+<class name="Msl::PlotFFClosure"/>
+<class name="Msl::PlotIsoSF"/>
+
+<class name="std::vector<Msl::IExecAlg *>"/>
+
+<class name="std::vector<Msl::VarEntry>"/>
+<class name="std::vector<Msl::VarHolder>"/>
+
+</lcgdict>
