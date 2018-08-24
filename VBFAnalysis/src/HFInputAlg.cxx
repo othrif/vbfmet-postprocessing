@@ -174,51 +174,53 @@ StatusCode HFInputAlg::execute() {
   if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
   if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
 
+  Float_t w_final = 1;
   Float_t lumi = 36.1;
+  if (isMC) w_final = w*1000*lumi;
   if (SR){
-    if (jj_mass < 1.5e6) hSR[0]->Fill(1,w*1000*lumi);
-    else if (jj_mass < 2e6) hSR[1]->Fill(1,w*1000*lumi);
-    else hSR[2]->Fill(1,w*1000*lumi);
+    if (jj_mass < 1.5e6) hSR[0]->Fill(1,w_final);
+    else if (jj_mass < 2e6) hSR[1]->Fill(1,w_final);
+    else hSR[2]->Fill(1,w_final);
   }
   if (CRWep){
-    if (jj_mass < 1.5e6) hCRWep[0]->Fill(1,w*1000*lumi);
-    else if (jj_mass < 2e6) hCRWep[1]->Fill(1,w*1000*lumi);
-    else hCRWep[2]->Fill(1,w*1000*lumi);
+    if (jj_mass < 1.5e6) hCRWep[0]->Fill(1,w_final);
+    else if (jj_mass < 2e6) hCRWep[1]->Fill(1,w_final);
+    else hCRWep[2]->Fill(1,w_final);
   }
   if (CRWen){
-    if (jj_mass < 1.5e6) hCRWen[0]->Fill(1,w*1000*lumi);
-    else if (jj_mass < 2e6) hCRWen[1]->Fill(1,w*1000*lumi);
-    else hCRWen[2]->Fill(1,w*1000*lumi);
+    if (jj_mass < 1.5e6) hCRWen[0]->Fill(1,w_final);
+    else if (jj_mass < 2e6) hCRWen[1]->Fill(1,w_final);
+    else hCRWen[2]->Fill(1,w_final);
   }
   if (CRWepLowSig){
-    if (jj_mass < 1.5e6) hCRWepLowSig[0]->Fill(1,w*1000*lumi);
-    else if (jj_mass < 2e6) hCRWepLowSig[1]->Fill(1,w*1000*lumi);
-    else hCRWepLowSig[2]->Fill(1,w*1000*lumi);
+    if (jj_mass < 1.5e6) hCRWepLowSig[0]->Fill(1,w_final);
+    else if (jj_mass < 2e6) hCRWepLowSig[1]->Fill(1,w_final);
+    else hCRWepLowSig[2]->Fill(1,w_final);
   }
   if (CRWenLowSig){
-    if (jj_mass < 1.5e6) hCRWenLowSig[0]->Fill(1,w*1000*lumi);
-    else if (jj_mass < 2e6) hCRWenLowSig[1]->Fill(1,w*1000*lumi);
-    else hCRWenLowSig[2]->Fill(1,w*1000*lumi);
+    if (jj_mass < 1.5e6) hCRWenLowSig[0]->Fill(1,w_final);
+    else if (jj_mass < 2e6) hCRWenLowSig[1]->Fill(1,w_final);
+    else hCRWenLowSig[2]->Fill(1,w_final);
   }
   if (CRWmp){
-    if (jj_mass < 1.5e6) hCRWmp[0]->Fill(1,w*1000*lumi);
-    else if (jj_mass < 2e6) hCRWmp[1]->Fill(1,w*1000*lumi);
-    else hCRWmp[2]->Fill(1,w*1000*lumi);
+    if (jj_mass < 1.5e6) hCRWmp[0]->Fill(1,w_final);
+    else if (jj_mass < 2e6) hCRWmp[1]->Fill(1,w_final);
+    else hCRWmp[2]->Fill(1,w_final);
   }
   if (CRWmn){
-    if (jj_mass < 1.5e6) hCRWmn[0]->Fill(1,w*1000*lumi);
-    else if (jj_mass < 2e6) hCRWmn[1]->Fill(1,w*1000*lumi);
-    else hCRWmn[2]->Fill(1,w*1000*lumi);
+    if (jj_mass < 1.5e6) hCRWmn[0]->Fill(1,w_final);
+    else if (jj_mass < 2e6) hCRWmn[1]->Fill(1,w_final);
+    else hCRWmn[2]->Fill(1,w_final);
   }
   if (CRZee){
-    if (jj_mass < 1.5e6) hCRZee[0]->Fill(1,w*1000*lumi);
-    else if (jj_mass < 2e6) hCRZee[1]->Fill(1,w*1000*lumi);
-    else hCRZee[2]->Fill(1,w*1000*lumi);
+    if (jj_mass < 1.5e6) hCRZee[0]->Fill(1,w_final);
+    else if (jj_mass < 2e6) hCRZee[1]->Fill(1,w_final);
+    else hCRZee[2]->Fill(1,w_final);
   }
   if (CRZmm){
-    if (jj_mass < 1.5e6) hCRZmm[0]->Fill(1,w*1000*lumi);
-    else if (jj_mass < 2e6) hCRZmm[1]->Fill(1,w*1000*lumi);
-    else hCRZmm[2]->Fill(1,w*1000*lumi);
+    if (jj_mass < 1.5e6) hCRZmm[0]->Fill(1,w_final);
+    else if (jj_mass < 2e6) hCRZmm[1]->Fill(1,w_final);
+    else hCRZmm[2]->Fill(1,w_final);
   }
 
 

@@ -86,6 +86,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t trigger_met;
 
   Int_t runNumber;
+  ULong64_t eventNumber;
   Float_t averageIntPerXing;
   Float_t mcEventWeight;
   Float_t puWeight;
@@ -115,12 +116,16 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Double_t met_tst_nolep_j2_dphi;
   Float_t met_tst_et;
   Float_t met_tst_nolep_et;
+  Float_t met_tst_phi;
+  Float_t met_tst_nolep_phi;
   std::vector<Float_t>* mu_charge;
   std::vector<Float_t>* mu_pt;
   std::vector<Float_t>* mu_phi;
   std::vector<Float_t>* el_charge;
   std::vector<Float_t>* el_pt;
   std::vector<Float_t>* el_phi;
+  std::vector<Float_t>* mu_eta;
+  std::vector<Float_t>* el_eta;
   std::vector<Float_t>* jet_pt;
   std::vector<Float_t>* jet_phi;
   std::vector<Float_t>* jet_eta;
