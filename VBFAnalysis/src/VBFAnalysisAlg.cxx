@@ -52,6 +52,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w); 
   m_tree_out->Branch("runNumber",&runNumber);
+  m_tree_out->Branch("eventNumber",&eventNumber);
   m_tree_out->Branch("trigger_met", &trigger_met);
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
@@ -67,6 +68,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);
   m_tree_out->Branch("met_tst_et",&met_tst_et);
   m_tree_out->Branch("met_tst_nolep_et",&met_tst_nolep_et);
+  m_tree_out->Branch("met_tst_phi",&met_tst_phi);
+  m_tree_out->Branch("met_tst_nolep_phi",&met_tst_nolep_phi);
   m_tree_out->Branch("mu_charge",&mu_charge);
   m_tree_out->Branch("mu_pt",&mu_pt);
   m_tree_out->Branch("el_charge",&el_charge);
@@ -75,9 +78,12 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("jet_timing",&jet_timing);
   m_tree_out->Branch("mu_phi",&mu_phi);
   m_tree_out->Branch("el_phi",&el_phi);
+  m_tree_out->Branch("mu_eta",&mu_eta);    
+  m_tree_out->Branch("el_eta",&el_eta); 
   m_tree_out->Branch("jet_phi",&jet_phi);
   m_tree_out->Branch("jet_eta",&jet_eta);
-
+  m_tree_out->Branch("met_significance",&met_significance);
+  
   //Register the output TTree 
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
   MapNgen(); //fill std::map with dsid->Ngen 
@@ -139,6 +145,7 @@ StatusCode VBFAnalysisAlg::execute() {
     crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
     if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
     else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 
+    ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
   } else {
     weight = 1;
   }
@@ -180,7 +187,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if (CRZmm) ATH_MSG_DEBUG ("It's CRZmm!"); else ATH_MSG_DEBUG ("It's NOT CRZmm");
 
   w = weight*mcEventWeight*puWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight;
-
+  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm)) return StatusCode::SUCCESS;
 
@@ -239,12 +246,16 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("met_tst_nolep_j2_dphi",1);
   m_tree->SetBranchStatus("met_tst_et",1);
   m_tree->SetBranchStatus("met_tst_nolep_et",1);
+  m_tree->SetBranchStatus("met_tst_phi",1);
+  m_tree->SetBranchStatus("met_tst_nolep_phi",1);
   m_tree->SetBranchStatus("mu_charge",1);
   m_tree->SetBranchStatus("mu_pt",1);
   m_tree->SetBranchStatus("mu_phi",1);
+  m_tree->SetBranchStatus("mu_eta",1);
   m_tree->SetBranchStatus("el_charge",1);
   m_tree->SetBranchStatus("el_pt",1);
   m_tree->SetBranchStatus("el_phi",1);
+  m_tree->SetBranchStatus("el_eta",1);
   m_tree->SetBranchStatus("jet_pt",1);
   m_tree->SetBranchStatus("jet_phi",1);
   m_tree->SetBranchStatus("jet_eta",1);
@@ -253,6 +264,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_passJvt",1);
 
   m_tree->SetBranchAddress("runNumber", &runNumber);
+  m_tree->SetBranchAddress("eventNumber", &eventNumber);
   m_tree->SetBranchAddress("mcEventWeight", &mcEventWeight);
   m_tree->SetBranchAddress("puWeight", &puWeight);
   m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);
@@ -281,13 +293,16 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);
   m_tree->SetBranchAddress("met_tst_et",&met_tst_et);
   m_tree->SetBranchAddress("met_tst_nolep_et",&met_tst_nolep_et);
-
+  m_tree->SetBranchAddress("met_tst_phi",&met_tst_phi);
+  m_tree->SetBranchAddress("met_tst_nolep_phi",&met_tst_nolep_phi);
   m_tree->SetBranchAddress("mu_charge",&mu_charge);//, &b_mu_charge);
   m_tree->SetBranchAddress("mu_pt",&mu_pt);//, &b_mu_pt);
   m_tree->SetBranchAddress("mu_phi",&mu_phi);//, &b_mu_phi);
   m_tree->SetBranchAddress("el_charge",&el_charge);
   m_tree->SetBranchAddress("el_pt",&el_pt);
   m_tree->SetBranchAddress("el_phi",&el_phi);
+  m_tree->SetBranchAddress("mu_eta",&mu_eta);
+  m_tree->SetBranchAddress("el_eta",&el_eta);
   m_tree->SetBranchAddress("jet_pt",&jet_pt);
   m_tree->SetBranchAddress("jet_phi",&jet_phi);
   m_tree->SetBranchAddress("jet_eta",&jet_eta);
