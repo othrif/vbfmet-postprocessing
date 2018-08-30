@@ -41,11 +41,11 @@ athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/use
 For running on condor:
 ```bash
 # run on condor over a list of files for nominal
-submitVBFAnalysisCondor.py -l list -n
+submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list -n
 # run on condor over a list of files for all sys
-submitVBFAnalysisCondor.py -l list
+submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list
 # run on condor over a list of files for all sys with log files saved to a specific dir
-submitVBFAnalysisCondor.py -l list -d dir
+submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list -d dir
 ```
 You can change the list of systematics in VBFAnalysis/python/systematics.py.
 To merge the samples, in the dir where microtuples live do:
