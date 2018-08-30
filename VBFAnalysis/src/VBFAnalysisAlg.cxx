@@ -12,6 +12,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "current sytematics of the tree" );
+  declareProperty( "normFile", m_normFile = "current.root", "path to a file with the number of events processed" );
   declareProperty( "mcCampaign", m_mcCampaign = "mc16a", "mcCampaign of the mc sample. only read if isMC is true" );
 }
 
@@ -106,7 +107,7 @@ StatusCode VBFAnalysisAlg::finalize() {
 }
 
 StatusCode VBFAnalysisAlg::MapNgen(){
-  TFile *f = new TFile("/eos/user/r/rzou/v04/f_out_total.root","READ");
+  TFile *f = TFile::Open(m_normFile.c_str(),"READ");
   h_Gen = (TH1F*) f->Get("h_total");
   if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
 

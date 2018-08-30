@@ -16,6 +16,8 @@ jps.AthenaCommonFlags.EvtMax =vars().get("nEvents", -1)                         
 config = JobConfigurationBase("JobOptions")
 arg_group = config.parser.add_argument_group("JobOptions", "Extra arguments specific to VBFAnalysisAlgJobOptions")
 arg_group.add_argument("--currentVariation", dest='currentVariation', default="Nominal", help="current systematics, default: Nominal")
+arg_group.add_argument("--normFile", dest='normFile', default="current.root", help="file with the total number of event processed")
+
 # parse the commandline options
 args = config.parse_args()
 
@@ -31,9 +33,10 @@ print inputDir, " ", currentSample, " ", str(runNumber)
 jps.AthenaCommonFlags.HistOutputs = ["MYSTREAM:"+currentSample+args.currentVariation+str(runNumber)+subfileN+".root"]  #optional, register output files like this. MYSTREAM is used in the code
 
 athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
-                               currentVariation = args.currentVariation,
-                               currentSample = currentSample,
-                               isMC = isMC,
-                               runNumberInput = runNumber);
+                                   currentVariation = args.currentVariation,
+                                   normFile = args.normFile,
+                                   currentSample = currentSample,
+                                   isMC = isMC,
+                                   runNumberInput = runNumber);
 
 include("AthAnalysisBaseComps/SuppressLogging.py") #optional line

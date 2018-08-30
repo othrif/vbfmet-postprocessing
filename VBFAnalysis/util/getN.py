@@ -33,12 +33,12 @@ for fdir in fdir_list:
     for line in p.stdout.readlines():
         filepath = line.strip()
         print filepath
-        f = ROOT.TFile.Open(filepath)
+        f = ROOT.TFile(filepath)
         if not f:
-            print "bad file continue"
+            print 'bad file. continuing',filepath
             continue
         if f.IsZombie():
-            print "is zombie!! continue"
+            print 'zombie file', filepath
             continue
         h = f.Get("NumberEvents")
         nevent += h.GetBinContent(2)
