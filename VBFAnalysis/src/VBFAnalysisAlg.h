@@ -73,6 +73,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   //output tree                                                                                                                                                                                                   
   std::string outputName;
   std::string m_currentVariation;
+  std::string m_normFile;
   std::string m_currentSample;
   Int_t m_runNumberInput;
   std::string treeNameOut="nominal";

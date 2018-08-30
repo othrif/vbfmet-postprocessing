@@ -24,6 +24,12 @@ for fdir in fdir_list:
         filepath = line.strip()
         print filepath
         f = ROOT.TFile(filepath)
+        if not f:
+            print 'bad file. continuing',filepath
+            continue
+        if f.IsZombie():
+            print 'zombie file', filepath
+            continue
         h = f.Get("NumberEvents")
         nevent += h.GetBinContent(2)
     h_total.Fill(dsid_string,nevent)

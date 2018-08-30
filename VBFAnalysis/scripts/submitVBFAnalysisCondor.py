@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser( description = "Looping over sys and samples fo
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", default = "/eos/user/r/rzou/v04/list", help = "list of ntuples to run over" )
+parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "current.root", help = "file with the total number of event processed" )
 args, unknown = parser.parse_known_args()
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
@@ -62,7 +63,7 @@ f.close()
 fMC.close()
 
 for syst in systlist:
-    runCommand = '''athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "'''+samplePatternGlobal+'''.$1" - --currentVariation '''+syst
+    runCommand = '''athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "'''+samplePatternGlobal+'''.$1" - --currentVariation '''+syst+''' --normFile '''+args.normFile
     writeCondorShell(workDir, buildDir, runCommand, syst, "VBFAnalysisCondorSub") #writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="VBFAnalysisCondorSub")
     print listofrunN
     writeCondorSub(workDir, syst, "VBFAnalysisCondorSub", listofrunN, listofrunNMC)
