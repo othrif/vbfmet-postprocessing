@@ -7,6 +7,7 @@ import argparse
 import VBFAnalysis.sample
 import VBFAnalysis.systematics
 from VBFAnalysis.buildCondorScript import *
+from VBFAnalysis.writeMultiJEleFake import *
 
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
@@ -14,6 +15,9 @@ parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", d
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
 args, unknown = parser.parse_known_args()
+
+writeMultiJet()
+writeFakeEle()
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:
