@@ -8,6 +8,7 @@ import VBFAnalysis.sample
 import VBFAnalysis.systematics
 import pickle
 from VBFAnalysis.buildCondorScript import *
+from VBFAnalysis.writeMultiJEleFake import *
 
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
@@ -16,6 +17,9 @@ parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", defau
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
 args, unknown = parser.parse_known_args()
+
+writeMultiJet()
+writeFakeEle()
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:

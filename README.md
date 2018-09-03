@@ -43,11 +43,11 @@ For running on condor:
 # you'll want to generate a list of files, which only has to be done once. give it a comma separated list of input containers
 python VBFAnalysis/util/writeFileMap.py
 # run on condor over a list of files for nominal
-submitVBFAnalysisCondor.py -l list -n
+submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list -n
 # run on condor over a list of files for all sys
-submitVBFAnalysisCondor.py -l list
+submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list
 # run on condor over a list of files for all sys with log files saved to a specific dir
-submitVBFAnalysisCondor.py -l list -d dir
+submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list -d dir
 # you'll need a grid proxy, which needs to have global permission. This is in the /tmp/x509*. Use the -p option. -l is for the map of the files at chicago on RUCIO
 submitVBFAnalysisCondor.py -l ../source/VBFAnalysis/data/uchicagoFileMap.p -n -p /home/schae/testarea/HInv/run/x509up_u20186
 ```

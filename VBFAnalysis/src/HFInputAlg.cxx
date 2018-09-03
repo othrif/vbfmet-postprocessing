@@ -53,6 +53,8 @@ StatusCode HFInputAlg::initialize() {
 	if (!isHigh && !replacedLow) replacedLow = replace(syst, "Down", "Low");
 	if (!isHigh && !replacedLow) syst.append("Low");
       }
+    } else {
+      syst = "Nom";
     }
     for (int c=1;c<4;c++) {
       hSR.push_back( new TH1F(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
@@ -120,7 +122,7 @@ std::string HFInputAlg::HistoNameMaker(std::string currentSample, std::string cu
     if (bin == "") return "h"+currentSample+ "_"+syst+"_"+currentCR + "_obs_cuts";
     else if (currentSample.find("signal") != std::string::npos) return "h"+currentSample+syst+"_"+currentCR + "_obs_cuts";
     //    else return "h"+currentSample+ "_VBFjetSel_bin"+bin+syst+"_"+currentCR + "_obs_cuts";
-    else return "h"+currentSample+ "_VBFjetSel_"+syst+"_"+currentCR + "_obs_cuts";
+    else return "h"+currentSample+ "_VBFjetSel_"+bin+syst+"_"+currentCR + "_obs_cuts";
   } else {
     //    return "h"+currentSample+ "_NONE_"+currentCR + "_obs_cuts";
     return "h"+currentSample+ "_NONE_"+currentCR + "_obs_cuts";  
