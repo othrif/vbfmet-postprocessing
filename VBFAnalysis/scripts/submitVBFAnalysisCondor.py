@@ -55,17 +55,11 @@ if isFileMap:
         for filepath in contFileList:
             comma_sep_files+=filepath+','
             nb+=1
-            #f.write(filepath+' '+container+"\n")
-            #f.write(filepath+"\n")
-            #if isMC:
-            #    fMC.write(filepath+' '+container+"\n")
-                #fMC.write(filepath+"\n")
-
         f.write(comma_sep_files.rstrip(',')+' '+container+"\n")
         if isMC:
             fMC.write(comma_sep_files.rstrip(',')+' '+container+"\n")
-        if nb>10:
-            break;
+        #if nb>10:
+        #    break;
         samplePatternGlobal=''
 else:
     for sampledir in list_file:
