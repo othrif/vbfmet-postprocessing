@@ -28,6 +28,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   //
   
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
+  cout << "isMC: " << m_isMC << endl;
   //  cout<<"NAME of output before ======="<<newtree->GetName()<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
 
@@ -108,6 +109,7 @@ StatusCode VBFAnalysisAlg::finalize() {
 
 StatusCode VBFAnalysisAlg::MapNgen(){
   TFile *f = TFile::Open(m_normFile.c_str(),"READ");
+  if(!f or f->IsZombie()) std::cout << "ERROR normFile. Could not open " << m_normFile << std::endl;
   h_Gen = (TH1F*) f->Get("h_total");
   if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
 
