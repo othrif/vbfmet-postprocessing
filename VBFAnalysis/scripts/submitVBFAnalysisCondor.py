@@ -48,6 +48,8 @@ samplePatternGlobal = ""
 if isFileMap:
     nb=0
     for container,contFileList in list_file.iteritems():
+        #if not container.count('276181'):#'364184'):
+        #    continue
         s=VBFAnalysis.sample.sample(container)
         isMC = s.getisMC()
         runNumberS = s.getrunNumberS()

@@ -6,6 +6,7 @@ import subprocess
 import argparse
 import VBFAnalysis.sample
 import VBFAnalysis.systematics
+import pickle
 from VBFAnalysis.buildCondorScript import *
 
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
@@ -13,6 +14,7 @@ parser = argparse.ArgumentParser( description = "Looping over sys and samples fo
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
+parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
 args, unknown = parser.parse_known_args()
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
@@ -38,8 +40,7 @@ listoffilesMC = workDir+"/filelistMC"
 f = open(listoffiles, 'w')
 fMC = open(listoffilesMC, 'w')
 samplePatternGlobal = ""
-
-p = subprocess.Popen("ls "+args.inputDir+"*root", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+p = subprocess.Popen("ls "+args.inputDir+"*root*", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 for line in p.stdout.readlines():
     filepath = line.strip()
     f.write(filepath+"\n")

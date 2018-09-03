@@ -7,9 +7,10 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst)
+        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK","Z_strong","ttbar","VBFH125","ggFH125","VH125","QCD","VV","VVV","Z_VBFFilt","data"]
 
     def load(self,samplename,syst):
-        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK","Z_strong","ttbar","VBFH125","ggFH125","VH125","data"]
+
         if samplename == "":
             return
         if syst == "":
