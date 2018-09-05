@@ -45,7 +45,7 @@ class sample(object):
             elif ((self.runNumber >= 308092 and self.runNumber <= 308095) or (self.runNumber >= 363355 and self.runNumber <= 363358)):
                 self.sampleType = "Z_EWK"
             elif (self.runNumber >= 345099 and self.runNumber <= 345102):
-                self.sampleType = "Z_VBFFilt"
+                self.sampleType = "Z_strong_VBFFilt"
             elif (self.runNumber >= 364100 and self.runNumber <= 364155):
                 self.sampleType = "Z_strong"
             elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471)):
