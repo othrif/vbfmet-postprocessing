@@ -216,6 +216,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   ATH_MSG_INFO("VBFAnalysisAlg::beginInputFile()");
 
   m_treeName = "MiniNtuple";
+  if(m_currentVariation!="Nominal")
+    m_treeName = "MiniNtuple_"+m_currentVariation;
+  std::cout << "Tree: " << m_treeName << std::endl;
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
   m_tree->SetBranchStatus("*",0);
   m_tree->SetBranchStatus("runNumber", 1);
