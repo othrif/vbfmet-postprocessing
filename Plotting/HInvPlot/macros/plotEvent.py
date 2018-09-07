@@ -13,6 +13,7 @@ import math
 import time
 
 import HInvPlot.JobOptions as config
+import HInvPlot.systematics as systematics
 
 par = config.getParser()
 log = config.getLog('plotEvent.py')
@@ -41,7 +42,7 @@ def passRegion(region):
     return False
 
 #-----------------------------------------------------------------------------------------
-def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=None, nbin_lim=None, skip_samples=False, my_cut_key=''):
+def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=None, nbin_lim=None, skip_samples=False, my_cut_key='', syst='Nominal'):
     #
     # Make alg for all events - this algorithm stores events for MakeInput
     #
@@ -72,7 +73,7 @@ def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=No
     return plot_algs
 
 #-----------------------------------------------------------------------------------------
-def prepareSeqSR(basic_cuts, alg_take=None):
+def prepareSeqSR(basic_cuts, alg_take=None, syst='Nominal'):
 
     selkey = basic_cuts.GetSelKey()
     region = 'sr'
@@ -80,14 +81,14 @@ def prepareSeqSR(basic_cuts, alg_take=None):
     if basic_cuts.chan !='nn' or not passRegion(region):
         return ('', [])
     
-    pass_alg = hstudy.preparePassEventForSR('pass_%s_%s' %(region, selkey), options, basic_cuts, cut=options.cut)
-    plot_alg = prepareListPlot              (selkey, alg_take, region=region)
+    pass_alg = hstudy.preparePassEventForSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
 #-----------------------------------------------------------------------------------------
-def prepareSeqWCR(basic_cuts, region, alg_take=None):
+def prepareSeqWCR(basic_cuts, region, alg_take=None, syst='Nominal'):
 
     selkey = basic_cuts.GetSelKey()
     region = 'wcr'
@@ -99,22 +100,22 @@ def prepareSeqWCR(basic_cuts, region, alg_take=None):
     if basic_cuts.chan in ['ee','uu','ll','nn'] or not passRegion(region):
         return ('', [])
     
-    pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s' %(region, selkey), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif)
-    plot_alg = prepareListPlot              (selkey, alg_take, region=region)
+    pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
 #-----------------------------------------------------------------------------------------
-def prepareSeqZCR(basic_cuts, region, alg_take=None):
+def prepareSeqZCR(basic_cuts, region, alg_take=None, syst='Nominal'):
 
     selkey = basic_cuts.GetSelKey()
     region = 'zcr'
     if basic_cuts.chan in ['ep','em','um','up','l','e','u','nn'] or not passRegion(region):
         return ('', [])
     
-    pass_alg = hstudy.preparePassEventForZCR('pass_%s_%s' %(region, selkey), options, basic_cuts, cut=options.cut)
-    plot_alg = prepareListPlot              (selkey, alg_take, region=region)
+    pass_alg = hstudy.preparePassEventForZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
@@ -148,82 +149,91 @@ def main():
     if options.chan != None:
         chans = options.chan.split(',')
 
-    #-----------------------------------------------------------------------------------------
-    # Common algorithms for computing additional event properties and event pre-selection
-    #     
-    # Currently using mc name because tatsuya does not store the mc channel number
-    #
-    plot_alg = hstudy.preparePlotEvent('plotEvent')        
-    read_alg.AddCommonAlg(plot_alg)    
-
-    #-----------------------------------------------------------------------------------------
-    # Cutflow algorithm list
-    #
-    input_cut = []
-
     try:
         tmp_signs=options.lep_sign.split(','); signs=[]
         for sign in tmp_signs: 
             if not sign in ['0','1']: raise NameError('Unknown Lepton sign: %s...needs to be 0 0,1 or 1' %options.lep_sign)
             signs+=[int(sign)]
     except: raise NameError('Unknown Lepton sign: %s...needs to be 0 0,1 or 1' %options.lep_sign)
-        
-    for sign in signs: # 0=opposite sign, 1=same sign
-        for a in anas:            
-            for c in chans:
-                basic_cuts = hstudy.BasicCuts(Analysis=a, Chan=c, SameSign=sign)
-                    
-                #
-                # SR Cut based regions and algorithms
-                #
-                (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut)
-                read_alg.AddNormalAlg(name_sr,  alg_sr)
 
-                #
-                # ZCR Cut based regions and algorithms
-                #
-                (name_zcr,  alg_zcr)  = prepareSeqZCR (basic_cuts, a, alg_take=input_cut)
-                read_alg.AddNormalAlg(name_zcr,  alg_zcr)
-
-                #
-                # WCR Cut based regions and algorithms
-                #
-                (name_wcr,  alg_wcr)  = prepareSeqWCR (basic_cuts, a, alg_take=input_cut)
-                read_alg.AddNormalAlg(name_wcr,  alg_wcr)                  
-
-    read_alg.RunConfForAlgs()
-
-    #-----------------------------------------------------------------------------------------
-    # Read selected input files and process events (real work is done here...)
-    # 
+    writeStyle='RECREATE'
+    syst_list=[options.syst]
+    if options.syst=="All":
+        syst_class = systematics.systematics('All') #All
+        syst_list = syst_class.getsystematicsList()
     timeStart = time.time()
-
-    for ifile in all_files:
-        print 'File: ',ifile
-        read_alg.ReadFile(ifile)
     
-    #-----------------------------------------------------------------------------------------
-    # Save histograms from algorithms
-    #
-    read_alg.Save(options.rfile)
+    for syst in syst_list:
+        print syst
+        read_alg.ClearAlgs();
+        read_alg.SetSystName(syst)
+        #-----------------------------------------------------------------------------------------
+        # Common algorithms for computing additional event properties and event pre-selection
+        #     
+        #plot_alg = hstudy.preparePlotEvent('plotEvent'+syst)
+        plot_alg = hstudy.preparePlotEvent('plotEvent')
+        read_alg.AddCommonAlg(plot_alg)
+        
+        #-----------------------------------------------------------------------------------------
+        # Cutflow algorithm list
+        #
+        input_cut = []
+        
+        for sign in signs: # 0=opposite sign, 1=same sign
+            for a in anas:            
+                for c in chans:
+                    basic_cuts = hstudy.BasicCuts(Analysis=a, Chan=c, SameSign=sign)
+                        
+                    #
+                    # SR Cut based regions and algorithms
+                    #
+                    (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_sr,  alg_sr)
+        
+                    #
+                    # ZCR Cut based regions and algorithms
+                    #
+                    (name_zcr,  alg_zcr)  = prepareSeqZCR (basic_cuts, a, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_zcr,  alg_zcr)
+        
+                    #
+                    # WCR Cut based regions and algorithms
+                    #
+                    (name_wcr,  alg_wcr)  = prepareSeqWCR (basic_cuts, a, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_wcr,  alg_wcr)                  
+        
+        read_alg.RunConfForAlgs()
+
+        #-----------------------------------------------------------------------------------------
+        # Read selected input files and process events (real work is done here...)
+        #         
+        for ifile in all_files:
+            print 'File: ',ifile
+            read_alg.ReadFile(ifile)
+    
+        #-----------------------------------------------------------------------------------------
+        # Save histograms from algorithms
+        #
+        read_alg.Save(options.rfile, writeStyle=writeStyle)
+        writeStyle='UPDATE'
 
     #-----------------------------------------------------------------------------------------
     # Save histograms for limit setting
     #  ---- currently not configured.....
-    if options.lfile and options.syst != None: 
-        print '--------------------------------------------------------------------'
-        log.info('Make limit inputs for: syst=%s' %options.syst)
-        if options.tfile:
-            tfile = ROOT.TFile(options.tfile, 'RECREATE')
-        else:
-            tfile = None
-            
-        log.info('Write limit files...')
-
-        if tfile:
-            tfile.Write()
-            del tfile
-
+    #if options.lfile and options.syst != None: 
+    #    print '--------------------------------------------------------------------'
+    #    log.info('Make limit inputs for: syst=%s' %options.syst)
+    #    if options.tfile:
+    #        tfile = ROOT.TFile(options.tfile, 'RECREATE')
+    #    else:
+    #        tfile = None
+    #        
+    #    log.info('Write limit files...')
+    #
+    #    if tfile:
+    #        tfile.Write()
+    #        del tfile
+    
     log.info('All is done - total job time: %.1fs' %(time.time()-timeStart))
 
 #-----------------------------------------------------------------------------------------

@@ -90,6 +90,14 @@ namespace Msl
       bool operator==(const AlgData &rhs) const { return alg_key == rhs.alg_key; }
     };
 
+    void SetSystName(std::string systName) { fSystName = systName; }
+    void ClearAlgs() {
+      fAlgAll.clear();
+      fAlgCommon.clear();
+      fAlgPreSel.clear();
+      fAlgNormal.clear();
+    }
+    
     typedef std::vector<AlgData>                 AlgList;
   private:
 

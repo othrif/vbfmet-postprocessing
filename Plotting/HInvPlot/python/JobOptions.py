@@ -53,7 +53,7 @@ def getParser():
     p.add_option('--region',       type='string', default='sr,zcr,wcr',          dest='region',     help='')    
     p.add_option('--chan',         type='string', default=None,          dest='chan',       help='')
     p.add_option('--njet',         type='string', default=None,          dest='njet',       help='')
-    p.add_option('--syst',         type='string', default='nom',         dest='syst',       help='')
+    p.add_option('--syst',         type='string', default='Nominal',     dest='syst',       help='')
     p.add_option('--sample',       type='string', default='all',         dest='sample',        help='')
     p.add_option('--cut',          type='string', default='BeforeMT',    dest='cut',        help='')
     p.add_option('--var',          type='string', default='Mll',         dest='var',        help='MT variable used for limits')
