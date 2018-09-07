@@ -2,6 +2,7 @@
 SYSTDIR=$1
 rm $SYSTDIR/filelistRESUB*
 grep ERROR $SYSTDIR/* | grep root &> fail.txt
+#grep "User job exit with code 2" $SYSTDIR/* &> fail_other.txt
 for i in `cat fail.txt`; do echo  "$i" | awk -F':' '{print $1}' ; done | grep output &> failoutput.txt
 while read i; do echo  "$i" | awk -F'[' '{print $2}' | awk -F']' '{print $1}' ; done < fail.txt | grep root  &> failFiles.txt
 for i in `cat failoutput.txt`; do cat  $i | grep THistSvc | awk -F'[' '{print $2}' | awk -F']' '{print $1}'  ; done  &> failSyst.txt

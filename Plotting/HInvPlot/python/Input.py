@@ -48,15 +48,15 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::Files',      ' '.join(self.files))
         
         self.read_reg.SetVal('ReadEvent::MCIDs',      ' '.join(my_runs_map.keys()))        
-        self.read_reg.SetVal('ReadEvent::Samples',    ' '.join(my_runs_map.values()))        
+        self.read_reg.SetVal('ReadEvent::Samples',    ' '.join(my_runs_map.values())) 
         self.read_reg.SetVal('ReadEvent::InputCount', -1.0) # 9983282
 
         self.read_reg.SetVal('ReadEvent::Sumw',options.sumw)
         self.read_reg.SetVal('ReadEvent::Nraw',options.nraw)
         
         # Load the systematics
-        syst_class = systematics.systematics(None)
-        self.read_reg.SetVal('ReadEvent::SystList',','.join(syst_class.getsystematicsList()))
+        syst_class = systematics.systematics('All')
+        #self.read_reg.SetVal('ReadEvent::SystList',','.join(syst_class.getsystematicsList()))
         
         if options.cfile != None:          
             self.read_reg.SetVal('ReadEvent::CutFlowFile', options.cfile)
@@ -88,6 +88,13 @@ class ReadEvent:
 
     def SetTrees(self,trees):
         self.trees = trees
+        
+    def ClearAlgs(self):
+        self.algs=[]
+        self.read_alg.ClearAlgs()
+        
+    def SetSystName(self,systName):
+        self.read_alg.SetSystName(systName)
 
     def ReadFile(self, path):
         
@@ -106,12 +113,12 @@ class ReadEvent:
     
         self.read_alg.ReadAllFile()
 
-    def Save(self, rfile, dirname = None):
+    def Save(self, rfile, dirname = None, writeStyle='RECREATE'):
         if type(rfile) != type(''):
             self.read_alg.Save(0)
             return
 
-        rfile = ROOT.TFile(rfile, 'RECREATE')
+        rfile = ROOT.TFile(rfile, writeStyle)
 
         log.info('ReadEvent - save algorithms...')
 
@@ -123,6 +130,7 @@ class ReadEvent:
         log.info('ReadEvent - write file...')
 
         rfile.Write()
+        rfile.Close()
         del rfile
         
     def ConvertAlgToList(self, par):
@@ -467,6 +475,61 @@ def prepareBkgRuns(keys,options=None):
         '410026':'schan_antitop',
         }
 
+    bkg_qcdunw = {'426001':'JZ1',
+                    '426002':'JZ2',
+                    '426003':'JZ3',
+                    '426004':'JZ4',
+                    '426005':'JZ5',
+                    '426006':'JZ6',
+                    '426007':'JZ7',
+                    '426008':'JZ8',
+                    '426009':'JZ9',
+                    }
+    bkg_qcdw = { 
+                   '361029':'JZ9W',
+                   '361030':'JZ10W',
+                   '361031':'JZ11W',
+                   '361032':'JZ12W',
+                   }
+    bkg_vv = {'364242':'3l3v_EWK6',
+                  '364243':'4l2v_EWK6',
+                  '364244':'BTD',
+                  '364245':'BTD',
+                  '364246':'BTD',
+                  '364247':'BTD',
+                  '364248':'BTD',
+                  '364249':'BTD',
+                  # VV
+                  '363494':'vvvv',                  
+                  '364250':'llll',                  
+                  '364254':'llvv',                  
+                  '364255':'lvvv',                  
+                  }
+    bkg_vbfFiltZ = {'345099':'TBD',
+                        '345100':'TBD',
+                        '345101':'TBD',
+                        '345102':'TBD',
+                        }
+    bkg_lowMassZ = {'364198':'TBD',
+                        '364199':'TBD',
+                        '364200':'TBD',
+                        '364201':'TBD',
+                        '364202':'TBD',
+                        '364203':'TBD',
+                        '364204':'TBD',
+                        '364205':'TBD',
+                        '364206':'TBD',
+                        '364207':'TBD',
+                        '364208':'TBD',
+                        '364209':'TBD',
+                        '364210':'TBD',
+                        '364211':'TBD',
+                        '364212':'TBD',
+                        '364213':'TBD',
+                        '364214':'TBD',
+                        '364215':'TBD',                        
+                        }    
+
     bkg_keys = {
                 'hvh':sig_VH125,                
                 'hggf':sig_ggF125,                
@@ -477,6 +540,11 @@ def prepareBkgRuns(keys,options=None):
                 'zqcd':bkg_zqcd,                                
                 'top2':bkg_top2,
                 'top1':bkg_top1,
+                'zldy':bkg_lowMassZ,                
+                'vvv':bkg_vv,
+                'dqcd':bkg_qcdw,                                
+                'mqcd':bkg_qcdunw,
+                'vbfz':bkg_vbfFiltZ,
                 }
 
     #

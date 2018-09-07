@@ -64,7 +64,6 @@ Msl::ReadEvent::~ReadEvent()
 void Msl::ReadEvent::Conf(const Registry &reg)
 {
   evt_map.clear();
-
   //
   // Read configuration
   //
@@ -113,18 +112,18 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   }
 
   // declare vectors
-  el_charge  = new std::vector<float>(0);
-  el_pt      = new std::vector<float>(0);
-  el_eta     = new std::vector<float>(0);
-  el_phi     = new std::vector<float>(0);
-  mu_charge  = new std::vector<float>(0);
-  mu_pt      = new std::vector<float>(0);
-  mu_eta     = new std::vector<float>(0);
-  mu_phi     = new std::vector<float>(0);
-  jet_timing = new std::vector<float>(0);
-  jet_pt     = new std::vector<float>(0);
-  jet_eta    = new std::vector<float>(0);
-  jet_phi    = new std::vector<float>(0);    
+  el_charge  = new std::vector<float>();
+  el_pt      = new std::vector<float>();
+  el_eta     = new std::vector<float>();
+  el_phi     = new std::vector<float>();
+  mu_charge  = new std::vector<float>();
+  mu_pt      = new std::vector<float>();
+  mu_eta     = new std::vector<float>();
+  mu_phi     = new std::vector<float>();
+  jet_timing = new std::vector<float>();
+  jet_pt     = new std::vector<float>();
+  jet_eta    = new std::vector<float>();
+  jet_phi    = new std::vector<float>();    
   
 #ifdef ANP_CPU_PROFILER
   string profile_file = "cpu-profile-readevent";
@@ -415,13 +414,14 @@ void Msl::ReadEvent::Read(const std::string &path)
     //
     // Identify the systematic type
     //
-    for(unsigned iSys=0; iSys<fSystNames.size(); ++iSys){
-      if(fTrees.at(i).find(fSystNames.at(iSys))!=std::string::npos){
-	fSystName = fSystNames.at(iSys);
-	break;
-      }
-    }
-    log() << "Read - Running systematic: " << fSystName <<std::endl;
+    if(fTrees.at(i).find(fSystName)==std::string::npos) continue;
+    //for(unsigned iSys=0; iSys<fSystNames.size(); ++iSys){
+    //  if(fTrees.at(i).find(fSystNames.at(iSys))!=std::string::npos){
+    //	fSystName = fSystNames.at(iSys);
+    //	break;
+    //  }
+    //}
+    log() << "Read - Running systematic: " << fSystName << " on tree: " << fTrees.at(i) <<std::endl;
     
     //
     // Read common ntuples
@@ -450,6 +450,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   // Read tree
   //
   int nevent = rtree->GetEntries();
+  unsigned nXSWarning=0;
   if(fMaxNEvent > 0) {
     nevent = std::min<int>(fMaxNEvent, rtree->GetEntries());
   }
@@ -632,7 +633,9 @@ void Msl::ReadEvent::FillEvent(Event &event)
   if(event.electrons.size()>0){
     event.AddVar(Mva::lepPt0,  event.electrons.at(0).pt);
     event.AddVar(Mva::lepCh0,  event.electrons.at(0).GetVar(Mva::charge));
+    //TLorentzVector W = event.electrons.at(0).GetLVec()+event.met;
     double MT = sqrt(2. * event.electrons.at(0).pt * event.met.Pt() * (1. - cos(event.electrons.at(0).phi - event.met.Phi())));
+    //event.AddVar(Mva::mt, W.M());
     event.AddVar(Mva::mt, MT);    
   }
   if(event.electrons.size()>1){
@@ -646,6 +649,8 @@ void Msl::ReadEvent::FillEvent(Event &event)
   if(event.muons.size()>0){
     event.AddVar(Mva::lepPt0,  event.muons.at(0).pt);
     event.AddVar(Mva::lepCh0,  event.muons.at(0).GetVar(Mva::charge));
+    //TLorentzVector W = event.muons.at(0).GetLVec()+event.met;
+    //event.AddVar(Mva::mt, W.M());
     double MT = sqrt(2. * event.muons.at(0).pt * event.met.Pt() * (1. - cos(event.muons.at(0).phi - event.met.Phi())));
     event.AddVar(Mva::mt, MT);  
   }

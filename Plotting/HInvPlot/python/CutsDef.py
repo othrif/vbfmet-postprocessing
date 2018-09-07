@@ -217,6 +217,10 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['zewk'] = ['zewk']
     bkgs['top1'] = ['top1']
     bkgs['top2'] = ['top2']
+    bkgs['vvv'] = ['vvv']    
+    bkgs['zldy'] = ['zldy']    
+    bkgs['dqcd'] = ['dqcd']    
+    bkgs['mqcd'] = ['mqcd']    
     bkgs['tall'] = ['top2','top1']    
 
     samples = {}

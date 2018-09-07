@@ -59,6 +59,7 @@ p.add_option('--make-syst-table', action='store_true', default=False,   dest='ma
 import ROOT
 import HInvPlot.JobOptions as config
 import HInvPlot.CutsDef    as hstudy
+import HInvPlot.systematics as syst
 
 #config.setPlotDefaults(ROOT)
 
@@ -66,16 +67,12 @@ if not options.wait:
     ROOT.gROOT.SetBatch(True)
 
 log = config.getLog('drawStack.py', debug=options.debug)
+mysyst = syst.systematics('All')
+mysystAsym = syst.systematics('Asym')
 
 # List of plots to symmeterize
-symm_list = {'ResoSoftTrackMetScaleDown_ptHard': 'ResoSoftTrackMetScaleUp_ptHard',
-             'ResoSoftTrackMetDownPerp_ptHard' : 'ResoSoftTrackMetUpPerp_ptHard',
-             'ResoSoftTrackMetScaleDown_uncorr': 'ResoSoftTrackMetScaleUp_uncorr',
-             'ResoSoftTrackMetDownPerp_uncorr' : 'ResoSoftTrackMetUpPerp_uncorr',
+symm_list=mysystAsym.getsystematicsList()
 
-            'SoftTrackResoParaDown' : 'SoftTrackResoPara',
-            'SoftTrackResoPerpDown' : 'SoftTrackResoPerp',                           
-             }
 #-----------------------------------------
 def Style():
     ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasStyle.C')                   
@@ -211,6 +208,8 @@ def getLabelSortKey(sample):
     elif sample == 'smww': return 1 # was 3
     elif sample == 'top1': return 4
     elif sample == 'tall': return 5
+    elif sample == 'vvv': return 6
+    elif sample == 'zldy': return 7
     elif sample == 'zjet': return 18
     elif sample == 'qflip': return 3       
     elif sample == 'zjhf': return 18
@@ -253,6 +252,8 @@ def getSampleSortKey(sample):
     elif sample == 'top2': return 4
     elif sample == 'top1': return 5
     elif sample == 'tall': return 5
+    elif sample == 'vvv': return 6
+    elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
     elif sample == 'hggf': return 8
     elif sample == 'hvbf': return 9
@@ -273,7 +274,6 @@ def getSampleLabel(sample):
     labels = {
         'smww': 'WW/W#gamma',
         'zjet': 'Z+jets',
-        #'zjet': 'Charge Flip',
         'qflip': 'Charge Flip',        
         'zqcd': 'Z+jets QCD',
         'zewk': 'Z+jets EWK',
@@ -282,10 +282,11 @@ def getSampleLabel(sample):
         'top1': 'Single Top',
         'top2': 't#bar{t}',
         'tall': 'Top',        
+        'vvv': 'VV/VVV',        
+        'zldy': 'Z low m.',        
         'wzzz': 'ZV',#'WZ/ZZ',
         'wz': 'WZ',
         'zz': 'ZZ',        
-        #'wzzz': 'WZ/ZZ/W#gamma',
         'wgam': 'W#gamma',
         'wgas': 'W#gamma*',
         'zgas': 'Z#gamma*',
@@ -337,6 +338,8 @@ def getStyle(sample):
     color_wzzz = ROOT.kMagenta-3
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
     color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3        
+    color_vvv = ROOT.kOrange
+    color_zldy = ROOT.kOrange-3
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
     color_wdpi = ROOT.kOrange-5
@@ -354,7 +357,9 @@ def getStyle(sample):
         'wewk':{'color':color_wewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top1':{'color':color_top1, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top2':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},                
+        'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},                
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
         #'hggf':{'color':color_hggf, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         #'hvbf':{'color':color_hvbf, 'fill_style':0,    'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
@@ -648,6 +653,7 @@ class DrawStack:
     def ReadSample(self, file, sample, syst=None, DO_SYMM=False):
 
         path = self.GetHistPath(sample, syst)
+        #print path
         hist = file.Get(path)
 
         if not hist:
@@ -703,6 +709,7 @@ class DrawStack:
                 sys.exit(1)
 
             bkg_ent.sample = 'bkgs'
+            #print bkg_ent
             self.sys_bkgs[syst] = bkg_ent
             self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst, DO_SYMM=DO_SYMM)
 
@@ -1903,92 +1910,7 @@ def writeSystTex(table_name, stack):
                 systs[i]=systs[j]
                 systs[j]=tmp
 
-    my_order=["lep_corr_fr_p",
-    "lep_corr_fr_n",
-    "jes_n",
-    "jes_p",
-    "jer",
-    "el_stat_fr_p",
-    "el_stat_fr_n",
-    "el_eff_p",
-    "el_eff_n",
-    "ees_mat_n",
-    "ees_low_p",
-    "eer_p",
-    "jvf_p",
-    "pileup_p",
-    "ees_z_p",
-    "ees_z_n",
-    "mu_stat_fr_p",
-    "pileup_n",
-    "mu_stat_fr_n",
-    "mu_eff_p",
-    "mu_eff_n",
-    "eer_n",
-    "id_n",
-    "ees_low_n",
-    "ms_n",
-    "qflip_p",
-    "qflip_n",
-    "ees_mat_p",
-    "ms_p",
-    "ees_ps_n",
-    "btag_cj_p",
-    "btag_cj_n",    
-    "btag_lj_n",
-    "tau_eff_p",
-    "btag_bj_n",
-    "tau_eff_n",
-    "jvf_n",
-    "ees_ps_p",
-    "btag_lj_p",
-    "id_p",
-    "btag_bj_p",'bch_up','bch_dn','scalest_p','scalest_n','resost']
-
-    my_order=['jes_n',
-'btag_bj_n',
-'jvf_n',
-'ees_z_p',
-'mu_stat_fr_p',
-'ees_ps_n',
-'tau_eff_p',
-'mu_stat_fr_n',
-'bch_up',
-'jvf_p',
-'btag_bj_p',
-'jes_p',
-'pileup_n',
-'ms_n',
-'bch_dn',
-'id_n',
-'ees_z_n',
-'id_p',
-'btag_lj_p',
-'ms_p',
-'pileup_p',
-'btag_lj_n',
-'ees_low_n',
-'scalest_n',
-'mu_eff_p',
-'ees_low_p',
-'scalest_p',
-'tau_eff_n',
-'jer',
-'el_eff_n',
-'lep_corr_fr_n',
-'btag_cj_p',
-'btag_cj_n',
-'eer_p',
-'el_stat_fr_p',
-'ees_mat_n',
-'mu_eff_n',
-'resost',
-'ees_mat_p',
-'el_stat_fr_n',
-'eer_n',
-'el_eff_p',
-'lep_corr_fr_p',]
-        
+    my_order=mysyst.getsystematicsList()
     if True:
         for key in my_order:
             for s in systs:
@@ -2054,14 +1976,16 @@ def main():
         sys.exit(1)
 
     rfile  = ROOT.TFile(rpath, 'READ')
-    sfiles={}    
-    sfiles = getSystFileList(rpath) # Turned off.
+    sfiles={}
+    for ia in mysyst.getsystematicsList():
+        sfiles[ia]=rfile
+    #sfiles = getSystFileList(rpath) # Turned off.
     
     #
     # Select histograms and samples for stacks
     #
     #bkgs = ['zewk', 'zqcd','wewk','wqcd','top1','top2']
-    bkgs = ['zewk', 'zqcd','wewk','wqcd','tall']  
+    bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','vvv','zldy']  
 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
@@ -2103,7 +2027,7 @@ def main():
 
     for var in vars:
 
-        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)  
+        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)
         if options.draw_syst:
             if len(sfiles):
                 stack.ReadSystFiles(sfiles)
