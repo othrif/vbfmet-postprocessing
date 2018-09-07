@@ -1,6 +1,8 @@
 
-iPATH=$i
-grep "connect_wrapper  | User job exit with code 2" $iPATH/output* | awk -F':' '{print $1}' | awk -F'/' '{print $1" "$2}'  &> failConnectv4.txt &
+iPATH=$1
+grep "connect_wrapper  | User job exit with code 2" $iPATH/output* | awk -F':' '{print $1}' | awk -F'/' '{print $1" "$2}'  &> failConnectv4.txt 
+#grep "connect_wrapper  | User job exit with code 2" testSystV3/output24847* testSystV3/output24848* | awk -F':' '{print $1}' | awk -F'/' '{print $1" "$2}'  &> failConnectv4.txt 
+#grep "connect_wrapper  | User job exit with code 2"  testSystV3/output248484* testSystV3/output248485*  | awk -F':' '{print $1}' | awk -F'/' '{print $1" "$2}'  &> failConnectv4.txt 
 source org.sh &> org_fail.txt
 
 while read inputs ; do
@@ -40,7 +42,7 @@ while read inputs ; do
 #testSystV3/submit_this_pythonMUON_TTVA_STAT__1down.sh
     cp $SubDir/submit_this_python${myVariation}.sh $SubDir/submit_this_python${myVariation}.sh.resubmit
     
-    if [ $myVariation != "Nominal" ]
+    if [[ $myVariation != "Nominal" ]]
     then
 	perl -pi -e 's/filelistMC/'${VARFILELIST}'/g' $SubDir/submit_this_python${myVariation}.sh.resubmit ;
 	#echo "NOT NOM"
