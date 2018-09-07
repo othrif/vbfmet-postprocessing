@@ -20,7 +20,7 @@ def writeCondorSub(workDir, syst="Nominal", scriptName="VBFAnalysisCondorSub", f
     os.system("echo 'output                  = "+workDir+"/output$(ClusterId).$(ProcId)' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'error                   = "+workDir+"/error$(ClusterId).$(ProcId)' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'log                     = "+workDir+"/log$(ClusterId)' >> "+workDir+"/submit_this_python"+syst+".sh")
-    #os.system("echo 'max_retries = 3' >> "+workDir+"/submit_this_python"+syst+".sh")
+    os.system("echo 'max_retries = 5' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system('''echo "+JobFlavour = 'tomorrow'" >> '''+workDir+'''/submit_this_python'''+syst+'''.sh''')
     os.system("echo '' >> "+workDir+"/submit_this_python"+syst+".sh")
     if syst == "Nominal":
