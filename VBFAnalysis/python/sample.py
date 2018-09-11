@@ -7,7 +7,18 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst)
-        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK","Z_strong","ttbar","VBFH125","ggFH125","VH125","QCD","VV","VVV","Z_VBFFilt","data"]
+        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK","Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125","ggFH125","VH125","QCDw","QCDunw","VVV","VV","data"] # do not change order
+
+        self.sampleMap = {'data':['data'],
+                          'W_EWK':['W_EWK'],
+                          'Z_EWK':['Z_EWK'],
+                          'W_strong':['W_strong'],
+                          'Z_strong':['Z_strong','Z_strong_VBFFilt','Z_strong_LowMass'],
+                          'Z_strong_VBFFilt':['Z_strong_VBFFilt'],
+                          'VV_VVV':['VV','VVV'],
+                          'signal':['VBFH125','ggFH125','VH125'],
+                          'QCD':['QCDw','QCDunw'],
+                          }
 
     def load(self,samplename,syst):
 
