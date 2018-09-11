@@ -4,6 +4,7 @@ import os,sys
 import re
 import sys
 import math
+import copy
 
 from optparse import OptionParser
 
@@ -59,6 +60,7 @@ p.add_option('--make-syst-table', action='store_true', default=False,   dest='ma
 import ROOT
 import HInvPlot.JobOptions as config
 import HInvPlot.CutsDef    as hstudy
+import HInvPlot.systematics as syst
 
 #config.setPlotDefaults(ROOT)
 
@@ -66,16 +68,17 @@ if not options.wait:
     ROOT.gROOT.SetBatch(True)
 
 log = config.getLog('drawStack.py', debug=options.debug)
+mysyst = syst.systematics('All')
+mysystAsym = syst.systematics('Asym')
 
 # List of plots to symmeterize
-symm_list = {'ResoSoftTrackMetScaleDown_ptHard': 'ResoSoftTrackMetScaleUp_ptHard',
-             'ResoSoftTrackMetDownPerp_ptHard' : 'ResoSoftTrackMetUpPerp_ptHard',
-             'ResoSoftTrackMetScaleDown_uncorr': 'ResoSoftTrackMetScaleUp_uncorr',
-             'ResoSoftTrackMetDownPerp_uncorr' : 'ResoSoftTrackMetUpPerp_uncorr',
+symm_list=[] #mysystAsym.getsystematicsList()
 
-            'SoftTrackResoParaDown' : 'SoftTrackResoPara',
-            'SoftTrackResoPerpDown' : 'SoftTrackResoPerp',                           
-             }
+#add asymetric uncertainties
+for key,v in mysystAsym.getsystematicsAsymMap().iteritems():
+    #mysyst+=[key]
+    symm_list+=[key]
+
 #-----------------------------------------
 def Style():
     ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasStyle.C')                   
@@ -109,7 +112,6 @@ def getSelKeyLabel(selkey):
         if selkey.count('sr_'):  proc += ', SR'
         if selkey.count('wcr'): proc += ', WCR'
         if selkey.count('zcr'): proc += ', ZCR'
-
 
     return proc
     
@@ -211,6 +213,8 @@ def getLabelSortKey(sample):
     elif sample == 'smww': return 1 # was 3
     elif sample == 'top1': return 4
     elif sample == 'tall': return 5
+    elif sample == 'vvv': return 6
+    elif sample == 'zldy': return 7
     elif sample == 'zjet': return 18
     elif sample == 'qflip': return 3       
     elif sample == 'zjhf': return 18
@@ -253,6 +257,8 @@ def getSampleSortKey(sample):
     elif sample == 'top2': return 4
     elif sample == 'top1': return 5
     elif sample == 'tall': return 5
+    elif sample == 'vvv': return 6
+    elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
     elif sample == 'hggf': return 8
     elif sample == 'hvbf': return 9
@@ -273,7 +279,6 @@ def getSampleLabel(sample):
     labels = {
         'smww': 'WW/W#gamma',
         'zjet': 'Z+jets',
-        #'zjet': 'Charge Flip',
         'qflip': 'Charge Flip',        
         'zqcd': 'Z+jets QCD',
         'zewk': 'Z+jets EWK',
@@ -282,10 +287,11 @@ def getSampleLabel(sample):
         'top1': 'Single Top',
         'top2': 't#bar{t}',
         'tall': 'Top',        
+        'vvv': 'VV/VVV',        
+        'zldy': 'Z low m.',        
         'wzzz': 'ZV',#'WZ/ZZ',
         'wz': 'WZ',
         'zz': 'ZZ',        
-        #'wzzz': 'WZ/ZZ/W#gamma',
         'wgam': 'W#gamma',
         'wgas': 'W#gamma*',
         'zgas': 'Z#gamma*',
@@ -337,6 +343,8 @@ def getStyle(sample):
     color_wzzz = ROOT.kMagenta-3
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
     color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3        
+    color_vvv = ROOT.kOrange
+    color_zldy = ROOT.kOrange-3
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
     color_wdpi = ROOT.kOrange-5
@@ -354,7 +362,9 @@ def getStyle(sample):
         'wewk':{'color':color_wewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top1':{'color':color_top1, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top2':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},                
+        'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},                
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
         #'hggf':{'color':color_hggf, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         #'hvbf':{'color':color_hvbf, 'fill_style':0,    'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
@@ -648,6 +658,7 @@ class DrawStack:
     def ReadSample(self, file, sample, syst=None, DO_SYMM=False):
 
         path = self.GetHistPath(sample, syst)
+        #print path
         hist = file.Get(path)
 
         if not hist:
@@ -657,7 +668,7 @@ class DrawStack:
         log.debug('ReadSample - integral=%5.1f sample=%s, syst=%s' %(hist.Integral(), sample, syst))
 
         if DO_SYMM:
-            print 'COMPUTING systematic'
+            #print 'COMPUTING systematic'
             hist_central_value = self.file_pointer.Get(path)
             self.Symmeterize(hist_central_value, hist)
             
@@ -686,14 +697,16 @@ class DrawStack:
 
             # check if we need to symmeterize
             DO_SYMM=False
+            syst_key = copy.deepcopy(syst)
             if syst in symm_list:
                 DO_SYMM=True
+                if syst in mysystAsym:
+                    syst_key = mysystAsym[syst]
             
             bkg_ent = None
             
             for bkg in self.bkgs:
-                bhist = self.ReadSample(sfile, bkg, syst, DO_SYMM=DO_SYMM)
-
+                bhist = self.ReadSample(sfile, bkg, syst_key, DO_SYMM=DO_SYMM)
                 if bkg_ent == None:
                     bkg_ent = bhist
                 else:
@@ -704,6 +717,7 @@ class DrawStack:
 
             bkg_ent.sample = 'bkgs'
             self.sys_bkgs[syst] = bkg_ent
+            #print 'integral: ',bkg_ent.hist.Integral()
             self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst, DO_SYMM=DO_SYMM)
 
     #-------------------------
@@ -747,7 +761,6 @@ class DrawStack:
                 sum = sum_sys[i]
                 h.SetBinContent(i+1, sum[1]/sum_nom)
                 h.GetXaxis().SetBinLabel(i+1, sum[0])
-
         return h
 
     #----------------------
@@ -1331,8 +1344,8 @@ class DrawStack:
 
         #
         # Draw systematics error band around total background stack
-        #
-        if options.draw_syst:
+        #    - this isn't used. It is commented out. it assumes a systemtic uncertainty
+        if options.draw_syst: 
             bkg_herr = self.stack.GetHistogram().Clone()
             bkg_herr.GetXaxis().SetLabelColor(0)
             bkg_herr.GetXaxis().SetTitle("")
@@ -1369,7 +1382,7 @@ class DrawStack:
         for hk,hg in self.bkgs.iteritems(): norm_hists_bkg+=[hg.hist.Clone()]
         syst_hist_bkg=ROOT.TGraphAsymmErrors(self.bkg_sum); self.err_bands+=[syst_hist_bkg]
         syst_ratio=syst_hist_bkg.Clone();                   self.err_bands+=[syst_ratio]
-        self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=self.stackeg)
+        self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
 
         # Setting the draw options
         syst_hist_bkg.SetFillStyle(3004)
@@ -1378,7 +1391,12 @@ class DrawStack:
         syst_hist_bkg.SetLineColor(1)
         syst_hist_bkg.GetXaxis().SetLabelColor(0)
         self.error_map['bkg']=syst_hist_bkg.Clone()
-        self.error_map['bkg'].GetXaxis().SetLabelColor(0)        
+        self.error_map['bkg'].GetXaxis().SetLabelColor(0)
+        self.error_map['bkg'].SetFillStyle(3004)
+        self.error_map['bkg'].SetFillColor(ROOT.kBlack)
+        self.error_map['bkg'].SetMarkerColor(1)
+        self.error_map['bkg'].SetMarkerSize(0)
+        self.error_map['bkg'].SetLineColor(1)        
         if options.draw_norm: pass #self.error_map['bkg'].DrawNormalized('SAMEE2')
         else: self.error_map['bkg'].Draw('SAMEE2')
 
@@ -1435,6 +1453,8 @@ class DrawStack:
                         self.ratio.Add(ent.hist, -1.0)
                         tot_bkg+=ent.hist.Integral(4,101)
                 # Divide
+                # set MC error to zero.
+                #for i in range()
                 self.ratio.Divide(den)
                 for i in range(0,self.ratio.GetNbinsX()+1):
                     if i<6:
@@ -1518,28 +1538,36 @@ class DrawStack:
         
         # Draw
         nom=None
-        for i, hist in enumerate(hists):
-            #self.format_syst(hist, i, linestyle)
-
-            if i==0 or True: # HACKING TO RUN only statistical error
-                if not nom:
-                    nom=hist.Clone()                
-                    for j in range(1,nom.GetNbinsX()+1):
-                        syst.SetPointEYhigh(j-1,nom.GetBinError(j))
-                        syst.SetPointEYlow(j-1,nom.GetBinError(j))                        
-                else:
-                    nom.Add(hist)
-                    for j in range(1,hist.GetNbinsX()+1):
-                        e1=hist.GetBinError(j)
-                        e2=syst.GetErrorYhigh(j-1)
-                        err_quad=math.sqrt(e1*e1+e2*e2)
-                        syst.SetPointEYhigh(j-1,err_quad)
-                        syst.SetPointEYlow(j-1,err_quad)
-
-                continue
+        nom = self.bkg_sum.Clone()
+        for i in range(0,self.bkg_sum.GetNbinsX()):
+            syst.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+            syst.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+        if False:
+            for i, hist in enumerate(hists):
+                #print 'i: ',i
+                #self.format_syst(hist, i, linestyle)
+            
+                #if i==0 or True: # HACKING TO RUN only statistical error
+                if i==0: # HACKING TO RUN only statistical error
+                    if not nom:
+                        nom=hist.Clone()                
+                        for j in range(1,nom.GetNbinsX()+1):
+                            syst.SetPointEYhigh(j-1,nom.GetBinError(j))
+                            syst.SetPointEYlow(j-1,nom.GetBinError(j))                        
+                    else:
+                        nom.Add(hist)
+                        for j in range(1,hist.GetNbinsX()+1):
+                            e1=hist.GetBinError(j)
+                            e2=syst.GetErrorYhigh(j-1)
+                            err_quad=math.sqrt(e1*e1+e2*e2)
+                            syst.SetPointEYhigh(j-1,err_quad)
+                            syst.SetPointEYlow(j-1,err_quad)
+            
+                    continue
             
             # HACKING TO RUN only statistical error
             if False: # HACKING TO RUN only statistical error
+                print 'nom: ',nom.Integral()
                 for m in range(1,nom.GetNbinsX()+1):
                     e1=(nom.GetBinContent(m)-hist.GetBinContent(m))
                     if e1>0:
@@ -1582,6 +1610,7 @@ class DrawStack:
             #    sval = ent.hist.GetBinContent(ibin)
             #    cerr += (cval-sval)*(cval-sval)
             if True: # HACKING TO RUN only statistical error
+                #print 'sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()                
                 for m in range(1,nom.GetNbinsX()+1):
                     nom_val=nom.GetBinContent(m)
                     e1=(ent.hist.GetBinContent(m)-nom_val)
@@ -1600,6 +1629,9 @@ class DrawStack:
         #  
         x1=ROOT.Double()
         y1=ROOT.Double()
+        for i in range(0,self.bkg_sum.GetNbinsX()):
+            syst_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+            syst_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)        
         for j in range(1,tot_bkg.GetNbinsX()+1):
             # Set Y value to 1  
             syst_ratio.GetPoint(j-1,x1,y1)
@@ -1903,92 +1935,7 @@ def writeSystTex(table_name, stack):
                 systs[i]=systs[j]
                 systs[j]=tmp
 
-    my_order=["lep_corr_fr_p",
-    "lep_corr_fr_n",
-    "jes_n",
-    "jes_p",
-    "jer",
-    "el_stat_fr_p",
-    "el_stat_fr_n",
-    "el_eff_p",
-    "el_eff_n",
-    "ees_mat_n",
-    "ees_low_p",
-    "eer_p",
-    "jvf_p",
-    "pileup_p",
-    "ees_z_p",
-    "ees_z_n",
-    "mu_stat_fr_p",
-    "pileup_n",
-    "mu_stat_fr_n",
-    "mu_eff_p",
-    "mu_eff_n",
-    "eer_n",
-    "id_n",
-    "ees_low_n",
-    "ms_n",
-    "qflip_p",
-    "qflip_n",
-    "ees_mat_p",
-    "ms_p",
-    "ees_ps_n",
-    "btag_cj_p",
-    "btag_cj_n",    
-    "btag_lj_n",
-    "tau_eff_p",
-    "btag_bj_n",
-    "tau_eff_n",
-    "jvf_n",
-    "ees_ps_p",
-    "btag_lj_p",
-    "id_p",
-    "btag_bj_p",'bch_up','bch_dn','scalest_p','scalest_n','resost']
-
-    my_order=['jes_n',
-'btag_bj_n',
-'jvf_n',
-'ees_z_p',
-'mu_stat_fr_p',
-'ees_ps_n',
-'tau_eff_p',
-'mu_stat_fr_n',
-'bch_up',
-'jvf_p',
-'btag_bj_p',
-'jes_p',
-'pileup_n',
-'ms_n',
-'bch_dn',
-'id_n',
-'ees_z_n',
-'id_p',
-'btag_lj_p',
-'ms_p',
-'pileup_p',
-'btag_lj_n',
-'ees_low_n',
-'scalest_n',
-'mu_eff_p',
-'ees_low_p',
-'scalest_p',
-'tau_eff_n',
-'jer',
-'el_eff_n',
-'lep_corr_fr_n',
-'btag_cj_p',
-'btag_cj_n',
-'eer_p',
-'el_stat_fr_p',
-'ees_mat_n',
-'mu_eff_n',
-'resost',
-'ees_mat_p',
-'el_stat_fr_n',
-'eer_n',
-'el_eff_p',
-'lep_corr_fr_p',]
-        
+    my_order=mysyst.getsystematicsList()
     if True:
         for key in my_order:
             for s in systs:
@@ -2054,14 +2001,17 @@ def main():
         sys.exit(1)
 
     rfile  = ROOT.TFile(rpath, 'READ')
-    sfiles={}    
-    sfiles = getSystFileList(rpath) # Turned off.
+    sfiles={}
+    print 'Reading nSyst: ',len(mysyst.getsystematicsList())
+    for ia in mysyst.getsystematicsList():
+        sfiles[ia]=rfile
+    #sfiles = getSystFileList(rpath) # Turned off.
     
     #
     # Select histograms and samples for stacks
     #
     #bkgs = ['zewk', 'zqcd','wewk','wqcd','top1','top2']
-    bkgs = ['zewk', 'zqcd','wewk','wqcd','tall']  
+    bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','vvv','zldy']  
 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
@@ -2078,8 +2028,6 @@ def main():
         for l in sf_file:
             sfs1=l.split(' ')
             try:
-            #if sfs1[0]==_opts.weight: pass
-            #else: continue                
                 if sfs1[0].strip()=='top':
                     nf_map['top2']=float(sfs1[1].strip())
                     nf_map['top1']=float(sfs1[1].strip())
@@ -2103,9 +2051,10 @@ def main():
 
     for var in vars:
 
-        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)  
+        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)
+        print 'nSYST: ',len(sfiles)
         if options.draw_syst:
-            if len(sfiles):
+            if len(sfiles)>0:
                 stack.ReadSystFiles(sfiles)
             
         stack.Draw(can)
