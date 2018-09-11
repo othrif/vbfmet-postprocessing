@@ -28,6 +28,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   //
   
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
+  cout << "isMC: " << m_isMC << endl;
   //  cout<<"NAME of output before ======="<<newtree->GetName()<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
 
@@ -108,6 +109,7 @@ StatusCode VBFAnalysisAlg::finalize() {
 
 StatusCode VBFAnalysisAlg::MapNgen(){
   TFile *f = TFile::Open(m_normFile.c_str(),"READ");
+  if(!f or f->IsZombie()) std::cout << "ERROR normFile. Could not open " << m_normFile << std::endl;
   h_Gen = (TH1F*) f->Get("h_total");
   if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
 
@@ -116,18 +118,31 @@ StatusCode VBFAnalysisAlg::MapNgen(){
     int dsid = tmp.Atoi(); 
     float N = h_Gen->GetBinContent(i); 
     Ngen[dsid]=N; 
+    //std::cout << "input: " << dsid << " " << N << std::endl;
    }
   
   return StatusCode::SUCCESS; 
 
 }
 
-StatusCode VBFAnalysisAlg::execute() {  
+StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG ("Executing " << name() << "...");
   //setFilterPassed(false); //optional: start with algorithm not passed
-  m_tree->GetEntry(m_tree->GetReadEntry());
+  //m_tree->GetEntry(m_tree->GetReadEntry());
+  m_tree->GetEntry(nFileEvt);
 
-  if (runNumber != m_runNumberInput) ATH_MSG_ERROR("VBFAnaysisAlg::execute: runNumber " << runNumber << " != m_runNumberInput " << m_runNumberInput);
+  // check that we don't have too many events
+  if(nFileEvt>=nFileEvtTot){
+    ATH_MSG_ERROR("VBFAnaysisAlg::execute: Too  many events:  " << nFileEvt << " total evts: " << nFileEvtTot);
+    return StatusCode::SUCCESS;
+  }
+
+  // iterate event count
+  ++nFileEvt;
+  if (runNumber != m_runNumberInput){ //HACK to hard set the run number
+    ATH_MSG_ERROR("VBFAnaysisAlg::execute: runNumber " << runNumber << " != m_runNumberInput " << m_runNumberInput << " " << jj_dphi << " avg: " << averageIntPerXing);
+    runNumber=m_runNumberInput;
+  }
 
   npevents++;
   if( (npevents%10000) ==0) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
@@ -212,9 +227,13 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   //float beamEnergy(0); CHECK( retrieveMetadata("/TagInfo","beam_energy",beamEnergy) );
   //std::vector<float> bunchPattern; CHECK( retrieveMetadata("/Digitiation/Parameters","BeamIntensityPattern",bunchPattern) );
   ATH_MSG_INFO("VBFAnalysisAlg::beginInputFile()");
-
+  nFileEvt=0;
   m_treeName = "MiniNtuple";
+  if(m_currentVariation!="Nominal")
+    m_treeName = "MiniNtuple_"+m_currentVariation;
+  std::cout << "Tree: " << m_treeName << std::endl;
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
+  nFileEvtTot=m_tree->GetEntries();
   m_tree->SetBranchStatus("*",0);
   m_tree->SetBranchStatus("runNumber", 1);
   m_tree->SetBranchStatus("eventNumber", 1);
@@ -266,6 +285,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 
   m_tree->SetBranchAddress("runNumber", &runNumber);
   m_tree->SetBranchAddress("eventNumber", &eventNumber);
+  m_tree->SetBranchAddress("averageIntPerXing", &averageIntPerXing);
   m_tree->SetBranchAddress("mcEventWeight", &mcEventWeight);
   m_tree->SetBranchAddress("puWeight", &puWeight);
   m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);

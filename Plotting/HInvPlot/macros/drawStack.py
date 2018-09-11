@@ -716,6 +716,7 @@ class DrawStack:
                 sys.exit(1)
 
             bkg_ent.sample = 'bkgs'
+            #print bkg_ent
             self.sys_bkgs[syst] = bkg_ent
             #print 'integral: ',bkg_ent.hist.Integral()
             self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst, DO_SYMM=DO_SYMM)

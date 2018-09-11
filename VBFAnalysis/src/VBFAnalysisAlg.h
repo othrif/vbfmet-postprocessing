@@ -45,6 +45,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
  private: 
 
   int npevents = 0;
+  long int nFileEvt = 0;
+  long int nFileEvtTot = 0;
   Bool_t m_isMC = true;
   bool is2015;
   bool is2016;
