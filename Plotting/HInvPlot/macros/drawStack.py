@@ -22,7 +22,7 @@ p.add_option('--outdir',       type='string', default=None,          dest='outdi
 p.add_option('--pref',         type='string', default=None,          dest='pref')
 p.add_option('--syst',         type='string', default='Nominal',     dest='syst')
 p.add_option('--syst-sel',     type='string', default='Nominal',     dest='syst_sel')
-p.add_option('--syst-see',     type='string', default='Nominal',     dest='syst_see')
+p.add_option('--syst-see',     type='string', default=None,          dest='syst_see')
 p.add_option('--sf-file',      type='string', default=None,          dest='sf_file')
 p.add_option('--do-nf',        type='string', default=None,          dest='do_nf')
 p.add_option('--extract-sig',  type='string', default=None,          dest='extract_sig')
@@ -945,7 +945,7 @@ class DrawStack:
         updateCanvas(can, name='%s_%s_%s_bkg' %(getSelKeyPath(), self.name, syst))
 
     #-------------------
-    def PlotManySyst(self, systs, can, isSignal=False, fillData=False):
+    def PlotManySyst(self, systs, can, isSignal=False, fillData=False, groupStart=-1, groupEnd=-1):
         #if syst not in self.sys_bkgs:
         #    return None
         if len(self.pads)>1:
@@ -955,16 +955,20 @@ class DrawStack:
             self.pads[0].SetBottomMargin(0.15);
         sys=[]
         ratio_sys = []
+        iSys=0
         for s in systs:
+            if groupStart>0 and iSys<groupStart:
+                iSys+=1
+                continue
             if isSignal:
                 sys       += [self.sys_sigs[s].hist.Clone()]
                 ratio_sys += [self.sys_sigs[s].hist.Clone()]                
             else:                   
                 sys       += [self.sys_bkgs[s].hist.Clone()]
                 ratio_sys += [self.sys_bkgs[s].hist.Clone()]
-
-        #fillData=True
-        #self.pads[0].SetLogy(1)
+            iSys+=1
+            if groupEnd>0 and iSys>groupEnd:
+                break;
         mydata=None
         if fillData:
             mydata = self.data.hist.Clone()
@@ -1030,14 +1034,22 @@ class DrawStack:
         self.leg.SetFillStyle (0)
         #self.leg.SetNColumns  (2)
         self.leg.SetTextFont(42);    
-        self.leg.SetTextSize(0.04);         
+        self.leg.SetTextSize(0.04);
         if fillData:
             self.leg.AddEntry(mydata, 'Data')                
         self.leg.AddEntry(bkg,    'Nominal')
-        i=0        
+        i=0
+        j=0
         while i<len(systs):
-            self.leg.AddEntry(sys[i],systs[i])
+            if groupStart>0 and i<groupStart:
+                i+=1
+                continue
+            
+            self.leg.AddEntry(sys[j],systs[i])
             i+=1
+            j+=1
+            if groupEnd>0 and i>groupEnd:
+                break
         self.leg.Draw()
 
         # Draw the ratios
@@ -1093,9 +1105,9 @@ class DrawStack:
                     s.Draw('HIST SAME')                    
 
         if isSignal:
-            updateCanvas(can, name='%s_%s_%s_sig' %(getSelKeyPath(), self.name, 'systall'))
+            updateCanvas(can, name='%s_%s_%s%s_sig' %(getSelKeyPath(), self.name, 'systall',groupStart))
         else:
-            updateCanvas(can, name='%s_%s_%s_bkg' %(getSelKeyPath(), self.name, 'systall'))              
+            updateCanvas(can, name='%s_%s_%s%s_bkg' %(getSelKeyPath(), self.name, 'systall',groupStart))              
 
     #------------------------------
     def PlotSystTables(self, can):
@@ -1542,74 +1554,23 @@ class DrawStack:
         for i in range(0,self.bkg_sum.GetNbinsX()):
             syst.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             syst.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
-        if False:
-            for i, hist in enumerate(hists):
-                #print 'i: ',i
-                #self.format_syst(hist, i, linestyle)
+            # This REMOVES THE MC STAT uncertainty from the syst band
+            syst.SetPointEYhigh(i-1,0.0)
+            syst.SetPointEYlow(i-1,0.0)
             
-                #if i==0 or True: # HACKING TO RUN only statistical error
-                if i==0: # HACKING TO RUN only statistical error
-                    if not nom:
-                        nom=hist.Clone()                
-                        for j in range(1,nom.GetNbinsX()+1):
-                            syst.SetPointEYhigh(j-1,nom.GetBinError(j))
-                            syst.SetPointEYlow(j-1,nom.GetBinError(j))                        
-                    else:
-                        nom.Add(hist)
-                        for j in range(1,hist.GetNbinsX()+1):
-                            e1=hist.GetBinError(j)
-                            e2=syst.GetErrorYhigh(j-1)
-                            err_quad=math.sqrt(e1*e1+e2*e2)
-                            syst.SetPointEYhigh(j-1,err_quad)
-                            syst.SetPointEYlow(j-1,err_quad)
-            
-                    continue
-            
-            # HACKING TO RUN only statistical error
-            if False: # HACKING TO RUN only statistical error
-                print 'nom: ',nom.Integral()
-                for m in range(1,nom.GetNbinsX()+1):
-                    e1=(nom.GetBinContent(m)-hist.GetBinContent(m))
-                    if e1>0:
-                        e2=syst.GetErrorYhigh(m-1)
-                        new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
-                        syst.SetPointEYhigh(m-1,new_e)
-                    elif e1<0:
-                        e2=syst.GetErrorYlow(m-1)
-                        new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
-                        syst.SetPointEYlow(m-1,new_e)
+            if other_syst:
+                m=i
+                e1=other_syst.GetErrorYhigh(m-1)
+                e2=syst.GetErrorYhigh(m-1)
+                new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
+                syst.SetPointEYhigh(m-1,new_e)
+                e2=syst.GetErrorYlow(m-1)
+                new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
+                syst.SetPointEYlow(m-1,new_e)
 
-        #if other_syst!=None and False:
-        #if True:
-            #print 'drawing this symmetric error: '
-            for m in range(1,nom.GetNbinsX()+1):
-                #adding 50\% error
-                print 'bins: ',m
-                #if nom.GetXaxis().GetBinUpEdge(m)<=12.0 and False:
-                #    #syst.SetPointEYhigh(m-1,math.sqrt(syst.GetErrorYhigh(m-1)**2+(3.5*nom.GetBinContent(m))**2))
-                #    #syst.SetPointEYlow(m-1,math.sqrt(syst.GetErrorYlow(m-1)**2+(3.5*nom.GetBinContent(m))**2))
-                #
-                #    syst.SetPointEYhigh(m-1,math.sqrt((3.5*nom.GetBinContent(m))**2))
-                #    syst.SetPointEYlow(m-1,math.sqrt((3.5*nom.GetBinContent(m))**2))                    
-                #else:
-                #    #syst.SetPointEYhigh(m-1,math.sqrt(syst.GetErrorYhigh(m-1)**2+(0.25*nom.GetBinContent(m))**2))
-                #    #syst.SetPointEYlow(m-1,math.sqrt(syst.GetErrorYlow(m-1)**2+(0.25*nom.GetBinContent(m))**2))
-                #    syst.SetPointEYhigh(m-1,math.sqrt((0.25*nom.GetBinContent(m))**2))
-                #    syst.SetPointEYlow(m-1,math.sqrt((0.25*nom.GetBinContent(m))**2))                                    
-                if other_syst:
-                    e1=other_syst.GetErrorYhigh(m-1)
-                    e2=syst.GetErrorYhigh(m-1)
-                    new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
-                    syst.SetPointEYhigh(m-1,new_e)
-                    e2=syst.GetErrorYlow(m-1)
-                    new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
-                    syst.SetPointEYlow(m-1,new_e)
-
+        # iterate over the systematics
         for sys, ent in self.sys_bkgs.iteritems():
-            #if ibin >= 0 and ibin <= ent.hist.GetNbinsX()+1:                
-            #    sval = ent.hist.GetBinContent(ibin)
-            #    cerr += (cval-sval)*(cval-sval)
-            if True: # HACKING TO RUN only statistical error
+            if True:
                 #print 'sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()                
                 for m in range(1,nom.GetNbinsX()+1):
                     nom_val=nom.GetBinContent(m)
@@ -1805,35 +1766,6 @@ class DrawStack:
 
         return ymax
 
-#-------------------------------------------------------------------------
-def getSystFileList(rpath):
-    
-    paths = {}
-    vetos = ['MuRescaleUp','MuRescaleDown']
-    
-    #systs = ['el_fr_n','el_fr_p','mu_fr_n','mu_fr_p'] #hstudy.getSystVarHWWWinter(options,returnVals=True)
-    systs = ['btag_cj_p','btag_cj_n','btag_lj_n','btag_lj_p','eer_n','eer_p','ees_low_n','ees_low_p','ees_mat_n','ees_mat_n','ees_mat_p','ees_ps_n','ees_z_n','ees_z_p','el_eff_n','el_eff_p','id_n','id_p','jer','jes_n','jes_p','jvf_n','jvf_p','ms_n','ms_p','mu_eff_n','mu_eff_p','pileup_n','pileup_p','tau_eff_n','tau_eff_p','qflip_n','qflip_p','btag_bj_n','btag_bj_p','el_stat_fr_p', 'el_stat_fr_n', 'mu_stat_fr_p', 'mu_stat_fr_n', 'lep_corr_fr_p',
-        'lep_corr_fr_n','bch_up','bch_dn','scalest_p','scalest_n','resost']#'xsec_n','xsec_p','nom','el_fr_n','el_fr_p','mu_fr_p','mu_fr_n',
-    #systs = ['el_fr_n','el_fr_p','mu_fr_p'] #hstudy.getSystVarHWWWinter(options,returnVals=True)    
-    if rpath.count('%s/' %options.syst_sel) != 1 or not options.draw_syst:
-        log.info('getSystFileList - ignore path with incorrect format: %s' %rpath)
-        return {}
-
-    for syst in sorted(systs):
-        if syst in vetos:
-            continue
-
-        if syst != options.syst_sel:
-            npath = rpath.replace(options.syst_sel, syst)
-
-            if os.path.isfile(npath):
-                rfile  = ROOT.TFile(npath, 'READ')
-                paths[syst] = rfile
-                log.info('getSystFileList - %-20s path: %s' %(syst, npath))
-            else: log.error('getSystFileList - %-20s path: %s' %(syst, npath))
-                
-    return paths
-
 #---
 def syst_names():
 
@@ -2005,7 +1937,6 @@ def main():
     print 'Reading nSyst: ',len(mysyst.getsystematicsList())
     for ia in mysyst.getsystematicsList():
         sfiles[ia]=rfile
-    #sfiles = getSystFileList(rpath) # Turned off.
     
     #
     # Select histograms and samples for stacks
@@ -2051,7 +1982,7 @@ def main():
 
     for var in vars:
 
-        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)
+        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)            
         print 'nSYST: ',len(sfiles)
         if options.draw_syst:
             if len(sfiles)>0:
@@ -2068,8 +1999,12 @@ def main():
         updateCanvas(can, name=cname)
 
         if options.syst_see == 'allsyst':
-            stack.PlotManySyst(sfiles.keys(), can, isSignal=True)
-            stack.PlotManySyst(sfiles.keys(), can, fillData=(not options.blind))
+
+            grouping=10
+            syst_group = len(sfiles.keys())/grouping+1
+            for i in range(0, syst_group):
+                stack.PlotManySyst(sfiles.keys(), can, isSignal=True, groupStart=i*grouping, groupEnd=(i+1)*grouping)
+                stack.PlotManySyst(sfiles.keys(), can, fillData=(not options.blind), groupStart=i*grouping, groupEnd=(i+1)*grouping)
 
         for syst in sorted(sfiles.keys()):
             if options.syst_see == 'all' or options.syst_see == syst:
