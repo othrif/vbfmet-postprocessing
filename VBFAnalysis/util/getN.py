@@ -4,6 +4,7 @@ import math
 import subprocess
 import argparse
 import pickle
+import sys
 
 parser = argparse.ArgumentParser( description = "get total Nevent to weight samples", add_help=True , fromfile_prefix_chars='@')
 parser.add_argument( "-l", "--list", type = str, dest = "filelist", default = "listslim", help = "list of files" )
@@ -12,13 +13,19 @@ parser.add_argument( "-o", "--output", type = str, dest = "output", default = "f
 parser.add_argument( "-p", "--pickle", type = str, dest = "pickle", default = None, help = "pickle file list" )
 args, unknown = parser.parse_known_args()
 
-Chain = ROOT.TChain("METTree")
+print 'Collecting your files!'
+sys.stdout.flush()
 
 fout = ROOT.TFile(args.output,"RECREATE")
 h_total = ROOT.TH1F("h_total","",1,0,1)
 if args.pickle==None:
+    print 'not a pickle'
     fdir_list = open(args.filelist,'r')
+    print 'fdir_list: ',fdir_list
+    sys.stdout.flush()
     for fdir in fdir_list:
+        print 'Directory:',fdir
+        sys.stdout.flush()
         samplesplit = fdir.split(".")
         if "physics_Main" in fdir:
                 continue
@@ -27,12 +34,13 @@ if args.pickle==None:
                 dsid_string = samplesplit[p+1]
     
         returnCode = -10
-        while returnCode!=0:
-            if args.grid:
+        if args.grid:
+            while returnCode!=0:
                 p = subprocess.Popen("rucio list-file-replicas --protocol root --pfns --rse MWT2_UC_LOCALGROUPDISK "+fdir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            else:
-                p = subprocess.Popen("ls "+fdir.replace("root","*/*"), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            returnCode=p.returncode
+                returnCode=p.returncode
+        else:
+            p = subprocess.Popen("ls "+fdir.replace("root","*/*"), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            
         nevent = 0
         for line in p.stdout.readlines():
             filepath = line.strip()

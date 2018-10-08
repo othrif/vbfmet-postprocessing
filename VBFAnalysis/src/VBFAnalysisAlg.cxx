@@ -4,7 +4,7 @@
 #include "PathResolver/PathResolver.h"
 //#include "xAODEventInfo/EventInfo.h"
 #include <vector>
-
+#include "TLorentzVector.h"
 
 
 VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ){
@@ -86,6 +86,15 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("jet_eta",&jet_eta);
   m_tree_out->Branch("met_significance",&met_significance);
   
+  m_tree_out->Branch("GenMET_pt", &GenMET_pt);
+  m_tree_out->Branch("met_truth_et", &met_truth_et);
+  m_tree_out->Branch("met_truth_sumet", &met_truth_sumet);
+  m_tree_out->Branch("truth_jet_pt", &truth_jet_pt);
+  m_tree_out->Branch("truth_jet_eta",&truth_jet_eta);
+  m_tree_out->Branch("truth_jet_phi",&truth_jet_phi);
+  m_tree_out->Branch("truth_jet_m",  &truth_jet_m);
+  m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
+
   //Register the output TTree 
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
   MapNgen(); //fill std::map with dsid->Ngen 
@@ -157,6 +166,17 @@ StatusCode VBFAnalysisAlg::execute() {
   bool CRZee = false;
   bool CRZmm = false;
 
+  // Fill
+  truth_jj_mass =-1.0;
+  if(truth_jet_pt->size()>1){
+    TLorentzVector tmp, jjtruth;
+    tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
+    jjtruth = tmp;
+    tmp.SetPtEtaPhiM(truth_jet_pt->at(1), truth_jet_eta->at(1),truth_jet_phi->at(1),truth_jet_m->at(1));
+    jjtruth += tmp;
+    truth_jj_mass =jjtruth.M();
+  }
+
   if (m_isMC){
     crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
     if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
@@ -166,13 +186,14 @@ StatusCode VBFAnalysisAlg::execute() {
     weight = 1;
   }
 
-  if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
+  //if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
+  if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) )) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (!(n_jet == 2)) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("n_jet = 2!");
   if (!(n_jet == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
   if (!(n_jet == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
-  if (!((jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > 4.8) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > 1e6))) return StatusCode::SUCCESS;
+  if (!((jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > 4.8) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > 2e5))) return StatusCode::SUCCESS; // was 1e6 for mjj
   ATH_MSG_DEBUG ("Pass VBF cuts!");
   if (trigger_HLT_xe100_mht_L1XE50 == 1 || trigger_HLT_xe110_mht_L1XE50 == 1 || trigger_HLT_xe90_mht_L1XE50 == 1) trigger_met = 1; else trigger_met = 0;
   ATH_MSG_DEBUG ("Assign trigger_met value");
@@ -183,7 +204,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   ATH_MSG_DEBUG ("met_significance calculated");
   
-  if ((trigger_met == 1) & (met_tst_et > 180e3) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
+  if ((trigger_met == 1) & (met_tst_et > 150e3) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
   if (SR) ATH_MSG_DEBUG ("It's SR!"); else ATH_MSG_DEBUG ("It's NOT SR");
   if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
   if (CRWep) ATH_MSG_DEBUG ("It's CRWep!"); else ATH_MSG_DEBUG ("It's NOT CRWep");
@@ -282,6 +303,13 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_jvt",1);
   m_tree->SetBranchStatus("jet_timing",1);
   m_tree->SetBranchStatus("jet_passJvt",1);
+  m_tree->SetBranchStatus("truth_jet_pt",1);
+  m_tree->SetBranchStatus("truth_jet_phi",1);
+  m_tree->SetBranchStatus("truth_jet_eta",1);
+  m_tree->SetBranchStatus("truth_jet_m",1);
+  m_tree->SetBranchStatus("met_truth_et",1);
+  m_tree->SetBranchStatus("met_truth_sumet",1);
+  m_tree->SetBranchStatus("GenMET_pt",1);
 
   m_tree->SetBranchAddress("runNumber", &runNumber);
   m_tree->SetBranchAddress("eventNumber", &eventNumber);
@@ -330,6 +358,15 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_jvt",&jet_jvt);
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
   m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);
+
+  m_tree->SetBranchAddress("truth_jet_pt", &truth_jet_pt);
+  m_tree->SetBranchAddress("truth_jet_phi",&truth_jet_phi);
+  m_tree->SetBranchAddress("truth_jet_eta",&truth_jet_eta);
+  m_tree->SetBranchAddress("truth_jet_m",  &truth_jet_m);
+
+  m_tree->SetBranchAddress("met_truth_et",  &met_truth_et);
+  m_tree->SetBranchAddress("met_truth_sumet",  &met_truth_sumet);
+  m_tree->SetBranchAddress("GenMET_pt",  &GenMET_pt);
 
   return StatusCode::SUCCESS;
 }

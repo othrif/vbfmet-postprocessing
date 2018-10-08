@@ -1,8 +1,8 @@
 import ROOT
 import subprocess
 import pickle
-
-l = open('/tmp/files.txt','r')
+import sys
+l = open('input_v3Loose.txt','r')
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt
 myMap = {}
@@ -10,7 +10,11 @@ n=0
 for ite in l:
 
     i=ite.rstrip('\n')
-    print 'File:',i
+    print 'File:',i.strip()
+    sys.stdout.flush()
+
+    if i.strip()=='':
+        continue
 
     stdout=None
     returnCode = -10
@@ -18,7 +22,7 @@ for ite in l:
     #proc = subprocess.Popen(['/bin/bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     #stdout,error = proc.communicate('rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  '+i+'/')
         proc = subprocess.Popen(['/bin/bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        stdout = proc.communicate('rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  '+i+'/')
+        stdout = proc.communicate('rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  '+i.strip()+'/')
     #stdout = proc.communicate('rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  '+i+'/')
     
         print stdout

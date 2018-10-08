@@ -72,6 +72,7 @@ else:
         s=VBFAnalysis.sample.sample(sampledir)
         isMC = s.getisMC()
         runNumberS = s.getrunNumberS()
+        print 'RunNumber:',runNumberS
         p = subprocess.Popen("ls "+sampledir.strip()+"*/*root*", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         for line in p.stdout.readlines():
             filepath = line.strip()
