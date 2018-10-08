@@ -16,7 +16,7 @@ VBFAnalysis/python/job_configurations package allows users to add user defined f
 cd $TestArea
 git clone ssh://git@gitlab.cern.ch:7999/VBFInv/STPostProcessing.git source/
 mkdir build;cd build
-acmSetup AthAnalysis,21.2.35
+acmSetup AthAnalysis,21.2.45
 acm compile
 ```
 
