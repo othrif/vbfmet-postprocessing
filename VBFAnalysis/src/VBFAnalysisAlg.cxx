@@ -86,7 +86,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("jet_eta",&jet_eta);
   m_tree_out->Branch("met_significance",&met_significance);
   
-  if(m_currentVariation=="Nominal"){
+  if(m_currentVariation=="Nominal" && m_isMC){
     m_tree_out->Branch("GenMET_pt", &GenMET_pt);
     m_tree_out->Branch("met_truth_et", &met_truth_et);
     m_tree_out->Branch("met_truth_sumet", &met_truth_sumet);
@@ -306,7 +306,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_jvt",1);
   m_tree->SetBranchStatus("jet_timing",1);
   m_tree->SetBranchStatus("jet_passJvt",1);
-  if(m_currentVariation=="Nominal"){
+  if(m_currentVariation=="Nominal" && m_isMC){
     m_tree->SetBranchStatus("truth_jet_pt",1);
     m_tree->SetBranchStatus("truth_jet_phi",1);
     m_tree->SetBranchStatus("truth_jet_eta",1);
@@ -364,7 +364,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
   m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);
 
-  if(m_currentVariation=="Nominal"){
+  if(m_currentVariation=="Nominal" && m_isMC){
     m_tree->SetBranchAddress("truth_jet_pt", &truth_jet_pt);
     m_tree->SetBranchAddress("truth_jet_phi",&truth_jet_phi);
     m_tree->SetBranchAddress("truth_jet_eta",&truth_jet_eta);
