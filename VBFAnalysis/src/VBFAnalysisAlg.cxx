@@ -86,15 +86,18 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("jet_eta",&jet_eta);
   m_tree_out->Branch("met_significance",&met_significance);
   
-  m_tree_out->Branch("GenMET_pt", &GenMET_pt);
-  m_tree_out->Branch("met_truth_et", &met_truth_et);
-  m_tree_out->Branch("met_truth_sumet", &met_truth_sumet);
-  m_tree_out->Branch("truth_jet_pt", &truth_jet_pt);
-  m_tree_out->Branch("truth_jet_eta",&truth_jet_eta);
-  m_tree_out->Branch("truth_jet_phi",&truth_jet_phi);
-  m_tree_out->Branch("truth_jet_m",  &truth_jet_m);
-  m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
-
+  if(m_currentVariation=="Nominal"){
+    m_tree_out->Branch("GenMET_pt", &GenMET_pt);
+    m_tree_out->Branch("met_truth_et", &met_truth_et);
+    m_tree_out->Branch("met_truth_sumet", &met_truth_sumet);
+    m_tree_out->Branch("truth_jet_pt", &truth_jet_pt);
+    m_tree_out->Branch("truth_jet_eta",&truth_jet_eta);
+    m_tree_out->Branch("truth_jet_phi",&truth_jet_phi);
+    m_tree_out->Branch("truth_jet_m",  &truth_jet_m);
+    m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
+  }else{
+    truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0;
+  }
   //Register the output TTree 
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
   MapNgen(); //fill std::map with dsid->Ngen 
@@ -167,8 +170,8 @@ StatusCode VBFAnalysisAlg::execute() {
   bool CRZmm = false;
 
   // Fill
-  truth_jj_mass =-1.0;
-  if(truth_jet_pt->size()>1){
+  truth_jj_mass =-1.0;  
+  if(truth_jet_pt && truth_jet_pt->size()>1){
     TLorentzVector tmp, jjtruth;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
     jjtruth = tmp;
@@ -303,13 +306,15 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_jvt",1);
   m_tree->SetBranchStatus("jet_timing",1);
   m_tree->SetBranchStatus("jet_passJvt",1);
-  m_tree->SetBranchStatus("truth_jet_pt",1);
-  m_tree->SetBranchStatus("truth_jet_phi",1);
-  m_tree->SetBranchStatus("truth_jet_eta",1);
-  m_tree->SetBranchStatus("truth_jet_m",1);
-  m_tree->SetBranchStatus("met_truth_et",1);
-  m_tree->SetBranchStatus("met_truth_sumet",1);
-  m_tree->SetBranchStatus("GenMET_pt",1);
+  if(m_currentVariation=="Nominal"){
+    m_tree->SetBranchStatus("truth_jet_pt",1);
+    m_tree->SetBranchStatus("truth_jet_phi",1);
+    m_tree->SetBranchStatus("truth_jet_eta",1);
+    m_tree->SetBranchStatus("truth_jet_m",1);
+    m_tree->SetBranchStatus("met_truth_et",1);
+    m_tree->SetBranchStatus("met_truth_sumet",1);
+    m_tree->SetBranchStatus("GenMET_pt",1);
+  }
 
   m_tree->SetBranchAddress("runNumber", &runNumber);
   m_tree->SetBranchAddress("eventNumber", &eventNumber);
@@ -359,15 +364,15 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
   m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);
 
-  m_tree->SetBranchAddress("truth_jet_pt", &truth_jet_pt);
-  m_tree->SetBranchAddress("truth_jet_phi",&truth_jet_phi);
-  m_tree->SetBranchAddress("truth_jet_eta",&truth_jet_eta);
-  m_tree->SetBranchAddress("truth_jet_m",  &truth_jet_m);
-
-  m_tree->SetBranchAddress("met_truth_et",  &met_truth_et);
-  m_tree->SetBranchAddress("met_truth_sumet",  &met_truth_sumet);
-  m_tree->SetBranchAddress("GenMET_pt",  &GenMET_pt);
-
+  if(m_currentVariation=="Nominal"){
+    m_tree->SetBranchAddress("truth_jet_pt", &truth_jet_pt);
+    m_tree->SetBranchAddress("truth_jet_phi",&truth_jet_phi);
+    m_tree->SetBranchAddress("truth_jet_eta",&truth_jet_eta);
+    m_tree->SetBranchAddress("truth_jet_m",  &truth_jet_m);
+    m_tree->SetBranchAddress("met_truth_et",  &met_truth_et);
+    m_tree->SetBranchAddress("met_truth_sumet",  &met_truth_sumet);
+    m_tree->SetBranchAddress("GenMET_pt",  &GenMET_pt);
+  }
   return StatusCode::SUCCESS;
 }
 
