@@ -42,6 +42,7 @@ For running on condor:
 ```bash
 # you'll want to generate a list of files, which only has to be done once. give it a comma separated list of input containers
 python VBFAnalysis/util/writeFileMap.py
+# there is also a setup for local files  VBFAnalysis/util/writeFileMapLS.py
 # run on condor over a list of files for nominal
 submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list -n
 # run on condor over a list of files for all sys
