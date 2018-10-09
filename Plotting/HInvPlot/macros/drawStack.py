@@ -4,6 +4,7 @@ import os,sys
 import re
 import sys
 import math
+import copy
 
 from optparse import OptionParser
 
@@ -71,7 +72,12 @@ mysyst = syst.systematics('All')
 mysystAsym = syst.systematics('Asym')
 
 # List of plots to symmeterize
-symm_list=mysystAsym.getsystematicsList()
+symm_list=[] #mysystAsym.getsystematicsList()
+
+#add asymetric uncertainties
+for key,v in mysystAsym.getsystematicsAsymMap().iteritems():
+    #mysyst+=[key]
+    symm_list+=[key]
 
 #-----------------------------------------
 def Style():
@@ -106,7 +112,6 @@ def getSelKeyLabel(selkey):
         if selkey.count('sr_'):  proc += ', SR'
         if selkey.count('wcr'): proc += ', WCR'
         if selkey.count('zcr'): proc += ', ZCR'
-
 
     return proc
     
@@ -663,7 +668,7 @@ class DrawStack:
         log.debug('ReadSample - integral=%5.1f sample=%s, syst=%s' %(hist.Integral(), sample, syst))
 
         if DO_SYMM:
-            print 'COMPUTING systematic'
+            #print 'COMPUTING systematic'
             hist_central_value = self.file_pointer.Get(path)
             self.Symmeterize(hist_central_value, hist)
             
@@ -692,14 +697,16 @@ class DrawStack:
 
             # check if we need to symmeterize
             DO_SYMM=False
+            syst_key = copy.deepcopy(syst)
             if syst in symm_list:
                 DO_SYMM=True
+                if syst in mysystAsym:
+                    syst_key = mysystAsym[syst]
             
             bkg_ent = None
             
             for bkg in self.bkgs:
-                bhist = self.ReadSample(sfile, bkg, syst, DO_SYMM=DO_SYMM)
-
+                bhist = self.ReadSample(sfile, bkg, syst_key, DO_SYMM=DO_SYMM)
                 if bkg_ent == None:
                     bkg_ent = bhist
                 else:
@@ -711,6 +718,7 @@ class DrawStack:
             bkg_ent.sample = 'bkgs'
             #print bkg_ent
             self.sys_bkgs[syst] = bkg_ent
+            #print 'integral: ',bkg_ent.hist.Integral()
             self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst, DO_SYMM=DO_SYMM)
 
     #-------------------------
@@ -754,7 +762,6 @@ class DrawStack:
                 sum = sum_sys[i]
                 h.SetBinContent(i+1, sum[1]/sum_nom)
                 h.GetXaxis().SetBinLabel(i+1, sum[0])
-
         return h
 
     #----------------------
@@ -1338,8 +1345,8 @@ class DrawStack:
 
         #
         # Draw systematics error band around total background stack
-        #
-        if options.draw_syst:
+        #    - this isn't used. It is commented out. it assumes a systemtic uncertainty
+        if options.draw_syst: 
             bkg_herr = self.stack.GetHistogram().Clone()
             bkg_herr.GetXaxis().SetLabelColor(0)
             bkg_herr.GetXaxis().SetTitle("")
@@ -1376,7 +1383,7 @@ class DrawStack:
         for hk,hg in self.bkgs.iteritems(): norm_hists_bkg+=[hg.hist.Clone()]
         syst_hist_bkg=ROOT.TGraphAsymmErrors(self.bkg_sum); self.err_bands+=[syst_hist_bkg]
         syst_ratio=syst_hist_bkg.Clone();                   self.err_bands+=[syst_ratio]
-        self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=self.stackeg)
+        self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
 
         # Setting the draw options
         syst_hist_bkg.SetFillStyle(3004)
@@ -1385,7 +1392,12 @@ class DrawStack:
         syst_hist_bkg.SetLineColor(1)
         syst_hist_bkg.GetXaxis().SetLabelColor(0)
         self.error_map['bkg']=syst_hist_bkg.Clone()
-        self.error_map['bkg'].GetXaxis().SetLabelColor(0)        
+        self.error_map['bkg'].GetXaxis().SetLabelColor(0)
+        self.error_map['bkg'].SetFillStyle(3004)
+        self.error_map['bkg'].SetFillColor(ROOT.kBlack)
+        self.error_map['bkg'].SetMarkerColor(1)
+        self.error_map['bkg'].SetMarkerSize(0)
+        self.error_map['bkg'].SetLineColor(1)        
         if options.draw_norm: pass #self.error_map['bkg'].DrawNormalized('SAMEE2')
         else: self.error_map['bkg'].Draw('SAMEE2')
 
@@ -1442,6 +1454,8 @@ class DrawStack:
                         self.ratio.Add(ent.hist, -1.0)
                         tot_bkg+=ent.hist.Integral(4,101)
                 # Divide
+                # set MC error to zero.
+                #for i in range()
                 self.ratio.Divide(den)
                 for i in range(0,self.ratio.GetNbinsX()+1):
                     if i<6:
@@ -1525,28 +1539,36 @@ class DrawStack:
         
         # Draw
         nom=None
-        for i, hist in enumerate(hists):
-            #self.format_syst(hist, i, linestyle)
-
-            if i==0 or True: # HACKING TO RUN only statistical error
-                if not nom:
-                    nom=hist.Clone()                
-                    for j in range(1,nom.GetNbinsX()+1):
-                        syst.SetPointEYhigh(j-1,nom.GetBinError(j))
-                        syst.SetPointEYlow(j-1,nom.GetBinError(j))                        
-                else:
-                    nom.Add(hist)
-                    for j in range(1,hist.GetNbinsX()+1):
-                        e1=hist.GetBinError(j)
-                        e2=syst.GetErrorYhigh(j-1)
-                        err_quad=math.sqrt(e1*e1+e2*e2)
-                        syst.SetPointEYhigh(j-1,err_quad)
-                        syst.SetPointEYlow(j-1,err_quad)
-
-                continue
+        nom = self.bkg_sum.Clone()
+        for i in range(0,self.bkg_sum.GetNbinsX()):
+            syst.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+            syst.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+        if False:
+            for i, hist in enumerate(hists):
+                #print 'i: ',i
+                #self.format_syst(hist, i, linestyle)
+            
+                #if i==0 or True: # HACKING TO RUN only statistical error
+                if i==0: # HACKING TO RUN only statistical error
+                    if not nom:
+                        nom=hist.Clone()                
+                        for j in range(1,nom.GetNbinsX()+1):
+                            syst.SetPointEYhigh(j-1,nom.GetBinError(j))
+                            syst.SetPointEYlow(j-1,nom.GetBinError(j))                        
+                    else:
+                        nom.Add(hist)
+                        for j in range(1,hist.GetNbinsX()+1):
+                            e1=hist.GetBinError(j)
+                            e2=syst.GetErrorYhigh(j-1)
+                            err_quad=math.sqrt(e1*e1+e2*e2)
+                            syst.SetPointEYhigh(j-1,err_quad)
+                            syst.SetPointEYlow(j-1,err_quad)
+            
+                    continue
             
             # HACKING TO RUN only statistical error
             if False: # HACKING TO RUN only statistical error
+                print 'nom: ',nom.Integral()
                 for m in range(1,nom.GetNbinsX()+1):
                     e1=(nom.GetBinContent(m)-hist.GetBinContent(m))
                     if e1>0:
@@ -1589,6 +1611,7 @@ class DrawStack:
             #    sval = ent.hist.GetBinContent(ibin)
             #    cerr += (cval-sval)*(cval-sval)
             if True: # HACKING TO RUN only statistical error
+                #print 'sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()                
                 for m in range(1,nom.GetNbinsX()+1):
                     nom_val=nom.GetBinContent(m)
                     e1=(ent.hist.GetBinContent(m)-nom_val)
@@ -1607,6 +1630,9 @@ class DrawStack:
         #  
         x1=ROOT.Double()
         y1=ROOT.Double()
+        for i in range(0,self.bkg_sum.GetNbinsX()):
+            syst_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+            syst_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)        
         for j in range(1,tot_bkg.GetNbinsX()+1):
             # Set Y value to 1  
             syst_ratio.GetPoint(j-1,x1,y1)
@@ -1977,6 +2003,7 @@ def main():
 
     rfile  = ROOT.TFile(rpath, 'READ')
     sfiles={}
+    print 'Reading nSyst: ',len(mysyst.getsystematicsList())
     for ia in mysyst.getsystematicsList():
         sfiles[ia]=rfile
     #sfiles = getSystFileList(rpath) # Turned off.
@@ -2002,8 +2029,6 @@ def main():
         for l in sf_file:
             sfs1=l.split(' ')
             try:
-            #if sfs1[0]==_opts.weight: pass
-            #else: continue                
                 if sfs1[0].strip()=='top':
                     nf_map['top2']=float(sfs1[1].strip())
                     nf_map['top1']=float(sfs1[1].strip())
@@ -2028,8 +2053,9 @@ def main():
     for var in vars:
 
         stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)
+        print 'nSYST: ',len(sfiles)
         if options.draw_syst:
-            if len(sfiles):
+            if len(sfiles)>0:
                 stack.ReadSystFiles(sfiles)
             
         stack.Draw(can)
