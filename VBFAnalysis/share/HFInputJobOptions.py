@@ -26,15 +26,17 @@ inputDir = str(jps.AthenaCommonFlags.FilesInput)
 s = VBFAnalysis.sample.sample("", args.currentVariation)
 currentSampleKey=''
 currentSampleList=[]
+currentSample=''
 if args.currentSample!="":
     currentSampleList+=[args.currentSample]
 subfileN=''
-if len(currentSampleList)>0:
+if len(currentSampleList)==0:
     #for sampl,slist in s.sampleMap.iteritems():
     for sampl in s.sampleTypeList:
         if inputDir.count(sampl):
             currentSampleKey=sampl
             currentSampleList=[sampl]
+            currentSample=sampl
             break;
 #s = VBFAnalysis.sample.sample(inputDir, args.currentVariation)
 #currentSample = s.getsampleType()
@@ -50,7 +52,9 @@ if containerName!="":
     runNumber = s.getrunNumber()
     subfileN = s.getsubfileN()
 
-for currentSample in currentSampleList:
+#for currentSample in currentSampleList:
+if True:
+    print 'currentSample: ',currentSample
     jps.AthenaCommonFlags.AccessMode = "TreeAccess"              #Choose from TreeAccess,BranchAccess,ClassAccess,AthenaAccess,POOLAccess
     jps.AthenaCommonFlags.TreeName = currentSample+args.currentVariation   #form:"Z_strongNominal"                    #when using TreeAccess, must specify the input tree name 
     print currentSample+args.currentVariation

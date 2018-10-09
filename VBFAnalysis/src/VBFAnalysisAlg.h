@@ -121,6 +121,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tst_nolep_et;
   Float_t met_tst_phi;
   Float_t met_tst_nolep_phi;
+
+  Float_t met_truth_et;
+  Float_t met_truth_sumet;
+  Float_t GenMET_pt;
+  Double_t truth_jj_mass;
   std::vector<Float_t>* mu_charge;
   std::vector<Float_t>* mu_pt;
   std::vector<Float_t>* mu_phi;
@@ -136,6 +141,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_timing;
   std::vector<Int_t>* jet_passJvt;
 
+  std::vector<Float_t>* truth_jet_pt;
+  std::vector<Float_t>* truth_jet_eta;
+  std::vector<Float_t>* truth_jet_phi;
+  std::vector<Float_t>* truth_jet_m;
+
   TBranch    *b_mu_charge;
   TBranch    *b_mu_pt;
   TBranch    *b_mu_phi;
@@ -148,6 +158,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TBranch    *b_jet_jvt;
   TBranch    *b_jet_timing;
   TBranch    *b_jet_passJvt;
+
+  TBranch    *b_truth_jet_pt;
+  TBranch    *b_truth_jet_eta;
+  TBranch    *b_truth_jet_phi;
+  TBranch    *b_truth_jet_m;
 }; 
 
 #endif //> !VBFANALYSIS_VBFANALYSISALG_H

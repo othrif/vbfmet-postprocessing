@@ -15,5 +15,5 @@ hadd QCDw.root QCDw*root
 hadd QCDunw.root QCDunw*root
 #hadd signal.root *H125*root
 hadd VBFH125.root  VBFH125*.root
-hadd ggF125.root  ggFH125*.root
+hadd ggFH125.root  ggFH125*.root
 hadd VH125.root  VH125*.root
