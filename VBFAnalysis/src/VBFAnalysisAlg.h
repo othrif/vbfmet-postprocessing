@@ -173,6 +173,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_pt;
   std::vector<Float_t>* jet_phi;
   std::vector<Float_t>* jet_eta;
+  std::vector<Float_t>* jet_m;
   std::vector<Float_t>* jet_jvt;
   std::vector<Float_t>* jet_fjvt;
   std::vector<Float_t>* jet_timing;

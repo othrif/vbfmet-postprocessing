@@ -85,6 +85,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("el_eta",&el_eta); 
   m_tree_out->Branch("jet_phi",&jet_phi);
   m_tree_out->Branch("jet_eta",&jet_eta);
+  m_tree_out->Branch("jet_m",&jet_m);
   m_tree_out->Branch("jet_jvt",&jet_jvt);
   m_tree_out->Branch("met_significance",&met_significance);
 
@@ -371,6 +372,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_pt",1);
   m_tree->SetBranchStatus("jet_phi",1);
   m_tree->SetBranchStatus("jet_eta",1);
+  m_tree->SetBranchStatus("jet_m",1);
   m_tree->SetBranchStatus("jet_jvt",1);
   m_tree->SetBranchStatus("jet_timing",1);
 
@@ -475,6 +477,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_pt",&jet_pt);
   m_tree->SetBranchAddress("jet_phi",&jet_phi);
   m_tree->SetBranchAddress("jet_eta",&jet_eta);
+  m_tree->SetBranchAddress("jet_m",&jet_m);
   m_tree->SetBranchAddress("jet_jvt",&jet_jvt);
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
   //if(foundGenMET) m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);

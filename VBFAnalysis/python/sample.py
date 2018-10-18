@@ -7,7 +7,7 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst)
-        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK","Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125","ggFH125","VH125","QCDw","QCDunw","VVV","VV","data"] # do not change order
+        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125","ggFH125","VH125","QCDw","QCDunw","VVV","VV","data"] # do not change order
 
         self.sampleMap = {'data':['data'],
                           'W_EWK':['W_EWK'],
@@ -53,6 +53,8 @@ class sample(object):
                 self.sampleType = "W_EWK"
             elif (self.runNumber >= 364156 and self.runNumber <= 364197):
                 self.sampleType = "W_strong"
+            elif (self.runNumber >= 363600 and self.runNumber <= 363671):
+                self.sampleType = "W_strong" # madgraph
             elif ((self.runNumber >= 308092 and self.runNumber <= 308095) or (self.runNumber >= 363355 and self.runNumber <= 363358)):
                 self.sampleType = "Z_EWK"
             elif (self.runNumber >= 345099 and self.runNumber <= 345102):
@@ -77,6 +79,10 @@ class sample(object):
                 self.sampleType = "VVV"
             elif (self.runNumber >= 364198 and self.runNumber <= 364215):
                 self.sampleType = "Z_strong_LowMass"
+            elif (self.runNumber >= 301020 and self.runNumber <= 361669):
+                self.sampleType = "Z_strong" #powheg
+            elif (self.runNumber >= 363147 and self.runNumber <= 363170) or (self.runNumber >= 363123 and self.runNumber <= 363146):
+                self.sampleType = "Z_strong" #madgraph
             else:
                 print "python/sample.py: runNumber "+str(self.runNumber)+" could not be identified as a valid MC :o"
                 self.sampleType = "ERROR"
