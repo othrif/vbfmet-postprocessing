@@ -107,6 +107,13 @@ StatusCode VBFAnalysisAlg::initialize() {
     if(m_isMC) m_tree_out->Branch("baseel_truthOrigin",  &baseel_truthOrigin);
     if(m_isMC) m_tree_out->Branch("baseel_truthType",    &baseel_truthType);
 
+    m_tree_out->Branch("ph_pt",&ph_pt);
+    m_tree_out->Branch("ph_phi",&ph_phi);
+    m_tree_out->Branch("ph_eta",&ph_eta);
+    m_tree_out->Branch("tau_pt",&tau_pt);
+    m_tree_out->Branch("tau_phi",&tau_phi);
+    m_tree_out->Branch("tau_eta",&tau_eta);
+
     m_tree_out->Branch("met_soft_tst_et",        &met_soft_tst_et);
     m_tree_out->Branch("met_soft_tst_phi",       &met_soft_tst_phi);
     m_tree_out->Branch("met_soft_tst_sumet",     &met_soft_tst_sumet);
@@ -377,6 +384,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_timing",1);
 
   if(m_extraVars){
+
+    m_tree->SetBranchStatus("ph_pt",1);
+    m_tree->SetBranchStatus("ph_phi",1);
+    m_tree->SetBranchStatus("ph_eta",1);
+    m_tree->SetBranchStatus("tau_pt",1);
+    m_tree->SetBranchStatus("tau_phi",1);
+    m_tree->SetBranchStatus("tau_eta",1);
+
     m_tree->SetBranchStatus("jet_fjvt",1);
     m_tree->SetBranchStatus("basemu_pt",1);
     m_tree->SetBranchStatus("basemu_eta",1);
@@ -510,6 +525,13 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
     if(m_isMC) m_tree->SetBranchAddress("baseel_truthOrigin",  &baseel_truthOrigin);
     if(m_isMC) m_tree->SetBranchAddress("baseel_truthType",    &baseel_truthType);
+
+    m_tree->SetBranchAddress("ph_pt",           &ph_pt);
+    m_tree->SetBranchAddress("ph_eta",          &ph_eta);
+    m_tree->SetBranchAddress("ph_phi",          &ph_phi);
+    m_tree->SetBranchAddress("tau_pt",           &tau_pt);
+    m_tree->SetBranchAddress("tau_eta",          &tau_eta);
+    m_tree->SetBranchAddress("tau_phi",          &tau_phi);
 
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
     m_tree->SetBranchAddress("met_soft_tst_phi",       &met_soft_tst_phi);
