@@ -179,13 +179,6 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_timing;
   std::vector<Int_t>* jet_passJvt;
 
-  std::vector<Float_t>* ph_pt;
-  std::vector<Float_t>* ph_phi;
-  std::vector<Float_t>* ph_eta;
-  std::vector<Float_t>* tau_pt;
-  std::vector<Float_t>* tau_phi;
-  std::vector<Float_t>* tau_eta;
-
   std::vector<Float_t>* truth_jet_pt;
   std::vector<Float_t>* truth_jet_eta;
   std::vector<Float_t>* truth_jet_phi;
@@ -200,6 +193,13 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* truth_el_pt;
   std::vector<Float_t>* truth_el_eta;
   std::vector<Float_t>* truth_el_phi;
+
+  std::vector<Float_t>* ph_pt;
+  std::vector<Float_t>* ph_phi;
+  std::vector<Float_t>* ph_eta;
+  std::vector<Float_t>* tau_pt;
+  std::vector<Float_t>* tau_phi;
+  std::vector<Float_t>* tau_eta;
 
   TBranch    *b_mu_charge;
   TBranch    *b_mu_pt;
@@ -219,6 +219,15 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TBranch    *b_truth_jet_eta;
   TBranch    *b_truth_jet_phi;
   TBranch    *b_truth_jet_m;
+
+  TBranch    *b_ph_pt;
+  TBranch    *b_ph_eta;
+  TBranch    *b_ph_phi;
+
+  TBranch    *b_tau_pt;
+  TBranch    *b_tau_eta;
+  TBranch    *b_tau_phi;
+
 }; 
 
 #endif //> !VBFANALYSIS_VBFANALYSISALG_H

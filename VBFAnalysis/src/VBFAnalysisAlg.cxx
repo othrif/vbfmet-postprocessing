@@ -44,6 +44,64 @@ StatusCode VBFAnalysisAlg::initialize() {
     //   w_VBFhiggs =1.;
     // }
   }
+
+  basemu_pt= new std::vector<float>(0);
+  basemu_eta= new std::vector<float>(0);
+  basemu_phi= new std::vector<float>(0);
+  basemu_z0= new std::vector<float>(0);
+  basemu_ptvarcone20= new std::vector<float>(0);
+  basemu_type= new std::vector<int>(0);
+  basemu_truthType= new std::vector<int>(0);
+  basemu_truthOrigin= new std::vector<int>(0);
+
+  baseel_pt= new std::vector<float>(0);
+  baseel_eta= new std::vector<float>(0);
+  baseel_phi= new std::vector<float>(0);
+  baseel_z0= new std::vector<float>(0);
+  baseel_ptvarcone20= new std::vector<float>(0);
+  baseel_truthType= new std::vector<int>(0);
+  baseel_truthOrigin= new std::vector<int>(0);
+
+  mu_charge= new std::vector<float>(0);
+  mu_pt= new std::vector<float>(0);
+  mu_phi= new std::vector<float>(0);
+  el_charge= new std::vector<float>(0);
+  el_pt= new std::vector<float>(0);
+  el_phi= new std::vector<float>(0);
+  mu_eta= new std::vector<float>(0);
+  el_eta= new std::vector<float>(0);
+  jet_pt= new std::vector<float>(0);
+  jet_phi= new std::vector<float>(0);
+  jet_eta= new std::vector<float>(0);
+  jet_m= new std::vector<float>(0);
+  jet_jvt= new std::vector<float>(0);
+  jet_fjvt= new std::vector<float>(0);
+  jet_timing= new std::vector<float>(0);
+  jet_passJvt= new std::vector<int>(0);
+
+  truth_jet_pt= new std::vector<float>(0);
+  truth_jet_eta= new std::vector<float>(0);
+  truth_jet_phi= new std::vector<float>(0);
+  truth_jet_m= new std::vector<float>(0);
+
+  truth_tau_pt= new std::vector<float>(0);
+  truth_tau_eta= new std::vector<float>(0);
+  truth_tau_phi= new std::vector<float>(0);
+  truth_mu_pt= new std::vector<float>(0);
+  truth_mu_eta= new std::vector<float>(0);
+  truth_mu_phi= new std::vector<float>(0);
+  truth_el_pt= new std::vector<float>(0);
+  truth_el_eta= new std::vector<float>(0);
+  truth_el_phi= new std::vector<float>(0);
+
+  ph_pt = new std::vector<float>(0);
+  ph_phi = new std::vector<float>(0);
+  ph_eta = new std::vector<float>(0);
+  tau_pt = new std::vector<float>(0);
+  tau_phi = new std::vector<float>(0);
+  tau_eta = new std::vector<float>(0);
+
+
   //    if(runNumber >= 276262 && runNumber <= 284484) is2015 =true;
   //    else if(runNumber >= 296939 && runNumber <= 311481) is2016 =true;
   //    else throw std::invalid_argument("runNumber could not be identified with a dataset :o");
@@ -142,7 +200,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   }
   
   if(m_currentVariation=="Nominal" && m_isMC){
-    m_tree_out->Branch("GenMET_pt", &GenMET_pt);
+    //m_tree_out->Branch("GenMET_pt", &GenMET_pt);
     m_tree_out->Branch("met_truth_et", &met_truth_et);
     m_tree_out->Branch("met_truth_sumet", &met_truth_sumet);
     m_tree_out->Branch("truth_jet_pt", &truth_jet_pt);
@@ -196,13 +254,15 @@ StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG ("Executing " << name() << "...");
   //setFilterPassed(false); //optional: start with algorithm not passed
   //m_tree->GetEntry(m_tree->GetReadEntry());
-  m_tree->GetEntry(nFileEvt);
 
   // check that we don't have too many events
   if(nFileEvt>=nFileEvtTot){
     ATH_MSG_ERROR("VBFAnaysisAlg::execute: Too  many events:  " << nFileEvt << " total evts: " << nFileEvtTot);
     return StatusCode::SUCCESS;
   }
+
+  if(!m_tree) ATH_MSG_ERROR("VBFAnaysisAlg::execute: tree invalid: " <<m_tree );
+  m_tree->GetEntry(nFileEvt);
 
   // iterate event count
   ++nFileEvt;
@@ -226,7 +286,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   // Fill
   truth_jj_mass =-1.0;  
-  if(truth_jet_pt && truth_jet_pt->size()>1){
+  if(m_isMC && truth_jet_pt && truth_jet_pt->size()>1){
     TLorentzVector tmp, jjtruth;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
     jjtruth = tmp;
@@ -242,6 +302,22 @@ StatusCode VBFAnalysisAlg::execute() {
     ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
   } else {
     weight = 1;
+  }
+
+  // base lepton selection
+  n_baseel=0;
+  n_basemu=0;
+  if(m_extraVars){
+    if(baseel_pt){
+      for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
+	if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25) ++n_baseel;
+      }
+    }
+    if(basemu_pt){
+      for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
+	if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25) ++n_basemu;
+      }
+    }
   }
 
   // Definiing a loose skimming
@@ -330,8 +406,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_treeName = "MiniNtuple";
   if(m_currentVariation!="Nominal")
     m_treeName = "MiniNtuple_"+m_currentVariation;
-  std::cout << "Tree: " << m_treeName << std::endl;
+  std::cout << "Tree: " << m_treeName << std::endl;  
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
+  if(!m_tree) ATH_MSG_ERROR("VBFAnaysisAlg::beginInputFile - tree is invalid " << m_tree);
+  
   nFileEvtTot=m_tree->GetEntries();
   m_tree->SetBranchStatus("*",0);
   m_tree->SetBranchStatus("runNumber", 1);
@@ -418,8 +496,6 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("met_tighter_tst_et",1);
     m_tree->SetBranchStatus("met_tighter_tst_phi",1);
     m_tree->SetBranchStatus("metsig_tst",1);
-    m_tree->SetBranchStatus("n_baseel",1);
-    m_tree->SetBranchStatus("n_basemu",1);
 
     if(m_currentVariation=="Nominal" && m_isMC){
       m_tree->SetBranchStatus("truth_tau_pt", 1);
@@ -443,7 +519,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("met_truth_et",1);
     m_tree->SetBranchStatus("met_truth_sumet",1);
     //m_tree->SetBranchStatus("GenMET_pt",1, &foundGetMet);
-    m_tree->SetBranchStatus("GenMET_pt",1);
+    //m_tree->SetBranchStatus("GenMET_pt",1);
   }
   //if(foundGenMET) m_tree->SetBranchStatus("jet_passJvt",1);
 
@@ -496,7 +572,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_jvt",&jet_jvt);
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
   //if(foundGenMET) m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);
-
+  
   if(m_currentVariation=="Nominal" && m_isMC){
     m_tree->SetBranchAddress("truth_jet_pt", &truth_jet_pt);
     m_tree->SetBranchAddress("truth_jet_phi",&truth_jet_phi);
@@ -504,11 +580,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("truth_jet_m",  &truth_jet_m);
     m_tree->SetBranchAddress("met_truth_et",  &met_truth_et);
     m_tree->SetBranchAddress("met_truth_sumet",  &met_truth_sumet);
-    if(foundGenMET) m_tree->SetBranchAddress("GenMET_pt",  &GenMET_pt);
+    //if(foundGenMET) m_tree->SetBranchAddress("GenMET_pt",  &GenMET_pt);
   }
-
+  
   if(m_extraVars){
-
+  
     m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
     m_tree->SetBranchAddress("basemu_pt",           &basemu_pt);
     m_tree->SetBranchAddress("basemu_eta",          &basemu_eta);
@@ -525,14 +601,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
     if(m_isMC) m_tree->SetBranchAddress("baseel_truthOrigin",  &baseel_truthOrigin);
     if(m_isMC) m_tree->SetBranchAddress("baseel_truthType",    &baseel_truthType);
-
+    
     m_tree->SetBranchAddress("ph_pt",           &ph_pt);
-    m_tree->SetBranchAddress("ph_eta",          &ph_eta);
     m_tree->SetBranchAddress("ph_phi",          &ph_phi);
+    m_tree->SetBranchAddress("ph_eta",          &ph_eta);
     m_tree->SetBranchAddress("tau_pt",           &tau_pt);
-    m_tree->SetBranchAddress("tau_eta",          &tau_eta);
     m_tree->SetBranchAddress("tau_phi",          &tau_phi);
-
+    m_tree->SetBranchAddress("tau_eta",          &tau_eta);
+    
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
     m_tree->SetBranchAddress("met_soft_tst_phi",       &met_soft_tst_phi);
     m_tree->SetBranchAddress("met_soft_tst_sumet",     &met_soft_tst_sumet);
@@ -543,10 +619,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("met_tighter_tst_et",     &met_tighter_tst_et);
     m_tree->SetBranchAddress("met_tighter_tst_phi",    &met_tighter_tst_phi);
     m_tree->SetBranchAddress("metsig_tst",             &metsig_tst);
-
-    m_tree->SetBranchAddress("n_baseel",             &n_baseel);
-    m_tree->SetBranchAddress("n_basemu",             &n_basemu);
-
+  
     if(m_currentVariation=="Nominal" && m_isMC){
       m_tree->SetBranchAddress("truth_tau_pt", &truth_tau_pt);
       m_tree->SetBranchAddress("truth_tau_eta",&truth_tau_eta);
