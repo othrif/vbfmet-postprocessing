@@ -2,12 +2,16 @@ import ROOT
 import subprocess
 import pickle
 import sys
-l = open('input_v3Loose.txt','r')
+#l = open('v14Loose.txt','r')
+l = open('input_v15Loose.txt','r')
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt
 myMap = {}
 n=0
 for ite in l:
+
+    if ite.count('#'):
+        continue
 
     i=ite.rstrip('\n')
     print 'File:',i.strip()

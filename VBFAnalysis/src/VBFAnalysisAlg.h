@@ -50,6 +50,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Bool_t m_isMC = true;
   bool is2015;
   bool is2016;
+  bool m_LooseSkim = true;
+  bool m_extraVars = true;
   TTree *m_tree = 0;
   TTree *m_tree_out = 0;
   SUSY::CrossSectionDB *my_XsecDB; 
@@ -72,7 +74,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
    //TH1D* m_myHist = 0;
    //TTree* m_myTree = 0;
 
-  //output tree                                                                                                                                                                                                   
+  //output tree
   std::string outputName;
   std::string m_currentVariation;
   std::string m_normFile;
@@ -110,6 +112,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t n_jet;
   Int_t n_el;
   Int_t n_mu;
+  Int_t n_ph;
+  Int_t n_tau;
   Double_t jj_mass;
   Double_t jj_deta;
   Double_t jj_dphi;
@@ -117,15 +121,49 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Double_t met_tst_j2_dphi;
   Double_t met_tst_nolep_j1_dphi;
   Double_t met_tst_nolep_j2_dphi;
+  Double_t met_cst_jet;
   Float_t met_tst_et;
   Float_t met_tst_nolep_et;
   Float_t met_tst_phi;
   Float_t met_tst_nolep_phi;
 
-  Float_t met_truth_et;
-  Float_t met_truth_sumet;
-  Float_t GenMET_pt;
-  Double_t truth_jj_mass;
+  // extra vars
+  Int_t   n_baseel=0;
+  Int_t   n_basemu=0;
+  Float_t met_soft_tst_et=-9999;
+  Float_t met_soft_tst_phi=-9999;
+  Float_t met_soft_tst_sumet=-9999;
+  Float_t met_tenacious_tst_et=-9999;
+  Float_t met_tenacious_tst_phi=-9999;
+  Float_t met_tighter_tst_et=-9999;
+  Float_t met_tighter_tst_phi=-9999;
+  Float_t met_tight_tst_et=-9999;
+  Float_t met_tight_tst_phi=-9999;
+  Double_t metsig_tst=-9999;
+
+  Float_t met_truth_et=-9999;
+  Float_t met_truth_sumet=-9999;
+  Float_t GenMET_pt=-9999;
+  Double_t truth_jj_mass=-9999;
+
+  // extra vars
+  std::vector<Float_t>* basemu_pt;
+  std::vector<Float_t>* basemu_eta;
+  std::vector<Float_t>* basemu_phi;
+  std::vector<Float_t>* basemu_z0;
+  std::vector<Float_t>* basemu_ptvarcone20;
+  std::vector<Int_t>* basemu_type;
+  std::vector<Int_t>* basemu_truthType;
+  std::vector<Int_t>* basemu_truthOrigin;
+
+  std::vector<Float_t>* baseel_pt;
+  std::vector<Float_t>* baseel_eta;
+  std::vector<Float_t>* baseel_phi;
+  std::vector<Float_t>* baseel_z0;
+  std::vector<Float_t>* baseel_ptvarcone20;
+  std::vector<Int_t>* baseel_truthType;
+  std::vector<Int_t>* baseel_truthOrigin;
+
   std::vector<Float_t>* mu_charge;
   std::vector<Float_t>* mu_pt;
   std::vector<Float_t>* mu_phi;
@@ -137,7 +175,9 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_pt;
   std::vector<Float_t>* jet_phi;
   std::vector<Float_t>* jet_eta;
+  std::vector<Float_t>* jet_m;
   std::vector<Float_t>* jet_jvt;
+  std::vector<Float_t>* jet_fjvt;
   std::vector<Float_t>* jet_timing;
   std::vector<Int_t>* jet_passJvt;
 
@@ -145,6 +185,29 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* truth_jet_eta;
   std::vector<Float_t>* truth_jet_phi;
   std::vector<Float_t>* truth_jet_m;
+
+  std::vector<Float_t>* truth_tau_pt;
+  std::vector<Float_t>* truth_tau_eta;
+  std::vector<Float_t>* truth_tau_phi;
+  std::vector<Float_t>* truth_mu_pt;
+  std::vector<Float_t>* truth_mu_eta;
+  std::vector<Float_t>* truth_mu_phi;
+  std::vector<Float_t>* truth_el_pt;
+  std::vector<Float_t>* truth_el_eta;
+  std::vector<Float_t>* truth_el_phi;
+
+  std::vector<Float_t>* outph_pt;
+  std::vector<Float_t>* outph_phi;
+  std::vector<Float_t>* outph_eta;
+  std::vector<Float_t>* outtau_pt;
+  std::vector<Float_t>* outtau_phi;
+  std::vector<Float_t>* outtau_eta;
+  std::vector<Float_t>* ph_pt;
+  std::vector<Float_t>* ph_phi;
+  std::vector<Float_t>* ph_eta;
+  std::vector<Float_t>* tau_pt;
+  std::vector<Float_t>* tau_phi;
+  std::vector<Float_t>* tau_eta;
 
   TBranch    *b_mu_charge;
   TBranch    *b_mu_pt;
@@ -156,6 +219,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TBranch    *b_jet_phi;
   TBranch    *b_jet_eta;
   TBranch    *b_jet_jvt;
+  TBranch    *b_jet_fjvt;
   TBranch    *b_jet_timing;
   TBranch    *b_jet_passJvt;
 
@@ -163,6 +227,15 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TBranch    *b_truth_jet_eta;
   TBranch    *b_truth_jet_phi;
   TBranch    *b_truth_jet_m;
+
+  TBranch    *b_ph_pt;
+  TBranch    *b_ph_eta;
+  TBranch    *b_ph_phi;
+
+  TBranch    *b_tau_pt;
+  TBranch    *b_tau_eta;
+  TBranch    *b_tau_phi;
+
 }; 
 
 #endif //> !VBFANALYSIS_VBFANALYSISALG_H
