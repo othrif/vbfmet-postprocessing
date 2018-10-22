@@ -318,6 +318,12 @@ StatusCode VBFAnalysisAlg::execute() {
   n_basemu=0;
   n_ph=0;
   n_tau=0;
+  outph_pt->clear();
+  outph_eta->clear();
+  outph_phi->clear();
+  outtau_pt->clear();
+  outtau_eta->clear();
+  outtau_phi->clear();
   if(m_extraVars){
     if(baseel_pt){
       for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
