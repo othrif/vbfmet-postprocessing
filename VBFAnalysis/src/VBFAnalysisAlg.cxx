@@ -94,6 +94,13 @@ StatusCode VBFAnalysisAlg::initialize() {
   truth_el_eta= new std::vector<float>(0);
   truth_el_phi= new std::vector<float>(0);
 
+  outph_pt = new std::vector<float>(0);
+  outph_phi = new std::vector<float>(0);
+  outph_eta = new std::vector<float>(0);
+  outtau_pt = new std::vector<float>(0);
+  outtau_phi = new std::vector<float>(0);
+  outtau_eta = new std::vector<float>(0);
+
   ph_pt = new std::vector<float>(0);
   ph_phi = new std::vector<float>(0);
   ph_eta = new std::vector<float>(0);
@@ -119,6 +126,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("n_jet",&n_jet);
   m_tree_out->Branch("n_el",&n_el);
   m_tree_out->Branch("n_mu",&n_mu);
+  m_tree_out->Branch("n_ph",&n_ph);
+  m_tree_out->Branch("n_tau",&n_tau);
   m_tree_out->Branch("jj_mass",&jj_mass);
   m_tree_out->Branch("jj_deta",&jj_deta);
   m_tree_out->Branch("jj_dphi",&jj_dphi);
@@ -165,12 +174,12 @@ StatusCode VBFAnalysisAlg::initialize() {
     if(m_isMC) m_tree_out->Branch("baseel_truthOrigin",  &baseel_truthOrigin);
     if(m_isMC) m_tree_out->Branch("baseel_truthType",    &baseel_truthType);
 
-    m_tree_out->Branch("ph_pt",&ph_pt);
-    m_tree_out->Branch("ph_phi",&ph_phi);
-    m_tree_out->Branch("ph_eta",&ph_eta);
-    m_tree_out->Branch("tau_pt",&tau_pt);
-    m_tree_out->Branch("tau_phi",&tau_phi);
-    m_tree_out->Branch("tau_eta",&tau_eta);
+    m_tree_out->Branch("ph_pt", &outph_pt);
+    m_tree_out->Branch("ph_phi",&outph_phi);
+    m_tree_out->Branch("ph_eta",&outph_eta);
+    m_tree_out->Branch("tau_pt",&outtau_pt);
+    m_tree_out->Branch("tau_phi",&outtau_phi);
+    m_tree_out->Branch("tau_eta",&outtau_eta);
 
     m_tree_out->Branch("met_soft_tst_et",        &met_soft_tst_et);
     m_tree_out->Branch("met_soft_tst_phi",       &met_soft_tst_phi);
@@ -307,6 +316,8 @@ StatusCode VBFAnalysisAlg::execute() {
   // base lepton selection
   n_baseel=0;
   n_basemu=0;
+  n_ph=0;
+  n_tau=0;
   if(m_extraVars){
     if(baseel_pt){
       for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
@@ -318,7 +329,68 @@ StatusCode VBFAnalysisAlg::execute() {
 	if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25) ++n_basemu;
       }
     }
-  }
+    // overlap remove with the photons
+    if(ph_pt){
+      TVector3 phvec,tmp;
+      for(unsigned iPh=0; iPh<ph_pt->size(); ++iPh){
+	bool passOR=true;
+	phvec.SetPtEtaPhi(ph_pt->at(iPh),ph_eta->at(iPh),ph_phi->at(iPh));
+	if(baseel_pt){
+	  for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
+	    if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25){
+	      tmp.SetPtEtaPhi(baseel_pt->at(iEle),baseel_eta->at(iEle),baseel_phi->at(iEle));
+	      if(phvec.DeltaR(tmp)<0.2) passOR=false;
+	    }
+	  }
+	}
+	if(basemu_pt){
+	  for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
+	    if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25){
+	      tmp.SetPtEtaPhi(basemu_pt->at(iMuo),basemu_eta->at(iMuo),basemu_phi->at(iMuo));
+	      if(phvec.DeltaR(tmp)<0.2) passOR=false;  
+	    }
+	  }
+	}// end base muon overlap
+	if(passOR){
+	  ++n_ph;
+	  outph_pt->push_back(ph_pt->at(iPh));
+	  outph_eta->push_back(ph_eta->at(iPh));
+	  outph_phi->push_back(ph_phi->at(iPh));
+	}
+      }// end photon loop
+    }// end photon overlap removal
+
+    // overlap remove with the photons
+    if(tau_pt){
+      TVector3 tauvec,tmp;
+      for(unsigned iTau=0; iTau<tau_pt->size(); ++iTau){
+	bool passOR=true;
+	tauvec.SetPtEtaPhi(tau_pt->at(iTau),tau_eta->at(iTau),tau_phi->at(iTau));
+	if(baseel_pt){
+	  for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
+	    if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25){
+	      tmp.SetPtEtaPhi(baseel_pt->at(iEle),baseel_eta->at(iEle),baseel_phi->at(iEle));
+	      if(tauvec.DeltaR(tmp)<0.2) passOR=false;
+	    }
+	  }
+	}
+	if(basemu_pt){
+	  for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
+	    if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25){
+	      tmp.SetPtEtaPhi(basemu_pt->at(iMuo),basemu_eta->at(iMuo),basemu_phi->at(iMuo));
+	      if(tauvec.DeltaR(tmp)<0.2) passOR=false;  
+	    }
+	  }
+	}// end base muon overlap
+	if(passOR){
+	  outtau_pt->push_back(tau_pt->at(iTau));
+	  outtau_eta->push_back(tau_eta->at(iTau));
+	  outtau_phi->push_back(tau_phi->at(iTau));
+	  ++n_tau;
+	}
+      }// end tau loop
+    }// end tau overlap removal
+  }// end extra variables
 
   // Definiing a loose skimming
   float METCut = 180.0e3;
