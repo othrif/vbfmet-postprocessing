@@ -120,7 +120,7 @@ StatusCode HFInputAlg::initialize() {
 std::string HFInputAlg::HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst, Bool_t isMC) {
   if (isMC) {
     if (bin == "") return "h"+currentSample+ "_"+syst+"_"+currentCR + "_obs_cuts";
-    else if (currentSample.find("signal") != std::string::npos) return "h"+currentSample+syst+"_"+currentCR + "_obs_cuts";
+    //    else if (currentSample.find("H125") != std::string::npos) return "h"+currentSample+syst+"_"+currentCR + "_obs_cuts";
     //    else return "h"+currentSample+ "_VBFjetSel_bin"+bin+syst+"_"+currentCR + "_obs_cuts";
     else return "h"+currentSample+ "_VBFjetSel_"+bin+syst+"_"+currentCR + "_obs_cuts";
   } else {

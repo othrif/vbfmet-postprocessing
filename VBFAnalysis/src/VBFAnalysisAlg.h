@@ -45,6 +45,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
  private: 
 
   int npevents = 0;
+  int year;
   long int nFileEvt = 0;
   long int nFileEvtTot = 0;
   Bool_t m_isMC = true;
@@ -121,6 +122,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tst_nolep_et;
   Float_t met_tst_phi;
   Float_t met_tst_nolep_phi;
+  Double_t met_cst_jet;
 
   Float_t met_truth_et;
   Float_t met_truth_sumet;
@@ -132,6 +134,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* el_charge;
   std::vector<Float_t>* el_pt;
   std::vector<Float_t>* el_phi;
+  std::vector<Float_t>* el_m;
+  std::vector<Float_t>* mu_m;
   std::vector<Float_t>* mu_eta;
   std::vector<Float_t>* el_eta;
   std::vector<Float_t>* jet_pt;
