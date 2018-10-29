@@ -142,6 +142,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Double_t metsig_tst=-9999;
 
   Float_t met_truth_et=-9999;
+  Float_t met_truth_phi=-9999;
   Float_t met_truth_sumet=-9999;
   Float_t GenMET_pt=-9999;
   Double_t truth_jj_mass=-9999;

@@ -2,8 +2,8 @@ import ROOT
 import subprocess
 import pickle
 
-#l = open('extra.txt','r')
-l = open('extra_v15.txt','r')
+l = open('extra.txt','r')
+#l = open('extra_v15.txt','r')
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt
 myMap = {}
@@ -56,7 +56,7 @@ print myMap
 
 # merging two maps
 if True:
-    oldMap = pickle.load( open( 'mapOld15.p', "rb" ) )
+    oldMap = pickle.load( open( 'mapOld.p', "rb" ) )
     for i,k in oldMap.iteritems():
         if len(k)>0:
             if i not in myMap:
