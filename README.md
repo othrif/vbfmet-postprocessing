@@ -16,7 +16,7 @@ VBFAnalysis/python/job_configurations package allows users to add user defined f
 cd $TestArea
 git clone ssh://git@gitlab.cern.ch:7999/VBFInv/STPostProcessing.git source/
 mkdir build;cd build
-acmSetup AthAnalysis,21.2.45
+acmSetup AthAnalysis,21.2.35
 acm compile
 ```
 
@@ -26,6 +26,16 @@ acm compile
 cd $TestArea/build
 acmSetup
 ```
+
+# create the input files
+# generating a map is the preferred option for listing files
+python VBFAnalysis/util/writeFileMap.py # for GRID files
+python VBFAnalysis/util/writeFileMapLS.py # copy in a text file with each input file per line. There is an input for text files from the GRID. These can be overwritten preferring local files
+# collect the pickle file to get the total event counts for normalization
+python -p source/VBFAnalysis/data/uchicagoFileMap_v15Loose.p -o fout_v15raw.root 
+
+# to check the number of raw. The RAW counts need to be saved. Add the -r 1 option.
+python -p source/VBFAnalysis/data/uchicagoFileMap_v15Loose.p -o fout_v15raw.root -r 1
 
 
 ## Run VBFAnalysisAlg ##
