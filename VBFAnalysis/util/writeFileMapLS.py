@@ -57,7 +57,8 @@ print myMap
 # merging two maps
 if True:
     oldMap = pickle.load( open( 'mapOld.p', "rb" ) )
-    for i,k in oldMap.iteritems():
+    for ii,k in oldMap.iteritems():
+        i=ii.strip('\n').strip(' ').strip('\n')
         if len(k)>0:
             if i not in myMap:
                 myMap[i]=k
