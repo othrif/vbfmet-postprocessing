@@ -68,8 +68,9 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kvvv:   return "vvv";
     case kJPsi:  return "jpsi";
     case kUpsl:  return "upsl";
-    case kSusy:  return "susy";
-    case kSusy1:  return "susy1";      
+    case kZqcdPow:  return "zqcdPow";
+    case kZqcdMad:  return "zqcdMad";      
+    case kWqcdMad:  return "wqcdMad";      
     default: break;
     }
 
@@ -137,8 +138,9 @@ std::string Msl::Mva::Convert2Std(Sample s)
     case kvvv:  return "vvv";
     case kJPsi: return "jpsi";
     case kUpsl: return "upsl";
-    case kSusy: return "susy";
-    case kSusy1: return "susy1";      
+    case kZqcdPow: return "zqcdPow";
+    case kZqcdMad: return "zqcdMad";
+    case kWqcdMad: return "wqcdMad";            
     default: break;
     }
 
@@ -246,8 +248,9 @@ Msl::Mva::Sample Msl::Mva::Convert2Sample(const std::string &s)
   if(s == "vvv")  return kvvv;
   if(s == "jpsi") return kJPsi;
   if(s == "upsl") return kUpsl;
-  if(s == "susy") return kSusy;
-  if(s == "susy1") return kSusy1;  
+  if(s == "zqcdPow") return kZqcdPow;
+  if(s == "zqcdMad") return kZqcdMad;  
+  if(s == "wqcdMad") return kWqcdMad;  
 
   std::cout << "ERROR - sample " << s << " is not defined in Sample.cxx" <<std::endl;
   return kNone;
@@ -318,8 +321,9 @@ const std::vector<Msl::Mva::Sample>& Msl::Mva::GetAllSamples()
     vars.push_back(kvvv);
     vars.push_back(kJPsi);
     vars.push_back(kUpsl);
-    vars.push_back(kSusy);
-    vars.push_back(kSusy1);    
+    vars.push_back(kZqcdPow);
+    vars.push_back(kZqcdMad);    
+    vars.push_back(kWqcdMad);    
   }
   
   return vars;

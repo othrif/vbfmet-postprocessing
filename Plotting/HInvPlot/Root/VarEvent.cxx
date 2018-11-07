@@ -1,3 +1,4 @@
+
 // Local
 #include "HInvPlot/Registry.h"
 #include "HInvPlot/VarEvent.h"
@@ -23,20 +24,49 @@ std::string Msl::Mva::Convert2Str(Var var)
     case trigger_lep:	          return "trigger_lep";
     case passJetCleanTight:	  return "passJetCleanTight";
 
-    case met_tst_et:	          return "met_tst_et";
+    case met_truth_et:	          return "met_truth_et";
+    case met_truth_phi:	          return "met_truth_phi";      
+    case met_tst_et:	          return "met_tst_et";      
     case met_tst_phi:	          return "met_tst_phi";
     case met_tst_nolep_et:	  return "met_tst_nolep_et";
     case met_tst_nolep_phi:	  return "met_tst_nolep_phi";
     case met_significance:	  return "met_significance";
+    case metsig_tst:	          return "metsig_tst";      
+    case met_tenacious_tst_et:	  return "met_tenacious_tst_et";      
+    case met_tight_tst_et:	  return "met_tight_tst_et";      
+    case met_tighter_tst_et:	  return "met_tighter_tst_et";      
+    case met_soft_tst_et:	  return "met_soft_tst_et";
+    case met_tenacious_tst_phi:	  return "met_tenacious_tst_phi";      
+    case met_tight_tst_phi:	  return "met_tight_tst_phi";      
+    case met_tighter_tst_phi:	  return "met_tighter_tst_phi";      
+    case met_soft_tst_phi:	  return "met_soft_tst_phi";            
+    case met_soft_tst_sumet:	  return "met_soft_tst_sumet";      
+    case met_cst_jet:	          return "met_cst_jet";      
     case n_jet:	                  return "n_jet";
+    case n_jet_fwd:	          return "n_jet_fwd";      
+    case n_jet_fwdj:	          return "n_jet_fwdj";      
+    case n_jet_fwdj30:	          return "n_jet_fwdj30";      
+    case n_jet_fwdj40:	          return "n_jet_fwdj40";      
+    case n_jet_fwdj50:	          return "n_jet_fwdj50";
+    case n_jet_cen:	          return "n_jet_cen";      
+    case n_jet_cenj:	          return "n_jet_cenj";      
+    case n_jet_cenj30:	          return "n_jet_cenj30";      
+    case n_jet_cenj40:	          return "n_jet_cenj40";      
+    case n_jet_cenj50:	          return "n_jet_cenj50";       
     case n_el:	                  return "n_el";
     case n_mu:	                  return "n_mu";
+    case n_baseel:	          return "n_baseel";
+    case n_basemu:	          return "n_basemu";
+    case n_baselep:	          return "n_baselep";      
+    case n_truth_tau:	          return "n_truth_tau";            
     case met_tst_j1_dphi:	  return "met_tst_j1_dphi";
     case met_tst_j2_dphi:	  return "met_tst_j2_dphi";
     case met_tst_nolep_j1_dphi:	  return "met_tst_nolep_j1_dphi";
     case met_tst_nolep_j2_dphi:	  return "met_tst_nolep_j2_dphi";
     case jetPt0:	          return "jetPt0";
     case jetPt1:	          return "jetPt1";
+    case jetEta0:	          return "jetEta0";
+    case jetEta1:	          return "jetEta1";
     case etaj0TimesEtaj1:	  return "etaj0TimesEtaj1";
     case lepPt0:	          return "lepPt0";      
     case lepPt1:	          return "lepPt1";
@@ -48,8 +78,20 @@ std::string Msl::Mva::Convert2Str(Var var)
     case chanFlavor:	          return "chanFlavor";      
     case charge:	          return "charge";
     case timing:	          return "timing";
+    case jvt:	                  return "jvt";
+    case fjvt:	                  return "fjvt";
     case j0timing:	          return "j0timing";
     case j1timing:	          return "j1timing";
+    case j0jvt:	                  return "j0jvt";
+    case j1jvt:	                  return "j1jvt";
+    case j0fjvt:	          return "j0fjvt";
+    case j1fjvt:	          return "j1fjvt";
+    case TruthFilter:	          return "TruthFilter";
+    case truth_jj_mass:	          return "truth_jj_mass";
+    case FilterMet:	          return "FilterMet";
+    case truth_jj_deta:	          return "truth_jj_deta";
+    case truthJet1Pt:	          return "truthJet1Pt";
+    case nTruthJetMatch:	  return "nTruthJetMatch";            
 
     case NONE: return "NONE";
     default  : break;
@@ -69,20 +111,49 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "trigger_met")   return trigger_met;  
   if(var == "trigger_lep")   return trigger_lep;  
   if(var == "passJetCleanTight")   return passJetCleanTight;  
-  if(var == "met_tst_et")    return met_tst_et;
+  if(var == "met_truth_et")    return met_truth_et;
+  if(var == "met_truth_phi")    return met_truth_phi;  
+  if(var == "met_tst_et")    return met_tst_et;  
   if(var == "met_tst_phi")    return met_tst_phi;  
   if(var == "met_tst_nolep_et")  return met_tst_nolep_et;
   if(var == "met_tst_nolep_phi")  return met_tst_nolep_phi;
   if(var == "met_significance")  return met_significance;
+  if(var == "metsig_tst")          return metsig_tst;
+  if(var == "met_tenacious_tst_et")return met_tenacious_tst_et;
+  if(var == "met_tight_tst_et")    return met_tight_tst_et;
+  if(var == "met_tighter_tst_et")  return met_tighter_tst_et;
+  if(var == "met_soft_tst_et")     return met_soft_tst_et;
+  if(var == "met_tenacious_tst_phi")return met_tenacious_tst_phi;
+  if(var == "met_tight_tst_phi")    return met_tight_tst_phi;
+  if(var == "met_tighter_tst_phi")  return met_tighter_tst_phi;
+  if(var == "met_soft_tst_phi")     return met_soft_tst_phi;  
+  if(var == "met_soft_tst_sumet")  return met_soft_tst_sumet;
+  if(var == "met_cst_jet")         return met_cst_jet;
   if(var == "n_jet")             return n_jet;
+  if(var == "n_jet_fwd")         return n_jet_fwd;
+  if(var == "n_jet_fwdj")        return n_jet_fwdj;
+  if(var == "n_jet_fwdj30")        return n_jet_fwdj30;
+  if(var == "n_jet_fwdj40")        return n_jet_fwdj40;
+  if(var == "n_jet_fwdj50")        return n_jet_fwdj50;
+  if(var == "n_jet_cen")         return n_jet_cen;
+  if(var == "n_jet_cenj")        return n_jet_cenj;
+  if(var == "n_jet_cenj30")        return n_jet_cenj30;
+  if(var == "n_jet_cenj40")        return n_jet_cenj40;
+  if(var == "n_jet_cenj50")        return n_jet_cenj50;  
   if(var == "n_el")              return n_el;
   if(var == "n_mu")              return n_mu;
+  if(var == "n_baseel")          return n_baseel;
+  if(var == "n_basemu")          return n_basemu;
+  if(var == "n_baselep")          return n_baselep;  
+  if(var == "n_truth_tau")       return n_truth_tau;  
   if(var == "met_tst_j1_dphi")   return met_tst_j1_dphi;
   if(var == "met_tst_j2_dphi")   return met_tst_j2_dphi;
   if(var == "met_tst_nolep_j1_dphi")   return met_tst_nolep_j1_dphi;
   if(var == "met_tst_nolep_j2_dphi")   return met_tst_nolep_j2_dphi;
   if(var == "jetPt0")            return jetPt0;
   if(var == "jetPt1")            return jetPt1;
+  if(var == "jetEta0")           return jetEta0;
+  if(var == "jetEta1")           return jetEta1;
   if(var == "etaj0TimesEtaj1")   return etaj0TimesEtaj1;
   if(var == "lepPt0")            return lepPt0;
   if(var == "lepPt1")            return lepPt1;
@@ -94,8 +165,20 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "chanFlavor")        return chanFlavor;  
   if(var == "charge")            return charge;
   if(var == "timing")            return timing;
+  if(var == "jvt")               return jvt;
+  if(var == "fjvt")              return fjvt;  
   if(var == "j0timing")          return j0timing;
   if(var == "j1timing")          return j1timing;
+  if(var == "j0jvt")             return j0jvt;
+  if(var == "j1jvt")             return j1jvt;
+  if(var == "j0fjvt")            return j0fjvt;
+  if(var == "j1fjvt")            return j1fjvt;
+  if(var == "TruthFilter")       return TruthFilter;
+  if(var == "truth_jj_mass")     return truth_jj_mass;    
+  if(var == "FilterMet")         return FilterMet;    
+  if(var == "truth_jj_deta")     return truth_jj_deta;
+  if(var == "truthJet1Pt")       return truthJet1Pt;
+  if(var == "nTruthJetMatch")    return nTruthJetMatch;        
 
   cout << "Msl::Mva::Convert2Var - unknown enum: " << var << endl;
   return NONE;
@@ -109,8 +192,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(unsigned long int key)
   //
   // Find matching enum by value
   //
-  //const vector<Var>::const_iterator vit = std::find(vars.begin(), vars.end(), Convert2Var(key));
-  const vector<Var>::const_iterator vit = std::find(vars.begin(), vars.end(), key);
+  const vector<Var>::const_iterator vit = std::find(vars.begin(), vars.end(), Convert2Var(key));
   
   if(vit != vars.end()) {
     return *vit;
@@ -203,20 +285,49 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(trigger_lep);
     vars.push_back(passJetCleanTight);
     
-    vars.push_back(met_tst_et);
+    vars.push_back(met_truth_et);
+    vars.push_back(met_truth_phi);    
+    vars.push_back(met_tst_et);    
     vars.push_back(met_tst_phi);
     vars.push_back(met_tst_nolep_et);
     vars.push_back(met_tst_nolep_phi);
     vars.push_back(met_significance);
+    vars.push_back(metsig_tst);    
+    vars.push_back(met_tenacious_tst_et);    
+    vars.push_back(met_tight_tst_et);    
+    vars.push_back(met_tighter_tst_et);    
+    vars.push_back(met_soft_tst_et);    
+    vars.push_back(met_tenacious_tst_phi);    
+    vars.push_back(met_tight_tst_phi);    
+    vars.push_back(met_tighter_tst_phi);    
+    vars.push_back(met_soft_tst_phi);        
+    vars.push_back(met_soft_tst_sumet);    
+    vars.push_back(met_cst_jet);    
     vars.push_back(n_jet);    
+    vars.push_back(n_jet_fwd);    
+    vars.push_back(n_jet_fwdj);    
+    vars.push_back(n_jet_fwdj30);    
+    vars.push_back(n_jet_fwdj40);    
+    vars.push_back(n_jet_fwdj50);
+    vars.push_back(n_jet_cen);    
+    vars.push_back(n_jet_cenj);    
+    vars.push_back(n_jet_cenj30);    
+    vars.push_back(n_jet_cenj40);    
+    vars.push_back(n_jet_cenj50);     
     vars.push_back(n_el);    
-    vars.push_back(n_mu);    
+    vars.push_back(n_mu);
+    vars.push_back(n_baseel);    
+    vars.push_back(n_basemu);
+    vars.push_back(n_baselep);    
+    vars.push_back(n_truth_tau);
     vars.push_back(met_tst_j1_dphi);    
     vars.push_back(met_tst_j2_dphi);    
     vars.push_back(met_tst_nolep_j1_dphi);    
     vars.push_back(met_tst_nolep_j2_dphi);    
     vars.push_back(jetPt0);    
     vars.push_back(jetPt1);    
+    vars.push_back(jetEta0);    
+    vars.push_back(jetEta1);    
     vars.push_back(etaj0TimesEtaj1);    
     vars.push_back(lepPt0);    
     vars.push_back(lepPt1);    
@@ -227,9 +338,21 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(mt);    
     vars.push_back(chanFlavor);    
     vars.push_back(charge);    
-    vars.push_back(timing);     
+    vars.push_back(timing);
+    vars.push_back(jvt);
+    vars.push_back(fjvt);         
     vars.push_back(j0timing);     
-    vars.push_back(j1timing);     
+    vars.push_back(j1timing);
+    vars.push_back(j0jvt);     
+    vars.push_back(j1jvt);         
+    vars.push_back(j0fjvt);     
+    vars.push_back(j1fjvt);         
+    vars.push_back(TruthFilter);
+    vars.push_back(truth_jj_mass);
+    vars.push_back(FilterMet);
+    vars.push_back(truth_jj_deta);
+    vars.push_back(truthJet1Pt);
+    vars.push_back(nTruthJetMatch);            
   }
   
   return vars;

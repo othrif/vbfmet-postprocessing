@@ -77,6 +77,12 @@ void Msl::Event::Clear()
   muons.clear();
   electrons.clear();
   jets.clear();
+  truth_jets.clear();
+  truth_taus.clear();
+  truth_el.clear();
+  truth_mu.clear();
+  baseel.clear();
+  basemu.clear();
   
   //
   // Clear local vectors
@@ -101,7 +107,7 @@ void Msl::Event::Print() const
   //
   // Printing variables
   //
-  //Print();
+  Print();
 }
 
 //-----------------------------------------------------------------------------

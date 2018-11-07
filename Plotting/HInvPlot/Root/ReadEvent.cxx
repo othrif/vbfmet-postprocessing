@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <algorithm> 
 
 #include <sstream>
 
@@ -48,6 +49,7 @@ Msl::ReadEvent::ReadEvent():
   fDebug        (false),
   fPrint        (false),
   fPrintEvent   (false),
+  fMaxNEvent(-1),
   fLumi         (1.0),
   genCutFlow    (0),
   procCutFlow0  (0),
@@ -70,9 +72,12 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Name",          fName);
   reg.Get("ReadEvent::CutFlowFile",   fCutFlowFile);
   reg.Get("ReadEvent::RawFlowFile",   fRawFlowFile);
+  reg.Get("ReadEvent::METChoice",     fMETChoice);  
   reg.Get("ReadEvent::SystList",      fSystNames);
   reg.Get("ReadEvent::Trees",         fTrees);
   reg.Get("ReadEvent::Files",         fFiles);
+
+  reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);  
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -81,6 +86,10 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Lumi",          fLumi = 1.0);  
   fDir="";
 
+  // set met phi
+  fMETChoice_phi = fMETChoice;
+  fMETChoice_phi.replace(fMETChoice_phi.end()-2, fMETChoice_phi.end(),"phi");
+  
   std::vector<std::string> mcids, samples;
   reg.Get("ReadEvent::MCIDs",   mcids);
   reg.Get("ReadEvent::Samples", samples);
@@ -123,7 +132,30 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   jet_timing = new std::vector<float>();
   jet_pt     = new std::vector<float>();
   jet_eta    = new std::vector<float>();
-  jet_phi    = new std::vector<float>();    
+  jet_phi    = new std::vector<float>();
+  jet_m      = new std::vector<float>();
+  jet_jvt    = new std::vector<float>();  
+  jet_fjvt   = new std::vector<float>();
+  truth_el_pt  = new std::vector<float>();
+  truth_el_eta = new std::vector<float>();
+  truth_el_phi = new std::vector<float>();
+  truth_mu_pt  = new std::vector<float>();
+  truth_mu_eta = new std::vector<float>();
+  truth_mu_phi = new std::vector<float>(); 
+  truth_tau_pt  = new std::vector<float>();
+  truth_tau_eta = new std::vector<float>();
+  truth_tau_phi = new std::vector<float>();    
+  truth_jet_pt  = new std::vector<float>();
+  truth_jet_eta = new std::vector<float>();
+  truth_jet_phi = new std::vector<float>();    
+  basemu_pt     = new std::vector<float>();
+  basemu_eta    = new std::vector<float>();
+  basemu_phi    = new std::vector<float>();
+  basemu_ptvarcone20    = new std::vector<float>();      
+  baseel_pt     = new std::vector<float>();
+  baseel_eta    = new std::vector<float>();
+  baseel_phi    = new std::vector<float>();
+  baseel_ptvarcone20    = new std::vector<float>();      
   
 #ifdef ANP_CPU_PROFILER
   string profile_file = "cpu-profile-readevent";
@@ -155,9 +187,35 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("mu_eta",   &mu_eta);  
   tree->SetBranchAddress("mu_phi",   &mu_phi);
   tree->SetBranchAddress("jet_timing",&jet_timing);  
-  tree->SetBranchAddress("jet_pt",    &jet_pt);  
+  tree->SetBranchAddress("jet_pt",    &jet_pt);
+  tree->SetBranchAddress("jet_m",     &jet_m);    
   tree->SetBranchAddress("jet_eta",   &jet_eta);  
-  tree->SetBranchAddress("jet_phi",   &jet_phi);    
+  tree->SetBranchAddress("jet_phi",   &jet_phi);
+  tree->SetBranchAddress("jet_jvt",   &jet_jvt);
+  tree->SetBranchAddress("jet_fjvt",   &jet_fjvt);  
+
+  if(fisMC){
+    tree->SetBranchAddress("truth_jet_pt",    &truth_jet_pt);  
+    tree->SetBranchAddress("truth_jet_eta",   &truth_jet_eta);  
+    tree->SetBranchAddress("truth_jet_phi",   &truth_jet_phi);
+    tree->SetBranchAddress("truth_tau_pt",    &truth_tau_pt);  
+    tree->SetBranchAddress("truth_tau_eta",   &truth_tau_eta);  
+    tree->SetBranchAddress("truth_tau_phi",   &truth_tau_phi);
+    tree->SetBranchAddress("truth_el_pt",    &truth_el_pt);  
+    tree->SetBranchAddress("truth_el_eta",   &truth_el_eta);  
+    tree->SetBranchAddress("truth_el_phi",   &truth_el_phi);
+    tree->SetBranchAddress("truth_mu_pt",    &truth_mu_pt);  
+    tree->SetBranchAddress("truth_mu_eta",   &truth_mu_eta);  
+    tree->SetBranchAddress("truth_mu_phi",   &truth_mu_phi);    
+  }
+  tree->SetBranchAddress("baseel_pt",    &baseel_pt);  
+  tree->SetBranchAddress("baseel_eta",   &baseel_eta);  
+  tree->SetBranchAddress("baseel_phi",   &baseel_phi);
+  tree->SetBranchAddress("baseel_ptvarcone20",   &baseel_ptvarcone20);  
+  tree->SetBranchAddress("basemu_pt",    &basemu_pt);  
+  tree->SetBranchAddress("basemu_eta",   &basemu_eta);  
+  tree->SetBranchAddress("basemu_phi",   &basemu_phi);
+  tree->SetBranchAddress("basemu_ptvarcone20",   &basemu_ptvarcone20);
 }
 
 //-----------------------------------------------------------------------------
@@ -426,6 +484,8 @@ void Msl::ReadEvent::Read(const std::string &path)
     //
     // Read common ntuples
     //
+    std::string treeName = std::string(rtree->GetName());
+    fisMC = (treeName.find("data")==std::string::npos);
     Init(rtree);
     ReadTree(rtree); // Processes the events
     
@@ -450,14 +510,13 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   // Read tree
   //
   int nevent = rtree->GetEntries();
-  unsigned nXSWarning=0;
   if(fMaxNEvent > 0) {
     nevent = std::min<int>(fMaxNEvent, rtree->GetEntries());
   }
 
   // identify the data based upon the tree name
   std::string treeName = std::string(rtree->GetName());
-  bool isMC = (treeName.find("data")==std::string::npos);
+  fisMC = (treeName.find("data")==std::string::npos);
   
   Event alg_evt;
   
@@ -476,9 +535,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }
 
     event->RunNumber = fRunNumber;
-    event->isMC = isMC;
+    event->isMC = fisMC;
     // identify the sample
-    if(!isMC){
+    if(!fisMC){
       event->sample = Mva::kData;
       event->SetWeight(fWeight);
     }else{
@@ -520,21 +579,237 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }    
 
     // Fill Jets
+    unsigned nJet=0;
+    unsigned nJet_fwd=0;    
+    unsigned nJet_fwdj=0;    
+    unsigned nJet_fwdj30=0;    
+    unsigned nJet_fwdj40=0;    
+    unsigned nJet_fwdj50=0;    
+    unsigned nJet_cen=0;    
+    unsigned nJet_cenj=0;    
+    unsigned nJet_cenj30=0;    
+    unsigned nJet_cenj40=0;    
+    unsigned nJet_cenj50=0;    
+    //unsigned nJet30=0;
+    //unsigned nJet40=0;    
     for(unsigned iJet=0; iJet<jet_pt->size(); ++iJet){
       RecParticle new_jet;
       new_jet.pt  = jet_pt->at(iJet)/1.0e3;
+      //new_jet.m   = jet_m->at(iJet)/1.0e3;      
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
-      new_jet.AddVar(Mva::timing,jet_timing->at(iJet));
+      new_jet.AddVar(Mva::timing,jet_timing->at(iJet));      
+      if(jet_jvt->size()>iJet){
+	float jvt = jet_jvt->at(iJet);
+	if(fabs(new_jet.eta)>2.5) jvt=jvt<0? jvt : -0.15;
+	if(fabs(new_jet.pt)>120.0) jvt=-0.2;	
+	new_jet.AddVar(Mva::jvt,jvt);
+      }
+      if(jet_fjvt->size()>iJet)new_jet.AddVar(Mva::fjvt,jet_fjvt->at(iJet));
+      if(jet_pt->at(iJet)>fJetVetoPt) ++nJet;
       event->jets.push_back(new_jet);
+    }
+
+    // forward jets relative to the leading two jets
+    float maxPosEta=0.0, maxNegEta=0.0;
+    if(event->jets.size()>1){
+      maxPosEta=std::max(event->jets.at(0).eta,event->jets.at(1).eta);
+      maxNegEta=std::min(event->jets.at(0).eta,event->jets.at(1).eta);	
+    }
+    for(unsigned iJet=2; iJet<event->jets.size(); ++iJet){
+      if((event->jets.at(iJet).eta>maxPosEta) || (event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj;
+      if(event->jets.at(iJet).pt>30.0 && (event->jets.at(iJet).eta>maxPosEta || event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj30;
+      if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta>maxPosEta || event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj40;
+      if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta>maxPosEta || event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj50;
+      if(fabs(event->jets.at(iJet).eta)>2.5) ++nJet_fwd;
+      else  ++nJet_cen;
+      if((event->jets.at(iJet).eta<maxPosEta) && (event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj;
+      if(event->jets.at(iJet).pt>30.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj30;
+      if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj40;
+      if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj50;      
+    }
+
+    if(fJetVetoPt>0.0)
+      event->RepVar(Mva::n_jet, nJet);
+    //if(nJet25!=event->GetVar(Mva::n_jet)) std::cout << "error in jet counting" << nJet25 << " "  << event->GetVar(Mva::n_jet) << std::endl;
+
+    // other jet calculations
+    event->AddVar(Mva::n_jet_fwd, nJet_fwd);    
+    event->AddVar(Mva::n_jet_fwdj, nJet_fwdj);
+    event->AddVar(Mva::n_jet_fwdj30, nJet_fwdj30);        
+    event->AddVar(Mva::n_jet_fwdj40, nJet_fwdj40);        
+    event->AddVar(Mva::n_jet_fwdj50, nJet_fwdj50);
+    event->AddVar(Mva::n_jet_cen, nJet_cen);    
+    event->AddVar(Mva::n_jet_cenj, nJet_cenj);
+    event->AddVar(Mva::n_jet_cenj30, nJet_cenj30);        
+    event->AddVar(Mva::n_jet_cenj40, nJet_cenj40);        
+    event->AddVar(Mva::n_jet_cenj50, nJet_cenj50);
+
+    
+    // Fill Truth Els
+    if(truth_el_pt && fisMC){
+      for(unsigned iEl=0; iEl<truth_el_pt->size(); ++iEl){
+	RecParticle new_el;
+	new_el.pt  = truth_el_pt->at(iEl)/1.0e3;
+	new_el.eta = truth_el_eta->at(iEl);
+	new_el.phi = truth_el_phi->at(iEl);
+	event->truth_el.push_back(new_el);
+      }
+      //event->RepVar(Mva::n_truth_el, truth_el_pt->size());
     }    
+
+    // Fill Truth Mus
+    if(truth_mu_pt && fisMC){
+      for(unsigned iMu=0; iMu<truth_mu_pt->size(); ++iMu){
+	RecParticle new_mu;
+	new_mu.pt  = truth_mu_pt->at(iMu)/1.0e3;
+	new_mu.eta = truth_mu_eta->at(iMu);
+	new_mu.phi = truth_mu_phi->at(iMu);
+	event->truth_mu.push_back(new_mu);
+      }
+      //event->RepVar(Mva::n_truth_mu, truth_mu_pt->size());
+    }
+
+    // Fill Truth Taus
+    if(truth_tau_pt && fisMC){
+      for(unsigned iTau=0; iTau<truth_tau_pt->size(); ++iTau){
+	RecParticle new_tau;
+	new_tau.pt  = truth_tau_pt->at(iTau)/1.0e3;
+	new_tau.eta = truth_tau_eta->at(iTau);
+	new_tau.phi = truth_tau_phi->at(iTau);
+	// overlap remove the taus
+	bool eMuVeto=false;
+	for(unsigned iMuo=0; iMuo<event->truth_mu.size(); ++iMuo)
+	  if(event->truth_mu.at(iMuo).GetVec().DeltaR(new_tau.GetVec())<0.4) eMuVeto=true;
+	for(unsigned iEle=0; iEle<event->truth_el.size(); ++iEle)
+	  if(event->truth_el.at(iEle).GetVec().DeltaR(new_tau.GetVec())<0.4) eMuVeto=true;
+	if(!eMuVeto) event->truth_taus.push_back(new_tau);
+      }
+      event->RepVar(Mva::n_truth_tau, truth_tau_pt->size());
+    }
+    
+    // Fill Truth Jets   
+    if(truth_jet_pt && fisMC){
+      for(unsigned iJet=0; iJet<truth_jet_pt->size(); ++iJet){
+	RecParticle new_jet;
+	new_jet.pt  = truth_jet_pt->at(iJet)/1.0e3;
+	new_jet.eta = truth_jet_eta->at(iJet);
+	new_jet.phi = truth_jet_phi->at(iJet);
+	bool skipJet=false;
+	for(unsigned iLep=0; iLep<(event->truth_el.size()); ++iLep)  if(new_jet.GetVec().DeltaR(event->truth_el.at(iLep).GetVec())<0.3 && event->truth_el.at(iLep).pt>20.0){ skipJet=true; break; }
+	for(unsigned iLep=0; iLep<(event->truth_taus.size()); ++iLep)  if(new_jet.GetVec().DeltaR(event->truth_taus.at(iLep).GetVec())<0.3 && event->truth_taus.at(iLep).pt>20.0){ skipJet=true; break; }
+	if(!skipJet) event->truth_jets.push_back(new_jet);
+      }
+    }
+
+    // Truth match the jets
+    int nTruthJetMatch=0;
+    if(fisMC){
+      for(unsigned iJet=0; iJet<event->jets.size(); ++iJet){
+	bool matchTruth=false;
+	for(unsigned iTJet=0; iTJet<event->truth_jets.size(); ++iTJet){
+	  if(event->jets.at(iJet).GetVec().DeltaR(event->truth_jets.at(iTJet).GetVec())<0.4){
+	    matchTruth=true;
+	    break;
+	  }
+	}
+	if(matchTruth) ++nTruthJetMatch;
+      }
+    }
+    event->AddVar(Mva::nTruthJetMatch, nTruthJetMatch);
+
+    // Fill Base electrons
+    unsigned n_baselep=0;
+    if(baseel_pt){
+      unsigned n_baseel=0;
+      for(unsigned iEl=0; iEl<baseel_pt->size(); ++iEl){
+	RecParticle new_ele;
+	new_ele.pt  = baseel_pt->at(iEl)/1.0e3;
+	new_ele.eta = baseel_eta->at(iEl);
+	new_ele.phi = baseel_phi->at(iEl);
+	//new_ele.AddVar(Mva::ptvarcone20,jet_timing->at(iJet));
+	if(baseel_ptvarcone20->at(iEl)/baseel_pt->at(iEl)<0.3){
+	  ++n_baseel;
+	  event->baseel.push_back(new_ele);
+	}
+      }
+      event->RepVar(Mva::n_baseel, n_baseel);
+      n_baselep+=n_baseel;
+    }
+
+    // Fill Base muons
+    if(basemu_pt){
+      unsigned n_basemu=0;
+      for(unsigned iMu=0; iMu<basemu_pt->size(); ++iMu){
+	RecParticle new_muo;
+	new_muo.pt  = basemu_pt->at(iMu)/1.0e3;
+	new_muo.eta = basemu_eta->at(iMu);
+	new_muo.phi = basemu_phi->at(iMu);
+	if(basemu_ptvarcone20->at(iMu)/basemu_pt->at(iMu)<0.3){
+	  ++n_basemu;
+	  event->basemu.push_back(new_muo);
+	}
+      }
+      event->RepVar(Mva::n_basemu, n_basemu);
+      n_baselep+=n_basemu;
+    }
+    event->RepVar(Mva::n_baselep, n_baselep);
     
     // convert variables to GeV
     event->Convert2GeV(fVarMeV);
 
+    // Reset MET?
+    if(fMETChoice!="met_tst_et"){
+      Mva::Var my_met = Mva::Convert2Var(fMETChoice);
+      Mva::Var my_met_phi = Mva::Convert2Var(fMETChoice_phi);      
+      event->RepVar(Mva::met_tst_phi, event->GetVar(my_met_phi));
+      event->RepVar(Mva::met_tst_et, event->GetVar(my_met));
+    }
+    
     // Fill MET
     if(event->HasVar(Mva::met_tst_phi))
       event->met.SetPtEtaPhiM(event->GetVar(Mva::met_tst_et),0.0,event->GetVar(Mva::met_tst_phi),0.0);
+
+    // refill the deltaPhi met jet
+    if(fMETChoice!="met_tst_et"){
+      if(event->jets.size()>1){
+	event->RepVar(Mva::met_tst_j1_dphi,fabs(event->met.DeltaPhi(event->jets.at(0).GetLVec())));
+	event->RepVar(Mva::met_tst_j2_dphi,fabs(event->met.DeltaPhi(event->jets.at(1).GetLVec())));
+      }
+    }
+
+    //
+    // Checking the truth filtering
+    //
+    int truthFilter=0;
+    double truth_deta_jj=-10.0, truth_jj_mass=-10.0, filterMet=-10.0, truthJet1=-10.0;
+    if(event->truth_jets.size()>1){
+      TVector3 tmet;
+      tmet.SetPtEtaPhi(event->GetVar(Mva::met_truth_et), 0, event->GetVar(Mva::met_truth_phi));
+      //if(event->sample==Mva::kZqcd) std::cout << "met before: " << tmet.Pt() << std::endl;
+      //std::cout << "met: " << tmet.Pt() << std::endl;
+      for(unsigned iLep=0; iLep<(event->truth_mu.size()); ++iLep)  tmet+=event->truth_mu.at(iLep).GetVec();
+      for(unsigned iLep=0; iLep<(event->truth_el.size()); ++iLep)  tmet+=event->truth_el.at(iLep).GetVec();
+      for(unsigned iLep=0; iLep<(event->truth_taus.size()); ++iLep) tmet+=event->truth_taus.at(iLep).GetVec();          
+      TLorentzVector truth_jj = event->truth_jets.at(0).GetLVec() + event->truth_jets.at(1).GetLVec();
+      truthJet1 = event->truth_jets.at(1).pt;
+      if(truthJet1>35.0){
+	truth_deta_jj = fabs(event->truth_jets.at(0).eta - event->truth_jets.at(1).eta);
+	truth_jj_mass=truth_jj.M();
+      }
+      filterMet = tmet.Pt();
+      //if(event->sample==Mva::kZqcd) std::cout << "met after: " << tmet.Pt() << std::endl;      
+      if(truth_jj_mass>500.0 && truth_deta_jj>4.0
+	 && event->truth_jets.at(1).pt>35.0 && filterMet>100.0) truthFilter=1;
+      //std::cout << "truthFilter: " << truthFilter << " met: " << tmet.Pt()
+      //<< " mjj: " << truth_jj.M() << " truthJetPt: " << event->truth_jets.at(1).pt
+      //	<< std::endl;
+    }
+    event->RepVar(Mva::truth_jj_mass, truth_jj_mass);
+    event->RepVar(Mva::truth_jj_deta, truth_deta_jj);
+    event->AddVar(Mva::FilterMet,     filterMet);
+    event->AddVar(Mva::TruthFilter,   truthFilter);
+    event->AddVar(Mva::truthJet1Pt,   truthJet1);
     
     // Fill remaining variables
     FillEvent(*event);
@@ -622,11 +897,17 @@ void Msl::ReadEvent::FillEvent(Event &event)
   //
   if(event.jets.size()>0){
     event.AddVar(Mva::jetPt0,  event.jets.at(0).pt);
+    event.AddVar(Mva::jetEta0, event.jets.at(0).eta);
     event.AddVar(Mva::j0timing,event.jets.at(0).GetVar(Mva::timing));
+    event.AddVar(Mva::j0jvt,event.jets.at(0).GetVar(Mva::jvt));    
+    event.AddVar(Mva::j0fjvt,event.jets.at(0).GetVar(Mva::fjvt));    
   }
   if(event.jets.size()>1){
     event.AddVar(Mva::jetPt1,  event.jets.at(1).pt);
+    event.AddVar(Mva::jetEta1, event.jets.at(1).eta);    
     event.AddVar(Mva::j1timing,event.jets.at(1).GetVar(Mva::timing));
+    event.AddVar(Mva::j1jvt,event.jets.at(1).GetVar(Mva::jvt));    
+    event.AddVar(Mva::j1fjvt,event.jets.at(1).GetVar(Mva::fjvt));        
     event.AddVar(Mva::etaj0TimesEtaj1,event.jets.at(0).eta*event.jets.at(1).eta);
   }
   // electrons

@@ -107,6 +107,12 @@ namespace Msl
     ParticleVec          muons;
     ParticleVec          electrons;
     ParticleVec          jets;
+    ParticleVec          truth_jets;
+    ParticleVec          truth_taus;
+    ParticleVec          truth_el;
+    ParticleVec          truth_mu;    
+    ParticleVec          baseel;
+    ParticleVec          basemu;
     TLorentzVector       met;
   };
 }

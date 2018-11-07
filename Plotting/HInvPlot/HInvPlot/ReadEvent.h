@@ -120,12 +120,15 @@ namespace Msl
     std::string                 fCutFlowFile;
     std::string                 fRawFlowFile;
     std::string                 fAnalysisName;
-
+    std::string                 fMETChoice;
+    std::string                 fMETChoice_phi;    
+    
     std::vector<std::string>    fTrees;
     std::vector<std::string>    fFiles;
     std::vector<std::string>    fSystNames;
     std::map<int,std::string>   fSampleMap; // mcid to plotting type
 
+    float                       fJetVetoPt;
     std::vector<unsigned>       fEventIdVec;
 
     bool                        fDebug;
@@ -147,7 +150,7 @@ namespace Msl
     // External
     float                       fInputCount;
     float                       fLumi;
-
+    bool                        fisMC;
     // Input vars
     float fWeight;
     int   fRunNumber;
@@ -164,9 +167,32 @@ namespace Msl
     std::vector<float> *mu_phi;
     std::vector<float> *jet_timing;
     std::vector<float> *jet_pt;
+    std::vector<float> *jet_m;    
     std::vector<float> *jet_eta;
     std::vector<float> *jet_phi;
-    
+    std::vector<float> *jet_jvt;
+    std::vector<float> *jet_fjvt;
+
+    std::vector<float> *truth_el_pt;
+    std::vector<float> *truth_el_eta;
+    std::vector<float> *truth_el_phi;
+    std::vector<float> *truth_mu_pt;
+    std::vector<float> *truth_mu_eta;
+    std::vector<float> *truth_mu_phi;
+    std::vector<float> *truth_tau_pt;
+    std::vector<float> *truth_tau_eta;
+    std::vector<float> *truth_tau_phi;
+    std::vector<float> *truth_jet_pt;
+    std::vector<float> *truth_jet_eta;
+    std::vector<float> *truth_jet_phi;    
+    std::vector<float> *baseel_pt;
+    std::vector<float> *baseel_eta;
+    std::vector<float> *baseel_phi;    
+    std::vector<float> *baseel_ptvarcone20;    
+    std::vector<float> *basemu_pt;
+    std::vector<float> *basemu_eta;
+    std::vector<float> *basemu_phi;
+    std::vector<float> *basemu_ptvarcone20;        
     
     // For event counting
     float                       fSumw;
