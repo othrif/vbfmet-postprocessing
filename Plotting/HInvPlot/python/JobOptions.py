@@ -60,7 +60,8 @@ def getParser():
     p.add_option('--lep-sign',     type='string', default='0',           dest='lep_sign',   help='Lepton Sign...0 is opposite sign, 1 is SS')
     p.add_option('--trees',        type='string', default='',      dest='trees',      help='Tree name: W_EWKNominal,W_strongNominal,Z_EWKNominal,Z_strongNominal,ttbarNominal,dataNominal,VBFH125Nominal,VH125Nominal,ggFH125Nominal ')
     p.add_option('--trig-name',    type='string', default='',            dest='trig_name',  help='Trigger name if wanted. TRIG_xe80_tclcw, TRIG_lep, TRIG_2mu8_EFxe40_tclcw') 
-
+    p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
+    
     # Should try to reduce these number of options
     p.add_option('--skim',         action='store_true', default=False,   dest='skim',                 help='Skim ntuples to met trigger or 3L')
 
@@ -69,7 +70,8 @@ def getParser():
 
     p.add_option('--ignore-njet',  action='store_true', default=False,   dest='ignore_njet',          help='Ignore Njet')
     p.add_option('--ignore-met',  action='store_true', default=False,   dest='ignore_met',          help='Ignore MET')
-        
+    p.add_option('--jet-veto-pt',         type='float'       , default=-10,       dest='jet_veto_pt',       help='pT for jet veto')
+    
     p.add_option('--debug',        action='store_true', default=False,   dest='debug',      help='')
     p.add_option('--print',        action='store_true', default=False,   dest='print',      help='')
     p.add_option('--print-run',    action='store_true', default=False,   dest='print_run',  help='')    

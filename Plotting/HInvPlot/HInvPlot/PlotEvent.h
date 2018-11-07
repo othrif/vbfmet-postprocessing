@@ -86,7 +86,25 @@ namespace Msl
     std::vector<double>         fHiVec;
     
     // Histograms:
-    TH1                        *hMu;
+    TH1                        *hTruthMuPt;
+    TH1                        *hTruthMuEta;
+    TH1                        *hBaseMuPt;
+    TH1                        *hBaseMuEta;
+    TH1                        *hTruthElPt;
+    TH1                        *hTruthElEta;    
+    TH1                        *hBaseElPt;
+    TH1                        *hBaseElEta;
+    TH1                        *hTruthTauPt;
+    TH1                        *hTruthTauDR;
+    TH1                        *hTruthTauEta;    
+    
+    TH1                        *hZMCIDQCD;
+    TH1                        *hWMCIDQCD;
+
+    TH1                        *hZMadMCIDQCD;
+    TH1                        *hZMad2MCIDQCD;    
+    TH1                        *hWMadMCIDQCD;
+    TH1                        *hZPowMCIDQCD;    
     std::map<Mva::Var,TH1*>    fHistVec;
   };
 }

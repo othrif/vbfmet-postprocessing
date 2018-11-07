@@ -12,7 +12,15 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 Msl::PlotEvent::PlotEvent():      fPassAlg(0), 
-				  hMu(0)
+				  hTruthMuPt(0), hTruthMuEta(0),
+				  hBaseMuPt(0), hBaseMuEta(0),
+				  hTruthElPt(0), hTruthElEta(0),
+				  hBaseElPt(0), hBaseElEta(0),
+				  hTruthTauPt(0), hTruthTauEta(0),
+				  hZMCIDQCD(0), hWMCIDQCD(0),
+				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
+				  hWMadMCIDQCD(0),
+				  hZPowMCIDQCD(0)
 {
 }
 
@@ -55,7 +63,23 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   //
   // Created histograms
   //
-  hMu          = GetTH1("mu",           50,  0.0,   100.0);
+  hTruthMuPt   = GetTH1("truthMuPt",    50,  0.0,   100.0);
+  hTruthMuEta  = GetTH1("truthMuEta",   45,  -4.5,   4.5);  
+  hBaseMuPt    = GetTH1("baseMuPt",    50,  0.0,   100.0);
+  hBaseMuEta   = GetTH1("baseMuEta",   45,  -4.5,   4.5);
+  hTruthElPt   = GetTH1("truthElPt",    50,  0.0,   100.0);
+  hTruthElEta  = GetTH1("truthElEta",   45,  -4.5,   4.5);  
+  hBaseElPt    = GetTH1("baseElPt",    50,  0.0,   100.0);
+  hBaseElEta   = GetTH1("baseElEta",   45,  -4.5,   4.5);
+  hTruthTauPt  = GetTH1("truthTauPt",    50,  0.0,   100.0);
+  hTruthTauDR  = GetTH1("truthTauDR",    100,  0.0,   10.0);
+  hTruthTauEta = GetTH1("truthTauEta",   45,  -4.5,   4.5);    
+  hZMCIDQCD    = GetTH1("ZMCIDQCD",     100,  364099.5,364199.5);
+  hWMCIDQCD    = GetTH1("WMCIDQCD",     100,  364155.5,364255.5);
+  hZMadMCIDQCD = GetTH1("ZMadMCIDQCD",  10,  361509.5,361519.5);
+  hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 10,  363122.5,363222.5);  
+  hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
+  hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -95,7 +119,38 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //
   // Fill histograms
   //
-  //FillHist(hjj_deta,   Mva::jj_deta, event, weight);
+  //FillHist(hZMCIDQCD,   Mva::jj_deta, event, weight);
+  hZMCIDQCD->Fill(event.RunNumber, weight);
+  hWMCIDQCD->Fill(event.RunNumber, weight);
+  hZMadMCIDQCD->Fill(event.RunNumber, weight);
+  hZMad2MCIDQCD->Fill(event.RunNumber, weight);  
+  hWMadMCIDQCD->Fill(event.RunNumber, weight);  
+  hZPowMCIDQCD->Fill(event.RunNumber, weight);
+  
+  if(event.truth_mu.size()>0){
+    hTruthMuPt ->Fill(event.truth_mu.at(0).pt, weight);
+    hTruthMuEta->Fill(event.truth_mu.at(0).eta, weight);
+  }
+  if(event.truth_el.size()>0){
+    hTruthElPt ->Fill(event.truth_el.at(0).pt, weight);
+    hTruthElEta->Fill(event.truth_el.at(0).eta, weight);
+  }
+
+  if(event.basemu.size()>0){
+    hBaseMuPt ->Fill(event.basemu.at(0).pt, weight);
+    hBaseMuEta->Fill(event.basemu.at(0).eta, weight);
+  }
+  if(event.baseel.size()>0){
+    hBaseElPt ->Fill(event.baseel.at(0).pt, weight);
+    hBaseElEta->Fill(event.baseel.at(0).eta, weight);
+  }
+  if(event.truth_taus.size()>0){
+    hTruthTauPt ->Fill(event.truth_taus.at(0).pt, weight);
+    for(unsigned iJet=0; iJet<event.jets.size(); ++iJet)
+      hTruthTauDR ->Fill(event.truth_taus.at(0).GetVec().DeltaR(event.jets.at(iJet).GetVec()), weight);
+    hTruthTauEta->Fill(event.truth_taus.at(0).eta, weight);
+  }  
+  
   for(unsigned a=0; a<fVarVec.size(); ++a){
     FillHist(fHistVec[fVarVec[a]], fVarVec[a], event, weight);
   }

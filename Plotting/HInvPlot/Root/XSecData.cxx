@@ -1,3 +1,4 @@
+// C/C++
 #include <set>
 #include <math.h>
 #include <cstdlib>
@@ -155,7 +156,7 @@ double Msl::VarData::GetVal() const
   else if(type == kUInt  ) return static_cast<double>(valu);
   else if(type == kBool  ) return static_cast<double>(valb);
 
-  cout << "VarData::GetVal - using undefined type" << endl;
+  cout << "VarData::GetVal - using undefined type for key: " << key << endl;
   return 0.0;
 }
 
@@ -203,7 +204,7 @@ bool Msl::VarData::SetVarBranch(TTree *tree)
   else if(type == kUInt  ) return SetBranch(tree, key, valu);
   else if(type == kBool  ) return SetBranch(tree, key, valb);
 
-  cout << "VarData::SetVarBranch - using undefined type" << endl;
+  cout << "VarData::SetVarBranch - using undefined type for key: " << key << endl;
   return false;
 }
 
