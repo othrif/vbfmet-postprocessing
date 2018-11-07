@@ -14,6 +14,7 @@ arg_group.add_argument("--currentVariation", dest='currentVariation', default="N
 arg_group.add_argument("--containerName", dest='containerName', default="", help="container name used to look up the sample ID if not in the file path")
 arg_group.add_argument("--currentSample", dest='currentSample', default="", help="sample name to process")
 arg_group.add_argument("--doLowNom", action="store_true", dest='doLowNom', default=False, help="doLowNom, to symmetrize asymmetric syst, default: False")
+arg_group.add_argument("--extraVars", action="store_true", dest='extraVars', default=False, help="extraVars, cut on the new variables for leptons veto etc, default: False")
 arg_group.add_argument("--isLow", action="store_true", dest='isLow', default=False, help="isLow, default: False")
 arg_group.add_argument("--oldInput", action="store_true", dest='oldInput', default=False, help="if oldInput, switch to HFInputOldInput")
 # parse the commandline options
@@ -70,6 +71,7 @@ if True:
                                        currentVariation = args.currentVariation,
                                        currentSample = currentSample,
                                        isMC = isMC,
+                                       ExtraVars=args.extraVars,
                                        doLowNom = args.doLowNom,
                                        isHigh = not args.isLow);
     else:
@@ -79,6 +81,7 @@ if True:
                                                currentVariation = args.currentVariation,
                                                currentSample = currentSample,
                                                isMC = isMC,
+                                               ExtraVars=args.extraVars,
                                                doLowNom = args.doLowNom,
                                                isHigh = not args.isLow);
     

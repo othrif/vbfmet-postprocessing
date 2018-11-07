@@ -16,6 +16,7 @@ parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", d
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
+parser.add_argument("--extraVars", action="store_true", dest='extraVars', default=False, help="extraVars, cut on the new variables for leptons veto etc, default: False")
 args, unknown = parser.parse_known_args()
 
 writeMultiJet()
@@ -53,17 +54,21 @@ for line in p.stdout.readlines():
 f.close()
 fMC.close()
 
+extraCommand=''
+if args.extraVars:
+    extraCommand=' --extraVars '
+
 for syst in systlist:
     isLow = ""
     if "__1down" in syst or "Down" in syst:
         isLow = " --isLow"
-    runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+isLow
+    runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+isLow+extraCommand
     print runCommand
     writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
     writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, listoffilesMC)
 
 for syst in asys_systlist:
-    runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+" --doLowNom"
+    runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+" --doLowNom"+extraCommand
     print runCommand
     writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
     writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, listoffilesMC)
