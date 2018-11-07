@@ -9,6 +9,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("currentVariation", currentVariation = "Nominal", "current systematics, NONE means nominal");
   declareProperty("currentSample", currentSample = "W_strong", "current samples");
   declareProperty("isMC", isMC = true, "isMC flag, true means the sample is MC");
+  declareProperty("ExtraVars", m_extraVars = true, "true if extra variables should be cut on" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   //declareProperty( "Property", m_nProperty = 0, "My Example Integer Property" ); //example property declaration
@@ -31,11 +32,30 @@ StatusCode HFInputAlg::initialize() {
   //This is called once, before the start of the event loop
   //Retrieves of tools you have configured in the joboptions go here
   //
-
+  mu_charge= new std::vector<int>(0);
+  mu_pt= new std::vector<float>(0);
+  mu_phi= new std::vector<float>(0);
+  mu_eta= new std::vector<float>(0);
+  el_charge= new std::vector<int>(0);
+  el_pt= new std::vector<float>(0);
+  el_phi= new std::vector<float>(0);
+  el_eta= new std::vector<float>(0);
+  jet_pt= new std::vector<float>(0);
+  jet_phi= new std::vector<float>(0);
+  jet_eta= new std::vector<float>(0);
+  jet_timing= new std::vector<float>(0); 
+  jet_passJvt= new std::vector<int>(0); 
+  jet_fjvt= new std::vector<float>(0);
+  baseel_pt= new std::vector<float>(0);
+  baseel_ptvarcone20= new std::vector<float>(0);
+  basemu_pt= new std::vector<float>(0);
+  basemu_ptvarcone20= new std::vector<float>(0); 
+  
   cout<<"NAME of input tree in intialize ======="<<currentVariation<<endl;
   if (currentSample == "data") isMC = false;
   cout<< "CURRENT  sample === "<< currentSample<<endl;
-  
+  std::cout << "Running Extra Veto? " << m_extraVars << std::endl;
+
   std::string syst;
   bool replacedHigh = false;
   bool replacedLow = false;
@@ -154,6 +174,37 @@ StatusCode HFInputAlg::execute() {
 
   //  TLorentzVector lep1,lep2,Z;
   m_tree->GetEntry(m_tree->GetReadEntry());
+
+  // extra vetos  
+  bool leptonVeto = false;
+  bool metSoftVeto = false;
+  bool fJVTVeto = false;
+  bool JetTimingVeto = false;
+  unsigned n_baseel=0;
+  unsigned n_basemu=0;
+  if(m_extraVars){
+    for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
+      if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25) ++n_baseel;
+    }
+    for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
+      if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25) ++n_basemu;
+    }
+
+    leptonVeto = (n_baseel>0 || n_basemu>0);
+    metSoftVeto = met_soft_tst_et>20.0e3;
+    if(jet_fjvt->size()>1)
+      fJVTVeto = fabs(jet_fjvt->at(0))>0.5 || fabs(jet_fjvt->at(1))>0.5;
+    else fJVTVeto=true;
+    if(jet_timing->size()>1)
+      JetTimingVeto = fabs(jet_timing->at(0))>11.0 || fabs(jet_timing->at(1))>11.0;
+    else JetTimingVeto = true;
+
+    // veto events with tighter selections
+    if(metSoftVeto || fJVTVeto || JetTimingVeto || leptonVeto) return StatusCode::SUCCESS;
+  }
+
+  // MET choice to be implemented...
+
   if (!((passJetCleanTight == 1) & (n_jet ==2) & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > 4.8) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > 1e6))) return StatusCode::SUCCESS; //metjet_CST>150e3
 
   if(n_el== 1) {
@@ -248,7 +299,9 @@ StatusCode HFInputAlg::beginInputFile() {
   } else{
     m_treeName = currentSample+currentVariation;
   }
+  std::cout << "Tree Name: " <<m_treeName <<std::endl;
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
+  std::cout << "Tree Entries: " <<m_tree->GetEntries() <<std::endl;
   m_tree->SetBranchStatus("*",0);
   m_tree->SetBranchStatus("runNumber", 1);
   m_tree->SetBranchStatus("w", 1);
@@ -309,5 +362,27 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("el_eta",&el_eta);
   m_tree->SetBranchAddress("jet_phi",&jet_phi);
   m_tree->SetBranchAddress("jet_eta",&jet_eta);
+
+  if(m_extraVars){  
+    m_tree->SetBranchStatus("met_soft_tst_et",1);
+    m_tree->SetBranchStatus("met_tenacious_tst_et",1);
+    m_tree->SetBranchStatus("met_tighter_tst_et",1);
+    m_tree->SetBranchStatus("met_tight_tst_et",1);
+    m_tree->SetBranchStatus("jet_fjvt",1);
+    m_tree->SetBranchStatus("baseel_pt",1);
+    m_tree->SetBranchStatus("baseel_ptvarcone20",1);
+    m_tree->SetBranchStatus("basemu_pt",1);
+    m_tree->SetBranchStatus("basemu_ptvarcone20",1);
+
+    m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
+    m_tree->SetBranchAddress("met_tenacious_tst_et",   &met_tenacious_tst_et);
+    m_tree->SetBranchAddress("met_tight_tst_et",       &met_tight_tst_et);
+    m_tree->SetBranchAddress("met_tighter_tst_et",     &met_tighter_tst_et);    
+    m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
+    m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
+    m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
+    m_tree->SetBranchAddress("basemu_pt",           &basemu_pt);
+    m_tree->SetBranchAddress("basemu_ptvarcone20",  &basemu_ptvarcone20);
+  }
   return StatusCode::SUCCESS;
 }

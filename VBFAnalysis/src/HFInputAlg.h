@@ -75,6 +75,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   vector <TH1F*> hCRZee;
   vector <TH1F*> hCRZmm;
 
+  bool m_extraVars = true;
+
   Float_t met_significance;
   Int_t trigger_met;
   Float_t w;
@@ -108,6 +110,17 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_jvt;
   std::vector<Float_t>* jet_timing;
   std::vector<Int_t>* jet_passJvt;
+  std::vector<Float_t>* jet_fjvt;
+  
+  Float_t met_soft_tst_et=-9999; 
+  Float_t met_tight_tst_et=-9999;
+  Float_t met_tighter_tst_et=-9999;
+  Float_t met_tenacious_tst_et=-9999;
+  std::vector<Float_t>* basemu_pt;
+  std::vector<Float_t>* basemu_ptvarcone20;
+  std::vector<Float_t>* baseel_pt;
+  std::vector<Float_t>* baseel_ptvarcone20;
+  
 }; 
 
 #endif //> !VBFANALYSIS_HFINPUTALG_H
