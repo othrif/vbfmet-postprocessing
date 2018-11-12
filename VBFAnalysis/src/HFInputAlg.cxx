@@ -3,7 +3,7 @@
 #include "SUSYTools/SUSYCrossSection.h"
 #include "PathResolver/PathResolver.h"
 //#include "xAODEventInfo/EventInfo.h"
-
+#include "TLorentzVector.h"
 
 HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ){
   declareProperty("currentVariation", currentVariation = "Nominal", "current systematics, NONE means nominal");
@@ -43,6 +43,7 @@ StatusCode HFInputAlg::initialize() {
   jet_pt= new std::vector<float>(0);
   jet_phi= new std::vector<float>(0);
   jet_eta= new std::vector<float>(0);
+  jet_m= new std::vector<float>(0);
   jet_timing= new std::vector<float>(0); 
   jet_passJvt= new std::vector<int>(0); 
   jet_fjvt= new std::vector<float>(0);
@@ -202,6 +203,15 @@ StatusCode HFInputAlg::execute() {
     // veto events with tighter selections
     if(metSoftVeto || fJVTVeto || JetTimingVeto || leptonVeto) return StatusCode::SUCCESS;
   }
+  xeSFTrigWeight=1.0;
+  if(isMC && jet_pt && jet_pt->size()>1){
+    TLorentzVector tmp, jj; 
+    tmp.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0),jet_phi->at(0),jet_m->at(0));    
+    jj=tmp;
+    tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));    
+    jj+=tmp;
+    xeSFTrigWeight = weightXETrigSF(jj.Pt());
+  }
 
   // MET choice to be implemented...
 
@@ -230,10 +240,11 @@ StatusCode HFInputAlg::execute() {
   Float_t w_final = 1;
   Float_t lumi = 36.1;
   if (isMC) w_final = w*1000*lumi;
+  //if(isMC) w_final *=xeSFTrigWeight;
   if (SR){
-    if (jj_mass < 1.5e6) hSR[0]->Fill(1,w_final);
-    else if (jj_mass < 2e6) hSR[1]->Fill(1,w_final);
-    else hSR[2]->Fill(1,w_final);
+    if (jj_mass < 1.5e6) hSR[0]->Fill(1,w_final*xeSFTrigWeight);
+    else if (jj_mass < 2e6) hSR[1]->Fill(1,w_final*xeSFTrigWeight);
+    else hSR[2]->Fill(1,w_final*xeSFTrigWeight);
   }
   if (CRWep){
     if (jj_mass < 1.5e6) hCRWep[0]->Fill(1,w_final);
@@ -331,6 +342,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_pt",1);
   m_tree->SetBranchStatus("jet_phi",1);
   m_tree->SetBranchStatus("jet_eta",1);
+  m_tree->SetBranchStatus("jet_m",1);
   m_tree->SetBranchStatus("jet_timing",1);
 
   m_tree->SetBranchAddress("w", &w);
@@ -362,6 +374,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("el_eta",&el_eta);
   m_tree->SetBranchAddress("jet_phi",&jet_phi);
   m_tree->SetBranchAddress("jet_eta",&jet_eta);
+  m_tree->SetBranchAddress("jet_m",&jet_m);
 
   if(m_extraVars){  
     m_tree->SetBranchStatus("met_soft_tst_et",1);
@@ -385,4 +398,16 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchAddress("basemu_ptvarcone20",  &basemu_ptvarcone20);
   }
   return StatusCode::SUCCESS;
+}
+
+double HFInputAlg::weightXETrigSF(const float jj_pt) {
+  static const double p0 = 59.3407;
+  static const double p1 = 54.9134;
+  double x = jj_pt / 1.0e3;
+  if (x < 100) { return 0; }
+  if (x > 240) { x = 240; }
+  double sf = 0.5*(1+TMath::Erf((x-p0)/(TMath::Sqrt(2)*p1)));
+  if(sf<0) sf=0.0;
+  if(sf > 1.5) sf=1.5;
+  return sf;
 }

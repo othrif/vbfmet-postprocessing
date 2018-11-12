@@ -46,7 +46,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     //   w_VBFhiggs =1.;
     // }
   }
-
+  xeSFTrigWeight=1.0;
   basemu_pt= new std::vector<float>(0);
   basemu_eta= new std::vector<float>(0);
   basemu_phi= new std::vector<float>(0);
@@ -120,6 +120,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   treeNameOut = m_currentSample+m_currentVariation;
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w); 
+  m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight); 
   m_tree_out->Branch("runNumber",&runNumber);
   m_tree_out->Branch("eventNumber",&eventNumber);
   m_tree_out->Branch("trigger_met", &trigger_met);
@@ -298,6 +299,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   // Fill
   truth_jj_mass =-1.0;  
+  xeSFTrigWeight=1.0;
   if(m_isMC && truth_jet_pt && truth_jet_pt->size()>1){
     TLorentzVector tmp, jjtruth;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
@@ -305,6 +307,16 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp.SetPtEtaPhiM(truth_jet_pt->at(1), truth_jet_eta->at(1),truth_jet_phi->at(1),truth_jet_m->at(1));
     jjtruth += tmp;
     truth_jj_mass =jjtruth.M();
+  }
+
+  xeSFTrigWeight=1.0;
+  if(m_isMC && jet_pt && jet_pt->size()>1){
+    TLorentzVector tmp, jj; 
+    tmp.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0),jet_phi->at(0),jet_m->at(0));    
+    jj=tmp;
+    tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));    
+    jj+=tmp;
+    xeSFTrigWeight = weightXETrigSF(jj.Pt());
   }
 
   if (m_isMC){
@@ -410,10 +422,10 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if(m_LooseSkim){
     METCut = 140.0e3;
-    LeadJetPtCut = 60.0e3;
-    subLeadJetPtCut = 40.0e3;
-    MjjCut =2e5;
-    DEtajjCut =3.5;
+    LeadJetPtCut = 60.0e3; // 60.0e3
+    subLeadJetPtCut = 40.0e3; // 40.0e3
+    MjjCut =2e5; // 2e5
+    DEtajjCut =3.5; // 3.5
   }
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
@@ -719,3 +731,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   return StatusCode::SUCCESS;
 }
 
+double VBFAnalysisAlg::weightXETrigSF(const float jj_pt) {
+  static const double p0 = 59.3407;
+  static const double p1 = 54.9134;
+  double x = jj_pt / 1.0e3;
+  if (x < 100) { return 0; }
+  if (x > 240) { x = 240; }
+  double sf = 0.5*(1+TMath::Erf((x-p0)/(TMath::Sqrt(2)*p1)));
+  if(sf<0) sf=0.0;
+  if(sf > 1.5) sf=1.5;
+  return sf;
+}  
