@@ -316,7 +316,7 @@ StatusCode VBFAnalysisAlg::execute() {
     jj=tmp;
     tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));    
     jj+=tmp;
-    xeSFTrigWeight = weightXETrigSF(jj.Pt());
+    xeSFTrigWeight = weightXETrigSF(met_tst_et); // met was used in the end instead of jj.Pt()
   }
 
   if (m_isMC){
