@@ -185,13 +185,13 @@ StatusCode HFInputAlg::execute() {
   unsigned n_basemu=0;
   if(m_extraVars){
     for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-      if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25) ++n_baseel;
+      if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.30) ++n_baseel;
     }
     for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-      if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25) ++n_basemu;
+      if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.30) ++n_basemu;
     }
 
-    leptonVeto = (n_baseel>0 || n_basemu>0);
+    leptonVeto = (n_baseel>0 || n_basemu>0) || (n_el+n_mu==1 && n_baseel+n_basemu==1) || (n_el+n_mu==2 && n_baseel+n_basemu==2);
     metSoftVeto = met_soft_tst_et>20.0e3;
     if(jet_fjvt->size()>1)
       fJVTVeto = fabs(jet_fjvt->at(0))>0.5 || fabs(jet_fjvt->at(1))>0.5;

@@ -4,7 +4,7 @@
 /**********************************************************************************
  * @Package: HInvPlot
  * @Class  : CutItem
- * @Author : Rustem Ospanov
+ * @Author : Doug Schaefer
  *
  * @Brief  :
  * 

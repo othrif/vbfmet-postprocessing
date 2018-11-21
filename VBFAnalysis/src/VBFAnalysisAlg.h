@@ -52,6 +52,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool is2016;
   bool m_LooseSkim = true;
   bool m_extraVars = true;
+  bool m_contLep   = false;
   TTree *m_tree = 0;
   TTree *m_tree_out = 0;
   SUSY::CrossSectionDB *my_XsecDB; 
@@ -148,6 +149,25 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t GenMET_pt=-9999;
   Double_t truth_jj_mass=-9999;
 
+  // optimization variables
+  std::vector<Float_t>* j3_centrality;
+  std::vector<Float_t>* j3_dRj1;
+  std::vector<Float_t>* j3_dRj2;
+  std::vector<Float_t>* j3_minDR;
+  std::vector<Float_t>* j3_mjclosest;
+  std::vector<Float_t>* j3_min_mj;
+  std::vector<Float_t>* j3_min_mj_over_mjj;
+  Float_t mj34;
+  Float_t max_j_eta;
+
+  // container vars
+  std::vector<Float_t>* contmu_pt;
+  std::vector<Float_t>* contmu_eta;
+  std::vector<Float_t>* contmu_phi;
+  std::vector<Float_t>* contel_pt;
+  std::vector<Float_t>* contel_eta;
+  std::vector<Float_t>* contel_phi;
+
   // extra vars
   std::vector<Float_t>* basemu_pt;
   std::vector<Float_t>* basemu_eta;
@@ -182,6 +202,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_fjvt;
   std::vector<Float_t>* jet_timing;
   std::vector<Int_t>* jet_passJvt;
+  std::vector<Int_t>* jet_PartonTruthLabelID;
+  std::vector<Int_t>* jet_ConeTruthLabelID;
 
   std::vector<Float_t>* truth_jet_pt;
   std::vector<Float_t>* truth_jet_eta;

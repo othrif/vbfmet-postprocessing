@@ -84,8 +84,9 @@ namespace Msl
       kvvv,
       kJPsi,
       kUpsl,
-      kSusy,
-      kSusy1     
+      kZqcdPow,
+      kZqcdMad,
+      kWqcdMad
     };
 
     std::string Convert2Str   (Sample s);
