@@ -5,6 +5,7 @@
 //#include "xAODEventInfo/EventInfo.h"
 #include <vector>
 #include "TLorentzVector.h"
+#include <math.h>       /* exp */
 
 
 VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ){
@@ -13,6 +14,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
   declareProperty( "LooseSkim", m_LooseSkim = true, "true if loose skimming is requested" );
   declareProperty( "ExtraVars", m_extraVars = true, "true if extra variables should be output" );
+  declareProperty( "ContLep", m_contLep = false, "true if container lepton variables should be output" );
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "current sytematics of the tree" );
   declareProperty( "normFile", m_normFile = "current.root", "path to a file with the number of events processed" );
   declareProperty( "mcCampaign", m_mcCampaign = "mc16a", "mcCampaign of the mc sample. only read if isMC is true" );
@@ -47,6 +49,24 @@ StatusCode VBFAnalysisAlg::initialize() {
     // }
   }
 
+  j3_centrality = new std::vector<float>(0);
+  j3_dRj1 = new std::vector<float>(0);
+  j3_dRj2 = new std::vector<float>(0);
+  j3_minDR = new std::vector<float>(0);
+  j3_mjclosest = new std::vector<float>(0);
+  j3_min_mj = new std::vector<float>(0);
+  j3_min_mj_over_mjj = new std::vector<float>(0);
+  mj34=-9999.0;
+  max_j_eta=-9999.0;
+
+
+  contmu_pt= new std::vector<float>(0);
+  contmu_eta= new std::vector<float>(0);
+  contmu_phi= new std::vector<float>(0);
+  contel_pt= new std::vector<float>(0);
+  contel_eta= new std::vector<float>(0);
+  contel_phi= new std::vector<float>(0);
+
   basemu_pt= new std::vector<float>(0);
   basemu_eta= new std::vector<float>(0);
   basemu_phi= new std::vector<float>(0);
@@ -80,6 +100,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   jet_fjvt= new std::vector<float>(0);
   jet_timing= new std::vector<float>(0);
   jet_passJvt= new std::vector<int>(0);
+  jet_PartonTruthLabelID = new std::vector<int>(0); 
+  jet_ConeTruthLabelID = new std::vector<int>(0); 
 
   truth_jet_pt= new std::vector<float>(0);
   truth_jet_eta= new std::vector<float>(0);
@@ -158,7 +180,29 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("jet_jvt",&jet_jvt);
   m_tree_out->Branch("met_significance",&met_significance);
 
+  if(m_contLep){
+    m_tree_out->Branch("contmu_pt",           &contmu_pt);
+    m_tree_out->Branch("contmu_eta",          &contmu_eta);
+    m_tree_out->Branch("contmu_phi",          &contmu_phi);
+    m_tree_out->Branch("contel_pt",           &contel_pt);
+    m_tree_out->Branch("contel_eta",          &contel_eta);
+    m_tree_out->Branch("contel_phi",          &contel_phi);
+  }
+
   if(m_extraVars){
+
+    m_tree_out->Branch("j3_centrality",&j3_centrality);
+    m_tree_out->Branch("j3_dRj1",&j3_dRj1);
+    m_tree_out->Branch("j3_dRj2",&j3_dRj2);
+    m_tree_out->Branch("j3_minDR",&j3_minDR);
+    m_tree_out->Branch("j3_mjclosest",&j3_mjclosest);
+    m_tree_out->Branch("j3_min_mj",&j3_min_mj);
+    m_tree_out->Branch("j3_min_mj_over_mjj",&j3_min_mj_over_mjj);
+    m_tree_out->Branch("mj34",&mj34);
+    m_tree_out->Branch("max_j_eta",&max_j_eta);
+    if(m_isMC) m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
+    if(m_isMC) m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
+
     m_tree_out->Branch("jet_fjvt",&jet_fjvt);    
     m_tree_out->Branch("basemu_pt",           &basemu_pt);
     m_tree_out->Branch("basemu_eta",          &basemu_eta);
@@ -401,6 +445,45 @@ StatusCode VBFAnalysisAlg::execute() {
     }// end tau overlap removal
   }// end extra variables
 
+  // fill extra jet variables for 3rd jets
+  if(m_extraVars){
+    mj34=-9999.0;
+    max_j_eta= fabs(jet_eta->at(0));
+    if(fabs(jet_eta->at(1))>max_j_eta) max_j_eta= fabs(jet_eta->at(1));
+    j3_centrality->clear();
+    j3_dRj1->clear();
+    j3_dRj2->clear();
+    j3_minDR->clear();
+    j3_mjclosest->clear();
+    j3_min_mj->clear();
+    j3_min_mj_over_mjj->clear();
+    if(jet_pt->size()>2){
+      TLorentzVector tmp, j1v, j2v, j3v, j4v;
+      j1v.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0), jet_phi->at(0), jet_m->at(0));
+      j2v.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1), jet_phi->at(1), jet_m->at(1));
+      for(unsigned iJet=2; iJet<jet_pt->size(); ++iJet){
+	tmp.SetPtEtaPhiM(jet_pt->at(iJet), jet_eta->at(iJet), jet_phi->at(iJet), jet_m->at(iJet)); 
+	float dRj1=tmp.DeltaR(j1v);
+	float dRj2=tmp.DeltaR(j2v);
+	j3_dRj1->push_back(dRj1);
+	j3_dRj2->push_back(dRj2);
+	j3_minDR->push_back(std::min(dRj1,dRj2));
+	float mj1 =  (tmp+j1v).M();
+	float mj2 =  (tmp+j2v).M();
+	j3_mjclosest->push_back(dRj1<dRj2 ? mj1 : mj2);
+	j3_min_mj->push_back(std::min(mj1,mj2));
+	j3_min_mj_over_mjj->push_back(std::min(mj1,mj2)/jj_mass);
+	float centrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(jet_eta->at(iJet) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
+	j3_centrality->push_back(centrality);
+      }
+      if(jet_pt->size()>3){
+	j3v.SetPtEtaPhiM(jet_pt->at(2), jet_eta->at(2), jet_phi->at(2), jet_m->at(2));
+	j4v.SetPtEtaPhiM(jet_pt->at(3), jet_eta->at(3), jet_phi->at(3), jet_m->at(3));
+	mj34 = (j3v+j4v).M();
+      }
+    }
+  }
+
   // Definiing a loose skimming
   float METCut = 180.0e3;
   float LeadJetPtCut = 80.0e3;
@@ -541,6 +624,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_m",1);
   m_tree->SetBranchStatus("jet_jvt",1);
   m_tree->SetBranchStatus("jet_timing",1);
+  m_tree->SetBranchStatus("jet_PartonTruthLabelID",1);
+  m_tree->SetBranchStatus("jet_ConeTruthLabelID",1);
 
   if(m_extraVars){
 
@@ -577,6 +662,15 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("met_tighter_tst_et",1);
     m_tree->SetBranchStatus("met_tighter_tst_phi",1);
     m_tree->SetBranchStatus("metsig_tst",1);
+
+    if(m_currentVariation=="Nominal" && m_contLep){
+      m_tree->SetBranchStatus("contel_pt",1);
+      m_tree->SetBranchStatus("contel_eta",1);
+      m_tree->SetBranchStatus("contel_phi",1);
+      m_tree->SetBranchStatus("contmu_pt",1);
+      m_tree->SetBranchStatus("contmu_eta",1);
+      m_tree->SetBranchStatus("contmu_phi",1);
+    }
 
     if(m_currentVariation=="Nominal" && m_isMC){
       m_tree->SetBranchStatus("truth_tau_pt", 1);
@@ -653,6 +747,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_m",&jet_m);
   m_tree->SetBranchAddress("jet_jvt",&jet_jvt);
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
+  m_tree->SetBranchAddress("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
+  m_tree->SetBranchAddress("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
   //if(foundGenMET) m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);
   
   if(m_currentVariation=="Nominal" && m_isMC){
@@ -666,6 +762,15 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     if(foundGenMET) m_tree->SetBranchAddress("GenMET_pt",  &GenMET_pt);
   }
   
+    if(m_currentVariation=="Nominal" && m_contLep){
+      m_tree->SetBranchAddress("contel_pt",           &contel_pt);
+      m_tree->SetBranchAddress("contel_eta",          &contel_eta);
+      m_tree->SetBranchAddress("contel_phi",          &contel_phi);
+      m_tree->SetBranchAddress("contmu_pt",           &contmu_pt);
+      m_tree->SetBranchAddress("contmu_eta",          &contmu_eta);
+      m_tree->SetBranchAddress("contmu_phi",          &contmu_phi);
+    }
+
   if(m_extraVars){
   
     m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
