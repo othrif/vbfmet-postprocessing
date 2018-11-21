@@ -77,7 +77,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Trees",         fTrees);
   reg.Get("ReadEvent::Files",         fFiles);
 
-  reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);  
+  reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -413,7 +413,7 @@ void Msl::ReadEvent::Read(const std::string &path)
   //
   TStopwatch timer;
   timer.Start();
-
+  
   TFile *file = 0;
   if(path.find("/eos/atlas") != string::npos) { file = TFile::Open(("root://eosatlas/"+path).c_str(), "READ"); }
   else { file = TFile::Open(path.c_str(), "READ"); }
@@ -539,9 +539,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // identify the sample
     if(!fisMC){
       event->sample = Mva::kData;
-      event->SetWeight(fWeight);
+      if(!fMCEventCount) event->SetWeight(fWeight);
+      else event->SetWeight(1.0);
     }else{
-      event->SetWeight((fWeight*fLumi));      
+      if(!fMCEventCount) event->SetWeight((fWeight*fLumi));
+      else  event->SetWeight(1.0);
       if(fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
 	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
@@ -891,7 +893,7 @@ void Msl::ReadEvent::Save(TDirectory *dir)
 //-----------------------------------------------------------------------------
 void Msl::ReadEvent::FillEvent(Event &event)
 {  
-
+  
   //
   // Compute xsec weight and classify event as data/signal/background
   //

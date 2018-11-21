@@ -254,6 +254,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     sigs = {}
     sigs['higgs'] = ['hggf','hvh','hvbf']
     sigs['hggf']  = ['hggf']
+    #sigs['whww']  = ['whww']    
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
     
@@ -292,7 +293,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     # Save samples (type list by hand to preserve order)
     #
     if reg != None and key != None:
-        reg.SetVal(key, 'higgs,top1,top2,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
+        reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 

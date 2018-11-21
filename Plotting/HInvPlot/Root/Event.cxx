@@ -87,7 +87,7 @@ void Msl::Event::Clear()
   //
   // Clear local vectors
   //
-  //totalWeight       = 0.0;
+  totalWeight       = 1.0;
   isMC              = false;
 
 }
@@ -107,7 +107,7 @@ void Msl::Event::Print() const
   //
   // Printing variables
   //
-  Print();
+  //Print();
 }
 
 //-----------------------------------------------------------------------------
