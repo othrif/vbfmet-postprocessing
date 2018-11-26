@@ -170,17 +170,17 @@ def getHistPars(hist):
         #
         'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5},
         'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
-        'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10},
+        'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':False},
         'jetEta1': {'xtitle':'Sub-Leading jet #eta'  ,       'ytitle':'Events', 'rebin':5},
         'jet1Phi': {'xtitle':'Sub-Leading jet #phi'  ,       'ytitle':'Events', 'rebin':2},
-        'jetPt1' : {'xtitle':'p_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10},
+        'jetPt1' : {'xtitle':'p_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':False},
         'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
-        'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True},
-        'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True},         
+        'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},
+        'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},         
         'j0timing' : {'xtitle':'Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1timing' : {'xtitle':'sub-Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},         
-        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0},
+        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0.0, 'ymin':0.1, 'logy':True, 'LtoRCut':True, 'xmax':6.0},
         'n_jet_fwd'   : {'xtitle':'Number of extra Jets |eta|>2.5',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj30'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
@@ -202,13 +202,13 @@ def getHistPars(hist):
         'dphill' : {'xtitle':'#Delta #phi_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
         'jj_dphi' : {'xtitle':'#Delta #phi_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
         'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':1.0, 'logy':True},
-        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':1.0, 'logy':True},        
+        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':1.0, 'logy':True, 'LtoRCut':False},        
         'met_tst_phi'    : {'xtitle':'E_{T}^{miss} #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},        
         'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},        
         'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
-        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False},        
-        'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001},        
+        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':False},        
+        'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':False},        
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':False},
@@ -227,7 +227,29 @@ def getHistPars(hist):
     'n_basemu'     : {'xtitle':'Number of Base Muons'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_truth_tau'     : {'xtitle':'Number of Truth taus'   ,         'ytitle':'Events',   'ymin':0.1},    
     'met_tst_j1_dphi'     : {'xtitle':'#Delta#phi(j1,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'met_tst_j2_dphi'     : {'xtitle':'#Delta#phi(j2,MET)'   ,         'ytitle':'Events',   'ymin':0.1},                        
+    'met_tst_j2_dphi'     : {'xtitle':'#Delta#phi(j2,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
+
+
+    'mj34'     : {'xtitle':'m_{j3,j4} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'max_j_eta'     : {'xtitle':'max(#eta_{j1},#eta_{j2})'   ,         'ytitle':'Events',   'ymin':0.1},                                
+    'dRj1'     : {'xtitle':'#DeltaR(j1,j3)'   ,         'ytitle':'Events',   'ymin':0.1},                                
+    'dRj2'     : {'xtitle':'#DeltaR(j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},                                
+    'minDR'     : {'xtitle':'min #DeltaR(j1/j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},                                
+    'mj1'     : {'xtitle':'m_{j1,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'mj2'     : {'xtitle':'m_{j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'minDRmj2'     : {'xtitle':'minDR m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'min_mj3'     : {'xtitle':'min m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'min_mj3_over_mjj'     : {'xtitle':'min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},                                                
+    'centrality'     : {'xtitle':'j3 Centrality'   ,         'ytitle':'Events',   'ymin':0.1},
+    'j3Pt'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
+    'j3Eta'     : {'xtitle':'j3 #eta'   ,         'ytitle':'Events',   'ymin':0.1},                                        
+    'j3Jvt'     : {'xtitle':'j3 Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
+    'j3FJvt'     : {'xtitle':'j3 f-Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
+    'jetPt3'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events / 10 GeV',   'ymin':0.1, 'LtoRCut':False},                                                
+    'avgCentrality'     : {'xtitle':'Average jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},                                                
+    'maxCentrality'     : {'xtitle':'Max jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},                                                
+    'avgmj3_over_mjj'     : {'xtitle':'Average min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},                                                
+    'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},                                                
         }
 
     try:
@@ -247,6 +269,7 @@ def getLabelSortKey(sample):
     elif sample == 'smww': return 1 # was 3
     elif sample == 'top1': return 4
     elif sample == 'tall': return 5
+    elif sample == 'mqcd': return 5        
     elif sample == 'vvv': return 6
     elif sample == 'zldy': return 7
     elif sample == 'zjet': return 18
@@ -295,6 +318,7 @@ def getSampleSortKey(sample):
     elif sample == 'top2': return 4
     elif sample == 'top1': return 5
     elif sample == 'tall': return 5
+    elif sample == 'mqcd': return 5        
     elif sample == 'vvv': return 6
     elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
@@ -321,6 +345,7 @@ def getSampleLabel(sample):
         'zqcd': 'Z+jets QCD',
         'zqcdMad': 'Z+jets QCD',        
         'zewk': 'Z+jets EWK',
+        'mqcd': 'MJ',        
         'wqcd': 'W+jets QCD',
         'wqcdMad': 'W+jets QCD',        
         'wewk': 'W+jets EWK',        
@@ -404,6 +429,7 @@ def getStyle(sample):
         'wewk':{'color':color_wewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top1':{'color':color_top1, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top2':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'mqcd':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},                
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},                
@@ -632,14 +658,16 @@ def getSystSumSortKey(value):
 class DrawStack:
     """DrawStack - a set of histograms for one stacked plot"""
         
-    def __init__(self, name, file, sign, data, bkgs, nf_map, extract_sig):
+    def __init__(self, name, file, sign, data, bkgs, nf_map, extract_sig, selkey=options.selkey):
 
         self.name   = name
-        self.selkey = options.selkey
+        self.selkey = selkey
         self.algkey = options.algkey
         self.nf_map = nf_map
         self.file_pointer = file
-
+        self.zcr_stack = None
+        if options.blind and self.selkey=='pass_sr_allmjj_nn_Nominal':
+            self.zcr_stack = DrawStack(name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_allmjj_ll_Nominal')
         self.sign = self.ReadSample(file, sign)
         if options.hscale!=None:
             self.sign.hist.Scale(float(options.hscale))
@@ -654,15 +682,19 @@ class DrawStack:
         self.sys_bkgs = {}
         self.sys_sigs = {}
         self.error_map= {}
+        self.bkg_sum = None
         
         self.bkg_table = None
-        self.sig_table = None        
+        self.sig_table = None
         
         self.stack    = None
         self.stackeg  = None
         self.leg      = None
+        self.legr     = None        
         self.texts    = None
         self.ratio    = None
+        self.signif   = None        
+        self.signifCR = None        
         self.err_bands= []    
         sum = 0.0
 
@@ -1290,6 +1322,11 @@ class DrawStack:
             self.pads[1].SetTickx(True);
             self.pads[1].SetTicky(True);
             
+            self.legr= ROOT.TLegend(0.07, 0.01, 0.35, 0.28)
+            self.legr.SetBorderSize(0)
+            self.legr.SetFillStyle (0)
+            self.legr.SetTextFont(42);    
+            self.legr.SetTextSize(0.09);
             if False:
                 self.pads[0].SetTicky(0)
                 # Margins                                                                                                                               
@@ -1318,6 +1355,9 @@ class DrawStack:
                     self.pads[1].SetRightMargin(rmargin_)
                     self.pads[1].SetTicky(1) # RHS ticks 
             else:
+                if len(self.pads)>1:
+                    self.pads[0].SetBottomMargin(0.0)
+                    self.pads[1].SetTopMargin(0.0)
                 self.pads[0].Draw()
                 self.pads[1].Draw()
 
@@ -1386,7 +1426,7 @@ class DrawStack:
             self.bkg_sum_alt.SetFillColor(1)
             self.bkg_sum_alt.SetFillStyle(3004)
         self.leg.Draw()
-        self.leg1.Draw()        
+        self.leg1.Draw()
 
         self.texts = getATLASLabels(can, 0.19, 0.86, selkey=self.selkey)
         for text in self.texts:
@@ -1399,7 +1439,7 @@ class DrawStack:
         #
         # Draw systematics error band around total background stack
         #    - this isn't used. It is commented out. it assumes a systemtic uncertainty
-        if options.draw_syst: 
+        if options.draw_syst:
             bkg_herr = self.stack.GetHistogram().Clone()
             bkg_herr.GetXaxis().SetLabelColor(0)
             bkg_herr.GetXaxis().SetTitle("")
@@ -1482,18 +1522,28 @@ class DrawStack:
             #self.pad = self.pads[ipad]
             #self.pad.cd()
             self.pads[ipad].cd()
-            self.ratio=self.data.hist.Clone()
+            if options.blind:
+                self.ratio=self.sign.hist.Clone()
+                self.signif=self.sign.hist.Clone()
+                self.signifCR=self.sign.hist.Clone()
+                self.signif.SetMinimum(0.0)
+                self.signif.SetMaximum(2.0)
+            else:
+                self.ratio=self.data.hist.Clone()
             self.UpdateHist(self.ratio)
             self.ratio.SetMinimum(0.25)
             self.ratio.SetMaximum(1.75)
-            #self.ratio.SetMinimum(0.0)
-            #self.ratio.SetMaximum(2.0)
-
+            
             if options.do_nf!=None:
                 samples = options.do_nf.split(',')
-                self.ratio=self.data.hist.Clone()
+                if options.blind:
+                    self.ratio=self.sign.hist.Clone()
+                    self.signif=self.sign.hist.Clone()
+                    self.signifCR=self.sign.hist.Clone()                    
+                else:
+                    self.ratio=self.data.hist.Clone()
                 den=None
-                tot_bkg=0.0; tot_data=0.0; tot_zgam=0.0
+                tot_bkg=0.0; tot_data=0.0; 
                 tot_data=self.ratio.Integral(4,101)                
 
                 for bkg, ent in self.bkgs.iteritems():
@@ -1502,11 +1552,10 @@ class DrawStack:
                             den=ent.hist.Clone()
                         else:
                             den.Add(ent.hist)
-                        tot_zgam+=ent.hist.Integral(4,101)
                     else:
                         self.ratio.Add(ent.hist, -1.0)
                         tot_bkg+=ent.hist.Integral(4,101)
-                # Divide
+                        
                 # set MC error to zero.
                 #for i in range()
                 self.ratio.Divide(den)
@@ -1514,27 +1563,82 @@ class DrawStack:
                     if i<6:
                         print self.ratio.GetXaxis().GetBinLowEdge(i),' mean: ',self.ratio.GetBinContent(i),' +/- ',self.ratio.GetBinError(i)
 
-                #print:
-                print (tot_data-tot_bkg)/tot_zgam,' +/- ',math.sqrt(tot_data)/tot_zgam*(tot_data-tot_bkg)/tot_zgam,
             else:
                 self.ratio.Divide(self.bkg_sum)                
+                # compute the mu-error
+                if options.blind:
+                    leftToRight=True
+                    CUTRANGE = range(0,self.signif.GetNbinsX()+1)
+                    if 'LtoRCut' in getHistPars(self.name):
+                        leftToRight = getHistPars(self.name)['LtoRCut']
+                    for ibinA in CUTRANGE:
+                        ibin = ibinA
+                        if not leftToRight:
+                            ibin = self.signif.GetNbinsX() - ibinA
+                        #print ibin
+                        cut_Nsig = self.sign.hist.Integral(0,ibin)
+                        cut_Nbkg = self.bkg_sum.Integral(0,ibin)
+                        if not leftToRight:
+                            cut_Nsig = self.sign.hist.Integral(ibin,10001)
+                            cut_Nbkg = self.bkg_sum.Integral(ibin,10001)
+                            
+                        #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
+                        if cut_Nsig>0.0 and cut_Nbkg>0.0:
+                            self.signif.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg)/cut_Nsig)
+                            wBKG=0.0
+                            if 'wqcd' in self.bkgs and 'wewk' in self.bkgs:
+                                wBKG = self.bkgs['wqcd'].hist.Integral(0,ibin)+self.bkgs['wewk'].hist.Integral(0,ibin)
+                                if not leftToRight:
+                                    wBKG = self.bkgs['wqcd'].hist.Integral(ibin,10001)+self.bkgs['wewk'].hist.Integral(ibin,10001)                                
+                            
+                            if 'zqcd' in self.bkgs and 'zewk' in self.bkgs:
+                                zBKG = self.bkgs['zqcd'].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
+                                if not leftToRight:
+                                    zBKG = self.bkgs['zqcd'].hist.Integral(ibin,10001)+self.bkgs['zewk'].hist.Integral(ibin,10001)
+                                #print 'self.zcr_stack: ',self.zcr_stack
+                                if not self.zcr_stack.bkg_sum:
+                                    self.zcr_stack.bkg_sum = self.zcr_stack.GetTotalBkgHist()
+                                total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
+                                if not leftToRight:
+                                    total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,10001)
+                                if total_zcr>0.0:
+                                    total_zcr = 1.0/math.sqrt(total_zcr)
+                                #print total_zcr
+                                self.signifCR.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig)                             
             
             # Set Names
-            pars = getHistPars(self.name)
+            pars = getHistPars(self.name)            
             if 'xtitle' in pars and self.bkg_sum.GetXaxis() != None:
                 self.ratio.GetXaxis().SetTitle(pars['xtitle'])
-            self.ratio.GetYaxis().SetTitle('Data / SM ')
-
             if options.blind:
-                for i in range(0,self.ratio.GetNbinsX()+1):
-                    self.ratio.SetBinError(i,0.0)
-                    self.ratio.SetBinContent(i,0.0)
+                self.ratio.GetYaxis().SetTitle('Sig. / SM ')
+            else:
+                self.ratio.GetYaxis().SetTitle('Data / SM ')
+            #if options.blind:
+            #    for i in range(0,self.ratio.GetNbinsX()+1):
+            #        self.ratio.SetBinError(i,0.0)
+            #        self.ratio.SetBinContent(i,0.0)
                     
-            # Setting the size of ratio font        
+            # Setting the size of ratio font
             bx = self.ratio.GetXaxis();
             by = self.ratio.GetYaxis();
-            self.ratio.SetMarkerSize(1.2);
-            self.ratio.SetMarkerStyle(20);
+            if not options.blind:
+                self.ratio.SetMarkerSize(1.2);
+                self.ratio.SetMarkerStyle(20);
+            else:
+                self.ratio.SetLineStyle(1);
+                self.ratio.SetMarkerSize(0.05);
+                self.signif.SetLineStyle(1);
+                self.signif.SetMarkerSize(0.05);
+                self.signif.SetLineColor(2);
+                self.signif.SetMarkerColor(2);                
+                self.signif.SetLineWidth(2);
+                self.signifCR.SetLineStyle(1);
+                self.signifCR.SetMarkerSize(0.05);
+                self.signifCR.SetLineColor(3);
+                self.signifCR.SetMarkerColor(3);
+                self.signifCR.SetLineWidth(2);
+                
             self.ratio.SetLineColor(ROOT.kBlack);
             self.ratio.SetLineWidth(2);
             
@@ -1557,6 +1661,8 @@ class DrawStack:
             bx.SetTitleOffset(1.2);
             
             by.SetRangeUser(0,2);
+            if options.blind:
+                by.SetRangeUser(0,0.799);
             by.SetLabelSize(0.13);
             by.SetLabelOffset(0.0125);
             by.SetTitleSize(0.14);
@@ -1579,8 +1685,17 @@ class DrawStack:
             self.error_map['bkg_ratio'].Draw('SAME E2')
 
             # Overlay the ratio plot on top of errors
-            self.ratio.Draw('same')
-
+            if options.blind:
+                self.ratio.Draw('same hist')
+                self.signif.Draw('same hist')
+                self.signifCR.Draw('same hist')
+                self.legr.Clear()
+                self.legr.AddEntry(self.ratio,'S/B')
+                self.legr.AddEntry(self.signif,'#sigma_{#mu} Stat 95% CL')
+                self.legr.AddEntry(self.signifCR,'#sigma_{#mu} w/ZCR 95% CL')
+                self.legr.Draw()
+            else:
+                self.ratio.Draw('same')
             self.pads[ipad].RedrawAxis()
             self.pads[ipad].Update()
 
@@ -1960,9 +2075,9 @@ def main():
         log.error('Need exactly one input argument: %s' %str(args))
         sys.exit(1)
 
-    if options.blind:
-        options.do_ratio=False
-        log.info('Ratio turned off because histogram is blinded!')
+    #if options.blind:
+    #    options.do_ratio=False
+    #    log.info('Ratio turned off because histogram is blinded!')
 
     rpath = args[0]
 
@@ -1984,7 +2099,7 @@ def main():
     # Select histograms and samples for stacks
     #
     #bkgs = ['zewk', 'zqcd','wewk','wqcd','top1','top2']
-    bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','vvv','zldy']
+    bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','vvv','zldy'] #,'mqcd'
     #bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','tall','vvv','zldy']  
 
     if options.stack_signal:

@@ -597,7 +597,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     for(unsigned iJet=0; iJet<jet_pt->size(); ++iJet){
       RecParticle new_jet;
       new_jet.pt  = jet_pt->at(iJet)/1.0e3;
-      //new_jet.m   = jet_m->at(iJet)/1.0e3;      
+      new_jet.m   = jet_m->at(iJet)/1.0e3;      
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));      
@@ -612,6 +612,34 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->jets.push_back(new_jet);
     }
 
+    TLorentzVector tmp;
+    const TLorentzVector j1v = event->jets.at(0).GetLVec();
+    const TLorentzVector j2v = event->jets.at(1).GetLVec();
+    float maxCentrality = -9999.0;
+    float avgCentrality = 0.0;
+    float maxmj3_over_mjj = -9999.0;
+    float avgmj3_over_mjj = 0.0;
+    for(unsigned iJet=2; iJet<event->jets.size(); ++iJet){
+      tmp=event->jets.at(iJet).GetLVec();
+      float centrality = exp(-4.0/std::pow(event->GetVar(Mva::jj_deta),2) * std::pow(tmp.Eta() - (j1v.Eta()+j2v.Eta())/2.0,2));
+      if(centrality>maxCentrality) maxCentrality = centrality;
+      avgCentrality+=centrality;
+
+      float mj1 =  (tmp+j1v).M();
+      float mj2 =  (tmp+j2v).M();
+      float tmp_maxmj3_over_mjj = (1000.0*std::min(mj1,mj2)/event->GetVar(Mva::jj_mass));
+      if(maxmj3_over_mjj<tmp_maxmj3_over_mjj) maxmj3_over_mjj = tmp_maxmj3_over_mjj;
+      avgmj3_over_mjj+=tmp_maxmj3_over_mjj;
+    }
+    event->AddVar(Mva::maxCentrality, maxCentrality);
+    if(event->jets.size()-2>0) avgCentrality/=float(event->jets.size()-2);
+    event->AddVar(Mva::avgCentrality, avgCentrality);
+    float jetPt3=-9999.0; if(event->jets.size()>2) jetPt3 = event->jets.at(2).pt;
+    event->AddVar(Mva::jetPt3, jetPt3);
+    event->AddVar(Mva::maxmj3_over_mjj, maxmj3_over_mjj);
+    if(event->jets.size()-2>0) avgmj3_over_mjj/=float(event->jets.size()-2);    
+    event->AddVar(Mva::avgmj3_over_mjj, avgmj3_over_mjj);
+      
     // forward jets relative to the leading two jets
     float maxPosEta=0.0, maxNegEta=0.0;
     if(event->jets.size()>1){
@@ -730,7 +758,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_ele.eta = baseel_eta->at(iEl);
 	new_ele.phi = baseel_phi->at(iEl);
 	//new_ele.AddVar(Mva::ptvarcone20,jet_timing->at(iJet));
-	if(baseel_ptvarcone20->at(iEl)/baseel_pt->at(iEl)<0.3){
+	if(baseel_ptvarcone20->at(iEl)/baseel_pt->at(iEl)<30.3){
 	  ++n_baseel;
 	  event->baseel.push_back(new_ele);
 	}
@@ -747,7 +775,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_muo.pt  = basemu_pt->at(iMu)/1.0e3;
 	new_muo.eta = basemu_eta->at(iMu);
 	new_muo.phi = basemu_phi->at(iMu);
-	if(basemu_ptvarcone20->at(iMu)/basemu_pt->at(iMu)<0.3){
+	if(basemu_ptvarcone20->at(iMu)/basemu_pt->at(iMu)<30.3){
 	  ++n_basemu;
 	  event->basemu.push_back(new_muo);
 	}

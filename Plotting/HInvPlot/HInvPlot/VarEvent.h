@@ -109,7 +109,12 @@ namespace Msl
       FilterMet,
       truth_jj_deta,
       truthJet1Pt,
-      nTruthJetMatch
+      nTruthJetMatch,
+      jetPt3,
+      maxCentrality,
+      avgCentrality,
+      maxmj3_over_mjj,
+      avgmj3_over_mjj
     };
 
     std::string       AsStr(Var var);

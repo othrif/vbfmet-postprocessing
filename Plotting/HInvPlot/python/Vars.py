@@ -69,7 +69,12 @@ myplots = [
               ['met_truth_phi', '6', '0.0', '6.2'],              
               ['truth_jj_deta', '10', '0.0', '10.0'],              
               ['truthJet1Pt', '50', '0.0', '150.0'],
-              ['nTruthJetMatch', '5', '-0.5', '4.5'],                            
+              ['nTruthJetMatch', '5', '-0.5', '4.5'],
+              ['jetPt3', '20', '0.0', '200.0'],
+              ['avgCentrality', '25', '0.0', '1.0'],
+              ['maxCentrality', '25', '0.0', '1.0'],
+              ['avgmj3_over_mjj', '50', '0.0', '1.0'],
+              ['maxmj3_over_mjj', '50', '0.0', '1.0'],
     ]
 mev_vars = ['jj_mass',
             'met_tst_et',

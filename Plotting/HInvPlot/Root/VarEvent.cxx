@@ -92,6 +92,11 @@ std::string Msl::Mva::Convert2Str(Var var)
     case truth_jj_deta:	          return "truth_jj_deta";
     case truthJet1Pt:	          return "truthJet1Pt";
     case nTruthJetMatch:	  return "nTruthJetMatch";            
+    case jetPt3:	          return "jetPt3";            
+    case maxCentrality:	          return "maxCentrality";
+    case avgCentrality:	          return "avgCentrality";
+    case maxmj3_over_mjj:	  return "maxmj3_over_mjj";
+    case avgmj3_over_mjj:	  return "avgmj3_over_mjj";      
 
     case NONE: return "NONE";
     default  : break;
@@ -179,7 +184,12 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "truth_jj_deta")     return truth_jj_deta;
   if(var == "truthJet1Pt")       return truthJet1Pt;
   if(var == "nTruthJetMatch")    return nTruthJetMatch;        
-
+  if(var == "jetPt3")	         return jetPt3;            
+  if(var == "maxCentrality")	 return maxCentrality;
+  if(var == "avgCentrality")	 return avgCentrality;
+  if(var == "maxmj3_over_mjj")	 return maxmj3_over_mjj;
+  if(var == "avgmj3_over_mjj")	 return avgmj3_over_mjj;
+  
   cout << "Msl::Mva::Convert2Var - unknown enum: " << var << endl;
   return NONE;
 }
@@ -352,7 +362,12 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(FilterMet);
     vars.push_back(truth_jj_deta);
     vars.push_back(truthJet1Pt);
-    vars.push_back(nTruthJetMatch);            
+    vars.push_back(nTruthJetMatch);
+    vars.push_back(jetPt3);
+    vars.push_back(maxCentrality);
+    vars.push_back(avgCentrality);
+    vars.push_back(maxmj3_over_mjj);
+    vars.push_back(avgmj3_over_mjj);
   }
   
   return vars;
