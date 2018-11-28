@@ -50,7 +50,7 @@ def getParser():
     p.add_option('--debug-alg',    type='string', default='no',          dest='debug_alg',  help='')
     p.add_option('--print-alg',    type='string', default='no',          dest='print_alg',  help='')
 
-    p.add_option('--region',       type='string', default='sr,zcr,wcr',          dest='region',     help='')    
+    p.add_option('--region',       type='string', default='sr,gamsr,zcr,wcr',          dest='region',     help='')    
     p.add_option('--chan',         type='string', default=None,          dest='chan',       help='')
     p.add_option('--njet',         type='string', default=None,          dest='njet',       help='')
     p.add_option('--syst',         type='string', default='Nominal',     dest='syst',       help='')
@@ -70,6 +70,8 @@ def getParser():
 
     p.add_option('--ignore-njet',  action='store_true', default=False,   dest='ignore_njet',          help='Ignore Njet')
     p.add_option('--ignore-met',  action='store_true', default=False,   dest='ignore_met',          help='Ignore MET')
+    p.add_option('--LooseLepZ',  action='store_true', default=False,   dest='LooseLepZ',          help='Use looser leptons')    
+    p.add_option('--OverlapPh',  action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')    
     p.add_option('--jet-veto-pt',         type='float'       , default=-10,       dest='jet_veto_pt',       help='pT for jet veto')
     
     p.add_option('--debug',        action='store_true', default=False,   dest='debug',      help='')

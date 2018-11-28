@@ -111,6 +111,9 @@ namespace Msl
 
     bool MatchAlg(IExecAlg *alg) const;
 
+    void ChangeLep(Event &event);
+    void AddPhoton(Event &event);
+    
   private:
     std::set<unsigned>          evt_map;
     // Properties:
@@ -151,6 +154,8 @@ namespace Msl
     float                       fInputCount;
     float                       fLumi;
     bool                        fisMC;
+    bool                        fLooseLepZ;
+    bool                        fOverlapPh;
     // Input vars
     float fWeight;
     int   fRunNumber;
@@ -192,7 +197,10 @@ namespace Msl
     std::vector<float> *basemu_pt;
     std::vector<float> *basemu_eta;
     std::vector<float> *basemu_phi;
-    std::vector<float> *basemu_ptvarcone20;        
+    std::vector<float> *basemu_ptvarcone20;
+    std::vector<float> *ph_pt;
+    std::vector<float> *ph_eta;
+    std::vector<float> *ph_phi;    
     
     // For event counting
     float                       fSumw;

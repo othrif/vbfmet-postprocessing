@@ -75,6 +75,8 @@ myplots = [
               ['maxCentrality', '25', '0.0', '1.0'],
               ['avgmj3_over_mjj', '50', '0.0', '1.0'],
               ['maxmj3_over_mjj', '50', '0.0', '1.0'],
+              ['phcentrality', '25', '0.0', '1.0'],
+              ['Mtt', '50', '0.0', '250.0'],
     ]
 mev_vars = ['jj_mass',
             'met_tst_et',

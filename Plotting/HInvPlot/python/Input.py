@@ -42,7 +42,9 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::Skim',          options.skim)
         self.read_reg.SetVal('ReadEvent::Lumi',          options.int_lumi)
         self.read_reg.SetVal('ReadEvent::METChoice',     options.met_choice)
-        self.read_reg.SetVal('ReadEvent::JetVetoPt',     options.jet_veto_pt)                        
+        self.read_reg.SetVal('ReadEvent::JetVetoPt',     options.jet_veto_pt) 
+        self.read_reg.SetVal('ReadEvent::LooseLepZ',     options.LooseLepZ)
+        self.read_reg.SetVal('ReadEvent::OverlapPh',     options.OverlapPh)
         self.read_reg.SetVal('ReadEvent::TrigString',    options.trig_name)  # specify a trigger from the command line       
             
         self.read_reg.SetVal('ReadEvent::Print',      'yes')

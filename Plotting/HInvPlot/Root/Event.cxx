@@ -83,6 +83,7 @@ void Msl::Event::Clear()
   truth_mu.clear();
   baseel.clear();
   basemu.clear();
+  photons.clear();
   
   //
   // Clear local vectors
@@ -122,4 +123,27 @@ void Msl::Event::Convert2GeV(const std::vector<Mva::Var> &vars)
       AddVar(var, val/1000.0);
     }
   }
+}
+
+//--------------------------------------------------------------------------------------                                       
+void Msl::Event::GetX1X2(const TLorentzVector &lep1,
+			 const TLorentzVector &lep2,
+			 const std::pair<float,float> &tmet,
+			 double& output_x1,
+			 double& output_x2)
+{
+  // 
+  // Find the x1 and x2 vars used in the collinear approximation   
+  //                                                                                                                           
+  float x1=0.0, x2=0.0;
+  float den1 = lep1.Px()*lep2.Py()+tmet.first*lep2.Py()-lep1.Py()*lep2.Px()-tmet.second*lep2.Px();
+  float den2 = lep1.Px()*lep2.Py()-tmet.first*lep1.Py()-lep1.Py()*lep2.Px()+tmet.second*lep1.Px();
+
+  if(den1!=0.0) x1 = (lep1.Px()*lep2.Py()-lep1.Py()*lep2.Px())/den1;
+  if(den2!=0.0) x2 = (lep1.Px()*lep2.Py()-lep1.Py()*lep2.Px())/den2;
+
+  output_x1 = x1;
+  output_x2 = x2;
+
+  return;
 }
