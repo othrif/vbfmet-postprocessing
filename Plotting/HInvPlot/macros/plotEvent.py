@@ -88,6 +88,21 @@ def prepareSeqSR(basic_cuts, alg_take=None, syst='Nominal'):
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
 #-----------------------------------------------------------------------------------------
+def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'gamsr'
+
+    if basic_cuts.chan !='nn' or not passRegion(region):
+        return ('', [])
+    
+    pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+#-----------------------------------------------------------------------------------------
 def prepareSeqWCR(basic_cuts, region, alg_take=None, syst='Nominal'):
 
     selkey = basic_cuts.GetSelKey()
@@ -189,6 +204,11 @@ def main():
                     #
                     (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
                     read_alg.AddNormalAlg(name_sr,  alg_sr)
+                    #
+                    # SR Cut based regions and algorithms with photon
+                    #
+                    (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)                    
         
                     #
                     # ZCR Cut based regions and algorithms

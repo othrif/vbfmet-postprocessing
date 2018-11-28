@@ -34,12 +34,12 @@ std::string Msl::Mva::Convert2Str(Var var)
     case metsig_tst:	          return "metsig_tst";      
     case met_tenacious_tst_et:	  return "met_tenacious_tst_et";      
     case met_tight_tst_et:	  return "met_tight_tst_et";      
-    case met_tighter_tst_et:	  return "met_tighter_tst_et";      
+    case met_tighter_tst_et:	  return "met_tighter_tst_et";
     case met_soft_tst_et:	  return "met_soft_tst_et";
-    case met_tenacious_tst_phi:	  return "met_tenacious_tst_phi";      
-    case met_tight_tst_phi:	  return "met_tight_tst_phi";      
-    case met_tighter_tst_phi:	  return "met_tighter_tst_phi";      
-    case met_soft_tst_phi:	  return "met_soft_tst_phi";            
+    case met_tenacious_tst_phi:	  return "met_tenacious_tst_phi";
+    case met_tight_tst_phi:	  return "met_tight_tst_phi";
+    case met_tighter_tst_phi:	  return "met_tighter_tst_phi";
+    case met_soft_tst_phi:	  return "met_soft_tst_phi";
     case met_soft_tst_sumet:	  return "met_soft_tst_sumet";      
     case met_cst_jet:	          return "met_cst_jet";      
     case n_jet:	                  return "n_jet";
@@ -58,6 +58,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case n_baseel:	          return "n_baseel";
     case n_basemu:	          return "n_basemu";
     case n_baselep:	          return "n_baselep";      
+    case n_ph:	                  return "n_ph";      
     case n_truth_tau:	          return "n_truth_tau";            
     case met_tst_j1_dphi:	  return "met_tst_j1_dphi";
     case met_tst_j2_dphi:	  return "met_tst_j2_dphi";
@@ -92,6 +93,13 @@ std::string Msl::Mva::Convert2Str(Var var)
     case truth_jj_deta:	          return "truth_jj_deta";
     case truthJet1Pt:	          return "truthJet1Pt";
     case nTruthJetMatch:	  return "nTruthJetMatch";            
+    case jetPt3:	          return "jetPt3";            
+    case maxCentrality:	          return "maxCentrality";
+    case avgCentrality:	          return "avgCentrality";
+    case phcentrality:	          return "phcentrality";
+    case maxmj3_over_mjj:	  return "maxmj3_over_mjj";
+    case avgmj3_over_mjj:	  return "avgmj3_over_mjj";      
+    case Mtt:	                  return "Mtt";      
 
     case NONE: return "NONE";
     default  : break;
@@ -145,6 +153,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "n_baseel")          return n_baseel;
   if(var == "n_basemu")          return n_basemu;
   if(var == "n_baselep")          return n_baselep;  
+  if(var == "n_ph")               return n_ph;  
   if(var == "n_truth_tau")       return n_truth_tau;  
   if(var == "met_tst_j1_dphi")   return met_tst_j1_dphi;
   if(var == "met_tst_j2_dphi")   return met_tst_j2_dphi;
@@ -179,7 +188,14 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "truth_jj_deta")     return truth_jj_deta;
   if(var == "truthJet1Pt")       return truthJet1Pt;
   if(var == "nTruthJetMatch")    return nTruthJetMatch;        
-
+  if(var == "jetPt3")	         return jetPt3;            
+  if(var == "maxCentrality")	 return maxCentrality;
+  if(var == "avgCentrality")	 return avgCentrality;
+  if(var == "phcentrality")	 return phcentrality;
+  if(var == "maxmj3_over_mjj")	 return maxmj3_over_mjj;
+  if(var == "avgmj3_over_mjj")	 return avgmj3_over_mjj;
+  if(var == "Mtt")	         return Mtt;
+  
   cout << "Msl::Mva::Convert2Var - unknown enum: " << var << endl;
   return NONE;
 }
@@ -319,6 +335,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(n_baseel);    
     vars.push_back(n_basemu);
     vars.push_back(n_baselep);    
+    vars.push_back(n_ph);    
     vars.push_back(n_truth_tau);
     vars.push_back(met_tst_j1_dphi);    
     vars.push_back(met_tst_j2_dphi);    
@@ -344,7 +361,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(j0timing);     
     vars.push_back(j1timing);
     vars.push_back(j0jvt);     
-    vars.push_back(j1jvt);         
+    vars.push_back(j1jvt);
     vars.push_back(j0fjvt);     
     vars.push_back(j1fjvt);         
     vars.push_back(TruthFilter);
@@ -352,7 +369,14 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(FilterMet);
     vars.push_back(truth_jj_deta);
     vars.push_back(truthJet1Pt);
-    vars.push_back(nTruthJetMatch);            
+    vars.push_back(nTruthJetMatch);
+    vars.push_back(jetPt3);
+    vars.push_back(maxCentrality);
+    vars.push_back(avgCentrality);
+    vars.push_back(phcentrality);
+    vars.push_back(maxmj3_over_mjj);
+    vars.push_back(avgmj3_over_mjj);
+    vars.push_back(Mtt);
   }
   
   return vars;

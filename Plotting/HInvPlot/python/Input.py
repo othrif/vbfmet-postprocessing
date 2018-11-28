@@ -42,7 +42,9 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::Skim',          options.skim)
         self.read_reg.SetVal('ReadEvent::Lumi',          options.int_lumi)
         self.read_reg.SetVal('ReadEvent::METChoice',     options.met_choice)
-        self.read_reg.SetVal('ReadEvent::JetVetoPt',     options.jet_veto_pt)                        
+        self.read_reg.SetVal('ReadEvent::JetVetoPt',     options.jet_veto_pt) 
+        self.read_reg.SetVal('ReadEvent::LooseLepZ',     options.LooseLepZ)
+        self.read_reg.SetVal('ReadEvent::OverlapPh',     options.OverlapPh)
         self.read_reg.SetVal('ReadEvent::TrigString',    options.trig_name)  # specify a trigger from the command line       
             
         self.read_reg.SetVal('ReadEvent::Print',      'yes')
@@ -333,11 +335,19 @@ def getInputDataFiles(paths):
 #
 def prepareBkgRuns(keys,options=None):
 
-    sig_ggF125 = {'308284':'ggF125',}    
+        #
+        #
+        #
+        
+    sig_VH125     = {'308072':'VH125',}        
+    sig_ggF125 = {'308284':'ggF125',}
+    #sig_ggF125 = {'364162':'Wmunu_MAXHTPTV140_280_CVetoBVeto',}
+    #sig_VH125     = {'364106':'TBD',}
+    #sig_VH125v2     = {'364148':'TBD',}    
     sig_VBF125     = {'308276':'VBF125 - met',
                       '308567':'VBF125 - all',
                           }
-    sig_VH125     = {'308072':'VH125',}
+
     bkg_wewk =     {'308096':'TBD',                        
                     '308097':'TBD',                        
                     '308098':'TBD',                        
@@ -707,6 +717,7 @@ def prepareBkgRuns(keys,options=None):
 
     bkg_keys = {
                 'hvh':sig_VH125,
+                #'whww':sig_VH125v2,                
                 'hggf':sig_ggF125,
                 'hvbf':sig_VBF125,
                 'wewk':bkg_wewk,

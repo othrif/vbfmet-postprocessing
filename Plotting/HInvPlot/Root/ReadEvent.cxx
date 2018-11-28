@@ -51,6 +51,8 @@ Msl::ReadEvent::ReadEvent():
   fPrintEvent   (false),
   fMaxNEvent(-1),
   fLumi         (1.0),
+  fLooseLepZ    (false),
+  fOverlapPh    (false),
   genCutFlow    (0),
   procCutFlow0  (0),
   rawCutFlow    (0)
@@ -77,7 +79,9 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Trees",         fTrees);
   reg.Get("ReadEvent::Files",         fFiles);
 
-  reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);  
+  reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
+  reg.Get("ReadEvent::LooseLepZ",     fLooseLepZ);
+  reg.Get("ReadEvent::OverlapPh",    fOverlapPh);
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -156,6 +160,9 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   baseel_eta    = new std::vector<float>();
   baseel_phi    = new std::vector<float>();
   baseel_ptvarcone20    = new std::vector<float>();      
+  ph_pt     = new std::vector<float>();
+  ph_eta    = new std::vector<float>();
+  ph_phi    = new std::vector<float>();
   
 #ifdef ANP_CPU_PROFILER
   string profile_file = "cpu-profile-readevent";
@@ -216,6 +223,10 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("basemu_eta",   &basemu_eta);  
   tree->SetBranchAddress("basemu_phi",   &basemu_phi);
   tree->SetBranchAddress("basemu_ptvarcone20",   &basemu_ptvarcone20);
+  // load photons
+  tree->SetBranchAddress("ph_pt",    &ph_pt);  
+  tree->SetBranchAddress("ph_eta",   &ph_eta);  
+  tree->SetBranchAddress("ph_phi",   &ph_phi);
 }
 
 //-----------------------------------------------------------------------------
@@ -413,7 +424,7 @@ void Msl::ReadEvent::Read(const std::string &path)
   //
   TStopwatch timer;
   timer.Start();
-
+  
   TFile *file = 0;
   if(path.find("/eos/atlas") != string::npos) { file = TFile::Open(("root://eosatlas/"+path).c_str(), "READ"); }
   else { file = TFile::Open(path.c_str(), "READ"); }
@@ -539,9 +550,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // identify the sample
     if(!fisMC){
       event->sample = Mva::kData;
-      event->SetWeight(fWeight);
+      if(!fMCEventCount) event->SetWeight(fWeight);
+      else event->SetWeight(1.0);
     }else{
-      event->SetWeight((fWeight*fLumi));      
+      if(!fMCEventCount) event->SetWeight((fWeight*fLumi));
+      else  event->SetWeight(1.0);
       if(fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
 	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
@@ -595,7 +608,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     for(unsigned iJet=0; iJet<jet_pt->size(); ++iJet){
       RecParticle new_jet;
       new_jet.pt  = jet_pt->at(iJet)/1.0e3;
-      //new_jet.m   = jet_m->at(iJet)/1.0e3;      
+      new_jet.m   = jet_m->at(iJet)/1.0e3;      
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));      
@@ -610,6 +623,34 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->jets.push_back(new_jet);
     }
 
+    TLorentzVector tmp;
+    const TLorentzVector j1v = event->jets.at(0).GetLVec();
+    const TLorentzVector j2v = event->jets.at(1).GetLVec();
+    float maxCentrality = -9999.0;
+    float avgCentrality = 0.0;
+    float maxmj3_over_mjj = -9999.0;
+    float avgmj3_over_mjj = 0.0;
+    for(unsigned iJet=2; iJet<event->jets.size(); ++iJet){
+      tmp=event->jets.at(iJet).GetLVec();
+      float centrality = exp(-4.0/std::pow(event->GetVar(Mva::jj_deta),2) * std::pow(tmp.Eta() - (j1v.Eta()+j2v.Eta())/2.0,2));
+      if(centrality>maxCentrality) maxCentrality = centrality;
+      avgCentrality+=centrality;
+
+      float mj1 =  (tmp+j1v).M();
+      float mj2 =  (tmp+j2v).M();
+      float tmp_maxmj3_over_mjj = (1000.0*std::min(mj1,mj2)/event->GetVar(Mva::jj_mass));
+      if(maxmj3_over_mjj<tmp_maxmj3_over_mjj) maxmj3_over_mjj = tmp_maxmj3_over_mjj;
+      avgmj3_over_mjj+=tmp_maxmj3_over_mjj;
+    }
+    event->AddVar(Mva::maxCentrality, maxCentrality);
+    if(event->jets.size()-2>0) avgCentrality/=float(event->jets.size()-2);
+    event->AddVar(Mva::avgCentrality, avgCentrality);
+    float jetPt3=-9999.0; if(event->jets.size()>2) jetPt3 = event->jets.at(2).pt;
+    event->AddVar(Mva::jetPt3, jetPt3);
+    event->AddVar(Mva::maxmj3_over_mjj, maxmj3_over_mjj);
+    if(event->jets.size()-2>0) avgmj3_over_mjj/=float(event->jets.size()-2);    
+    event->AddVar(Mva::avgmj3_over_mjj, avgmj3_over_mjj);
+      
     // forward jets relative to the leading two jets
     float maxPosEta=0.0, maxNegEta=0.0;
     if(event->jets.size()>1){
@@ -728,10 +769,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_ele.eta = baseel_eta->at(iEl);
 	new_ele.phi = baseel_phi->at(iEl);
 	//new_ele.AddVar(Mva::ptvarcone20,jet_timing->at(iJet));
-	if(baseel_ptvarcone20->at(iEl)/baseel_pt->at(iEl)<0.3){
-	  ++n_baseel;
-	  event->baseel.push_back(new_ele);
-	}
+	//if(baseel_ptvarcone20->at(iEl)/baseel_pt->at(iEl)<30.3){
+	++n_baseel;
+	event->baseel.push_back(new_ele);
+	  //}
       }
       event->RepVar(Mva::n_baseel, n_baseel);
       n_baselep+=n_baseel;
@@ -745,15 +786,29 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_muo.pt  = basemu_pt->at(iMu)/1.0e3;
 	new_muo.eta = basemu_eta->at(iMu);
 	new_muo.phi = basemu_phi->at(iMu);
-	if(basemu_ptvarcone20->at(iMu)/basemu_pt->at(iMu)<0.3){
-	  ++n_basemu;
-	  event->basemu.push_back(new_muo);
-	}
+	//if(basemu_ptvarcone20->at(iMu)/basemu_pt->at(iMu)<30.3){
+	++n_basemu;
+	event->basemu.push_back(new_muo);
+	//}
       }
       event->RepVar(Mva::n_basemu, n_basemu);
       n_baselep+=n_basemu;
     }
     event->RepVar(Mva::n_baselep, n_baselep);
+
+    // Fill signal photons
+    if(ph_pt){
+      unsigned n_ph=0;
+      for(unsigned iPh=0; iPh<ph_pt->size(); ++iPh){
+	RecParticle new_ph;
+	new_ph.pt  = ph_pt->at(iPh)/1.0e3;
+	new_ph.eta = ph_eta->at(iPh);
+	new_ph.phi = ph_phi->at(iPh);
+	++n_ph;
+	event->photons.push_back(new_ph);
+      }
+      event->RepVar(Mva::n_ph, n_ph);          
+    }
     
     // convert variables to GeV
     event->Convert2GeV(fVarMeV);
@@ -810,6 +865,12 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->AddVar(Mva::FilterMet,     filterMet);
     event->AddVar(Mva::TruthFilter,   truthFilter);
     event->AddVar(Mva::truthJet1Pt,   truthJet1);
+
+    // Change the leptons to base leptons
+    if(fLooseLepZ) ChangeLep(*event);
+
+    // update for photon
+    if(fOverlapPh) AddPhoton(*event);
     
     // Fill remaining variables
     FillEvent(*event);
@@ -891,7 +952,7 @@ void Msl::ReadEvent::Save(TDirectory *dir)
 //-----------------------------------------------------------------------------
 void Msl::ReadEvent::FillEvent(Event &event)
 {  
-
+  
   //
   // Compute xsec weight and classify event as data/signal/background
   //
@@ -1018,6 +1079,120 @@ void Msl::ReadEvent::ProcessAlgs(Event &top_event, Event &alg_event)
       }
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+void Msl::ReadEvent::ChangeLep(Event &event)
+{
+  // change to using baseleptons with loose iso.
+  //n_el,n_mu,met_tst_nolep_j1_dphi,met_tst_nolep_j2_dphi
+  // met_tst_nolep_et,met_tst_nolep_phi, ptll, mll, lepPt0, lepPt1, lepCh0, lepCh1
+  //event->baseel;
+  //event->basemu; mtautau
+  TVector3 met, met_beforeRemove;
+  met.SetPtEtaPhi(event.met.Pt(), event.met.Eta(), event.met.Phi());
+  met_beforeRemove=met;
+
+  unsigned n_el=0;
+  unsigned n_mu=0;
+  std::vector<TLorentzVector> my_leps;
+  for(unsigned i=0; i<event.baseel.size(); ++i)
+    if(baseel_ptvarcone20->at(i)/baseel_pt->at(i)<0.2){
+      met+=event.baseel.at(i).GetVec();
+      ++n_el;
+      my_leps.push_back(event.baseel.at(i).GetLVec());
+    }
+  for(unsigned i=0; i<event.basemu.size(); ++i)
+    if(basemu_ptvarcone20->at(i)/basemu_pt->at(i)<0.2){
+      met+=event.basemu.at(i).GetVec();
+      ++n_mu;
+      my_leps.push_back(event.basemu.at(i).GetLVec());
+    }
+
+  // removing the leptons
+  event.RepVar(Mva::met_tst_nolep_et,  met.Pt());
+  event.RepVar(Mva::met_tst_nolep_phi, met.Phi());
+  if(event.jets.size()>1){
+    event.RepVar(Mva::met_tst_nolep_j1_dphi, met.DeltaPhi(event.jets.at(0).GetVec()));
+    event.RepVar(Mva::met_tst_nolep_j2_dphi, met.DeltaPhi(event.jets.at(1).GetVec()));
+  }
+  event.RepVar(Mva::n_el, n_el);  
+  event.RepVar(Mva::n_mu, n_mu);
+  // sort leptons
+  std::sort(my_leps.begin(),my_leps.end(),SortPhysicsObject("pt"));
+  if(my_leps.size()>0)  event.RepVar(Mva::lepPt0, my_leps.at(0).Pt());
+  if(my_leps.size()>1){
+    event.RepVar(Mva::lepPt1, my_leps.at(1).Pt());
+    TLorentzVector dilep = my_leps.at(0)+my_leps.at(1);
+    event.RepVar(Mva::ptll, dilep.Pt());
+    event.RepVar(Mva::mll, dilep.M());
+  }
+
+  ////////////////////////////////
+  // Mtt   // assumes collinear approximation
+  ////////////////////////////////
+  double x1=-999., x2=-999.,mtt=-999., mll=-999.0;;
+  if(my_leps.size()>1)
+    event.GetX1X2(my_leps.at(0), my_leps.at(1),
+		  make_pair<float,float>(met_beforeRemove.Px(), met_beforeRemove.Py()),  x1, x2);
+  if(x1>0.0 && x2>0.0) mtt=mll/TMath::Sqrt(x1*x2);
+  event.RepVar(Mva::Mtt, mtt);    
+}
+
+//-----------------------------------------------------------------------------
+void Msl::ReadEvent::AddPhoton(Event &event)
+{
+  // remove the jet overlapping
+  // recompute jj_mass, jj_deta, etaj0TimesEtaj1, jetPt0, jetPt1, j0fjvt, j1fjvt, j0jvt, j1jvt, j0timing, j1timing,
+  // add photon centrality?
+  bool jet_change=false;
+  vector<unsigned> jerase;
+  unsigned nph = event.photons.size();
+  for(unsigned i=0; i<nph; ++i){
+    bool erase=false;
+    TVector3 photon = event.photons.at(i).GetVec();
+    unsigned nj = event.jets.size();
+    for(unsigned j=0; j<nj; ++j){
+      if(photon.DeltaR(event.jets.at(j).GetVec())<0.2){
+      	jet_change=true;
+	jerase.push_back(j);
+      }
+      for(unsigned j=0; j<event.baseel.size(); ++j){
+	if(photon.DeltaR(event.baseel.at(j).GetVec())<0.2){
+	  erase=true;break;
+	}
+      }
+      for(unsigned j=0; j<event.basemu.size(); ++j){
+	if(photon.DeltaR(event.basemu.at(j).GetVec())<0.2){
+	  erase=true;break;
+	}
+      }
+      if(erase){ event.photons.erase(event.photons.begin()+i); --i; --nph; }
+    }
+  }
+  // erase jets overlapping
+  unsigned ner = 0;
+  for(unsigned a=0; a<jerase.size(); ++a){
+    event.jets.erase(event.jets.begin()+jerase.at(a)-ner);
+    ++ner;
+  }
+  if(jet_change){
+    event.RepVar(Mva::n_jet, event.jets.size());
+    if(event.jets.size()>1){
+      TLorentzVector jj = event.jets.at(0).GetLVec() + event.jets.at(1).GetLVec();
+      event.RepVar(Mva::jj_mass, jj.M());
+      event.RepVar(Mva::jj_deta, fabs(event.jets.at(0).eta - event.jets.at(1).eta));
+      event.RepVar(Mva::jj_dphi, fabs(event.jets.at(0).GetVec().DeltaR(event.jets.at(1).GetVec())));
+      //event.RepVar(Mva::etaj0TimesEtaj1,(event.jets.at(0).eta * event.jets.at(1).eta));
+      //event.RepVar(Mva::jetPt0,event.jets.at(0).pt);
+      //event.RepVar(Mva::jetPt1,event.jets.at(1).pt);
+    }
+  }
+  float centrality=-999;
+  if(event.photons.size()>0 && event.jets.size()>1){
+    centrality = exp(-4.0/std::pow(event.GetVar(Mva::jj_deta),2) * std::pow(event.photons.at(0).eta - (event.jets.at(0).pt+event.jets.at(1).pt)/2.0,2));
+  }
+  event.RepVar(Mva::phcentrality,centrality);  
 }
 
 //-----------------------------------------------------------------------------

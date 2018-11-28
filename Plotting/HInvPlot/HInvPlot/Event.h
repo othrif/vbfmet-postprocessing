@@ -87,6 +87,13 @@ namespace Msl
 
     void SetVars();
 
+    double GetMll   () const;
+    void GetX1X2(const TLorentzVector &lep1,
+                 const TLorentzVector &lep2,
+                 const std::pair<float,float> &met,
+                 double& output_x1,
+                 double& output_x2);
+
   public:
 
     //
@@ -113,6 +120,7 @@ namespace Msl
     ParticleVec          truth_mu;    
     ParticleVec          baseel;
     ParticleVec          basemu;
+    ParticleVec          photons;
     TLorentzVector       met;
   };
 }
@@ -128,5 +136,9 @@ namespace Msl
   }
   inline double Msl::Event::GetWeight() const {
     return totalWeight;
+  }
+  inline double Msl::Event::GetMll() const {
+    //return (GetLVLep0()+GetLVLep1()).M();
+    return GetVar(Mva::mll);
   }
 #endif

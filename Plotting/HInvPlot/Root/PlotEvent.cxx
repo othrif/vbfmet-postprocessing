@@ -17,6 +17,17 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hTruthElPt(0), hTruthElEta(0),
 				  hBaseElPt(0), hBaseElEta(0),
 				  hTruthTauPt(0), hTruthTauEta(0),
+				  hmj34(0),
+				  hmax_j_eta(0),
+				  hdRj1(0),
+				  hdRj2(0),
+				  hminDR(0),
+				  hmj1(0),
+				  hmj2(0),
+				  hminDRmj2(0),
+				  hmin_mj3(0),
+				  hmin_mj3_over_mjj(0),
+				  hcentrality(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
@@ -73,7 +84,24 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hBaseElEta   = GetTH1("baseElEta",   45,  -4.5,   4.5);
   hTruthTauPt  = GetTH1("truthTauPt",    50,  0.0,   100.0);
   hTruthTauDR  = GetTH1("truthTauDR",    100,  0.0,   10.0);
-  hTruthTauEta = GetTH1("truthTauEta",   45,  -4.5,   4.5);    
+  hTruthTauEta = GetTH1("truthTauEta",   45,  -4.5,   4.5);
+  // extra vars
+  hmj34             = GetTH1("mj34",             50,  0.0,   1000.0);		  
+  hmax_j_eta        = GetTH1("max_j_eta",        45,  0.0,   4.5);    	  
+  hdRj1             = GetTH1("dRj1",             20,  0.0,   10.0);		  
+  hdRj2             = GetTH1("dRj2",             20,  0.0,   10.0);		  
+  hminDR            = GetTH1("minDR",            20,  0.0,  10.0);		  
+  hmj1              = GetTH1("mj1",              50,  0.0,   2000.0);		  
+  hmj2              = GetTH1("mj2",              50,  0.0,   2000.0);		  
+  hminDRmj2         = GetTH1("minDRmj2",         50,  0.0,   2000.0);    	  
+  hmin_mj3          = GetTH1("min_mj3",          50,  0.0,   2000.0);	  
+  hmin_mj3_over_mjj = GetTH1("min_mj3_over_mjj", 25,  0.0,   1.0);
+  hcentrality       = GetTH1("centrality",       25,  0.0,   1.0);
+  hj3Pt             = GetTH1("j3Pt",             20,  0.0,   200.0);
+  hj3Eta            = GetTH1("j3Eta",            22,  -4.5,  4.5);
+  hj3Jvt            = GetTH1("j3Jvt",            12,  -0.2,  1.0);
+  hj3FJvt           = GetTH1("j3FJvt",           22,  -0.2,  2.0);
+  
   hZMCIDQCD    = GetTH1("ZMCIDQCD",     100,  364099.5,364199.5);
   hWMCIDQCD    = GetTH1("WMCIDQCD",     100,  364155.5,364255.5);
   hZMadMCIDQCD = GetTH1("ZMadMCIDQCD",  10,  361509.5,361519.5);
@@ -150,11 +178,50 @@ bool Msl::PlotEvent::DoExec(Event &event)
       hTruthTauDR ->Fill(event.truth_taus.at(0).GetVec().DeltaR(event.jets.at(iJet).GetVec()), weight);
     hTruthTauEta->Fill(event.truth_taus.at(0).eta, weight);
   }  
-  
+
+  // testing
+  float max_j_eta= max_j_eta= fabs(event.jets.at(0).eta);
+  if(event.jets.size()>1)
+    if(fabs(event.jets.at(1).eta)>max_j_eta) max_j_eta= fabs(event.jets.at(1).eta);
+  if(hmax_j_eta)  hmax_j_eta->Fill(max_j_eta, weight);
+  if(event.jets.size()>2){
+         
+    TLorentzVector tmp;
+    const TLorentzVector j1v = event.jets.at(0).GetLVec();
+    const TLorentzVector j2v = event.jets.at(1).GetLVec();
+    for(unsigned iJet=2; iJet<event.jets.size(); ++iJet){
+      tmp=event.jets.at(iJet).GetLVec();
+      hcentrality->Fill(event.GetVar(Mva::maxCentrality), weight);
+      
+      float dRj1=tmp.DeltaR(j1v);
+      float dRj2=tmp.DeltaR(j2v);
+      hdRj1->Fill(dRj1, weight);
+      hdRj2->Fill(dRj2, weight);
+      hminDR->Fill(std::min(dRj1,dRj2), weight);
+      
+      float mj1 =  (tmp+j1v).M();
+      float mj2 =  (tmp+j2v).M();
+      hmj1->Fill(mj1, weight);
+      hmj2->Fill(mj2, weight);
+      hminDRmj2->Fill((dRj1<dRj2 ? mj1 : mj2), weight);
+      hmin_mj3->Fill(std::min(mj1,mj2), weight);
+      hmin_mj3_over_mjj->Fill(event.GetVar(Mva::maxmj3_over_mjj), weight);
+    }
+    if(event.jets.size()>3){
+      float mj34 = (event.jets.at(2).GetLVec()+event.jets.at(3).GetLVec()).M();
+      if(hmj34) hmj34->Fill(mj34, weight);
+    }
+    if(hj3Pt) hj3Pt->Fill(event.jets.at(2).pt, weight);
+    if(hj3Eta) hj3Eta->Fill(event.jets.at(2).eta, weight);
+    if(hj3Jvt) hj3Jvt->Fill(event.jets.at(2).GetVar(Mva::jvt), weight);
+    if(hj3FJvt) hj3FJvt->Fill(event.jets.at(2).GetVar(Mva::fjvt), weight);
+  }
+  // end testing
+
+  // fill stored variables
   for(unsigned a=0; a<fVarVec.size(); ++a){
     FillHist(fHistVec[fVarVec[a]], fVarVec[a], event, weight);
-  }
-  
+  }  
   return true;
 }
 

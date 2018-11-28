@@ -76,6 +76,7 @@ namespace Msl
       n_baseel,
       n_basemu,
       n_baselep,      
+      n_ph,      
       n_truth_tau,      
       met_tst_j1_dphi,
       met_tst_j2_dphi,
@@ -109,7 +110,14 @@ namespace Msl
       FilterMet,
       truth_jj_deta,
       truthJet1Pt,
-      nTruthJetMatch
+      nTruthJetMatch,
+      jetPt3,
+      maxCentrality,
+      avgCentrality,
+      phcentrality,
+      maxmj3_over_mjj,
+      avgmj3_over_mjj,
+      Mtt
     };
 
     std::string       AsStr(Var var);

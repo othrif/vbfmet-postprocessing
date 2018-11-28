@@ -97,6 +97,22 @@ namespace Msl
     TH1                        *hTruthTauPt;
     TH1                        *hTruthTauDR;
     TH1                        *hTruthTauEta;    
+
+    TH1                        *hmj34;
+    TH1                        *hmax_j_eta;    
+    TH1                        *hdRj1;
+    TH1                        *hdRj2;
+    TH1                        *hminDR;
+    TH1                        *hmj1;
+    TH1                        *hmj2;
+    TH1                        *hminDRmj2;    
+    TH1                        *hmin_mj3;
+    TH1                        *hmin_mj3_over_mjj;
+    TH1                        *hcentrality;      
+    TH1                        *hj3Pt;      
+    TH1                        *hj3Eta;      
+    TH1                        *hj3Jvt;      
+    TH1                        *hj3FJvt;      
     
     TH1                        *hZMCIDQCD;
     TH1                        *hWMCIDQCD;

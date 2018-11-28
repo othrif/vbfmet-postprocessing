@@ -91,7 +91,7 @@ def getLepChannelCuts(basic_cuts):
 def ExtraCuts(n_mu=0, n_el=0):
     cuts = []
     #cuts += [CutItem('CutTruthFilter','TruthFilter < 0.5')]    
-    return cuts
+    #return cuts
     if n_mu>=0 and n_el>=0:
         cuts += [CutItem('CutBaseLep','n_baselep == %s' %(n_mu))]        
     elif n_mu>=0 or n_el>=0:
@@ -104,7 +104,43 @@ def ExtraCuts(n_mu=0, n_el=0):
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
     return cuts
+
+#-------------------------------------------------------------------------
+def getJetCuts(isPh=False):
+    cuts = [CutItem('CutNjet',  'n_jet == 2')]
+    if not isPh:
+        #cuts += [CutItem('CutNjetCen',  'n_jet_cenj == 0')]    
+        #cuts  = [CutItem('CutNjet',  'n_jet > 1')]
+        #cuts += [CutItem('CutMaxCentrality',  'maxCentrality <0.6')]
+        #cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
+
+        cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
+        cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
+        #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
+        #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
+    else:
+        cuts += [CutItem('CutJ0Pt',  'jetPt0 > 50.0')]
+        cuts += [CutItem('CutJ1Pt',  'jetPt1 > 35.0')]
+        
+    return cuts
+
+#-------------------------------------------------------------------------
+def getVBFCuts(isLep=False):
     
+    cuts = [CutItem('CutDPhijj',   'jj_dphi < 1.8')]
+    if not isLep:
+        cuts += [CutItem('CutDPhiMetj0','met_tst_j1_dphi > 1.0')]
+        cuts += [CutItem('CutDPhiMetj1','met_tst_j2_dphi > 1.0')]
+    else:
+        cuts += [CutItem('CutDPhiMetj0','met_tst_nolep_j1_dphi > 1.0')]
+        cuts += [CutItem('CutDPhiMetj1','met_tst_nolep_j2_dphi > 1.0')] 
+    cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
+    cuts += [CutItem('CutDEtajj','jj_deta > 4.8')]
+    #cuts += [CutItem('CutDEtajjV','jj_deta > 3.0')]    
+    cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
+    
+    return cuts
+
 #-------------------------------------------------------------------------
 def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
 
@@ -113,15 +149,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     cuts += [CutItem('CutTrig',      'trigger_met == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
-    #cuts += [CutItem('CutNjet',  'n_jet == 2')]
-    cuts += [CutItem('CutNjet',  'n_jet == 2')]
-    cuts += [CutItem('CutNjetCen',  'n_jet_cenj == 0')]    
-    cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
-    cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
-
-    #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
-    #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]        
-    #cuts += [CutItem('CutMetSig', 'mll < 116.0 && mll > 76.0')]
+    cuts += getJetCuts();
 
     # add the extra cuts
     cuts += ExtraCuts()
@@ -133,13 +161,37 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
         #cuts += [CutItem('CutMetLow',       '%s > 100.0' %(options.met_choice))]
         cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 150.0')]
 
-    cuts += [CutItem('CutDPhijj',   'jj_dphi < 1.8')]
-    cuts += [CutItem('CutDPhiMetj0','met_tst_j1_dphi > 1.0')]
-    cuts += [CutItem('CutDPhiMetj1','met_tst_j2_dphi > 1.0')]
+    # VBF cuts
+    cuts+=getVBFCuts(isLep=False)
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getGamSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
+
+    cuts = []
+
+    cuts += [CutItem('CutTrig',      'trigger_met == 1')]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh',       'n_ph==1')]
+    cuts += getJetCuts(isPh=True);
+
+    # add the extra cuts
+    #cuts += ExtraCuts()
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += [CutItem('CutMet',       '%s > 100.0' %(options.met_choice))]
+        #cuts += [CutItem('CutMetLow',       '%s > 100.0' %(options.met_choice))]
+        #cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 150.0')]
+
+    # VBF cuts
+    #cuts+=getVBFCuts(isLep=False)
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
-    cuts += [CutItem('CutDEtajj','jj_deta > 4.8')]
-    #cuts += [CutItem('CutDEtajjV','jj_deta > 3.0')]    
-    cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
+    cuts += [CutItem('CutDEtajj','jj_deta > 2.5')]
+    cuts += [CutItem('CutMjj','jj_mass > 250.0')]
 
     return GetCuts(cuts)
 
@@ -151,9 +203,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
-    cuts += [CutItem('CutNjet',  'n_jet == 2')]
-    cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
-    cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
+    cuts += getJetCuts();
     cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
     cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]
     #cuts += [CutItem('CutMetSig', 'mll < 116.0 && mll > 76.0')]    
@@ -179,13 +229,8 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     if basic_cuts.chan=='uu':
         cuts += [CutItem('CutLepVeto',   'n_el == 0')]        
         
-    cuts += [CutItem('CutDPhijj',   'jj_dphi < 1.8')]        
-    cuts += [CutItem('CutDPhiMetj0','met_tst_nolep_j1_dphi > 1.0')]        
-    cuts += [CutItem('CutDPhiMetj1','met_tst_nolep_j2_dphi > 1.0')]        
-    cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')] 
-    cuts += [CutItem('CutDEtajj','jj_deta > 4.8')]
-    #cuts += [CutItem('CutDEtajjV','jj_deta > 3.0')]
-    cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
+    # VBF cuts
+    cuts+=getVBFCuts(isLep=True)
 
     return GetCuts(cuts)
 
@@ -193,13 +238,10 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
 def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met_signif=False):
 
     cuts = []
-
     cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)    
-    cuts += [CutItem('CutNjet',  'n_jet == 2')]
-    cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]        
-    cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
+    cuts += getJetCuts();
     cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
 
     # add the extra cuts
@@ -213,13 +255,8 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
         cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 150.0')]
     if do_met_signif:
         cuts += [CutItem('CutMetSignif','met_significance > 4.0')]
-    cuts += [CutItem('CutDPhijj',   'jj_dphi < 1.8')]        
-    cuts += [CutItem('CutDPhiMetj0','met_tst_nolep_j1_dphi > 1.0')]        
-    cuts += [CutItem('CutDPhiMetj1','met_tst_nolep_j2_dphi > 1.0')]        
-    cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')] 
-    cuts += [CutItem('CutDEtajj','jj_deta > 4.8')]
-    #cuts += [CutItem('CutDEtajjV','jj_deta > 3.0')]
-    cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
+    # VBF cuts
+    cuts+=getVBFCuts(isLep=True)
 
     return GetCuts(cuts)
 
@@ -254,6 +291,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     sigs = {}
     sigs['higgs'] = ['hggf','hvh','hvbf']
     sigs['hggf']  = ['hggf']
+    #sigs['whww']  = ['whww']    
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
     
@@ -292,7 +330,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     # Save samples (type list by hand to preserve order)
     #
     if reg != None and key != None:
-        reg.SetVal(key, 'higgs,top1,top2,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
+        reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 
@@ -338,6 +376,20 @@ def preparePassEventForSR(alg_name, options, basic_cuts, cut='BASIC'):
     reg  = ROOT.Msl.Registry()
 
     cuts = getSRCuts(cut, options, basic_cuts, ignore_met=options.ignore_met)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForGamSR(alg_name, options, basic_cuts, cut='BASIC'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getGamSRCuts(cut, options, basic_cuts, ignore_met=options.ignore_met)
 
     #
     # Fill Registry with cuts and samples for cut-flow
