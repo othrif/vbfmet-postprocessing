@@ -1160,7 +1160,7 @@ void Msl::ReadEvent::ChangeLep(Event &event)
   if(my_leps.size()>1)
     event.GetX1X2(my_leps.at(0), my_leps.at(1),
 		  make_pair<float,float>(met_beforeRemove.Px(), met_beforeRemove.Py()),  x1, x2);
-  if(x1>0.0 && x2>0.0) mtt=mll/TMath::Sqrt(x1*x2);
+  if(x1>0.0 && x2>0.0) mtt=event.GetVar(Mva::mll)/TMath::Sqrt(x1*x2);
   event.RepVar(Mva::Mtt, mtt);    
 }
 

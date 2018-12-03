@@ -194,7 +194,7 @@ def getHistPars(hist):
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},           
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0},
 
-        'lepPt0'   : {'xtitle':'Anti-Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
+        'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
         'muon_den_pt'   : {'xtitle':'Anti-Id Muon p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'lepEta' : {'xtitle':'Lepton #eta [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
@@ -241,7 +241,7 @@ def getHistPars(hist):
     'min_mj3'     : {'xtitle':'min m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'min_mj3_over_mjj'     : {'xtitle':'min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},                                                
     'centrality'     : {'xtitle':'j3 Centrality'   ,         'ytitle':'Events',   'ymin':0.1},
-    'phcentrality'     : {'xtitle':'#gamma Centrality'   ,         'ytitle':'Events',   'ymin':0.1},
+    'phcentrality'     : {'xtitle':'#gamma Centrality'   ,         'ytitle':'Events',   'ymin':0.1,'rebin':5},
     'phPt'     : {'xtitle':'#gamma p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'phEta'     : {'xtitle':'#gamma #eta'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tst_ph_dphi'     : {'xtitle':'#Delta#phi(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},            

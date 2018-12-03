@@ -191,6 +191,7 @@ def getGamSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
         #cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 150.0')]
         
     cuts += [CutItem('CutDPhiMetPh','met_tst_ph_dphi > 1.8')]
+    cuts += [CutItem('CutPhCentrality','phcentrality > 0.4')]
     # VBF cuts
     #cuts+=getVBFCuts(isLep=False)
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
