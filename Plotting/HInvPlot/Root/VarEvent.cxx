@@ -100,6 +100,9 @@ std::string Msl::Mva::Convert2Str(Var var)
     case maxmj3_over_mjj:	  return "maxmj3_over_mjj";
     case avgmj3_over_mjj:	  return "avgmj3_over_mjj";      
     case Mtt:	                  return "Mtt";      
+    case phPt:	                  return "phPt";      
+    case phEta:	                  return "phEta";      
+    case met_tst_ph_dphi:	  return "met_tst_ph_dphi";      
 
     case NONE: return "NONE";
     default  : break;
@@ -195,6 +198,9 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "maxmj3_over_mjj")	 return maxmj3_over_mjj;
   if(var == "avgmj3_over_mjj")	 return avgmj3_over_mjj;
   if(var == "Mtt")	         return Mtt;
+  if(var == "phPt")	         return phPt;
+  if(var == "phEta")	         return phEta;
+  if(var == "met_tst_ph_dphi")	 return met_tst_ph_dphi;
   
   cout << "Msl::Mva::Convert2Var - unknown enum: " << var << endl;
   return NONE;
@@ -377,6 +383,9 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(maxmj3_over_mjj);
     vars.push_back(avgmj3_over_mjj);
     vars.push_back(Mtt);
+    vars.push_back(phPt);    
+    vars.push_back(phEta);    
+    vars.push_back(met_tst_ph_dphi);    
   }
   
   return vars;

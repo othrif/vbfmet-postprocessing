@@ -88,18 +88,21 @@ def getLepChannelCuts(basic_cuts):
     return GetCuts(cuts)
 
 #-------------------------------------------------------------------------
-def ExtraCuts(n_mu=0, n_el=0):
+def ExtraCuts(n_mu=0, n_el=0, isEMu=False):
     cuts = []
     #cuts += [CutItem('CutTruthFilter','TruthFilter < 0.5')]    
     #return cuts
-    if n_mu>=0 and n_el>=0:
+    if isEMu:
+        cuts += [CutItem('CutBaseLep','n_baselep == 2')]                
+    elif n_mu>=0 and n_el>=0:
         cuts += [CutItem('CutBaseLep','n_baselep == %s' %(n_mu))]        
     elif n_mu>=0 or n_el>=0:
         cuts += [CutItem('CutBaseMu','n_basemu == %s' %(n_mu))]
         cuts += [CutItem('CutBaseEl','n_baseel == %s' %(n_el))]
     else:
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
-    cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
+    if not isEMu:
+        cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
     cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
@@ -178,15 +181,16 @@ def getGamSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     cuts += getJetCuts(isPh=True);
 
     # add the extra cuts
-    #cuts += ExtraCuts()
+    cuts += ExtraCuts()
     
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        cuts += [CutItem('CutMet',       '%s > 100.0' %(options.met_choice))]
+        cuts += [CutItem('CutMet',       '%s > 150.0' %(options.met_choice))]
         #cuts += [CutItem('CutMetLow',       '%s > 100.0' %(options.met_choice))]
         #cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 150.0')]
-
+        
+    cuts += [CutItem('CutDPhiMetPh','met_tst_ph_dphi > 1.8')]
     # VBF cuts
     #cuts+=getVBFCuts(isLep=False)
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
@@ -204,18 +208,25 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
     cuts += getJetCuts();
-    cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
-    cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]
+    if basic_cuts.chan=='eu':
+        cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
+        #cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]
+    else:
+        cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+        cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]        
     #cuts += [CutItem('CutMetSig', 'mll < 116.0 && mll > 76.0')]    
 
     # add the extra cuts
     n_mu=2
-    n_el=2
+    n_el=2;
+    isEMu=False
     if basic_cuts.chan=='ee':
         n_mu=2; n_el=0; #note that the muon is used
     if basic_cuts.chan=='uu':
         n_mu=2; n_el=0;
-    cuts += ExtraCuts(n_mu,n_el)
+    if basic_cuts.chan=='eu':
+        n_mu=1; n_el=1; isEMu=True;        
+    cuts += ExtraCuts(n_mu,n_el,isEMu)
     
     if cut == 'BeforeMET':
         return GetCuts(cuts)    

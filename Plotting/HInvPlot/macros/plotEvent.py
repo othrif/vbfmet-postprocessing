@@ -112,7 +112,7 @@ def prepareSeqWCR(basic_cuts, region, alg_take=None, syst='Nominal'):
     if basic_cuts.chan in ['ep','em','e']:
         do_met_signif=True
     
-    if basic_cuts.chan in ['ee','uu','ll','nn'] or not passRegion(region):
+    if basic_cuts.chan in ['ee','uu','ll','nn','eu'] or not passRegion(region):
         return ('', [])
     
     pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif)
@@ -159,7 +159,7 @@ def main():
     # Prepare selection keys
     #
     anas    = ['allmjj']
-    chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u']
+    chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']
 
     if options.chan != None:
         chans = options.chan.split(',')

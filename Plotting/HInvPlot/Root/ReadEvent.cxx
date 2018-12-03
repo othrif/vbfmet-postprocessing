@@ -871,7 +871,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // update for photon
     if(fOverlapPh) AddPhoton(*event);
-    
+    //std::cout << "before" << std::endl;
     // Fill remaining variables
     FillEvent(*event);
 
@@ -971,37 +971,62 @@ void Msl::ReadEvent::FillEvent(Event &event)
     event.AddVar(Mva::j1fjvt,event.jets.at(1).GetVar(Mva::fjvt));        
     event.AddVar(Mva::etaj0TimesEtaj1,event.jets.at(0).eta*event.jets.at(1).eta);
   }
-  // electrons
-  if(event.electrons.size()>0){
-    event.AddVar(Mva::lepPt0,  event.electrons.at(0).pt);
-    event.AddVar(Mva::lepCh0,  event.electrons.at(0).GetVar(Mva::charge));
-    //TLorentzVector W = event.electrons.at(0).GetLVec()+event.met;
-    double MT = sqrt(2. * event.electrons.at(0).pt * event.met.Pt() * (1. - cos(event.electrons.at(0).phi - event.met.Phi())));
-    //event.AddVar(Mva::mt, W.M());
-    event.AddVar(Mva::mt, MT);    
-  }
-  if(event.electrons.size()>1){
-    event.AddVar(Mva::lepPt1,  event.electrons.at(1).pt);
-    event.AddVar(Mva::lepCh1,  event.electrons.at(1).GetVar(Mva::charge));
-    TLorentzVector Z = (event.electrons.at(1).GetLVec()+event.electrons.at(0).GetLVec());
+
+  if(event.electrons.size()>0 && event.muons.size()>0){
+
+    TLorentzVector leadL = event.electrons.at(0).GetLVec();
+    if(event.electrons.at(0).pt<event.muons.at(0).pt){
+      leadL=event.muons.at(0).GetLVec();
+      event.AddVar(Mva::lepCh0,  event.muons.at(0).GetVar(Mva::charge));
+      event.AddVar(Mva::lepCh1,  event.electrons.at(0).GetVar(Mva::charge));
+      event.AddVar(Mva::lepPt1,  event.electrons.at(0).pt);      
+    }else{
+      event.AddVar(Mva::lepCh0,  event.electrons.at(0).GetVar(Mva::charge));
+      event.AddVar(Mva::lepCh1,  event.muons.at(0).GetVar(Mva::charge));
+      event.AddVar(Mva::lepPt1,  event.muons.at(0).pt);      
+    }
+    event.AddVar(Mva::lepPt0,  leadL.Pt());    
+    double MT = sqrt(2. * leadL.Pt() * event.met.Pt() * (1. - cos(leadL.Phi() - event.met.Phi())));
+    event.AddVar(Mva::mt, MT);
+
+    TLorentzVector Z = (event.electrons.at(0).GetLVec()+event.muons.at(0).GetLVec());
     event.AddVar(Mva::mll,  Z.M());
-    event.AddVar(Mva::ptll, Z.Pt());        
-  }
-  // muons
-  if(event.muons.size()>0){
-    event.AddVar(Mva::lepPt0,  event.muons.at(0).pt);
-    event.AddVar(Mva::lepCh0,  event.muons.at(0).GetVar(Mva::charge));
-    //TLorentzVector W = event.muons.at(0).GetLVec()+event.met;
-    //event.AddVar(Mva::mt, W.M());
-    double MT = sqrt(2. * event.muons.at(0).pt * event.met.Pt() * (1. - cos(event.muons.at(0).phi - event.met.Phi())));
-    event.AddVar(Mva::mt, MT);  
-  }
-  if(event.muons.size()>1){
-    event.AddVar(Mva::lepPt1, event.muons.at(1).pt);
-    event.AddVar(Mva::lepCh1, event.muons.at(1).GetVar(Mva::charge));
-    TLorentzVector Z = (event.muons.at(1).GetLVec()+event.muons.at(0).GetLVec());
-    event.AddVar(Mva::mll,  Z.M());
-    event.AddVar(Mva::ptll, Z.Pt());    
+    event.AddVar(Mva::ptll, Z.Pt());       
+    
+  }else{
+    // electrons
+    if(event.electrons.size()>0){
+      event.AddVar(Mva::lepPt0,  event.electrons.at(0).pt);
+      event.AddVar(Mva::lepCh0,  event.electrons.at(0).GetVar(Mva::charge));
+      //TLorentzVector W = event.electrons.at(0).GetLVec()+event.met;
+      double MT = sqrt(2. * event.electrons.at(0).pt * event.met.Pt() * (1. - cos(event.electrons.at(0).phi - event.met.Phi())));
+      //event.AddVar(Mva::mt, W.M());
+      event.AddVar(Mva::mt, MT);    
+    }
+    if(event.electrons.size()>1){
+      event.AddVar(Mva::lepPt1,  event.electrons.at(1).pt);
+      event.AddVar(Mva::lepCh1,  event.electrons.at(1).GetVar(Mva::charge));
+      TLorentzVector Z = (event.electrons.at(1).GetLVec()+event.electrons.at(0).GetLVec());
+      event.AddVar(Mva::mll,  Z.M());
+      event.AddVar(Mva::ptll, Z.Pt());        
+    }
+    
+    // muons
+    if(event.muons.size()>0){
+      event.AddVar(Mva::lepPt0,  event.muons.at(0).pt);
+      event.AddVar(Mva::lepCh0,  event.muons.at(0).GetVar(Mva::charge));
+      //TLorentzVector W = event.muons.at(0).GetLVec()+event.met;
+      //event.AddVar(Mva::mt, W.M());
+      double MT = sqrt(2. * event.muons.at(0).pt * event.met.Pt() * (1. - cos(event.muons.at(0).phi - event.met.Phi())));
+      event.AddVar(Mva::mt, MT);  
+    }
+    if(event.muons.size()>1){
+      event.AddVar(Mva::lepPt1, event.muons.at(1).pt);
+      event.AddVar(Mva::lepCh1, event.muons.at(1).GetVar(Mva::charge));
+      TLorentzVector Z = (event.muons.at(1).GetLVec()+event.muons.at(0).GetLVec());
+      event.AddVar(Mva::mll,  Z.M());
+      event.AddVar(Mva::ptll, Z.Pt());    
+    }
   }
 
   // Lepton Channels
@@ -1146,36 +1171,34 @@ void Msl::ReadEvent::AddPhoton(Event &event)
   // recompute jj_mass, jj_deta, etaj0TimesEtaj1, jetPt0, jetPt1, j0fjvt, j1fjvt, j0jvt, j1jvt, j0timing, j1timing,
   // add photon centrality?
   bool jet_change=false;
-  vector<unsigned> jerase;
   unsigned nph = event.photons.size();
   for(unsigned i=0; i<nph; ++i){
     bool erase=false;
     TVector3 photon = event.photons.at(i).GetVec();
+
+    for(unsigned j=0; j<event.baseel.size(); ++j){
+      if(photon.DeltaR(event.baseel.at(j).GetVec())<0.2){
+	erase=true;break;
+      }
+    }
+    for(unsigned j=0; j<event.basemu.size(); ++j){
+      if(photon.DeltaR(event.basemu.at(j).GetVec())<0.2){
+	erase=true;break;
+      }
+    }
+    if(erase){ event.photons.erase(event.photons.begin()+i); --i; --nph; continue; }
+    
+    // if photon is not removed by lepton, then remove jets nearby
     unsigned nj = event.jets.size();
     for(unsigned j=0; j<nj; ++j){
       if(photon.DeltaR(event.jets.at(j).GetVec())<0.2){
       	jet_change=true;
-	jerase.push_back(j);
+	event.jets.erase(event.jets.begin()+j);
+	--j; --nj;
       }
-      for(unsigned j=0; j<event.baseel.size(); ++j){
-	if(photon.DeltaR(event.baseel.at(j).GetVec())<0.2){
-	  erase=true;break;
-	}
-      }
-      for(unsigned j=0; j<event.basemu.size(); ++j){
-	if(photon.DeltaR(event.basemu.at(j).GetVec())<0.2){
-	  erase=true;break;
-	}
-      }
-      if(erase){ event.photons.erase(event.photons.begin()+i); --i; --nph; }
     }
   }
-  // erase jets overlapping
-  unsigned ner = 0;
-  for(unsigned a=0; a<jerase.size(); ++a){
-    event.jets.erase(event.jets.begin()+jerase.at(a)-ner);
-    ++ner;
-  }
+
   if(jet_change){
     event.RepVar(Mva::n_jet, event.jets.size());
     if(event.jets.size()>1){
@@ -1189,10 +1212,20 @@ void Msl::ReadEvent::AddPhoton(Event &event)
     }
   }
   float centrality=-999;
+  float phPt = -999.0;
+  float phEta = -999.0;
+  float met_tst_ph_dphi = -999.;
   if(event.photons.size()>0 && event.jets.size()>1){
-    centrality = exp(-4.0/std::pow(event.GetVar(Mva::jj_deta),2) * std::pow(event.photons.at(0).eta - (event.jets.at(0).pt+event.jets.at(1).pt)/2.0,2));
+    centrality = exp(-4.0/std::pow(event.GetVar(Mva::jj_deta),2) * std::pow(event.photons.at(0).eta - (event.jets.at(0).eta+event.jets.at(1).eta)/2.0,2));
+    phPt = event.photons.at(0).pt;
+    phEta = event.photons.at(0).eta;
+    met_tst_ph_dphi = fabs(event.photons.at(0).GetVec().DeltaPhi(event.met.Vect()));
   }
-  event.RepVar(Mva::phcentrality,centrality);  
+  event.RepVar(Mva::phcentrality,centrality);
+
+  event.AddVar(Mva::met_tst_ph_dphi, met_tst_ph_dphi);    
+  event.AddVar(Mva::phPt, phPt);    
+  event.AddVar(Mva::phEta, phEta);    
 }
 
 //-----------------------------------------------------------------------------

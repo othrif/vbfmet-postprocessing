@@ -117,7 +117,7 @@ namespace Msl
       phcentrality,
       maxmj3_over_mjj,
       avgmj3_over_mjj,
-      Mtt
+      Mtt,phPt,phEta, met_tst_ph_dphi
     };
 
     std::string       AsStr(Var var);
