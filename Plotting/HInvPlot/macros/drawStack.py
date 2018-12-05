@@ -1600,11 +1600,12 @@ class DrawStack:
                                 zBKG = self.bkgs['zqcd'].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
                                 if not leftToRight:
                                     zBKG = self.bkgs['zqcd'].hist.Integral(ibin,10001)+self.bkgs['zewk'].hist.Integral(ibin,10001)
+                                total_zcr=-100.0
                                 #print 'self.zcr_stack: ',self.zcr_stack
-                                if not self.zcr_stack.bkg_sum:
+                                if self.zcr_stack and not self.zcr_stack.bkg_sum:
                                     self.zcr_stack.bkg_sum = self.zcr_stack.GetTotalBkgHist()
-                                total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
-                                if not leftToRight:
+                                    total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
+                                if not leftToRight and self.zcr_stack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,10001)
                                 if total_zcr>0.0:
                                     total_zcr = 1.0/math.sqrt(total_zcr)

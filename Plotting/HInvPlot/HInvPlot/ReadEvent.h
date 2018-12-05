@@ -112,6 +112,7 @@ namespace Msl
     bool MatchAlg(IExecAlg *alg) const;
 
     void ChangeLep(Event &event);
+    void ComputeLepVars(Event &event);
     void AddPhoton(Event &event);
     
   private:

@@ -866,14 +866,17 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->AddVar(Mva::TruthFilter,   truthFilter);
     event->AddVar(Mva::truthJet1Pt,   truthJet1);
 
-    // Change the leptons to base leptons
-    if(fLooseLepZ) ChangeLep(*event);
-
     // update for photon
     if(fOverlapPh) AddPhoton(*event);
-    //std::cout << "before" << std::endl;
+
+    // fill emu variables
+    ComputeLepVars(*event);
+    
     // Fill remaining variables
     FillEvent(*event);
+
+    // Change the leptons to base leptons - after filling the event
+    if(fLooseLepZ) ChangeLep(*event);    
 
     if(i % 10000 == 0 && i > 0) {
       cout << "Processed " << setw(10) << right << i << " events" << endl; 
@@ -990,8 +993,8 @@ void Msl::ReadEvent::FillEvent(Event &event)
     event.AddVar(Mva::mt, MT);
 
     TLorentzVector Z = (event.electrons.at(0).GetLVec()+event.muons.at(0).GetLVec());
-    event.AddVar(Mva::mll,  Z.M());
-    event.AddVar(Mva::ptll, Z.Pt());       
+    event.RepVar(Mva::mll,  Z.M());
+    event.RepVar(Mva::ptll, Z.Pt());       
     
   }else{
     // electrons
@@ -1007,8 +1010,8 @@ void Msl::ReadEvent::FillEvent(Event &event)
       event.AddVar(Mva::lepPt1,  event.electrons.at(1).pt);
       event.AddVar(Mva::lepCh1,  event.electrons.at(1).GetVar(Mva::charge));
       TLorentzVector Z = (event.electrons.at(1).GetLVec()+event.electrons.at(0).GetLVec());
-      event.AddVar(Mva::mll,  Z.M());
-      event.AddVar(Mva::ptll, Z.Pt());        
+      event.RepVar(Mva::mll,  Z.M());
+      event.RepVar(Mva::ptll, Z.Pt());        
     }
     
     // muons
@@ -1024,8 +1027,8 @@ void Msl::ReadEvent::FillEvent(Event &event)
       event.AddVar(Mva::lepPt1, event.muons.at(1).pt);
       event.AddVar(Mva::lepCh1, event.muons.at(1).GetVar(Mva::charge));
       TLorentzVector Z = (event.muons.at(1).GetLVec()+event.muons.at(0).GetLVec());
-      event.AddVar(Mva::mll,  Z.M());
-      event.AddVar(Mva::ptll, Z.Pt());    
+      event.RepVar(Mva::mll,  Z.M());
+      event.RepVar(Mva::ptll, Z.Pt());    
     }
   }
 
@@ -1107,6 +1110,39 @@ void Msl::ReadEvent::ProcessAlgs(Event &top_event, Event &alg_event)
 }
 
 //-----------------------------------------------------------------------------
+void Msl::ReadEvent::ComputeLepVars(Event &event)
+{
+  // fill leptons
+  std::vector<TLorentzVector> my_leps;
+  for(unsigned i=0; i<event.electrons.size(); ++i)
+    my_leps.push_back(event.electrons.at(i).GetLVec());
+
+  for(unsigned i=0; i<event.muons.size(); ++i)
+      my_leps.push_back(event.muons.at(i).GetLVec());
+  // fill met
+  TVector3 met_beforeRemove;
+  met_beforeRemove.SetPtEtaPhi(event.met.Pt(), event.met.Eta(), event.met.Phi());
+
+  std::sort(my_leps.begin(),my_leps.end(),SortPhysicsObject("pt"));
+
+  ////////////////////////////////
+  // Mtt   // assumes collinear approximation
+  ////////////////////////////////
+  double x1=-999., x2=-999.,mtt=-999.;
+  // leading two
+  if(my_leps.size()>1){
+    TLorentzVector Z = (my_leps.at(1)+my_leps.at(0));
+    event.AddVar(Mva::mll,  Z.M());
+    event.AddVar(Mva::ptll, Z.Pt()); 
+    event.GetX1X2(my_leps.at(0), my_leps.at(1),
+		  make_pair<float,float>(met_beforeRemove.Px(), met_beforeRemove.Py()),
+		  x1, x2);
+  if(x1>0.0 && x2>0.0) mtt=event.GetVar(Mva::mll)/TMath::Sqrt(x1*x2);
+  }
+  event.RepVar(Mva::Mtt, mtt);
+}
+
+//-----------------------------------------------------------------------------
 void Msl::ReadEvent::ChangeLep(Event &event)
 {
   // change to using baseleptons with loose iso.
@@ -1156,7 +1192,7 @@ void Msl::ReadEvent::ChangeLep(Event &event)
   ////////////////////////////////
   // Mtt   // assumes collinear approximation
   ////////////////////////////////
-  double x1=-999., x2=-999.,mtt=-999., mll=-999.0;;
+  double x1=-999., x2=-999.,mtt=-999.;
   if(my_leps.size()>1)
     event.GetX1X2(my_leps.at(0), my_leps.at(1),
 		  make_pair<float,float>(met_beforeRemove.Px(), met_beforeRemove.Py()),  x1, x2);

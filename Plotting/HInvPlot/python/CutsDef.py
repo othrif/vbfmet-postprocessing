@@ -211,11 +211,14 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     cuts += getJetCuts();
     if basic_cuts.chan=='eu':
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
-        #cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]
+        cuts += [CutItem('CutMass',   'Mtt < 116.0 && Mtt > 76.0')]
     else:
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
-        cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]        
-    #cuts += [CutItem('CutMetSig', 'mll < 116.0 && mll > 76.0')]    
+        #cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]
+        cutMass = CutItem('CutMass')
+        cutMass.AddCut(CutItem('Mll',  'mll < 116.0 && mll > 76.0'), 'OR')
+        cutMass.AddCut(CutItem('Mtt', 'Mtt < 116.0 && Mtt > 76.0'), 'OR')
+        cuts += [cutMass]
 
     # add the extra cuts
     n_mu=2

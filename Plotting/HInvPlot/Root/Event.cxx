@@ -134,7 +134,7 @@ void Msl::Event::GetX1X2(const TLorentzVector &lep1,
 {
   // 
   // Find the x1 and x2 vars used in the collinear approximation   
-  //                                                                                                                           
+  //
   float x1=0.0, x2=0.0;
   float den1 = lep1.Px()*lep2.Py()+tmet.first*lep2.Py()-lep1.Py()*lep2.Px()-tmet.second*lep2.Px();
   float den2 = lep1.Px()*lep2.Py()-tmet.first*lep1.Py()-lep1.Py()*lep2.Px()+tmet.second*lep1.Px();
