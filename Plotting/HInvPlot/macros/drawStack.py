@@ -194,7 +194,7 @@ def getHistPars(hist):
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},           
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0},
 
-        'lepPt0'   : {'xtitle':'Anti-Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
+        'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
         'muon_den_pt'   : {'xtitle':'Anti-Id Muon p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'lepEta' : {'xtitle':'Lepton #eta [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
@@ -241,6 +241,11 @@ def getHistPars(hist):
     'min_mj3'     : {'xtitle':'min m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'min_mj3_over_mjj'     : {'xtitle':'min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},                                                
     'centrality'     : {'xtitle':'j3 Centrality'   ,         'ytitle':'Events',   'ymin':0.1},
+    'phcentrality'     : {'xtitle':'#gamma Centrality'   ,         'ytitle':'Events',   'ymin':0.1,'rebin':5},
+    'phPt'     : {'xtitle':'#gamma p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'phEta'     : {'xtitle':'#gamma #eta'   ,         'ytitle':'Events',   'ymin':0.1},
+    'met_tst_ph_dphi'     : {'xtitle':'#Delta#phi(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},            
+    'Mtt'     : {'xtitle':'m_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3Pt'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
     'j3Eta'     : {'xtitle':'j3 #eta'   ,         'ytitle':'Events',   'ymin':0.1},                                        
     'j3Jvt'     : {'xtitle':'j3 Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -1595,11 +1600,12 @@ class DrawStack:
                                 zBKG = self.bkgs['zqcd'].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
                                 if not leftToRight:
                                     zBKG = self.bkgs['zqcd'].hist.Integral(ibin,10001)+self.bkgs['zewk'].hist.Integral(ibin,10001)
+                                total_zcr=-100.0
                                 #print 'self.zcr_stack: ',self.zcr_stack
-                                if not self.zcr_stack.bkg_sum:
+                                if self.zcr_stack and not self.zcr_stack.bkg_sum:
                                     self.zcr_stack.bkg_sum = self.zcr_stack.GetTotalBkgHist()
-                                total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
-                                if not leftToRight:
+                                    total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
+                                if not leftToRight and self.zcr_stack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,10001)
                                 if total_zcr>0.0:
                                     total_zcr = 1.0/math.sqrt(total_zcr)

@@ -77,6 +77,9 @@ myplots = [
               ['maxmj3_over_mjj', '50', '0.0', '1.0'],
               ['phcentrality', '25', '0.0', '1.0'],
               ['Mtt', '50', '0.0', '250.0'],
+              ['phPt', '50', '0.0', '250.0'],
+              ['phEta', '15', '-2.5', '2.5'],
+              ['met_tst_ph_dphi', '12', '0.0', '3.15'],
     ]
 mev_vars = ['jj_mass',
             'met_tst_et',
