@@ -339,7 +339,7 @@ def prepareBkgRuns(keys,options=None):
         #
         #
         
-    sig_VH125     = {'308072':'VH125',}        
+    sig_VH125     = {'308072':'VH125',}
     sig_ggF125 = {'308284':'ggF125',}
     #sig_ggF125 = {'364162':'Wmunu_MAXHTPTV140_280_CVetoBVeto',}
     #sig_VH125     = {'364106':'TBD',}
@@ -348,12 +348,12 @@ def prepareBkgRuns(keys,options=None):
                       '308567':'VBF125 - all',
                           }
 
-    bkg_wewk =     {'308096':'TBD',                        
-                    '308097':'TBD',                        
-                    '308098':'TBD',                        
-                    '363359':'TBD',                        
-                    '363360':'TBD',                        
-                    '363489':'TBD',                        
+    bkg_wewk =     {'308096':'TBD',
+                    '308097':'TBD',
+                    '308098':'TBD',
+                    '363359':'TBD',
+                    '363360':'TBD',
+                    '363489':'TBD',
                         }
         
     bkg_wqcd_mnu =     {'364156':'Wmunu_MAXHTPTV0_70_CVetoBVeto',

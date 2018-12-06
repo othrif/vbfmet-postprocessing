@@ -97,7 +97,8 @@ namespace Msl
     TH1                        *hTruthTauPt;
     TH1                        *hTruthTauDR;
     TH1                        *hTruthTauEta;    
-
+    TH1                        *hminDRLep;    
+    
     TH1                        *hmj34;
     TH1                        *hmax_j_eta;    
     TH1                        *hdRj1;
