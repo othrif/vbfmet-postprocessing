@@ -133,6 +133,10 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   mu_pt      = new std::vector<float>();
   mu_eta     = new std::vector<float>();
   mu_phi     = new std::vector<float>();
+  tau_charge  = new std::vector<float>();
+  tau_pt      = new std::vector<float>();
+  tau_eta     = new std::vector<float>();
+  tau_phi     = new std::vector<float>();  
   jet_timing = new std::vector<float>();
   jet_pt     = new std::vector<float>();
   jet_eta    = new std::vector<float>();
@@ -193,6 +197,10 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("mu_pt",    &mu_pt);  
   tree->SetBranchAddress("mu_eta",   &mu_eta);  
   tree->SetBranchAddress("mu_phi",   &mu_phi);
+  tree->SetBranchAddress("tau_charge",&tau_charge);  
+  tree->SetBranchAddress("tau_pt",    &tau_pt);  
+  tree->SetBranchAddress("tau_eta",   &tau_eta);  
+  tree->SetBranchAddress("tau_phi",   &tau_phi);
   tree->SetBranchAddress("jet_timing",&jet_timing);  
   tree->SetBranchAddress("jet_pt",    &jet_pt);
   tree->SetBranchAddress("jet_m",     &jet_m);    
@@ -589,7 +597,19 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       new_muo.m   = 0.10566;      
       new_muo.AddVar(Mva::charge,mu_charge->at(iMuo)); 
       event->muons.push_back(new_muo);
-    }    
+    }
+
+    // Fill Taus
+    for(unsigned iTau=0; iTau<tau_pt->size(); ++iTau){
+      RecParticle new_tau;
+      new_tau.pt  = tau_pt->at(iTau)/1.0e3;
+      new_tau.eta = tau_eta->at(iTau);
+      new_tau.phi = tau_phi->at(iTau);
+      new_tau.m   = 1.777;
+      //new_tau.AddVar(Mva::charge,tau_charge->at(iTau));       
+      event->taus.push_back(new_tau);
+    }
+    event->AddVar(Mva::n_tau,event->taus.size());           
 
     // Fill Jets
     unsigned nJet=0;

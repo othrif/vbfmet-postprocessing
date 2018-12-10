@@ -43,6 +43,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case met_soft_tst_sumet:	  return "met_soft_tst_sumet";      
     case met_cst_jet:	          return "met_cst_jet";      
     case n_jet:	                  return "n_jet";
+    case n_bjet:	          return "n_bjet";      
     case n_jet_fwd:	          return "n_jet_fwd";      
     case n_jet_fwdj:	          return "n_jet_fwdj";      
     case n_jet_fwdj30:	          return "n_jet_fwdj30";      
@@ -55,6 +56,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case n_jet_cenj50:	          return "n_jet_cenj50";       
     case n_el:	                  return "n_el";
     case n_mu:	                  return "n_mu";
+    case n_tau:	                  return "n_tau";
     case n_baseel:	          return "n_baseel";
     case n_basemu:	          return "n_basemu";
     case n_baselep:	          return "n_baselep";      
@@ -141,6 +143,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "met_soft_tst_sumet")  return met_soft_tst_sumet;
   if(var == "met_cst_jet")         return met_cst_jet;
   if(var == "n_jet")             return n_jet;
+  if(var == "n_bjet")             return n_bjet;  
   if(var == "n_jet_fwd")         return n_jet_fwd;
   if(var == "n_jet_fwdj")        return n_jet_fwdj;
   if(var == "n_jet_fwdj30")        return n_jet_fwdj30;
@@ -153,6 +156,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "n_jet_cenj50")        return n_jet_cenj50;  
   if(var == "n_el")              return n_el;
   if(var == "n_mu")              return n_mu;
+  if(var == "n_tau")             return n_tau;
   if(var == "n_baseel")          return n_baseel;
   if(var == "n_basemu")          return n_basemu;
   if(var == "n_baselep")          return n_baselep;  
@@ -325,7 +329,8 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(met_soft_tst_phi);        
     vars.push_back(met_soft_tst_sumet);    
     vars.push_back(met_cst_jet);    
-    vars.push_back(n_jet);    
+    vars.push_back(n_jet);
+    vars.push_back(n_bjet);        
     vars.push_back(n_jet_fwd);    
     vars.push_back(n_jet_fwdj);    
     vars.push_back(n_jet_fwdj30);    
@@ -338,6 +343,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(n_jet_cenj50);     
     vars.push_back(n_el);    
     vars.push_back(n_mu);
+    vars.push_back(n_tau);    
     vars.push_back(n_baseel);    
     vars.push_back(n_basemu);
     vars.push_back(n_baselep);    

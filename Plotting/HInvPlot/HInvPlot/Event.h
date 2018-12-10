@@ -113,6 +113,7 @@ namespace Msl
 
     ParticleVec          muons;
     ParticleVec          electrons;
+    ParticleVec          taus;    
     ParticleVec          jets;
     ParticleVec          truth_jets;
     ParticleVec          truth_taus;

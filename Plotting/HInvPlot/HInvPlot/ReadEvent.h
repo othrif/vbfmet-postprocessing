@@ -171,6 +171,10 @@ namespace Msl
     std::vector<float> *mu_pt;
     std::vector<float> *mu_eta;
     std::vector<float> *mu_phi;
+    std::vector<float> *tau_charge;
+    std::vector<float> *tau_pt;
+    std::vector<float> *tau_eta;
+    std::vector<float> *tau_phi;    
     std::vector<float> *jet_timing;
     std::vector<float> *jet_pt;
     std::vector<float> *jet_m;    
