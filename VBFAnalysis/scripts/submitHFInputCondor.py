@@ -16,7 +16,7 @@ parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", d
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
-parser.add_argument("--extraVars", action="store_true", dest='extraVars', default=False, help="extraVars, cut on the new variables for leptons veto etc, default: False")
+parser.add_argument("--extraVars", dest='extraVars', default="0", help="extraVars, 1=cut on the new variables for leptons veto, 2=loosen cuts, default: 0")
 args, unknown = parser.parse_known_args()
 
 writeMultiJet()
@@ -26,10 +26,13 @@ writeFakeEle()
 if args.nominal:
     sys = VBFAnalysis.systematics.systematics("Nominal")
     asys_systlist = []
+    wsys_systlist = []
 else:
     sys = VBFAnalysis.systematics.systematics("All")
     asys = VBFAnalysis.systematics.systematics("Asym")
+    wsys = VBFAnalysis.systematics.systematics("WeightSyst")
     asys_systlist = asys.getsystematicsList()
+    wsys_systlist = wsys.getsystematicsList()
 
 systlist = sys.getsystematicsList()
 print systlist
@@ -59,9 +62,11 @@ if args.extraVars:
     extraCommand=' --extraVars '
 
 for syst in systlist:
-    isLow = ""
+    isLow = ""    
     if "__1down" in syst or "Down" in syst:
         isLow = " --isLow"
+    if syst in wsys_systlist:
+        isLow+=' --weightSyst'
     runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+isLow+extraCommand
     print runCommand
     writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")

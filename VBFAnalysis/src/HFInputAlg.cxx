@@ -12,6 +12,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("ExtraVars", m_extraVars = 0, "true if extra variables should be cut on" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
+  declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
   //declareProperty( "Property", m_nProperty = 0, "My Example Integer Property" ); //example property declaration
 }
 
@@ -56,6 +57,7 @@ StatusCode HFInputAlg::initialize() {
   if (currentSample == "data") isMC = false;
   cout<< "CURRENT  sample === "<< currentSample<<endl;
   std::cout << "Running Extra Veto? " << m_extraVars << std::endl;
+  std::cout << "is a weightSyst? " << weightSyst << std::endl;
 
   std::string syst;
   bool replacedHigh = false;
@@ -329,7 +331,7 @@ StatusCode HFInputAlg::beginInputFile() {
   //example of IOVMetaData retrieval (see https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/AthAnalysisBase#How_to_access_file_metadata_in_C)
   //float beamEnergy(0); CHECK( retrieveMetadata("/TagInfo","beam_energy",beamEnergy) );
   //std::vector<float> bunchPattern; CHECK( retrieveMetadata("/Digitiation/Parameters","BeamIntensityPattern",bunchPattern) );
-  if (doLowNom) {
+  if (doLowNom || weightSyst) {
     m_treeName = currentSample+"Nominal";
   } else{
     m_treeName = currentSample+currentVariation;
@@ -338,8 +340,29 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
   std::cout << "Tree Entries: " <<m_tree->GetEntries() <<std::endl;
   m_tree->SetBranchStatus("*",0);
+  if(weightSyst){
+    bool found=false;
+    TObjArray *var_list = m_tree->GetListOfBranches();
+    for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) {
+      TString var_name = var_list->At(a)->GetName();
+      if(var_name.Contains(currentVariation)){
+	if(var_name.Contains("ANTISF") && currentVariation.find("ANTISF")==std::string::npos) continue; // checking that the antiID SF are treated separately. skipping if they dont match
+	m_tree->SetBranchStatus(var_name, 1);
+	m_tree->SetBranchAddress(var_name, &w);
+	found=true;
+	break;
+      }
+    }  
+    if(!found){
+      std::cout << "ERROR - did not find the correct weight systematic for " << currentVariation <<std::endl;
+      m_tree->SetBranchStatus("w", 1);
+      m_tree->SetBranchAddress("w", &w);
+    }
+  }else{
+    m_tree->SetBranchStatus("w", 1);
+    m_tree->SetBranchAddress("w", &w);
+  }
   m_tree->SetBranchStatus("runNumber", 1);
-  m_tree->SetBranchStatus("w", 1);
   m_tree->SetBranchStatus("passJetCleanTight", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
@@ -370,7 +393,6 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_m",1);
   m_tree->SetBranchStatus("jet_timing",1);
 
-  m_tree->SetBranchAddress("w", &w);
   m_tree->SetBranchAddress("runNumber",&runNumber);
   m_tree->SetBranchAddress("trigger_met", &trigger_met);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
