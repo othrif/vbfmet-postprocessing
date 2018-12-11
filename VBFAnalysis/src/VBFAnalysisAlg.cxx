@@ -8,7 +8,8 @@
 #include <math.h>       /* exp */
 
 
-VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ){
+VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ),
+										      fjvtSFWeight(1.0){
   declareProperty( "currentSample", m_currentSample = "W_strong", "current sample");
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
@@ -30,15 +31,12 @@ StatusCode VBFAnalysisAlg::initialize() {
   //This is called once, before the start of the event loop
   //Retrieves of tools you have configured in the joboptions go here
   //
-  
+
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout << "isMC: " << m_isMC << endl;
-  //  cout<<"NAME of output before ======="<<newtree->GetName()<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
 
-  //double crossSection;
   if(m_isMC){
-    //SUSY::CrossSectionDB *my_XsecDB;
     std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
     xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
     my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
@@ -311,8 +309,6 @@ StatusCode VBFAnalysisAlg::MapNgen(){
 
 StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG ("Executing " << name() << "...");
-  //setFilterPassed(false); //optional: start with algorithm not passed
-  //m_tree->GetEntry(m_tree->GetReadEntry());
 
   // check that we don't have too many events
   if(nFileEvt>=nFileEvtTot){
@@ -329,6 +325,10 @@ StatusCode VBFAnalysisAlg::execute() {
     ATH_MSG_ERROR("VBFAnaysisAlg::execute: runNumber " << runNumber << " != m_runNumberInput " << m_runNumberInput << " " << jj_dphi << " avg: " << averageIntPerXing);
     runNumber=m_runNumberInput;
   }
+
+  // initialize to 1
+  for(std::map<TString,Float_t>::iterator it=tMapFloatW.begin(); it!=tMapFloatW.end(); ++it)
+    it->second=1.0;
 
   npevents++;
   if( (npevents%10000) ==0) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
@@ -389,13 +389,11 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_extraVars){
     if(baseel_pt){
       for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-	//if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25) ++n_baseel;
 	if(baseel_pt->at(iEle)>4.5e3) ++n_baseel;
       }
     }
     if(basemu_pt){
       for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-	//if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25) ++n_basemu;
 	if(basemu_pt->at(iMuo)>4.0e3) ++n_basemu;
       }
     }
@@ -561,7 +559,39 @@ StatusCode VBFAnalysisAlg::execute() {
   if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt");
 
-  w = weight*mcEventWeight*puWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight;
+  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight;
+  //
+  /// compute the systematics weights
+  //
+  float tmp_puWeight = puWeight;
+  float tmp_jvtSFWeight = jvtSFWeight;
+  float tmp_fjvtSFWeight = fjvtSFWeight;
+  float tmp_elSFWeight = elSFWeight;
+  float tmp_muSFWeight = muSFWeight;
+  float tmp_elSFTrigWeight = elSFTrigWeight;
+  float tmp_muSFTrigWeight = muSFTrigWeight;
+
+  for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
+    // initialize
+    tmp_puWeight = puWeight;	    
+    tmp_jvtSFWeight = jvtSFWeight;	    
+    tmp_fjvtSFWeight = fjvtSFWeight;    
+    tmp_elSFWeight = elSFWeight;	    
+    tmp_muSFWeight = muSFWeight;	    
+    tmp_elSFTrigWeight = elSFTrigWeight;
+    tmp_muSFTrigWeight = muSFTrigWeight;
+
+    if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("puWeight"))       tmp_puWeight=tMapFloat[it->first];
+    else if(it->first.Contains("elSFWeight"))     tmp_elSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
+    else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
+
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight;
+  }//end systematic weight loop
+
   ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt)) return StatusCode::SUCCESS;
@@ -596,12 +626,28 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   
   nFileEvtTot=m_tree->GetEntries();
   m_tree->SetBranchStatus("*",0);
+  // add the systematics weights to the nominal
+  TObjArray *var_list = m_tree->GetListOfBranches();
+  for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) {
+    TString var_name = var_list->At(a)->GetName();
+    if(var_name.Contains("__1up") || var_name.Contains("__1down")){
+      m_tree->SetBranchStatus(var_name, 1);
+      if(tMapFloat.find(var_name)==tMapFloat.end()){
+	tMapFloat[var_name]=-999.0;
+	tMapFloatW[var_name]=-999.0;
+	m_tree_out->Branch("w"+var_name,&(tMapFloatW[var_name]));	
+      }
+      m_tree->SetBranchAddress(var_name, &tMapFloat[var_name]);
+    }
+  }
+
   m_tree->SetBranchStatus("runNumber", 1);
   m_tree->SetBranchStatus("eventNumber", 1);
   m_tree->SetBranchStatus("averageIntPerXing", 1);
   m_tree->SetBranchStatus("mcEventWeight", 1);
   m_tree->SetBranchStatus("puWeight", 1);
   m_tree->SetBranchStatus("jvtSFWeight", 1);
+  m_tree->SetBranchStatus("fjvtSFWeight", 1);
   m_tree->SetBranchStatus("elSFWeight", 1);
   m_tree->SetBranchStatus("muSFWeight", 1);
   m_tree->SetBranchStatus("elSFTrigWeight", 1);
@@ -726,6 +772,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("mcEventWeight", &mcEventWeight);
   m_tree->SetBranchAddress("puWeight", &puWeight);
   m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);
+  m_tree->SetBranchAddress("fjvtSFWeight", &fjvtSFWeight);
   m_tree->SetBranchAddress("elSFWeight", &elSFWeight);
   m_tree->SetBranchAddress("muSFWeight", &muSFWeight);
   m_tree->SetBranchAddress("elSFTrigWeight", &elSFTrigWeight);
