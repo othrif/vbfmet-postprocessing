@@ -173,8 +173,31 @@ StatusCode HFInputAlg::execute() {
   bool CRZee = false;
   bool CRZmm = false;
 
-  //  TLorentzVector lep1,lep2,Z;
   m_tree->GetEntry(m_tree->GetReadEntry());
+
+  // Compute jet centrality
+  float max_centrality=0.0, maxmj3_over_mjj=0.0;
+  TLorentzVector j1v,j2v, tmp;
+  if(jet_eta->size()>1){
+    j1v.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0), jet_phi->at(0), jet_m->at(0));
+    j2v.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1), jet_phi->at(1), jet_m->at(1));
+  }
+  for(unsigned iJet=2; iJet<jet_eta->size(); ++iJet){
+    tmp.SetPtEtaPhiM(jet_pt->at(iJet), jet_eta->at(iJet), jet_phi->at(iJet), jet_m->at(iJet));
+    float centrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(jet_eta->at(iJet) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
+    if(max_centrality<centrality) max_centrality=centrality;
+    float mj1 = (tmp+j1v).M();
+    float mj2 = (tmp+j2v).M();
+    float j3_over_mjj =std::min(mj1,mj2)/jj_mass;
+    if(j3_over_mjj>maxmj3_over_mjj) maxmj3_over_mjj = j3_over_mjj;
+  }
+
+  // Cuts
+  float METCut=180.0e3; // 150.0e3
+  float METCSTJetCut = 150.0e3; // 120.0e3
+  float jj_detaCut = 4.8; // 4.0
+  float jj_massCut = 1000.0e3;
+  bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
 
   // extra vetos  
   bool leptonVeto = false;
@@ -185,10 +208,10 @@ StatusCode HFInputAlg::execute() {
   unsigned n_basemu=0;
   if(m_extraVars){
     for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-      if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.30) ++n_baseel;
+      if(baseel_pt->at(iEle)>4.5e3) ++n_baseel;
     }
     for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-      if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.30) ++n_basemu;
+      if(basemu_pt->at(iMuo)>4.0e3) ++n_basemu;
     }
 
     leptonVeto = (n_baseel>0 || n_basemu>0) || (n_el+n_mu==1 && n_baseel+n_basemu==1) || (n_el+n_mu==2 && n_baseel+n_basemu==2);
@@ -214,33 +237,27 @@ StatusCode HFInputAlg::execute() {
   }
 
   // MET choice to be implemented...
-
-  if (!((passJetCleanTight == 1) & (n_jet ==2) & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > 4.8) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > 1e6))) return StatusCode::SUCCESS; //metjet_CST>150e3
+  if (!((passJetCleanTight == 1) & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut))) return StatusCode::SUCCESS; 
 
   if(n_el== 1) {
-    met_significance = met_tst_et/1000/sqrt(sqrt(el_pt->at(0)*el_pt->at(0)*cos(el_phi->at(0))*cos(el_phi->at(0))+el_pt->at(0)*el_pt->at(0)*sin(el_phi->at(0))*sin(el_phi->at(0))+jet_pt->at(0)*jet_pt->at(0)*sin(jet_phi->at(0))*sin(jet_phi->at(0))+jet_pt->at(0)*jet_pt->at(0)*cos(jet_phi->at(0))*cos(jet_phi->at(0))+jet_pt->at(1)*jet_pt->at(1)*sin(jet_phi->at(1))*sin(jet_phi->at(1))+jet_pt->at(1)*jet_pt->at(1)*cos(jet_phi->at(1))*cos(jet_phi->at(1)))/1000);
+    met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0);
   } else {
     met_significance = 0;
   }
 
-  if ((trigger_met == 1) & (met_tst_et > 180e3) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
-    // lep1->SetPtEtaPhiM(el_pt->at(0),el_eta->at(0),el_phi->at(0),el_m->at(0));
-    // lep2->SetPtEtaPhiM(el_pt->at(0),el_eta->at(0),el_phi->at(0),el_m->at(0));
-    // Z = lep1+lep2;
-    // Z_mass = Z.M()
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
-  if ((trigger_lep == 1) & (met_tst_nolep_et > 180e3) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
+  if ((trigger_met == 1) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
+  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
+  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
+  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
+  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
+  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
+  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
+  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
+  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
 
   Float_t w_final = 1;
   Float_t lumi = 36.1;
   if (isMC) w_final = w*1000*lumi;
-  //if(isMC) w_final *=xeSFTrigWeight;
   if (SR){
     if (jj_mass < 1.5e6) hSR[0]->Fill(1,w_final*xeSFTrigWeight);
     else if (jj_mass < 2e6) hSR[1]->Fill(1,w_final*xeSFTrigWeight);
@@ -331,6 +348,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("met_tst_nolep_j2_dphi",1);
   m_tree->SetBranchStatus("met_tst_et",1);
   m_tree->SetBranchStatus("met_tst_nolep_et",1);
+  m_tree->SetBranchStatus("met_cst_jet",1);
   m_tree->SetBranchStatus("mu_charge",1);
   m_tree->SetBranchStatus("mu_pt",1);
   m_tree->SetBranchStatus("mu_phi",1);
@@ -362,6 +380,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);
   m_tree->SetBranchAddress("met_tst_et",&met_tst_et);
   m_tree->SetBranchAddress("met_tst_nolep_et",&met_tst_nolep_et);
+  m_tree->SetBranchAddress("met_cst_jet",&met_cst_jet);
   m_tree->SetBranchAddress("mu_charge",&mu_charge);
   m_tree->SetBranchAddress("mu_pt",&mu_pt);
   m_tree->SetBranchAddress("el_charge",&el_charge);

@@ -192,6 +192,8 @@ StatusCode VBFAnalysisAlg::initialize() {
 
   if(m_extraVars){
 
+    m_tree_out->Branch("n_bjet",&n_bjet);
+
     m_tree_out->Branch("j3_centrality",&j3_centrality);
     m_tree_out->Branch("j3_dRj1",&j3_dRj1);
     m_tree_out->Branch("j3_dRj2",&j3_dRj2);
@@ -340,6 +342,7 @@ StatusCode VBFAnalysisAlg::execute() {
   bool CRWmn = false;
   bool CRZee = false;
   bool CRZmm = false;
+  bool CRZtt = false;
 
   // Fill
   truth_jj_mass =-1.0;  
@@ -386,12 +389,14 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_extraVars){
     if(baseel_pt){
       for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-	if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25) ++n_baseel;
+	//if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25) ++n_baseel;
+	if(baseel_pt->at(iEle)>4.5e3) ++n_baseel;
       }
     }
     if(basemu_pt){
       for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-	if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25) ++n_basemu;
+	//if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25) ++n_basemu;
+	if(basemu_pt->at(iMuo)>4.0e3) ++n_basemu;
       }
     }
     // overlap remove with the photons
@@ -524,7 +529,8 @@ StatusCode VBFAnalysisAlg::execute() {
   if (trigger_HLT_xe100_mht_L1XE50 == 1 || trigger_HLT_xe110_mht_L1XE50 == 1 || trigger_HLT_xe90_mht_L1XE50 == 1) trigger_met = 1; else trigger_met = 0;
   ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
-    met_significance = met_tst_et/1000/sqrt(sqrt(el_pt->at(0)*el_pt->at(0)*cos(el_phi->at(0))*cos(el_phi->at(0))+el_pt->at(0)*el_pt->at(0)*sin(el_phi->at(0))*sin(el_phi->at(0)))+sqrt(jet_pt->at(0)*jet_pt->at(0)*sin(jet_phi->at(0))*sin(jet_phi->at(0))+jet_pt->at(0)*jet_pt->at(0)*cos(jet_phi->at(0))*cos(jet_phi->at(0)))+sqrt(jet_pt->at(1)*jet_pt->at(1)*sin(jet_phi->at(1))*sin(jet_phi->at(1))+jet_pt->at(1)*jet_pt->at(1)*cos(jet_phi->at(1))*cos(jet_phi->at(1)))/1000);
+    //met_significance = met_tst_et/1000/sqrt(sqrt(el_pt->at(0)*el_pt->at(0)*cos(el_phi->at(0))*cos(el_phi->at(0))+el_pt->at(0)*el_pt->at(0)*sin(el_phi->at(0))*sin(el_phi->at(0)))+sqrt(jet_pt->at(0)*jet_pt->at(0)*sin(jet_phi->at(0))*sin(jet_phi->at(0))+jet_pt->at(0)*jet_pt->at(0)*cos(jet_phi->at(0))*cos(jet_phi->at(0)))+sqrt(jet_pt->at(1)*jet_pt->at(1)*sin(jet_phi->at(1))*sin(jet_phi->at(1))+jet_pt->at(1)*jet_pt->at(1)*cos(jet_phi->at(1))*cos(jet_phi->at(1)))/1000);
+    met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
   } else {
     met_significance = 0;
   }
@@ -552,11 +558,13 @@ StatusCode VBFAnalysisAlg::execute() {
   if (CRZee) ATH_MSG_DEBUG ("It's CRZee!"); else ATH_MSG_DEBUG ("It's NOT CRZee");
   if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
   if (CRZmm) ATH_MSG_DEBUG ("It's CRZmm!"); else ATH_MSG_DEBUG ("It's NOT CRZmm");
+  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
+  if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt");
 
   w = weight*mcEventWeight*puWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight;
   ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight);
   // only save events that pass any of the regions
-  if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm)) return StatusCode::SUCCESS;
+  if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt)) return StatusCode::SUCCESS;
 
   m_tree_out->Fill();
 
@@ -640,6 +648,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_ConeTruthLabelID",1);
 
   if(m_extraVars){
+    m_tree->SetBranchStatus("n_bjet",1);
 
     m_tree->SetBranchStatus("ph_pt",1);
     m_tree->SetBranchStatus("ph_phi",1);
@@ -785,6 +794,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 
   if(m_extraVars){
   
+    m_tree->SetBranchAddress("n_bjet",            &n_bjet);
+
     m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
     m_tree->SetBranchAddress("basemu_pt",           &basemu_pt);
     m_tree->SetBranchAddress("basemu_eta",          &basemu_eta);

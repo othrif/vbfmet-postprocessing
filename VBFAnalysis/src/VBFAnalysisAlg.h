@@ -112,6 +112,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t passPV;
   Int_t passDetErr;
   Int_t n_jet;
+  Int_t n_bjet;
   Int_t n_el;
   Int_t n_mu;
   Int_t n_ph;
