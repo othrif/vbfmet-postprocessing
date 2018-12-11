@@ -9,7 +9,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("currentVariation", currentVariation = "Nominal", "current systematics, NONE means nominal");
   declareProperty("currentSample", currentSample = "W_strong", "current samples");
   declareProperty("isMC", isMC = true, "isMC flag, true means the sample is MC");
-  declareProperty("ExtraVars", m_extraVars = true, "true if extra variables should be cut on" );
+  declareProperty("ExtraVars", m_extraVars = 0, "true if extra variables should be cut on" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   //declareProperty( "Property", m_nProperty = 0, "My Example Integer Property" ); //example property declaration
@@ -206,7 +206,7 @@ StatusCode HFInputAlg::execute() {
   bool JetTimingVeto = false;
   unsigned n_baseel=0;
   unsigned n_basemu=0;
-  if(m_extraVars){
+  if(m_extraVars>0){
     for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
       if(baseel_pt->at(iEle)>4.5e3) ++n_baseel;
     }
@@ -214,7 +214,7 @@ StatusCode HFInputAlg::execute() {
       if(basemu_pt->at(iMuo)>4.0e3) ++n_basemu;
     }
 
-    leptonVeto = (n_baseel>0 || n_basemu>0) || (n_el+n_mu==1 && n_baseel+n_basemu==1) || (n_el+n_mu==2 && n_baseel+n_basemu==2);
+    leptonVeto = (n_baseel>0 || n_basemu>0) && !((n_el+n_mu==1 && n_baseel+n_basemu==1) || (n_el+n_mu==2 && n_baseel+n_basemu==2));
     metSoftVeto = met_soft_tst_et>20.0e3;
     if(jet_fjvt->size()>1)
       fJVTVeto = fabs(jet_fjvt->at(0))>0.5 || fabs(jet_fjvt->at(1))>0.5;
@@ -225,6 +225,13 @@ StatusCode HFInputAlg::execute() {
 
     // veto events with tighter selections
     if(metSoftVeto || fJVTVeto || JetTimingVeto || leptonVeto) return StatusCode::SUCCESS;
+
+    if(m_extraVars>1){
+      METCut=150.0e3;
+      METCSTJetCut=120.0e3;
+      jj_detaCut=4.0;
+      jetCut = (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05);
+    }
   }
   xeSFTrigWeight=1.0;
   if(isMC && jet_pt && jet_pt->size()>1){
@@ -395,7 +402,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_eta",&jet_eta);
   m_tree->SetBranchAddress("jet_m",&jet_m);
 
-  if(m_extraVars){  
+  if(m_extraVars>0){  
     m_tree->SetBranchStatus("met_soft_tst_et",1);
     m_tree->SetBranchStatus("met_tenacious_tst_et",1);
     m_tree->SetBranchStatus("met_tighter_tst_et",1);
