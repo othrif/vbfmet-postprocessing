@@ -76,6 +76,7 @@ void Msl::Event::Clear()
   VarHolder::ClearVars();
   muons.clear();
   electrons.clear();
+  taus.clear();  
   jets.clear();
   truth_jets.clear();
   truth_taus.clear();

@@ -17,6 +17,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hTruthElPt(0), hTruthElEta(0),
 				  hBaseElPt(0), hBaseElEta(0),
 				  hTruthTauPt(0), hTruthTauEta(0),
+				  hminDRLep(0),
 				  hmj34(0),
 				  hmax_j_eta(0),
 				  hdRj1(0),
@@ -85,6 +86,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hTruthTauPt  = GetTH1("truthTauPt",    50,  0.0,   100.0);
   hTruthTauDR  = GetTH1("truthTauDR",    100,  0.0,   10.0);
   hTruthTauEta = GetTH1("truthTauEta",   45,  -4.5,   4.5);
+
+  hminDRLep = GetTH1("minDRLep",   60,  0.0,   6.0);  
   // extra vars
   hmj34             = GetTH1("mj34",             50,  0.0,   1000.0);		  
   hmax_j_eta        = GetTH1("max_j_eta",        45,  0.0,   4.5);    	  
@@ -218,6 +221,22 @@ bool Msl::PlotEvent::DoExec(Event &event)
   }
   // end testing
 
+  // jet DR
+  float minDR=999.0;
+  for(unsigned il=0; il<event.muons.size(); ++il){
+    for(unsigned ij=0; ij<event.jets.size(); ++ij){
+      float qDR = event.jets.at(ij).GetVec().DeltaR(event.muons.at(il).GetVec());
+      if(minDR>qDR) minDR = qDR;
+    }
+  }
+  for(unsigned il=0; il<event.electrons.size(); ++il){
+    for(unsigned ij=0; ij<event.jets.size(); ++ij){
+      float qDR = event.jets.at(ij).GetVec().DeltaR(event.electrons.at(il).GetVec());
+      if(minDR>qDR) minDR = qDR;
+    }
+  }  
+  hminDRLep->Fill(minDR, weight);
+  
   // fill stored variables
   for(unsigned a=0; a<fVarVec.size(); ++a){
     FillHist(fHistVec[fVarVec[a]], fVarVec[a], event, weight);

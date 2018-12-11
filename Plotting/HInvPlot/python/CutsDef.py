@@ -110,18 +110,20 @@ def ExtraCuts(n_mu=0, n_el=0, isEMu=False):
 
 #-------------------------------------------------------------------------
 def getJetCuts(isPh=False):
-    cuts = [CutItem('CutNjet',  'n_jet == 2')]
+    #cuts = [CutItem('CutNjet',  'n_jet == 2')]
+    cuts = [CutItem('CutNjet',  'n_jet < 5')]
     if not isPh:
         #cuts += [CutItem('CutNjetCen',  'n_jet_cenj == 0')]    
-        #cuts  = [CutItem('CutNjet',  'n_jet > 1')]
-        #cuts += [CutItem('CutMaxCentrality',  'maxCentrality <0.6')]
-        #cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
+        cuts  = [CutItem('CutNjet',  'n_jet > 1 && n_jet < 5')]
+        cuts += [CutItem('CutMaxCentrality',  'maxCentrality <0.6')]
+        cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
 
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
         #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
         #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
+        cuts = [CutItem('CutNjet',  'n_jet == 2')]
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 50.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 35.0')]
         
@@ -136,11 +138,11 @@ def getVBFCuts(isLep=False):
         cuts += [CutItem('CutDPhiMetj1','met_tst_j2_dphi > 1.0')]
     else:
         cuts += [CutItem('CutDPhiMetj0','met_tst_nolep_j1_dphi > 1.0')]
-        cuts += [CutItem('CutDPhiMetj1','met_tst_nolep_j2_dphi > 1.0')] 
+        cuts += [CutItem('CutDPhiMetj1','met_tst_nolep_j2_dphi > 1.0')]
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
     cuts += [CutItem('CutDEtajj','jj_deta > 4.8')]
-    #cuts += [CutItem('CutDEtajjV','jj_deta > 3.0')]    
-    cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
+    #cuts += [CutItem('CutDEtajjV','jj_deta > 2.5')]
+    cuts += [CutItem('CutMjj','jj_mass > 200.0')]
     
     return cuts
 
@@ -211,13 +213,14 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     cuts += getJetCuts();
     if basic_cuts.chan=='eu':
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
+        cuts += [CutItem('CutNbjet',  'n_bjet < 0.5')]        
         cuts += [CutItem('CutMass',   'Mtt < 116.0 && Mtt > 76.0')]
     else:
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
         #cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]
         cutMass = CutItem('CutMass')
         cutMass.AddCut(CutItem('Mll',  'mll < 116.0 && mll > 76.0'), 'OR')
-        cutMass.AddCut(CutItem('Mtt', 'Mtt < 116.0 && Mtt > 76.0'), 'OR')
+        #cutMass.AddCut(CutItem('Mtt', 'Mtt < 116.0 && Mtt > 76.0'), 'OR')
         cuts += [cutMass]
 
     # add the extra cuts

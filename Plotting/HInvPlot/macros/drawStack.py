@@ -35,6 +35,7 @@ p.add_option('--xmax',         type='float',  default=None,          dest='xmax'
 p.add_option('--xmin',         type='float',  default=None,          dest='xmin')
 
 p.add_option('--blind',         action='store_true', default=False,   dest='blind')
+p.add_option('--madgraph',      action='store_true', default=False,   dest='madgraph')
 p.add_option('--do-eps',        action='store_true', default=False,   dest='do_eps')
 p.add_option('--do-pdf',        action='store_true', default=False,   dest='do_pdf')
 p.add_option('--do-logy',       action='store_true', default=False,   dest='do_logy')
@@ -180,7 +181,7 @@ def getHistPars(hist):
         'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},         
         'j0timing' : {'xtitle':'Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1timing' : {'xtitle':'sub-Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},         
-        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0.0, 'ymin':0.1, 'logy':True, 'LtoRCut':True, 'xmax':6.0},
+        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0.0, 'ymin':0.1, 'logy':False, 'LtoRCut':True, 'xmax':9.0},
         'n_jet_fwd'   : {'xtitle':'Number of extra Jets |eta|>2.5',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj30'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
@@ -224,6 +225,7 @@ def getHistPars(hist):
     'truthJet1Pt'     : {'xtitle':'Truth sub-lead Jet p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'nTruthJetMatch'     : {'xtitle':'Number of Truth Matched Jets'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_baseel'     : {'xtitle':'Number of Base Electrons'   ,         'ytitle':'Events',   'ymin':0.1},
+    'n_tau'     : {'xtitle':'Number of Taus'   ,         'ytitle':'Events',   'ymin':0.1},    
     'n_basemu'     : {'xtitle':'Number of Base Muons'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_truth_tau'     : {'xtitle':'Number of Truth taus'   ,         'ytitle':'Events',   'ymin':0.1},    
     'met_tst_j1_dphi'     : {'xtitle':'#Delta#phi(j1,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -246,6 +248,7 @@ def getHistPars(hist):
     'phEta'     : {'xtitle':'#gamma #eta'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tst_ph_dphi'     : {'xtitle':'#Delta#phi(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},            
     'Mtt'     : {'xtitle':'m_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'minDRLep'     : {'xtitle':'min #DeltaR(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},    
     'j3Pt'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
     'j3Eta'     : {'xtitle':'j3 #eta'   ,         'ytitle':'Events',   'ymin':0.1},                                        
     'j3Jvt'     : {'xtitle':'j3 Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -1591,15 +1594,18 @@ class DrawStack:
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
                             self.signif.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg)/cut_Nsig)
                             wBKG=0.0
-                            if 'wqcd' in self.bkgs and 'wewk' in self.bkgs:
-                                wBKG = self.bkgs['wqcd'].hist.Integral(0,ibin)+self.bkgs['wewk'].hist.Integral(0,ibin)
+                            madgraph=''
+                            if options.madgraph:
+                                madgraph='Mad'
+                            if ('wqcd'+madgraph) in self.bkgs and 'wewk' in self.bkgs:
+                                wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['wewk'].hist.Integral(0,ibin)
                                 if not leftToRight:
-                                    wBKG = self.bkgs['wqcd'].hist.Integral(ibin,10001)+self.bkgs['wewk'].hist.Integral(ibin,10001)                                
+                                    wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['wewk'].hist.Integral(ibin,10001)                                
                             
-                            if 'zqcd' in self.bkgs and 'zewk' in self.bkgs:
-                                zBKG = self.bkgs['zqcd'].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
+                            if ('zqcd'+madgraph) in self.bkgs and 'zewk' in self.bkgs:
+                                zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
                                 if not leftToRight:
-                                    zBKG = self.bkgs['zqcd'].hist.Integral(ibin,10001)+self.bkgs['zewk'].hist.Integral(ibin,10001)
+                                    zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['zewk'].hist.Integral(ibin,10001)
                                 total_zcr=-100.0
                                 #print 'self.zcr_stack: ',self.zcr_stack
                                 if self.zcr_stack and not self.zcr_stack.bkg_sum:
@@ -2105,9 +2111,11 @@ def main():
     # Select histograms and samples for stacks
     #
     #bkgs = ['zewk', 'zqcd','wewk','wqcd','top1','top2']
-    bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','vvv','zldy'] #,'mqcd'
-    #bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','tall','vvv','zldy']  
-
+    if options.madgraph:
+        bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','tall','vvv','zldy']
+    else:
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','vvv','zldy'] #,'mqcd'
+        
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
 
