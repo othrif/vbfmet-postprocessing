@@ -110,13 +110,13 @@ def ExtraCuts(n_mu=0, n_el=0, isEMu=False):
 
 #-------------------------------------------------------------------------
 def getJetCuts(isPh=False):
-    #cuts = [CutItem('CutNjet',  'n_jet == 2')]
-    cuts = [CutItem('CutNjet',  'n_jet < 5')]
+    cuts = [CutItem('CutNjet',  'n_jet == 2')]
+    #cuts = [CutItem('CutNjet',  'n_jet < 5')]
     if not isPh:
         #cuts += [CutItem('CutNjetCen',  'n_jet_cenj == 0')]    
-        cuts  = [CutItem('CutNjet',  'n_jet > 1 && n_jet < 5')]
-        cuts += [CutItem('CutMaxCentrality',  'maxCentrality <0.6')]
-        cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
+        #cuts  = [CutItem('CutNjet',  'n_jet > 1 && n_jet < 5')]
+        #cuts += [CutItem('CutMaxCentrality',  'maxCentrality <0.6')]
+        #cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
 
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
@@ -142,7 +142,7 @@ def getVBFCuts(isLep=False):
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
     cuts += [CutItem('CutDEtajj','jj_deta > 4.8')]
     #cuts += [CutItem('CutDEtajjV','jj_deta > 2.5')]
-    cuts += [CutItem('CutMjj','jj_mass > 200.0')]
+    cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
     
     return cuts
 
