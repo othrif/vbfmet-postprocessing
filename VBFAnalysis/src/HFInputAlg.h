@@ -47,6 +47,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Bool_t isMC = true;
   Bool_t doLowNom = false; //put nominal yields for "Low" histogram for asymmetric systematics for HistFitter
   Bool_t isHigh = true;
+  Bool_t weightSyst=false;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
@@ -75,7 +76,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   vector <TH1F*> hCRZee;
   vector <TH1F*> hCRZmm;
 
-  bool m_extraVars = true;
+  Int_t m_extraVars = 0;
 
   Double_t xeSFTrigWeight;
   Float_t met_significance;
@@ -97,6 +98,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Double_t met_tst_nolep_j2_dphi;
   Float_t met_tst_et;
   Float_t met_tst_nolep_et;
+  Double_t met_cst_jet;
   std::vector<Int_t>* mu_charge;
   std::vector<Float_t>* mu_pt;
   std::vector<Float_t>* mu_phi;
