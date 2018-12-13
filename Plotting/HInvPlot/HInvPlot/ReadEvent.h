@@ -125,7 +125,9 @@ namespace Msl
     std::string                 fRawFlowFile;
     std::string                 fAnalysisName;
     std::string                 fMETChoice;
-    std::string                 fMETChoice_phi;    
+    std::string                 fMETChoice_phi;
+    std::string                 fMETChoice_nolep;    
+    std::string                 fMETChoice_nolep_phi;
     
     std::vector<std::string>    fTrees;
     std::vector<std::string>    fFiles;

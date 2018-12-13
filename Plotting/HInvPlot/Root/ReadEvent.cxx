@@ -93,6 +93,10 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   // set met phi
   fMETChoice_phi = fMETChoice;
   fMETChoice_phi.replace(fMETChoice_phi.end()-2, fMETChoice_phi.end(),"phi");
+  fMETChoice_nolep = fMETChoice;
+  fMETChoice_nolep_phi = fMETChoice_phi;
+  fMETChoice_nolep.replace(fMETChoice_nolep.find("_tst"), 4, "_tst_nolep");
+  fMETChoice_nolep_phi.replace(fMETChoice_nolep_phi.find("_tst"), 4, "_tst_nolep");
   
   std::vector<std::string> mcids, samples;
   reg.Get("ReadEvent::MCIDs",   mcids);
@@ -790,8 +794,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_ele.phi = baseel_phi->at(iEl);
 	//new_ele.AddVar(Mva::ptvarcone20,jet_timing->at(iJet));
 	//if(baseel_ptvarcone20->at(iEl)/baseel_pt->at(iEl)<30.3){
-	++n_baseel;
-	event->baseel.push_back(new_ele);
+	//if(!(fabs(new_ele.eta)>1.37 && fabs(new_ele.eta)<1.52 && new_ele.pt<27.0)){
+	  ++n_baseel;
+	  event->baseel.push_back(new_ele);
 	  //}
       }
       event->RepVar(Mva::n_baseel, n_baseel);
@@ -836,20 +841,41 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Reset MET?
     if(fMETChoice!="met_tst_et"){
       Mva::Var my_met = Mva::Convert2Var(fMETChoice);
-      Mva::Var my_met_phi = Mva::Convert2Var(fMETChoice_phi);      
-      event->RepVar(Mva::met_tst_phi, event->GetVar(my_met_phi));
-      event->RepVar(Mva::met_tst_et, event->GetVar(my_met));
+      Mva::Var my_met_phi = Mva::Convert2Var(fMETChoice_phi);
+      //Mva::Var my_met_nolep = Mva::Convert2Var(fMETChoice_nolep);
+      //Mva::Var my_met_nolep_phi = Mva::Convert2Var(fMETChoice_nolep_phi);
+
+      // fill the met alternative
+      event->met_nolep.SetPtEtaPhiM(event->GetVar(my_met),0.0,event->GetVar(my_met_phi),0.0);
+      //std::cout << "met before leptons: " << event->GetVar(my_met) << std::endl;
+      for(unsigned iLep=0; iLep<event->electrons.size(); ++iLep)
+	event->met_nolep+=event->electrons.at(iLep).GetLVec();
+      for(unsigned iLep=0; iLep<event->muons.size(); ++iLep)
+	event->met_nolep+=event->muons.at(iLep).GetLVec();
+      //std::cout << "    met after leptons: " << event->met_nolep.Pt()
+      //		<< " nEle: " << event->electrons.size()
+      //		<< " nMuo: " << event->muons.size()	
+      //		<< std::endl;      
+      // replace
+      event->RepVar(Mva::met_tst_phi,       event->GetVar(my_met_phi));
+      event->RepVar(Mva::met_tst_et,        event->GetVar(my_met));      
+      event->RepVar(Mva::met_tst_nolep_phi, event->met_nolep.Phi());
+      event->RepVar(Mva::met_tst_nolep_et,  event->met_nolep.Pt());
     }
     
     // Fill MET
     if(event->HasVar(Mva::met_tst_phi))
       event->met.SetPtEtaPhiM(event->GetVar(Mva::met_tst_et),0.0,event->GetVar(Mva::met_tst_phi),0.0);
+    if(event->HasVar(Mva::met_tst_nolep_phi))
+      event->met_nolep.SetPtEtaPhiM(event->GetVar(Mva::met_tst_nolep_et),0.0,event->GetVar(Mva::met_tst_nolep_phi),0.0);
 
     // refill the deltaPhi met jet
     if(fMETChoice!="met_tst_et"){
       if(event->jets.size()>1){
 	event->RepVar(Mva::met_tst_j1_dphi,fabs(event->met.DeltaPhi(event->jets.at(0).GetLVec())));
 	event->RepVar(Mva::met_tst_j2_dphi,fabs(event->met.DeltaPhi(event->jets.at(1).GetLVec())));
+	event->RepVar(Mva::met_tst_nolep_j1_dphi,fabs(event->met_nolep.DeltaPhi(event->jets.at(0).GetLVec())));
+	event->RepVar(Mva::met_tst_nolep_j2_dphi,fabs(event->met_nolep.DeltaPhi(event->jets.at(1).GetLVec())));
       }
     }
 
