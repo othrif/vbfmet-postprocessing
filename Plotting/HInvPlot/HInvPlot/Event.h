@@ -123,6 +123,7 @@ namespace Msl
     ParticleVec          basemu;
     ParticleVec          photons;
     TLorentzVector       met;
+    TLorentzVector       met_nolep;
   };
 }
 
