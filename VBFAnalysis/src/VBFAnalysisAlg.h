@@ -130,7 +130,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tst_nolep_et;
   Float_t met_tst_phi;
   Float_t met_tst_nolep_phi;
-
+  Float_t max_mj_over_mjj;
+  Float_t maxCentrality;
+  // to fill min_mj_over_mjj,minCentrality,met_tenacious_tst_j1_dphi,met_tenacious_tst_j2_dphi
+  //met_tenacious_tst_nolep_j1_dphi,met_tenacious_tst_nolep_j2_dphi,met_tenacious_tst_nolep_et,
+  //met_tenacious_tst_nolep_phi
   // extra vars
   Int_t   n_baseel=0;
   Int_t   n_basemu=0;
@@ -139,6 +143,12 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_soft_tst_sumet=-9999;
   Float_t met_tenacious_tst_et=-9999;
   Float_t met_tenacious_tst_phi=-9999;
+  Float_t met_tenacious_tst_j1_dphi=-9999;
+  Float_t met_tenacious_tst_j2_dphi=-9999;
+  Float_t met_tenacious_tst_nolep_j1_dphi=-9999;
+  Float_t met_tenacious_tst_nolep_j2_dphi=-9999;
+  Float_t met_tenacious_tst_nolep_et=-9999;
+  Float_t met_tenacious_tst_nolep_phi=-9999;
   Float_t met_tighter_tst_et=-9999;
   Float_t met_tighter_tst_phi=-9999;
   Float_t met_tight_tst_et=-9999;

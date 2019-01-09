@@ -158,11 +158,12 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("met_tst_j2_dphi",&met_tst_j2_dphi);
   m_tree_out->Branch("met_tst_nolep_j1_dphi",&met_tst_nolep_j1_dphi);
   m_tree_out->Branch("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);
-  m_tree_out->Branch("met_cst_jet",&met_cst_jet);
   m_tree_out->Branch("met_tst_et",&met_tst_et);
   m_tree_out->Branch("met_tst_nolep_et",&met_tst_nolep_et);
   m_tree_out->Branch("met_tst_phi",&met_tst_phi);
   m_tree_out->Branch("met_tst_nolep_phi",&met_tst_nolep_phi);
+  m_tree_out->Branch("met_cst_jet",&met_cst_jet);
+  m_tree_out->Branch("met_soft_tst_et",        &met_soft_tst_et);
   m_tree_out->Branch("mu_charge",&mu_charge);
   m_tree_out->Branch("mu_pt",&mu_pt);
   m_tree_out->Branch("el_charge",&el_charge);
@@ -178,6 +179,10 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("jet_m",&jet_m);
   m_tree_out->Branch("jet_jvt",&jet_jvt);
   m_tree_out->Branch("met_significance",&met_significance);
+  m_tree_out->Branch("max_mj_over_mjj",&max_mj_over_mjj);
+  m_tree_out->Branch("maxCentrality",&maxCentrality);
+  m_tree_out->Branch("n_baseel",&n_baseel);
+  m_tree_out->Branch("n_basemu",&n_basemu);
 
   if(m_contLep){
     m_tree_out->Branch("contmu_pt",           &contmu_pt);
@@ -228,19 +233,23 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("tau_phi",&outtau_phi);
     m_tree_out->Branch("tau_eta",&outtau_eta);
 
-    m_tree_out->Branch("met_soft_tst_et",        &met_soft_tst_et);
     m_tree_out->Branch("met_soft_tst_phi",       &met_soft_tst_phi);
     m_tree_out->Branch("met_soft_tst_sumet",     &met_soft_tst_sumet);
     m_tree_out->Branch("met_tenacious_tst_et",   &met_tenacious_tst_et);
     m_tree_out->Branch("met_tenacious_tst_phi",  &met_tenacious_tst_phi);
+
+    m_tree_out->Branch("met_tenacious_tst_j1_dphi",&met_tenacious_tst_j1_dphi);
+    m_tree_out->Branch("met_tenacious_tst_j2_dphi",&met_tenacious_tst_j2_dphi);
+    m_tree_out->Branch("met_tenacious_tst_nolep_j1_dphi",&met_tenacious_tst_nolep_j1_dphi);
+    m_tree_out->Branch("met_tenacious_tst_nolep_j2_dphi",&met_tenacious_tst_nolep_j2_dphi);
+    m_tree_out->Branch("met_tenacious_tst_nolep_et",&met_tenacious_tst_nolep_et);
+    m_tree_out->Branch("met_tenacious_tst_nolep_phi",&met_tenacious_tst_nolep_phi);
+
     m_tree_out->Branch("met_tight_tst_et",       &met_tight_tst_et);
     m_tree_out->Branch("met_tight_tst_phi",      &met_tight_tst_phi);
     m_tree_out->Branch("met_tighter_tst_et",     &met_tighter_tst_et);
     m_tree_out->Branch("met_tighter_tst_phi",    &met_tighter_tst_phi);
     m_tree_out->Branch("metsig_tst",             &metsig_tst);
-
-    m_tree_out->Branch("n_baseel",&n_baseel);
-    m_tree_out->Branch("n_basemu",&n_basemu);
 
     if(m_currentVariation=="Nominal" && m_isMC){
       m_tree_out->Branch("truth_tau_pt", &truth_tau_pt);
@@ -386,7 +395,7 @@ StatusCode VBFAnalysisAlg::execute() {
   outtau_pt->clear();
   outtau_eta->clear();
   outtau_phi->clear();
-  if(m_extraVars){
+  if(m_extraVars || true){
     if(baseel_pt){
       for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
 	if(baseel_pt->at(iEle)>4.5e3) ++n_baseel;
@@ -461,10 +470,12 @@ StatusCode VBFAnalysisAlg::execute() {
   }// end extra variables
 
   // fill extra jet variables for 3rd jets
-  if(m_extraVars){
+  if(m_extraVars || true){
+    maxCentrality=0;
+    max_mj_over_mjj=0.0;
     mj34=-9999.0;
     max_j_eta= fabs(jet_eta->at(0));
-    if(fabs(jet_eta->at(1))>max_j_eta) max_j_eta= fabs(jet_eta->at(1));
+    if(jet_eta->size()>1 && fabs(jet_eta->at(1))>max_j_eta) max_j_eta= fabs(jet_eta->at(1));
     j3_centrality->clear();
     j3_dRj1->clear();
     j3_dRj2->clear();
@@ -490,6 +501,8 @@ StatusCode VBFAnalysisAlg::execute() {
 	j3_min_mj_over_mjj->push_back(std::min(mj1,mj2)/jj_mass);
 	float centrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(jet_eta->at(iJet) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
 	j3_centrality->push_back(centrality);
+	if(maxCentrality<centrality) maxCentrality=centrality;
+	if(max_mj_over_mjj<j3_min_mj_over_mjj->at(iJet)) max_mj_over_mjj=j3_min_mj_over_mjj->at(iJet);
       }
       if(jet_pt->size()>3){
 	j3v.SetPtEtaPhiM(jet_pt->at(2), jet_eta->at(2), jet_phi->at(2), jet_m->at(2));
