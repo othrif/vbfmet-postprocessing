@@ -468,9 +468,8 @@ StatusCode VBFAnalysisAlg::execute() {
       }// end tau loop
     }// end tau overlap removal
   }// end extra variables
-
   // fill extra jet variables for 3rd jets
-  if(m_extraVars || true){
+  if(m_extraVars && jet_pt){
     maxCentrality=0;
     max_mj_over_mjj=0.0;
     mj34=-9999.0;
@@ -502,7 +501,7 @@ StatusCode VBFAnalysisAlg::execute() {
 	float centrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(jet_eta->at(iJet) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
 	j3_centrality->push_back(centrality);
 	if(maxCentrality<centrality) maxCentrality=centrality;
-	if(max_mj_over_mjj<j3_min_mj_over_mjj->at(iJet)) max_mj_over_mjj=j3_min_mj_over_mjj->at(iJet);
+	if(max_mj_over_mjj<j3_min_mj_over_mjj->at(iJet-2)) max_mj_over_mjj=j3_min_mj_over_mjj->at(iJet-2);
       }
       if(jet_pt->size()>3){
 	j3v.SetPtEtaPhiM(jet_pt->at(2), jet_eta->at(2), jet_phi->at(2), jet_m->at(2));
