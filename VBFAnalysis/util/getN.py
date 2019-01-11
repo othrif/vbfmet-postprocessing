@@ -18,7 +18,7 @@ print 'Collecting your files!'
 sys.stdout.flush()
 
 fout = ROOT.TFile(args.output,"RECREATE")
-h_total = ROOT.TH1F("h_total","",1,0,1)
+h_total = ROOT.TH1D("h_total","",1,0,1)
 if args.pickle==None:
     print 'not a pickle'
     fdir_list = open(args.filelist,'r')
@@ -28,7 +28,7 @@ if args.pickle==None:
         print 'Directory:',fdir
         sys.stdout.flush()
         samplesplit = fdir.split(".")
-        if "physics_Main" in fdir:
+        if "physics_Main" in fdir and args.event_count!=1:
                 continue
         for p,s in enumerate(samplesplit):
             if s[0]=="v":
@@ -61,8 +61,10 @@ else:
     list_file = pickle.load( open( args.pickle, "rb" ) )
     for container,contFileList in list_file.iteritems():
         samplesplit = container.split(".")
-        if "physics_Main" in container:
+        if "physics_Main" in container and (args.event_count!=4):
             continue
+	#if not "physics_Main" in container:
+	#    continue
         for p,s in enumerate(samplesplit):
             if s[0]=="v":
                     dsid_string = samplesplit[p+1]
@@ -79,7 +81,10 @@ else:
                 print 'ERROR - zombie file', filepath
                 continue
             h = f.Get("NumberEvents")
-            nevent += h.GetBinContent(args.event_count)
+            if not h:
+		print 'ERROR - histogram invalid',filepath
+		continue
+	    nevent += h.GetBinContent(args.event_count)
             print 'total events: ',nevent
             f.Close()
         h_total.Fill(dsid_string,nevent)

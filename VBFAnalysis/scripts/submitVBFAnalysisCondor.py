@@ -12,6 +12,7 @@ from VBFAnalysis.buildCondorScript import *
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
+parser.add_argument( "--slc7", dest = "slc7", action="store_true", default = False, help = "Do slc7" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", default = "/eos/user/r/rzou/v04/list", help = "list of ntuples to run over" )
 #parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "/home/rzou/STPostProcessing/run/f_out_total_v05.root", help = "file with the total number of event processed" )
@@ -102,6 +103,6 @@ for syst in systlist:
     runCommand = '''athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "'''+samplePatternGlobal+'''$1" - --currentVariation '''+syst+''' --normFile '''+args.normFile
     if isFileMap:
         runCommand+=''' --containerName $2'''
-    writeCondorShell(workDir, buildDir, runCommand, syst, "VBFAnalysisCondorSub", proxyName=args.proxyName) #writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="VBFAnalysisCondorSub")
+    writeCondorShell(workDir, buildDir, runCommand, syst, "VBFAnalysisCondorSub", proxyName=args.proxyName, slc7=args.slc7) #writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="VBFAnalysisCondorSub")
     print listofrunN
     writeCondorSub(workDir, syst, "VBFAnalysisCondorSub", listofrunN, listofrunNMC)
