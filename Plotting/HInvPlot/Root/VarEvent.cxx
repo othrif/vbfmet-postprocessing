@@ -66,6 +66,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case n_truth_tau:	          return "n_truth_tau";            
     case met_tst_j1_dphi:	  return "met_tst_j1_dphi";
     case met_tst_j2_dphi:	  return "met_tst_j2_dphi";
+    case met_tst_j3_dphi:	  return "met_tst_j3_dphi";      
     case met_tst_nolep_j1_dphi:	  return "met_tst_nolep_j1_dphi";
     case met_tst_nolep_j2_dphi:	  return "met_tst_nolep_j2_dphi";
     case met_tenacious_tst_j1_dphi:	  return "met_tenacious_tst_j1_dphi";
@@ -107,7 +108,8 @@ std::string Msl::Mva::Convert2Str(Var var)
     case phcentrality:	          return "phcentrality";
     case maxmj3_over_mjj:	  return "maxmj3_over_mjj";
     case avgmj3_over_mjj:	  return "avgmj3_over_mjj";      
-    case Mtt:	                  return "Mtt";      
+    case max_j3_dr:	          return "max_j3_dr";
+    case Mtt:	                  return "Mtt";            
     case phPt:	                  return "phPt";      
     case phEta:	                  return "phEta";      
     case met_tst_ph_dphi:	  return "met_tst_ph_dphi";      
@@ -172,6 +174,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "n_truth_tau")       return n_truth_tau;  
   if(var == "met_tst_j1_dphi")   return met_tst_j1_dphi;
   if(var == "met_tst_j2_dphi")   return met_tst_j2_dphi;
+  if(var == "met_tst_j3_dphi")   return met_tst_j3_dphi;  
   if(var == "met_tst_nolep_j1_dphi")   return met_tst_nolep_j1_dphi;
   if(var == "met_tst_nolep_j2_dphi")   return met_tst_nolep_j2_dphi;
   if(var == "met_tenacious_tst_j1_dphi")       return met_tenacious_tst_j1_dphi;
@@ -213,7 +216,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "phcentrality")	 return phcentrality;
   if(var == "maxmj3_over_mjj")	 return maxmj3_over_mjj;
   if(var == "avgmj3_over_mjj")	 return avgmj3_over_mjj;
-  if(var == "Mtt")	         return Mtt;
+  if(var == "max_j3_dr")	 return max_j3_dr;
+  if(var == "Mtt")	         return Mtt;  
   if(var == "phPt")	         return phPt;
   if(var == "phEta")	         return phEta;
   if(var == "met_tst_ph_dphi")	 return met_tst_ph_dphi;
@@ -365,6 +369,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(n_truth_tau);
     vars.push_back(met_tst_j1_dphi);
     vars.push_back(met_tst_j2_dphi);
+    vars.push_back(met_tst_j3_dphi);
     vars.push_back(met_tst_nolep_j1_dphi);
     vars.push_back(met_tst_nolep_j2_dphi);
     vars.push_back(met_tenacious_tst_j1_dphi);
@@ -372,8 +377,8 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(met_tenacious_tst_nolep_j1_dphi);
     vars.push_back(met_tenacious_tst_nolep_j2_dphi);
     vars.push_back(jetPt0);    
-    vars.push_back(jetPt1);    
-    vars.push_back(jetEta0);    
+    vars.push_back(jetPt1);
+    vars.push_back(jetEta0);
     vars.push_back(jetEta1);    
     vars.push_back(etaj0TimesEtaj1);    
     vars.push_back(lepPt0);    
@@ -406,8 +411,9 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(phcentrality);
     vars.push_back(maxmj3_over_mjj);
     vars.push_back(avgmj3_over_mjj);
+    vars.push_back(max_j3_dr);
     vars.push_back(Mtt);
-    vars.push_back(phPt);    
+    vars.push_back(phPt);
     vars.push_back(phEta);    
     vars.push_back(met_tst_ph_dphi);    
   }

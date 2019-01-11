@@ -339,14 +339,24 @@ def prepareBkgRuns(keys,options=None):
         #
         #
         
-    sig_VH125     = {'308072':'VH125',}
+    sig_VH125     = {'308072':'VH125',
+                         '308071':'VH125',
+                         }
     sig_ggF125 = {'308284':'ggF125',}
     #sig_ggF125 = {'364162':'Wmunu_MAXHTPTV140_280_CVetoBVeto',}
     #sig_VH125     = {'364106':'TBD',}
     #sig_VH125v2     = {'364148':'TBD',}    
     sig_VBF125     = {'308276':'VBF125 - met',
-                      '308567':'VBF125 - all',
+                      '308567':'VBF125 - all',                                                                                        
                           }
+    alt_VBF = {'308275':'VBF125 - H75',
+                      '308277':'VBF125 - H200',
+                      '308278':'VBF125 - H300',                                                                  
+                      '308279':'VBF125 - H500',                                                                  
+                      '308280':'VBF125 - H750',                                                                  
+                      '308281':'VBF125 - H1000',                                                                  
+                      '308282':'VBF125 - H2000',                                                                  
+                      '308283':'VBF125 - H3000',}
 
     bkg_wewk =     {'308096':'TBD',
                     '308097':'TBD',
@@ -405,7 +415,7 @@ def prepareBkgRuns(keys,options=None):
     bkg_wqcd.update(bkg_wqcd_tnu)
     bkg_zewk =     {'308092':'TBD',
                     '308093':'TBD',                        
-                    '308094':'TBD',                        
+                    '308094':'TBD',
                     '308095':'TBD',                        
                     '363355':'TBD',                        
                     '363356':'TBD',                        
@@ -486,7 +496,8 @@ def prepareBkgRuns(keys,options=None):
         }
     bkg_top2 = {
         '410470':'ttbar(w/oFullHad)',
-        '410471':'ttbar(w/FullHad)',        
+        '410471':'ttbar(w/FullHad)',
+        '410472':'ttbar(w/dil)',                
         }
     bkg_top1 = {
         '410011':'tchan_top',
@@ -650,14 +661,14 @@ def prepareBkgRuns(keys,options=None):
                       '301028':'BTD',
                       '301029':'BTD',
                       '301030':'BTD',                      
-                      '301031':'BTD',                      
+                      '301031':'BTD',
                       '301032':'BTD',                      
                       '301033':'BTD',                      
-                      '301034':'BTD',                      
-                      '301035':'BTD',                      
-                      '301036':'BTD',                      
-                      '301037':'BTD',                      
-                      '301038':'BTD',                      
+                      '301034':'BTD',
+                      '301035':'BTD',
+                      '301036':'BTD',
+                      '301037':'BTD',
+                      '301038':'BTD',
                           }
 
     bkg_qcdunw = {'426001':'JZ1',
@@ -670,7 +681,18 @@ def prepareBkgRuns(keys,options=None):
                     '426008':'JZ8',
                     '426009':'JZ9',
                     }
-    bkg_qcdw = { 
+    bkg_qcdw = {
+                   '310502':'powerlaw',
+                   '304784':'powerlaw',                   
+                   '361020':'JZ0W',
+                   '361021':'JZ1W',                   
+                   '361022':'JZ2W',
+                   '361023':'JZ3W',
+                   '361024':'JZ4W',
+                   '361025':'JZ5W',
+                   '361026':'JZ6W',
+                   '361027':'JZ7W',
+                   '361028':'JZ8W',
                    '361029':'JZ9W',
                    '361030':'JZ10W',
                    '361031':'JZ11W',
@@ -717,7 +739,8 @@ def prepareBkgRuns(keys,options=None):
 
     bkg_keys = {
                 'hvh':sig_VH125,
-                #'whww':sig_VH125v2,                
+                #'whww':sig_VH125v2,
+                'whww':alt_VBF,
                 'hggf':sig_ggF125,
                 'hvbf':sig_VBF125,
                 'wewk':bkg_wewk,

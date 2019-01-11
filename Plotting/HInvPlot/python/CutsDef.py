@@ -143,6 +143,7 @@ def getVBFCuts(isLep=False):
     cuts += [CutItem('CutDEtajj','jj_deta > 4.0')]
     #cuts += [CutItem('CutDEtajjV','jj_deta > 2.5')]
     cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
+    #cuts += [CutItem('CutMjjv2','jj_mass < 1500.0')]    
     
     return cuts
 

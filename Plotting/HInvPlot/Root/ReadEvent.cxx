@@ -879,6 +879,23 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       }
     }
 
+    // extra jets - computing the dPhi
+    float met_tst_j3_dphi=-999.0;
+    float max_j3_dr = -999.0;
+    if(event->jets.size()>1){
+      const TLorentzVector j1v = event->jets.at(0).GetLVec();
+      const TLorentzVector j2v = event->jets.at(1).GetLVec();      
+      for(unsigned iJ=2; iJ<event->jets.size(); ++iJ){
+	const TLorentzVector j3v = event->jets.at(iJ).GetLVec();
+	if(met_tst_j3_dphi<fabs(event->met.DeltaPhi(j3v)))
+	  met_tst_j3_dphi=fabs(event->met.DeltaPhi(j3v));
+	float tmp_max_j3_dr = std::min(j1v.DeltaR(j3v), j2v.DeltaR(j3v));
+	if(max_j3_dr<tmp_max_j3_dr) max_j3_dr = tmp_max_j3_dr;
+      }
+    }
+    event->RepVar(Mva::met_tst_j3_dphi, met_tst_j3_dphi);
+    event->RepVar(Mva::max_j3_dr, max_j3_dr);
+    
     //
     // Checking the truth filtering
     //
@@ -921,6 +938,13 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Fill remaining variables
     FillEvent(*event);
 
+    // decode trigger_lep
+    int trigger_lep = event->GetVar(Mva::trigger_lep);
+    int trigger_lep_new = (trigger_lep&0x1) ? 1 : 0;
+    if(trigger_lep_new==0 && (trigger_lep&0x10)==0x10) trigger_lep_new = 2;
+    if(trigger_lep_new==0 && (trigger_lep&0x100)==0x100) trigger_lep_new = 3;    
+    event->RepVar(Mva::trigger_lep, trigger_lep_new);
+    
     // Change the leptons to base leptons - after filling the event
     if(fLooseLepZ) ChangeLep(*event);    
 
