@@ -18,7 +18,7 @@ print 'Collecting your files!'
 sys.stdout.flush()
 
 fout = ROOT.TFile(args.output,"RECREATE")
-h_total = ROOT.TH1F("h_total","",1,0,1)
+h_total = ROOT.TH1D("h_total","",1,0,1)
 if args.pickle==None:
     print 'not a pickle'
     fdir_list = open(args.filelist,'r')
