@@ -61,7 +61,7 @@ class sample(object):
                 self.sampleType = "Z_strong_VBFFilt"
             elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515):
                 self.sampleType = "Z_strong"
-            elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471)):
+            elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)):
                 self.sampleType = "ttbar"
             elif ((self.runNumber == 308276) or (self.runNumber == 308567)):
                 self.sampleType = "VBFH125"
@@ -69,7 +69,7 @@ class sample(object):
                 self.sampleType = "ggFH125"
             elif ((self.runNumber == 308071) or (self.runNumber == 308072)):
                 self.sampleType = "VH125"
-            elif (self.runNumber >= 361020 and self.runNumber <= 361032):
+            elif (self.runNumber >= 361020 and self.runNumber <= 361032) or self.runNumber==310502 or self.runNumber==304784:
                 self.sampleType = "QCDw"
             elif (self.runNumber >= 426001 and self.runNumber <= 426009):
                 self.sampleType = "QCDunw"
@@ -114,6 +114,6 @@ class sample(object):
   # Zmumu:   strong 364100-364113, EWK 308093                                                                                                                                                                     
   # Ztautau: strong 364128-364141, EWK 308094                                                                                                                                                                     
   # Znunu:   strong 364142-364155, EWK 308095                                                                                                                                                                     
-  # SingleTop: 410011-410014,410025,410026,ttbar:410470,410471                                                                                                                                                    
+  # SingleTop: 410011-410014,410025,410026,ttbar:410470,410471,410472
   # Other higgs: 308275-308283                                                                                                                                                                                    
   #                                                                         

@@ -38,7 +38,9 @@ StatusCode VBFAnalysisAlg::initialize() {
 
   if(m_isMC){
     std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+    //xSecFilePath = "/home/schae/testarea/HInv/source/VBFAnalysis/data/PMGxsecDB_mc16.txt";
     xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
+    std::cout << "Cross section: " << xSecFilePath << std::endl;
     my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
     // if( (runNumber == 308567 || runNumber == 308276 ) ){
     //   if(truthHiggs_pt->size() > 0) w_VBFhiggs =  -0.000342 * truthHiggs_pt->at(0)/GeV - 0.0708;
@@ -100,6 +102,12 @@ StatusCode VBFAnalysisAlg::initialize() {
   jet_passJvt= new std::vector<int>(0);
   jet_PartonTruthLabelID = new std::vector<int>(0); 
   jet_ConeTruthLabelID = new std::vector<int>(0); 
+  jet_NTracks = new std::vector<float>(0);
+  jet_SumPtTracks = new std::vector<float>(0);
+  jet_TrackWidth = new std::vector<float>(0);
+  jet_HECFrac = new std::vector<float>(0);
+  jet_EMFrac = new std::vector<float>(0);
+  jet_fch = new std::vector<float>(0);
 
   truth_jet_pt= new std::vector<float>(0);
   truth_jet_eta= new std::vector<float>(0);
@@ -158,11 +166,12 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("met_tst_j2_dphi",&met_tst_j2_dphi);
   m_tree_out->Branch("met_tst_nolep_j1_dphi",&met_tst_nolep_j1_dphi);
   m_tree_out->Branch("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);
-  m_tree_out->Branch("met_cst_jet",&met_cst_jet);
   m_tree_out->Branch("met_tst_et",&met_tst_et);
   m_tree_out->Branch("met_tst_nolep_et",&met_tst_nolep_et);
   m_tree_out->Branch("met_tst_phi",&met_tst_phi);
   m_tree_out->Branch("met_tst_nolep_phi",&met_tst_nolep_phi);
+  m_tree_out->Branch("met_cst_jet",&met_cst_jet);
+  m_tree_out->Branch("met_soft_tst_et",        &met_soft_tst_et);
   m_tree_out->Branch("mu_charge",&mu_charge);
   m_tree_out->Branch("mu_pt",&mu_pt);
   m_tree_out->Branch("el_charge",&el_charge);
@@ -178,6 +187,10 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("jet_m",&jet_m);
   m_tree_out->Branch("jet_jvt",&jet_jvt);
   m_tree_out->Branch("met_significance",&met_significance);
+  m_tree_out->Branch("max_mj_over_mjj",&max_mj_over_mjj);
+  m_tree_out->Branch("maxCentrality",&maxCentrality);
+  m_tree_out->Branch("n_baseel",&n_baseel);
+  m_tree_out->Branch("n_basemu",&n_basemu);
 
   if(m_contLep){
     m_tree_out->Branch("contmu_pt",           &contmu_pt);
@@ -201,6 +214,14 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("j3_min_mj_over_mjj",&j3_min_mj_over_mjj);
     m_tree_out->Branch("mj34",&mj34);
     m_tree_out->Branch("max_j_eta",&max_j_eta);
+    if(m_QGTagger){
+      m_tree_out->Branch("jet_NTracks",&jet_NTracks);
+      m_tree_out->Branch("jet_SumPtTracks",&jet_SumPtTracks);
+      m_tree_out->Branch("jet_TrackWidth",&jet_TrackWidth);
+      m_tree_out->Branch("jet_HECFrac",&jet_HECFrac);
+      m_tree_out->Branch("jet_EMFrac",&jet_EMFrac);
+      m_tree_out->Branch("jet_fch",&jet_fch);
+    }
     if(m_isMC) m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
     if(m_isMC) m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
 
@@ -228,19 +249,23 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("tau_phi",&outtau_phi);
     m_tree_out->Branch("tau_eta",&outtau_eta);
 
-    m_tree_out->Branch("met_soft_tst_et",        &met_soft_tst_et);
     m_tree_out->Branch("met_soft_tst_phi",       &met_soft_tst_phi);
     m_tree_out->Branch("met_soft_tst_sumet",     &met_soft_tst_sumet);
     m_tree_out->Branch("met_tenacious_tst_et",   &met_tenacious_tst_et);
     m_tree_out->Branch("met_tenacious_tst_phi",  &met_tenacious_tst_phi);
+
+    m_tree_out->Branch("met_tenacious_tst_j1_dphi",&met_tenacious_tst_j1_dphi);
+    m_tree_out->Branch("met_tenacious_tst_j2_dphi",&met_tenacious_tst_j2_dphi);
+    m_tree_out->Branch("met_tenacious_tst_nolep_j1_dphi",&met_tenacious_tst_nolep_j1_dphi);
+    m_tree_out->Branch("met_tenacious_tst_nolep_j2_dphi",&met_tenacious_tst_nolep_j2_dphi);
+    m_tree_out->Branch("met_tenacious_tst_nolep_et",&met_tenacious_tst_nolep_et);
+    m_tree_out->Branch("met_tenacious_tst_nolep_phi",&met_tenacious_tst_nolep_phi);
+
     m_tree_out->Branch("met_tight_tst_et",       &met_tight_tst_et);
     m_tree_out->Branch("met_tight_tst_phi",      &met_tight_tst_phi);
     m_tree_out->Branch("met_tighter_tst_et",     &met_tighter_tst_et);
     m_tree_out->Branch("met_tighter_tst_phi",    &met_tighter_tst_phi);
     m_tree_out->Branch("metsig_tst",             &metsig_tst);
-
-    m_tree_out->Branch("n_baseel",&n_baseel);
-    m_tree_out->Branch("n_basemu",&n_basemu);
 
     if(m_currentVariation=="Nominal" && m_isMC){
       m_tree_out->Branch("truth_tau_pt", &truth_tau_pt);
@@ -292,13 +317,13 @@ StatusCode VBFAnalysisAlg::finalize() {
 StatusCode VBFAnalysisAlg::MapNgen(){
   TFile *f = TFile::Open(m_normFile.c_str(),"READ");
   if(!f or f->IsZombie()) std::cout << "ERROR normFile. Could not open " << m_normFile << std::endl;
-  h_Gen = (TH1F*) f->Get("h_total");
+  h_Gen = (TH1D*) f->Get("h_total");
   if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
 
   for(int i=1; i<=h_Gen->GetNbinsX();i++){
     TString tmp = h_Gen->GetXaxis()->GetBinLabel(i);
     int dsid = tmp.Atoi(); 
-    float N = h_Gen->GetBinContent(i); 
+    double N = h_Gen->GetBinContent(i); 
     Ngen[dsid]=N; 
     //std::cout << "input: " << dsid << " " << N << std::endl;
    }
@@ -327,7 +352,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   // initialize to 1
-  for(std::map<TString,Float_t>::iterator it=tMapFloatW.begin(); it!=tMapFloatW.end(); ++it)
+  for(std::map<TString,Double_t>::iterator it=tMapFloatW.begin(); it!=tMapFloatW.end(); ++it)
     it->second=1.0;
 
   npevents++;
@@ -367,7 +392,19 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   if (m_isMC){
+    // hack for when the cross-section code messed up
+    //if(runNumber==410011) crossSection =  43.739*1.00944237408;
+    //else if (runNumber==410012)  crossSection =  25.778*1.01931879898;
+    //else if (runNumber==410013)  crossSection =  34.009*1.054;
+    //else if (runNumber==410014)  crossSection =  33.989*1.054;
+    //else if (runNumber==410025)  crossSection =  2.0514*1.00478210003;
+    //else if (runNumber==410026)  crossSection =  1.2615*1.02153151011;
+    //else if (runNumber==410470)  crossSection =  729.77*0.54384*1.13975636159;
+    //else if (runNumber==410471)  crossSection =  729.78*0.45627*1.13974074379;
+    //else if (runNumber==410472)  crossSection =  729.77*0.10546*1.13975636159;
+    //else 
     crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
+    //std::cout << "crossSection: " << crossSection << std::endl;
     if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
     else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 
     ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
@@ -386,7 +423,7 @@ StatusCode VBFAnalysisAlg::execute() {
   outtau_pt->clear();
   outtau_eta->clear();
   outtau_phi->clear();
-  if(m_extraVars){
+  if(m_extraVars || true){
     if(baseel_pt){
       for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
 	if(baseel_pt->at(iEle)>4.5e3) ++n_baseel;
@@ -459,12 +496,13 @@ StatusCode VBFAnalysisAlg::execute() {
       }// end tau loop
     }// end tau overlap removal
   }// end extra variables
-
   // fill extra jet variables for 3rd jets
-  if(m_extraVars){
+  if(m_extraVars && jet_pt){
+    maxCentrality=0;
+    max_mj_over_mjj=0.0;
     mj34=-9999.0;
     max_j_eta= fabs(jet_eta->at(0));
-    if(fabs(jet_eta->at(1))>max_j_eta) max_j_eta= fabs(jet_eta->at(1));
+    if(jet_eta->size()>1 && fabs(jet_eta->at(1))>max_j_eta) max_j_eta= fabs(jet_eta->at(1));
     j3_centrality->clear();
     j3_dRj1->clear();
     j3_dRj2->clear();
@@ -490,6 +528,8 @@ StatusCode VBFAnalysisAlg::execute() {
 	j3_min_mj_over_mjj->push_back(std::min(mj1,mj2)/jj_mass);
 	float centrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(jet_eta->at(iJet) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
 	j3_centrality->push_back(centrality);
+	if(maxCentrality<centrality) maxCentrality=centrality;
+	if(max_mj_over_mjj<j3_min_mj_over_mjj->at(iJet-2)) max_mj_over_mjj=j3_min_mj_over_mjj->at(iJet-2);
       }
       if(jet_pt->size()>3){
 	j3v.SetPtEtaPhiM(jet_pt->at(2), jet_eta->at(2), jet_phi->at(2), jet_m->at(2));
@@ -540,23 +580,23 @@ StatusCode VBFAnalysisAlg::execute() {
     if ((trigger_met == 1) & (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut || met_tighter_tst_et > METCut) & (n_el == 0) & (n_mu == 0)) SR = true;
   }
   if (SR) ATH_MSG_DEBUG ("It's SR!"); else ATH_MSG_DEBUG ("It's NOT SR");
-  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
   if (CRWep) ATH_MSG_DEBUG ("It's CRWep!"); else ATH_MSG_DEBUG ("It's NOT CRWep");
-  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
   if (CRWen) ATH_MSG_DEBUG ("It's CRWen!"); else ATH_MSG_DEBUG ("It's NOT CRWen");
-  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
   if (CRWepLowSig) ATH_MSG_DEBUG ("It's CRWepLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWepLowSig");
-  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
   if (CRWenLowSig) ATH_MSG_DEBUG ("It's CRWenLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWenLowSig");
-  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
   if (CRWmp) ATH_MSG_DEBUG ("It's CRWmp!"); else ATH_MSG_DEBUG ("It's NOT CRWmp");
-  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
   if (CRWmn) ATH_MSG_DEBUG ("It's CRWmn!"); else ATH_MSG_DEBUG ("It's NOT CRWmn");
-  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
   if (CRZee) ATH_MSG_DEBUG ("It's CRZee!"); else ATH_MSG_DEBUG ("It's NOT CRZee");
-  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
   if (CRZmm) ATH_MSG_DEBUG ("It's CRZmm!"); else ATH_MSG_DEBUG ("It's NOT CRZmm");
-  if ((trigger_lep == 1) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt");
 
   w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight;
@@ -571,7 +611,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_elSFTrigWeight = elSFTrigWeight;
   float tmp_muSFTrigWeight = muSFTrigWeight;
 
-  for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
+  for(std::map<TString,Double_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
     tmp_puWeight = puWeight;	    
     tmp_jvtSFWeight = jvtSFWeight;	    
@@ -692,6 +732,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_timing",1);
   m_tree->SetBranchStatus("jet_PartonTruthLabelID",1);
   m_tree->SetBranchStatus("jet_ConeTruthLabelID",1);
+  if(m_QGTagger){
+    m_tree->SetBranchStatus("jet_NTracks",1);
+    m_tree->SetBranchStatus("jet_SumPtTracks",1);
+    m_tree->SetBranchStatus("jet_TrackWidth",1);
+    m_tree->SetBranchStatus("jet_HECFrac",1);
+    m_tree->SetBranchStatus("jet_EMFrac",1);
+    m_tree->SetBranchStatus("jet_fch",1);
+  }
 
   if(m_extraVars){
     m_tree->SetBranchStatus("n_bjet",1);
@@ -818,7 +866,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
   m_tree->SetBranchAddress("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
   //if(foundGenMET) m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);
-  
+  if(m_QGTagger){
+    m_tree->SetBranchAddress("jet_NTracks",&jet_NTracks);
+    m_tree->SetBranchAddress("jet_SumPtTracks",&jet_SumPtTracks);
+    m_tree->SetBranchAddress("jet_TrackWidth",&jet_TrackWidth);
+    m_tree->SetBranchAddress("jet_HECFrac",&jet_HECFrac);
+    m_tree->SetBranchAddress("jet_EMFrac",&jet_EMFrac);
+    m_tree->SetBranchAddress("jet_fch",&jet_fch);
+  }
   if(m_currentVariation=="Nominal" && m_isMC){
     m_tree->SetBranchAddress("truth_jet_pt", &truth_jet_pt);
     m_tree->SetBranchAddress("truth_jet_phi",&truth_jet_phi);

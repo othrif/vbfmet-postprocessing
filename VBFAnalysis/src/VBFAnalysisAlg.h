@@ -53,6 +53,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool m_LooseSkim = true;
   bool m_extraVars = true;
   bool m_contLep   = false;
+  bool m_QGTagger   = true;
   TTree *m_tree = 0;
   TTree *m_tree_out = 0;
   SUSY::CrossSectionDB *my_XsecDB; 
@@ -60,13 +61,13 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TString m_treeName = "MiniNtuple";
   TString outputFileName = "ntuple";
 
-  TH1F *h_Gen; 
-  std::map<int,float> Ngen; 
+  TH1D *h_Gen; 
+  std::map<int,double> Ngen; 
 
   //Maps for types of Tree things 
   std::map<TString, int>   tMapInt; 
-  std::map<TString, float> tMapFloat;
-  std::map<TString, float> tMapFloatW;
+  std::map<TString, double> tMapFloat;
+  std::map<TString, double> tMapFloatW;
 
    //Example algorithm property, see constructor for declaration:
    //int m_nProperty = 0;
@@ -86,7 +87,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::string m_mcCampaign;
 
   Float_t crossSection;
-  Float_t weight;
+  Double_t weight;
   Float_t w;
   Float_t met_significance;
   Int_t trigger_met;
@@ -130,7 +131,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tst_nolep_et;
   Float_t met_tst_phi;
   Float_t met_tst_nolep_phi;
-
+  Float_t max_mj_over_mjj;
+  Float_t maxCentrality;
+  // to fill min_mj_over_mjj,minCentrality,met_tenacious_tst_j1_dphi,met_tenacious_tst_j2_dphi
+  //met_tenacious_tst_nolep_j1_dphi,met_tenacious_tst_nolep_j2_dphi,met_tenacious_tst_nolep_et,
+  //met_tenacious_tst_nolep_phi
   // extra vars
   Int_t   n_baseel=0;
   Int_t   n_basemu=0;
@@ -139,6 +144,12 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_soft_tst_sumet=-9999;
   Float_t met_tenacious_tst_et=-9999;
   Float_t met_tenacious_tst_phi=-9999;
+  Float_t met_tenacious_tst_j1_dphi=-9999;
+  Float_t met_tenacious_tst_j2_dphi=-9999;
+  Float_t met_tenacious_tst_nolep_j1_dphi=-9999;
+  Float_t met_tenacious_tst_nolep_j2_dphi=-9999;
+  Float_t met_tenacious_tst_nolep_et=-9999;
+  Float_t met_tenacious_tst_nolep_phi=-9999;
   Float_t met_tighter_tst_et=-9999;
   Float_t met_tighter_tst_phi=-9999;
   Float_t met_tight_tst_et=-9999;
@@ -206,6 +217,12 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Int_t>* jet_passJvt;
   std::vector<Int_t>* jet_PartonTruthLabelID;
   std::vector<Int_t>* jet_ConeTruthLabelID;
+  std::vector<Float_t>* jet_NTracks;
+  std::vector<Float_t>* jet_SumPtTracks;
+  std::vector<Float_t>* jet_TrackWidth;
+  std::vector<Float_t>* jet_HECFrac;
+  std::vector<Float_t>* jet_EMFrac;
+  std::vector<Float_t>* jet_fch;
 
   std::vector<Float_t>* truth_jet_pt;
   std::vector<Float_t>* truth_jet_eta;
