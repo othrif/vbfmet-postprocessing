@@ -99,6 +99,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t puWeight;
   Float_t jvtSFWeight;
   Float_t fjvtSFWeight;
+  Float_t elANTISF;
   Float_t elSFWeight;
   Float_t muSFWeight;
   Float_t elSFTrigWeight;
