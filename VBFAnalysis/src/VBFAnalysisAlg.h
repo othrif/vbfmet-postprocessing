@@ -99,7 +99,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t puWeight;
   Float_t jvtSFWeight;
   Float_t fjvtSFWeight;
-  Float_t elANTISF;
+  Float_t eleANTISF;
   Float_t elSFWeight;
   Float_t muSFWeight;
   Float_t elSFTrigWeight;
@@ -187,7 +187,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* basemu_eta;
   std::vector<Float_t>* basemu_phi;
   std::vector<Float_t>* basemu_z0;
+  std::vector<Float_t>* basemu_d0sig;
   std::vector<Float_t>* basemu_ptvarcone20;
+  std::vector<Float_t>* basemu_ptvarcone30;
+  std::vector<Float_t>* basemu_topoetcone20;
+  std::vector<Float_t>* basemu_topoetcone30;
   std::vector<Int_t>* basemu_type;
   std::vector<Int_t>* basemu_truthType;
   std::vector<Int_t>* basemu_truthOrigin;
@@ -196,7 +200,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* baseel_eta;
   std::vector<Float_t>* baseel_phi;
   std::vector<Float_t>* baseel_z0;
+  std::vector<Float_t>* baseel_d0sig;
   std::vector<Float_t>* baseel_ptvarcone20;
+  std::vector<Float_t>* baseel_ptvarcone30;
+  std::vector<Float_t>* baseel_topoetcone20;
+  std::vector<Float_t>* baseel_topoetcone30;
   std::vector<Int_t>* baseel_truthType;
   std::vector<Int_t>* baseel_truthOrigin;
 

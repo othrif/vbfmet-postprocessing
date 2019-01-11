@@ -71,7 +71,11 @@ StatusCode VBFAnalysisAlg::initialize() {
   basemu_eta= new std::vector<float>(0);
   basemu_phi= new std::vector<float>(0);
   basemu_z0= new std::vector<float>(0);
+  basemu_d0sig= new std::vector<float>(0);
   basemu_ptvarcone20= new std::vector<float>(0);
+  basemu_ptvarcone30= new std::vector<float>(0);
+  basemu_topoetcone20= new std::vector<float>(0);
+  basemu_topoetcone30= new std::vector<float>(0);
   basemu_type= new std::vector<int>(0);
   basemu_truthType= new std::vector<int>(0);
   basemu_truthOrigin= new std::vector<int>(0);
@@ -80,7 +84,11 @@ StatusCode VBFAnalysisAlg::initialize() {
   baseel_eta= new std::vector<float>(0);
   baseel_phi= new std::vector<float>(0);
   baseel_z0= new std::vector<float>(0);
+  baseel_d0sig= new std::vector<float>(0);
   baseel_ptvarcone20= new std::vector<float>(0);
+  baseel_ptvarcone30= new std::vector<float>(0);
+  baseel_topoetcone20= new std::vector<float>(0);
+  baseel_topoetcone30= new std::vector<float>(0);
   baseel_truthType= new std::vector<int>(0);
   baseel_truthOrigin= new std::vector<int>(0);
 
@@ -230,7 +238,11 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("basemu_eta",          &basemu_eta);
     m_tree_out->Branch("basemu_phi",          &basemu_phi);
     m_tree_out->Branch("basemu_z0",           &basemu_z0);
+    m_tree_out->Branch("basemu_d0sig",           &basemu_d0sig);
     m_tree_out->Branch("basemu_ptvarcone20",  &basemu_ptvarcone20);
+    m_tree_out->Branch("basemu_ptvarcone30",  &basemu_ptvarcone30);
+    m_tree_out->Branch("basemu_topoetcone20",  &basemu_topoetcone20);
+    m_tree_out->Branch("basemu_topoetcone30",  &basemu_topoetcone30);
     m_tree_out->Branch("basemu_type",         &basemu_type);
     if(m_isMC) m_tree_out->Branch("basemu_truthOrigin",  &basemu_truthOrigin);
     if(m_isMC) m_tree_out->Branch("basemu_truthType",    &basemu_truthType);
@@ -238,7 +250,11 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("baseel_eta",          &baseel_eta);
     m_tree_out->Branch("baseel_phi",          &baseel_phi);
     m_tree_out->Branch("baseel_z0",           &baseel_z0);
+    m_tree_out->Branch("baseel_d0sig",        &baseel_d0sig);
     m_tree_out->Branch("baseel_ptvarcone20",  &baseel_ptvarcone20);
+    m_tree_out->Branch("baseel_ptvarcone30",  &baseel_ptvarcone30);
+    m_tree_out->Branch("baseel_topoetcone20",  &baseel_topoetcone20);
+    m_tree_out->Branch("baseel_topoetcone30",  &baseel_topoetcone30);
     if(m_isMC) m_tree_out->Branch("baseel_truthOrigin",  &baseel_truthOrigin);
     if(m_isMC) m_tree_out->Branch("baseel_truthType",    &baseel_truthType);
 
@@ -599,7 +615,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt");
 
-  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*elANTISF;
+  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF;
   //
   /// compute the systematics weights
   //
@@ -610,7 +626,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_muSFWeight = muSFWeight;
   float tmp_elSFTrigWeight = elSFTrigWeight;
   float tmp_muSFTrigWeight = muSFTrigWeight;
-  float tmp_elANTISF = elANTISF;
+  float tmp_eleANTISF = eleANTISF;
 
   for(std::map<TString,Double_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
@@ -621,7 +637,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_muSFWeight = muSFWeight;	    
     tmp_elSFTrigWeight = elSFTrigWeight;
     tmp_muSFTrigWeight = muSFTrigWeight;
-    tmp_elANTISF = elANTISF;
+    tmp_eleANTISF = eleANTISF;
 
     if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
@@ -630,12 +646,12 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
-    else if(it->first.Contains("elANTISF"))       tmp_elANTISF=tMapFloat[it->first];
+    else if(it->first.Contains("eleANTISF"))       tmp_eleANTISF=tMapFloat[it->first];
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_elANTISF;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF;
   }//end systematic weight loop
 
-  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " elANTISF: " << elANTISF);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt)) return StatusCode::SUCCESS;
 
@@ -691,7 +707,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("puWeight", 1);
   m_tree->SetBranchStatus("jvtSFWeight", 1);
   m_tree->SetBranchStatus("fjvtSFWeight", 1);
-  m_tree->SetBranchStatus("elANTISF", 1);
+  m_tree->SetBranchStatus("eleANTISF", 1);
   m_tree->SetBranchStatus("elSFWeight", 1);
   m_tree->SetBranchStatus("muSFWeight", 1);
   m_tree->SetBranchStatus("elSFTrigWeight", 1);
@@ -760,7 +776,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("basemu_eta",1);
     m_tree->SetBranchStatus("basemu_phi",1);
     m_tree->SetBranchStatus("basemu_z0",1);
+    m_tree->SetBranchStatus("basemu_d0sig",1);
     m_tree->SetBranchStatus("basemu_ptvarcone20",1);
+    m_tree->SetBranchStatus("basemu_ptvarcone30",1);
+    m_tree->SetBranchStatus("basemu_topoetcone20",1);
+    m_tree->SetBranchStatus("basemu_topoetcone30",1);
     m_tree->SetBranchStatus("basemu_type",1);
     if(m_isMC) m_tree->SetBranchStatus("basemu_truthOrigin",1);
     if(m_isMC) m_tree->SetBranchStatus("basemu_truthType",1);
@@ -768,7 +788,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("baseel_eta",1);
     m_tree->SetBranchStatus("baseel_phi",1);
     m_tree->SetBranchStatus("baseel_z0",1);
+    m_tree->SetBranchStatus("baseel_d0sig",1);
     m_tree->SetBranchStatus("baseel_ptvarcone20",1);
+    m_tree->SetBranchStatus("baseel_ptvarcone30",1);
+    m_tree->SetBranchStatus("baseel_topoetcone20",1);
+    m_tree->SetBranchStatus("baseel_topoetcone30",1);
     if(m_isMC) m_tree->SetBranchStatus("baseel_truthOrigin",1);
     if(m_isMC) m_tree->SetBranchStatus("baseel_truthType",1);
     m_tree->SetBranchStatus("met_soft_tst_et",1);
@@ -825,7 +849,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("puWeight", &puWeight);
   m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);
   m_tree->SetBranchAddress("fjvtSFWeight", &fjvtSFWeight);
-  m_tree->SetBranchAddress("elANTISF", &elANTISF);
+  m_tree->SetBranchAddress("eleANTISF", &eleANTISF);
   m_tree->SetBranchAddress("elSFWeight", &elSFWeight);
   m_tree->SetBranchAddress("muSFWeight", &muSFWeight);
   m_tree->SetBranchAddress("elSFTrigWeight", &elSFTrigWeight);
@@ -908,7 +932,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("basemu_eta",          &basemu_eta);
     m_tree->SetBranchAddress("basemu_phi",          &basemu_phi);
     m_tree->SetBranchAddress("basemu_z0",           &basemu_z0);
+    m_tree->SetBranchAddress("basemu_d0sig",        &basemu_d0sig);
     m_tree->SetBranchAddress("basemu_ptvarcone20",  &basemu_ptvarcone20);
+    m_tree->SetBranchAddress("basemu_ptvarcone30",  &basemu_ptvarcone30);
+    m_tree->SetBranchAddress("basemu_topoetcone20",  &basemu_topoetcone20);
+    m_tree->SetBranchAddress("basemu_topoetcone30",  &basemu_topoetcone30);
     m_tree->SetBranchAddress("basemu_type",         &basemu_type);
     if(m_isMC) m_tree->SetBranchAddress("basemu_truthOrigin",  &basemu_truthOrigin);
     if(m_isMC) m_tree->SetBranchAddress("basemu_truthType",    &basemu_truthType);
@@ -916,7 +944,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("baseel_eta",          &baseel_eta);
     m_tree->SetBranchAddress("baseel_phi",          &baseel_phi);
     m_tree->SetBranchAddress("baseel_z0",           &baseel_z0);
+    m_tree->SetBranchAddress("baseel_d0sig",           &baseel_d0sig);
     m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
+    m_tree->SetBranchAddress("baseel_ptvarcone30",  &baseel_ptvarcone30);
+    m_tree->SetBranchAddress("baseel_topoetcone20",  &baseel_topoetcone20);
+    m_tree->SetBranchAddress("baseel_topoetcone30",  &baseel_topoetcone30);
     if(m_isMC) m_tree->SetBranchAddress("baseel_truthOrigin",  &baseel_truthOrigin);
     if(m_isMC) m_tree->SetBranchAddress("baseel_truthType",    &baseel_truthType);
     
