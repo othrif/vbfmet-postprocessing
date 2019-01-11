@@ -84,6 +84,7 @@ namespace Msl
       n_truth_tau,
       met_tst_j1_dphi,
       met_tst_j2_dphi,
+      met_tst_j3_dphi,      
       met_tst_nolep_j1_dphi,
       met_tst_nolep_j2_dphi,
       met_tenacious_tst_j1_dphi,
@@ -125,6 +126,7 @@ namespace Msl
       phcentrality,
       maxmj3_over_mjj,
       avgmj3_over_mjj,
+      max_j3_dr,
       Mtt,phPt,phEta, met_tst_ph_dphi
     };
 
