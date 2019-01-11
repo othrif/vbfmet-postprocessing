@@ -599,7 +599,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt");
 
-  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight;
+  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*elANTISF;
   //
   /// compute the systematics weights
   //
@@ -610,6 +610,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_muSFWeight = muSFWeight;
   float tmp_elSFTrigWeight = elSFTrigWeight;
   float tmp_muSFTrigWeight = muSFTrigWeight;
+  float tmp_elANTISF = elANTISF;
 
   for(std::map<TString,Double_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
@@ -620,6 +621,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_muSFWeight = muSFWeight;	    
     tmp_elSFTrigWeight = elSFTrigWeight;
     tmp_muSFTrigWeight = muSFTrigWeight;
+    tmp_elANTISF = elANTISF;
 
     if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
@@ -628,11 +630,12 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
+    else if(it->first.Contains("elANTISF"))       tmp_elANTISF=tMapFloat[it->first];
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_elANTISF;
   }//end systematic weight loop
 
-  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " elANTISF: " << elANTISF);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt)) return StatusCode::SUCCESS;
 
@@ -688,6 +691,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("puWeight", 1);
   m_tree->SetBranchStatus("jvtSFWeight", 1);
   m_tree->SetBranchStatus("fjvtSFWeight", 1);
+  m_tree->SetBranchStatus("elANTISF", 1);
   m_tree->SetBranchStatus("elSFWeight", 1);
   m_tree->SetBranchStatus("muSFWeight", 1);
   m_tree->SetBranchStatus("elSFTrigWeight", 1);
@@ -821,6 +825,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("puWeight", &puWeight);
   m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);
   m_tree->SetBranchAddress("fjvtSFWeight", &fjvtSFWeight);
+  m_tree->SetBranchAddress("elANTISF", &elANTISF);
   m_tree->SetBranchAddress("elSFWeight", &elSFWeight);
   m_tree->SetBranchAddress("muSFWeight", &muSFWeight);
   m_tree->SetBranchAddress("elSFTrigWeight", &elSFTrigWeight);
