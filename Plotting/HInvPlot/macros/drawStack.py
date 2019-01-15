@@ -56,7 +56,12 @@ p.add_option('--no-underflow',  action='store_true', default=False,   dest='no_u
 p.add_option('--draw-syst',       action='store_true', default=False,   dest='draw_syst')
 p.add_option('--make-syst-table', action='store_true', default=False,   dest='make_syst_table')
 
-(options, args) = p.parse_args()  
+p.add_option('--atlas-style', dest='atlas_style_path', default="/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/")
+
+(options, args) = p.parse_args()
+
+# Make this a global variable from the argument parser.
+atlas_style_path = options.atlas_style_path
 
 import ROOT
 import HInvPlot.JobOptions as config
@@ -82,8 +87,11 @@ for key,v in mysystAsym.getsystematicsAsymMap().iteritems():
 
 #-----------------------------------------
 def Style():
-    ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasStyle.C')                   
-    ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasUtils.C')
+    if not os.path.exists(atlas_style_path):
+        print("Error: could not find ATLAS style macros at: " + atlas_style_path)
+        sys.exit(1)
+    ROOT.gROOT.LoadMacro(os.path.join(atlas_style_path, 'AtlasStyle.C'))
+    ROOT.gROOT.LoadMacro(os.path.join(atlas_style_path, 'AtlasUtils.C'))
     ROOT.SetAtlasStyle()
 
 #-------------------------------------------------------------------------
