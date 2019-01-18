@@ -146,7 +146,6 @@ StatusCode VBFAnalysisAlg::initialize() {
   tau_phi = new std::vector<float>(0);
   tau_eta = new std::vector<float>(0);
 
-
   //    if(runNumber >= 276262 && runNumber <= 284484) is2015 =true;
   //    else if(runNumber >= 296939 && runNumber <= 311481) is2016 =true;
   //    else throw std::invalid_argument("runNumber could not be identified with a dataset :o");
@@ -157,9 +156,11 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w); 
   m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight); 
+  m_tree_out->Branch("eleANTISF",&eleANTISF); 
   m_tree_out->Branch("runNumber",&runNumber);
   m_tree_out->Branch("eventNumber",&eventNumber);
   m_tree_out->Branch("trigger_met", &trigger_met);
+  if(m_extraVars) m_tree_out->Branch("trigger_met_encoded", &trigger_met_encoded);
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
   m_tree_out->Branch("n_jet",&n_jet);
@@ -580,6 +581,14 @@ StatusCode VBFAnalysisAlg::execute() {
   if (!(n_jet == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
   if (!((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < 1.8) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut))) return StatusCode::SUCCESS; // was 1e6 for mjj
   ATH_MSG_DEBUG ("Pass VBF cuts!");
+  // encoding met triggers
+  trigger_met_encoded=0;
+  if (trigger_HLT_xe100_mht_L1XE50 == 1) trigger_met_encoded+=0x1;
+  if (trigger_HLT_xe110_mht_L1XE50 == 1) trigger_met_encoded+=0x2;
+  if (trigger_HLT_xe90_mht_L1XE50 == 1)  trigger_met_encoded+=0x4;
+  if (trigger_HLT_xe70_mht == 1)         trigger_met_encoded+=0x8;
+  if (trigger_HLT_noalg_L1J400 == 1)     trigger_met_encoded+=0x10;
+
   if (trigger_HLT_xe100_mht_L1XE50 == 1 || trigger_HLT_xe110_mht_L1XE50 == 1 || trigger_HLT_xe90_mht_L1XE50 == 1) trigger_met = 1; else trigger_met = 0;
   ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
@@ -715,6 +724,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("trigger_HLT_xe100_mht_L1XE50", 1);
   m_tree->SetBranchStatus("trigger_HLT_xe110_mht_L1XE50", 1);
   m_tree->SetBranchStatus("trigger_HLT_xe90_mht_L1XE50", 1);
+  m_tree->SetBranchStatus("trigger_HLT_xe70_mht", 1);
+  m_tree->SetBranchStatus("trigger_HLT_noalg_L1J400", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
   m_tree->SetBranchStatus("passGRL", 1);
   m_tree->SetBranchStatus("passPV", 1);
@@ -857,6 +868,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("trigger_HLT_xe100_mht_L1XE50", &trigger_HLT_xe100_mht_L1XE50);
   m_tree->SetBranchAddress("trigger_HLT_xe110_mht_L1XE50", &trigger_HLT_xe110_mht_L1XE50);
   m_tree->SetBranchAddress("trigger_HLT_xe90_mht_L1XE50", &trigger_HLT_xe90_mht_L1XE50);
+  m_tree->SetBranchAddress("trigger_HLT_xe70_mht", &trigger_HLT_xe70_mht);
+  m_tree->SetBranchAddress("trigger_HLT_noalg_L1J400", &trigger_HLT_noalg_L1J400);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
   m_tree->SetBranchAddress("passGRL", &passGRL);
   m_tree->SetBranchAddress("passPV", &passPV);

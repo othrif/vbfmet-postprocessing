@@ -91,6 +91,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t w;
   Float_t met_significance;
   Int_t trigger_met;
+  Int_t trigger_met_encoded;
 
   Int_t runNumber;
   ULong64_t eventNumber;
@@ -110,6 +111,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t trigger_HLT_xe100_mht_L1XE50;
   Int_t trigger_HLT_xe110_mht_L1XE50;
   Int_t trigger_HLT_xe90_mht_L1XE50;
+  Int_t trigger_HLT_xe70_mht;
+  Int_t trigger_HLT_noalg_L1J400;
   Int_t trigger_lep;
   Int_t passGRL;
   Int_t passPV;
