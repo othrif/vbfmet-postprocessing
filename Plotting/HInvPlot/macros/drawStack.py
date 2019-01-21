@@ -74,7 +74,7 @@ if not options.wait:
     ROOT.gROOT.SetBatch(True)
 
 log = config.getLog('drawStack.py', debug=options.debug)
-mysyst = syst.systematics('JES')
+mysyst = syst.systematics('All')
 mysystOneSided = syst.systematics('OneSided')
 
 # List of plots to symmeterize
