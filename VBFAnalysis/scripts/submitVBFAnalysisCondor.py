@@ -41,7 +41,7 @@ workDir = os.getcwd()+"/"+args.submitDir
 CMTCONFIG = os.getenv('CMTCONFIG')
 buildPaths = os.getenv('CMAKE_PREFIX_PATH')
 buildPathsVec = buildPaths.split(':')
-buildDir =  buildPathsVec[0][:buildPathsVec[0].find(CMTCONFIG)].rstrip('/')
+buildDir =  buildPathsVec[0][:buildPathsVec[0].find(CMTCONFIG)-len(CMTCONFIG)].rstrip('/')
 os.system("rm -rf "+workDir)
 os.system("mkdir "+workDir)                
 
