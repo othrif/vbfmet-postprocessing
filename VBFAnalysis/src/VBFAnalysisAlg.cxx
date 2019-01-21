@@ -110,8 +110,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   jet_passJvt= new std::vector<int>(0);
   jet_PartonTruthLabelID = new std::vector<int>(0); 
   jet_ConeTruthLabelID = new std::vector<int>(0); 
-  jet_NTracks = new std::vector<float>(0);
-  jet_SumPtTracks = new std::vector<float>(0);
+  jet_NTracks = new std::vector<std::vector<unsigned short> >(0);
+  jet_SumPtTracks = new std::vector<std::vector<float> >(0);
   jet_TrackWidth = new std::vector<float>(0);
   jet_HECFrac = new std::vector<float>(0);
   jet_EMFrac = new std::vector<float>(0);
@@ -440,7 +440,7 @@ StatusCode VBFAnalysisAlg::execute() {
 	tauvec.SetPtEtaPhi(tau_pt->at(iTau),tau_eta->at(iTau),tau_phi->at(iTau));
 	if(baseel_pt){
 	  for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-	    if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25){
+	    if(baseel_pt->at(iEle)>4.5e3){
 	      tmp.SetPtEtaPhi(baseel_pt->at(iEle),baseel_eta->at(iEle),baseel_phi->at(iEle));
 	      if(tauvec.DeltaR(tmp)<0.2) passOR=false;
 	    }
@@ -448,7 +448,7 @@ StatusCode VBFAnalysisAlg::execute() {
 	}
 	if(basemu_pt){
 	  for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-	    if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25){
+	    if(basemu_pt->at(iMuo)>4.0e3){
 	      tmp.SetPtEtaPhi(basemu_pt->at(iMuo),basemu_eta->at(iMuo),basemu_phi->at(iMuo));
 	      if(tauvec.DeltaR(tmp)<0.2) passOR=false;  
 	    }
@@ -587,7 +587,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_muSFTrigWeight = muSFTrigWeight;
   float tmp_eleANTISF = eleANTISF;
 
-  for(std::map<TString,Double_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
+  for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
     tmp_puWeight = puWeight;	    
     tmp_jvtSFWeight = jvtSFWeight;	    
@@ -605,7 +605,9 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
-    else if(it->first.Contains("eleANTISF"))       tmp_eleANTISF=tMapFloat[it->first];
+    else if(it->first.Contains("eleANTISF"))      tmp_eleANTISF=tMapFloat[it->first];
+
+    ATH_MSG_DEBUG("VBFAnalysisAlg: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF);
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF;
   }//end systematic weight loop
@@ -655,7 +657,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	tMapFloatW[var_name]=-999.0;
 	m_tree_out->Branch("w"+var_name,&(tMapFloatW[var_name]));	
       }
-      m_tree->SetBranchAddress(var_name, &tMapFloat[var_name]);
+      m_tree->SetBranchStatus(var_name, 1);
+      m_tree->SetBranchAddress(var_name, &(tMapFloat[var_name]));
     }
   }
 

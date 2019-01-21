@@ -66,8 +66,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
 
   //Maps for types of Tree things 
   std::map<TString, int>   tMapInt; 
-  std::map<TString, double> tMapFloat;
-  std::map<TString, double> tMapFloatW;
+  std::map<TString, Float_t> tMapFloat;
+  std::map<TString, Double_t> tMapFloatW;
 
    //Example algorithm property, see constructor for declaration:
    //int m_nProperty = 0;
@@ -229,8 +229,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Int_t>* jet_passJvt;
   std::vector<Int_t>* jet_PartonTruthLabelID;
   std::vector<Int_t>* jet_ConeTruthLabelID;
-  std::vector<Float_t>* jet_NTracks;
-  std::vector<Float_t>* jet_SumPtTracks;
+  std::vector<std::vector<unsigned short> >* jet_NTracks;
+  std::vector<std::vector<Float_t> >* jet_SumPtTracks;
   std::vector<Float_t>* jet_TrackWidth;
   std::vector<Float_t>* jet_HECFrac;
   std::vector<Float_t>* jet_EMFrac;
