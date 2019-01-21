@@ -21,13 +21,21 @@ parser.add_argument( "-p", "--proxyName", type = str, dest = "proxyName", defaul
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
 args, unknown = parser.parse_known_args()
 
+
+systlist  = []
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:
     sys = VBFAnalysis.systematics.systematics("Nominal")
+    systlist = sys.getsystematicsList()
 else:
     sys = VBFAnalysis.systematics.systematics("All")
-systlist = sys.getsystematicsList()
-print systlist
+    sysweight = VBFAnalysis.systematics.systematics("WeightSyst")
+    systalllist = sys.getsystematicsList()
+    systweightlist = sysweight.getsystematicsList()
+    for sys in systalllist:
+        if sys not in systweightlist:
+            systlist.append(sys)
+
 list_file=None
 isFileMap=False
 if args.listSample.count('.p'):
