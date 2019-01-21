@@ -184,7 +184,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   }  
 
   // testing
-  float max_j_eta= max_j_eta= fabs(event.jets.at(0).eta);
+  float max_j_eta=fabs(event.jets.at(0).eta);
   if(event.jets.size()>1)
     if(fabs(event.jets.at(1).eta)>max_j_eta) max_j_eta= fabs(event.jets.at(1).eta);
   if(hmax_j_eta)  hmax_j_eta->Fill(max_j_eta, weight);
