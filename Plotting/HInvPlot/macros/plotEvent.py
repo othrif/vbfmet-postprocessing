@@ -173,8 +173,8 @@ def main():
 
     writeStyle='RECREATE'
     syst_list=[options.syst]
-    if options.syst=="All":
-        syst_class = systematics.systematics('All') #All
+    if options.syst=="All" or options.syst=='JES' or options.syst=='JER':
+        syst_class = systematics.systematics(options.syst) #All
         syst_list = syst_class.getsystematicsList()
     weight_syst_class = systematics.systematics('WeightSyst')
     weight_syst = weight_syst_class.getsystematicsList()
