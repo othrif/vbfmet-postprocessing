@@ -785,14 +785,14 @@ class DrawStack:
     def ReadSystFiles(self, sfiles):
         
         for syst, sfile in sfiles.iteritems():
-
+            print syst
             # check if we need to symmeterize
             DO_SYMM=False
             syst_key = copy.deepcopy(syst)
             if syst in symm_list:
                 DO_SYMM=True
-                if syst in mysystOneSided:
-                    syst_key = mysystOneSided[syst]
+                if syst in mysystOneSided.getsystematicsOneSidedMap():
+                    syst_key = mysystOneSided.getsystematicsOneSidedMap()[syst]
             
             bkg_ent = None
             
@@ -1078,8 +1078,8 @@ class DrawStack:
         
         hpars = getHistPars(self.name)
 
-        bkg.GetXaxis().SetTitle(hpars['xtitle'])        
-        bkg.GetYaxis().SetTitle(hpars['ytitle'])        
+        bkg.GetXaxis().SetTitle(hpars['xtitle'])
+        bkg.GetYaxis().SetTitle(hpars['ytitle'])
         max_bin = bkg.GetMaximum()
         # Set the systematics plots
         tmp_color=3
@@ -1089,7 +1089,7 @@ class DrawStack:
             log.info('PlotManySyst - %s: %s Mean: %0.2f RMS: %0.2f' %(self.name, systs[i], s.GetMean(), s.GetRMS()))
             s.SetLineColor(getColor(tmp_color))
             s.SetMarkerColor(getColor(tmp_color))
-            s.SetLineWidth(2)        
+            s.SetLineWidth(2)
             s.SetFillColor(0)
             s.SetFillStyle(0)
             tmp_color+=1
