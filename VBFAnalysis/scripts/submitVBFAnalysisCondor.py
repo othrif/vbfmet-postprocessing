@@ -30,13 +30,11 @@ if args.nominal:
 else:
     sys = VBFAnalysis.systematics.systematics("All")
     sysW = VBFAnalysis.systematics.systematics("WeightSyst")
-systlistA = sys.getsystematicsList()
-
-# remove the weight systematics to avoid empty ntuples. weight systematics are saved as weights
-systlist=[]
-for s in systlistA:
-    if s not in sysW.getsystematicsList():
-        systlist+=[s]
+    systlistA = sys.getsystematicsList()
+    # remove the weight systematics to avoid empty ntuples. weight systematics are saved as weights
+    for s in systlistA:
+        if s not in sysW.getsystematicsList():
+            systlist+=[s]
 
 print systlist
 list_file=None
