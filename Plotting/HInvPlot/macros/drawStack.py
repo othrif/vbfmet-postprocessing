@@ -75,14 +75,13 @@ if not options.wait:
 
 log = config.getLog('drawStack.py', debug=options.debug)
 mysyst = syst.systematics('All')
-mysystAsym = syst.systematics('Asym')
+mysystOneSided = syst.systematics('OneSided')
 
 # List of plots to symmeterize
-symm_list=[] #mysystAsym.getsystematicsList()
+symm_list=[] 
 
 #add asymetric uncertainties
-for key,v in mysystAsym.getsystematicsAsymMap().iteritems():
-    #mysyst+=[key]
+for key,v in mysystOneSided.getsystematicsOneSidedMap().iteritems():
     symm_list+=[key]
 
 #-----------------------------------------
@@ -792,8 +791,8 @@ class DrawStack:
             syst_key = copy.deepcopy(syst)
             if syst in symm_list:
                 DO_SYMM=True
-                if syst in mysystAsym:
-                    syst_key = mysystAsym[syst]
+                if syst in mysystOneSided:
+                    syst_key = mysystOneSided[syst]
             
             bkg_ent = None
             
