@@ -132,9 +132,6 @@ StatusCode VBFAnalysisAlg::initialize() {
   truth_el_eta= new std::vector<float>(0);
   truth_el_phi= new std::vector<float>(0);
 
-  outph_pt = new std::vector<float>(0);
-  outph_phi = new std::vector<float>(0);
-  outph_eta = new std::vector<float>(0);
   outtau_pt = new std::vector<float>(0);
   outtau_phi = new std::vector<float>(0);
   outtau_eta = new std::vector<float>(0);
@@ -259,9 +256,9 @@ StatusCode VBFAnalysisAlg::initialize() {
     if(m_isMC) m_tree_out->Branch("baseel_truthOrigin",  &baseel_truthOrigin);
     if(m_isMC) m_tree_out->Branch("baseel_truthType",    &baseel_truthType);
 
-    m_tree_out->Branch("ph_pt", &outph_pt);
-    m_tree_out->Branch("ph_phi",&outph_phi);
-    m_tree_out->Branch("ph_eta",&outph_eta);
+    m_tree_out->Branch("ph_pt", &ph_pt);
+    m_tree_out->Branch("ph_phi",&ph_phi);
+    m_tree_out->Branch("ph_eta",&ph_eta);
     m_tree_out->Branch("tau_pt",&outtau_pt);
     m_tree_out->Branch("tau_phi",&outtau_phi);
     m_tree_out->Branch("tau_eta",&outtau_eta);
@@ -429,57 +426,11 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   // base lepton selection
-  n_baseel=0;
-  n_basemu=0;
-  n_ph=0;
   n_tau=0;
-  outph_pt->clear();
-  outph_eta->clear();
-  outph_phi->clear();
   outtau_pt->clear();
   outtau_eta->clear();
   outtau_phi->clear();
   if(m_extraVars || true){
-    if(baseel_pt){
-      for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-	if(baseel_pt->at(iEle)>4.5e3) ++n_baseel;
-      }
-    }
-    if(basemu_pt){
-      for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-	if(basemu_pt->at(iMuo)>4.0e3) ++n_basemu;
-      }
-    }
-    // overlap remove with the photons
-    if(ph_pt){
-      TVector3 phvec,tmp;
-      for(unsigned iPh=0; iPh<ph_pt->size(); ++iPh){
-	bool passOR=true;
-	phvec.SetPtEtaPhi(ph_pt->at(iPh),ph_eta->at(iPh),ph_phi->at(iPh));
-	if(baseel_pt){
-	  for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-	    if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25){
-	      tmp.SetPtEtaPhi(baseel_pt->at(iEle),baseel_eta->at(iEle),baseel_phi->at(iEle));
-	      if(phvec.DeltaR(tmp)<0.2) passOR=false;
-	    }
-	  }
-	}
-	if(basemu_pt){
-	  for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-	    if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25){
-	      tmp.SetPtEtaPhi(basemu_pt->at(iMuo),basemu_eta->at(iMuo),basemu_phi->at(iMuo));
-	      if(phvec.DeltaR(tmp)<0.2) passOR=false;  
-	    }
-	  }
-	}// end base muon overlap
-	if(passOR){
-	  ++n_ph;
-	  outph_pt->push_back(ph_pt->at(iPh));
-	  outph_eta->push_back(ph_eta->at(iPh));
-	  outph_phi->push_back(ph_phi->at(iPh));
-	}
-      }// end photon loop
-    }// end photon overlap removal
 
     // overlap remove with the photons
     if(tau_pt){
@@ -734,6 +685,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("n_jet",1);
   m_tree->SetBranchStatus("n_el",1);
   m_tree->SetBranchStatus("n_mu",1);
+  m_tree->SetBranchStatus("n_ph",1);
+  m_tree->SetBranchStatus("n_el_baseline",1);
+  m_tree->SetBranchStatus("n_mu_baseline",1);
   m_tree->SetBranchStatus("jj_mass",1);
   m_tree->SetBranchStatus("jj_deta",1);
   m_tree->SetBranchStatus("jj_dphi",1);
@@ -878,6 +832,12 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_jet",&n_jet);
   m_tree->SetBranchAddress("n_el",&n_el);
   m_tree->SetBranchAddress("n_mu",&n_mu);
+
+  // variables that are now filled
+  m_tree->SetBranchAddress("n_el_baseline",&n_baseel);
+  m_tree->SetBranchAddress("n_mu_baseline",&n_basemu);
+  m_tree->SetBranchAddress("n_ph",&n_ph);
+
   m_tree->SetBranchAddress("jj_mass",&jj_mass);
   m_tree->SetBranchAddress("jj_deta",&jj_deta);
   m_tree->SetBranchAddress("jj_dphi",&jj_dphi);

@@ -26,7 +26,15 @@ if args.nominal:
     sys = VBFAnalysis.systematics.systematics("Nominal")
 else:
     sys = VBFAnalysis.systematics.systematics("All")
-systlist = sys.getsystematicsList()
+    sysW = VBFAnalysis.systematics.systematics("WeightSyst")
+systlistA = sys.getsystematicsList()
+
+# remove the weight systematics to avoid empty ntuples. weight systematics are saved as weights
+systlist=[]
+for s in systlistA:
+    if s not in sysW.getsystematicsList():
+        systlist+=[s]
+
 print systlist
 list_file=None
 isFileMap=False
@@ -41,7 +49,7 @@ workDir = os.getcwd()+"/"+args.submitDir
 CMTCONFIG = os.getenv('CMTCONFIG')
 buildPaths = os.getenv('CMAKE_PREFIX_PATH')
 buildPathsVec = buildPaths.split(':')
-buildDir =  buildPathsVec[0][:buildPathsVec[0].find(CMTCONFIG)-len(CMTCONFIG)].rstrip('/')
+buildDir =  buildPathsVec[0][:buildPathsVec[0].find(CMTCONFIG)].rstrip('/')
 os.system("rm -rf "+workDir)
 os.system("mkdir "+workDir)                
 
