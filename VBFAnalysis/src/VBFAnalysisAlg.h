@@ -67,7 +67,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   //Maps for types of Tree things 
   std::map<TString, int>   tMapInt; 
   std::map<TString, Float_t> tMapFloat;
-  std::map<TString, Double_t> tMapFloatW;
+  std::map<TString, Float_t> tMapFloatW;
 
    //Example algorithm property, see constructor for declaration:
    //int m_nProperty = 0;
