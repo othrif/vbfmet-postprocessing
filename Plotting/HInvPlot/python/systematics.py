@@ -40,7 +40,7 @@ class systematics(object):
         return self.systematicsList
 
     def getsystematicsOneSidedMap(self):
-        return {'JET_JER_DataVsMC__1up':'JET_JER_DataVsMC__1down',
+        return {'JET_JER_DataVsMC__1down':'JET_JER_DataVsMC__1up',
                 'JET_JER_EffectiveNP_1__1down':'JET_JER_EffectiveNP_1__1up',
                 'JET_JER_EffectiveNP_2__1down':'JET_JER_EffectiveNP_2__1up',
                 'JET_JER_EffectiveNP_3__1down':'JET_JER_EffectiveNP_3__1up',
