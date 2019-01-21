@@ -38,3 +38,8 @@ class systematics(object):
             self.systematicsList = ["JET_JER_SINGLE_NP__1up", "MET_SoftTrk_ResoPara", "MET_SoftTrk_ResoPerp"]
     def getsystematicsList(self):
         return self.systematicsList
+
+    def getsystematicsAsymMap(self):
+        return {"JET_JER_SINGLE_NP__1down":"JET_JER_SINGLE_NP__1up",
+                "MET_SoftTrk_ResoParaDown":"MET_SoftTrk_ResoPara",
+                "MET_SoftTrk_ResoPerpDown":"MET_SoftTrk_ResoPerp"}
