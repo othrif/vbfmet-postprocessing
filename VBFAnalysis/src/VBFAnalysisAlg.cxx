@@ -613,12 +613,28 @@ StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt)) return StatusCode::SUCCESS;
+  double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
+  computeMETj(met_tenacious_tst_phi, jet_phi, m_met_tenacious_tst_j1_dphi,m_met_tenacious_tst_j2_dphi);
+  met_tenacious_tst_j1_dphi = m_met_tenacious_tst_j1_dphi;
+  met_tenacious_tst_j2_dphi = m_met_tenacious_tst_j2_dphi;
+
+  double m_met_tenacious_tst_nolep_j1_dphi, m_met_tenacious_tst_nolep_j2_dphi;
+  computeMETj(met_tenacious_tst_nolep_phi, jet_phi, m_met_tenacious_tst_nolep_j1_dphi,m_met_tenacious_tst_nolep_j2_dphi);
+  met_tenacious_tst_nolep_j1_dphi = m_met_tenacious_tst_nolep_j1_dphi;
+  met_tenacious_tst_nolep_j2_dphi = m_met_tenacious_tst_nolep_j2_dphi;
 
   m_tree_out->Fill();
 
   //setFilterPassed(true); //if got here, assume that means algorithm passed
   return StatusCode::SUCCESS;
 }
+
+void VBFAnalysisAlg::computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi)
+{
+  e_met_j1_dphi          = TVector2::Phi_mpi_pi(met_phi-jet_phi->at(0));
+  e_met_j2_dphi          = TVector2::Phi_mpi_pi(met_phi-jet_phi->at(1));
+}
+
 
 StatusCode VBFAnalysisAlg::beginInputFile() { 
   //
