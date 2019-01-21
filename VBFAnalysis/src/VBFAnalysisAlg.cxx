@@ -366,7 +366,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   // initialize to 1
-  for(std::map<TString,Double_t>::iterator it=tMapFloatW.begin(); it!=tMapFloatW.end(); ++it)
+  for(std::map<TString,Float_t>::iterator it=tMapFloatW.begin(); it!=tMapFloatW.end(); ++it)
     it->second=1.0;
 
   npevents++;
