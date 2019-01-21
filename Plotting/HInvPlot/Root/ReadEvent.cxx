@@ -548,7 +548,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Clear event
     //
     event->Clear();
-    
+
     // read in tree
     rtree->GetEntry(i);
 
@@ -879,6 +879,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       }
     }
 
+    
     // extra jets - computing the dPhi
     float met_tst_j3_dphi=-999.0;
     float max_j3_dr = -999.0;
@@ -902,8 +903,12 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     int truthFilter=0;
     double truth_deta_jj=-10.0, truth_jj_mass=-10.0, filterMet=-10.0, truthJet1=-10.0;
     if(event->truth_jets.size()>1){
+      float tmet_px=0.0, tmet_py=0.0;
       TVector3 tmet;
-      tmet.SetPtEtaPhi(event->GetVar(Mva::met_truth_et), 0, event->GetVar(Mva::met_truth_phi));
+      //tmet.SetPtEtaPhi(event->GetVar(Mva::met_truth_et), 0, event->GetVar(Mva::met_truth_phi)); // removed due to speed
+      tmet_px=event->GetVar(Mva::met_truth_et)*cos(event->GetVar(Mva::met_truth_phi));
+      tmet_py=event->GetVar(Mva::met_truth_et)*sin(event->GetVar(Mva::met_truth_phi));
+      tmet.SetXYZ(tmet_px,tmet_py,0.0);
       //if(event->sample==Mva::kZqcd) std::cout << "met before: " << tmet.Pt() << std::endl;
       //std::cout << "met: " << tmet.Pt() << std::endl;
       for(unsigned iLep=0; iLep<(event->truth_mu.size()); ++iLep)  tmet+=event->truth_mu.at(iLep).GetVec();
@@ -915,7 +920,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	truth_deta_jj = fabs(event->truth_jets.at(0).eta - event->truth_jets.at(1).eta);
 	truth_jj_mass=truth_jj.M();
       }
-      filterMet = tmet.Pt();
+      //filterMet = sqrt(tmet_px*tmet_px+tmet_py*tmet_py);//tmet.Pt();
+      filterMet = sqrt(tmet.Px()*tmet.Px()+tmet.Py()*tmet.Py()); // needed for speed issues
       //if(event->sample==Mva::kZqcd) std::cout << "met after: " << tmet.Pt() << std::endl;      
       if(truth_jj_mass>500.0 && truth_deta_jj>4.0
 	 && event->truth_jets.at(1).pt>35.0 && filterMet>100.0) truthFilter=1;
@@ -931,7 +937,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // update for photon
     if(fOverlapPh) AddPhoton(*event);
-
+    
     // fill emu variables
     ComputeLepVars(*event);
     
@@ -1189,11 +1195,6 @@ void Msl::ReadEvent::ComputeLepVars(Event &event)
 
   for(unsigned i=0; i<event.muons.size(); ++i)
       my_leps.push_back(event.muons.at(i).GetLVec());
-  // fill met
-  TVector3 met_beforeRemove;
-  met_beforeRemove.SetPtEtaPhi(event.met.Pt(), event.met.Eta(), event.met.Phi());
-
-  std::sort(my_leps.begin(),my_leps.end(),SortPhysicsObject("pt"));
 
   ////////////////////////////////
   // Mtt   // assumes collinear approximation
@@ -1201,12 +1202,19 @@ void Msl::ReadEvent::ComputeLepVars(Event &event)
   double x1=-999., x2=-999.,mtt=-999.;
   // leading two
   if(my_leps.size()>1){
+
+    // fill met
+    TVector3 met_beforeRemove;
+    met_beforeRemove.SetPtEtaPhi(event.met.Pt(), 0.0, event.met.Phi());
+    
+    std::sort(my_leps.begin(),my_leps.end(),SortPhysicsObject("pt"));
+
     TLorentzVector Z = (my_leps.at(1)+my_leps.at(0));
     event.AddVar(Mva::mll,  Z.M());
     event.AddVar(Mva::ptll, Z.Pt()); 
     event.GetX1X2(my_leps.at(0), my_leps.at(1),
-		  make_pair<float,float>(met_beforeRemove.Px(), met_beforeRemove.Py()),
-		  x1, x2);
+    make_pair<float,float>(met_beforeRemove.Px(), met_beforeRemove.Py()),
+    x1, x2);
   if(x1>0.0 && x2>0.0) mtt=event.GetVar(Mva::mll)/TMath::Sqrt(x1*x2);
   }
   event.RepVar(Mva::Mtt, mtt);
@@ -1221,7 +1229,7 @@ void Msl::ReadEvent::ChangeLep(Event &event)
   //event->baseel;
   //event->basemu; mtautau
   TVector3 met, met_beforeRemove;
-  met.SetPtEtaPhi(event.met.Pt(), event.met.Eta(), event.met.Phi());
+  met.SetPtEtaPhi(event.met.Pt(), 0.0, event.met.Phi());
   met_beforeRemove=met;
 
   unsigned n_el=0;
