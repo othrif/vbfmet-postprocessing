@@ -388,7 +388,6 @@ StatusCode VBFAnalysisAlg::execute() {
 
   // Fill
   truth_jj_mass =-1.0;  
-  xeSFTrigWeight=1.0;
   if(m_isMC && truth_jet_pt && truth_jet_pt->size()>1){
     TLorentzVector tmp, jjtruth;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
