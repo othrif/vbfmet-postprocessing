@@ -166,7 +166,7 @@ def main():
 
     try:
         tmp_signs=options.lep_sign.split(','); signs=[]
-        for sign in tmp_signs: 
+        for sign in tmp_signs:
             if not sign in ['0','1']: raise NameError('Unknown Lepton sign: %s...needs to be 0 0,1 or 1' %options.lep_sign)
             signs+=[int(sign)]
     except: raise NameError('Unknown Lepton sign: %s...needs to be 0 0,1 or 1' %options.lep_sign)
@@ -176,12 +176,24 @@ def main():
     if options.syst=="All":
         syst_class = systematics.systematics('All') #All
         syst_list = syst_class.getsystematicsList()
+    weight_syst_class = systematics.systematics('WeightSyst')
+    weight_syst = weight_syst_class.getsystematicsList()
+        
     timeStart = time.time()
-    
+
+    print 'Running These systematics'
     for syst in syst_list:
         print syst
+    
+    for syst in syst_list:
+        print 'SYST: ',syst
         read_alg.ClearAlgs();
-        read_alg.SetSystName(syst)
+        if syst in weight_syst:
+            read_alg.SetSystName("Nominal")
+            read_alg.SetWeightSystName(syst)            
+        else:
+            read_alg.SetSystName(syst)
+            read_alg.SetWeightSystName("Nominal")
         #-----------------------------------------------------------------------------------------
         # Common algorithms for computing additional event properties and event pre-selection
         #     

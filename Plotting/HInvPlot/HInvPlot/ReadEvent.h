@@ -91,6 +91,7 @@ namespace Msl
     };
 
     void SetSystName(std::string systName) { fSystName = systName; }
+    void SetWeightSystName(std::string wsystName) { fWeightSystName = wsystName; }    
     void ClearAlgs() {
       fAlgAll.clear();
       fAlgCommon.clear();
@@ -121,6 +122,7 @@ namespace Msl
     std::string                 fDir;
     std::string                 fName;
     std::string                 fSystName;
+    std::string                 fWeightSystName;
     std::string                 fCutFlowFile;
     std::string                 fRawFlowFile;
     std::string                 fAnalysisName;
@@ -131,7 +133,6 @@ namespace Msl
     
     std::vector<std::string>    fTrees;
     std::vector<std::string>    fFiles;
-    std::vector<std::string>    fSystNames;
     std::map<int,std::string>   fSampleMap; // mcid to plotting type
 
     float                       fJetVetoPt;
