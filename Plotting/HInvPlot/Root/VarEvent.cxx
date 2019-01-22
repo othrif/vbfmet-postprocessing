@@ -113,6 +113,15 @@ std::string Msl::Mva::Convert2Str(Var var)
     case phPt:	                  return "phPt";      
     case phEta:	                  return "phEta";      
     case met_tst_ph_dphi:	  return "met_tst_ph_dphi";      
+    case jetTrackWidth:           return "jetTrackWidth";
+    case jetTrackWidth0:          return "jetTrackWidth0";
+    case jetTrackWidth1:	  return "jetTrackWidth1";
+    case jetNTracks:              return "jetNTracks";
+    case jetNTracks0:             return "jetNTracks0";
+    case jetNTracks1:	          return "jetNTracks1";
+    case jetPartonTruthLabelID:   return "jetPartonTruthLabelID";
+    case jetPartonTruthLabelID0:  return "jetPartonTruthLabelID0";
+    case jetPartonTruthLabelID1:  return "jetPartonTruthLabelID1";
 
     case NONE: return "NONE";
     default  : break;
@@ -221,6 +230,15 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "phPt")	         return phPt;
   if(var == "phEta")	         return phEta;
   if(var == "met_tst_ph_dphi")	 return met_tst_ph_dphi;
+  if(var == "jetTrackWidth")     return jetTrackWidth;  
+  if(var == "jetTrackWidth0")    return jetTrackWidth0;  
+  if(var == "jetTrackWidth1")    return jetTrackWidth1;  
+  if(var == "jetNTracks")        return jetNTracks;
+  if(var == "jetNTracks0")       return jetNTracks0;
+  if(var == "jetNTracks1")	 return jetNTracks1;
+  if(var == "jetPartonTruthLabelID") return jetPartonTruthLabelID;
+  if(var == "jetPartonTruthLabelID0") return jetPartonTruthLabelID0;
+  if(var == "jetPartonTruthLabelID1") return jetPartonTruthLabelID1;
   
   cout << "Msl::Mva::Convert2Var - unknown enum: " << var << endl;
   return NONE;
@@ -416,6 +434,15 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(phPt);
     vars.push_back(phEta);    
     vars.push_back(met_tst_ph_dphi);    
+    vars.push_back(jetTrackWidth);         
+    vars.push_back(jetTrackWidth0);         
+    vars.push_back(jetTrackWidth1);         
+    vars.push_back(jetNTracks);         
+    vars.push_back(jetNTracks0);         
+    vars.push_back(jetNTracks1);         
+    vars.push_back(jetPartonTruthLabelID);         
+    vars.push_back(jetPartonTruthLabelID0);         
+    vars.push_back(jetPartonTruthLabelID1);         
   }
   
   return vars;

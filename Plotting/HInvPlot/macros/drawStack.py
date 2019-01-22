@@ -267,6 +267,12 @@ def getHistPars(hist):
     'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
     'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},     
+        'jetTrackWidth0' : {'xtitle':'Track Width (leading)',          'ytitle':'Events', 'LtoRCut':False},
+        'jetTrackWidth1' : {'xtitle':'Track Width (subleading)',          'ytitle':'Events', 'LtoRCut':False},
+        'jetNTracks0' : {'xtitle':'NTracks (leading)',          'ytitle':'Events','LtoRCut':False},
+        'jetNTracks1' : {'xtitle':'NTracks (subleading)',          'ytitle':'Events', 'LtoRCut':False},
+        'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
+        'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
         }
 
     try:
