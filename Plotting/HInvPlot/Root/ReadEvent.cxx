@@ -129,6 +129,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   }
 
   // declare vectors
+  //
   el_charge  = new std::vector<float>();
   el_pt      = new std::vector<float>();
   el_eta     = new std::vector<float>();
@@ -148,6 +149,9 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   jet_m      = new std::vector<float>();
   jet_jvt    = new std::vector<float>();  
   jet_fjvt   = new std::vector<float>();
+  jet_TrackWidth   = new std::vector<float>();
+  jet_NTracks   = new std::vector<float>();
+  jet_PartonTruthLabelID   = new std::vector<float>();
   truth_el_pt  = new std::vector<float>();
   truth_el_eta = new std::vector<float>();
   truth_el_phi = new std::vector<float>();
@@ -230,6 +234,9 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("jet_phi",   &jet_phi);
   tree->SetBranchAddress("jet_jvt",   &jet_jvt);
   tree->SetBranchAddress("jet_fjvt",   &jet_fjvt);  
+  tree->SetBranchAddress("jet_TrackWidth",   &jet_TrackWidth);  
+  tree->SetBranchAddress("jet_NTracks",   &jet_NTracks);  
+  tree->SetBranchAddress("jet_PartonTruthLabelID",   &jet_PartonTruthLabelID);  
 
   if(fisMC){
     tree->SetBranchAddress("truth_jet_pt",    &truth_jet_pt);  
@@ -649,6 +656,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));      
+      new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));      
+      new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));      
+      new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));      
+      
       if(jet_jvt->size()>iJet){
 	float jvt = jet_jvt->at(iJet);
 	if(fabs(new_jet.eta)>2.5) jvt=jvt<0? jvt : -0.15;
@@ -1054,6 +1065,9 @@ void Msl::ReadEvent::FillEvent(Event &event)
     event.AddVar(Mva::j0timing,event.jets.at(0).GetVar(Mva::timing));
     event.AddVar(Mva::j0jvt,event.jets.at(0).GetVar(Mva::jvt));    
     event.AddVar(Mva::j0fjvt,event.jets.at(0).GetVar(Mva::fjvt));    
+    event.AddVar(Mva::jetTrackWidth0,  event.jets.at(0).GetVar(Mva::jetTrackWidth));
+    event.AddVar(Mva::jetNTracks0,  event.jets.at(0).GetVar(Mva::jetNTracks));
+    event.AddVar(Mva::jetPartonTruthLabelID0,  event.jets.at(0).GetVar(Mva::jetPartonTruthLabelID));
   }
   if(event.jets.size()>1){
     event.AddVar(Mva::jetPt1,  event.jets.at(1).pt);
@@ -1062,6 +1076,9 @@ void Msl::ReadEvent::FillEvent(Event &event)
     event.AddVar(Mva::j1jvt,event.jets.at(1).GetVar(Mva::jvt));    
     event.AddVar(Mva::j1fjvt,event.jets.at(1).GetVar(Mva::fjvt));        
     event.AddVar(Mva::etaj0TimesEtaj1,event.jets.at(0).eta*event.jets.at(1).eta);
+    event.AddVar(Mva::jetTrackWidth1,  event.jets.at(1).GetVar(Mva::jetTrackWidth));
+    event.AddVar(Mva::jetNTracks1,  event.jets.at(1).GetVar(Mva::jetNTracks));
+    event.AddVar(Mva::jetPartonTruthLabelID1,  event.jets.at(1).GetVar(Mva::jetPartonTruthLabelID));
   }
 
   if(event.electrons.size()>0 && event.muons.size()>0){

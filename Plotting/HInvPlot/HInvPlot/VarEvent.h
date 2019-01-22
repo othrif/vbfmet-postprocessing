@@ -127,7 +127,18 @@ namespace Msl
       maxmj3_over_mjj,
       avgmj3_over_mjj,
       max_j3_dr,
-      Mtt,phPt,phEta, met_tst_ph_dphi
+      Mtt,phPt,
+      phEta, 
+      met_tst_ph_dphi,
+      jetTrackWidth,
+      jetTrackWidth0,
+      jetTrackWidth1,
+      jetNTracks,
+      jetNTracks0,
+      jetNTracks1,
+      jetPartonTruthLabelID,
+      jetPartonTruthLabelID0,
+      jetPartonTruthLabelID1
     };
 
     std::string       AsStr(Var var);
