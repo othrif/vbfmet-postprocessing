@@ -2,7 +2,8 @@ import ROOT
 import subprocess
 import pickle
 import sys
-l = open('v20LooseSort.txt','r')
+#l = open('v20LooseSort.txt','r')
+l = open('f.txt','r')
 #l = open('input_v15Loose.txt','r')
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt

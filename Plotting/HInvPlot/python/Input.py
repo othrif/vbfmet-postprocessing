@@ -99,6 +99,8 @@ class ReadEvent:
         
     def SetSystName(self,systName):
         self.read_alg.SetSystName(systName)
+    def SetWeightSystName(self,systName):
+        self.read_alg.SetWeightSystName(systName)
 
     def ReadFile(self, path):
         

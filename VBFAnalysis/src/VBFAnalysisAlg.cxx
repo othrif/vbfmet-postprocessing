@@ -110,8 +110,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   jet_passJvt= new std::vector<int>(0);
   jet_PartonTruthLabelID = new std::vector<int>(0); 
   jet_ConeTruthLabelID = new std::vector<int>(0); 
-  jet_NTracks = new std::vector<float>(0);
-  jet_SumPtTracks = new std::vector<float>(0);
+  jet_NTracks = new std::vector<std::vector<unsigned short> >(0);
+  jet_SumPtTracks = new std::vector<std::vector<float> >(0);
   jet_TrackWidth = new std::vector<float>(0);
   jet_HECFrac = new std::vector<float>(0);
   jet_EMFrac = new std::vector<float>(0);
@@ -132,9 +132,6 @@ StatusCode VBFAnalysisAlg::initialize() {
   truth_el_eta= new std::vector<float>(0);
   truth_el_phi= new std::vector<float>(0);
 
-  outph_pt = new std::vector<float>(0);
-  outph_phi = new std::vector<float>(0);
-  outph_eta = new std::vector<float>(0);
   outtau_pt = new std::vector<float>(0);
   outtau_phi = new std::vector<float>(0);
   outtau_eta = new std::vector<float>(0);
@@ -259,9 +256,9 @@ StatusCode VBFAnalysisAlg::initialize() {
     if(m_isMC) m_tree_out->Branch("baseel_truthOrigin",  &baseel_truthOrigin);
     if(m_isMC) m_tree_out->Branch("baseel_truthType",    &baseel_truthType);
 
-    m_tree_out->Branch("ph_pt", &outph_pt);
-    m_tree_out->Branch("ph_phi",&outph_phi);
-    m_tree_out->Branch("ph_eta",&outph_eta);
+    m_tree_out->Branch("ph_pt", &ph_pt);
+    m_tree_out->Branch("ph_phi",&ph_phi);
+    m_tree_out->Branch("ph_eta",&ph_eta);
     m_tree_out->Branch("tau_pt",&outtau_pt);
     m_tree_out->Branch("tau_phi",&outtau_phi);
     m_tree_out->Branch("tau_eta",&outtau_eta);
@@ -369,7 +366,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   // initialize to 1
-  for(std::map<TString,Double_t>::iterator it=tMapFloatW.begin(); it!=tMapFloatW.end(); ++it)
+  for(std::map<TString,Float_t>::iterator it=tMapFloatW.begin(); it!=tMapFloatW.end(); ++it)
     it->second=1.0;
 
   npevents++;
@@ -388,7 +385,6 @@ StatusCode VBFAnalysisAlg::execute() {
 
   // Fill
   truth_jj_mass =-1.0;  
-  xeSFTrigWeight=1.0;
   if(m_isMC && truth_jet_pt && truth_jet_pt->size()>1){
     TLorentzVector tmp, jjtruth;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
@@ -430,57 +426,11 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   // base lepton selection
-  n_baseel=0;
-  n_basemu=0;
-  n_ph=0;
   n_tau=0;
-  outph_pt->clear();
-  outph_eta->clear();
-  outph_phi->clear();
   outtau_pt->clear();
   outtau_eta->clear();
   outtau_phi->clear();
   if(m_extraVars || true){
-    if(baseel_pt){
-      for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-	if(baseel_pt->at(iEle)>4.5e3) ++n_baseel;
-      }
-    }
-    if(basemu_pt){
-      for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-	if(basemu_pt->at(iMuo)>4.0e3) ++n_basemu;
-      }
-    }
-    // overlap remove with the photons
-    if(ph_pt){
-      TVector3 phvec,tmp;
-      for(unsigned iPh=0; iPh<ph_pt->size(); ++iPh){
-	bool passOR=true;
-	phvec.SetPtEtaPhi(ph_pt->at(iPh),ph_eta->at(iPh),ph_phi->at(iPh));
-	if(baseel_pt){
-	  for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-	    if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25){
-	      tmp.SetPtEtaPhi(baseel_pt->at(iEle),baseel_eta->at(iEle),baseel_phi->at(iEle));
-	      if(phvec.DeltaR(tmp)<0.2) passOR=false;
-	    }
-	  }
-	}
-	if(basemu_pt){
-	  for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-	    if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25){
-	      tmp.SetPtEtaPhi(basemu_pt->at(iMuo),basemu_eta->at(iMuo),basemu_phi->at(iMuo));
-	      if(phvec.DeltaR(tmp)<0.2) passOR=false;  
-	    }
-	  }
-	}// end base muon overlap
-	if(passOR){
-	  ++n_ph;
-	  outph_pt->push_back(ph_pt->at(iPh));
-	  outph_eta->push_back(ph_eta->at(iPh));
-	  outph_phi->push_back(ph_phi->at(iPh));
-	}
-      }// end photon loop
-    }// end photon overlap removal
 
     // overlap remove with the photons
     if(tau_pt){
@@ -490,7 +440,7 @@ StatusCode VBFAnalysisAlg::execute() {
 	tauvec.SetPtEtaPhi(tau_pt->at(iTau),tau_eta->at(iTau),tau_phi->at(iTau));
 	if(baseel_pt){
 	  for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-	    if(baseel_pt->at(iEle)>4.5e3 && baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle)<0.25){
+	    if(baseel_pt->at(iEle)>4.5e3){
 	      tmp.SetPtEtaPhi(baseel_pt->at(iEle),baseel_eta->at(iEle),baseel_phi->at(iEle));
 	      if(tauvec.DeltaR(tmp)<0.2) passOR=false;
 	    }
@@ -498,7 +448,7 @@ StatusCode VBFAnalysisAlg::execute() {
 	}
 	if(basemu_pt){
 	  for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-	    if(basemu_pt->at(iMuo)>4.0e3 && basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)<0.25){
+	    if(basemu_pt->at(iMuo)>4.0e3){
 	      tmp.SetPtEtaPhi(basemu_pt->at(iMuo),basemu_eta->at(iMuo),basemu_phi->at(iMuo));
 	      if(tauvec.DeltaR(tmp)<0.2) passOR=false;  
 	    }
@@ -637,7 +587,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_muSFTrigWeight = muSFTrigWeight;
   float tmp_eleANTISF = eleANTISF;
 
-  for(std::map<TString,Double_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
+  for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
     tmp_puWeight = puWeight;	    
     tmp_jvtSFWeight = jvtSFWeight;	    
@@ -655,7 +605,9 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
-    else if(it->first.Contains("eleANTISF"))       tmp_eleANTISF=tMapFloat[it->first];
+    else if(it->first.Contains("eleANTISF"))      tmp_eleANTISF=tMapFloat[it->first];
+
+    ATH_MSG_DEBUG("VBFAnalysisAlg: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF);
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF;
   }//end systematic weight loop
@@ -663,12 +615,28 @@ StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt)) return StatusCode::SUCCESS;
+  double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
+  computeMETj(met_tenacious_tst_phi, jet_phi, m_met_tenacious_tst_j1_dphi,m_met_tenacious_tst_j2_dphi);
+  met_tenacious_tst_j1_dphi = m_met_tenacious_tst_j1_dphi;
+  met_tenacious_tst_j2_dphi = m_met_tenacious_tst_j2_dphi;
+
+  double m_met_tenacious_tst_nolep_j1_dphi, m_met_tenacious_tst_nolep_j2_dphi;
+  computeMETj(met_tenacious_tst_nolep_phi, jet_phi, m_met_tenacious_tst_nolep_j1_dphi,m_met_tenacious_tst_nolep_j2_dphi);
+  met_tenacious_tst_nolep_j1_dphi = m_met_tenacious_tst_nolep_j1_dphi;
+  met_tenacious_tst_nolep_j2_dphi = m_met_tenacious_tst_nolep_j2_dphi;
 
   m_tree_out->Fill();
 
   //setFilterPassed(true); //if got here, assume that means algorithm passed
   return StatusCode::SUCCESS;
 }
+
+void VBFAnalysisAlg::computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi)
+{
+  e_met_j1_dphi          = TVector2::Phi_mpi_pi(met_phi-jet_phi->at(0));
+  e_met_j2_dphi          = TVector2::Phi_mpi_pi(met_phi-jet_phi->at(1));
+}
+
 
 StatusCode VBFAnalysisAlg::beginInputFile() { 
   //
@@ -705,7 +673,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	tMapFloatW[var_name]=-999.0;
 	m_tree_out->Branch("w"+var_name,&(tMapFloatW[var_name]));	
       }
-      m_tree->SetBranchAddress(var_name, &tMapFloat[var_name]);
+      m_tree->SetBranchStatus(var_name, 1);
+      m_tree->SetBranchAddress(var_name, &(tMapFloat[var_name]));
     }
   }
 
@@ -735,6 +704,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("n_jet",1);
   m_tree->SetBranchStatus("n_el",1);
   m_tree->SetBranchStatus("n_mu",1);
+  m_tree->SetBranchStatus("n_ph",1);
+  m_tree->SetBranchStatus("n_el_baseline",1);
+  m_tree->SetBranchStatus("n_mu_baseline",1);
   m_tree->SetBranchStatus("jj_mass",1);
   m_tree->SetBranchStatus("jj_deta",1);
   m_tree->SetBranchStatus("jj_dphi",1);
@@ -879,6 +851,12 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_jet",&n_jet);
   m_tree->SetBranchAddress("n_el",&n_el);
   m_tree->SetBranchAddress("n_mu",&n_mu);
+
+  // variables that are now filled
+  m_tree->SetBranchAddress("n_el_baseline",&n_baseel);
+  m_tree->SetBranchAddress("n_mu_baseline",&n_basemu);
+  m_tree->SetBranchAddress("n_ph",&n_ph);
+
   m_tree->SetBranchAddress("jj_mass",&jj_mass);
   m_tree->SetBranchAddress("jj_deta",&jj_deta);
   m_tree->SetBranchAddress("jj_dphi",&jj_dphi);

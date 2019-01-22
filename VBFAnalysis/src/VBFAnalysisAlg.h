@@ -41,7 +41,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
   double weightXETrigSF(const float jj_pt); 
-
+  void computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi);
  private: 
 
   int npevents = 0;
@@ -66,8 +66,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
 
   //Maps for types of Tree things 
   std::map<TString, int>   tMapInt; 
-  std::map<TString, double> tMapFloat;
-  std::map<TString, double> tMapFloatW;
+  std::map<TString, Float_t> tMapFloat;
+  std::map<TString, Float_t> tMapFloatW;
 
    //Example algorithm property, see constructor for declaration:
    //int m_nProperty = 0;
@@ -229,8 +229,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Int_t>* jet_passJvt;
   std::vector<Int_t>* jet_PartonTruthLabelID;
   std::vector<Int_t>* jet_ConeTruthLabelID;
-  std::vector<Float_t>* jet_NTracks;
-  std::vector<Float_t>* jet_SumPtTracks;
+  std::vector<std::vector<unsigned short> >* jet_NTracks;
+  std::vector<std::vector<Float_t> >* jet_SumPtTracks;
   std::vector<Float_t>* jet_TrackWidth;
   std::vector<Float_t>* jet_HECFrac;
   std::vector<Float_t>* jet_EMFrac;
@@ -251,9 +251,6 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* truth_el_eta;
   std::vector<Float_t>* truth_el_phi;
 
-  std::vector<Float_t>* outph_pt;
-  std::vector<Float_t>* outph_phi;
-  std::vector<Float_t>* outph_eta;
   std::vector<Float_t>* outtau_pt;
   std::vector<Float_t>* outtau_phi;
   std::vector<Float_t>* outtau_eta;

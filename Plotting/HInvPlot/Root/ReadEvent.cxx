@@ -46,6 +46,7 @@ Msl::ReadEvent::AlgData::AlgData(const std::string &key):
 //-----------------------------------------------------------------------------
 Msl::ReadEvent::ReadEvent():
   fSystName     ("Nominal"),
+  fWeightSystName("Nominal"),
   fDebug        (false),
   fPrint        (false),
   fPrintEvent   (false),
@@ -75,7 +76,6 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::CutFlowFile",   fCutFlowFile);
   reg.Get("ReadEvent::RawFlowFile",   fRawFlowFile);
   reg.Get("ReadEvent::METChoice",     fMETChoice);  
-  reg.Get("ReadEvent::SystList",      fSystNames);
   reg.Get("ReadEvent::Trees",         fTrees);
   reg.Get("ReadEvent::Files",         fFiles);
 
@@ -195,7 +195,25 @@ void Msl::ReadEvent::Init(TTree* tree)
   for(unsigned i=0; i<fVarVec.size(); ++i)
     fVarVec.at(i).SetVarBranch(tree);
 
-  tree->SetBranchAddress("w",        &fWeight);
+  if(fWeightSystName=="Nominal")
+    tree->SetBranchAddress("w",        &fWeight);
+  else{
+    // add the systematics weights to the nominal
+    bool found_weight_syst=false;
+    TObjArray *var_list = tree->GetListOfBranches();
+    for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) {
+      TString var_name = var_list->At(a)->GetName();
+      if(var_name.Contains("__1up") || var_name.Contains("__1down")){
+	tree->SetBranchStatus(var_name, 1);
+	if(var_name.Contains(fWeightSystName)){
+	  tree->SetBranchAddress(var_name, &fWeight);
+	  found_weight_syst=true;
+	  break;
+	}
+      }
+    }
+    if(!found_weight_syst) std::cout << "ERROR - Failed to find weight for " << fWeightSystName << std::endl;
+  }
   tree->SetBranchAddress("runNumber",&fRunNumber);  
   tree->SetBranchAddress("el_charge",&el_charge);  
   tree->SetBranchAddress("el_pt",    &el_pt);  
@@ -503,12 +521,7 @@ void Msl::ReadEvent::Read(const std::string &path)
     // Identify the systematic type
     //
     if(fTrees.at(i).find(fSystName)==std::string::npos) continue;
-    //for(unsigned iSys=0; iSys<fSystNames.size(); ++iSys){
-    //  if(fTrees.at(i).find(fSystNames.at(iSys))!=std::string::npos){
-    //	fSystName = fSystNames.at(iSys);
-    //	break;
-    //  }
-    //}
+
     log() << "Read - Running systematic: " << fSystName << " on tree: " << fTrees.at(i) <<std::endl;
     
     //
