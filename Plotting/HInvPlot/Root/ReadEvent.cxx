@@ -656,9 +656,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));      
-      new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));      
-      new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));      
-      new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));      
+      if(jet_TrackWidth && jet_TrackWidth->size()>iJet) new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));      
+      if(jet_NTracks && jet_NTracks->size()>iJet) new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));      
+      if(jet_PartonTruthLabelID && jet_PartonTruthLabelID->size()>iJet) new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));      
       
       if(jet_jvt->size()>iJet){
 	float jvt = jet_jvt->at(iJet);
