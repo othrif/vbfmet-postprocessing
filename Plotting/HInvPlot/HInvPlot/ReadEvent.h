@@ -184,6 +184,9 @@ namespace Msl
     std::vector<float> *jet_phi;
     std::vector<float> *jet_jvt;
     std::vector<float> *jet_fjvt;
+    std::vector<float> *jet_TrackWidth;
+    std::vector<float> *jet_NTracks;
+    std::vector<float> *jet_PartonTruthLabelID;
 
     std::vector<float> *truth_el_pt;
     std::vector<float> *truth_el_eta;
