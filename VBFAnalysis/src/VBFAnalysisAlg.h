@@ -189,6 +189,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* basemu_pt;
   std::vector<Float_t>* basemu_eta;
   std::vector<Float_t>* basemu_phi;
+  std::vector<Int_t>* basemu_charge;
   std::vector<Float_t>* basemu_z0;
   std::vector<Float_t>* basemu_d0sig;
   std::vector<Float_t>* basemu_ptvarcone20;
@@ -202,6 +203,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* baseel_pt;
   std::vector<Float_t>* baseel_eta;
   std::vector<Float_t>* baseel_phi;
+  std::vector<Int_t>* baseel_charge;
   std::vector<Float_t>* baseel_z0;
   std::vector<Float_t>* baseel_d0sig;
   std::vector<Float_t>* baseel_ptvarcone20;

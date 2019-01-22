@@ -70,6 +70,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   basemu_pt= new std::vector<float>(0);
   basemu_eta= new std::vector<float>(0);
   basemu_phi= new std::vector<float>(0);
+  basemu_charge= new std::vector<int>(0);
   basemu_z0= new std::vector<float>(0);
   basemu_d0sig= new std::vector<float>(0);
   basemu_ptvarcone20= new std::vector<float>(0);
@@ -83,6 +84,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   baseel_pt= new std::vector<float>(0);
   baseel_eta= new std::vector<float>(0);
   baseel_phi= new std::vector<float>(0);
+  baseel_charge= new std::vector<int>(0);
   baseel_z0= new std::vector<float>(0);
   baseel_d0sig= new std::vector<float>(0);
   baseel_ptvarcone20= new std::vector<float>(0);
@@ -235,6 +237,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("basemu_pt",           &basemu_pt);
     m_tree_out->Branch("basemu_eta",          &basemu_eta);
     m_tree_out->Branch("basemu_phi",          &basemu_phi);
+    m_tree_out->Branch("basemu_charge",          &basemu_charge);
     m_tree_out->Branch("basemu_z0",           &basemu_z0);
     m_tree_out->Branch("basemu_d0sig",           &basemu_d0sig);
     m_tree_out->Branch("basemu_ptvarcone20",  &basemu_ptvarcone20);
@@ -247,6 +250,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("baseel_pt",           &baseel_pt);
     m_tree_out->Branch("baseel_eta",          &baseel_eta);
     m_tree_out->Branch("baseel_phi",          &baseel_phi);
+    m_tree_out->Branch("baseel_charge",          &baseel_charge);
     m_tree_out->Branch("baseel_z0",           &baseel_z0);
     m_tree_out->Branch("baseel_d0sig",        &baseel_d0sig);
     m_tree_out->Branch("baseel_ptvarcone20",  &baseel_ptvarcone20);
@@ -758,6 +762,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("basemu_pt",1);
     m_tree->SetBranchStatus("basemu_eta",1);
     m_tree->SetBranchStatus("basemu_phi",1);
+    m_tree->SetBranchStatus("basemu_charge",1);
     m_tree->SetBranchStatus("basemu_z0",1);
     m_tree->SetBranchStatus("basemu_d0sig",1);
     m_tree->SetBranchStatus("basemu_ptvarcone20",1);
@@ -770,6 +775,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("baseel_pt",1);
     m_tree->SetBranchStatus("baseel_eta",1);
     m_tree->SetBranchStatus("baseel_phi",1);
+    m_tree->SetBranchStatus("baseel_charge",1);
     m_tree->SetBranchStatus("baseel_z0",1);
     m_tree->SetBranchStatus("baseel_d0sig",1);
     m_tree->SetBranchStatus("baseel_ptvarcone20",1);
@@ -922,6 +928,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("basemu_pt",           &basemu_pt);
     m_tree->SetBranchAddress("basemu_eta",          &basemu_eta);
     m_tree->SetBranchAddress("basemu_phi",          &basemu_phi);
+    m_tree->SetBranchAddress("basemu_charge",          &basemu_charge);
     m_tree->SetBranchAddress("basemu_z0",           &basemu_z0);
     m_tree->SetBranchAddress("basemu_d0sig",        &basemu_d0sig);
     m_tree->SetBranchAddress("basemu_ptvarcone20",  &basemu_ptvarcone20);
@@ -934,6 +941,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
     m_tree->SetBranchAddress("baseel_eta",          &baseel_eta);
     m_tree->SetBranchAddress("baseel_phi",          &baseel_phi);
+    m_tree->SetBranchAddress("baseel_charge",          &baseel_charge);
     m_tree->SetBranchAddress("baseel_z0",           &baseel_z0);
     m_tree->SetBranchAddress("baseel_d0sig",           &baseel_d0sig);
     m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
