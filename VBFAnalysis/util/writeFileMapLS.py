@@ -3,7 +3,6 @@ import subprocess
 import pickle
 
 l = open('extra.txt','r')
-#l = open('extra_v15.txt','r')
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt
 myMap = {}

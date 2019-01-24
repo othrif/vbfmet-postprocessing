@@ -2,13 +2,17 @@
 OUTDIRM=v13
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
-#hadd VV_VVV.root VV*root
-hadd $OUTDIRM/VV.root VV*root
 hadd $OUTDIRM/VVV.root VVV*root
-hadd $OUTDIRM/W_strong.root W_strong*root
-hadd $OUTDIRM/Z_strong.root Z_strong*root
+rm VVV*root
 hadd $OUTDIRM/Z_strong_VBFFilt.root Z_strong_VBFFilt*root
 hadd $OUTDIRM/Z_strong_LowMass.root Z_strong_LowMass*root
+rm Z_strong_VBFFilt*root
+rm Z_strong_LowMass*root
+
+# now hadd the standard samples
+hadd $OUTDIRM/VV.root VV*root
+hadd $OUTDIRM/W_strong.root W_strong*root
+hadd $OUTDIRM/Z_strong.root Z_strong*root
 hadd $OUTDIRM/W_EWK.root W_EWK*root
 hadd $OUTDIRM/Z_EWK.root Z_EWK*root
 hadd $OUTDIRM/ttbar.root ttbar*root
