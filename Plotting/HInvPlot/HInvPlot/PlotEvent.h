@@ -98,6 +98,9 @@ namespace Msl
     TH1                        *hTruthTauDR;
     TH1                        *hTruthTauEta;    
     TH1                        *hminDRLep;    
+    TH1                        *hptvarcone20;
+    TH1                        *hptvarcone30;
+    TH1                        *htopoetcone20;
     
     TH1                        *hmj34;
     TH1                        *hmax_j_eta;    

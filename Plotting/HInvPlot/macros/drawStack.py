@@ -237,7 +237,9 @@ def getHistPars(hist):
     'n_truth_tau'     : {'xtitle':'Number of Truth taus'   ,         'ytitle':'Events',   'ymin':0.1},    
     'met_tst_j1_dphi'     : {'xtitle':'#Delta#phi(j1,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tst_j2_dphi'     : {'xtitle':'#Delta#phi(j2,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
-
+    'ptvarcone20'     : {'xtitle':'ptvarcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'ptvarcone30'     : {'xtitle':'ptvarcone30/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'topoetcone20'     : {'xtitle':'topoetcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
 
     'mj34'     : {'xtitle':'m_{j3,j4} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'max_j_eta'     : {'xtitle':'max(#eta_{j1},#eta_{j2})'   ,         'ytitle':'Events',   'ymin':0.1},                                
