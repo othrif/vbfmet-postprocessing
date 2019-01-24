@@ -70,7 +70,7 @@ def getParser():
 
     p.add_option('--ignore-njet',  action='store_true', default=False,   dest='ignore_njet',          help='Ignore Njet')
     p.add_option('--ignore-met',  action='store_true', default=False,   dest='ignore_met',          help='Ignore MET')
-    p.add_option('--LooseLepZ',  action='store_true', default=False,   dest='LooseLepZ',          help='Use looser leptons')    
+    p.add_option('--LoadBaseLep',  action='store_true', default=False,   dest='LoadBaseLep',          help='Use looser leptons')    
     p.add_option('--OverlapPh',  action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')    
     p.add_option('--jet-veto-pt',         type='float'       , default=-10,       dest='jet_veto_pt',       help='pT for jet veto')
     

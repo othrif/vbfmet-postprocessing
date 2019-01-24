@@ -158,7 +158,7 @@ namespace Msl
     float                       fInputCount;
     float                       fLumi;
     bool                        fisMC;
-    bool                        fLooseLepZ;
+    bool                        fLoadBaseLep;
     bool                        fOverlapPh;
     // Input vars
     float fWeight;
@@ -202,13 +202,19 @@ namespace Msl
     std::vector<float> *truth_jet_eta;
     std::vector<float> *truth_jet_phi;    
     std::vector<float> *baseel_pt;
+    std::vector<int>   *baseel_charge;    
     std::vector<float> *baseel_eta;
     std::vector<float> *baseel_phi;    
-    std::vector<float> *baseel_ptvarcone20;    
+    std::vector<float> *baseel_ptvarcone20;
+    std::vector<float> *baseel_ptvarcone30;        
+    std::vector<float> *baseel_topoetcone20;        
     std::vector<float> *basemu_pt;
+    std::vector<int>   *basemu_charge;    
     std::vector<float> *basemu_eta;
     std::vector<float> *basemu_phi;
     std::vector<float> *basemu_ptvarcone20;
+    std::vector<float> *basemu_ptvarcone30;
+    std::vector<float> *basemu_topoetcone20;
     std::vector<float> *ph_pt;
     std::vector<float> *ph_eta;
     std::vector<float> *ph_phi;    

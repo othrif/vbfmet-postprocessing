@@ -237,7 +237,9 @@ def getHistPars(hist):
     'n_truth_tau'     : {'xtitle':'Number of Truth taus'   ,         'ytitle':'Events',   'ymin':0.1},    
     'met_tst_j1_dphi'     : {'xtitle':'#Delta#phi(j1,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tst_j2_dphi'     : {'xtitle':'#Delta#phi(j2,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
-
+    'ptvarcone20'     : {'xtitle':'ptvarcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'ptvarcone30'     : {'xtitle':'ptvarcone30/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'topoetcone20'     : {'xtitle':'topoetcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
 
     'mj34'     : {'xtitle':'m_{j3,j4} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'max_j_eta'     : {'xtitle':'max(#eta_{j1},#eta_{j2})'   ,         'ytitle':'Events',   'ymin':0.1},                                
@@ -267,12 +269,12 @@ def getHistPars(hist):
     'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
     'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},     
-        'jetTrackWidth0' : {'xtitle':'Track Width (leading)',          'ytitle':'Events', 'LtoRCut':False},
-        'jetTrackWidth1' : {'xtitle':'Track Width (subleading)',          'ytitle':'Events', 'LtoRCut':False},
-        'jetNTracks0' : {'xtitle':'NTracks (leading)',          'ytitle':'Events','LtoRCut':False},
-        'jetNTracks1' : {'xtitle':'NTracks (subleading)',          'ytitle':'Events', 'LtoRCut':False},
-        'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
-        'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
+    'jetTrackWidth0' : {'xtitle':'Track Width (leading)',          'ytitle':'Events', 'logy':True},
+    'jetTrackWidth1' : {'xtitle':'Track Width (subleading)',          'ytitle':'Events', 'logy':True},
+    'jetNTracks0' : {'xtitle':'NTracks (leading)',          'ytitle':'Events','logy':True},
+    'jetNTracks1' : {'xtitle':'NTracks (subleading)',          'ytitle':'Events', 'logy':True},
+    'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
+    'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
         }
 
     try:

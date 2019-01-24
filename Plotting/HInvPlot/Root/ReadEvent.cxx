@@ -52,7 +52,7 @@ Msl::ReadEvent::ReadEvent():
   fPrintEvent   (false),
   fMaxNEvent(-1),
   fLumi         (1.0),
-  fLooseLepZ    (false),
+  fLoadBaseLep  (false),
   fOverlapPh    (false),
   genCutFlow    (0),
   procCutFlow0  (0),
@@ -80,8 +80,8 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Files",         fFiles);
 
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
-  reg.Get("ReadEvent::LooseLepZ",     fLooseLepZ);
-  reg.Get("ReadEvent::OverlapPh",    fOverlapPh);
+  reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
+  reg.Get("ReadEvent::OverlapPh",     fOverlapPh);
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -165,13 +165,19 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   truth_jet_eta = new std::vector<float>();
   truth_jet_phi = new std::vector<float>();    
   basemu_pt     = new std::vector<float>();
+  basemu_charge = new std::vector<int>();  
   basemu_eta    = new std::vector<float>();
   basemu_phi    = new std::vector<float>();
   basemu_ptvarcone20    = new std::vector<float>();      
-  baseel_pt     = new std::vector<float>();
-  baseel_eta    = new std::vector<float>();
-  baseel_phi    = new std::vector<float>();
+  basemu_ptvarcone30    = new std::vector<float>();      
+  basemu_topoetcone20   = new std::vector<float>();      
+  baseel_pt       = new std::vector<float>();
+  baseel_charge   = new std::vector<int>();  
+  baseel_eta      = new std::vector<float>();
+  baseel_phi      = new std::vector<float>();
   baseel_ptvarcone20    = new std::vector<float>();      
+  baseel_ptvarcone30    = new std::vector<float>();      
+  baseel_topoetcone20    = new std::vector<float>();      
   ph_pt     = new std::vector<float>();
   ph_eta    = new std::vector<float>();
   ph_phi    = new std::vector<float>();
@@ -253,13 +259,19 @@ void Msl::ReadEvent::Init(TTree* tree)
     tree->SetBranchAddress("truth_mu_phi",   &truth_mu_phi);    
   }
   tree->SetBranchAddress("baseel_pt",    &baseel_pt);  
+  tree->SetBranchAddress("baseel_charge",    &baseel_charge);  
   tree->SetBranchAddress("baseel_eta",   &baseel_eta);  
   tree->SetBranchAddress("baseel_phi",   &baseel_phi);
   tree->SetBranchAddress("baseel_ptvarcone20",   &baseel_ptvarcone20);  
+  tree->SetBranchAddress("baseel_ptvarcone30",   &baseel_ptvarcone30);  
+  tree->SetBranchAddress("baseel_topoetcone20",   &baseel_topoetcone20);  
   tree->SetBranchAddress("basemu_pt",    &basemu_pt);  
+  tree->SetBranchAddress("basemu_charge",    &basemu_charge);  
   tree->SetBranchAddress("basemu_eta",   &basemu_eta);  
   tree->SetBranchAddress("basemu_phi",   &basemu_phi);
   tree->SetBranchAddress("basemu_ptvarcone20",   &basemu_ptvarcone20);
+  tree->SetBranchAddress("basemu_ptvarcone30",   &basemu_ptvarcone30);
+  tree->SetBranchAddress("basemu_topoetcone20",   &basemu_topoetcone20);
   // load photons
   tree->SetBranchAddress("ph_pt",    &ph_pt);  
   tree->SetBranchAddress("ph_eta",   &ph_eta);  
@@ -601,26 +613,56 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	event->sample = fCurrSample;
       }
     }
-    // Fill Electrons
-    for(unsigned iEle=0; iEle<el_pt->size(); ++iEle){
-      RecParticle new_ele;
-      new_ele.pt  = el_pt->at(iEle)/1.0e3;
-      new_ele.eta = el_eta->at(iEle);
-      new_ele.phi = el_phi->at(iEle);
-      new_ele.m   = 0.000511;
-      new_ele.AddVar(Mva::charge,el_charge->at(iEle));       
-      event->electrons.push_back(new_ele);
-    }
-
-    // Fill Muons
-    for(unsigned iMuo=0; iMuo<mu_pt->size(); ++iMuo){
-      RecParticle new_muo;
-      new_muo.pt  = mu_pt->at(iMuo)/1.0e3;
-      new_muo.eta = mu_eta->at(iMuo);
-      new_muo.phi = mu_phi->at(iMuo);
-      new_muo.m   = 0.10566;      
-      new_muo.AddVar(Mva::charge,mu_charge->at(iMuo)); 
-      event->muons.push_back(new_muo);
+    if(fLoadBaseLep){
+      // Fill Electrons with the baseline electrons for this looser lepton selection
+      for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
+	RecParticle new_ele;
+	new_ele.pt  = baseel_pt->at(iEle)/1.0e3;
+	new_ele.eta = baseel_eta->at(iEle);
+	new_ele.phi = baseel_phi->at(iEle);
+	new_ele.m   = 0.000511;
+	new_ele.AddVar(Mva::charge,baseel_charge->at(iEle));       
+	if(baseel_ptvarcone20 && baseel_ptvarcone20->size()>iEle) new_ele.AddVar(Mva::ptvarcone20,baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle));       
+	if(baseel_ptvarcone30 && baseel_ptvarcone30->size()>iEle) new_ele.AddVar(Mva::ptvarcone30,baseel_ptvarcone30->at(iEle)/baseel_pt->at(iEle));
+	if(baseel_topoetcone20 && baseel_topoetcone20->size()>iEle) new_ele.AddVar(Mva::topoetcone20,baseel_topoetcone20->at(iEle)/baseel_pt->at(iEle));
+	event->electrons.push_back(new_ele);
+      }
+      
+      // Fill Muons
+      for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
+	RecParticle new_muo;
+	new_muo.pt  = basemu_pt->at(iMuo)/1.0e3;
+	new_muo.eta = basemu_eta->at(iMuo);
+	new_muo.phi = basemu_phi->at(iMuo);
+	new_muo.m   = 0.10566;      
+	new_muo.AddVar(Mva::charge,basemu_charge->at(iMuo));
+	if(basemu_ptvarcone20 && basemu_ptvarcone20->size()>iMuo) new_muo.AddVar(Mva::ptvarcone20,basemu_ptvarcone20->at(iMuo)/basemu_pt->at(iMuo)); 	
+	if(basemu_ptvarcone30 && basemu_ptvarcone30->size()>iMuo) new_muo.AddVar(Mva::ptvarcone30,basemu_ptvarcone30->at(iMuo)/basemu_pt->at(iMuo)); 	
+	if(basemu_topoetcone20 && basemu_topoetcone20->size()>iMuo) new_muo.AddVar(Mva::topoetcone20,basemu_topoetcone20->at(iMuo)/basemu_pt->at(iMuo)); 	
+	event->muons.push_back(new_muo);
+      }
+    }else{
+      // Fill Electrons
+      for(unsigned iEle=0; iEle<el_pt->size(); ++iEle){
+	RecParticle new_ele;
+	new_ele.pt  = el_pt->at(iEle)/1.0e3;
+	new_ele.eta = el_eta->at(iEle);
+	new_ele.phi = el_phi->at(iEle);
+	new_ele.m   = 0.000511;
+	new_ele.AddVar(Mva::charge,el_charge->at(iEle));       
+	event->electrons.push_back(new_ele);
+      }
+      
+      // Fill Muons
+      for(unsigned iMuo=0; iMuo<mu_pt->size(); ++iMuo){
+	RecParticle new_muo;
+	new_muo.pt  = mu_pt->at(iMuo)/1.0e3;
+	new_muo.eta = mu_eta->at(iMuo);
+	new_muo.phi = mu_phi->at(iMuo);
+	new_muo.m   = 0.10566;      
+	new_muo.AddVar(Mva::charge,mu_charge->at(iMuo)); 
+	event->muons.push_back(new_muo);
+      }
     }
 
     // Fill Taus
@@ -656,9 +698,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));      
-      new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));      
-      new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));      
-      new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));      
+      if(jet_TrackWidth && jet_TrackWidth->size()>iJet) new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));      
+      if(jet_NTracks && jet_NTracks->size()>iJet) new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));      
+      if(jet_PartonTruthLabelID && jet_PartonTruthLabelID->size()>iJet) new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));      
       
       if(jet_jvt->size()>iJet){
 	float jvt = jet_jvt->at(iJet);
@@ -866,12 +908,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if(fMETChoice!="met_tst_et"){
       Mva::Var my_met = Mva::Convert2Var(fMETChoice);
       Mva::Var my_met_phi = Mva::Convert2Var(fMETChoice_phi);
-      //Mva::Var my_met_nolep = Mva::Convert2Var(fMETChoice_nolep);
-      //Mva::Var my_met_nolep_phi = Mva::Convert2Var(fMETChoice_nolep_phi);
 
       // fill the met alternative
       event->met_nolep.SetPtEtaPhiM(event->GetVar(my_met),0.0,event->GetVar(my_met_phi),0.0);
-      //std::cout << "met before leptons: " << event->GetVar(my_met) << std::endl;
       for(unsigned iLep=0; iLep<event->electrons.size(); ++iLep)
 	event->met_nolep+=event->electrons.at(iLep).GetLVec();
       for(unsigned iLep=0; iLep<event->muons.size(); ++iLep)
@@ -976,7 +1015,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->RepVar(Mva::trigger_lep, trigger_lep_new);
     
     // Change the leptons to base leptons - after filling the event
-    if(fLooseLepZ) ChangeLep(*event);    
+    //if(fLoadBaseLep) ChangeLep(*event);    
 
     if(i % 10000 == 0 && i > 0) {
       cout << "Processed " << setw(10) << right << i << " events" << endl; 
@@ -1107,9 +1146,7 @@ void Msl::ReadEvent::FillEvent(Event &event)
     if(event.electrons.size()>0){
       event.AddVar(Mva::lepPt0,  event.electrons.at(0).pt);
       event.AddVar(Mva::lepCh0,  event.electrons.at(0).GetVar(Mva::charge));
-      //TLorentzVector W = event.electrons.at(0).GetLVec()+event.met;
       double MT = sqrt(2. * event.electrons.at(0).pt * event.met.Pt() * (1. - cos(event.electrons.at(0).phi - event.met.Phi())));
-      //event.AddVar(Mva::mt, W.M());
       event.AddVar(Mva::mt, MT);    
     }
     if(event.electrons.size()>1){
@@ -1124,8 +1161,6 @@ void Msl::ReadEvent::FillEvent(Event &event)
     if(event.muons.size()>0){
       event.AddVar(Mva::lepPt0,  event.muons.at(0).pt);
       event.AddVar(Mva::lepCh0,  event.muons.at(0).GetVar(Mva::charge));
-      //TLorentzVector W = event.muons.at(0).GetLVec()+event.met;
-      //event.AddVar(Mva::mt, W.M());
       double MT = sqrt(2. * event.muons.at(0).pt * event.met.Pt() * (1. - cos(event.muons.at(0).phi - event.met.Phi())));
       event.AddVar(Mva::mt, MT);  
     }

@@ -70,6 +70,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   basemu_pt= new std::vector<float>(0);
   basemu_eta= new std::vector<float>(0);
   basemu_phi= new std::vector<float>(0);
+  basemu_charge= new std::vector<int>(0);
   basemu_z0= new std::vector<float>(0);
   basemu_d0sig= new std::vector<float>(0);
   basemu_ptvarcone20= new std::vector<float>(0);
@@ -83,6 +84,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   baseel_pt= new std::vector<float>(0);
   baseel_eta= new std::vector<float>(0);
   baseel_phi= new std::vector<float>(0);
+  baseel_charge= new std::vector<int>(0);
   baseel_z0= new std::vector<float>(0);
   baseel_d0sig= new std::vector<float>(0);
   baseel_ptvarcone20= new std::vector<float>(0);
@@ -235,6 +237,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("basemu_pt",           &basemu_pt);
     m_tree_out->Branch("basemu_eta",          &basemu_eta);
     m_tree_out->Branch("basemu_phi",          &basemu_phi);
+    m_tree_out->Branch("basemu_charge",          &basemu_charge);
     m_tree_out->Branch("basemu_z0",           &basemu_z0);
     m_tree_out->Branch("basemu_d0sig",           &basemu_d0sig);
     m_tree_out->Branch("basemu_ptvarcone20",  &basemu_ptvarcone20);
@@ -247,6 +250,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("baseel_pt",           &baseel_pt);
     m_tree_out->Branch("baseel_eta",          &baseel_eta);
     m_tree_out->Branch("baseel_phi",          &baseel_phi);
+    m_tree_out->Branch("baseel_charge",          &baseel_charge);
     m_tree_out->Branch("baseel_z0",           &baseel_z0);
     m_tree_out->Branch("baseel_d0sig",        &baseel_d0sig);
     m_tree_out->Branch("baseel_ptvarcone20",  &baseel_ptvarcone20);
@@ -542,30 +546,40 @@ StatusCode VBFAnalysisAlg::execute() {
   if (trigger_HLT_xe100_mht_L1XE50 == 1 || trigger_HLT_xe110_mht_L1XE50 == 1 || trigger_HLT_xe90_mht_L1XE50 == 1) trigger_met = 1; else trigger_met = 0;
   ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
-    //met_significance = met_tst_et/1000/sqrt(sqrt(el_pt->at(0)*el_pt->at(0)*cos(el_phi->at(0))*cos(el_phi->at(0))+el_pt->at(0)*el_pt->at(0)*sin(el_phi->at(0))*sin(el_phi->at(0)))+sqrt(jet_pt->at(0)*jet_pt->at(0)*sin(jet_phi->at(0))*sin(jet_phi->at(0))+jet_pt->at(0)*jet_pt->at(0)*cos(jet_phi->at(0))*cos(jet_phi->at(0)))+sqrt(jet_pt->at(1)*jet_pt->at(1)*sin(jet_phi->at(1))*sin(jet_phi->at(1))+jet_pt->at(1)*jet_pt->at(1)*cos(jet_phi->at(1))*cos(jet_phi->at(1)))/1000);
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
-  } else {
+  }else if(n_baseel == 1){
+    met_significance = met_tst_et/1000/sqrt((baseel_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);    
+  }else if(n_mu == 1){
+    met_significance = met_tst_et/1000/sqrt((mu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);    
+  }else if(n_basemu == 1){
+    met_significance = met_tst_et/1000/sqrt((basemu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);    
+  }else {
     met_significance = 0;
   }
   ATH_MSG_DEBUG ("met_significance calculated");
-  
+
+  bool OneElec = (n_el == 1); // n_el should be a subset of baseel
+  bool OneMuon = (n_mu == 1);// n_mu should be a subset of basemu
   if(!m_LooseSkim){
     if ((trigger_met == 1) & (met_tst_et > METCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
   }else{
     if ((trigger_met == 1) & (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut || met_tighter_tst_et > METCut) & (n_el == 0) & (n_mu == 0)) SR = true;
+    // saving the base leptons for the fake lepton estimate. This is done in the loose skimming
+    OneElec = (n_el == 1 || n_baseel==1); // n_el should be a subset of baseel
+    OneMuon = (n_mu == 1 || n_basemu==1);// n_mu should be a subset of basemu
   }
   if (SR) ATH_MSG_DEBUG ("It's SR!"); else ATH_MSG_DEBUG ("It's NOT SR");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
   if (CRWep) ATH_MSG_DEBUG ("It's CRWep!"); else ATH_MSG_DEBUG ("It's NOT CRWep");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
   if (CRWen) ATH_MSG_DEBUG ("It's CRWen!"); else ATH_MSG_DEBUG ("It's NOT CRWen");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
   if (CRWepLowSig) ATH_MSG_DEBUG ("It's CRWepLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWepLowSig");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
   if (CRWenLowSig) ATH_MSG_DEBUG ("It's CRWenLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWenLowSig");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (OneMuon)){ if ((basemu_charge->at(0) > 0)) CRWmp = true;}
   if (CRWmp) ATH_MSG_DEBUG ("It's CRWmp!"); else ATH_MSG_DEBUG ("It's NOT CRWmp");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
+  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (OneMuon)){ if ((basemu_charge->at(0) < 0)) CRWmn = true;}
   if (CRWmn) ATH_MSG_DEBUG ("It's CRWmn!"); else ATH_MSG_DEBUG ("It's NOT CRWmn");
   if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
   if (CRZee) ATH_MSG_DEBUG ("It's CRZee!"); else ATH_MSG_DEBUG ("It's NOT CRZee");
@@ -758,6 +772,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("basemu_pt",1);
     m_tree->SetBranchStatus("basemu_eta",1);
     m_tree->SetBranchStatus("basemu_phi",1);
+    m_tree->SetBranchStatus("basemu_charge",1);
     m_tree->SetBranchStatus("basemu_z0",1);
     m_tree->SetBranchStatus("basemu_d0sig",1);
     m_tree->SetBranchStatus("basemu_ptvarcone20",1);
@@ -770,6 +785,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("baseel_pt",1);
     m_tree->SetBranchStatus("baseel_eta",1);
     m_tree->SetBranchStatus("baseel_phi",1);
+    m_tree->SetBranchStatus("baseel_charge",1);
     m_tree->SetBranchStatus("baseel_z0",1);
     m_tree->SetBranchStatus("baseel_d0sig",1);
     m_tree->SetBranchStatus("baseel_ptvarcone20",1);
@@ -922,6 +938,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("basemu_pt",           &basemu_pt);
     m_tree->SetBranchAddress("basemu_eta",          &basemu_eta);
     m_tree->SetBranchAddress("basemu_phi",          &basemu_phi);
+    m_tree->SetBranchAddress("basemu_charge",          &basemu_charge);
     m_tree->SetBranchAddress("basemu_z0",           &basemu_z0);
     m_tree->SetBranchAddress("basemu_d0sig",        &basemu_d0sig);
     m_tree->SetBranchAddress("basemu_ptvarcone20",  &basemu_ptvarcone20);
@@ -934,6 +951,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
     m_tree->SetBranchAddress("baseel_eta",          &baseel_eta);
     m_tree->SetBranchAddress("baseel_phi",          &baseel_phi);
+    m_tree->SetBranchAddress("baseel_charge",          &baseel_charge);
     m_tree->SetBranchAddress("baseel_z0",           &baseel_z0);
     m_tree->SetBranchAddress("baseel_d0sig",           &baseel_d0sig);
     m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
