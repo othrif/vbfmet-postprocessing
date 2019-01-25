@@ -154,6 +154,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   treeNameOut = m_currentSample+m_currentVariation;
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w); 
+  //m_tree_out->Branch("nloEWKWeight",&nloEWKWeight); 
   m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight); 
   m_tree_out->Branch("eleANTISF",&eleANTISF); 
   m_tree_out->Branch("runNumber",&runNumber);
@@ -398,6 +399,7 @@ StatusCode VBFAnalysisAlg::execute() {
     truth_jj_mass =jjtruth.M();
   }
 
+  // MET trigger scale factor
   xeSFTrigWeight=1.0;
   if(m_isMC && jet_pt && jet_pt->size()>1){
     TLorentzVector tmp, jj; 
@@ -406,6 +408,12 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));    
     jj+=tmp;
     xeSFTrigWeight = weightXETrigSF(met_tst_et); // met was used in the end instead of jj.Pt()
+  }
+  // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
+  nloEWKWeight=1.0;
+  if(m_isMC && met_truth_et>-0.5 && (runNumber==308567 || (runNumber>=308275 && runNumber<=308283))){
+    nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;
+    nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
   }
 
   if (m_isMC){
@@ -588,7 +596,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt");
 
-  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF;
+  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF*nloEWKWeight;
   //
   /// compute the systematics weights
   //
@@ -626,7 +634,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF;
   }//end systematic weight loop
 
-  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt)) return StatusCode::SUCCESS;
   double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;

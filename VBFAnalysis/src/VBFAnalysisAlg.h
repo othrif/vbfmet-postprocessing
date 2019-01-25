@@ -97,6 +97,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   ULong64_t eventNumber;
   Float_t averageIntPerXing;
   Float_t mcEventWeight;
+  Float_t nloEWKWeight;
   Float_t puWeight;
   Float_t jvtSFWeight;
   Float_t fjvtSFWeight;
