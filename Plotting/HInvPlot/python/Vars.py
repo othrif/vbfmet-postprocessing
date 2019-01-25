@@ -49,6 +49,7 @@ myplots = [
               ['jetNTracks1', '40', '0.0', '40.0'], 
               ['jetPartonTruthLabelID0', '28', '-5.0', '22.0'], 
               ['jetPartonTruthLabelID1', '28', '-5.0', '22.0'], 
+              ['jj_nmbGluons', '3', '0.0', '2.0'], 
               ['etaj0TimesEtaj1', '200', '-100.0', '100.0'],              
               ['chanFlavor', '10', '-0.5', '9.5'],
               ['lepPt0', '500', '0.0', '500.0'],                            

@@ -759,6 +759,13 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj40;
       if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj50;      
     }
+    
+    //calculate how many gluon-initiated leading jets
+    int nmbGluons =0;
+    for(unsigned iJet=0; iJet<2; ++iJet){
+      if(jet_PartonTruthLabelID->at(iJet)==21) ++nmbGluons; 
+    }
+    event->AddVar(Mva::jj_nmbGluons, nmbGluons);
 
     if(fJetVetoPt>0.0)
       event->RepVar(Mva::n_jet, nJet);

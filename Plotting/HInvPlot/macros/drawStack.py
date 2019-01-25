@@ -275,6 +275,7 @@ def getHistPars(hist):
     'jetNTracks1' : {'xtitle':'NTracks (subleading)',          'ytitle':'Events', 'logy':True},
     'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
     'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
+    'jj_nmbGluons' : {'xtitle':'Number of gluon-initiated leading jets',          'ytitle':'Events', 'logy':True},
         }
 
     try:
