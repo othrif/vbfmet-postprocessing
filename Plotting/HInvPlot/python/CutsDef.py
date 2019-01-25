@@ -161,11 +161,15 @@ def metCuts(options, isLep=False):
     return cuts
 
 #-------------------------------------------------------------------------
-def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
+def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
 
     cuts = []
 
-    cuts += [CutItem('CutTrig',      'trigger_met == 1')]
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight=None
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
     cuts += [CutItem('CutPh', 'n_ph==0')]
@@ -325,6 +329,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     sigs['hvbf']  = ['hvbf']
     
     bkgs = {}
+
     bkgs['wqcd'] = ['wqcd']
     bkgs['zqcd'] = ['zqcd']
     bkgs['wewk'] = ['wewk']
@@ -400,11 +405,11 @@ def _fillPassEventRegistry(reg, cuts, options, basic_cuts=None, *arguments, **ke
     fillSampleList(reg, 'PassEvent::Sets', options, basic_cuts)
 
 #-------------------------------------------------------------------------
-def preparePassEventForSR(alg_name, options, basic_cuts, cut='BASIC'):
+def preparePassEventForSR(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
 
     reg  = ROOT.Msl.Registry()
 
-    cuts = getSRCuts(cut, options, basic_cuts, ignore_met=options.ignore_met)
+    cuts = getSRCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
 
     #
     # Fill Registry with cuts and samples for cut-flow
