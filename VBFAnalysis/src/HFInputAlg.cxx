@@ -236,7 +236,7 @@ StatusCode HFInputAlg::execute() {
     }
   }
   xeSFTrigWeight=1.0;
-  if(isMC && jet_pt && jet_pt->size()>1){
+  if(isMC && jet_pt && jet_pt->size()>1 && currentVariation!="xeSFTrigWeight__1up"){ // the MET trigger SF is turned off in the up variation. so it will be =1.
     TLorentzVector tmp, jj; 
     tmp.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0),jet_phi->at(0),jet_m->at(0));    
     jj=tmp;
@@ -343,13 +343,13 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
   std::cout << "Tree Entries: " <<m_tree->GetEntries() <<std::endl;
   m_tree->SetBranchStatus("*",0);
-  if(weightSyst){
+  if(weightSyst && currentVariation!="xeSFTrigWeight__1up"){// MET trigger SF systematic is computed differently. The variable is saved. So here we just pickup the nominal weights
     bool found=false;
     TObjArray *var_list = m_tree->GetListOfBranches();
-    for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) {
+    for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) { 
       TString var_name = var_list->At(a)->GetName();
       if(var_name.Contains(currentVariation)){
-	if(var_name.Contains("ANTISF") && currentVariation.find("ANTISF")==std::string::npos) continue; // checking that the antiID SF are treated separately. skipping if they dont match
+	if(var_name.Contains("ANTISF") && currentVariation.find("ANTISF")==std::string::npos) continue; // checking that the antiID SF are treated separately. skipping if they dont match to avoid picking the ID SF
 	m_tree->SetBranchStatus(var_name, 1);
 	m_tree->SetBranchAddress(var_name, &w);
 	found=true;
