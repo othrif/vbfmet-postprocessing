@@ -81,7 +81,7 @@ def prepareSeqSR(basic_cuts, alg_take=None, syst='Nominal'):
     if basic_cuts.chan !='nn' or not passRegion(region):
         return ('', [])
     
-    pass_alg = hstudy.preparePassEventForSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    pass_alg = hstudy.preparePassEventForSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
@@ -188,7 +188,10 @@ def main():
     for syst in syst_list:
         print 'SYST: ',syst
         read_alg.ClearAlgs();
-        if syst in weight_syst:
+        if syst in weight_syst and syst=='xeSFTrigWeight__1up':
+            read_alg.SetSystName("Nominal")
+            read_alg.SetWeightSystName("Nominal")
+        elif syst in weight_syst:            
             read_alg.SetSystName("Nominal")
             read_alg.SetWeightSystName(syst)            
         else:

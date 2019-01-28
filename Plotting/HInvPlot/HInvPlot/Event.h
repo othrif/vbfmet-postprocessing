@@ -70,6 +70,7 @@ namespace Msl
     virtual ~Event() {}
 
     void AddWeight(double w);
+    void AddWeight(float w);    
     void SetWeight(double w);
     
     double GetWeight() const;
@@ -131,6 +132,9 @@ namespace Msl
   // Inlined Event functions: scalar operations
   //
   inline void Msl::Event::AddWeight(double w) {
+    totalWeight *= w;
+  }
+  inline void Msl::Event::AddWeight(float w) {
     totalWeight *= w;
   }
   inline void Msl::Event::SetWeight(double w) {

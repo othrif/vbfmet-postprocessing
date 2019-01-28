@@ -162,6 +162,7 @@ namespace Msl
     bool                        fOverlapPh;
     // Input vars
     float fWeight;
+    float xeSFTrigWeight;
     int   fRunNumber;
     int   fCurrRunNumber;
     Mva::Sample fCurrSample;
