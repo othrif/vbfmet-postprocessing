@@ -49,13 +49,13 @@ class sample(object):
             else:
                 self.isMC = True
         if (self.isMC):
-            if ((self.runNumber >= 308096 and self.runNumber <= 308098) or (self.runNumber == 363359) or (self.runNumber == 363360) or (self.runNumber == 363489)):
+            if ((self.runNumber >= 308096 and self.runNumber <= 308098) or (self.runNumber == 363489)):
                 self.sampleType = "W_EWK"
             elif (self.runNumber >= 364156 and self.runNumber <= 364197):
                 self.sampleType = "W_strong"
             elif (self.runNumber >= 363600 and self.runNumber <= 363671):
                 self.sampleType = "W_strong" # madgraph
-            elif ((self.runNumber >= 308092 and self.runNumber <= 308095) or (self.runNumber >= 363355 and self.runNumber <= 363358)):
+            elif (self.runNumber >= 308092 and self.runNumber <= 308095):
                 self.sampleType = "Z_EWK"
             elif (self.runNumber >= 345099 and self.runNumber <= 345102):
                 self.sampleType = "Z_strong_VBFFilt"
@@ -73,14 +73,18 @@ class sample(object):
                 self.sampleType = "QCDw"
             elif (self.runNumber >= 426001 and self.runNumber <= 426009):
                 self.sampleType = "QCDunw"
-            elif (self.runNumber == 363494 or self.runNumber == 364250 or self.runNumber == 364254 or self.runNumber == 364255):
+            elif (self.runNumber >= 364250 and self.runNumber <= 364255) or (self.runNumber >= 363355 and self.runNumber <= 363360) or self.runNumber==363489 or self.runNumber==363494:
                 self.sampleType = "VV"
-            elif (self.runNumber >= 364242 and self.runNumber <= 364249):
+            elif (self.runNumber >= 364242 and self.runNumber <= 364249 or self.runNumber==364253):
                 self.sampleType = "VVV"
             elif (self.runNumber >= 364198 and self.runNumber <= 364215):
                 self.sampleType = "Z_strong_LowMass"
             elif (self.runNumber >= 301020 and self.runNumber <= 361669):
                 self.sampleType = "Z_strong" #powheg
+            elif (self.runNumber >=309662  and self.runNumber <= 309679):
+                self.sampleType = "Z_strongExt" #extension
+            elif (self.runNumber >=364216  and self.runNumber <= 364229):
+                self.sampleType = "Z_strongOtherExt" #other?
             elif (self.runNumber >= 363147 and self.runNumber <= 363170) or (self.runNumber >= 363123 and self.runNumber <= 363146):
                 self.sampleType = "Z_strong" #madgraph
             else:
