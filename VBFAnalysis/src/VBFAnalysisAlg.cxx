@@ -163,6 +163,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("trigger_met_encodedv2", &trigger_met_encodedv2);
   m_tree_out->Branch("l1_met_trig_encoded", &l1_met_trig_encoded);
   if(m_extraVars) m_tree_out->Branch("trigger_met_encoded", &trigger_met_encoded);
+  m_tree_out->Branch("passVjetsFilter", &passVjetsFilter );
+  m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
   m_tree_out->Branch("n_jet",&n_jet);
@@ -902,6 +904,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   //m_tree->SetBranchAddress("trigger_met", &trigger_met); // just testing being copying directly
   m_tree->SetBranchAddress("trigger_met", &trigger_met_encodedv2);
   m_tree->SetBranchAddress("l1_met_trig_encoded", &l1_met_trig_encoded);
+  m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
+  m_tree->SetBranchAddress("passVjetsPTV", &passVjetsPTV);
   m_tree->SetBranchAddress("passGRL", &passGRL);
   m_tree->SetBranchAddress("passPV", &passPV);
   m_tree->SetBranchAddress("passDetErr", &passDetErr);

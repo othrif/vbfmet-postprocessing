@@ -94,6 +94,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t trigger_met_encoded;
   Int_t trigger_met_encodedv2;
   Int_t l1_met_trig_encoded;
+  Bool_t passVjetsFilter;
+  Bool_t passVjetsPTV;
 
   Int_t runNumber;
   ULong64_t eventNumber;
