@@ -160,6 +160,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("runNumber",&runNumber);
   m_tree_out->Branch("eventNumber",&eventNumber);
   m_tree_out->Branch("trigger_met", &trigger_met);
+  m_tree_out->Branch("trigger_met_encodedv2", &trigger_met_encodedv2);
+  m_tree_out->Branch("l1_met_trig_encoded", &l1_met_trig_encoded);
   if(m_extraVars) m_tree_out->Branch("trigger_met_encoded", &trigger_met_encoded);
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
@@ -212,17 +214,18 @@ StatusCode VBFAnalysisAlg::initialize() {
 
   if(m_extraVars){
 
-    m_tree_out->Branch("n_bjet",&n_bjet);
-
-    m_tree_out->Branch("j3_centrality",&j3_centrality);
-    m_tree_out->Branch("j3_dRj1",&j3_dRj1);
-    m_tree_out->Branch("j3_dRj2",&j3_dRj2);
-    m_tree_out->Branch("j3_minDR",&j3_minDR);
-    m_tree_out->Branch("j3_mjclosest",&j3_mjclosest);
-    m_tree_out->Branch("j3_min_mj",&j3_min_mj);
-    m_tree_out->Branch("j3_min_mj_over_mjj",&j3_min_mj_over_mjj);
-    m_tree_out->Branch("mj34",&mj34);
-    m_tree_out->Branch("max_j_eta",&max_j_eta);
+    if(m_currentVariation=="Nominal"){
+      m_tree_out->Branch("n_bjet",&n_bjet);
+      m_tree_out->Branch("j3_centrality",&j3_centrality);
+      m_tree_out->Branch("j3_min_mj_over_mjj",&j3_min_mj_over_mjj);
+      m_tree_out->Branch("j3_dRj1",&j3_dRj1);
+      m_tree_out->Branch("j3_dRj2",&j3_dRj2);
+      m_tree_out->Branch("j3_minDR",&j3_minDR);
+      m_tree_out->Branch("j3_mjclosest",&j3_mjclosest);
+      m_tree_out->Branch("j3_min_mj",&j3_min_mj);
+      m_tree_out->Branch("mj34",&mj34);
+      m_tree_out->Branch("max_j_eta",&max_j_eta);
+    }
     if(m_QGTagger){
       m_tree_out->Branch("jet_NTracks",&jet_NTracks);
       m_tree_out->Branch("jet_SumPtTracks",&jet_SumPtTracks);
@@ -235,55 +238,59 @@ StatusCode VBFAnalysisAlg::initialize() {
     if(m_isMC) m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
 
     m_tree_out->Branch("jet_fjvt",&jet_fjvt);    
-    m_tree_out->Branch("basemu_pt",           &basemu_pt);
-    m_tree_out->Branch("basemu_eta",          &basemu_eta);
-    m_tree_out->Branch("basemu_phi",          &basemu_phi);
-    m_tree_out->Branch("basemu_charge",          &basemu_charge);
-    m_tree_out->Branch("basemu_z0",           &basemu_z0);
-    m_tree_out->Branch("basemu_d0sig",           &basemu_d0sig);
-    m_tree_out->Branch("basemu_ptvarcone20",  &basemu_ptvarcone20);
-    m_tree_out->Branch("basemu_ptvarcone30",  &basemu_ptvarcone30);
-    m_tree_out->Branch("basemu_topoetcone20",  &basemu_topoetcone20);
-    m_tree_out->Branch("basemu_topoetcone30",  &basemu_topoetcone30);
-    m_tree_out->Branch("basemu_type",         &basemu_type);
-    if(m_isMC) m_tree_out->Branch("basemu_truthOrigin",  &basemu_truthOrigin);
-    if(m_isMC) m_tree_out->Branch("basemu_truthType",    &basemu_truthType);
-    m_tree_out->Branch("baseel_pt",           &baseel_pt);
-    m_tree_out->Branch("baseel_eta",          &baseel_eta);
-    m_tree_out->Branch("baseel_phi",          &baseel_phi);
-    m_tree_out->Branch("baseel_charge",          &baseel_charge);
-    m_tree_out->Branch("baseel_z0",           &baseel_z0);
-    m_tree_out->Branch("baseel_d0sig",        &baseel_d0sig);
-    m_tree_out->Branch("baseel_ptvarcone20",  &baseel_ptvarcone20);
-    m_tree_out->Branch("baseel_ptvarcone30",  &baseel_ptvarcone30);
-    m_tree_out->Branch("baseel_topoetcone20",  &baseel_topoetcone20);
-    m_tree_out->Branch("baseel_topoetcone30",  &baseel_topoetcone30);
-    if(m_isMC) m_tree_out->Branch("baseel_truthOrigin",  &baseel_truthOrigin);
-    if(m_isMC) m_tree_out->Branch("baseel_truthType",    &baseel_truthType);
-
-    m_tree_out->Branch("ph_pt", &ph_pt);
-    m_tree_out->Branch("ph_phi",&ph_phi);
-    m_tree_out->Branch("ph_eta",&ph_eta);
-    m_tree_out->Branch("tau_pt",&outtau_pt);
-    m_tree_out->Branch("tau_phi",&outtau_phi);
-    m_tree_out->Branch("tau_eta",&outtau_eta);
-
-    m_tree_out->Branch("met_soft_tst_phi",       &met_soft_tst_phi);
-    m_tree_out->Branch("met_soft_tst_sumet",     &met_soft_tst_sumet);
+    if(m_currentVariation=="Nominal"){
+      m_tree_out->Branch("basemu_pt",           &basemu_pt);
+      m_tree_out->Branch("basemu_eta",          &basemu_eta);
+      m_tree_out->Branch("basemu_phi",          &basemu_phi);
+      m_tree_out->Branch("basemu_charge",          &basemu_charge);
+      m_tree_out->Branch("basemu_z0",           &basemu_z0);
+      m_tree_out->Branch("basemu_d0sig",           &basemu_d0sig);
+      m_tree_out->Branch("basemu_ptvarcone20",  &basemu_ptvarcone20);
+      m_tree_out->Branch("basemu_ptvarcone30",  &basemu_ptvarcone30);
+      m_tree_out->Branch("basemu_topoetcone20",  &basemu_topoetcone20);
+      m_tree_out->Branch("basemu_topoetcone30",  &basemu_topoetcone30);
+      m_tree_out->Branch("basemu_type",         &basemu_type);
+      if(m_isMC) m_tree_out->Branch("basemu_truthOrigin",  &basemu_truthOrigin);
+      if(m_isMC) m_tree_out->Branch("basemu_truthType",    &basemu_truthType);
+      m_tree_out->Branch("baseel_pt",           &baseel_pt);
+      m_tree_out->Branch("baseel_eta",          &baseel_eta);
+      m_tree_out->Branch("baseel_phi",          &baseel_phi);
+      m_tree_out->Branch("baseel_charge",          &baseel_charge);
+      m_tree_out->Branch("baseel_z0",           &baseel_z0);
+      m_tree_out->Branch("baseel_d0sig",        &baseel_d0sig);
+      m_tree_out->Branch("baseel_ptvarcone20",  &baseel_ptvarcone20);
+      m_tree_out->Branch("baseel_ptvarcone30",  &baseel_ptvarcone30);
+      m_tree_out->Branch("baseel_topoetcone20",  &baseel_topoetcone20);
+      m_tree_out->Branch("baseel_topoetcone30",  &baseel_topoetcone30);
+      if(m_isMC) m_tree_out->Branch("baseel_truthOrigin",  &baseel_truthOrigin);
+      if(m_isMC) m_tree_out->Branch("baseel_truthType",    &baseel_truthType);
+    }
+    if(m_currentVariation=="Nominal"){
+      m_tree_out->Branch("ph_pt", &ph_pt);
+      m_tree_out->Branch("ph_phi",&ph_phi);
+      m_tree_out->Branch("ph_eta",&ph_eta);
+      m_tree_out->Branch("tau_pt",&outtau_pt);
+      m_tree_out->Branch("tau_phi",&outtau_phi);
+      m_tree_out->Branch("tau_eta",&outtau_eta);
+      m_tree_out->Branch("met_soft_tst_phi",       &met_soft_tst_phi);
+      m_tree_out->Branch("met_soft_tst_sumet",     &met_soft_tst_sumet);
+    }
+    // Tenacious MET
     m_tree_out->Branch("met_tenacious_tst_et",   &met_tenacious_tst_et);
     m_tree_out->Branch("met_tenacious_tst_phi",  &met_tenacious_tst_phi);
 
-    m_tree_out->Branch("met_tenacious_tst_j1_dphi",&met_tenacious_tst_j1_dphi);
-    m_tree_out->Branch("met_tenacious_tst_j2_dphi",&met_tenacious_tst_j2_dphi);
-    m_tree_out->Branch("met_tenacious_tst_nolep_j1_dphi",&met_tenacious_tst_nolep_j1_dphi);
-    m_tree_out->Branch("met_tenacious_tst_nolep_j2_dphi",&met_tenacious_tst_nolep_j2_dphi);
-    m_tree_out->Branch("met_tenacious_tst_nolep_et",&met_tenacious_tst_nolep_et);
-    m_tree_out->Branch("met_tenacious_tst_nolep_phi",&met_tenacious_tst_nolep_phi);
-
-    m_tree_out->Branch("met_tight_tst_et",       &met_tight_tst_et);
-    m_tree_out->Branch("met_tight_tst_phi",      &met_tight_tst_phi);
-    m_tree_out->Branch("met_tighter_tst_et",     &met_tighter_tst_et);
-    m_tree_out->Branch("met_tighter_tst_phi",    &met_tighter_tst_phi);
+    if(m_currentVariation=="Nominal"){
+      m_tree_out->Branch("met_tenacious_tst_j1_dphi",&met_tenacious_tst_j1_dphi);
+      m_tree_out->Branch("met_tenacious_tst_j2_dphi",&met_tenacious_tst_j2_dphi);
+      m_tree_out->Branch("met_tenacious_tst_nolep_j1_dphi",&met_tenacious_tst_nolep_j1_dphi);
+      m_tree_out->Branch("met_tenacious_tst_nolep_j2_dphi",&met_tenacious_tst_nolep_j2_dphi);
+      m_tree_out->Branch("met_tenacious_tst_nolep_et",&met_tenacious_tst_nolep_et);
+      m_tree_out->Branch("met_tenacious_tst_nolep_phi",&met_tenacious_tst_nolep_phi);
+      m_tree_out->Branch("met_tight_tst_et",       &met_tight_tst_et);
+      m_tree_out->Branch("met_tight_tst_phi",      &met_tight_tst_phi);
+      m_tree_out->Branch("met_tighter_tst_et",     &met_tighter_tst_et);
+      m_tree_out->Branch("met_tighter_tst_phi",    &met_tighter_tst_phi);
+    }
     m_tree_out->Branch("metsig_tst",             &metsig_tst);
 
     if(m_currentVariation=="Nominal" && m_isMC){
@@ -296,6 +303,10 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("truth_mu_pt", &truth_mu_pt);
       m_tree_out->Branch("truth_mu_eta",&truth_mu_eta);
       m_tree_out->Branch("truth_mu_phi",&truth_mu_phi);
+    }else{
+      truth_tau_pt=0; truth_tau_eta=0; truth_tau_phi=0; 
+      truth_el_pt=0;  truth_el_eta=0;  truth_el_phi=0;
+      truth_mu_pt=0;  truth_mu_eta=0;  truth_mu_phi=0;
     }
   }
   
@@ -310,7 +321,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("truth_jet_m",  &truth_jet_m);
     m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
   }else{
-    truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0;
+    truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0; 
   }
   //Register the output TTree 
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
@@ -519,11 +530,11 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   // Definiing a loose skimming
-  float METCut = 180.0e3;
+  float METCut = 150.0e3;
   float LeadJetPtCut = 80.0e3;
   float subLeadJetPtCut = 50.0e3;
-  float MjjCut =2e5;
-  float DEtajjCut =4.8;
+  float MjjCut =8e5;
+  float DEtajjCut =3.8;
 
   if(m_LooseSkim){
     METCut = 140.0e3;
@@ -552,6 +563,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if (trigger_HLT_noalg_L1J400 == 1)     trigger_met_encoded+=0x10;
 
   if (trigger_HLT_xe100_mht_L1XE50 == 1 || trigger_HLT_xe110_mht_L1XE50 == 1 || trigger_HLT_xe90_mht_L1XE50 == 1) trigger_met = 1; else trigger_met = 0;
+  bool passMETTrig = trigger_met_encodedv2>0 || trigger_met>0;
   ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
@@ -569,9 +581,9 @@ StatusCode VBFAnalysisAlg::execute() {
   bool OneElec = (n_el == 1); // n_el should be a subset of baseel
   bool OneMuon = (n_mu == 1);// n_mu should be a subset of basemu
   if(!m_LooseSkim){
-    if ((trigger_met == 1) & (met_tst_et > METCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
+    if ((passMETTrig) & (met_tst_et > METCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
   }else{
-    if ((trigger_met == 1) & (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut || met_tighter_tst_et > METCut) & (n_el == 0) & (n_mu == 0)) SR = true;
+    if ((passMETTrig) & (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut || met_tighter_tst_et > METCut) & (n_el == 0) & (n_mu == 0)) SR = true;
     // saving the base leptons for the fake lepton estimate. This is done in the loose skimming
     OneElec = (n_el == 1 || n_baseel==1); // n_el should be a subset of baseel
     OneMuon = (n_mu == 1 || n_basemu==1);// n_mu should be a subset of basemu
@@ -585,15 +597,15 @@ StatusCode VBFAnalysisAlg::execute() {
   if (CRWepLowSig) ATH_MSG_DEBUG ("It's CRWepLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWepLowSig");
   if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
   if (CRWenLowSig) ATH_MSG_DEBUG ("It's CRWenLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWenLowSig");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (OneMuon)){ if ((basemu_charge->at(0) > 0)) CRWmp = true;}
+  if ((trigger_lep > 0 || passMETTrig) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (OneMuon)){ if ((basemu_charge->at(0) > 0)) CRWmp = true;}
   if (CRWmp) ATH_MSG_DEBUG ("It's CRWmp!"); else ATH_MSG_DEBUG ("It's NOT CRWmp");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (OneMuon)){ if ((basemu_charge->at(0) < 0)) CRWmn = true;}
+  if ((trigger_lep > 0 || passMETTrig) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (OneMuon)){ if ((basemu_charge->at(0) < 0)) CRWmn = true;}
   if (CRWmn) ATH_MSG_DEBUG ("It's CRWmn!"); else ATH_MSG_DEBUG ("It's NOT CRWmn");
   if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
   if (CRZee) ATH_MSG_DEBUG ("It's CRZee!"); else ATH_MSG_DEBUG ("It's NOT CRZee");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
+  if ((trigger_lep > 0 || passMETTrig) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
   if (CRZmm) ATH_MSG_DEBUG ("It's CRZmm!"); else ATH_MSG_DEBUG ("It's NOT CRZmm");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
+  if ((trigger_lep > 0 || passMETTrig) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt");
 
   w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF*nloEWKWeight;
@@ -867,6 +879,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("trigger_HLT_xe70_mht", &trigger_HLT_xe70_mht);
   m_tree->SetBranchAddress("trigger_HLT_noalg_L1J400", &trigger_HLT_noalg_L1J400);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
+  //m_tree->SetBranchAddress("trigger_met", &trigger_met); // just testing being copying directly
+  m_tree->SetBranchAddress("trigger_met", &trigger_met_encodedv2);
+  m_tree->SetBranchAddress("l1_met_trig_encoded", &l1_met_trig_encoded);
   m_tree->SetBranchAddress("passGRL", &passGRL);
   m_tree->SetBranchAddress("passPV", &passPV);
   m_tree->SetBranchAddress("passDetErr", &passDetErr);

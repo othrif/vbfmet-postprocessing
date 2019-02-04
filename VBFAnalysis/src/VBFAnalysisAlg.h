@@ -92,6 +92,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_significance;
   Int_t trigger_met;
   Int_t trigger_met_encoded;
+  Int_t trigger_met_encodedv2;
+  Int_t l1_met_trig_encoded;
 
   Int_t runNumber;
   ULong64_t eventNumber;
