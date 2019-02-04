@@ -460,6 +460,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==361517) crossSection =  387.1 *1.2283;
     else if(runNumber==361518) crossSection =  110.08*1.2283;
     else if(runNumber==361519) crossSection =  43.469*1.2283;
+    else if(runNumber==309668) crossSection =  592.36*0.9728*0.005082;
     else  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
     
     //std::cout << "crossSection: " << crossSection << std::endl;
