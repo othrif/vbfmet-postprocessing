@@ -86,7 +86,7 @@ class sample(object):
             elif (self.runNumber >=309662  and self.runNumber <= 309679):
                 self.sampleType = "Z_strongExt" #extension
             elif (self.runNumber >=364216  and self.runNumber <= 364229):
-                self.sampleType = "Z_strongOtherExt" #other?
+                self.sampleType = "Z_strongPTVExt" #other?
             elif (self.runNumber >= 363147 and self.runNumber <= 363170) or (self.runNumber >= 363123 and self.runNumber <= 363146):
                 self.sampleType = "Z_strong" #madgraph
             else:
