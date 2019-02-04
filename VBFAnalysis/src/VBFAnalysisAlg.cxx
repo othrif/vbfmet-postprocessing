@@ -559,7 +559,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float MjjCut =8e5;
   float DEtajjCut =3.8;
 
-  if(m_LooseSkim){
+  if(m_LooseSkim && m_currentVariation=="Nominal"){
     METCut = 140.0e3;
     LeadJetPtCut = 60.0e3; // 60.0e3
     subLeadJetPtCut = 40.0e3; // 40.0e3
