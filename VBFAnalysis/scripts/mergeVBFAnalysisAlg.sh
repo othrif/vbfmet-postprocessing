@@ -24,5 +24,7 @@ hadd $OUTDIRM/QCDw.root QCDw*root
 hadd $OUTDIRM/QCDunw.root QCDunw*root
 #hadd signal.root *H125*root
 hadd $OUTDIRM/VBFH125.root  VBFH125*.root
+hadd $OUTDIRM/VBFHOther.root  VBFHOther*.root
 hadd $OUTDIRM/ggFH125.root  ggFH125*.root
 hadd $OUTDIRM/VH125.root  VH125*.root
+
