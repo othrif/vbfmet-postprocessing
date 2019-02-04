@@ -5,9 +5,13 @@ hadd $OUTDIRM/data.root data*root
 hadd $OUTDIRM/VVV.root VVV*root
 rm VVV*root
 hadd $OUTDIRM/Z_strong_VBFFilt.root Z_strong_VBFFilt*root
+hadd $OUTDIRM/Z_strongOtherExt.root Z_strongOtherExt*root
+hadd $OUTDIRM/Z_strongExt.root Z_strongExt*root
 hadd $OUTDIRM/Z_strong_LowMass.root Z_strong_LowMass*root
 rm Z_strong_VBFFilt*root
+rm Z_strongOtherExt*root
 rm Z_strong_LowMass*root
+rm Z_strongExt*root
 
 # now hadd the standard samples
 hadd $OUTDIRM/VV.root VV*root

@@ -375,9 +375,9 @@ StatusCode VBFAnalysisAlg::execute() {
   m_tree->GetEntry(nFileEvt);
 
   // iterate event count
-  ++nFileEvt;
-  if (runNumber != m_runNumberInput){ //HACK to hard set the run number
-    ATH_MSG_ERROR("VBFAnaysisAlg::execute: runNumber " << runNumber << " != m_runNumberInput " << m_runNumberInput << " " << jj_dphi << " avg: " << averageIntPerXing);
+  ++nFileEvt; 
+  if (runNumber != m_runNumberInput){ //HACK to hard set the run number except for the filtered samples
+    if(!(m_runNumberInput>=309662 && m_runNumberInput<=309679)) ATH_MSG_ERROR("VBFAnaysisAlg::execute: runNumber " << runNumber << " != m_runNumberInput " << m_runNumberInput << " " << jj_dphi << " avg: " << averageIntPerXing);
     runNumber=m_runNumberInput;
   }
 
@@ -438,8 +438,28 @@ StatusCode VBFAnalysisAlg::execute() {
     //else if (runNumber==410470)  crossSection =  729.77*0.54384*1.13975636159;
     //else if (runNumber==410471)  crossSection =  729.78*0.45627*1.13974074379;
     //else if (runNumber==410472)  crossSection =  729.77*0.10546*1.13975636159;
-    //else 
-    crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
+    if(runNumber==361500) crossSection =  1401.6*1.232 ;
+    else if(runNumber==361501) crossSection =  211.99*1.232 ;
+    else if(runNumber==361502) crossSection =  67.305*1.232 ;
+    else if(runNumber==361503) crossSection =  18.679*1.232 ;
+    else if(runNumber==361504) crossSection =  7.291 *1.232 ;
+    else if(runNumber==361505) crossSection =  1402.0*1.232 ;
+    else if(runNumber==361506) crossSection =  211.99*1.232 ;
+    else if(runNumber==361507) crossSection =  67.353*1.232 ;
+    else if(runNumber==361508) crossSection =  18.633*1.232 ;
+    else if(runNumber==361509) crossSection =  7.3013*1.232 ;
+    else if(runNumber==361510) crossSection =  1398.8*1.232 ;
+    else if(runNumber==361511) crossSection =  211.44*1.232 ;
+    else if(runNumber==361512) crossSection =  67.197*1.232 ;
+    else if(runNumber==361513) crossSection =  18.612*1.232 ;
+    else if(runNumber==361514) crossSection =  7.2598*1.232 ;
+    else if(runNumber==361515) crossSection =  7521.2*1.2283;
+    else if(runNumber==361516) crossSection =  1199.9*1.2283;
+    else if(runNumber==361517) crossSection =  387.1 *1.2283;
+    else if(runNumber==361518) crossSection =  110.08*1.2283;
+    else if(runNumber==361519) crossSection =  43.469*1.2283;
+    else  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
+    
     //std::cout << "crossSection: " << crossSection << std::endl;
     if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
     else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 

@@ -30,6 +30,8 @@ class sample(object):
                 if s[0]=="v":
                     self.runNumber = int(samplesplit[p+1])
                     self.runNumberS = samplesplit[p+1]
+                    break
+            print "RUN: ",self.runNumber
             if "MiniNtuple.root/user" in samplename:
                 self.subfileN = samplename.split(".")[-3]
             if "physics_Main" in samplesplit:
@@ -79,7 +81,7 @@ class sample(object):
                 self.sampleType = "VVV"
             elif (self.runNumber >= 364198 and self.runNumber <= 364215):
                 self.sampleType = "Z_strong_LowMass"
-            elif (self.runNumber >= 301020 and self.runNumber <= 361669):
+            elif (self.runNumber >= 301020 and self.runNumber <= 301038):
                 self.sampleType = "Z_strong" #powheg
             elif (self.runNumber >=309662  and self.runNumber <= 309679):
                 self.sampleType = "Z_strongExt" #extension
