@@ -179,7 +179,9 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     # special setup for the trigger SF in the signal region
     apply_weight='xeSFTrigWeight'
     if syst=='xeSFTrigWeight__1up':
-        apply_weight=None
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
     cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)

@@ -24,6 +24,8 @@ std::string Msl::Mva::Convert2Str(Var var)
     case trigger_lep:	          return "trigger_lep";
     case passJetCleanTight:	  return "passJetCleanTight";
     case xeSFTrigWeight:	  return "xeSFTrigWeight";      
+    case xeSFTrigWeight__1up:	  return "xeSFTrigWeight__1up";      
+    case xeSFTrigWeight__1down:	  return "xeSFTrigWeight__1down";      
 
     case met_truth_et:	          return "met_truth_et";
     case met_truth_phi:	          return "met_truth_phi";      
@@ -148,6 +150,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "trigger_lep")   return trigger_lep;  
   if(var == "passJetCleanTight")   return passJetCleanTight;
   if(var == "xeSFTrigWeight")   return xeSFTrigWeight;    
+  if(var == "xeSFTrigWeight__1up")   return xeSFTrigWeight__1up;    
+  if(var == "xeSFTrigWeight__1down")   return xeSFTrigWeight__1down;    
   if(var == "met_truth_et")    return met_truth_et;
   if(var == "met_truth_phi")    return met_truth_phi;  
   if(var == "met_tst_et")    return met_tst_et;  
@@ -356,7 +360,9 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(trigger_met);
     vars.push_back(trigger_lep);
     vars.push_back(passJetCleanTight);
-    vars.push_back(xeSFTrigWeight);    
+    vars.push_back(xeSFTrigWeight);
+    vars.push_back(xeSFTrigWeight__1up);        
+    vars.push_back(xeSFTrigWeight__1down);        
     
     vars.push_back(met_truth_et);
     vars.push_back(met_truth_phi);    
