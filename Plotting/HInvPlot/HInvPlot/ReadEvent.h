@@ -165,6 +165,8 @@ namespace Msl
     // Input vars
     float fWeight;
     float xeSFTrigWeight;
+    float xeSFTrigWeight__1up;
+    float xeSFTrigWeight__1down;
     int   fRunNumber;
     int   fCurrRunNumber;
     Mva::Sample fCurrSample;

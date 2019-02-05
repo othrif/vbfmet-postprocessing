@@ -202,10 +202,18 @@ void Msl::ReadEvent::Init(TTree* tree)
   // Init
   for(unsigned i=0; i<fVarVec.size(); ++i)
     fVarVec.at(i).SetVarBranch(tree);
-
-  tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);  
-  if(fWeightSystName=="Nominal")
+  xeSFTrigWeight=1.0;
+  xeSFTrigWeight__1up=1.0;
+  xeSFTrigWeight__1down=1.0;
+  tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
+  if(fWeightSystName=="Nominal"){
     tree->SetBranchAddress("w",        &fWeight);
+    // xe SF runs with the weight syst set to Nominal
+    if(fSystName=="Nominal"){
+      tree->SetBranchAddress("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);    
+      tree->SetBranchAddress("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
+    }
+  }
   else{
     // add the systematics weights to the nominal
     bool found_weight_syst=false;
@@ -617,7 +625,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       }
     }
     // Load XS trigger SF
-    event->RepVar(Mva::xeSFTrigWeight, xeSFTrigWeight);
+    event->RepVar(Mva::xeSFTrigWeight,        xeSFTrigWeight);
+    event->RepVar(Mva::xeSFTrigWeight__1up,   xeSFTrigWeight__1up);
+    event->RepVar(Mva::xeSFTrigWeight__1down, xeSFTrigWeight__1down);
     
     if(fLoadBaseLep){
       // Fill Electrons with the baseline electrons for this looser lepton selection

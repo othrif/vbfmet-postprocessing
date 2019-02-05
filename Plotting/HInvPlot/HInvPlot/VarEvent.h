@@ -38,7 +38,9 @@ namespace Msl
       trigger_met,
       trigger_lep,
       passJetCleanTight,
-      xeSFTrigWeight,      
+      xeSFTrigWeight,
+      xeSFTrigWeight__1up,
+      xeSFTrigWeight__1down,            
       //
       // KInematic variables read directly from standard ntuples
       //   - enum name must match branch name from HWW tree

@@ -188,7 +188,7 @@ def main():
     for syst in syst_list:
         print 'SYST: ',syst
         read_alg.ClearAlgs();
-        if syst in weight_syst and syst=='xeSFTrigWeight__1up':
+        if syst in weight_syst and (syst=='xeSFTrigWeight__1up' or syst=='xeSFTrigWeight__1down'):
             read_alg.SetSystName("Nominal")
             read_alg.SetWeightSystName("Nominal")
         elif syst in weight_syst:            
