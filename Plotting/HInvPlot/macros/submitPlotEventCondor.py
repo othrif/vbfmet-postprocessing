@@ -48,7 +48,7 @@ f.close()
 extraCommand=''
 #if args.extraVars:
 #    extraCommand=' --extraVars '
-TESTAREA='/home/schae/testarea/HInv/source/Plotting'
+TESTAREA=buildDir+'/Plotting'
 runCommand = '''python '''+TESTAREA+'''/HInvPlot/macros/plotEvent.py --syst "$1"  -r /tmp/out_"$1".root -i '''+args.inputFile+extraCommand
 print runCommand
 writeCondorShell(workDir, buildDir, '', runCommand, "PlotEventCondorSub")
