@@ -82,6 +82,8 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
   reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
   reg.Get("ReadEvent::OverlapPh",     fOverlapPh);
+  reg.Get("ReadEvent::mergeExt",      fMergeExt);
+  reg.Get("ReadEvent::mergePTV",      fMergePTV);
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -150,7 +152,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   jet_jvt    = new std::vector<float>();  
   jet_fjvt   = new std::vector<float>();
   jet_TrackWidth   = new std::vector<float>();
-  jet_NTracks   = new std::vector<float>();
+  jet_NTracks   = new std::vector<unsigned short>();
   jet_PartonTruthLabelID   = new std::vector<float>();
   truth_el_pt  = new std::vector<float>();
   truth_el_eta = new std::vector<float>();
@@ -160,10 +162,10 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   truth_mu_phi = new std::vector<float>(); 
   truth_tau_pt  = new std::vector<float>();
   truth_tau_eta = new std::vector<float>();
-  truth_tau_phi = new std::vector<float>();    
+  truth_tau_phi = new std::vector<float>();
   truth_jet_pt  = new std::vector<float>();
   truth_jet_eta = new std::vector<float>();
-  truth_jet_phi = new std::vector<float>();    
+  truth_jet_phi = new std::vector<float>();
   basemu_pt     = new std::vector<float>();
   basemu_charge = new std::vector<int>();  
   basemu_eta    = new std::vector<float>();

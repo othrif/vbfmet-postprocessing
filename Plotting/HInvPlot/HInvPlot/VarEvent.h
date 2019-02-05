@@ -134,6 +134,8 @@ namespace Msl
       Mtt,phPt,
       phEta, 
       met_tst_ph_dphi,
+      passVjetsFilter,
+      passVjetsPTV,
       jetTrackWidth,
       jetTrackWidth0,
       jetTrackWidth1,
