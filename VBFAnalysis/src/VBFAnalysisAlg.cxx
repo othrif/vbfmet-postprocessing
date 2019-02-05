@@ -431,7 +431,7 @@ StatusCode VBFAnalysisAlg::execute() {
     jj=tmp;
     tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));    
     jj+=tmp;
-    xeSFTrigWeight = weightXETrigSF(met_tst_et); // met was used in the end instead of jj.Pt()
+    xeSFTrigWeight = weightXETrigSF(met_tst_et, 0); // met was used in the end instead of jj.Pt()
     xeSFTrigWeight__1up = weightXETrigSF(met_tst_et, 1);
     xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, 2);     
   }
