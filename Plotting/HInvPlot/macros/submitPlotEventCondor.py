@@ -38,7 +38,7 @@ bDir= os.getenv('ROOTCOREDIR')
 buildDir = workDir[:bDir.find("/Plotting")]
 os.system("rm -rf "+workDir)
 os.system("mkdir "+workDir)                
-os.system("chmod uog+w "+workDir) 
+#os.system("chmod uog+w "+workDir) 
 
 listofsysts = workDir+"/systlist"
 f = open(listofsysts, 'w')

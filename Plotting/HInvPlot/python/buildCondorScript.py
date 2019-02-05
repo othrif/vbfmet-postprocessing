@@ -14,7 +14,7 @@ def writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="PlotEventCo
     os.system('''echo ' cd $HOME' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system('''echo ' echo '''+runCommand+'''' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system('''echo ' '''+runCommand+'''' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
-    os.system('''echo ' cp out_*.root '''+subDir+'''/.' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
+    #os.system('''echo ' cp out_*.root '''+subDir+'''/.' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system("chmod 777 "+subDir+"/"+scriptName+syst+".sh")
 
 def writeCondorSub(workDir, syst="Nominal", scriptName="PlotEventCondorSub", fileForArguments="systlist",fileForArgumentsSys=""):
