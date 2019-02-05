@@ -164,7 +164,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up); 
     m_tree_out->Branch("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
   }
-  m_tree_out->Branch("eleANTISF",&eleANTISF); 
+  if(m_currentVariation=="Nominal") m_tree_out->Branch("eleANTISF",&eleANTISF); 
   m_tree_out->Branch("runNumber",&runNumber);
   m_tree_out->Branch("eventNumber",&eventNumber);
   m_tree_out->Branch("trigger_met", &trigger_met);
