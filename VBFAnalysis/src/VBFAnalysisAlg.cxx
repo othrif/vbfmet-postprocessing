@@ -378,7 +378,7 @@ StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG ("Executing " << name() << "...");
 
   // check that we don't have too many events
-  if(nFileEvt>=nFileEvtTot){
+  if(nFileEvt>nFileEvtTot){
     ATH_MSG_ERROR("VBFAnaysisAlg::execute: Too  many events:  " << nFileEvt << " total evts: " << nFileEvtTot);
     return StatusCode::SUCCESS;
   }
@@ -389,7 +389,7 @@ StatusCode VBFAnalysisAlg::execute() {
   // iterate event count
   ++nFileEvt; 
   if (runNumber != m_runNumberInput){ //HACK to hard set the run number except for the filtered samples
-    if(!(m_runNumberInput>=309662 && m_runNumberInput<=309679)) ATH_MSG_ERROR("VBFAnaysisAlg::execute: runNumber " << runNumber << " != m_runNumberInput " << m_runNumberInput << " " << jj_dphi << " avg: " << averageIntPerXing);
+    if(!((m_runNumberInput>=309662 && m_runNumberInput<=309679) || m_runNumberInput==310502)) ATH_MSG_ERROR("VBFAnaysisAlg::execute: runNumber " << runNumber << " != m_runNumberInput " << m_runNumberInput << " " << jj_dphi << " avg: " << averageIntPerXing);
     runNumber=m_runNumberInput;
   }
 
