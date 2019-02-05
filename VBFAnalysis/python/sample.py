@@ -63,7 +63,7 @@ class sample(object):
                 self.sampleType = "Z_strong_VBFFilt"
             elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515):
                 self.sampleType = "Z_strong"
-            elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)):
+            elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)) or (self.runNumber>=410642 and self.runNumber<=410649) or self.runNumber==410642 or self.runNumber==410643:
                 self.sampleType = "ttbar"
             elif ((self.runNumber == 308276) or (self.runNumber == 308567)):
                 self.sampleType = "VBFH125"

@@ -113,7 +113,9 @@ StatusCode VBFAnalysisAlg::initialize() {
   jet_PartonTruthLabelID = new std::vector<int>(0); 
   jet_ConeTruthLabelID = new std::vector<int>(0); 
   jet_NTracks = new std::vector<std::vector<unsigned short> >(0);
+  jet_NTracks_PV = new std::vector<unsigned short>(0);
   jet_SumPtTracks = new std::vector<std::vector<float> >(0);
+  jet_SumPtTracks_PV = new std::vector<float>(0);
   jet_TrackWidth = new std::vector<float>(0);
   jet_HECFrac = new std::vector<float>(0);
   jet_EMFrac = new std::vector<float>(0);
@@ -227,17 +229,18 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("j3_min_mj",&j3_min_mj);
       m_tree_out->Branch("mj34",&mj34);
       m_tree_out->Branch("max_j_eta",&max_j_eta);
+
+      if(m_QGTagger){
+	m_tree_out->Branch("jet_NTracks",&jet_NTracks_PV);
+	m_tree_out->Branch("jet_SumPtTracks",&jet_SumPtTracks_PV);
+	m_tree_out->Branch("jet_TrackWidth",&jet_TrackWidth);
+	m_tree_out->Branch("jet_HECFrac",&jet_HECFrac);
+	m_tree_out->Branch("jet_EMFrac",&jet_EMFrac);
+	m_tree_out->Branch("jet_fch",&jet_fch);
+      }
+      if(m_isMC) m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
+      if(m_isMC) m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
     }
-    if(m_QGTagger){
-      m_tree_out->Branch("jet_NTracks",&jet_NTracks);
-      m_tree_out->Branch("jet_SumPtTracks",&jet_SumPtTracks);
-      m_tree_out->Branch("jet_TrackWidth",&jet_TrackWidth);
-      m_tree_out->Branch("jet_HECFrac",&jet_HECFrac);
-      m_tree_out->Branch("jet_EMFrac",&jet_EMFrac);
-      m_tree_out->Branch("jet_fch",&jet_fch);
-    }
-    if(m_isMC) m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
-    if(m_isMC) m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
 
     m_tree_out->Branch("jet_fjvt",&jet_fjvt);    
     if(m_currentVariation=="Nominal"){
@@ -552,6 +555,51 @@ StatusCode VBFAnalysisAlg::execute() {
     }
   }
 
+  // Load the PV parameters for jets
+  if(m_QGTagger && jet_NTracks){ 
+    jet_NTracks_PV->clear();
+    jet_SumPtTracks_PV->clear();
+    for(unsigned iJet=0; iJet<jet_NTracks->size(); ++iJet){
+      if(jet_NTracks->at(iJet).size()>0)     jet_NTracks_PV    ->push_back(jet_NTracks->at(iJet)[0]);
+      if(jet_SumPtTracks->at(iJet).size()>0) jet_SumPtTracks_PV->push_back(jet_SumPtTracks->at(iJet)[0]);
+    }
+  }
+  
+  // set the merging for the existing samples
+  //364173-364175,364159-364161,364187-364189,364162-364163,364176-364177,364193-364194
+  //364103,364132,364145-364146,364151,364134,364120,364106-364107
+  if((runNumber>=309662 && runNumber<=309679)){ // QCD NLO sherpa extension samples with Mjj filter
+    // use the filter as calculated
+  }else if((runNumber>=364173 && runNumber<=364173) || // Wenu
+	   (runNumber>=364159 && runNumber<=364161) || // Wmunu
+	   (runNumber>=364187 && runNumber<=364189) || // Wtaunu
+	   (runNumber>=364162 && runNumber<=364163) || // 
+	   (runNumber>=364176 && runNumber<=364177) || // 
+	   (runNumber>=364193 && runNumber<=364194) || // 
+	   (runNumber>=364103 && runNumber<=364103) || // 
+	   (runNumber>=364132 && runNumber<=364132) || // 
+	   (runNumber>=364145 && runNumber<=364146) || // 
+	   (runNumber>=364151 && runNumber<=364151) || // 
+	   (runNumber>=364134 && runNumber<=364134) || // 
+	   (runNumber>=364120 && runNumber<=364120) || // 
+	   (runNumber>=364106 && runNumber<=364107)){
+    passVjetsFilter=(!passVjetsFilter);
+  }else passVjetsFilter=true;
+
+  //364112-364113,364126-364127,364140-364141,364154-364155
+  //364168-364169,364182-364183,364196-364197
+  if((runNumber>=364216 && runNumber<=364229)){ // QCD NLO sherpa extension samples for pTV
+    // use the filter
+  }else if((runNumber>=364112 && runNumber<=364113) ||
+	   (runNumber>=364126 && runNumber<=364127) ||
+	   (runNumber>=364140 && runNumber<=364141) ||
+	   (runNumber>=364154 && runNumber<=364155) ||
+	   (runNumber>=364168 && runNumber<=364169) ||
+	   (runNumber>=364182 && runNumber<=364183) ||
+	   (runNumber>=364196 && runNumber<=364197)){ // flip these
+    passVjetsPTV=(!passVjetsPTV);
+  }else passVjetsPTV=true;// others must pass
+
   // Definiing a loose skimming
   float METCut = 150.0e3;
   float LeadJetPtCut = 80.0e3;
@@ -753,6 +801,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("trigger_HLT_xe70_mht", 1);
   m_tree->SetBranchStatus("trigger_HLT_noalg_L1J400", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
+  m_tree->SetBranchStatus("trigger_met", 1);
+  m_tree->SetBranchStatus("l1_met_trig_encoded", 1);
+  m_tree->SetBranchStatus("passVjetsFilter", 1);
+  m_tree->SetBranchStatus("passVjetsPTV", 1);
   m_tree->SetBranchStatus("passGRL", 1);
   m_tree->SetBranchStatus("passPV", 1);
   m_tree->SetBranchStatus("passDetErr", 1);

@@ -237,7 +237,9 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Int_t>* jet_PartonTruthLabelID;
   std::vector<Int_t>* jet_ConeTruthLabelID;
   std::vector<std::vector<unsigned short> >* jet_NTracks;
+  std::vector<unsigned short>* jet_NTracks_PV;
   std::vector<std::vector<Float_t> >* jet_SumPtTracks;
+  std::vector<Float_t>* jet_SumPtTracks_PV;
   std::vector<Float_t>* jet_TrackWidth;
   std::vector<Float_t>* jet_HECFrac;
   std::vector<Float_t>* jet_EMFrac;
