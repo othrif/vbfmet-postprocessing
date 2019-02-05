@@ -29,7 +29,7 @@ if args.nominal:
     wsys_systlist = []
 else:
     sys = VBFAnalysis.systematics.systematics("All")
-    asys = VBFAnalysis.systematics.systematics("Asym")
+    asys = VBFAnalysis.systematics.systematics("OneSided")
     wsys = VBFAnalysis.systematics.systematics("WeightSyst")
     asys_systlist = asys.getsystematicsList()
     wsys_systlist = wsys.getsystematicsList()
