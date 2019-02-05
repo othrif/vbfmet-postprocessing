@@ -212,6 +212,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("maxCentrality",&maxCentrality);
   m_tree_out->Branch("n_baseel",&n_baseel);
   m_tree_out->Branch("n_basemu",&n_basemu);
+  m_tree_out->Branch("n_bjet",&n_bjet);
 
   if(m_contLep){
     m_tree_out->Branch("contmu_pt",           &contmu_pt);
@@ -225,7 +226,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   if(m_extraVars){
 
     if(m_currentVariation=="Nominal"){
-      m_tree_out->Branch("n_bjet",&n_bjet);
+
       m_tree_out->Branch("j3_centrality",&j3_centrality);
       m_tree_out->Branch("j3_min_mj_over_mjj",&j3_min_mj_over_mjj);
       m_tree_out->Branch("j3_dRj1",&j3_dRj1);
@@ -824,6 +825,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("n_el",1);
   m_tree->SetBranchStatus("n_mu",1);
   m_tree->SetBranchStatus("n_ph",1);
+  m_tree->SetBranchStatus("n_bjet",1);
   m_tree->SetBranchStatus("n_el_baseline",1);
   m_tree->SetBranchStatus("n_mu_baseline",1);
   m_tree->SetBranchStatus("jj_mass",1);
@@ -864,7 +866,6 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   }
 
   if(m_extraVars){
-    m_tree->SetBranchStatus("n_bjet",1);
 
     m_tree->SetBranchStatus("ph_pt",1);
     m_tree->SetBranchStatus("ph_phi",1);
@@ -899,10 +900,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("baseel_topoetcone30",1);
     if(m_isMC) m_tree->SetBranchStatus("baseel_truthOrigin",1);
     if(m_isMC) m_tree->SetBranchStatus("baseel_truthType",1);
-    m_tree->SetBranchStatus("met_soft_tst_et",1);
     m_tree->SetBranchStatus("met_soft_tst_phi",1);
     m_tree->SetBranchStatus("met_soft_tst_sumet",1);
     m_tree->SetBranchStatus("met_tenacious_tst_et",1);
+    m_tree->SetBranchStatus("met_soft_tst_et",1);
     m_tree->SetBranchStatus("met_tenacious_tst_phi",1);
     m_tree->SetBranchStatus("met_tight_tst_et",1);
     m_tree->SetBranchStatus("met_tight_tst_phi",1);
@@ -982,6 +983,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_el_baseline",&n_baseel);
   m_tree->SetBranchAddress("n_mu_baseline",&n_basemu);
   m_tree->SetBranchAddress("n_ph",&n_ph);
+  m_tree->SetBranchAddress("n_bjet",            &n_bjet);
 
   m_tree->SetBranchAddress("jj_mass",&jj_mass);
   m_tree->SetBranchAddress("jj_deta",&jj_deta);
@@ -1041,9 +1043,6 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     }
 
   if(m_extraVars){
-  
-    m_tree->SetBranchAddress("n_bjet",            &n_bjet);
-
     m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
     m_tree->SetBranchAddress("basemu_pt",           &basemu_pt);
     m_tree->SetBranchAddress("basemu_eta",          &basemu_eta);

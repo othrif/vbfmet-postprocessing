@@ -868,53 +868,50 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Fill Base electrons
     unsigned n_baselep=0;
     if(baseel_pt){
-      unsigned n_baseel=0;
+      //unsigned n_baseel=0;
       for(unsigned iEl=0; iEl<baseel_pt->size(); ++iEl){
 	RecParticle new_ele;
 	new_ele.pt  = baseel_pt->at(iEl)/1.0e3;
 	new_ele.eta = baseel_eta->at(iEl);
 	new_ele.phi = baseel_phi->at(iEl);
 	//new_ele.AddVar(Mva::ptvarcone20,jet_timing->at(iJet));
-	//if(baseel_ptvarcone20->at(iEl)/baseel_pt->at(iEl)<30.3){
 	//if(!(fabs(new_ele.eta)>1.37 && fabs(new_ele.eta)<1.52 && new_ele.pt<27.0)){
-	  ++n_baseel;
-	  event->baseel.push_back(new_ele);
-	  //}
+	//++n_baseel;
+	event->baseel.push_back(new_ele);
       }
-      event->RepVar(Mva::n_baseel, n_baseel);
-      n_baselep+=n_baseel;
+      //event->RepVar(Mva::n_baseel, n_baseel);
     }
 
     // Fill Base muons
     if(basemu_pt){
-      unsigned n_basemu=0;
+      //unsigned n_basemu=0;
       for(unsigned iMu=0; iMu<basemu_pt->size(); ++iMu){
 	RecParticle new_muo;
 	new_muo.pt  = basemu_pt->at(iMu)/1.0e3;
 	new_muo.eta = basemu_eta->at(iMu);
 	new_muo.phi = basemu_phi->at(iMu);
-	//if(basemu_ptvarcone20->at(iMu)/basemu_pt->at(iMu)<30.3){
-	++n_basemu;
+	//++n_basemu;
 	event->basemu.push_back(new_muo);
-	//}
       }
-      event->RepVar(Mva::n_basemu, n_basemu);
-      n_baselep+=n_basemu;
+      //event->RepVar(Mva::n_basemu, n_basemu);
+      //n_baselep+=n_basemu;
     }
+    n_baselep+=event->GetVar(Mva::n_baseel);
+    n_baselep+=event->GetVar(Mva::n_basemu);
     event->RepVar(Mva::n_baselep, n_baselep);
 
     // Fill signal photons
     if(ph_pt){
-      unsigned n_ph=0;
+      //unsigned n_ph=0;
       for(unsigned iPh=0; iPh<ph_pt->size(); ++iPh){
 	RecParticle new_ph;
 	new_ph.pt  = ph_pt->at(iPh)/1.0e3;
 	new_ph.eta = ph_eta->at(iPh);
 	new_ph.phi = ph_phi->at(iPh);
-	++n_ph;
+	//++n_ph;
 	event->photons.push_back(new_ph);
       }
-      event->RepVar(Mva::n_ph, n_ph);          
+      //event->RepVar(Mva::n_ph, n_ph);          
     }
     
     // convert variables to GeV
