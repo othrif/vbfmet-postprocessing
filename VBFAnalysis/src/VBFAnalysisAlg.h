@@ -40,7 +40,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   ///histSvc()         : ServiceHandle to output ROOT service (writing TObjects)
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
-  double weightXETrigSF(const float jj_pt); 
+  double weightXETrigSF(const float met_pt, int syst); 
   void computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi);
  private: 
 
@@ -111,6 +111,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t elSFTrigWeight;
   Float_t muSFTrigWeight;
   Float_t xeSFTrigWeight;
+  Float_t xeSFTrigWeight__1up;
+  Float_t xeSFTrigWeight__1down;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_HLT_xe100_mht_L1XE50;
