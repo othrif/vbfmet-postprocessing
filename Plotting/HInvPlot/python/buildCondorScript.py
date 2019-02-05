@@ -11,9 +11,10 @@ def writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="PlotEventCo
     #os.system("echo 'source "+buildDir+"/${CMTCONFIG}/setup.sh' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'source "+buildDir+"/Plotting/RootCore/scripts/setup.sh' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system('''echo ' echo INPUT:$1 $2' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
+    os.system('''echo ' cd $HOME' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system('''echo ' echo '''+runCommand+'''' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system('''echo ' '''+runCommand+'''' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
-    os.system('''echo ' cp out_*.root '''+subDir+'''/.' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
+    #os.system('''echo ' cp out_*.root '''+subDir+'''/.' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system("chmod 777 "+subDir+"/"+scriptName+syst+".sh")
 
 def writeCondorSub(workDir, syst="Nominal", scriptName="PlotEventCondorSub", fileForArguments="systlist",fileForArgumentsSys=""):
@@ -22,8 +23,8 @@ def writeCondorSub(workDir, syst="Nominal", scriptName="PlotEventCondorSub", fil
     os.system("echo 'output                  = "+workDir+"/output$(ClusterId).$(ProcId)' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'error                   = "+workDir+"/error$(ClusterId).$(ProcId)' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'log                     = "+workDir+"/log$(ClusterId)' >> "+workDir+"/submit_this_python"+syst+".sh")
-    #os.system("echo 'should_transfer_files = YES >> "+workDir+"/submit_this_python"+syst+".sh")
-    #os.system("echo 'when_to_transfer_output = ON_EXIT >> "+workDir+"/submit_this_python"+syst+".sh")
+    os.system("echo 'should_transfer_files = YES' >> "+workDir+"/submit_this_python"+syst+".sh")
+    os.system("echo 'when_to_transfer_output = ON_EXIT' >> "+workDir+"/submit_this_python"+syst+".sh")
     #os.system("echo 'transfer_output_files = out_ >> "+workDir+"/submit_this_python"+syst+".sh")
     #transfer_output_files = /tmp/out1
     os.system("echo 'max_retries = 5' >> "+workDir+"/submit_this_python"+syst+".sh")
