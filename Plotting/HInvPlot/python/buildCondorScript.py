@@ -31,4 +31,4 @@ def writeCondorSub(workDir, syst="Nominal", scriptName="PlotEventCondorSub", fil
             fileForArgumentsSys = fileForArguments
         os.system("echo 'queue arguments from '"+fileForArgumentsSys+" >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("chmod 777 "+workDir+"/submit_this_python"+syst+".sh")
-    #os.system("condor_submit "+workDir+"/submit_this_python"+syst+".sh")
+    os.system("condor_submit "+workDir+"/submit_this_python"+syst+".sh")
