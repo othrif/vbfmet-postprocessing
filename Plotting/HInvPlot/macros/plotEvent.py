@@ -67,6 +67,7 @@ def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=No
 
         for key, samples in hstudy.fillSampleList(options=options).iteritems():
             plot_algs += [hstudy.preparePlotEvent('plotEvent%s_%s%s' %(alg_suff, key, my_cut_key),
+                                                  syst_name=syst,
                                                   Samples=samples,
                                                   PassAlg=alg_pass)]
         
@@ -153,7 +154,7 @@ def main():
     #----------------------------------------------------------------------------------------
     # Create and configure main algorithm which reads input files and runs event loop
     #
-    read_alg = hinput.ReadEvent('readEvent', options, all_files, all_runs)
+    read_alg = hinput.ReadEvent('readEvent', options, all_files, all_runs, options.syst)
 
     #-----------------------------------------------------------------------------------------
     # Prepare selection keys
@@ -201,7 +202,7 @@ def main():
         # Common algorithms for computing additional event properties and event pre-selection
         #     
         #plot_alg = hstudy.preparePlotEvent('plotEvent'+syst)
-        plot_alg = hstudy.preparePlotEvent('plotEvent')
+        plot_alg = hstudy.preparePlotEvent('plotEvent',syst_name=syst)
         read_alg.AddCommonAlg(plot_alg)
         
         #-----------------------------------------------------------------------------------------
