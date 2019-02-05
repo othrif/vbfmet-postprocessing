@@ -22,7 +22,7 @@ log = config.getLog('Input.py')
 class ReadEvent:
     """ ReadEvent -  read events """
         
-    def __init__(self, alg_name, options, my_files, my_runs_map):
+    def __init__(self, alg_name, options, my_files, my_runs_map, syst_name):
         
         self.name       = alg_name
         self.read_reg   = ROOT.Msl.Registry()
@@ -82,7 +82,7 @@ class ReadEvent:
         # Additional input variables 
         #    - read branches from tree and add to Event::VarHolder as enums
         #
-        inp_vars = get_vars.GetVarStr(0)
+        inp_vars = get_vars.GetVarStr(0, syst_name)
         mev_vars = get_vars.mev_vars
         self.read_reg.SetVal('ReadEvent::InputVars', ','.join(sorted(inp_vars)))
         self.read_reg.SetVal('ReadEvent::VarMeV',    ','.join(sorted(mev_vars)))

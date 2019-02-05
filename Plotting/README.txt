@@ -43,3 +43,8 @@ https://gitlab.cern.ch/VBFInv/STPostProcessing/blob/master/Plotting/HInvPlot/mac
 ==========
 
 To run the fake lepton estimate, you'll want to use the option --LoadBaseLep when running plotEvent.py. This loads the baseline leptons into the signal lepton collection. It does not change n_mu nor n_el though, so these can still be used for the selection of not-signal leptons using  n_basemu==0 && n_baseel==1 && n_el==0 && trigger_lep>0.
+
+======
+
+Drawing the systematics can be time consumming, so it is possible to submit them to a condor batch
+python HInvPlot/macros/submitPlotEventCondor.py -i /home/schae/testarea/HInv/source/Plotting/v26.txt
