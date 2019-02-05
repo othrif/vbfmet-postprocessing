@@ -40,7 +40,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   ///histSvc()         : ServiceHandle to output ROOT service (writing TObjects)
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
-  double weightXETrigSF(const float jj_pt);
+  double weightXETrigSF(const float met_pt, int syst);
 
  private: 
   int npevents = 0;
