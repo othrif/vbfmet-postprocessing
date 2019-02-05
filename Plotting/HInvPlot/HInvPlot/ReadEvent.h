@@ -160,6 +160,8 @@ namespace Msl
     bool                        fisMC;
     bool                        fLoadBaseLep;
     bool                        fOverlapPh;
+    bool                        fMergeExt;
+    bool                        fMergePTV;
     // Input vars
     float fWeight;
     float xeSFTrigWeight;
@@ -187,7 +189,8 @@ namespace Msl
     std::vector<float> *jet_jvt;
     std::vector<float> *jet_fjvt;
     std::vector<float> *jet_TrackWidth;
-    std::vector<float> *jet_NTracks;
+    //std::vector<std::vector<unsigned short> > *jet_NTracks;
+    std::vector<unsigned short> *jet_NTracks;
     std::vector<float> *jet_PartonTruthLabelID;
 
     std::vector<float> *truth_el_pt;

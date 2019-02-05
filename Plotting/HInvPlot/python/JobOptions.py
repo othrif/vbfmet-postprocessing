@@ -61,6 +61,8 @@ def getParser():
     p.add_option('--trees',        type='string', default='',      dest='trees',      help='Tree name: W_EWKNominal,W_strongNominal,Z_EWKNominal,Z_strongNominal,ttbarNominal,dataNominal,VBFH125Nominal,VH125Nominal,ggFH125Nominal ')
     p.add_option('--trig-name',    type='string', default='',            dest='trig_name',  help='Trigger name if wanted. TRIG_xe80_tclcw, TRIG_lep, TRIG_2mu8_EFxe40_tclcw') 
     p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
+    p.add_option('--mergePTV',  action='store_true', default=False,   dest='mergePTV',          help='Merge the pTV slices')
+    p.add_option('--mergeExt',  action='store_true', default=False,   dest='mergeExt',          help='Merge the Sherpa extension slices')
     
     # Should try to reduce these number of options
     p.add_option('--skim',         action='store_true', default=False,   dest='skim',                 help='Skim ntuples to met trigger or 3L')

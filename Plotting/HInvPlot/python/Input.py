@@ -45,7 +45,9 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::JetVetoPt',     options.jet_veto_pt) 
         self.read_reg.SetVal('ReadEvent::LoadBaseLep',   options.LoadBaseLep)
         self.read_reg.SetVal('ReadEvent::OverlapPh',     options.OverlapPh)
-        self.read_reg.SetVal('ReadEvent::TrigString',    options.trig_name)  # specify a trigger from the command line       
+        self.read_reg.SetVal('ReadEvent::TrigString',    options.trig_name)  # specify a trigger from the command line
+        self.read_reg.SetVal('ReadEvent::mergePTV',      options.mergePTV)  
+        self.read_reg.SetVal('ReadEvent::mergeExt',      options.mergeExt)  
             
         self.read_reg.SetVal('ReadEvent::Print',      'yes')
         self.read_reg.SetVal('ReadEvent::Trees',      ' '.join(self.trees))
@@ -428,10 +430,10 @@ def prepareBkgRuns(keys,options=None):
     bkg_zqcd_zmm = {'364100':'Zmumu_MAXHTPTV0_70_CVetoBVeto',
                     '364101':'TBD',
                     '364102':'TBD',
-                    '364103':'TBD',
+                    '364103':'TBD',#70
                     '364104':'TBD',
                     '364105':'TBD',
-                    '364106':'TBD',
+                    '364106':'TBD',#140
                     '364107':'TBD',
                     '364108':'TBD',
                     '364109':'TBD',
@@ -442,10 +444,10 @@ def prepareBkgRuns(keys,options=None):
     bkg_zqcd_zee = {'364114':'Zee_MAXHTPTV0_70_CVetoBVeto',
                     '364115':'TBD',
                     '364116':'TBD',
-                    '364117':'TBD',
+                    '364117':'TBD',#70
                     '364118':'TBD',
                     '364119':'TBD',
-                    '364120':'TBD',
+                    '364120':'TBD',#140
                     '364121':'Zee_MAXHTPTV140_280_CFilterBVeto',
                     '364122':'TBD',
                     '364123':'TBD',
@@ -456,13 +458,13 @@ def prepareBkgRuns(keys,options=None):
     bkg_zqcd_ztt = {'364128':'Ztautau_MAXHTPTV0_70_CVetoBVeto',
                     '364129':'TBD',
                     '364130':'TBD',
-                    '364131':'TBD',
+                    '364131':'TBD',#70
                     '364132':'TBD',
                     '364133':'TBD',
-                    '364134':'TBD',
+                    '364134':'TBD',#140
                     '364135':'TBD',
                     '364136':'TBD',
-                    '364137':'TBD',
+                    '364137':'TBD',#280
                     '364138':'TBD',
                     '364139':'TBD',
                     '364140':'TBD',
@@ -470,13 +472,13 @@ def prepareBkgRuns(keys,options=None):
     bkg_zqcd_znn = {'364142':'Znunu_MAXHTPTV0_70_CVetoBVeto',
                     '364143':'TBD',
                     '364144':'TBD',
-                    '364145':'TBD',
+                    '364145':'TBD',#70
                     '364146':'TBD',
                     '364147':'TBD',
-                    '364148':'TBD',
+                    '364148':'TBD',#140
                     '364149':'TBD',
                     '364150':'TBD',
-                    '364151':'TBD',
+                    '364151':'TBD',#280
                     '364152':'TBD',
                     '364153':'TBD',
                     '364154':'TBD',
@@ -509,6 +511,17 @@ def prepareBkgRuns(keys,options=None):
         '410025':'schan_top',
         '410026':'schan_antitop',
         }
+    bkg_top1 = {
+        '410642':'tchan_lept_top',
+        '410643':'tchan_lept_antitop',
+        '410644':'schan_top',
+        '410645':'schan_antitop',
+        #'410646':'Wt_top_incl',
+        #'410647':'Wt_antitop_incl',
+        '410648':'Wt_DR_dilepton_top',
+        '410649':'Wt_DR_dilepton_antitop',
+        }
+    bkg_top2.update(bkg_top1)
 
     bkg_z_strong_madgraph_znn = {'361515':'Znn_Np0',
                       '361516':'Znn_Np1',
@@ -709,11 +722,49 @@ def prepareBkgRuns(keys,options=None):
                   '364248':'ZZZ_4l2v_EW6',
                   '364249':'ZZZ_2l4v_EW6',
                   # VV
-                  '363494':'vvvv',                  
-                  '364250':'llll',                  
-                  '364254':'llvv',                  
-                  '364255':'lvvv',                  
+                  '364253':'lllv',
+                  '363494':'vvvv',
+                  '364250':'llll',
+                  '364254':'llvv',
+                  '364255':'lvvv',
                   }
+        
+    bkg_vbfExt = {'309662':'Wenu_MAXHTPTV70_140',
+                  '309663':'Wmunu_MAXHTPTV70_140',
+                  '309664':'Wtaunu_MAXHTPTV70_140',
+                  '309665':'Zmumu_MAXHTPTV70_140_CVBV',
+                  '309666':'Ztautau_MAXHTPTV70_140_CFBV',
+                  '309667':'Znunu_MAXHTPTV70_140_CVBV',
+                  '309668':'Znunu_MAXHTPTV70_140_CFBV',
+                  '309669':'Zmumu_MAXHTPTV140_280_CVBV',
+                  '309670':'Zmumu_MAXHTPTV140_280_CFBV',
+                  '309671':'Zee_MAXHTPTV140_280_CVBV',
+                  '309672':'Ztautau_MAXHTPTV140_280_CVBV',
+                  '309673':'Znunu_MAXHTPTV140_280_CVBV',
+                  '309674':'Wmunu_MAXHTPTV140_280_CVBV',
+                  '309675':'Wmunu_MAXHTPTV140_280_CFBV',
+                  '309676':'Wenu_MAXHTPTV140_280_CVBV',
+                  '309677':'Wenu_MAXHTPTV140_280_CFBV',
+                  '309678':'Wtaunu_MAXHTPTV140_280_CVBV',
+                  '309679':'Wtaunu_MAXHTPTV140_280_CFBV',
+                      }
+        
+    bkg_vbfPTVExt = {'364216':'Zmumu_PTV500_1000',
+                     '364217':'Zmumu_PTV1000_E_CMS',
+                     '364218':'Zee_PTV500_1000',
+                     '364219':'Zee_PTV1000_E_CMS',
+                     '364220':'Ztautau_PTV500_1000',
+                     '364221':'Ztautau_PTV1000_E_CMS',
+                     '364222':'Znunu_PTV500_1000',
+                     '364223':'Znunu_PTV1000_E_CMS',
+                     '364224':'Wmunu_PTV500_1000',
+                     '364225':'Wmunu_PTV1000_E_CMS',
+                     '364226':'Wenu_PTV500_1000',
+                     '364227':'Wenu_PTV1000_E_CMS',
+                     '364228':'Wtaunu_PTV500_1000',
+                     '364229':'Wtaunu_PTV1000_E_CMS',
+                      }        
+        
     bkg_vbfFiltZ = {'345099':'TBD',
                         '345100':'TBD',
                         '345101':'TBD',
@@ -737,8 +788,17 @@ def prepareBkgRuns(keys,options=None):
                         '364213':'TBD',
                         '364214':'TBD',
                         '364215':'TBD',                        
-                        }    
+                        }
 
+    if options.mergePTV:
+        for ki,yi in bkg_vbfPTVExt:
+            if yi[0]=='W': bkg_wqcd[ki]=yi
+            elif yi[0]=='Z': bkg_zqcd[ki]=yi 
+    if options.mergeExt:
+        for ki,yi in bkg_vbfExt:
+            if yi[0]=='W': bkg_wqcd[ki]=yi
+            elif yi[0]=='Z': bkg_zqcd[ki]=yi
+                
     bkg_keys = {
                 'hvh':sig_VH125,
                 #'whww':sig_VH125v2,
@@ -749,8 +809,8 @@ def prepareBkgRuns(keys,options=None):
                 'wqcd':bkg_wqcd,
                 'zewk':bkg_zewk,
                 'zqcd':bkg_zqcd,
-                'top2':bkg_top2,
-                'top1':bkg_top1,
+                'top2':bkg_top2, # all top 
+                #'top1':bkg_top1,
                 ##'hvbf':bkg_wqcd_mnu,
                 ##'wewk':bkg_wqcd_tnu,
                 ##'wqcd':bkg_wqcd_enu,
@@ -758,17 +818,13 @@ def prepareBkgRuns(keys,options=None):
                 ##'zqcd':bkg_zqcd_zee,
                 ##'top2':bkg_zqcd_ztt,
                 ##'top1':bkg_zqcd_znn,
-                'zldy':bkg_lowMassZ,                
                 'vvv':bkg_vv,
                 'dqcd':bkg_qcdw,
-                'mqcd':bkg_qcdunw,
-                'vbfz':bkg_vbfFiltZ,
+                #'mqcd':bkg_qcdunw,
                 'zqcdMad':bkg_z_strong_madgraph,
                 'wqcdMad':bkg_w_strong_madgraph,
                 #'zqcdMad':bkg_zqcd,
                 #'wqcdMad':bkg_wqcd,
-                'zqcdPow':bkg_z_strong_powheg,
-
                 #'hvbf':bkg_w_strong_madgraph_wmnu,
                 #'wewk':bkg_w_strong_madgraph_wenu,
                 #'wqcd':bkg_w_strong_madgraph_wtnu,
@@ -777,7 +833,19 @@ def prepareBkgRuns(keys,options=None):
                 #'top2':bkg_z_strong_madgraph_ztt,
                 #'top1':bkg_z_strong_madgraph_znn,                
                 }
-
+    extra_samples=bkg_lowMassZ
+    extra_samples.update(bkg_vbfFiltZ)
+    extra_samples.update(bkg_z_strong_powheg)
+    bkg_keys['wdpi']=extra_samples
+    if not options.mergePTV:
+        bkg_keys['wdpi'].update(bkg_vbfPTVExt)
+    if not options.mergeExt:
+        bkg_keys['wdpi'].update(bkg_vbfExt)
+    if False:
+        bkg_keys['zqcdPow']=bkg_z_strong_powheg
+        bkg_keys['vbfz']=bkg_vbfFiltZ        
+        bkg_keys['zldy']=bkg_lowMassZ
+        
     #
     # Select MC samples 
     #
