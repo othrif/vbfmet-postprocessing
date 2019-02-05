@@ -101,7 +101,7 @@ syst_filter_vars = ['met_soft_tst_phi',
                     'met_tighter_tst_et',
                     'met_tighter_tst_phi',
                     'met_truth_et',
-                    'n_bjet',
+                    #'n_bjet',
                 ]
 mev_vars = ['jj_mass',
             'met_tst_et',
