@@ -49,6 +49,8 @@ StatusCode VBFAnalysisAlg::initialize() {
     // }
   }
   xeSFTrigWeight=1.0;
+  xeSFTrigWeight__1up=1.0;
+  xeSFTrigWeight__1down=1.0;    
 
   j3_centrality = new std::vector<float>(0);
   j3_dRj1 = new std::vector<float>(0);
@@ -157,7 +159,11 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w); 
   //m_tree_out->Branch("nloEWKWeight",&nloEWKWeight); 
-  m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight); 
+  m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight);
+  if(m_currentVariation=="Nominal"){ // only write for the nominal
+    m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up); 
+    m_tree_out->Branch("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
+  }
   m_tree_out->Branch("eleANTISF",&eleANTISF); 
   m_tree_out->Branch("runNumber",&runNumber);
   m_tree_out->Branch("eventNumber",&eventNumber);
@@ -417,6 +423,8 @@ StatusCode VBFAnalysisAlg::execute() {
 
   // MET trigger scale factor
   xeSFTrigWeight=1.0;
+  xeSFTrigWeight__1up=1.0;
+  xeSFTrigWeight__1down=1.0;
   if(m_isMC && jet_pt && jet_pt->size()>1){
     TLorentzVector tmp, jj; 
     tmp.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0),jet_phi->at(0),jet_m->at(0));    
@@ -424,6 +432,8 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));    
     jj+=tmp;
     xeSFTrigWeight = weightXETrigSF(met_tst_et); // met was used in the end instead of jj.Pt()
+    xeSFTrigWeight__1up = weightXETrigSF(met_tst_et, 1);
+    xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, 2);     
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
@@ -1095,14 +1105,28 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   return StatusCode::SUCCESS;
 }
 
-double VBFAnalysisAlg::weightXETrigSF(const float jj_pt) {
-  static const double p0 = 59.3407;
-  static const double p1 = 54.9134;
-  double x = jj_pt / 1.0e3;
+double VBFAnalysisAlg::weightXETrigSF(const float met_pt, int syst=0) {
+  // 20.7 values
+  //static const double p0 = 59.3407;
+  //static const double p1 = 54.9134;
+  // For MET tight
+  static const double p0 = 99.4255;
+  static const double p1 = 38.6145;
+
+  double x = met_pt / 1.0e3;
   if (x < 100) { return 0; }
   if (x > 240) { x = 240; }
   double sf = 0.5*(1+TMath::Erf((x-p0)/(TMath::Sqrt(2)*p1)));
   if(sf<0) sf=0.0;
   if(sf > 1.5) sf=1.5;
+
+  // linear parameterization of the systematics
+  if(syst==1){ // up variation
+    if(x<210.0) sf+=(0.000784094)*(150-x)+0.05;
+    else sf=1.0;
+  }else if(syst==2){ // down
+    if(x<210.0)sf-=(0.000784094)*(150-x)+0.05;
+    else sf=1.0;
+  }
   return sf;
 }  
