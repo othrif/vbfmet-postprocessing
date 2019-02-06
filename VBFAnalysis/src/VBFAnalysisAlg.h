@@ -165,6 +165,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tighter_tst_phi=-9999;
   Float_t met_tight_tst_et=-9999;
   Float_t met_tight_tst_phi=-9999;
+  Float_t met_tighter_tst_nolep_et=-9999;
+  Float_t met_tighter_tst_nolep_phi=-9999;
+  Float_t met_tight_tst_nolep_et=-9999;
+  Float_t met_tight_tst_nolep_phi=-9999;
   Double_t metsig_tst=-9999;
 
   Float_t met_truth_et=-9999;

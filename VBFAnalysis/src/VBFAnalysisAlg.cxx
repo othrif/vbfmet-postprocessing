@@ -302,6 +302,10 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("met_tight_tst_phi",      &met_tight_tst_phi);
       m_tree_out->Branch("met_tighter_tst_et",     &met_tighter_tst_et);
       m_tree_out->Branch("met_tighter_tst_phi",    &met_tighter_tst_phi);
+      m_tree_out->Branch("met_tight_tst_nolep_et",       &met_tight_tst_nolep_et);
+      m_tree_out->Branch("met_tight_tst_nolep_phi",      &met_tight_tst_nolep_phi);
+      m_tree_out->Branch("met_tighter_tst_nolep_et",     &met_tighter_tst_nolep_et);
+      m_tree_out->Branch("met_tighter_tst_nolep_phi",    &met_tighter_tst_nolep_phi);
     }
     m_tree_out->Branch("metsig_tst",             &metsig_tst);
 
@@ -619,7 +623,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float DEtajjCut =3.8;
 
   if(m_LooseSkim && m_currentVariation=="Nominal"){
-    METCut = 140.0e3;
+    METCut = 100.0e3;
     LeadJetPtCut = 60.0e3; // 60.0e3
     subLeadJetPtCut = 40.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
@@ -662,32 +666,36 @@ StatusCode VBFAnalysisAlg::execute() {
 
   bool OneElec = (n_el == 1); // n_el should be a subset of baseel
   bool OneMuon = (n_mu == 1);// n_mu should be a subset of basemu
+  bool passMETCut = (met_tst_et > METCut && (met_tst_j1_dphi>1.0) && (met_tst_j2_dphi>1.0));
+  bool passMETNoLepCut = (met_tst_nolep_et > METCut && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0));
   if(!m_LooseSkim){
-    if ((passMETTrig) & (met_tst_et > METCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
+    if ((passMETTrig) && (passMETCut) && (n_el == 0) && (n_mu == 0)) SR = true;
   }else{
-    if ((passMETTrig) & (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut || met_tighter_tst_et > METCut) & (n_el == 0) & (n_mu == 0)) SR = true;
+    passMETCut = (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut || met_tighter_tst_et > METCut);
+    passMETNoLepCut = (met_tst_nolep_et > METCut || met_tenacious_tst_nolep_et > METCut || met_tight_tst_nolep_et > METCut || met_tighter_tst_nolep_et > METCut);
+    if ((passMETTrig) && (passMETCut) && (n_el == 0) && (n_mu == 0)) SR = true;
     // saving the base leptons for the fake lepton estimate. This is done in the loose skimming
     OneElec = (n_el == 1 || n_baseel==1); // n_el should be a subset of baseel
     OneMuon = (n_mu == 1 || n_basemu==1);// n_mu should be a subset of basemu
   }
   if (SR) ATH_MSG_DEBUG ("It's SR!"); else ATH_MSG_DEBUG ("It's NOT SR");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
+  if ((trigger_lep > 0) && (passMETNoLepCut) && (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
   if (CRWep) ATH_MSG_DEBUG ("It's CRWep!"); else ATH_MSG_DEBUG ("It's NOT CRWep");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
+  if ((trigger_lep > 0) && (passMETNoLepCut) && (OneElec) && (n_mu == 0)){ if ((baseel_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
   if (CRWen) ATH_MSG_DEBUG ("It's CRWen!"); else ATH_MSG_DEBUG ("It's NOT CRWen");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
+  if ((trigger_lep > 0) && (passMETNoLepCut) && (OneElec) && (n_mu == 0)){ if ((baseel_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
   if (CRWepLowSig) ATH_MSG_DEBUG ("It's CRWepLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWepLowSig");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (OneElec) & (n_mu == 0)){ if ((baseel_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
+  if ((trigger_lep > 0) && (passMETNoLepCut) && (OneElec) && (n_mu == 0)){ if ((baseel_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
   if (CRWenLowSig) ATH_MSG_DEBUG ("It's CRWenLowSig!"); else ATH_MSG_DEBUG ("It's NOT CRWenLowSig");
-  if ((trigger_lep > 0 || passMETTrig) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (OneMuon)){ if ((basemu_charge->at(0) > 0)) CRWmp = true;}
+  if ((trigger_lep > 0 || passMETTrig) && (passMETNoLepCut) && (n_el == 0) && (OneMuon)){ if ((basemu_charge->at(0) > 0)) CRWmp = true;}
   if (CRWmp) ATH_MSG_DEBUG ("It's CRWmp!"); else ATH_MSG_DEBUG ("It's NOT CRWmp");
-  if ((trigger_lep > 0 || passMETTrig) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (OneMuon)){ if ((basemu_charge->at(0) < 0)) CRWmn = true;}
+  if ((trigger_lep > 0 || passMETTrig) && (passMETNoLepCut) && (n_el == 0) && (OneMuon)){ if ((basemu_charge->at(0) < 0)) CRWmn = true;}
   if (CRWmn) ATH_MSG_DEBUG ("It's CRWmn!"); else ATH_MSG_DEBUG ("It's NOT CRWmn");
-  if ((trigger_lep > 0) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
+  if ((trigger_lep > 0) && (passMETNoLepCut) && (n_el == 2) && (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
   if (CRZee) ATH_MSG_DEBUG ("It's CRZee!"); else ATH_MSG_DEBUG ("It's NOT CRZee");
-  if ((trigger_lep > 0 || passMETTrig) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
+  if ((trigger_lep > 0 || passMETTrig) && (passMETNoLepCut) && (n_el == 0) && (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
   if (CRZmm) ATH_MSG_DEBUG ("It's CRZmm!"); else ATH_MSG_DEBUG ("It's NOT CRZmm");
-  if ((trigger_lep > 0 || passMETTrig) & (met_tst_nolep_et > METCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_baseel+n_basemu>=2)){ CRZtt = true;}
+  if ((trigger_lep > 0 || passMETTrig) && (passMETNoLepCut) && (n_baseel+n_basemu>=2)){ CRZtt = true;}
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt");
 
   w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF*nloEWKWeight;
@@ -902,13 +910,19 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     if(m_isMC) m_tree->SetBranchStatus("baseel_truthType",1);
     m_tree->SetBranchStatus("met_soft_tst_phi",1);
     m_tree->SetBranchStatus("met_soft_tst_sumet",1);
-    m_tree->SetBranchStatus("met_tenacious_tst_et",1);
     m_tree->SetBranchStatus("met_soft_tst_et",1);
+    m_tree->SetBranchStatus("met_tenacious_tst_et",1);
     m_tree->SetBranchStatus("met_tenacious_tst_phi",1);
     m_tree->SetBranchStatus("met_tight_tst_et",1);
     m_tree->SetBranchStatus("met_tight_tst_phi",1);
     m_tree->SetBranchStatus("met_tighter_tst_et",1);
     m_tree->SetBranchStatus("met_tighter_tst_phi",1);
+    m_tree->SetBranchStatus("met_tenacious_tst_nolep_et",1);
+    m_tree->SetBranchStatus("met_tenacious_tst_nolep_phi",1);
+    m_tree->SetBranchStatus("met_tight_tst_nolep_et",1);
+    m_tree->SetBranchStatus("met_tight_tst_nolep_phi",1);
+    m_tree->SetBranchStatus("met_tighter_tst_nolep_et",1);
+    m_tree->SetBranchStatus("met_tighter_tst_nolep_phi",1);
     m_tree->SetBranchStatus("metsig_tst",1);
 
     if(m_currentVariation=="Nominal" && m_contLep){
@@ -1086,6 +1100,12 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("met_tight_tst_phi",      &met_tight_tst_phi);
     m_tree->SetBranchAddress("met_tighter_tst_et",     &met_tighter_tst_et);
     m_tree->SetBranchAddress("met_tighter_tst_phi",    &met_tighter_tst_phi);
+    m_tree->SetBranchAddress("met_tenacious_tst_nolep_et",   &met_tenacious_tst_nolep_et);
+    m_tree->SetBranchAddress("met_tenacious_tst_nolep_phi",  &met_tenacious_tst_nolep_phi);
+    m_tree->SetBranchAddress("met_tight_tst_nolep_et",       &met_tight_tst_nolep_et);
+    m_tree->SetBranchAddress("met_tight_tst_nolep_phi",      &met_tight_tst_nolep_phi);
+    m_tree->SetBranchAddress("met_tighter_tst_nolep_et",     &met_tighter_tst_nolep_et);
+    m_tree->SetBranchAddress("met_tighter_tst_nolep_phi",    &met_tighter_tst_nolep_phi);
     m_tree->SetBranchAddress("metsig_tst",             &metsig_tst);
   
     if(m_currentVariation=="Nominal" && m_isMC){
