@@ -478,8 +478,28 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==361517) crossSection =  387.1 *1.2283;
     else if(runNumber==361518) crossSection =  110.08*1.2283;
     else if(runNumber==361519) crossSection =  43.469*1.2283;
-    else if(runNumber==309668) crossSection =  592.36*0.9728*0.005082;
+    else if(runNumber==309668) crossSection =  592.36*0.9728*0.001043;
     else  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
+
+    // corrections for the filtered samples
+    if(runNumber==309662) crossSection *= 0.9331*0.9702;
+    else if(runNumber==309663) crossSection *= 0.9527*0.9702;
+    else if(runNumber==309664) crossSection *= 0.9307*0.9702;
+    else if(runNumber==309665) crossSection *= 0.6516*0.9751;
+    else if(runNumber==309666) crossSection *= 0.1804*0.9751;
+    else if(runNumber==309667) crossSection *= 0.6516*0.9728;
+    else if(runNumber==309669) crossSection *= 0.5681*0.9728;
+    else if(runNumber==309670) crossSection *= 0.2215*0.9728;
+    else if(runNumber==309671) crossSection *= 0.5891*0.9728;
+    else if(runNumber==309672) crossSection *= 0.6045*0.9728;
+    else if(runNumber==309673) crossSection *= 0.05928*0.9728;
+    else if(runNumber==309674) crossSection *= 0.5684*0.9702;
+    else if(runNumber==309675) crossSection *= 0.2782*0.9702;
+    else if(runNumber==309676) crossSection *= 0.5430*0.9702;
+    else if(runNumber==309677) crossSection *= 0.2749*0.9702;
+    else if(runNumber==309678) crossSection *= 0.5632*0.9702;
+    else if(runNumber==309679) crossSection *= 0.2691*0.9702;
+    else if(runNumber==310502) crossSection *= 0.95325;
     
     //std::cout << "crossSection: " << crossSection << std::endl;
     if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
@@ -696,7 +716,15 @@ StatusCode VBFAnalysisAlg::execute() {
   if ((trigger_lep > 0 || passMETTrig) && (passMETNoLepCut) && (n_el == 0) && (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
   if (CRZmm) ATH_MSG_DEBUG ("It's CRZmm!"); else ATH_MSG_DEBUG ("It's NOT CRZmm");
   if ((trigger_lep > 0 || passMETTrig) && (passMETNoLepCut) && (n_baseel+n_basemu>=2)){ CRZtt = true;}
-  if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt");
+  if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt"); // this allows the baseline>=2 to pass
+
+  // reset the electron anti-ID SF to only affect W events. To be fixed. kind of a hack
+  bool isWenu = ((runNumber>=364170 && runNumber<=364183) || (runNumber>=363600 && runNumber<=363623) || (runNumber==363359 || runNumber==363360 || runNumber==363489));
+  eleANTISF=std::min<float>(eleANTISF,1.5);
+  eleANTISF=std::max<float>(eleANTISF,0.6);
+  if(isWenu){
+    if(!(n_baseel==0 && n_basemu==0)) eleANTISF=1.0;
+  }else{ eleANTISF=1.0; }
 
   w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF*nloEWKWeight;
   //
@@ -729,7 +757,14 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
-    else if(it->first.Contains("eleANTISF"))      tmp_eleANTISF=tMapFloat[it->first];
+    else if(it->first.Contains("eleANTISF")){
+      tmp_eleANTISF=tMapFloat[it->first];
+      tmp_eleANTISF=std::min<float>(tmp_eleANTISF,1.5);
+      tmp_eleANTISF=std::max<float>(tmp_eleANTISF,0.6);
+      if(isWenu){
+	if(!(n_baseel==0 && n_basemu==0)) tmp_eleANTISF=1.0;
+      }else{ tmp_eleANTISF=1.0; }
+    }
 
     ATH_MSG_DEBUG("VBFAnalysisAlg: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF);
 
