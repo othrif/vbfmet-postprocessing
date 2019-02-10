@@ -15,6 +15,7 @@ arg_group.add_argument("--containerName", dest='containerName', default="", help
 arg_group.add_argument("--currentSample", dest='currentSample', default="", help="sample name to process")
 arg_group.add_argument("--doLowNom", action="store_true", dest='doLowNom', default=False, help="doLowNom, to symmetrize asymmetric syst, default: False")
 arg_group.add_argument("--extraVars", dest='extraVars', default='0', help="extraVars, cut on the new variables for leptons veto etc, default: 0, 1=lepton vars, 2= includes kinematics")
+arg_group.add_argument("--isMadgraph", action="store_true", dest='isMadgraph', default=False, help="isMadgraph, default: False")
 arg_group.add_argument("--isLow", action="store_true", dest='isLow', default=False, help="isLow, default: False")
 arg_group.add_argument("--weightSyst", action="store_true", dest='weightSyst', default=False, help="is a weight systematic, default: False")
 arg_group.add_argument("--oldInput", action="store_true", dest='oldInput', default=False, help="if oldInput, switch to HFInputOldInput")
@@ -77,6 +78,7 @@ if True:
                                        ExtraVars=int(args.extraVars),
                                        doLowNom = args.doLowNom,
                                        isHigh = not args.isLow,
+                                       isMadgraph = args.isMadgraph,
                                        weightSyst = args.weightSyst);
     else:
         if args.currentSample == "physics_micro":
@@ -88,6 +90,7 @@ if True:
                                                ExtraVars=int(args.extraVars),
                                                doLowNom = args.doLowNom,
                                                isHigh = not args.isLow,
+                                               isMadgraph = args.isMadgraph,
                                                weightSyst=weightSyst);
     
     

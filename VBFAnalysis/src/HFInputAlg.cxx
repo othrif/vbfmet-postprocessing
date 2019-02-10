@@ -9,6 +9,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("currentVariation", currentVariation = "Nominal", "current systematics, NONE means nominal");
   declareProperty("currentSample", currentSample = "W_strong", "current samples");
   declareProperty("isMC", isMC = true, "isMC flag, true means the sample is MC");
+  declareProperty("isMadgraph", isMadgraph = false, "isMadgraph flag, true means the sample is Madgraph");
   declareProperty("ExtraVars", m_extraVars = 0, "true if extra variables should be cut on" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
@@ -200,6 +201,19 @@ StatusCode HFInputAlg::execute() {
   float jj_detaCut = 4.8; // 4.0
   float jj_massCut = 1000.0e3;
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
+
+  // decide if this MG or sherpa
+  bool passSample=false;
+  if(isMadgraph){
+    if(currentSample=="W_strong") passSample=(runNumber >= 363600 && runNumber <= 363671);
+    else if(currentSample=="Z_strong") passSample=(runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519);
+    else passSample=true;
+  }else{
+    if(currentSample=="W_strong") passSample=!(runNumber >= 363600 && runNumber <= 363671);
+    else if(currentSample=="Z_strong") passSample=!((runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519));
+    else passSample=true;
+  }
+  if(!passSample)  return StatusCode::SUCCESS;
 
   // extra vetos  
   bool leptonVeto = false;
@@ -465,10 +479,10 @@ double HFInputAlg::weightXETrigSF(const float met_pt, int syst=0) {
 
   // linear parameterization of the systematics
   if(syst==1){ // up variation
-    if(x<210.0) sf+=(0.000784094)*(150-x)+0.05;
+    if(x<210.0) sf+=((0.000784094)*(150-x)+0.05)*0.6;
     else sf=1.0;
   }else if(syst==2){ // down
-    if(x<210.0)sf-=(0.000784094)*(150-x)+0.05;
+    if(x<210.0)sf-=((0.000784094)*(150-x)+0.05)*0.6;
     else sf=1.0;
   }
   return sf;

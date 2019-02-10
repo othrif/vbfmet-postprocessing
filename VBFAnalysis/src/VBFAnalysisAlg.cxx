@@ -643,7 +643,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float DEtajjCut =3.8;
 
   if(m_LooseSkim && m_currentVariation=="Nominal"){
-    METCut = 100.0e3;
+    METCut = 140.0e3;
     LeadJetPtCut = 60.0e3; // 60.0e3
     subLeadJetPtCut = 40.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
@@ -1176,10 +1176,10 @@ double VBFAnalysisAlg::weightXETrigSF(const float met_pt, int syst=0) {
 
   // linear parameterization of the systematics
   if(syst==1){ // up variation
-    if(x<210.0) sf+=(0.000784094)*(150-x)+0.05;
+    if(x<210.0) sf+=((0.000784094)*(150-x)+0.05)*0.6;
     else sf=1.0;
   }else if(syst==2){ // down
-    if(x<210.0)sf-=(0.000784094)*(150-x)+0.05;
+    if(x<210.0)sf-=((0.000784094)*(150-x)+0.05)*0.6;
     else sf=1.0;
   }
   return sf;
