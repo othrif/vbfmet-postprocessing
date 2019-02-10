@@ -39,7 +39,11 @@ print systlist
 
 ### Remake submitDir ###
 workDir = os.getcwd()+"/"+args.submitDir
-buildDir = workDir[:workDir.find("/run/")]+"/build"
+#buildDir = workDir[:workDir.find("/run/")]+"/build"
+CMTCONFIG = os.getenv('CMTCONFIG')
+buildPaths = os.getenv('CMAKE_PREFIX_PATH')
+buildPathsVec = buildPaths.split(':')
+buildDir =  buildPathsVec[0][:buildPathsVec[0].find(CMTCONFIG)].rstrip('/')
 os.system("rm -rf "+workDir)
 os.system("mkdir "+workDir)                
 
@@ -59,7 +63,7 @@ fMC.close()
 
 extraCommand=''
 if args.extraVars:
-    extraCommand=' --extraVars '
+    extraCommand=' --extraVars '+args.extraVars
 
 for syst in systlist:
     isLow = ""    
