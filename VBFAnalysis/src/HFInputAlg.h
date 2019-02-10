@@ -45,6 +45,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
  private: 
   int npevents = 0;
   Bool_t isMC = true;
+  Bool_t isMadgraph = true;
   Bool_t doLowNom = false; //put nominal yields for "Low" histogram for asymmetric systematics for HistFitter
   Bool_t isHigh = true;
   Bool_t weightSyst=false;
