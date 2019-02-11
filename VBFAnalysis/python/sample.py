@@ -7,7 +7,7 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst)
-        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125","ggFH125","VH125","VBFHOther","QCDw","QCDunw","VVV","VV","data"] # do not change order
+        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125","ggFH125","VH125","VBFHOther","QCDw","QCDunw","VVV","VV","data"] # do not change order
 
         self.sampleMap = {'data':['data'],
                           'W_EWK':['W_EWK'],
@@ -85,9 +85,9 @@ class sample(object):
             elif (self.runNumber >= 364242 and self.runNumber <= 364249 or self.runNumber==364253):
                 self.sampleType = "VVV"
             elif (self.runNumber >= 364198 and self.runNumber <= 364215):
-                self.sampleType = "Z_strong_LowMass"
+                self.sampleType = "Z_strong" # Z_strong_LowMass added to the Z_strong
             elif (self.runNumber >= 301020 and self.runNumber <= 301038):
-                self.sampleType = "Z_strong" #powheg
+                self.sampleType = "Z_strongPow" #powheg
             elif (self.runNumber >=309662  and self.runNumber <= 309679):
                 self.sampleType = "Z_strongExt" #extension
             elif (self.runNumber >=364216  and self.runNumber <= 364229):
