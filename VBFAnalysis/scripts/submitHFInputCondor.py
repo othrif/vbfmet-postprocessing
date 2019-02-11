@@ -79,9 +79,11 @@ for syst in systlist:
     writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
     writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, listoffilesMC)
 
-for syst in asys_systlist:
-    runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+" --doLowNom"+extraCommand
-    print runCommand
-    writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
-    writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, listoffilesMC)
+
+# The low one sided systematics can be handled in the fitting. just call symmeterize in hist fitter
+#for syst in asys_systlist:
+#    runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+" --doLowNom"+extraCommand
+#    print runCommand
+#    writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
+#    writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, listoffilesMC)
 
