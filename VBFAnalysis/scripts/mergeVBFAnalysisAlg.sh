@@ -1,5 +1,5 @@
 #!/bin/bash                                                                                                                                                                                                       
-OUTDIRM=v26Loose
+OUTDIRM=v26Looseb
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 hadd $OUTDIRM/VVV.root VVV*root
@@ -7,7 +7,7 @@ rm VVV*root
 hadd $OUTDIRM/Z_strong_VBFFilt.root Z_strong_VBFFilt*root
 hadd $OUTDIRM/Z_strongPTVExt.root Z_strongPTVExt*root
 hadd $OUTDIRM/Z_strongExt.root Z_strongExt*root
-hadd $OUTDIRM/Z_strong_LowMass.root Z_strong_LowMass*root
+#hadd $OUTDIRM/Z_strong_LowMass.root Z_strong_LowMass*root
 rm Z_strong_VBFFilt*root
 rm Z_strongPTVExt*root
 rm Z_strong_LowMass*root
@@ -21,7 +21,7 @@ hadd $OUTDIRM/W_EWK.root W_EWK*root
 hadd $OUTDIRM/Z_EWK.root Z_EWK*root
 hadd $OUTDIRM/ttbar.root ttbar*root
 hadd $OUTDIRM/QCDw.root QCDw*root
-hadd $OUTDIRM/QCDunw.root QCDunw*root
+#hadd $OUTDIRM/QCDunw.root QCDunw*root
 #hadd signal.root *H125*root
 hadd $OUTDIRM/VBFH125.root  VBFH125*.root
 hadd $OUTDIRM/VBFHOther.root  VBFHOther*.root
