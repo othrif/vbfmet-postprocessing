@@ -354,7 +354,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
   std::cout << "Tree Entries: " <<m_tree->GetEntries() <<std::endl;
   m_tree->SetBranchStatus("*",0);
-  if(weightSyst && currentVariation!="xeSFTrigWeight__1up"){// MET trigger SF systematic is computed differently. The variable is saved. So here we just pickup the nominal weights
+  if(weightSyst && currentVariation!="xeSFTrigWeight__1up"  && currentVariation!="xeSFTrigWeight__1down"){// MET trigger SF systematic is computed differently. The variable is saved. So here we just pickup the nominal weights
     bool found=false;
     TObjArray *var_list = m_tree->GetListOfBranches();
     for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) { 
