@@ -766,7 +766,7 @@ StatusCode VBFAnalysisAlg::execute() {
       }else{ tmp_eleANTISF=1.0; }
     }
 
-    ATH_MSG_DEBUG("VBFAnalysisAlg: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF);
+    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF);
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF;
   }//end systematic weight loop
@@ -983,14 +983,16 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   }
 
   UInt_t foundGenMET = 0;
+  if(m_isMC){
+    m_tree->SetBranchStatus("met_truth_et",1);
+    m_tree->SetBranchStatus("met_truth_phi",1);
+    m_tree->SetBranchStatus("met_truth_sumet",1);
+  }
   if(m_currentVariation=="Nominal" && m_isMC){
     m_tree->SetBranchStatus("truth_jet_pt",1);
     m_tree->SetBranchStatus("truth_jet_phi",1);
     m_tree->SetBranchStatus("truth_jet_eta",1);
     m_tree->SetBranchStatus("truth_jet_m",1);
-    m_tree->SetBranchStatus("met_truth_et",1);
-    m_tree->SetBranchStatus("met_truth_phi",1);
-    m_tree->SetBranchStatus("met_truth_sumet",1);
     m_tree->SetBranchStatus("GenMET_pt",1, &foundGenMET);
     //m_tree->SetBranchStatus("GenMET_pt",1);
   }
@@ -1071,14 +1073,16 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("jet_EMFrac",&jet_EMFrac);
     m_tree->SetBranchAddress("jet_fch",&jet_fch);
   }
-  if(m_currentVariation=="Nominal" && m_isMC){
+  if(m_isMC){
+    m_tree->SetBranchAddress("met_truth_et",  &met_truth_et);
+    m_tree->SetBranchAddress("met_truth_phi",  &met_truth_phi);
+    m_tree->SetBranchAddress("met_truth_sumet",  &met_truth_sumet);    
+  }
+  if(m_isMC && m_currentVariation=="Nominal"){
     m_tree->SetBranchAddress("truth_jet_pt", &truth_jet_pt);
     m_tree->SetBranchAddress("truth_jet_phi",&truth_jet_phi);
     m_tree->SetBranchAddress("truth_jet_eta",&truth_jet_eta);
     m_tree->SetBranchAddress("truth_jet_m",  &truth_jet_m);
-    m_tree->SetBranchAddress("met_truth_et",  &met_truth_et);
-    m_tree->SetBranchAddress("met_truth_phi",  &met_truth_phi);
-    m_tree->SetBranchAddress("met_truth_sumet",  &met_truth_sumet);
     if(foundGenMET) m_tree->SetBranchAddress("GenMET_pt",  &GenMET_pt);
   }
   
