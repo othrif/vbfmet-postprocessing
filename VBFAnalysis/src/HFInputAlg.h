@@ -84,6 +84,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t trigger_met;
   Float_t w;
   Int_t runNumber;
+  ULong64_t eventNumber;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_lep;

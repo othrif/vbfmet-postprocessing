@@ -215,6 +215,9 @@ StatusCode HFInputAlg::execute() {
   }
   if(!passSample)  return StatusCode::SUCCESS;
 
+  // removed extra top samples:
+  if(runNumber==410649 || runNumber==410648 || runNumber==410472) return StatusCode::SUCCESS;
+
   // extra vetos  
   bool leptonVeto = false;
   bool metSoftVeto = false;
@@ -257,7 +260,7 @@ StatusCode HFInputAlg::execute() {
   }
 
   // MET choice to be implemented...
-  if (!((passJetCleanTight == 1) & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut)) & (n_ph==0)) return StatusCode::SUCCESS; 
+  if (!((passJetCleanTight == 1) & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (n_ph==0))) return StatusCode::SUCCESS; 
 
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0);
@@ -331,11 +334,13 @@ StatusCode HFInputAlg::execute() {
     else hCRWmn[2]->Fill(1,w_final);
   }
   if (CRZee){
+    //std::cout << "CRZee: " << runNumber << " " << eventNumber << std::endl;
     if (jj_mass < 1.5e6) hCRZee[0]->Fill(1,w_final);
     else if (jj_mass < 2e6) hCRZee[1]->Fill(1,w_final);
     else hCRZee[2]->Fill(1,w_final);
   }
   if (CRZmm){
+    //std::cout << "CRZmm: " << runNumber << " " << eventNumber << std::endl;
     if (jj_mass < 1.5e6) hCRZmm[0]->Fill(1,w_final);
     else if (jj_mass < 2e6) hCRZmm[1]->Fill(1,w_final);
     else hCRZmm[2]->Fill(1,w_final);
@@ -391,6 +396,7 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchAddress("w", &w);
   }
   m_tree->SetBranchStatus("runNumber", 1);
+  m_tree->SetBranchStatus("eventNumber", 1);
   m_tree->SetBranchStatus("passJetCleanTight", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
@@ -423,6 +429,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_timing",1);
 
   m_tree->SetBranchAddress("runNumber",&runNumber);
+  m_tree->SetBranchAddress("eventNumber",&eventNumber);
   m_tree->SetBranchAddress("trigger_met", &trigger_met);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
