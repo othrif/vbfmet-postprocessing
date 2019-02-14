@@ -215,6 +215,9 @@ StatusCode HFInputAlg::execute() {
   }
   if(!passSample)  return StatusCode::SUCCESS;
 
+  // removed extra top samples:
+  if(runNumber==410649 || runNumber==410648 || runNumber==410472) return StatusCode::SUCCESS;
+
   // extra vetos  
   bool leptonVeto = false;
   bool metSoftVeto = false;
@@ -257,7 +260,7 @@ StatusCode HFInputAlg::execute() {
   }
 
   // MET choice to be implemented...
-  if (!((passJetCleanTight == 1) & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut)) & (n_ph==0)) return StatusCode::SUCCESS; 
+  if (!((passJetCleanTight == 1) & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (n_ph==0))) return StatusCode::SUCCESS; 
 
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0);
