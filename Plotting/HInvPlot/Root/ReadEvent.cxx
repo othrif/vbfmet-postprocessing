@@ -867,6 +867,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // Fill Base electrons
     unsigned n_baselep=0;
+    unsigned n_siglep=0;    
     if(baseel_pt){
       //unsigned n_baseel=0;
       for(unsigned iEl=0; iEl<baseel_pt->size(); ++iEl){
@@ -899,6 +900,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     n_baselep+=event->GetVar(Mva::n_baseel);
     n_baselep+=event->GetVar(Mva::n_basemu);
     event->RepVar(Mva::n_baselep, n_baselep);
+    n_siglep+=event->GetVar(Mva::n_el);
+    n_siglep+=event->GetVar(Mva::n_mu);
+    event->RepVar(Mva::n_siglep, n_siglep);
 
     // Fill signal photons
     if(ph_pt){

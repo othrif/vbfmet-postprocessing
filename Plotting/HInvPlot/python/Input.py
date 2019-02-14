@@ -501,7 +501,7 @@ def prepareBkgRuns(keys,options=None):
     bkg_top2 = {
         '410470':'ttbar(w/oFullHad)',
         '410471':'ttbar(w/FullHad)',
-        '410472':'ttbar(w/dil)',                
+        #'410472':'ttbar(w/dil)',                remove dilepton
         }
     bkg_top1 = {
         '410011':'tchan_top',
@@ -514,12 +514,12 @@ def prepareBkgRuns(keys,options=None):
     bkg_top1 = {
         '410642':'tchan_lept_top',
         '410643':'tchan_lept_antitop',
-        '410644':'schan_top',
-        '410645':'schan_antitop',
-        #'410646':'Wt_top_incl',
-        #'410647':'Wt_antitop_incl',
-        '410648':'Wt_DR_dilepton_top',
-        '410649':'Wt_DR_dilepton_antitop',
+        '410644':'schan_top_lept',
+        '410645':'schan_antitop_lept',
+        '410646':'Wt_top_incl',
+        '410647':'Wt_antitop_incl',
+        #'410648':'Wt_DR_dilepton_top',
+        #'410649':'Wt_DR_dilepton_antitop',
         }
     bkg_top2.update(bkg_top1)
 
