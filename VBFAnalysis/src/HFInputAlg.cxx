@@ -334,11 +334,13 @@ StatusCode HFInputAlg::execute() {
     else hCRWmn[2]->Fill(1,w_final);
   }
   if (CRZee){
+    //std::cout << "CRZee: " << runNumber << " " << eventNumber << std::endl;
     if (jj_mass < 1.5e6) hCRZee[0]->Fill(1,w_final);
     else if (jj_mass < 2e6) hCRZee[1]->Fill(1,w_final);
     else hCRZee[2]->Fill(1,w_final);
   }
   if (CRZmm){
+    //std::cout << "CRZmm: " << runNumber << " " << eventNumber << std::endl;
     if (jj_mass < 1.5e6) hCRZmm[0]->Fill(1,w_final);
     else if (jj_mass < 2e6) hCRZmm[1]->Fill(1,w_final);
     else hCRZmm[2]->Fill(1,w_final);
@@ -394,6 +396,7 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchAddress("w", &w);
   }
   m_tree->SetBranchStatus("runNumber", 1);
+  m_tree->SetBranchStatus("eventNumber", 1);
   m_tree->SetBranchStatus("passJetCleanTight", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
@@ -426,6 +429,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_timing",1);
 
   m_tree->SetBranchAddress("runNumber",&runNumber);
+  m_tree->SetBranchAddress("eventNumber",&eventNumber);
   m_tree->SetBranchAddress("trigger_met", &trigger_met);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
