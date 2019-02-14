@@ -106,6 +106,8 @@ def ExtraCuts(n_mu=0, n_el=0, isEMu=False):
     cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
+    cuts += [CutItem('CutJetFlavor','jj_nmbGluons < 2.0')]
+
     return cuts
 
 #-------------------------------------------------------------------------
