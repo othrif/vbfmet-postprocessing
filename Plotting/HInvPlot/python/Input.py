@@ -362,9 +362,9 @@ def prepareBkgRuns(keys,options=None):
                       '308282':'VBF125 - H2000',                                                                  
                       '308283':'VBF125 - H3000',}
 
-    bkg_wewk =     {'308096':'TBD',
-                    '308097':'TBD',
-                    '308098':'TBD',
+    bkg_wewk =     {'308096':'Wenu',
+                    '308097':'Wmunu',
+                    '308098':'Wtaunu',
                     '363359':'TBD',
                     '363360':'TBD',
                     '363489':'TBD',
@@ -392,26 +392,26 @@ def prepareBkgRuns(keys,options=None):
                     '364175':'Wenu_MAXHTPTV70_140_BFilter',       
                     '364176':'Wenu_MAXHTPTV140_280_CVetoBVeto',   
                     '364177':'Wenu_MAXHTPTV140_280_CFilterBVeto', 
-                    '364178':'Wenu_MAXHTPTV140_280_BFilter',      
+                    '364178':'Wenu_MAXHTPTV140_280_BFilter',
                     '364179':'Wenu_MAXHTPTV280_500_CVetoBVeto',   
                     '364180':'Wenu_MAXHTPTV280_500_CFilterBVeto', 
                     '364181':'Wenu_MAXHTPTV280_500_BFilter',      
-                    '364182':'Wenu_MAXHTPTV500_1000',             
+                    '364182':'Wenu_MAXHTPTV500_1000',
                     '364183':'Wenu_MAXHTPTV1000_E_CMS',   }        
-    bkg_wqcd_tnu={'364184':'Wtaunu_MAXHTPTV0_70_CVetoBVeto',       
-                    '364185':'Wtaunu_MAXHTPTV0_70_CFilterBVeto',     
-                    '364186':'Wtaunu_MAXHTPTV0_70_BFilter',          
+    bkg_wqcd_tnu={'364184':'Wtaunu_MAXHTPTV0_70_CVetoBVeto',
+                    '364185':'Wtaunu_MAXHTPTV0_70_CFilterBVeto',
+                    '364186':'Wtaunu_MAXHTPTV0_70_BFilter',
                     '364187':'Wtaunu_MAXHTPTV70_140_CVetoBVeto',     
                     '364188':'Wtaunu_MAXHTPTV70_140_CFilterBVeto',   
-                    '364189':'Wtaunu_MAXHTPTV70_140_BFilter',        
-                    '364190':'Wtaunu_MAXHTPTV140_280_CVetoBVeto',    
+                    '364189':'Wtaunu_MAXHTPTV70_140_BFilter',
+                    '364190':'Wtaunu_MAXHTPTV140_280_CVetoBVeto',
                     '364191':'Wtaunu_MAXHTPTV140_280_CFilterBVeto',  
-                    '364192':'Wtaunu_MAXHTPTV140_280_BFilter',       
-                    '364193':'Wtaunu_MAXHTPTV280_500_CVetoBVeto',    
+                    '364192':'Wtaunu_MAXHTPTV140_280_BFilter',
+                    '364193':'Wtaunu_MAXHTPTV280_500_CVetoBVeto',
                     '364194':'Wtaunu_MAXHTPTV280_500_CFilterBVeto',  
                     '364195':'Wtaunu_MAXHTPTV280_500_BFilter',       
-                    '364196':'Wtaunu_MAXHTPTV500_1000',              
-                    '364197':'Wtaunu_MAXHTPTV1000_E_CMS',            
+                    '364196':'Wtaunu_MAXHTPTV500_1000',
+                    '364197':'Wtaunu_MAXHTPTV1000_E_CMS',
                         }
     bkg_wqcd={}
     bkg_wqcd.update(bkg_wqcd_enu)
@@ -791,11 +791,11 @@ def prepareBkgRuns(keys,options=None):
                         }
 
     if options.mergePTV:
-        for ki,yi in bkg_vbfPTVExt:
+        for ki,yi in bkg_vbfPTVExt.iteritems():
             if yi[0]=='W': bkg_wqcd[ki]=yi
             elif yi[0]=='Z': bkg_zqcd[ki]=yi 
     if options.mergeExt:
-        for ki,yi in bkg_vbfExt:
+        for ki,yi in bkg_vbfExt.iteritems():
             if yi[0]=='W': bkg_wqcd[ki]=yi
             elif yi[0]=='Z': bkg_zqcd[ki]=yi
                 
@@ -823,6 +823,7 @@ def prepareBkgRuns(keys,options=None):
                 #'mqcd':bkg_qcdunw,
                 'zqcdMad':bkg_z_strong_madgraph,
                 'wqcdMad':bkg_w_strong_madgraph,
+                'wdpi':{},
                 #'zqcdMad':bkg_zqcd,
                 #'wqcdMad':bkg_wqcd,
                 #'hvbf':bkg_w_strong_madgraph_wmnu,
@@ -833,10 +834,7 @@ def prepareBkgRuns(keys,options=None):
                 #'top2':bkg_z_strong_madgraph_ztt,
                 #'top1':bkg_z_strong_madgraph_znn,                
                 }
-    extra_samples=bkg_lowMassZ
-    extra_samples.update(bkg_vbfFiltZ)
-    extra_samples.update(bkg_z_strong_powheg)
-    bkg_keys['wdpi']=extra_samples
+
     if not options.mergePTV:
         bkg_keys['wdpi'].update(bkg_vbfPTVExt)
     if not options.mergeExt:
@@ -845,6 +843,11 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['zqcdPow']=bkg_z_strong_powheg
         bkg_keys['vbfz']=bkg_vbfFiltZ        
         bkg_keys['zldy']=bkg_lowMassZ
+    else:
+        extra_samples=bkg_lowMassZ
+        extra_samples.update(bkg_vbfFiltZ)
+        extra_samples.update(bkg_z_strong_powheg)
+        bkg_keys['wdpi']=extra_samples
         
     #
     # Select MC samples 
