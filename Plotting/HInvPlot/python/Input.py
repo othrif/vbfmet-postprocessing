@@ -522,7 +522,10 @@ def prepareBkgRuns(keys,options=None):
         #'410649':'Wt_DR_dilepton_antitop',
         }
     bkg_top2.update(bkg_top1)
-
+    bkg_top_other = {'410472':'ttbar(w/dil)',#                remove dilepton
+                     '410648':'Wt_DR_dilepton_top',
+                     '410649':'Wt_DR_dilepton_antitop',       
+        }
     bkg_z_strong_madgraph_znn = {'361515':'Znn_Np0',
                       '361516':'Znn_Np1',
                       '361517':'Znn_Np2',
@@ -823,7 +826,7 @@ def prepareBkgRuns(keys,options=None):
                 #'mqcd':bkg_qcdunw,
                 'zqcdMad':bkg_z_strong_madgraph,
                 'wqcdMad':bkg_w_strong_madgraph,
-                'wdpi':{},
+                'wdpi':bkg_top_other,
                 #'zqcdMad':bkg_zqcd,
                 #'wqcdMad':bkg_wqcd,
                 #'hvbf':bkg_w_strong_madgraph_wmnu,
