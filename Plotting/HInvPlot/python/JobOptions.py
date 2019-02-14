@@ -63,6 +63,7 @@ def getParser():
     p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
     p.add_option('--mergePTV',  action='store_true', default=False,   dest='mergePTV',          help='Merge the pTV slices')
     p.add_option('--mergeExt',  action='store_true', default=False,   dest='mergeExt',          help='Merge the Sherpa extension slices')
+    p.add_option('--r207Ana',  action='store_true', default=False,   dest='r207Ana',          help='Run the release 20.7 analysis')    
     
     # Should try to reduce these number of options
     p.add_option('--skim',         action='store_true', default=False,   dest='skim',                 help='Skim ntuples to met trigger or 3L')
