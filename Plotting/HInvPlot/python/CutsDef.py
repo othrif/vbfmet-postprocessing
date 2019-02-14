@@ -88,6 +88,17 @@ def getLepChannelCuts(basic_cuts):
     return GetCuts(cuts)
 
 #-------------------------------------------------------------------------
+def FilterCuts(options):
+    cuts = []
+    if options==None:
+        return cuts
+    if options.mergePTV:
+        cuts += [CutItem('CutMergePTV','passVjetsPTV > 0')]
+    if options.mergeExt:
+        cuts += [CutItem('CutMergeExt','passVjetsFilter > 0')]
+    return cuts
+
+#-------------------------------------------------------------------------
 def ExtraCuts(n_mu=0, n_el=0, isEMu=False):
     cuts = []
     #cuts += [CutItem('CutTruthFilter','TruthFilter < 0.5')]    
@@ -165,12 +176,14 @@ def metCuts(options, isLep=False):
 #-------------------------------------------------------------------------
 def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
 
-    cuts = []
+    cuts = FilterCuts(options)
 
     # special setup for the trigger SF in the signal region
     apply_weight='xeSFTrigWeight'
     if syst=='xeSFTrigWeight__1up':
-        apply_weight=None
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
     cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
@@ -193,7 +206,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
 #-------------------------------------------------------------------------
 def getGamSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
 
-    cuts = []
+    cuts = FilterCuts(options)
 
     cuts += [CutItem('CutTrig',      'trigger_met == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
@@ -224,9 +237,10 @@ def getGamSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
 #-------------------------------------------------------------------------
 def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
 
-    cuts = []
+    cuts = FilterCuts(options)
 
     cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
+    #cuts += [CutItem('CutTrig',      'trigger_lep > 0 || trigger_met>0')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += [CutItem('CutPh', 'n_ph==0')]
     cuts += getLepChannelCuts(basic_cuts)
@@ -273,7 +287,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
 #-------------------------------------------------------------------------
 def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met_signif=False):
 
-    cuts = []
+    cuts = FilterCuts(options)
     cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += [CutItem('CutPh', 'n_ph==0')]
@@ -336,12 +350,12 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['zqcd'] = ['zqcd']
     bkgs['wewk'] = ['wewk']
     bkgs['zewk'] = ['zewk']
-    bkgs['top1'] = ['top1']
+    #bkgs['top1'] = ['top1']
     bkgs['top2'] = ['top2']
     bkgs['vvv']  = ['vvv']    
-    bkgs['zldy'] = ['zldy']    
+    #bkgs['zldy'] = ['zldy']    
     bkgs['mqcd'] = ['mqcd']    
-    bkgs['tall'] = ['top2','top1']
+    #bkgs['tall'] = ['top2','top1']
     #bkgs['tall'] = ['top2','top1']    
 
     other={}
@@ -366,7 +380,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     # Save samples (type list by hand to preserve order)
     #
     if reg != None and key != None:
-        reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
+        reg.SetVal(key, 'higgs,top2,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 
@@ -475,7 +489,7 @@ def prepareFillEvent(alg_name, options):
     return ExecBase(alg_name, 'FillEvent', ROOT.Msl.FillEvent(), reg)
 
 #-------------------------------------------------------------------------
-def preparePlotEvent(alg_name, *arguments, **keywords):
+def preparePlotEvent(alg_name, syst_name, *arguments, **keywords):
 
     alg = ROOT.Msl.PlotEvent()
     reg = ROOT.Msl.Registry()
@@ -485,10 +499,10 @@ def preparePlotEvent(alg_name, *arguments, **keywords):
     reg.SetVal('PlotEvent::VarPref',     'var_')
     reg.SetVal('PlotEvent::DetailLvl',   1)
     #reg.SetVal('PlotEvent::Debug',       'yes')    
-    reg.SetVal('PlotEvent::VarVec',      ','.join((get_vars.GetPltStr(0)))) 
-    reg.SetVal('PlotEvent::NBinVec',     ','.join((get_vars.GetPltStr(1))))
-    reg.SetVal('PlotEvent::LoVec',       ','.join((get_vars.GetPltStr(2))))
-    reg.SetVal('PlotEvent::HiVec',       ','.join((get_vars.GetPltStr(3))))
+    reg.SetVal('PlotEvent::VarVec',      ','.join((get_vars.GetPltStr(0,syst_name)))) 
+    reg.SetVal('PlotEvent::NBinVec',     ','.join((get_vars.GetPltStr(1,syst_name))))
+    reg.SetVal('PlotEvent::LoVec',       ','.join((get_vars.GetPltStr(2,syst_name))))
+    reg.SetVal('PlotEvent::HiVec',       ','.join((get_vars.GetPltStr(3,syst_name))))
     
     pass_algs = []
     

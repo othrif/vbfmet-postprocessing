@@ -40,11 +40,12 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   ///histSvc()         : ServiceHandle to output ROOT service (writing TObjects)
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
-  double weightXETrigSF(const float jj_pt);
+  double weightXETrigSF(const float met_pt, int syst);
 
  private: 
   int npevents = 0;
   Bool_t isMC = true;
+  Bool_t isMadgraph = true;
   Bool_t doLowNom = false; //put nominal yields for "Low" histogram for asymmetric systematics for HistFitter
   Bool_t isHigh = true;
   Bool_t weightSyst=false;
@@ -87,6 +88,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t passJetCleanTight;
   Int_t trigger_lep;
   Int_t n_jet;
+  Int_t n_ph;
   Int_t n_el;
   Int_t n_mu;
   Double_t jj_mass;

@@ -82,6 +82,8 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
   reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
   reg.Get("ReadEvent::OverlapPh",     fOverlapPh);
+  reg.Get("ReadEvent::mergeExt",      fMergeExt);
+  reg.Get("ReadEvent::mergePTV",      fMergePTV);
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -150,7 +152,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   jet_jvt    = new std::vector<float>();  
   jet_fjvt   = new std::vector<float>();
   jet_TrackWidth   = new std::vector<float>();
-  jet_NTracks   = new std::vector<float>();
+  jet_NTracks   = new std::vector<unsigned short>();
   jet_PartonTruthLabelID   = new std::vector<float>();
   truth_el_pt  = new std::vector<float>();
   truth_el_eta = new std::vector<float>();
@@ -160,10 +162,10 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   truth_mu_phi = new std::vector<float>(); 
   truth_tau_pt  = new std::vector<float>();
   truth_tau_eta = new std::vector<float>();
-  truth_tau_phi = new std::vector<float>();    
+  truth_tau_phi = new std::vector<float>();
   truth_jet_pt  = new std::vector<float>();
   truth_jet_eta = new std::vector<float>();
-  truth_jet_phi = new std::vector<float>();    
+  truth_jet_phi = new std::vector<float>();
   basemu_pt     = new std::vector<float>();
   basemu_charge = new std::vector<int>();  
   basemu_eta    = new std::vector<float>();
@@ -200,10 +202,18 @@ void Msl::ReadEvent::Init(TTree* tree)
   // Init
   for(unsigned i=0; i<fVarVec.size(); ++i)
     fVarVec.at(i).SetVarBranch(tree);
-
-  tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);  
-  if(fWeightSystName=="Nominal")
+  xeSFTrigWeight=1.0;
+  xeSFTrigWeight__1up=1.0;
+  xeSFTrigWeight__1down=1.0;
+  tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
+  if(fWeightSystName=="Nominal"){
     tree->SetBranchAddress("w",        &fWeight);
+    // xe SF runs with the weight syst set to Nominal
+    if(fSystName=="Nominal"){
+      tree->SetBranchAddress("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);    
+      tree->SetBranchAddress("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
+    }
+  }
   else{
     // add the systematics weights to the nominal
     bool found_weight_syst=false;
@@ -615,7 +625,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       }
     }
     // Load XS trigger SF
-    event->RepVar(Mva::xeSFTrigWeight, xeSFTrigWeight);
+    event->RepVar(Mva::xeSFTrigWeight,        xeSFTrigWeight);
+    event->RepVar(Mva::xeSFTrigWeight__1up,   xeSFTrigWeight__1up);
+    event->RepVar(Mva::xeSFTrigWeight__1down, xeSFTrigWeight__1down);
     
     if(fLoadBaseLep){
       // Fill Electrons with the baseline electrons for this looser lepton selection
@@ -863,53 +875,50 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Fill Base electrons
     unsigned n_baselep=0;
     if(baseel_pt){
-      unsigned n_baseel=0;
+      //unsigned n_baseel=0;
       for(unsigned iEl=0; iEl<baseel_pt->size(); ++iEl){
 	RecParticle new_ele;
 	new_ele.pt  = baseel_pt->at(iEl)/1.0e3;
 	new_ele.eta = baseel_eta->at(iEl);
 	new_ele.phi = baseel_phi->at(iEl);
 	//new_ele.AddVar(Mva::ptvarcone20,jet_timing->at(iJet));
-	//if(baseel_ptvarcone20->at(iEl)/baseel_pt->at(iEl)<30.3){
 	//if(!(fabs(new_ele.eta)>1.37 && fabs(new_ele.eta)<1.52 && new_ele.pt<27.0)){
-	  ++n_baseel;
-	  event->baseel.push_back(new_ele);
-	  //}
+	//++n_baseel;
+	event->baseel.push_back(new_ele);
       }
-      event->RepVar(Mva::n_baseel, n_baseel);
-      n_baselep+=n_baseel;
+      //event->RepVar(Mva::n_baseel, n_baseel);
     }
 
     // Fill Base muons
     if(basemu_pt){
-      unsigned n_basemu=0;
+      //unsigned n_basemu=0;
       for(unsigned iMu=0; iMu<basemu_pt->size(); ++iMu){
 	RecParticle new_muo;
 	new_muo.pt  = basemu_pt->at(iMu)/1.0e3;
 	new_muo.eta = basemu_eta->at(iMu);
 	new_muo.phi = basemu_phi->at(iMu);
-	//if(basemu_ptvarcone20->at(iMu)/basemu_pt->at(iMu)<30.3){
-	++n_basemu;
+	//++n_basemu;
 	event->basemu.push_back(new_muo);
-	//}
       }
-      event->RepVar(Mva::n_basemu, n_basemu);
-      n_baselep+=n_basemu;
+      //event->RepVar(Mva::n_basemu, n_basemu);
+      //n_baselep+=n_basemu;
     }
+    n_baselep+=event->GetVar(Mva::n_baseel);
+    n_baselep+=event->GetVar(Mva::n_basemu);
     event->RepVar(Mva::n_baselep, n_baselep);
 
     // Fill signal photons
     if(ph_pt){
-      unsigned n_ph=0;
+      //unsigned n_ph=0;
       for(unsigned iPh=0; iPh<ph_pt->size(); ++iPh){
 	RecParticle new_ph;
 	new_ph.pt  = ph_pt->at(iPh)/1.0e3;
 	new_ph.eta = ph_eta->at(iPh);
 	new_ph.phi = ph_phi->at(iPh);
-	++n_ph;
+	//++n_ph;
 	event->photons.push_back(new_ph);
       }
-      event->RepVar(Mva::n_ph, n_ph);          
+      //event->RepVar(Mva::n_ph, n_ph);          
     }
     
     // convert variables to GeV

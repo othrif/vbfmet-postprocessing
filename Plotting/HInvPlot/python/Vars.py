@@ -15,6 +15,7 @@ myvars = [    ['jj_deta', '50', '0.0', '10.0'],
               ['n_bjet', '10', '-0.5', '9.5'],              
               ['n_el', '4', '-0.5', '3.5'],
               ['n_mu', '4', '-0.5', '3.5'],
+              ['n_ph', '4', '-0.5', '3.5'],
               ['n_baseel', '4', '-0.5', '3.5'],
               ['n_basemu', '4', '-0.5', '3.5'], 
               ['met_tst_j1_dphi', '32', '0.0', '3.2'],              
@@ -32,6 +33,8 @@ myvars = [    ['jj_deta', '50', '0.0', '10.0'],
               ['met_soft_tst_phi', '32', '0.0', '3.2'],              
               ['met_cst_jet', '100', '0.0', '500.0'],
               ['met_truth_et', '100', '0.0', '500.0'],
+              ['passVjetsFilter', '2', '0.0', '1.0'],
+              ['passVjetsPTV', '2', '0.0', '1.0'],
               ]
 # these are variables not stored, but that we want to plot
 myplots = [
@@ -92,6 +95,15 @@ myplots = [
               ['met_tst_j3_dphi', '32', '0.0', '3.2'],
               ['max_j3_dr', '20', '0.0', '10.0'],
     ]
+syst_filter_vars = ['met_soft_tst_phi',
+                    'met_soft_tst_sumet',
+                    'met_tight_tst_et',
+                    'met_tight_tst_phi',
+                    'met_tighter_tst_et',
+                    'met_tighter_tst_phi',
+                    'met_truth_et',
+                    #'n_bjet',
+                ]
 mev_vars = ['jj_mass',
             'met_tst_et',
             'met_tst_nolep_et',
@@ -103,17 +115,33 @@ mev_vars = ['jj_mass',
             'met_cst_jet',
             'met_truth_et',
                 ]
-def GetVarStr(entry=0):
+def GetVarStr(entry=0, syst_name='Nominal'):
     varstr = []
     for i in myvars:
+        skip=False
+        if syst_name!='Nominal':
+            for j in syst_filter_vars:
+                if i[0]==j:
+                    skip=True
+                    break
+        if skip:
+            continue
         varstr  +=[i[entry]]
     return varstr
 
-def GetPltStr(entry=0):
+def GetPltStr(entry=0, syst_name='Nominal'):
     varstr = []
     allvars = []
     allvars += myplots
     allvars += myvars
     for i in allvars:
+        skip=False
+        if syst_name!='Nominal':
+            for j in syst_filter_vars:
+                if i[0]==j:
+                    skip=True
+                    break
+        if skip:
+            continue
         varstr  +=[i[entry]]
     return varstr

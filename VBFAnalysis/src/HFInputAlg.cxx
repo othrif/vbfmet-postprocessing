@@ -9,6 +9,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("currentVariation", currentVariation = "Nominal", "current systematics, NONE means nominal");
   declareProperty("currentSample", currentSample = "W_strong", "current samples");
   declareProperty("isMC", isMC = true, "isMC flag, true means the sample is MC");
+  declareProperty("isMadgraph", isMadgraph = false, "isMadgraph flag, true means the sample is Madgraph");
   declareProperty("ExtraVars", m_extraVars = 0, "true if extra variables should be cut on" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
@@ -201,6 +202,19 @@ StatusCode HFInputAlg::execute() {
   float jj_massCut = 1000.0e3;
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
 
+  // decide if this MG or sherpa
+  bool passSample=false;
+  if(isMadgraph){
+    if(currentSample=="W_strong") passSample=(runNumber >= 363600 && runNumber <= 363671);
+    else if(currentSample=="Z_strong") passSample=(runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519);
+    else passSample=true;
+  }else{
+    if(currentSample=="W_strong") passSample=!(runNumber >= 363600 && runNumber <= 363671);
+    else if(currentSample=="Z_strong") passSample=!((runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519));
+    else passSample=true;
+  }
+  if(!passSample)  return StatusCode::SUCCESS;
+
   // extra vetos  
   bool leptonVeto = false;
   bool metSoftVeto = false;
@@ -236,17 +250,14 @@ StatusCode HFInputAlg::execute() {
     }
   }
   xeSFTrigWeight=1.0;
-  if(isMC && jet_pt && jet_pt->size()>1 && currentVariation!="xeSFTrigWeight__1up"){ // the MET trigger SF is turned off in the up variation. so it will be =1.
-    TLorentzVector tmp, jj; 
-    tmp.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0),jet_phi->at(0),jet_m->at(0));    
-    jj=tmp;
-    tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));    
-    jj+=tmp;
-    xeSFTrigWeight = weightXETrigSF(met_tst_et); // met was used in the end instead of jj.Pt() 
+  if(isMC){ // the MET trigger SF is turned off in the up variation. so it will be =1.
+    xeSFTrigWeight = weightXETrigSF(met_tst_et, 0); // met was used in the end instead of jj.Pt() 
+    if(currentVariation=="xeSFTrigWeight__1up")   xeSFTrigWeight = weightXETrigSF(met_tst_et, 1);
+    if(currentVariation=="xeSFTrigWeight__1down") xeSFTrigWeight = weightXETrigSF(met_tst_et, 2);
   }
 
   // MET choice to be implemented...
-  if (!((passJetCleanTight == 1) & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut))) return StatusCode::SUCCESS; 
+  if (!((passJetCleanTight == 1) & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut)) & (n_ph==0)) return StatusCode::SUCCESS; 
 
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0);
@@ -257,15 +268,29 @@ StatusCode HFInputAlg::execute() {
   bool trigger_lep_bool = (trigger_lep & 0x1)==0x1;
   if(m_extraVars) trigger_lep_bool = (trigger_lep>0);
 
-  if ((trigger_met == 1) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
-  if ((trigger_lep_bool) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
-  if ((trigger_lep_bool) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
-  if ((trigger_lep_bool) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
-  if ((trigger_lep_bool) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 1) & (n_mu == 0)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
-  if ((trigger_lep_bool) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
-  if ((trigger_lep_bool) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 1)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
-  if ((trigger_lep_bool) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 2) & (n_mu == 0)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
-  if ((trigger_lep_bool) & (met_tst_nolep_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_nolep_j1_dphi>1.0) & (met_tst_nolep_j2_dphi>1.0) & (n_el == 0) & (n_mu == 2)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
+  // compute the mll
+  float mll=-999.0;
+  TLorentzVector l0, l1;
+  if(n_el == 2){
+    l0.SetPtEtaPhiM(el_pt->at(0), el_eta->at(0),  el_phi->at(0), 0.511);
+    l1.SetPtEtaPhiM(el_pt->at(1), el_eta->at(1),  el_phi->at(1), 0.511);
+    mll = (l0+l1).M();
+  }
+  if(n_mu == 2){
+    l0.SetPtEtaPhiM(mu_pt->at(0), mu_eta->at(0),  mu_phi->at(0), 105.66);
+    l1.SetPtEtaPhiM(mu_pt->at(1), mu_eta->at(1),  mu_phi->at(1), 105.66);
+    mll = (l0+l1).M();
+  }
+
+  if (((trigger_met &0x1) == 0x1) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 1) && (n_mu == 0) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 1) && (n_mu == 0) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 1) && (n_mu == 0) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 1) && (n_mu == 0) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 0) && (n_mu == 1) && (mu_pt->at(0)>30.0e3)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 0) && (n_mu == 1) && (mu_pt->at(0)>30.0e3)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 2) && (n_mu == 0) && (el_pt->at(0)>30.0e3) && (el_pt->at(1)>7.0e3) && (mll> 76.0e3 && mll<116.0e3)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 0) && (n_mu == 2) && (mu_pt->at(0)>30.0e3) && (mu_pt->at(1)>7.0e3) && (mll> 76.0e3 && mll<116.0e3)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
 
   Float_t w_final = 1;
   Float_t lumi = 36.1;
@@ -343,7 +368,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
   std::cout << "Tree Entries: " <<m_tree->GetEntries() <<std::endl;
   m_tree->SetBranchStatus("*",0);
-  if(weightSyst && currentVariation!="xeSFTrigWeight__1up"){// MET trigger SF systematic is computed differently. The variable is saved. So here we just pickup the nominal weights
+  if(weightSyst && currentVariation!="xeSFTrigWeight__1up"  && currentVariation!="xeSFTrigWeight__1down"){// MET trigger SF systematic is computed differently. The variable is saved. So here we just pickup the nominal weights
     bool found=false;
     TObjArray *var_list = m_tree->GetListOfBranches();
     for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) { 
@@ -370,6 +395,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
   m_tree->SetBranchStatus("n_jet",1);
+  m_tree->SetBranchStatus("n_ph",1);
   m_tree->SetBranchStatus("n_el",1);
   m_tree->SetBranchStatus("n_mu",1);
   m_tree->SetBranchStatus("jj_mass",1);
@@ -401,6 +427,8 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
   m_tree->SetBranchAddress("n_jet",&n_jet);
+  m_tree->SetBranchAddress("n_ph",&n_ph);
+  m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_el",&n_el);
   m_tree->SetBranchAddress("n_mu",&n_mu);
   m_tree->SetBranchAddress("jj_mass",&jj_mass);
@@ -451,14 +479,28 @@ StatusCode HFInputAlg::beginInputFile() {
   return StatusCode::SUCCESS;
 }
 
-double HFInputAlg::weightXETrigSF(const float jj_pt) {
-  static const double p0 = 59.3407;
-  static const double p1 = 54.9134;
-  double x = jj_pt / 1.0e3;
+double HFInputAlg::weightXETrigSF(const float met_pt, int syst=0) {
+  // 20.7 values
+  //static const double p0 = 59.3407;
+  //static const double p1 = 54.9134;
+  // For MET tight
+  static const double p0 = 99.4255;
+  static const double p1 = 38.6145;
+
+  double x = met_pt / 1.0e3;
   if (x < 100) { return 0; }
   if (x > 240) { x = 240; }
   double sf = 0.5*(1+TMath::Erf((x-p0)/(TMath::Sqrt(2)*p1)));
   if(sf<0) sf=0.0;
   if(sf > 1.5) sf=1.5;
+
+  // linear parameterization of the systematics
+  if(syst==1){ // up variation
+    if(x<210.0) sf+=((0.000784094)*(150-x)+0.05)*0.6;
+    else sf=1.0;
+  }else if(syst==2){ // down
+    if(x<210.0)sf-=((0.000784094)*(150-x)+0.05)*0.6;
+    else sf=1.0;
+  }
   return sf;
 }

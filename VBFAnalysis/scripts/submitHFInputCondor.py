@@ -17,6 +17,7 @@ parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", defau
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
 parser.add_argument("--extraVars", dest='extraVars', default="0", help="extraVars, 1=cut on the new variables for leptons veto, 2=loosen cuts, default: 0")
+parser.add_argument( "--isMadgraph", dest = "isMadgraph", action="store_true", default = False, help = "Use the madgraph samples" )
 args, unknown = parser.parse_known_args()
 
 writeMultiJet()
@@ -29,7 +30,7 @@ if args.nominal:
     wsys_systlist = []
 else:
     sys = VBFAnalysis.systematics.systematics("All")
-    asys = VBFAnalysis.systematics.systematics("Asym")
+    asys = VBFAnalysis.systematics.systematics("OneSided")
     wsys = VBFAnalysis.systematics.systematics("WeightSyst")
     asys_systlist = asys.getsystematicsList()
     wsys_systlist = wsys.getsystematicsList()
@@ -39,7 +40,11 @@ print systlist
 
 ### Remake submitDir ###
 workDir = os.getcwd()+"/"+args.submitDir
-buildDir = workDir[:workDir.find("/run/")]+"/build"
+#buildDir = workDir[:workDir.find("/run/")]+"/build"
+CMTCONFIG = os.getenv('CMTCONFIG')
+buildPaths = os.getenv('CMAKE_PREFIX_PATH')
+buildPathsVec = buildPaths.split(':')
+buildDir =  buildPathsVec[0][:buildPathsVec[0].find(CMTCONFIG)].rstrip('/')
 os.system("rm -rf "+workDir)
 os.system("mkdir "+workDir)                
 
@@ -59,7 +64,9 @@ fMC.close()
 
 extraCommand=''
 if args.extraVars:
-    extraCommand=' --extraVars '
+    extraCommand=' --extraVars '+args.extraVars
+if args.isMadgraph:
+    extraCommand+=' --isMadgraph '
 
 for syst in systlist:
     isLow = ""    
@@ -72,9 +79,11 @@ for syst in systlist:
     writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
     writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, listoffilesMC)
 
-for syst in asys_systlist:
-    runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+" --doLowNom"+extraCommand
-    print runCommand
-    writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
-    writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, listoffilesMC)
+
+# The low one sided systematics can be handled in the fitting. just call symmeterize in hist fitter
+#for syst in asys_systlist:
+#    runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+" --doLowNom"+extraCommand
+#    print runCommand
+#    writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
+#    writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, listoffilesMC)
 

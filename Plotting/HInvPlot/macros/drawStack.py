@@ -376,7 +376,7 @@ def getSampleLabel(sample):
         'wqcdMad': 'W+jets QCD',        
         'wewk': 'W+jets EWK',        
         'top1': 'Single Top',
-        'top2': 't#bar{t}',
+        'top2': 'Top', #'t#bar{t}',
         'tall': 'Top',        
         'vvv': 'VV/VVV',        
         'zldy': 'Z low m.',        
@@ -2130,9 +2130,9 @@ def main():
     #
     #bkgs = ['zewk', 'zqcd','wewk','wqcd','top1','top2']
     if options.madgraph:
-        bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','tall','vvv','zldy']
+        bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv']#,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','vvv','zldy'] #,'mqcd'
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv'] #,'mqcd','zldy'
         
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']

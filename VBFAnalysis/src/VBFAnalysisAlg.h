@@ -40,7 +40,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   ///histSvc()         : ServiceHandle to output ROOT service (writing TObjects)
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
-  double weightXETrigSF(const float jj_pt); 
+  double weightXETrigSF(const float met_pt, int syst); 
   void computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi);
  private: 
 
@@ -92,6 +92,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_significance;
   Int_t trigger_met;
   Int_t trigger_met_encoded;
+  Int_t trigger_met_encodedv2;
+  Int_t l1_met_trig_encoded;
+  Bool_t passVjetsFilter;
+  Bool_t passVjetsPTV;
 
   Int_t runNumber;
   ULong64_t eventNumber;
@@ -107,6 +111,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t elSFTrigWeight;
   Float_t muSFTrigWeight;
   Float_t xeSFTrigWeight;
+  Float_t xeSFTrigWeight__1up;
+  Float_t xeSFTrigWeight__1down;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_HLT_xe100_mht_L1XE50;
@@ -159,6 +165,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tighter_tst_phi=-9999;
   Float_t met_tight_tst_et=-9999;
   Float_t met_tight_tst_phi=-9999;
+  Float_t met_tighter_tst_nolep_et=-9999;
+  Float_t met_tighter_tst_nolep_phi=-9999;
+  Float_t met_tight_tst_nolep_et=-9999;
+  Float_t met_tight_tst_nolep_phi=-9999;
   Double_t metsig_tst=-9999;
 
   Float_t met_truth_et=-9999;
@@ -233,7 +243,9 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Int_t>* jet_PartonTruthLabelID;
   std::vector<Int_t>* jet_ConeTruthLabelID;
   std::vector<std::vector<unsigned short> >* jet_NTracks;
+  std::vector<unsigned short>* jet_NTracks_PV;
   std::vector<std::vector<Float_t> >* jet_SumPtTracks;
+  std::vector<Float_t>* jet_SumPtTracks_PV;
   std::vector<Float_t>* jet_TrackWidth;
   std::vector<Float_t>* jet_HECFrac;
   std::vector<Float_t>* jet_EMFrac;

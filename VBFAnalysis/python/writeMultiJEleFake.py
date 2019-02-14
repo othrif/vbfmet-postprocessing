@@ -16,8 +16,8 @@ def writeMultiJet():
 
 def writeFakeEle():
     f_fakeele = ROOT.TFile("fakeele.root", "recreate")
-    fakeelesp = [9, 9.7, 5]
-    fakeelesm = [9, 9.7, 5]
+    fakeelesp = [9.3, 10.0, 4.6]
+    fakeelesm = [9.3, 10.0, 4.6]
     a = 1
     for fakeelep in fakeelesp:
         fakeelem = fakeelesm[a-1]

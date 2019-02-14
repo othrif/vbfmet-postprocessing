@@ -24,6 +24,8 @@ std::string Msl::Mva::Convert2Str(Var var)
     case trigger_lep:	          return "trigger_lep";
     case passJetCleanTight:	  return "passJetCleanTight";
     case xeSFTrigWeight:	  return "xeSFTrigWeight";      
+    case xeSFTrigWeight__1up:	  return "xeSFTrigWeight__1up";      
+    case xeSFTrigWeight__1down:	  return "xeSFTrigWeight__1down";      
 
     case met_truth_et:	          return "met_truth_et";
     case met_truth_phi:	          return "met_truth_phi";      
@@ -116,7 +118,9 @@ std::string Msl::Mva::Convert2Str(Var var)
     case Mtt:	                  return "Mtt";            
     case phPt:	                  return "phPt";      
     case phEta:	                  return "phEta";      
-    case met_tst_ph_dphi:	  return "met_tst_ph_dphi";      
+    case met_tst_ph_dphi:	  return "met_tst_ph_dphi";
+    case passVjetsFilter:	  return "passVjetsFilter";
+    case passVjetsPTV:	          return "passVjetsPTV";
     case jetTrackWidth:           return "jetTrackWidth";
     case jetTrackWidth0:          return "jetTrackWidth0";
     case jetTrackWidth1:	  return "jetTrackWidth1";
@@ -147,6 +151,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "trigger_lep")   return trigger_lep;  
   if(var == "passJetCleanTight")   return passJetCleanTight;
   if(var == "xeSFTrigWeight")   return xeSFTrigWeight;    
+  if(var == "xeSFTrigWeight__1up")   return xeSFTrigWeight__1up;    
+  if(var == "xeSFTrigWeight__1down")   return xeSFTrigWeight__1down;    
   if(var == "met_truth_et")    return met_truth_et;
   if(var == "met_truth_phi")    return met_truth_phi;  
   if(var == "met_tst_et")    return met_tst_et;  
@@ -239,6 +245,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "phPt")	         return phPt;
   if(var == "phEta")	         return phEta;
   if(var == "met_tst_ph_dphi")	 return met_tst_ph_dphi;
+  if(var == "passVjetsFilter")	 return passVjetsFilter;
+  if(var == "passVjetsPTV")	 return passVjetsPTV;
   if(var == "jetTrackWidth")     return jetTrackWidth;  
   if(var == "jetTrackWidth0")    return jetTrackWidth0;  
   if(var == "jetTrackWidth1")    return jetTrackWidth1;  
@@ -354,7 +362,9 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(trigger_met);
     vars.push_back(trigger_lep);
     vars.push_back(passJetCleanTight);
-    vars.push_back(xeSFTrigWeight);    
+    vars.push_back(xeSFTrigWeight);
+    vars.push_back(xeSFTrigWeight__1up);        
+    vars.push_back(xeSFTrigWeight__1down);        
     
     vars.push_back(met_truth_et);
     vars.push_back(met_truth_phi);    
@@ -447,7 +457,9 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(Mtt);
     vars.push_back(phPt);
     vars.push_back(phEta);    
-    vars.push_back(met_tst_ph_dphi);    
+    vars.push_back(met_tst_ph_dphi);
+    vars.push_back(passVjetsFilter);
+    vars.push_back(passVjetsPTV);
     vars.push_back(jetTrackWidth);         
     vars.push_back(jetTrackWidth0);         
     vars.push_back(jetTrackWidth1);         
