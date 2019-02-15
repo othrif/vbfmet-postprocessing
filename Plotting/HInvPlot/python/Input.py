@@ -355,19 +355,16 @@ def prepareBkgRuns(keys,options=None):
                           }
     alt_VBF = {'308275':'VBF125 - H75',
                       '308277':'VBF125 - H200',
-                      '308278':'VBF125 - H300',                                                                  
-                      '308279':'VBF125 - H500',                                                                  
-                      '308280':'VBF125 - H750',                                                                  
-                      '308281':'VBF125 - H1000',                                                                  
-                      '308282':'VBF125 - H2000',                                                                  
+                      '308278':'VBF125 - H300', 
+                      '308279':'VBF125 - H500', 
+                      '308280':'VBF125 - H750', 
+                      '308281':'VBF125 - H1000',
+                      '308282':'VBF125 - H2000',
                       '308283':'VBF125 - H3000',}
 
-    bkg_wewk =     {'308096':'Wenu',
-                    '308097':'Wmunu',
-                    '308098':'Wtaunu',
-                    '363359':'TBD',
-                    '363360':'TBD',
-                    '363489':'TBD',
+    bkg_wewk =     {'308096':'WenuEWK',
+                    '308097':'WmunuEWK',
+                    '308098':'WtaunuEWK',                    
                         }
         
     bkg_wqcd_mnu =     {'364156':'Wmunu_MAXHTPTV0_70_CVetoBVeto',
@@ -417,20 +414,16 @@ def prepareBkgRuns(keys,options=None):
     bkg_wqcd.update(bkg_wqcd_enu)
     bkg_wqcd.update(bkg_wqcd_mnu)
     bkg_wqcd.update(bkg_wqcd_tnu)
-    bkg_zewk =     {'308092':'TBD',
-                    '308093':'TBD',                        
-                    '308094':'TBD',
-                    '308095':'TBD',                        
-                    '363355':'TBD',                        
-                    '363356':'TBD',                        
-                    '363357':'TBD',                        
-                    '363358':'TBD',                        
+    bkg_zewk =     {'308092':'ZeeEWK',
+                    '308093':'ZmmEWK',                        
+                    '308094':'ZttEWK',
+                    '308095':'ZnnEWK',                     
                         }
     
     bkg_zqcd_zmm = {'364100':'Zmumu_MAXHTPTV0_70_CVetoBVeto',
                     '364101':'TBD',
                     '364102':'TBD',
-                    '364103':'TBD',#70
+                    '364103':'TBD',#70 _CVetoBVeto
                     '364104':'TBD',
                     '364105':'TBD',
                     '364106':'TBD',#140
@@ -472,7 +465,7 @@ def prepareBkgRuns(keys,options=None):
     bkg_zqcd_znn = {'364142':'Znunu_MAXHTPTV0_70_CVetoBVeto',
                     '364143':'TBD',
                     '364144':'TBD',
-                    '364145':'TBD',#70
+                    '364145':'TBD',#70 CVBV
                     '364146':'TBD',
                     '364147':'TBD',
                     '364148':'TBD',#140
@@ -730,6 +723,14 @@ def prepareBkgRuns(keys,options=None):
                   '364250':'llll',
                   '364254':'llvv',
                   '364255':'lvvv',
+                  # possible samples to correlate with W/Z EWK?
+                  '363359':'W+W-->qqln',
+                  '363360':'W+W-->lnqq',
+                  '363489':'WZ->lnqq',
+                  '363355':'ZZ->qqnn',                        
+                  '363356':'ZZ->qqll',                        
+                  '363357':'WZ->qqnn',                        
+                  '363358':'WZ->qqll',
                   }
         
     bkg_vbfExt = {'309662':'Wenu_MAXHTPTV70_140',
