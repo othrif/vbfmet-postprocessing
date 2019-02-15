@@ -138,6 +138,7 @@ def getJetCuts(options, isPh=False):
 
     if not isPh:
         if options.r207Ana:
+            cuts=[]
             cuts = [CutItem('CutNjet',  'n_jet == 2')]
             cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
             cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]

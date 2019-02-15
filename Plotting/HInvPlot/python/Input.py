@@ -801,7 +801,10 @@ def prepareBkgRuns(keys,options=None):
         for ki,yi in bkg_vbfExt.iteritems():
             if yi[0]=='W': bkg_wqcd[ki]=yi
             elif yi[0]=='Z': bkg_zqcd[ki]=yi
-                
+
+
+    # add low mass
+    bkg_zqcd.update(bkg_lowMassZ)
     bkg_keys = {
                 'hvh':sig_VH125,
                 #'whww':sig_VH125v2,
@@ -847,10 +850,11 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['vbfz']=bkg_vbfFiltZ        
         bkg_keys['zldy']=bkg_lowMassZ
     else:
-        extra_samples=bkg_lowMassZ
-        extra_samples.update(bkg_vbfFiltZ)
+        #extra_samples=bkg_lowMassZ
+        #extra_samples.update(bkg_vbfFiltZ)
+        extra_samples=bkg_vbfFiltZ
         extra_samples.update(bkg_z_strong_powheg)
-        bkg_keys['wdpi']=extra_samples
+        bkg_keys['wdpi'].update(extra_samples)
         
     #
     # Select MC samples 
