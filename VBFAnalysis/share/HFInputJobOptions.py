@@ -19,6 +19,7 @@ arg_group.add_argument("--isMadgraph", action="store_true", dest='isMadgraph', d
 arg_group.add_argument("--isLow", action="store_true", dest='isLow', default=False, help="isLow, default: False")
 arg_group.add_argument("--weightSyst", action="store_true", dest='weightSyst', default=False, help="is a weight systematic, default: False")
 arg_group.add_argument("--oldInput", action="store_true", dest='oldInput', default=False, help="if oldInput, switch to HFInputOldInput")
+arg_group.add_argument("--doPlot", action="store_true", dest='doPlot', default=False, help="doPlot, to turn on additional histograms used for postfit plots, default: False")
 # parse the commandline options
 args = config.parse_args()
 
@@ -79,7 +80,8 @@ if True:
                                        doLowNom = args.doLowNom,
                                        isHigh = not args.isLow,
                                        isMadgraph = args.isMadgraph,
-                                       weightSyst = args.weightSyst);
+                                       weightSyst = args.weightSyst,
+                                       doPlot = args.doPlot);
     else:
         if args.currentSample == "physics_micro":
             isMC = False
@@ -91,7 +93,8 @@ if True:
                                                doLowNom = args.doLowNom,
                                                isHigh = not args.isLow,
                                                isMadgraph = args.isMadgraph,
-                                               weightSyst=weightSyst);
+                                               weightSyst = args.weightSyst,
+                                               doPlot = args.doPlot);
     
     
     include("AthAnalysisBaseComps/SuppressLogging.py")              #Optional include to suppress as much athena output as possible. Keep at bottom of joboptions so that it doesn't suppress the logging of the things you have configured above

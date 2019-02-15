@@ -14,6 +14,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
+  declareProperty("doPlot", doPlot =false, "doPlot flag, true means the output contains variable distributions");
   //declareProperty( "Property", m_nProperty = 0, "My Example Integer Property" ); //example property declaration
 }
 
@@ -80,78 +81,65 @@ StatusCode HFInputAlg::initialize() {
     } else {
       syst = "Nom";
     }
-    for (int c=1;c<4;c++) {
-      hSR.push_back( new TH1F(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWep.push_back(new TH1F(HistoNameMaker(currentSample,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWen.push_back(new TH1F(HistoNameMaker(currentSample,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWepLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWenLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWmp.push_back(new TH1F(HistoNameMaker(currentSample,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWmn.push_back(new TH1F(HistoNameMaker(currentSample,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRZee.push_back(new TH1F(HistoNameMaker(currentSample,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRZmm.push_back(new TH1F(HistoNameMaker(currentSample,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC), hSR[c-1]));  
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC), hCRWep[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC), hCRWen[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC), hCRWepLowSig[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC), hCRWenLowSig[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC), hCRWmp[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC), hCRWmn[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC), hCRZee[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC), hCRZmm[c-1]));
-      hSR[c-1]->GetXaxis()->SetBinLabel(1,("SR"+to_string(c)).c_str());
-      hCRWep[c-1]->GetXaxis()->SetBinLabel(1,("oneElePosCR"+to_string(c)).c_str());
-      hCRWen[c-1]->GetXaxis()->SetBinLabel(1,("oneEleNegCR"+to_string(c)).c_str());
-      hCRWepLowSig[c-1]->GetXaxis()->SetBinLabel(1,("oneElePosLowSigCR"+to_string(c)).c_str());
-      hCRWenLowSig[c-1]->GetXaxis()->SetBinLabel(1,("oneEleNegLowSIgCR"+to_string(c)).c_str());
-      hCRWmp[c-1]->GetXaxis()->SetBinLabel(1,("oneMuPosCR"+to_string(c)).c_str());
-      hCRWmn[c-1]->GetXaxis()->SetBinLabel(1,("oneMuNegCR"+to_string(c)).c_str());
-      hCRZee[c-1]->GetXaxis()->SetBinLabel(1,("twoEleCR"+to_string(c)).c_str());
-      hCRZmm[c-1]->GetXaxis()->SetBinLabel(1,("twoMuCR"+to_string(c)).c_str());
-    }} else {
-    for (int c=1;c<4;c++) {
-      hSR.push_back( new TH1F(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWep.push_back(new TH1F(HistoNameMaker(currentSample,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWen.push_back(new TH1F(HistoNameMaker(currentSample,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWepLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWenLowSig.push_back(new TH1F(HistoNameMaker(currentSample,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWmp.push_back(new TH1F(HistoNameMaker(currentSample,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRWmn.push_back(new TH1F(HistoNameMaker(currentSample,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRZee.push_back(new TH1F(HistoNameMaker(currentSample,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      hCRZmm.push_back(new TH1F(HistoNameMaker(currentSample,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC).c_str(), (""+HistoNameMaker(currentSample,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC)+";;").c_str(), 1, 0.5, 1.5));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC), hSR[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC), hCRWep[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC), hCRWen[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC), hCRWepLowSig[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC), hCRWenLowSig[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC), hCRWmp[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC), hCRWmn[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC), hCRZee[c-1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+HistoNameMaker(currentSample,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC), hCRZmm[c-1]));
-      hSR[c-1]->GetXaxis()->SetBinLabel(1,("SR"+to_string(c)).c_str());
-      hCRWep[c-1]->GetXaxis()->SetBinLabel(1,("oneElePosCR"+to_string(c)).c_str());
-      hCRWen[c-1]->GetXaxis()->SetBinLabel(1,("oneEleNegCR"+to_string(c)).c_str());
-      hCRWepLowSig[c-1]->GetXaxis()->SetBinLabel(1,("oneElePosLowSigCR"+to_string(c)).c_str());
-      hCRWenLowSig[c-1]->GetXaxis()->SetBinLabel(1,("oneEleNegLowSigCR"+to_string(c)).c_str());
-      hCRWmp[c-1]->GetXaxis()->SetBinLabel(1,("oneMuPosCR"+to_string(c)).c_str());
-      hCRWmn[c-1]->GetXaxis()->SetBinLabel(1,("oneMuNegCR"+to_string(c)).c_str());
-      hCRZee[c-1]->GetXaxis()->SetBinLabel(1,("twoEleCR"+to_string(c)).c_str());
-      hCRZmm[c-1]->GetXaxis()->SetBinLabel(1,("twoMuCR"+to_string(c)).c_str());
+  }
+  for (int c=1;c<4;c++) {
+    hSR.push_back(HistoAppend(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC), string("SR"+to_string(c))));
+    hCRWep.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosCR"+to_string(c))));
+    hCRWen.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegCR"+to_string(c))));
+    hCRWepLowSig.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosLowSigCR"+to_string(c))));
+    hCRWenLowSig.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegLowSigCR"+to_string(c))));
+    hCRWmp.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuPosCR"+to_string(c))));
+    hCRWmn.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuNegCR"+to_string(c))));
+    hCRZee.push_back(HistoAppend(HistoNameMaker(currentSample,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC), string("twoEleCR"+to_string(c))));
+    hCRZmm.push_back(HistoAppend(HistoNameMaker(currentSample,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC), string("twoMuCR"+to_string(c))));
+    vector <std::pair<vector <TH1F*>, std::string>> hnames;
+    hnames.push_back(std::make_pair(hSR.back(),HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWep.back(), HistoNameMaker(currentSample,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWen.back(), HistoNameMaker(currentSample,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWepLowSig.back(), HistoNameMaker(currentSample,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWenLowSig.back(), HistoNameMaker(currentSample,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWmp.back(), HistoNameMaker(currentSample,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWmn.back(), HistoNameMaker(currentSample,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC)));
+    hnames.push_back(std::make_pair(hCRZee.back(), HistoNameMaker(currentSample,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC)));
+    hnames.push_back(std::make_pair(hCRZmm.back(), HistoNameMaker(currentSample,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC)));
+    CheckHists(hnames);
+  }
+  return StatusCode::SUCCESS;
+}
+
+std::string HFInputAlg::HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst, Bool_t isMC) {
+  if (isMC) {
+    if (bin == "") return "h"+currentSample+ "_"+syst+"_"+currentCR + "_obs";
+    else if (currentSample.find("signal") != std::string::npos) return "h"+currentSample+syst+"_"+currentCR + "_obs";
+    else return "h"+currentSample+ "_VBFjetSel_"+bin+syst+"_"+currentCR + "_obs";
+  } else {
+    return "h"+currentSample+ "_NONE_"+currentCR + "_obs";
+  }
+}
+
+vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR) {
+  vector <TH1F*> h;
+  h.push_back(new TH1F((name+"_cuts").c_str(), (name+"_cuts;;").c_str(), 1, 0.5, 1.5));
+  if (doPlot) {
+    h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
+    h.push_back(new TH1F((name+"_met_et").c_str(), (name+"_met_et;;").c_str(), 10, 0, 800));
+    h.push_back(new TH1F((name+"_lepmet_et").c_str(), (name+"_lepmet_et;;").c_str(), 10, 0, 800));
+  }
+  return h;
+}
+
+StatusCode HFInputAlg::CheckHists(vector <std::pair<vector <TH1F*>, std::string>> hnames){
+  for (auto hname : hnames) {
+    CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_cuts", std::get<0>(hname)[0]));
+    if (doPlot) {
+      CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_jj_mass", std::get<0>(hname)[1]));
+      CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_met_et", std::get<0>(hname)[2]));
+      CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_lepmet_et", std::get<0>(hname)[3]));
     }
   }
   return StatusCode::SUCCESS;
 }
-std::string HFInputAlg::HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst, Bool_t isMC) {
-  if (isMC) {
-    if (bin == "") return "h"+currentSample+ "_"+syst+"_"+currentCR + "_obs_cuts";
-    else if (currentSample.find("signal") != std::string::npos) return "h"+currentSample+syst+"_"+currentCR + "_obs_cuts";
-    //    else return "h"+currentSample+ "_VBFjetSel_bin"+bin+syst+"_"+currentCR + "_obs_cuts";
-    else return "h"+currentSample+ "_VBFjetSel_"+bin+syst+"_"+currentCR + "_obs_cuts";
-  } else {
-    //    return "h"+currentSample+ "_NONE_"+currentCR + "_obs_cuts";
-    return "h"+currentSample+ "_NONE_"+currentCR + "_obs_cuts";  
-  }
-}
+
 
 StatusCode HFInputAlg::finalize() {
   ATH_MSG_INFO ("Finalizing " << name() << "...");
@@ -298,58 +286,35 @@ StatusCode HFInputAlg::execute() {
   Float_t w_final = 1;
   Float_t lumi = 36.1;
   if (isMC) w_final = w*1000*lumi;
-  if (SR){
-    if (jj_mass < 1.5e6) hSR[0]->Fill(1,w_final*xeSFTrigWeight);
-    else if (jj_mass < 2e6) hSR[1]->Fill(1,w_final*xeSFTrigWeight);
-    else hSR[2]->Fill(1,w_final*xeSFTrigWeight);
-  }
-  if (CRWep){
-    if (jj_mass < 1.5e6) hCRWep[0]->Fill(1,w_final);
-    else if (jj_mass < 2e6) hCRWep[1]->Fill(1,w_final);
-    else hCRWep[2]->Fill(1,w_final);
-  }
-  if (CRWen){
-    if (jj_mass < 1.5e6) hCRWen[0]->Fill(1,w_final);
-    else if (jj_mass < 2e6) hCRWen[1]->Fill(1,w_final);
-    else hCRWen[2]->Fill(1,w_final);
-  }
-  if (CRWepLowSig){
-    if (jj_mass < 1.5e6) hCRWepLowSig[0]->Fill(1,w_final);
-    else if (jj_mass < 2e6) hCRWepLowSig[1]->Fill(1,w_final);
-    else hCRWepLowSig[2]->Fill(1,w_final);
-  }
-  if (CRWenLowSig){
-    if (jj_mass < 1.5e6) hCRWenLowSig[0]->Fill(1,w_final);
-    else if (jj_mass < 2e6) hCRWenLowSig[1]->Fill(1,w_final);
-    else hCRWenLowSig[2]->Fill(1,w_final);
-  }
-  if (CRWmp){
-    if (jj_mass < 1.5e6) hCRWmp[0]->Fill(1,w_final);
-    else if (jj_mass < 2e6) hCRWmp[1]->Fill(1,w_final);
-    else hCRWmp[2]->Fill(1,w_final);
-  }
-  if (CRWmn){
-    if (jj_mass < 1.5e6) hCRWmn[0]->Fill(1,w_final);
-    else if (jj_mass < 2e6) hCRWmn[1]->Fill(1,w_final);
-    else hCRWmn[2]->Fill(1,w_final);
-  }
-  if (CRZee){
-    //std::cout << "CRZee: " << runNumber << " " << eventNumber << std::endl;
-    if (jj_mass < 1.5e6) hCRZee[0]->Fill(1,w_final);
-    else if (jj_mass < 2e6) hCRZee[1]->Fill(1,w_final);
-    else hCRZee[2]->Fill(1,w_final);
-  }
-  if (CRZmm){
-    //std::cout << "CRZmm: " << runNumber << " " << eventNumber << std::endl;
-    if (jj_mass < 1.5e6) hCRZmm[0]->Fill(1,w_final);
-    else if (jj_mass < 2e6) hCRZmm[1]->Fill(1,w_final);
-    else hCRZmm[2]->Fill(1,w_final);
-  }
+  int bin = 0;
+  if (jj_mass < 1.5e6) bin = 0;
+  else if (jj_mass < 2e6) bin = 1;
+  else bin = 2;
 
+  if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight);
+  if (CRWep) HistoFill(hCRWep[bin],w_final*xeSFTrigWeight);
+  if (CRWen) HistoFill(hCRWen[bin],w_final*xeSFTrigWeight);
+  if (CRWepLowSig) HistoFill(hCRWepLowSig[bin],w_final*xeSFTrigWeight);
+  if (CRWenLowSig) HistoFill(hCRWenLowSig[bin],w_final*xeSFTrigWeight);
+  if (CRWmp) HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight);
+  if (CRWmn) HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight);
+  if (CRZee) HistoFill(hCRZee[bin],w_final*xeSFTrigWeight);
+  if (CRZmm) HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight);
 
   setFilterPassed(true); //if got here, assume that means algorithm passed
   return StatusCode::SUCCESS;
 }
+
+void HFInputAlg::HistoFill(vector<TH1F*> hs, double w){
+  hs[0]->Fill(1,w);
+  if (doPlot) {
+    hs[1]->Fill(jj_mass/(1e3),w);
+    hs[2]->Fill(met_tst_et/(1e3),w);
+    hs[3]->Fill(met_tst_nolep_et/(1e3),w);
+  }
+  return ;
+}
+
 
 StatusCode HFInputAlg::beginInputFile() { 
   //
