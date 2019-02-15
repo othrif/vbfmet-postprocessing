@@ -2,8 +2,8 @@
 OUTDIRM=v26Looseb
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
-hadd $OUTDIRM/VVV.root VVV*root
-rm VVV*root
+#hadd $OUTDIRM/VVV.root VVV*root
+#rm VVV*root
 hadd $OUTDIRM/Z_strong_VBFFilt.root Z_strong_VBFFilt*root
 hadd $OUTDIRM/Z_strongPTVExt.root Z_strongPTVExt*root
 hadd $OUTDIRM/Z_strongExt.root Z_strongExt*root
@@ -14,7 +14,7 @@ rm Z_strong_LowMass*root
 rm Z_strongExt*root
 
 # now hadd the standard samples
-hadd $OUTDIRM/VV.root VV*root
+#hadd $OUTDIRM/VV.root VV*root
 hadd $OUTDIRM/W_strong.root W_strong*root
 hadd $OUTDIRM/Z_strong.root Z_strong*root
 hadd $OUTDIRM/W_EWK.root W_EWK*root

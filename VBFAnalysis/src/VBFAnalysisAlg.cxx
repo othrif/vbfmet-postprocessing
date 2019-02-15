@@ -624,15 +624,14 @@ StatusCode VBFAnalysisAlg::execute() {
   //364112-364113,364126-364127,364140-364141,364154-364155
   //364168-364169,364182-364183,364196-364197
   if((runNumber>=364216 && runNumber<=364229)){ // QCD NLO sherpa extension samples for pTV
-    // use the filter - NEED TO validate!!!
   }else if((runNumber>=364112 && runNumber<=364113) || // Zmm 500, 1000
-	   (runNumber>=364126 && runNumber<=364127) || // 
-	   (runNumber>=364140 && runNumber<=364141) ||
-	   (runNumber>=364154 && runNumber<=364155) ||
-	   (runNumber>=364168 && runNumber<=364169) ||
-	   (runNumber>=364182 && runNumber<=364183) ||
-	   (runNumber>=364196 && runNumber<=364197)){ // flip these
-    passVjetsPTV=(!passVjetsPTV);
+	   (runNumber>=364126 && runNumber<=364127) || // Zee 500, 1000    
+	   (runNumber>=364140 && runNumber<=364141) || // Ztt 500, 1000    
+	   (runNumber>=364154 && runNumber<=364155) || // Znn 500, 1000    
+	   (runNumber>=364168 && runNumber<=364169) || // Wmunu 500, 1000
+	   (runNumber>=364182 && runNumber<=364183) || // Wenu 500, 1000
+	   (runNumber>=364196 && runNumber<=364197)){  // Wtaunu 500, 1000
+    passVjetsPTV=(!passVjetsPTV); // flip these
   }else passVjetsPTV=true;// others must pass
 
   // Definiing a loose skimming
