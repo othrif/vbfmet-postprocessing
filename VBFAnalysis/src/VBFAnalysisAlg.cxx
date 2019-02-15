@@ -792,8 +792,8 @@ StatusCode VBFAnalysisAlg::execute() {
 
 void VBFAnalysisAlg::computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi)
 {
-  e_met_j1_dphi          = TVector2::Phi_mpi_pi(met_phi-jet_phi->at(0));
-  e_met_j2_dphi          = TVector2::Phi_mpi_pi(met_phi-jet_phi->at(1));
+  e_met_j1_dphi          = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(0)));
+  e_met_j2_dphi          = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(1)));
 }
 
 

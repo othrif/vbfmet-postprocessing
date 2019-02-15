@@ -18,6 +18,7 @@ parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
 parser.add_argument("--extraVars", dest='extraVars', default="0", help="extraVars, 1=cut on the new variables for leptons veto, 2=loosen cuts, default: 0")
 parser.add_argument( "--isMadgraph", dest = "isMadgraph", action="store_true", default = False, help = "Use the madgraph samples" )
+parser.add_argument( "--doPlot", dest = "doPlot", action="store_true", default = False, help = "Generate additional histograms for postfit plots")
 args, unknown = parser.parse_known_args()
 
 writeMultiJet()
@@ -67,6 +68,8 @@ if args.extraVars:
     extraCommand=' --extraVars '+args.extraVars
 if args.isMadgraph:
     extraCommand+=' --isMadgraph '
+if args.doPlot:
+    extraCommand+=' --doPlot '
 
 for syst in systlist:
     isLow = ""    
