@@ -14,7 +14,7 @@ parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", d
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-i", "--inputFile",  type = str, dest = "inputFile", default = "v26.txt", help = "path for input files")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
-parser.add_argument("--extraVars", dest='extraVars', default="0", help="extraVars, 1=cut on the new variables for leptons veto, 2=loosen cuts, default: 0")
+parser.add_argument("--extraCommand", dest='extraCommand', default="", help="extraCommand, string of possible commands to give plotEvent.py, something like --r207Ana")
 args, unknown = parser.parse_known_args()
 
 ### Load systematics list from HInvPlot/python/systematics.py ###
@@ -46,9 +46,9 @@ for line in systlist:
     f.write(line+"\n")
 f.close()
 
-extraCommand=''
-#if args.extraVars:
-#    extraCommand=' --extraVars '
+extraCommand=' '
+if args.extraCommand:
+    extraCommand=' '+args.extraCommand+' '
 TESTAREA=buildDir+'/Plotting'
 runCommand = '''python '''+TESTAREA+'''/HInvPlot/macros/plotEvent.py --syst "$1"  -r out_"$1".root -i '''+args.inputFile+extraCommand
 print runCommand

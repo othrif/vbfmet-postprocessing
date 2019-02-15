@@ -605,28 +605,28 @@ StatusCode VBFAnalysisAlg::execute() {
   //364103,364132,364145-364146,364151,364134,364120,364106-364107
   if((runNumber>=309662 && runNumber<=309679)){ // QCD NLO sherpa extension samples with Mjj filter
     // use the filter as calculated
-  }else if((runNumber>=364173 && runNumber<=364173) || // Wenu
-	   (runNumber>=364159 && runNumber<=364161) || // Wmunu
-	   (runNumber>=364187 && runNumber<=364189) || // Wtaunu
-	   (runNumber>=364162 && runNumber<=364163) || // 
-	   (runNumber>=364176 && runNumber<=364177) || // 
-	   (runNumber>=364193 && runNumber<=364194) || // 
-	   (runNumber>=364103 && runNumber<=364103) || // 
-	   (runNumber>=364132 && runNumber<=364132) || // 
-	   (runNumber>=364145 && runNumber<=364146) || // 
-	   (runNumber>=364151 && runNumber<=364151) || // 
-	   (runNumber>=364134 && runNumber<=364134) || // 
-	   (runNumber>=364120 && runNumber<=364120) || // 
-	   (runNumber>=364106 && runNumber<=364107)){
+  }else if((runNumber>=364173 && runNumber<=364175) || // Wenu 70-140 all three
+	   (runNumber>=364159 && runNumber<=364161) || // Wmunu 70-140 all three
+	   (runNumber>=364187 && runNumber<=364189) || // Wtaunu 70-140 all three
+	   (runNumber>=364162 && runNumber<=364163) || // Wmunu 140-280 CVBV+cFilter
+	   (runNumber>=364176 && runNumber<=364177) || // Wenu 140-280 CVBV+cFilter 
+	   (runNumber>=364190 && runNumber<=364191) || // Wtaunu 140-280 CVBV+cFilter 
+	   (runNumber>=364103 && runNumber<=364103) || // Zmm 70-140 CVBV
+	   (runNumber>=364132 && runNumber<=364132) || // Ztautau_MAXHTPTV70_140_CFBV
+	   (runNumber>=364145 && runNumber<=364146) || // Znn 70-140 CVBV, c Filter
+	   (runNumber>=364148 && runNumber<=364148) || // znn 140-280 CVBV
+	   (runNumber>=364134 && runNumber<=364134) || // Ztt 140-280 CVBV
+	   (runNumber>=364120 && runNumber<=364120) || // Zee 140-280 CVBV
+	   (runNumber>=364106 && runNumber<=364107)){  // Zmm 140-280 CVBV+cfilter
     passVjetsFilter=(!passVjetsFilter);
   }else passVjetsFilter=true;
 
   //364112-364113,364126-364127,364140-364141,364154-364155
   //364168-364169,364182-364183,364196-364197
   if((runNumber>=364216 && runNumber<=364229)){ // QCD NLO sherpa extension samples for pTV
-    // use the filter
-  }else if((runNumber>=364112 && runNumber<=364113) ||
-	   (runNumber>=364126 && runNumber<=364127) ||
+    // use the filter - NEED TO validate!!!
+  }else if((runNumber>=364112 && runNumber<=364113) || // Zmm 500, 1000
+	   (runNumber>=364126 && runNumber<=364127) || // 
 	   (runNumber>=364140 && runNumber<=364141) ||
 	   (runNumber>=364154 && runNumber<=364155) ||
 	   (runNumber>=364168 && runNumber<=364169) ||
