@@ -81,9 +81,9 @@ class sample(object):
             elif (self.runNumber >= 426001 and self.runNumber <= 426009):
                 self.sampleType = "QCDunw"
             elif (self.runNumber >= 364250 and self.runNumber <= 364255) or (self.runNumber >= 363355 and self.runNumber <= 363360) or self.runNumber==363489 or self.runNumber==363494:
-                self.sampleType = "VV"
+                self.sampleType = "ttbar" # VV moved to ttbar+other
             elif (self.runNumber >= 364242 and self.runNumber <= 364249 or self.runNumber==364253):
-                self.sampleType = "VVV"
+                self.sampleType = "ttbar" # VVV moved to ttbar+other
             elif (self.runNumber >= 364198 and self.runNumber <= 364215):
                 self.sampleType = "Z_strong" # Z_strong_LowMass added to the Z_strong
             elif (self.runNumber >= 301020 and self.runNumber <= 301038):
