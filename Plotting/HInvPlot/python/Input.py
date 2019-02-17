@@ -355,19 +355,16 @@ def prepareBkgRuns(keys,options=None):
                           }
     alt_VBF = {'308275':'VBF125 - H75',
                       '308277':'VBF125 - H200',
-                      '308278':'VBF125 - H300',                                                                  
-                      '308279':'VBF125 - H500',                                                                  
-                      '308280':'VBF125 - H750',                                                                  
-                      '308281':'VBF125 - H1000',                                                                  
-                      '308282':'VBF125 - H2000',                                                                  
+                      '308278':'VBF125 - H300', 
+                      '308279':'VBF125 - H500', 
+                      '308280':'VBF125 - H750', 
+                      '308281':'VBF125 - H1000',
+                      '308282':'VBF125 - H2000',
                       '308283':'VBF125 - H3000',}
 
-    bkg_wewk =     {'308096':'Wenu',
-                    '308097':'Wmunu',
-                    '308098':'Wtaunu',
-                    '363359':'TBD',
-                    '363360':'TBD',
-                    '363489':'TBD',
+    bkg_wewk =     {'308096':'WenuEWK',
+                    '308097':'WmunuEWK',
+                    '308098':'WtaunuEWK',                    
                         }
         
     bkg_wqcd_mnu =     {'364156':'Wmunu_MAXHTPTV0_70_CVetoBVeto',
@@ -417,20 +414,16 @@ def prepareBkgRuns(keys,options=None):
     bkg_wqcd.update(bkg_wqcd_enu)
     bkg_wqcd.update(bkg_wqcd_mnu)
     bkg_wqcd.update(bkg_wqcd_tnu)
-    bkg_zewk =     {'308092':'TBD',
-                    '308093':'TBD',                        
-                    '308094':'TBD',
-                    '308095':'TBD',                        
-                    '363355':'TBD',                        
-                    '363356':'TBD',                        
-                    '363357':'TBD',                        
-                    '363358':'TBD',                        
+    bkg_zewk =     {'308092':'ZeeEWK',
+                    '308093':'ZmmEWK',                        
+                    '308094':'ZttEWK',
+                    '308095':'ZnnEWK',                     
                         }
     
     bkg_zqcd_zmm = {'364100':'Zmumu_MAXHTPTV0_70_CVetoBVeto',
                     '364101':'TBD',
                     '364102':'TBD',
-                    '364103':'TBD',#70
+                    '364103':'TBD',#70 _CVetoBVeto
                     '364104':'TBD',
                     '364105':'TBD',
                     '364106':'TBD',#140
@@ -472,7 +465,7 @@ def prepareBkgRuns(keys,options=None):
     bkg_zqcd_znn = {'364142':'Znunu_MAXHTPTV0_70_CVetoBVeto',
                     '364143':'TBD',
                     '364144':'TBD',
-                    '364145':'TBD',#70
+                    '364145':'TBD',#70 CVBV
                     '364146':'TBD',
                     '364147':'TBD',
                     '364148':'TBD',#140
@@ -501,7 +494,7 @@ def prepareBkgRuns(keys,options=None):
     bkg_top2 = {
         '410470':'ttbar(w/oFullHad)',
         '410471':'ttbar(w/FullHad)',
-        '410472':'ttbar(w/dil)',                
+        #'410472':'ttbar(w/dil)',                remove dilepton
         }
     bkg_top1 = {
         '410011':'tchan_top',
@@ -514,15 +507,18 @@ def prepareBkgRuns(keys,options=None):
     bkg_top1 = {
         '410642':'tchan_lept_top',
         '410643':'tchan_lept_antitop',
-        '410644':'schan_top',
-        '410645':'schan_antitop',
-        #'410646':'Wt_top_incl',
-        #'410647':'Wt_antitop_incl',
-        '410648':'Wt_DR_dilepton_top',
-        '410649':'Wt_DR_dilepton_antitop',
+        '410644':'schan_top_lept',
+        '410645':'schan_antitop_lept',
+        '410646':'Wt_top_incl',
+        '410647':'Wt_antitop_incl',
+        #'410648':'Wt_DR_dilepton_top',
+        #'410649':'Wt_DR_dilepton_antitop',
         }
     bkg_top2.update(bkg_top1)
-
+    bkg_top_other = {'410472':'ttbar(w/dil)',#                remove dilepton
+                     '410648':'Wt_DR_dilepton_top',
+                     '410649':'Wt_DR_dilepton_antitop',       
+        }
     bkg_z_strong_madgraph_znn = {'361515':'Znn_Np0',
                       '361516':'Znn_Np1',
                       '361517':'Znn_Np2',
@@ -727,6 +723,14 @@ def prepareBkgRuns(keys,options=None):
                   '364250':'llll',
                   '364254':'llvv',
                   '364255':'lvvv',
+                  # possible samples to correlate with W/Z EWK?
+                  '363359':'W+W-->qqln',
+                  '363360':'W+W-->lnqq',
+                  '363489':'WZ->lnqq',
+                  '363355':'ZZ->qqnn',                        
+                  '363356':'ZZ->qqll',                        
+                  '363357':'WZ->qqnn',                        
+                  '363358':'WZ->qqll',
                   }
         
     bkg_vbfExt = {'309662':'Wenu_MAXHTPTV70_140',
@@ -798,7 +802,10 @@ def prepareBkgRuns(keys,options=None):
         for ki,yi in bkg_vbfExt.iteritems():
             if yi[0]=='W': bkg_wqcd[ki]=yi
             elif yi[0]=='Z': bkg_zqcd[ki]=yi
-                
+
+
+    # add low mass
+    bkg_zqcd.update(bkg_lowMassZ)
     bkg_keys = {
                 'hvh':sig_VH125,
                 #'whww':sig_VH125v2,
@@ -823,7 +830,7 @@ def prepareBkgRuns(keys,options=None):
                 #'mqcd':bkg_qcdunw,
                 'zqcdMad':bkg_z_strong_madgraph,
                 'wqcdMad':bkg_w_strong_madgraph,
-                'wdpi':{},
+                'wdpi':bkg_top_other,
                 #'zqcdMad':bkg_zqcd,
                 #'wqcdMad':bkg_wqcd,
                 #'hvbf':bkg_w_strong_madgraph_wmnu,
@@ -844,10 +851,11 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['vbfz']=bkg_vbfFiltZ        
         bkg_keys['zldy']=bkg_lowMassZ
     else:
-        extra_samples=bkg_lowMassZ
-        extra_samples.update(bkg_vbfFiltZ)
+        #extra_samples=bkg_lowMassZ
+        #extra_samples.update(bkg_vbfFiltZ)
+        extra_samples=bkg_vbfFiltZ
         extra_samples.update(bkg_z_strong_powheg)
-        bkg_keys['wdpi']=extra_samples
+        bkg_keys['wdpi'].update(extra_samples)
         
     #
     # Select MC samples 

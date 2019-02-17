@@ -26,6 +26,9 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   virtual StatusCode  beginInputFile(); //start of each input file, only metadata loaded
   //virtual StatusCode  firstExecute();   //once, after first eventdata is loaded (not per file)
   std::string HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst, Bool_t isMC);
+  vector <TH1F*> HistoAppend(std::string name, std::string currentCR);
+  virtual StatusCode CheckHists(vector <std::pair<vector <TH1F*>, std::string>> hnames);
+  void HistoFill(vector<TH1F*> hs, double w);
   bool replace(std::string& str, const std::string& from, const std::string& to);
   virtual StatusCode  execute();        //per event
   //virtual StatusCode  endInputFile();   //end of each input file
@@ -49,6 +52,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Bool_t doLowNom = false; //put nominal yields for "Low" histogram for asymmetric systematics for HistFitter
   Bool_t isHigh = true;
   Bool_t weightSyst=false;
+  Bool_t doPlot = false;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
@@ -67,15 +71,15 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::string currentVariation = "Nominal";
   std::string currentSample = "Z_strong";//"W_strong";
 
-  vector <TH1F*> hSR;
-  vector <TH1F*> hCRWep;
-  vector <TH1F*> hCRWen;
-  vector <TH1F*> hCRWepLowSig;
-  vector <TH1F*> hCRWenLowSig;
-  vector <TH1F*> hCRWmp;
-  vector <TH1F*> hCRWmn;
-  vector <TH1F*> hCRZee;
-  vector <TH1F*> hCRZmm;
+  vector <vector <TH1F*>> hSR;
+  vector <vector <TH1F*>> hCRWep;
+  vector <vector <TH1F*>> hCRWen;
+  vector <vector <TH1F*>> hCRWepLowSig;
+  vector <vector <TH1F*>> hCRWenLowSig;
+  vector <vector <TH1F*>> hCRWmp;
+  vector <vector <TH1F*>> hCRWmn;
+  vector <vector <TH1F*>> hCRZee;
+  vector <vector <TH1F*>> hCRZmm;
 
   Int_t m_extraVars = 0;
 
@@ -84,6 +88,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t trigger_met;
   Float_t w;
   Int_t runNumber;
+  ULong64_t eventNumber;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_lep;
