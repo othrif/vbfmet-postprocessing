@@ -211,16 +211,7 @@ StatusCode HFInputAlg::execute() {
   bool metSoftVeto = false;
   bool fJVTVeto = false;
   bool JetTimingVeto = false;
-  unsigned n_baseel=0;
-  unsigned n_basemu=0;
   if(m_extraVars>0){
-    for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
-      if(baseel_pt->at(iEle)>4.5e3) ++n_baseel;
-    }
-    for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
-      if(basemu_pt->at(iMuo)>4.0e3) ++n_basemu;
-    }
-
     leptonVeto = (n_baseel>0 || n_basemu>0) && !((n_el+n_mu==1 && n_baseel+n_basemu==1) || (n_el+n_mu==2 && n_baseel+n_basemu==2));
     metSoftVeto = met_soft_tst_et>20.0e3;
     if(jet_fjvt->size()>1)
@@ -403,6 +394,8 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_el",&n_el);
   m_tree->SetBranchAddress("n_mu",&n_mu);
+  m_tree->SetBranchAddress("n_baseel",&n_baseel);
+  m_tree->SetBranchAddress("n_basemu",&n_basemu);
   m_tree->SetBranchAddress("jj_mass",&jj_mass);
   m_tree->SetBranchAddress("jj_deta",&jj_deta);
   m_tree->SetBranchAddress("jj_dphi",&jj_dphi);

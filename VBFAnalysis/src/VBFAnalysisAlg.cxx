@@ -445,6 +445,16 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_isMC && met_truth_et>-0.5 && (runNumber==308567 || (runNumber>=308275 && runNumber<=308283))){
     nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
+
+    // add systematics here
+    // UP -0.000320 x Pt(Higgs) - 0.0729
+    // DOWN -0.000355 x Pt(Higgs) - 0.0692
+    // use (UP - DOWN) / 2
+    // float up = -0.000320*(met_truth_et/1.0e3) - 0.0729;
+    // float down = -0.000355 *(met_truth_et/1.0e3) - 0.0692;
+    // float syst = fabs(up-down)/2.0;
+    // nloEWKWeight__1up = nloEWKWeight + syst;
+    // nloEWKWeight__1down = nloEWKWeight - syst;
   }
 
   if (m_isMC){

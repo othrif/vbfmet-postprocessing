@@ -96,6 +96,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t n_ph;
   Int_t n_el;
   Int_t n_mu;
+  Int_t n_baseel;
+  Int_t n_basemu;
   Double_t jj_mass;
   Double_t jj_deta;
   Double_t jj_dphi;
