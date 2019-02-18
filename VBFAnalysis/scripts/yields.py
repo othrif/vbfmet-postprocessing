@@ -55,8 +55,8 @@ samples =['hVBFH125_',
 
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhotonAllSyst_v26New.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_v26c.root')
-f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c.root')
-#xf=ROOT.TFile.Open('SumHFOld.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c.root')
+f=ROOT.TFile.Open('SumHF.root')
 
 line='Region\t'
 for s in samples:

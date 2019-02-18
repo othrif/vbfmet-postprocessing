@@ -220,10 +220,10 @@ StatusCode HFInputAlg::execute() {
     if(jet_timing->size()>1)
       JetTimingVeto = fabs(jet_timing->at(0))>11.0 || fabs(jet_timing->at(1))>11.0;
     else JetTimingVeto = true;
-
+  
     // veto events with tighter selections
     if(metSoftVeto || fJVTVeto || JetTimingVeto || leptonVeto) return StatusCode::SUCCESS;
-
+  
     if(m_extraVars>1){
       METCut=150.0e3;
       METCSTJetCut=120.0e3;
@@ -282,15 +282,15 @@ StatusCode HFInputAlg::execute() {
   else if (jj_mass < 2e6) bin = 1;
   else bin = 2;
 
-  if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight);
-  if (CRWep) HistoFill(hCRWep[bin],w_final*xeSFTrigWeight);
-  if (CRWen) HistoFill(hCRWen[bin],w_final*xeSFTrigWeight);
-  if (CRWepLowSig) HistoFill(hCRWepLowSig[bin],w_final*xeSFTrigWeight);
-  if (CRWenLowSig) HistoFill(hCRWenLowSig[bin],w_final*xeSFTrigWeight);
-  if (CRWmp) HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight);
-  if (CRWmn) HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight);
-  if (CRZee) HistoFill(hCRZee[bin],w_final*xeSFTrigWeight);
-  if (CRZmm) HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight);
+  if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
+  if (CRWep) HistoFill(hCRWep[bin],w_final);
+  if (CRWen) HistoFill(hCRWen[bin],w_final);
+  if (CRWepLowSig) HistoFill(hCRWepLowSig[bin],w_final);
+  if (CRWenLowSig) HistoFill(hCRWenLowSig[bin],w_final);
+  if (CRWmp) HistoFill(hCRWmp[bin],w_final);
+  if (CRWmn) HistoFill(hCRWmn[bin],w_final);
+  if (CRZee) HistoFill(hCRZee[bin],w_final);
+  if (CRZmm) HistoFill(hCRZmm[bin],w_final);
 
   setFilterPassed(true); //if got here, assume that means algorithm passed
   return StatusCode::SUCCESS;
