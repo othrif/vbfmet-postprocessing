@@ -450,11 +450,12 @@ StatusCode VBFAnalysisAlg::execute() {
     // UP -0.000320 x Pt(Higgs) - 0.0729
     // DOWN -0.000355 x Pt(Higgs) - 0.0692
     // use (UP - DOWN) / 2
-    // float up = -0.000320*(met_truth_et/1.0e3) - 0.0729;
-    // float down = -0.000355 *(met_truth_et/1.0e3) - 0.0692;
-    // float syst = fabs(up-down)/2.0;
-    // nloEWKWeight__1up = nloEWKWeight + syst;
-    // nloEWKWeight__1down = nloEWKWeight - syst;
+    float up = -0.000320*(met_truth_et/1.0e3) - 0.0729;
+    float down = -0.000355 *(met_truth_et/1.0e3) - 0.0692;
+    float syst = fabs(up-down)/2.0;
+
+    tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
+    tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
   }
 
   if (m_isMC){
@@ -747,6 +748,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_elSFTrigWeight = elSFTrigWeight;
   float tmp_muSFTrigWeight = muSFTrigWeight;
   float tmp_eleANTISF = eleANTISF;
+  float tmp_nloEWKWeight = nloEWKWeight;
 
   for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
@@ -758,6 +760,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_elSFTrigWeight = elSFTrigWeight;
     tmp_muSFTrigWeight = muSFTrigWeight;
     tmp_eleANTISF = eleANTISF;
+    tmp_nloEWKWeight = nloEWKWeight;
 
     if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
@@ -766,6 +769,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
+    else if(it->first.Contains("nloEWKWeight"))   tmp_nloEWKWeight=tMapFloat[it->first];
     else if(it->first.Contains("eleANTISF")){
       tmp_eleANTISF=tMapFloat[it->first];
       tmp_eleANTISF=std::min<float>(tmp_eleANTISF,1.5);
@@ -775,9 +779,9 @@ StatusCode VBFAnalysisAlg::execute() {
       }else{ tmp_eleANTISF=1.0; }
     }
 
-    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF);
+    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight);
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*nloEWKWeight;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight;
   }//end systematic weight loop
 
   ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight);
@@ -843,6 +847,19 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       }
       m_tree->SetBranchStatus(var_name, 1);
       m_tree->SetBranchAddress(var_name, &(tMapFloat[var_name]));
+    }
+  }
+  // add nloEWK
+  if(m_currentVariation=="Nominal"){
+    if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
+      tMapFloat["nloEWKWeight__1up"]=-999.0;
+      tMapFloatW["nloEWKWeight__1up"]=-999.0;
+      m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));	
+    }    
+    if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
+      tMapFloat["nloEWKWeight__1down"]=-999.0;
+      tMapFloatW["nloEWKWeight__1down"]=-999.0;
+      m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
     }
   }
 
