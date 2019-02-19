@@ -55,8 +55,8 @@ samples =['hVBFH125_',
 
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhotonAllSyst_v26New.root')
 #f=ROOT.TFile.Open('SumHF_noMET.root')
-f=ROOT.TFile.Open('SumHF_lepVeto.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_v26c.root')
+#f=ROOT.TFile.Open('SumHF_lepVeto.root')
+f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_FJVT.root')
 #f=ROOT.TFile.Open('SumHF_nj2.root')
@@ -83,8 +83,9 @@ for r in regions:
         h=f.Get(histname)
         integral=0.0
         if h!=None:
-            integral=h.Integral()
-            line+='%0.2f\t' %integral
+            e = ROOT.Double(0.0)
+            integral=h.IntegralAndError(0,1001,e)
+            line+='%0.2f +/- %0.2f\t' %(integral,e)
             SumList[su]+=integral
         else:
             line+='N/A\t' 
