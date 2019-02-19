@@ -231,7 +231,8 @@ void Msl::ReadEvent::Init(TTree* tree)
     }
     if(!found_weight_syst) std::cout << "ERROR - Failed to find weight for " << fWeightSystName << std::endl;
   }
-  tree->SetBranchAddress("runNumber",&fRunNumber);  
+  tree->SetBranchAddress("runNumber",&fRunNumber);
+  tree->SetBranchAddress("eventNumber",&fEventNumber);    
   tree->SetBranchAddress("el_charge",&el_charge);  
   tree->SetBranchAddress("el_pt",    &el_pt);  
   tree->SetBranchAddress("el_eta",   &el_eta);  
@@ -601,6 +602,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }
 
     event->RunNumber = fRunNumber;
+    event->EventNumber = fEventNumber;    
     event->isMC = fisMC;
     // identify the sample
     if(!fisMC){
@@ -1030,6 +1032,14 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if(trigger_lep_new==0 && (trigger_lep&0x10)==0x10) trigger_lep_new = 2;
     if(trigger_lep_new==0 && (trigger_lep&0x100)==0x100) trigger_lep_new = 3;    
     event->RepVar(Mva::trigger_lep, trigger_lep_new);
+
+    // decode trigger_met
+    int trigger_met_encodedv2 = event->GetVar(Mva::trigger_met_encodedv2);
+    int trigger_met_encodedv2_new=0;
+    if((trigger_met_encodedv2 & 0x2)==0x2) trigger_met_encodedv2_new=1; // HLT_xe110_pufit_L1XE55 2017
+    if((trigger_met_encodedv2 & 0x4)==0x4) trigger_met_encodedv2_new=2; // HLT_xe90_pufit_L1XE50 2017
+    if((trigger_met_encodedv2 & 0x8)==0x8) trigger_met_encodedv2_new=3; // HLT_xe110_pufit_xe70_L1XE50 2018
+    event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
     
     // Change the leptons to base leptons - after filling the event
     //if(fLoadBaseLep) ChangeLep(*event);    
