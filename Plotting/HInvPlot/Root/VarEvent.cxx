@@ -21,6 +21,8 @@ std::string Msl::Mva::Convert2Str(Var var)
     case jj_mass:	          return "jj_mass";
       
     case trigger_met:	          return "trigger_met";
+    case trigger_met_encoded:	  return "trigger_met_encoded";
+    case trigger_met_encodedv2:	  return "trigger_met_encodedv2";
     case trigger_lep:	          return "trigger_lep";
     case passJetCleanTight:	  return "passJetCleanTight";
     case xeSFTrigWeight:	  return "xeSFTrigWeight";      
@@ -148,6 +150,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "jj_dphi")       return jj_dphi;
   if(var == "jj_mass")       return jj_mass;
   if(var == "trigger_met")   return trigger_met;  
+  if(var == "trigger_met_encoded")   return trigger_met_encoded;  
+  if(var == "trigger_met_encodedv2")   return trigger_met_encodedv2;  
   if(var == "trigger_lep")   return trigger_lep;  
   if(var == "passJetCleanTight")   return passJetCleanTight;
   if(var == "xeSFTrigWeight")   return xeSFTrigWeight;    
@@ -360,6 +364,8 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(jj_dphi);
     vars.push_back(jj_mass);
     vars.push_back(trigger_met);
+    vars.push_back(trigger_met_encoded);    
+    vars.push_back(trigger_met_encodedv2);    
     vars.push_back(trigger_lep);
     vars.push_back(passJetCleanTight);
     vars.push_back(xeSFTrigWeight);

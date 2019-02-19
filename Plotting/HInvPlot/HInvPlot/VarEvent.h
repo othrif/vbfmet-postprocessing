@@ -36,6 +36,8 @@ namespace Msl
       jj_mass,
 
       trigger_met,
+      trigger_met_encoded,      
+      trigger_met_encodedv2,
       trigger_lep,
       passJetCleanTight,
       xeSFTrigWeight,
