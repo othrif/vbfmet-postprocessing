@@ -212,7 +212,7 @@ StatusCode HFInputAlg::execute() {
   bool fJVTVeto = false;
   bool JetTimingVeto = false;
   if(m_extraVars>0){
-    leptonVeto = (n_baseel>0 || n_basemu>0) && !((n_el+n_mu==1 && n_baseel+n_basemu==1) || (n_el+n_mu==2 && n_baseel+n_basemu==2));
+    //leptonVeto = (n_baseel>0 || n_basemu>0) && !(((n_el+n_mu)==1 && (n_baseel+n_basemu)==1) || ((n_el+n_mu)==2 && (n_baseel+n_basemu)==2));
     metSoftVeto = met_soft_tst_et>20.0e3;
     if(jet_fjvt->size()>1)
       fJVTVeto = fabs(jet_fjvt->at(0))>0.5 || fabs(jet_fjvt->at(1))>0.5;
@@ -220,6 +220,15 @@ StatusCode HFInputAlg::execute() {
     if(jet_timing->size()>1)
       JetTimingVeto = fabs(jet_timing->at(0))>11.0 || fabs(jet_timing->at(1))>11.0;
     else JetTimingVeto = true;
+
+    // tighten fjvt for the lower met events
+    if(m_extraVars>1){
+      if(n_baseel==0 && n_basemu==0){
+	if(met_tst_et<180.0e3) fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+      }else{
+	if(met_tst_nolep_et<180.0e3) fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+      }
+    }
   
     // veto events with tighter selections
     if(metSoftVeto || fJVTVeto || JetTimingVeto || leptonVeto) return StatusCode::SUCCESS;
@@ -248,7 +257,7 @@ StatusCode HFInputAlg::execute() {
   }
 
   bool trigger_lep_bool = (trigger_lep & 0x1)==0x1;
-  if(m_extraVars) trigger_lep_bool = (trigger_lep>0);
+  //if(m_extraVars) trigger_lep_bool = (trigger_lep>0);
 
   // compute the mll
   float mll=-999.0;
@@ -264,15 +273,30 @@ StatusCode HFInputAlg::execute() {
     mll = (l0+l1).M();
   }
 
-  if (((trigger_met &0x1) == 0x1) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (n_el == 0) & (n_mu == 0)) SR = true;
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 1) && (n_mu == 0) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 1) && (n_mu == 0) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 1) && (n_mu == 0) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 1) && (n_mu == 0) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 0) && (n_mu == 1) && (mu_pt->at(0)>30.0e3)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 0) && (n_mu == 1) && (mu_pt->at(0)>30.0e3)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 2) && (n_mu == 0) && (el_pt->at(0)>30.0e3) && (el_pt->at(1)>7.0e3) && (mll> 76.0e3 && mll<116.0e3)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (n_el == 0) && (n_mu == 2) && (mu_pt->at(0)>30.0e3) && (mu_pt->at(1)>7.0e3) && (mll> 76.0e3 && mll<116.0e3)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
+  // lepton vetos
+  bool SR_lepVeto = ((n_el == 0) && (n_mu == 0));
+  bool We_lepVeto = ((n_el == 1) && (n_mu == 0));
+  bool Wm_lepVeto = ((n_el == 0) && (n_mu == 1));
+  bool Zee_lepVeto = ((n_el == 2) && (n_mu == 0));
+  bool Zmm_lepVeto = ((n_el == 0) && (n_mu == 2));
+
+  if(m_extraVars>0){
+    SR_lepVeto  = ((n_baseel == 0) && (n_basemu == 0));
+    We_lepVeto  = ((n_baseel == 1) && (n_basemu == 0) && (n_el == 1));
+    Wm_lepVeto  = ((n_baseel == 0) && (n_basemu == 1) && (n_mu == 1));
+    Zee_lepVeto = ((n_baseel == 2) && (n_basemu == 0) && (n_el == 2));
+    Zmm_lepVeto = ((n_baseel == 0) && (n_basemu == 2) && (n_mu == 2));
+  }
+
+  if (((trigger_met &0x1) == 0x1) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (SR_lepVeto)) SR = true;
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (mu_pt->at(0)>30.0e3)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (mu_pt->at(0)>30.0e3)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (el_pt->at(0)>30.0e3) && (el_pt->at(1)>7.0e3) && (mll> 76.0e3 && mll<116.0e3)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (mu_pt->at(0)>30.0e3) && (mu_pt->at(1)>7.0e3) && (mll> 76.0e3 && mll<116.0e3)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
 
   Float_t w_final = 1;
   Float_t lumi = 36.1;
@@ -360,6 +384,8 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("n_ph",1);
   m_tree->SetBranchStatus("n_el",1);
   m_tree->SetBranchStatus("n_mu",1);
+  m_tree->SetBranchStatus("n_baseel",1);
+  m_tree->SetBranchStatus("n_basemu",1);
   m_tree->SetBranchStatus("jj_mass",1);
   m_tree->SetBranchStatus("jj_deta",1);
   m_tree->SetBranchStatus("jj_dphi",1);
