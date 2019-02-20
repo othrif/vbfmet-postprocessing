@@ -41,8 +41,9 @@ StatusCode VBFAnalysisAlg::initialize() {
     std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
     xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
     std::cout << "Cross section: " << xSecFilePath << std::endl;
-    xSecFilePath = "/home/schae/testarea/HInv/source/VBFAnalysis/data/PMGxsecDB_mc16.txt";
-    my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, false);
+    my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
+    //xSecFilePath = "/home/schae/testarea/HInv/source/VBFAnalysis/data/PMGxsecDB_mc16.txt";
+    //my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, false);
     //my_XsecDB->loadFile(xSecFilePath);
     //my_XsecDB->extend(xSecFilePath);
     // if( (runNumber == 308567 || runNumber == 308276 ) ){
