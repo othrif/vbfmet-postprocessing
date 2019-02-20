@@ -399,6 +399,13 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     # Add a cut to veto signal leptons.
     new_cuts.append(CutItem("CutNoSigLeps", "n_siglep == 0"))
 
+    # Add the trigger isolation: ptvarcone30/pt < 0.07 for mu, ptvarcone20/pt<0.1
+    # TODO: make this one optional!
+    if basic_cuts.chan[0] == 'e':
+        new_cuts.append(CutItem("CutPtVarCone", "baselep_ptvarcone_0 < 0.1"))
+    else:
+        new_cuts.append(CutItem("CutPtVarCone", "baselep_ptvarcone_0 < 0.07"))
+
     # Debugging: print out the cuts.
     #print("Selection in anti-ID region (%s):" % (basic_cuts.chan))
     #for cutobj in cuts:

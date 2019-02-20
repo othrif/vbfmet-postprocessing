@@ -98,6 +98,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case ptvarcone20:	          return "ptvarcone20";
     case ptvarcone30:	          return "ptvarcone30";
     case topoetcone20:	          return "topoetcone20";
+    case baselep_ptvarcone_0:	  return "baselep_ptvarcone_0";
     case timing:	          return "timing";
     case jvt:	                  return "jvt";
     case fjvt:	                  return "fjvt";
@@ -228,6 +229,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "ptvarcone20")       return ptvarcone20;
   if(var == "ptvarcone30")       return ptvarcone30;
   if(var == "topoetcone20")      return topoetcone20;
+  if(var == "baselep_ptvarcone_0")  return baselep_ptvarcone_0;
   if(var == "timing")            return timing;
   if(var == "jvt")               return jvt;
   if(var == "fjvt")              return fjvt;
@@ -445,6 +447,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(ptvarcone20);
     vars.push_back(ptvarcone30);
     vars.push_back(topoetcone20);
+    vars.push_back(baselep_ptvarcone_0);
     vars.push_back(timing);
     vars.push_back(jvt);
     vars.push_back(fjvt);

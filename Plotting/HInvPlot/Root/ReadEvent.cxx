@@ -1230,6 +1230,8 @@ void Msl::ReadEvent::FillEvent(Event &event)
   }
 
   // Store the base lepton pT and charge.
+  // Also store the ptvarcone-- ptvarcone30 for muons, ptvarcone20 for electrons.
+  // Note that the ptvarcone was already divided by the pT above.
   if (event.baseel.size() > 0 || event.basemu.size() > 0) {
     TLorentzVector leadBaseEl;
     TLorentzVector leadBaseMu;
@@ -1246,9 +1248,11 @@ void Msl::ReadEvent::FillEvent(Event &event)
     if (leadBaseEl.Pt() >= leadBaseMu.Pt()) {
       event.RepVar(Mva::baselepPt0, leadBaseEl.Pt());
       event.RepVar(Mva::baselepCh0, event.baseel.at(0).GetVar(Mva::charge));
+      event.RepVar(Mva::baselep_ptvarcone_0, event.baseel.at(0).GetVar(Mva::ptvarcone20));
     } else {
       event.RepVar(Mva::baselepPt0, leadBaseMu.Pt());
       event.RepVar(Mva::baselepCh0, event.basemu.at(0).GetVar(Mva::charge));
+      event.RepVar(Mva::baselep_ptvarcone_0, event.basemu.at(0).GetVar(Mva::ptvarcone30));
     }
   }
 
