@@ -879,10 +879,17 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       //unsigned n_baseel=0;
       for(unsigned iEl=0; iEl<baseel_pt->size(); ++iEl){
 	RecParticle new_ele;
-	new_ele.pt  = baseel_pt->at(iEl)/1.0e3;
+        float base_pt = baseel_pt->at(iEl);
+	new_ele.pt  = base_pt/1.0e3;
 	new_ele.eta = baseel_eta->at(iEl);
 	new_ele.phi = baseel_phi->at(iEl);
         new_ele.AddVar(Mva::charge, baseel_charge->at(iEl));
+
+        // Store the ptvarcone{20,30} and the topoetcone.
+        if (baseel_ptvarcone20 && baseel_ptvarcone20->size()>iEl) new_ele.AddVar(Mva::ptvarcone20,baseel_ptvarcone20->at(iEl)/base_pt);
+        if (baseel_ptvarcone30 && baseel_ptvarcone30->size()>iEl) new_ele.AddVar(Mva::ptvarcone30,baseel_ptvarcone30->at(iEl)/base_pt);
+        if (baseel_topoetcone20 && baseel_topoetcone20->size()>iEl) new_ele.AddVar(Mva::topoetcone20,baseel_topoetcone20->at(iEl)/base_pt);
+
 	//new_ele.AddVar(Mva::ptvarcone20,jet_timing->at(iJet));
 	//if(!(fabs(new_ele.eta)>1.37 && fabs(new_ele.eta)<1.52 && new_ele.pt<27.0)){
 	//++n_baseel;
@@ -896,10 +903,18 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       //unsigned n_basemu=0;
       for(unsigned iMu=0; iMu<basemu_pt->size(); ++iMu){
 	RecParticle new_muo;
-	new_muo.pt  = basemu_pt->at(iMu)/1.0e3;
+
+        float base_pt = basemu_pt->at(iMu);
+	new_muo.pt  = base_pt/1.0e3;
 	new_muo.eta = basemu_eta->at(iMu);
 	new_muo.phi = basemu_phi->at(iMu);
         new_muo.AddVar(Mva::charge, basemu_charge->at(iMu));
+
+        // Store the ptvarcone{20,30} and the topoetcone.
+        if (basemu_ptvarcone20 && basemu_ptvarcone20->size()>iMu) new_muo.AddVar(Mva::ptvarcone20,basemu_ptvarcone20->at(iMu)/base_pt);
+        if (basemu_ptvarcone30 && basemu_ptvarcone30->size()>iMu) new_muo.AddVar(Mva::ptvarcone30,basemu_ptvarcone30->at(iMu)/base_pt);
+        if (basemu_topoetcone20 && basemu_topoetcone20->size()>iMu) new_muo.AddVar(Mva::topoetcone20,basemu_topoetcone20->at(iMu)/base_pt);
+
 	//++n_basemu;
 	event->basemu.push_back(new_muo);
       }

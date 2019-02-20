@@ -382,11 +382,28 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
             chan_cut = CutItem("CutChannel", conf=chan_conf, weight=cutobj.cut_wkey)
             new_cuts.append(chan_cut)
 
+        # I believe we need a special case for the 20.7 cuts.
+        # There, we require that there be exactly one signal lepton-- and do not
+        # put requirements on the base leptons beyond this. Thus, there can be
+        # more than one base lepton.
+        # So, in the anti-ID region for r20.7 cuts, replace this with a cut
+        # requiring n_baseleps > 0.
+        elif cutobj.GetCutName() == "CutBaseLep" and options.r207Ana:
+            r207_base_cut = CutItem("CutBaseLep", "n_baselep > 0")
+            new_cuts.append(r207_base_cut)
+
+        # Otherwise-- just add the cut.
         else:
             new_cuts.append(cutobj)
 
     # Add a cut to veto signal leptons.
     new_cuts.append(CutItem("CutNoSigLeps", "n_siglep == 0"))
+
+    # Debugging: print out the cuts.
+    #print("Selection in anti-ID region (%s):" % (basic_cuts.chan))
+    #for cutobj in cuts:
+    #    print("%s: %s" % (cutobj.cut_name, cutobj.cut_conf))
+    #sys.exit(1)
 
     # Return the modified cuts.
     return new_cuts
