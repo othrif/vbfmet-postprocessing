@@ -503,7 +503,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==309670) crossSection *= 0.2215*0.9728;
     else if(runNumber==309671) crossSection *= 0.5891*0.9728;
     else if(runNumber==309672) crossSection *= 0.6045*0.9728;
-    else if(runNumber==309673) crossSection *= 0.05928*0.9728;
+    else if(runNumber==309673) crossSection *= 0.5928*0.9728;
     else if(runNumber==309674) crossSection *= 0.5684*0.9702;
     else if(runNumber==309675) crossSection *= 0.2782*0.9702;
     else if(runNumber==309676) crossSection *= 0.5430*0.9702;
@@ -515,7 +515,7 @@ StatusCode VBFAnalysisAlg::execute() {
     double NgenCorrected = 0.;
     if (m_UseExtMC) {
       vector<int> samplesfilter = {309665,309666,309667,309668,309669,309670,309671,309672,309673,309674,309675,309676,309677,309678,309679};
-      vector<float> filtereffs = {6.28e-03,4.08e-03,6.08e-03,5.48e-03,1.56e-02,1.22e-02,1.02e-02,1.13e-02,1.58e-03,1.43e-02,1.03e-02,1.06e-02,8.75e-03,1.23e-02,9.03e-03};
+      vector<float> filtereffs = {6.28e-03,4.08e-03,6.08e-03,5.48e-03,1.56e-02,1.22e-02,1.02e-02,1.13e-02,1.58e-02,1.43e-02,1.03e-02,1.06e-02,8.75e-03,1.23e-02,9.03e-03};
       vector<int> samplesinclusive = {364103,364132,364145,364146,364106,364107,364120,364134,364148,364162,364163,364176,364177,364190,364191};
       unsigned index_f = std::find(samplesfilter.begin(), samplesfilter.end(), runNumber)-samplesfilter.begin();
       unsigned index_i = std::find(samplesinclusive.begin(), samplesinclusive.end(), runNumber)-samplesinclusive.begin();
@@ -523,14 +523,14 @@ StatusCode VBFAnalysisAlg::execute() {
       if (index_f < samplesfilter.size()){
 	if(Ngen[runNumber]>0 && Ngen[samplesinclusive.at(index_f)] > 0){
 	  //	  std::cout << "Rui: NgenFilter: " << Ngen[runNumber] << " fileterff: " << filtereffs.at(index_f) << " NgenInclusive: " << Ngen[samplesinclusive.at(index_f)] << endl;
-	  NgenCorrected = (Ngen[runNumber]*filtereffs.at(index_f)+Ngen[samplesinclusive.at(index_f)])*filtereffs.at(index_f);
+	  NgenCorrected = (Ngen[runNumber]/filtereffs.at(index_f)+Ngen[samplesinclusive.at(index_f)])*filtereffs.at(index_f);
 	  //	  std::cout << "Rui: NgenCorrected (filter sample): " << NgenCorrected <<endl;
       }
       } else if (index_i < samplesinclusive.size()){
 	if (passVjetsFilter) {
 	  if(Ngen[runNumber]>0 && Ngen[samplesfilter.at(index_i)] > 0){
 	    //	    std::cout << "Rui: NgenFilter: " << Ngen[samplesfilter.at(index_i)] << " fileterff: " << filtereffs.at(index_i) << " NgenInclusive: " << Ngen[runNumber] << endl;
-	    NgenCorrected = (Ngen[samplesfilter.at(index_i)]*filtereffs.at(index_i)+Ngen[runNumber]);
+	    NgenCorrected = (Ngen[samplesfilter.at(index_i)]/filtereffs.at(index_i)+Ngen[runNumber]);
 	    //	    std::cout << "Rui: NgenCorrected (inclusive sample): " << NgenCorrected <<endl;
 	  } 
 	} else {
