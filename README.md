@@ -84,3 +84,18 @@ submitHFInputCondor.py -n
 submitHFInputCondor.py
 ```
 You can change the list of systematics in VBFAnalysis/python/systematics.py and list of contributions in VBFAnalysis/python/sample.py.
+
+## Plotting output of HF Input Maker ##
+To plot all bins do (HFoutput.root is the file after merging the output of HF Input Maker):
+```bash
+fitPlot.py -i HFoutput.root --data --ratio
+```
+You can also print out tex tables of the yields and save them together with the plot as pdf:
+```bash
+fitPlot.py -i HFoutput.root --data --ratio --yieldTable --texTables -q --saveAs pdf
+```
+To compare different root files you can use the --compare option instead of -i:
+```bash
+fitPlot.py --compare HFoutput1.root,HFoutput2.root,HFoutput3.root --data --ratio --yieldTable --texTables -q --saveAs png
+```
+
