@@ -132,6 +132,8 @@ std::string Msl::Mva::Convert2Str(Var var)
     case jetPartonTruthLabelID0:  return "jetPartonTruthLabelID0";
     case jetPartonTruthLabelID1:  return "jetPartonTruthLabelID1";
     case jj_nmbGluons:		  return "jj_nmbGluons";
+    case passPerfFTagging:	  return "passPerfFTagging";
+    case passPerfCTagging:	  return "passPerfCTagging";
 
     case NONE: return "NONE";
     default  : break;
@@ -259,6 +261,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "jetPartonTruthLabelID0") return jetPartonTruthLabelID0;
   if(var == "jetPartonTruthLabelID1") return jetPartonTruthLabelID1;
   if(var == "jj_nmbGluons")	 return jj_nmbGluons; 
+  if(var == "passPerfFTagging")	 return passPerfFTagging; 
+  if(var == "passPerfCTagging")	 return passPerfCTagging; 
  
   cout << "Msl::Mva::Convert2Var - unknown enum: " << var << endl;
   return NONE;
@@ -473,6 +477,8 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(jetPartonTruthLabelID0);         
     vars.push_back(jetPartonTruthLabelID1);         
     vars.push_back(jj_nmbGluons);
+    vars.push_back(passPerfFTagging);
+    vars.push_back(passPerfCTagging);
   }
   
   return vars;

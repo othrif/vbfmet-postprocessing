@@ -276,6 +276,8 @@ def getHistPars(hist):
     'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
     'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
     'jj_nmbGluons' : {'xtitle':'Number of gluon-initiated leading jets', 'ytitle':'Events', 'logy':True},
+    'passPerfFTagging' : {'xtitle':'Passing jets:  q-initiated forward OR central', 'ytitle':'Events', 'logy':True},
+    'passPerfCTagging' : {'xtitle':'Passing jets:  q-initiated central OR forward', 'ytitle':'Events', 'logy':True},
         }
 
     try:

@@ -778,10 +778,17 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     
     //calculate how many gluon-initiated leading jets
     int nmbGluons =0;
+    int passF =0; //of leading jets, how many would pass with perfect forward tagging
+    int passC =0; //of leading jets, how many would pass with perfect central tagging
     for(unsigned iJet=0; iJet<2; ++iJet){
       if(jet_PartonTruthLabelID->at(iJet)==21) ++nmbGluons; 
+      //filter event to passing or failing no-gluon requirement in different detector regions
+      if((event->jets.at(iJet).eta>-2.5 && event->jets.at(iJet).eta<2.5) || (event->jets.at(iJet).eta<-2.5 && jet_PartonTruthLabelID->at(iJet)!=21) || (event->jets.at(iJet).eta>2.5 && jet_PartonTruthLabelID->at(iJet)!=21)) ++passF;//if central or (forward and quark initiated) 
+      if(event->jets.at(iJet).eta<-2.5 || event->jets.at(iJet).eta>2.5 || (event->jets.at(iJet).eta>-2.5 && event->jets.at(iJet).eta<2.5 && jet_PartonTruthLabelID->at(iJet)!=21)) ++passC;//if forward or (central and quark initiated) 
     }
     event->AddVar(Mva::jj_nmbGluons, nmbGluons);
+    event->AddVar(Mva::passPerfFTagging, passF);
+    event->AddVar(Mva::passPerfCTagging, passC);
 
     if(fJetVetoPt>0.0)
       event->RepVar(Mva::n_jet, nJet);

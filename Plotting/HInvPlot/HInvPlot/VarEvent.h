@@ -148,7 +148,9 @@ namespace Msl
       jetPartonTruthLabelID,
       jetPartonTruthLabelID0,
       jetPartonTruthLabelID1,
-      jj_nmbGluons
+      jj_nmbGluons,
+      passPerfFTagging,
+      passPerfCTagging
     };
 
     std::string       AsStr(Var var);

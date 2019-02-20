@@ -120,30 +120,60 @@ def prepareSeqSR2(basic_cuts, alg_take=None, syst='Nominal'):
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
 #-----------------------------------------------------------------------------------------
-def prepareSeqSR1ff(basic_cuts, alg_take=None, syst='Nominal'):
+def prepareSeqSR1f(basic_cuts, alg_take=None, syst='Nominal'):
 
     selkey = basic_cuts.GetSelKey()
-    region = 'sr1ff'
+    region = 'sr1f'
 
     if basic_cuts.chan !='nn' or not passRegion(region):
         return ('', [])
     
-    pass_alg = hstudy.preparePassEventForSR1ff('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
+    pass_alg = hstudy.preparePassEventForSR1f('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
 #-----------------------------------------------------------------------------------------
-def prepareSeqSR2ff(basic_cuts, alg_take=None, syst='Nominal'):
+def prepareSeqSR2f(basic_cuts, alg_take=None, syst='Nominal'):
 
     selkey = basic_cuts.GetSelKey()
-    region = 'sr2ff'
+    region = 'sr2f'
 
     if basic_cuts.chan !='nn' or not passRegion(region):
         return ('', [])
     
-    pass_alg = hstudy.preparePassEventForSR2ff('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
+    pass_alg = hstudy.preparePassEventForSR2f('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+#-----------------------------------------------------------------------------------------
+def prepareSeqSR1c(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'sr1c'
+
+    if basic_cuts.chan !='nn' or not passRegion(region):
+        return ('', [])
+    
+    pass_alg = hstudy.preparePassEventForSR1c('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+#-----------------------------------------------------------------------------------------
+def prepareSeqSR2c(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'sr2c'
+
+    if basic_cuts.chan !='nn' or not passRegion(region):
+        return ('', [])
+    
+    pass_alg = hstudy.preparePassEventForSR2c('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
@@ -293,11 +323,17 @@ def main():
                     (name_sr2,  alg_sr2)  = prepareSeqSR2 (basic_cuts, alg_take=input_cut, syst=syst)
                     read_alg.AddNormalAlg(name_sr2,  alg_sr2)
  
-                    (name_sr1ff,  alg_sr1ff)  = prepareSeqSR1ff (basic_cuts, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_sr1ff,  alg_sr1ff)
+                    (name_sr1f,  alg_sr1f)  = prepareSeqSR1f (basic_cuts, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_sr1f,  alg_sr1f)
         
-                    (name_sr2ff,  alg_sr2ff)  = prepareSeqSR2ff (basic_cuts, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_sr2ff,  alg_sr2ff)
+                    (name_sr2f,  alg_sr2f)  = prepareSeqSR2f (basic_cuts, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_sr2f,  alg_sr2f)
+                    
+		    (name_sr1c,  alg_sr1c)  = prepareSeqSR1c (basic_cuts, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_sr1c,  alg_sr1c)
+        
+                    (name_sr2c,  alg_sr2c)  = prepareSeqSR2c (basic_cuts, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_sr2c,  alg_sr2c)
                     #
                     # SR Cut based regions and algorithms with photon
                     #
