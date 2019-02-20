@@ -506,7 +506,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==309670) crossSection *= 0.2215*0.9728;
     else if(runNumber==309671) crossSection *= 0.5891*0.9728;
     else if(runNumber==309672) crossSection *= 0.6045*0.9728;
-    else if(runNumber==309673) crossSection *= 0.05928*0.9728;
+    else if(runNumber==309673) crossSection *= 0.5928*0.9728;
     else if(runNumber==309674) crossSection *= 0.5684*0.9702;
     else if(runNumber==309675) crossSection *= 0.2782*0.9702;
     else if(runNumber==309676) crossSection *= 0.5430*0.9702;
