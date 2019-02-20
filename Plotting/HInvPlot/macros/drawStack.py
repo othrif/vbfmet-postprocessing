@@ -28,7 +28,7 @@ p.add_option('--do-nf',        type='string', default=None,          dest='do_nf
 p.add_option('--extract-sig',  type='string', default=None,          dest='extract_sig')
 p.add_option('--syst-table',   type='string', default=None,          dest='syst_table')
 
-p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi 2017: 44307.4, 2018: 59937.2')
+p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi') # 2017: 44307.4, 2018: 59937.2
 p.add_option('--ymin',         type='float',  default=None,          dest='ymin')
 p.add_option('--ymax',         type='float',  default=None,          dest='ymax')
 p.add_option('--xmax',         type='float',  default=None,          dest='xmax')
