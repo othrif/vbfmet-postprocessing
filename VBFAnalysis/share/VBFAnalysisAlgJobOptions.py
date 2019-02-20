@@ -48,6 +48,7 @@ athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                    isMC = isMC,
                                    LooseSkim = True,
                                    ExtraVars=True,
+                                   QGTagger=False,
                                    runNumberInput = runNumber);
 
 include("AthAnalysisBaseComps/SuppressLogging.py") #optional line
