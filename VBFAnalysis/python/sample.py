@@ -88,10 +88,15 @@ class sample(object):
                 self.sampleType = "Z_strong" # Z_strong_LowMass added to the Z_strong
             elif (self.runNumber >= 301020 and self.runNumber <= 301038):
                 self.sampleType = "Z_strongPow" #powheg
-            elif (self.runNumber >=309665  and self.runNumber <= 309679):
+            elif (self.runNumber >=309665  and self.runNumber <= 309673):
                 if Ext:
                     self.sampleType = "Z_strong" #extension
                 else: 
+                    self.sampleType = "Z_strongExt"
+            elif (self.runNumber >=309674  and self.runNumber <= 309679):
+                if Ext:
+                    self.sampleType = "W_strong"
+                else:
                     self.sampleType = "Z_strongExt"
             elif (self.runNumber >=309662  and self.runNumber <= 309664):
                 self.sampleType = "Z_strongExt"
