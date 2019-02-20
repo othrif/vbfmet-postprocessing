@@ -153,7 +153,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //
   // Fill histograms
   //
-  //std::cout << "Run:" << event.RunNumber << std::endl;
+  //std::cout << "Run:" << " " << event.RunNumber << " event: " << event.EventNumber << std::endl;
   //FillHist(hZMCIDQCD,   Mva::jj_deta, event, weight);
   hZMCIDQCD->Fill(event.RunNumber, weight);
   hWMCIDQCD->Fill(event.RunNumber, weight);

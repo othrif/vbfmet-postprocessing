@@ -3,8 +3,7 @@ myvars = [    ['jj_deta', '50', '0.0', '10.0'],
               ['jj_dphi', '32', '0.0', '3.2'],
               ['jj_mass', '50', '0.0', '5000.0'],
               ['trigger_met', '2', '-0.5', '1.5'],              
-              ['trigger_lep', '2', '-0.5', '1.5'],              
-              ['passJetCleanTight', '2', '-0.5', '1.5'],              
+              ['trigger_lep', '2', '-0.5', '1.5'],
               ['met_tst_et', '100', '0.0', '500.0'],
               ['met_tst_phi', '32', '-3.2', '3.2'],
               ['met_tst_nolep_et', '100', '0.0', '500.0'],
@@ -26,16 +25,21 @@ myvars = [    ['jj_deta', '50', '0.0', '10.0'],
               ['met_soft_tst_sumet', '100', '0.0', '500.0'],
               ['met_tenacious_tst_et', '100', '0.0', '500.0'],              
               ['met_tight_tst_et', '100', '0.0', '500.0'],              
-              ['met_tighter_tst_et', '100', '0.0', '500.0'],
+              #['met_tighter_tst_et', '100', '0.0', '500.0'],
               ['met_tenacious_tst_phi', '32', '0.0', '3.2'],              
               ['met_tight_tst_phi', '32', '0.0', '3.2'],              
-              ['met_tighter_tst_phi', '32', '0.0', '3.2'],              
+              #['met_tighter_tst_phi', '32', '0.0', '3.2'],              
               ['met_soft_tst_phi', '32', '0.0', '3.2'],              
               ['met_cst_jet', '100', '0.0', '500.0'],
               ['met_truth_et', '100', '0.0', '500.0'],
+              ]
+myvars_notplotted = [['trigger_met_encoded', '2', '0.0', '1.0'],
+                         ['trigger_met_encodedv2', '2', '0.0', '1.0'],
               ['passVjetsFilter', '2', '0.0', '1.0'],
               ['passVjetsPTV', '2', '0.0', '1.0'],
-              ]
+                         ['passJetCleanTight', '2', '-0.5', '1.5'],              
+        ]
+    
 # these are variables not stored, but that we want to plot
 myplots = [
               ['jetPt0', '500', '0.0', '500.0'], 
@@ -110,13 +114,14 @@ mev_vars = ['jj_mass',
             'met_tight_tst_et',
             'met_tighter_tst_et',
             'met_soft_tst_et',            
-            'met_soft_tst_sumet',            
+            'met_soft_tst_sumet',
             'met_cst_jet',
             'met_truth_et',
                 ]
 def GetVarStr(entry=0, syst_name='Nominal'):
     varstr = []
-    for i in myvars:
+    all_vars = myvars+myvars_notplotted
+    for i in all_vars:
         skip=False
         if syst_name!='Nominal':
             for j in syst_filter_vars:

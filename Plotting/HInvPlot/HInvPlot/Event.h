@@ -108,6 +108,7 @@ namespace Msl
     unsigned long int    bits; // was uint32_t - see comment next to stdint.h
 
     unsigned long int    RunNumber;
+    unsigned long int    RandomRunNumber;    
     unsigned long int    EventNumber;
 
     double               totalWeight;

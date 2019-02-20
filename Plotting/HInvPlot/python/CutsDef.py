@@ -212,7 +212,12 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
         apply_weight='xeSFTrigWeight__1up'
     elif syst=='xeSFTrigWeight__1down':
         apply_weight='xeSFTrigWeight__1down'
-    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    if options.year==2017:
+        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4', weight=apply_weight)]
+    elif options.year==2018:
+        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 3', weight=apply_weight)]
+    else:
+        cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)] 
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
     cuts += [CutItem('CutPh', 'n_ph==0')]
@@ -275,7 +280,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     cuts += getJetCuts(options);
     if basic_cuts.chan=='eu':
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
-        cuts += [CutItem('CutNbjet',  'n_bjet < 0.5')]        
+        cuts += [CutItem('CutNbjet',  'n_bjet < 0.5')]
         cuts += [CutItem('CutMass',   'Mtt < 116.0 && Mtt > 76.0')]
     else:
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
