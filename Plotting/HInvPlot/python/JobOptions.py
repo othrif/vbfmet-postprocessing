@@ -39,7 +39,7 @@ def getParser():
     p.add_option('-n','--nevent',  type='int',    dest='nevent',         default=0,         help='number of events')
     p.add_option('--year',         type='int',    dest='year',           default=2012,      help='analysis year')
     
-    p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi',    help='int luminosity')
+    p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi',    help='int luminosity 2017: 44307.4, 2018: 59937.2')
     p.add_option('-r','--rfile',   type='string', default='out.root',    dest='rfile',      help='output ROOT file')
     p.add_option('-c','--cfile',   type='string', default=None,          dest='cfile',      help='cutflow tables')
     p.add_option('-t','--tfile',   type='string', default=None,          dest='tfile',      help='tree files')
@@ -74,7 +74,7 @@ def getParser():
     p.add_option('--ignore-njet',  action='store_true', default=False,   dest='ignore_njet',          help='Ignore Njet')
     p.add_option('--ignore-met',  action='store_true', default=False,   dest='ignore_met',          help='Ignore MET')
     p.add_option('--LoadBaseLep',  action='store_true', default=False,   dest='LoadBaseLep',          help='Use looser leptons')    
-    p.add_option('--OverlapPh',  action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')    
+    p.add_option('--OverlapPh',  action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')
     p.add_option('--jet-veto-pt',         type='float'       , default=-10,       dest='jet_veto_pt',       help='pT for jet veto')
     
     p.add_option('--debug',        action='store_true', default=False,   dest='debug',      help='')

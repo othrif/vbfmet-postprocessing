@@ -99,6 +99,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Bool_t passVjetsPTV;
 
   Int_t runNumber;
+  Int_t randomRunNumber;
   ULong64_t eventNumber;
   Float_t averageIntPerXing;
   Float_t mcEventWeight;

@@ -28,7 +28,7 @@ p.add_option('--do-nf',        type='string', default=None,          dest='do_nf
 p.add_option('--extract-sig',  type='string', default=None,          dest='extract_sig')
 p.add_option('--syst-table',   type='string', default=None,          dest='syst_table')
 
-p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi')
+p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi') # 2017: 44307.4, 2018: 59937.2
 p.add_option('--ymin',         type='float',  default=None,          dest='ymin')
 p.add_option('--ymax',         type='float',  default=None,          dest='ymax')
 p.add_option('--xmax',         type='float',  default=None,          dest='xmax')
@@ -52,6 +52,7 @@ p.add_option('--save-algkey',   action='store_true', default=False,   dest='save
 p.add_option('--syst-fakes',    type='int',          default=0,       dest='syst_fakes')
 p.add_option('--syst-trkmet',   type='int',          default=0,       dest='syst_trkmet')
 p.add_option('--no-underflow',  action='store_true', default=False,   dest='no_underflow')
+p.add_option('--show-mc-stat-err',  action='store_true', default=False,   dest='show_mc_stat_err')
 
 p.add_option('--draw-syst',       action='store_true', default=False,   dest='draw_syst')
 p.add_option('--make-syst-table', action='store_true', default=False,   dest='make_syst_table')
@@ -202,7 +203,7 @@ def getHistPars(hist):
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},           
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0},
 
-        'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
+        'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
         'muon_den_pt'   : {'xtitle':'Anti-Id Muon p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'lepEta' : {'xtitle':'Lepton #eta [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
@@ -213,7 +214,7 @@ def getHistPars(hist):
         'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':1.0, 'logy':True, 'LtoRCut':False},        
         'met_tst_phi'    : {'xtitle':'E_{T}^{miss} #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},        
         'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},        
+        'met_tst_nolep_phi'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},        
         'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':False},        
         'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':False},        
@@ -906,7 +907,7 @@ class DrawStack:
                 cbin  = ent.hist.GetBinCenter (ibin)
                 
         for sys, ent in self.sys_bkgs.iteritems():
-            if ibin >= 0 and ibin <= ent.hist.GetNbinsX()+1:                
+            if ibin >= 0 and ibin <= ent.hist.GetNbinsX()+1:
                 sval = ent.hist.GetBinContent(ibin)
                 cerr += (cval-sval)*(cval-sval)
 
@@ -1326,13 +1327,13 @@ class DrawStack:
             lineWidth = 2;
             markerStyle = 20;
             padScaling      = 0.75 / (1. - ratioPadRatio) ;
-            ratioPadScaling = 0.75*(1. / ratioPadRatio) ;  
+            ratioPadScaling = 0.75*(1. / ratioPadRatio) ;
             ROOT.gStyle.SetPadTopMargin(0.065);
             ROOT.gStyle.SetPadRightMargin(0.05);
             ROOT.gStyle.SetPadBottomMargin(0.16);
             ROOT.gStyle.SetPadLeftMargin(0.16);
             ROOT.gStyle.SetTitleXOffset(1.0);
-            ROOT.gStyle.SetTitleYOffset(1.28);            
+            ROOT.gStyle.SetTitleYOffset(1.28);
             self.pads.append( ROOT.TPad('pad0','pad0', 0.0, ratioPadRatio, 1.0, 1.0) )
             self.pads.append( ROOT.TPad('pad1','pad1', 0.0, 0.0, 1.0, ratioPadRatio) )
 
@@ -1582,14 +1583,22 @@ class DrawStack:
                         tot_bkg+=ent.hist.Integral(4,101)
                         
                 # set MC error to zero.
-                #for i in range()
-                self.ratio.Divide(den)
+                den_tmp=den.Clone() # removing the mc stat uncertainty from the ratio...
+                if options.show_mc_stat_err:
+                    for i in range(0,den_tmp.GetNbinsX()):
+                        den_tmp.SetBinError(i,0.0)
+                self.ratio.Divide(den_tmp)
                 for i in range(0,self.ratio.GetNbinsX()+1):
                     if i<6:
                         print self.ratio.GetXaxis().GetBinLowEdge(i),' mean: ',self.ratio.GetBinContent(i),' +/- ',self.ratio.GetBinError(i)
 
             else:
-                self.ratio.Divide(self.bkg_sum)                
+                # set MC error to zero.
+                den_tmp=self.bkg_sum.Clone() # removing the mc stat uncertainty from the ratio...
+                if options.show_mc_stat_err:
+                    for i in range(0,den_tmp.GetNbinsX()):
+                        den_tmp.SetBinError(i,0.0)                
+                self.ratio.Divide(den_tmp)
                 # compute the mu-error
                 if options.blind:
                     leftToRight=True
@@ -1741,8 +1750,9 @@ class DrawStack:
             syst.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             syst.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             # This REMOVES THE MC STAT uncertainty from the syst band
-            syst.SetPointEYhigh(i-1,0.0)
-            syst.SetPointEYlow(i-1,0.0)
+            if not options.show_mc_stat_err:
+                syst.SetPointEYhigh(i-1,0.0)
+                syst.SetPointEYlow(i-1,0.0)
             
             if other_syst:
                 m=i
