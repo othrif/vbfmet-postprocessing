@@ -519,22 +519,16 @@ StatusCode VBFAnalysisAlg::execute() {
       vector<int> samplesinclusive = {364103,364132,364145,364146,364106,364107,364120,364134,364148,364162,364163,364176,364177,364190,364191};
       unsigned index_f = std::find(samplesfilter.begin(), samplesfilter.end(), runNumber)-samplesfilter.begin();
       unsigned index_i = std::find(samplesinclusive.begin(), samplesinclusive.end(), runNumber)-samplesinclusive.begin();
-      //      std::cout << "Rui: index_f: " << index_f << " index_i: " << index_i << endl;
       if (index_f < samplesfilter.size()){
 	if(Ngen[runNumber]>0 && Ngen[samplesinclusive.at(index_f)] > 0){
-	  //	  std::cout << "Rui: NgenFilter: " << Ngen[runNumber] << " fileterff: " << filtereffs.at(index_f) << " NgenInclusive: " << Ngen[samplesinclusive.at(index_f)] << endl;
 	  NgenCorrected = (Ngen[runNumber]/filtereffs.at(index_f)+Ngen[samplesinclusive.at(index_f)])*filtereffs.at(index_f);
-	  //	  std::cout << "Rui: NgenCorrected (filter sample): " << NgenCorrected <<endl;
       }
       } else if (index_i < samplesinclusive.size()){
 	if (passVjetsFilter) {
 	  if(Ngen[runNumber]>0 && Ngen[samplesfilter.at(index_i)] > 0){
-	    //	    std::cout << "Rui: NgenFilter: " << Ngen[samplesfilter.at(index_i)] << " fileterff: " << filtereffs.at(index_i) << " NgenInclusive: " << Ngen[runNumber] << endl;
 	    NgenCorrected = (Ngen[samplesfilter.at(index_i)]/filtereffs.at(index_i)+Ngen[runNumber]);
-	    //	    std::cout << "Rui: NgenCorrected (inclusive sample): " << NgenCorrected <<endl;
 	  } 
 	} else {
-	  //	  std::cout << "Rui: inclusive, not passing VjetsFilter" << endl;
 	  NgenCorrected = Ngen[runNumber];
 	}
       } else {
@@ -543,7 +537,6 @@ StatusCode VBFAnalysisAlg::execute() {
     } else {
       NgenCorrected = Ngen[runNumber];
     }
-    //std::cout << "crossSection: " << crossSection << std::endl;
     if(NgenCorrected>0)  weight = crossSection/NgenCorrected; 
     else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 
     ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
