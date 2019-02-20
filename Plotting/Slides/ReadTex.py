@@ -340,6 +340,31 @@ def Get4Chart(names=[], title='Check Modelling',xtitle='',ytitle=''):
     return line
 
 #--------------------------------------------------------
+def Get2Chart(names=[], title='Check Modelling',xtitle='',ytitle=''):
+    #
+    # Makes a page with four histograms
+    #
+    if len(names)!=2: 
+        print 'ERROR - different than 2 histograms'
+        return ''
+    line='\\frame{\\frametitle{%s}\n' %(title)
+    line+='\\begin{columns}\n'
+    line+='\\begin{column}{6cm}\n'
+    line+='%s $\\newline$ \n' %(xtitle)
+    line+='\\includegraphics[angle=0.0, width=0.98\\textwidth]{%s}\n' %(names[0])
+    line+='\\end{column}\n'
+    line+='\\vline\n'
+    line+='\\begin{column}{6cm} \n'
+    line+='%s $\\newline$ \n' %(ytitle)    
+    line+='\\includegraphics[angle=0.0, width=0.98\\textwidth]{%s}\n' %(names[1])
+    line+='\\end{column}\n'
+    line+='\\end{columns}\n'
+    line+='}\n'
+
+    return line
+
+
+#--------------------------------------------------------
 def GetEnd():
     
     return '\\end{document}\n'
@@ -428,7 +453,7 @@ if __name__ == "__main__":
     dir1='../Baseline2017/'
     dir2='../Baseline201516/'
     samples = [['pass_wcr_allmjj_e_','pass_wcr_allmjj_u_'],['pass_zcr_allmjj_ee_','pass_zcr_allmjj_uu_'],
-                   #['pass_sr_allmjj_nn_','pass_sr_allmjj_nn_']
+                   ['pass_sr_allmjj_nn_']
                    ]
         #jj_mass,jj_dphi,met_tst_et,met_tst_nolep_et,jj_deta,met_significance,met_tst_et,lepPt0 
     filelist = ['Nominal_jj_mass_Nominal.pdf','Nominal_jj_deta_Nominal.pdf',
@@ -439,7 +464,10 @@ if __name__ == "__main__":
     for s in samples:
         i=0        
         for fi in filelist:
-            f.write(Get4Chart(names=[dir2+s[0]+fi,dir2+s[1]+fi,dir1+s[0]+fi,dir1+s[1]+fi], title=titles[i],xtitle='2015 and 2016',ytitle='2017'))
+            if len(s)==2:
+                f.write(Get4Chart(names=[dir2+s[0]+fi,dir2+s[1]+fi,dir1+s[0]+fi,dir1+s[1]+fi], title=titles[i],xtitle='2015 and 2016',ytitle='2017'))
+            elif len(s)==1:
+                f.write(Get2Chart(names=[dir2+s[0]+fi,dir1+s[0]+fi], title='SR '+titles[i],xtitle='2015 and 2016',ytitle='2017'))                
             i+=1
     f.write(GetEnd())
     f.close()
