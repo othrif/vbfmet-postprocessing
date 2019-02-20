@@ -20,6 +20,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "current sytematics of the tree" );
   declareProperty( "normFile", m_normFile = "current.root", "path to a file with the number of events processed" );
   declareProperty( "mcCampaign", m_mcCampaign = "mc16a", "mcCampaign of the mc sample. only read if isMC is true" );
+  declareProperty( "UseExtMC", m_UseExtMC = false, "Use extended MC samples");
 }
 
 
@@ -516,8 +517,32 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==309679) crossSection *= 0.2691*0.9702;
     else if(runNumber==310502) crossSection *= 0.95325;
     
-    //std::cout << "crossSection: " << crossSection << std::endl;
-    if(Ngen[runNumber]>0)  weight = crossSection/Ngen[runNumber]; 
+    double NgenCorrected = 0.;
+    if (m_UseExtMC) {
+      vector<int> samplesfilter = {309665,309666,309667,309668,309669,309670,309671,309672,309673,309674,309675,309676,309677,309678,309679};
+      vector<float> filtereffs = {6.28e-03,4.08e-03,6.08e-03,5.48e-03,1.56e-02,1.22e-02,1.02e-02,1.13e-02,1.58e-02,1.43e-02,1.03e-02,1.06e-02,8.75e-03,1.23e-02,9.03e-03};
+      vector<int> samplesinclusive = {364103,364132,364145,364146,364106,364107,364120,364134,364148,364162,364163,364176,364177,364190,364191};
+      unsigned index_f = std::find(samplesfilter.begin(), samplesfilter.end(), runNumber)-samplesfilter.begin();
+      unsigned index_i = std::find(samplesinclusive.begin(), samplesinclusive.end(), runNumber)-samplesinclusive.begin();
+      if (index_f < samplesfilter.size()){
+	if(Ngen[runNumber]>0 && Ngen[samplesinclusive.at(index_f)] > 0){
+	  NgenCorrected = (Ngen[runNumber]/filtereffs.at(index_f)+Ngen[samplesinclusive.at(index_f)])*filtereffs.at(index_f);
+      }
+      } else if (index_i < samplesinclusive.size()){
+	if (passVjetsFilter) {
+	  if(Ngen[runNumber]>0 && Ngen[samplesfilter.at(index_i)] > 0){
+	    NgenCorrected = (Ngen[samplesfilter.at(index_i)]/filtereffs.at(index_i)+Ngen[runNumber]);
+	  } 
+	} else {
+	  NgenCorrected = Ngen[runNumber];
+	}
+      } else {
+	NgenCorrected = Ngen[runNumber];
+      }
+    } else {
+      NgenCorrected = Ngen[runNumber];
+    }
+    if(NgenCorrected>0)  weight = crossSection/NgenCorrected; 
     else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 
     ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
   } else {
@@ -647,24 +672,29 @@ StatusCode VBFAnalysisAlg::execute() {
   // set the merging for the existing samples
   //364173-364175,364159-364161,364187-364189,364162-364163,364176-364177,364193-364194
   //364103,364132,364145-364146,364151,364134,364120,364106-364107
-  if((runNumber>=309662 && runNumber<=309679)){ // QCD NLO sherpa extension samples with Mjj filter
-    // use the filter as calculated
-  }else if((runNumber>=364173 && runNumber<=364175) || // Wenu 70-140 all three
-	   (runNumber>=364159 && runNumber<=364161) || // Wmunu 70-140 all three
-	   (runNumber>=364187 && runNumber<=364189) || // Wtaunu 70-140 all three
-	   (runNumber>=364162 && runNumber<=364163) || // Wmunu 140-280 CVBV+cFilter
-	   (runNumber>=364176 && runNumber<=364177) || // Wenu 140-280 CVBV+cFilter 
-	   (runNumber>=364190 && runNumber<=364191) || // Wtaunu 140-280 CVBV+cFilter 
-	   (runNumber>=364103 && runNumber<=364103) || // Zmm 70-140 CVBV
-	   (runNumber>=364132 && runNumber<=364132) || // Ztautau_MAXHTPTV70_140_CFBV
-	   (runNumber>=364145 && runNumber<=364146) || // Znn 70-140 CVBV, c Filter
-	   (runNumber>=364148 && runNumber<=364148) || // znn 140-280 CVBV
-	   (runNumber>=364134 && runNumber<=364134) || // Ztt 140-280 CVBV
-	   (runNumber>=364120 && runNumber<=364120) || // Zee 140-280 CVBV
-	   (runNumber>=364106 && runNumber<=364107)){  // Zmm 140-280 CVBV+cfilter
-    passVjetsFilter=(!passVjetsFilter);
-  }else passVjetsFilter=true;
-
+  if (m_UseExtMC){
+    if((runNumber>=309662 && runNumber<=309664)) {
+      passVjetsFilter=false;
+    }else passVjetsFilter=true;
+  } else {
+    if((runNumber>=309662 && runNumber<=309679)){ // QCD NLO sherpa extension samples with Mjj filter
+      // use the filter as calculated
+    }else if((runNumber>=364173 && runNumber<=364175) || // Wenu 70-140 all three
+	     (runNumber>=364159 && runNumber<=364161) || // Wmunu 70-140 all three
+	     (runNumber>=364187 && runNumber<=364189) || // Wtaunu 70-140 all three
+	     (runNumber>=364162 && runNumber<=364163) || // Wmunu 140-280 CVBV+cFilter
+	     (runNumber>=364176 && runNumber<=364177) || // Wenu 140-280 CVBV+cFilter 
+	     (runNumber>=364190 && runNumber<=364191) || // Wtaunu 140-280 CVBV+cFilter 
+	     (runNumber>=364103 && runNumber<=364103) || // Zmm 70-140 CVBV
+	     (runNumber>=364132 && runNumber<=364132) || // Ztautau_MAXHTPTV70_140_CFBV
+	     (runNumber>=364145 && runNumber<=364146) || // Znn 70-140 CVBV, c Filter
+	     (runNumber>=364148 && runNumber<=364148) || // znn 140-280 CVBV
+	     (runNumber>=364134 && runNumber<=364134) || // Ztt 140-280 CVBV
+	     (runNumber>=364120 && runNumber<=364120) || // Zee 140-280 CVBV
+	     (runNumber>=364106 && runNumber<=364107)){  // Zmm 140-280 CVBV+cfilter
+      passVjetsFilter=(!passVjetsFilter);
+    }else passVjetsFilter=true;
+  }
   //364112-364113,364126-364127,364140-364141,364154-364155
   //364168-364169,364182-364183,364196-364197
   if((runNumber>=364216 && runNumber<=364229)){ // QCD NLO sherpa extension samples for pTV
@@ -677,7 +707,7 @@ StatusCode VBFAnalysisAlg::execute() {
 	   (runNumber>=364196 && runNumber<=364197)){  // Wtaunu 500, 1000
     passVjetsPTV=(!passVjetsPTV); // flip these
   }else passVjetsPTV=true;// others must pass
-
+  
   // Definiing a loose skimming
   float METCut = 150.0e3;
   float LeadJetPtCut = 80.0e3;
