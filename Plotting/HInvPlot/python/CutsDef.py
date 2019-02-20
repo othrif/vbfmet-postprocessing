@@ -213,7 +213,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     elif syst=='xeSFTrigWeight__1down':
         apply_weight='xeSFTrigWeight__1down'
     if options.year==2017:
-        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 1', weight=apply_weight)]
+        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4', weight=apply_weight)]
     elif options.year==2018:
         cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 3', weight=apply_weight)]
     else:

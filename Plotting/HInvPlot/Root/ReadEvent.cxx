@@ -232,6 +232,7 @@ void Msl::ReadEvent::Init(TTree* tree)
     if(!found_weight_syst) std::cout << "ERROR - Failed to find weight for " << fWeightSystName << std::endl;
   }
   tree->SetBranchAddress("runNumber",&fRunNumber);
+  tree->SetBranchAddress("randomRunNumber",&fRandomRunNumber);  
   tree->SetBranchAddress("eventNumber",&fEventNumber);    
   tree->SetBranchAddress("el_charge",&el_charge);  
   tree->SetBranchAddress("el_pt",    &el_pt);  
@@ -602,6 +603,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }
 
     event->RunNumber = fRunNumber;
+    event->RandomRunNumber = fRandomRunNumber;    
     event->EventNumber = fEventNumber;    
     event->isMC = fisMC;
     // identify the sample
@@ -1039,6 +1041,13 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if((trigger_met_encodedv2 & 0x2)==0x2) trigger_met_encodedv2_new=1; // HLT_xe110_pufit_L1XE55 2017
     if((trigger_met_encodedv2 & 0x4)==0x4) trigger_met_encodedv2_new=2; // HLT_xe90_pufit_L1XE50 2017
     if((trigger_met_encodedv2 & 0x8)==0x8) trigger_met_encodedv2_new=3; // HLT_xe110_pufit_xe70_L1XE50 2018
+
+    // run selected for 2017
+    if(!fisMC) fRandomRunNumber = fRunNumber;
+    if(fRandomRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))                                    trigger_met_encodedv2_new=4; //HLT_xe90_pufit_L1XE50; // period B
+    else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
+    else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
+    else if(340453>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
     
     // Change the leptons to base leptons - after filling the event
