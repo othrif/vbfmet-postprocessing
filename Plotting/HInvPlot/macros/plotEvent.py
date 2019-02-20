@@ -127,7 +127,9 @@ def prepareSeqWCRAntiID(basic_cuts, region, alg_take=None, syst='Nominal'):
     selkey = basic_cuts.GetSelKey()
     region = 'wcranti'
 
-    if basic_cuts.chan in ['ee','uu','ll','nn','eu'] or not passRegion(region):
+    # The anti-ID region should always be e *or* mu; we don't want an
+    # inclusive lepton region.
+    if basic_cuts.chan in ['ee','uu','ll','nn','eu', 'l'] or not passRegion(region):
         return ('', [])
 
     pass_alg = hstudy.preparePassEventForWCRAntiID('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)

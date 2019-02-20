@@ -6,9 +6,9 @@
  * @Author : Rustem Ospanov, Doug Schaefer
  *
  * @Brief  :
- * 
+ *
  *  List of event variables for monojet analysis
- * 
+ *
  **********************************************************************************/
 
 // C/C++
@@ -23,14 +23,14 @@ namespace Msl
 {
   class Registry;
 
-  namespace Mva 
+  namespace Mva
   {
-    enum Var 
+    enum Var
     {
       //
       // Variables added by ReadEvent and FillEvent algorithms
       //
-      NONE = 0, 
+      NONE = 0,
       jj_deta,
       jj_dphi,
       jj_mass,
@@ -42,22 +42,22 @@ namespace Msl
       passJetCleanTight,
       xeSFTrigWeight,
       xeSFTrigWeight__1up,
-      xeSFTrigWeight__1down,            
+      xeSFTrigWeight__1down,
       //
       // KInematic variables read directly from standard ntuples
       //   - enum name must match branch name from HWW tree
       //
       met_truth_et,
-      met_truth_phi,      
+      met_truth_phi,
       met_tst_et,
-      met_tst_phi,      
+      met_tst_phi,
       met_tst_nolep_et,
       met_tst_nolep_phi,
       met_tenacious_tst_nolep_et,
-      met_tenacious_tst_nolep_phi,      
+      met_tenacious_tst_nolep_phi,
       met_significance,
-      metsig_tst,      
-      met_tenacious_tst_et,      
+      metsig_tst,
+      met_tenacious_tst_et,
       met_tight_tst_et,
       met_tighter_tst_et,
       met_soft_tst_et,
@@ -70,42 +70,44 @@ namespace Msl
       n_jet,
       n_bjet,
       n_jet_fwd,
-      n_jet_fwdj,      
-      n_jet_fwdj30,      
-      n_jet_fwdj40,      
+      n_jet_fwdj,
+      n_jet_fwdj30,
+      n_jet_fwdj40,
       n_jet_fwdj50,
       n_jet_cen,
-      n_jet_cenj,      
-      n_jet_cenj30,      
-      n_jet_cenj40,      
-      n_jet_cenj50,      
+      n_jet_cenj,
+      n_jet_cenj30,
+      n_jet_cenj40,
+      n_jet_cenj50,
       n_el,
       n_mu,
       n_tau,
       n_baseel,
       n_basemu,
       n_baselep,
-      n_siglep,            
-      n_ph,      
+      n_siglep,
+      n_ph,
       n_truth_tau,
       met_tst_j1_dphi,
       met_tst_j2_dphi,
-      met_tst_j3_dphi,      
+      met_tst_j3_dphi,
       met_tst_nolep_j1_dphi,
       met_tst_nolep_j2_dphi,
       met_tenacious_tst_j1_dphi,
       met_tenacious_tst_j2_dphi,
       met_tenacious_tst_nolep_j1_dphi,
-      met_tenacious_tst_nolep_j2_dphi,      
+      met_tenacious_tst_nolep_j2_dphi,
       jetPt0,
       jetPt1,
       jetEta0,
-      jetEta1,      
+      jetEta1,
       etaj0TimesEtaj1,
       lepPt0,
       lepPt1,
       lepCh0,
       lepCh1,
+      baselepPt0,
+      baselepCh0,
       chanFlavor,
       mll,
       ptll,
@@ -113,10 +115,10 @@ namespace Msl
       charge,
       ptvarcone20,
       ptvarcone30,
-      topoetcone20,      
+      topoetcone20,
       timing,
       jvt,
-      fjvt,      
+      fjvt,
       j0timing,
       j1timing,
       j0jvt,
@@ -137,7 +139,7 @@ namespace Msl
       avgmj3_over_mjj,
       max_j3_dr,
       Mtt,phPt,
-      phEta, 
+      phEta,
       met_tst_ph_dphi,
       passVjetsFilter,
       passVjetsPTV,
@@ -154,16 +156,16 @@ namespace Msl
 
     std::string       AsStr(Var var);
     std::string Convert2Str(Var var);
-    Var         Convert2Var(const std::string &var);   
+    Var         Convert2Var(const std::string &var);
     Var         Convert2Var(unsigned long int           key); // was uint32_t - see comment next to stdint.h
 
-    
-    Msl::Mva::Var ReadVar(const Msl::Registry &reg, 
-			  const std::string &key, 
+
+    Msl::Mva::Var ReadVar(const Msl::Registry &reg,
+			  const std::string &key,
 			  const std::string &caller = "ReadVar");
-    
-    std::vector<Msl::Mva::Var> ReadVars(const Msl::Registry &reg, 
-					const std::string &key, 
+
+    std::vector<Msl::Mva::Var> ReadVars(const Msl::Registry &reg,
+					const std::string &key,
 					const std::string &caller = "ReadVars");
 
     std::vector<Msl::Mva::Var> ReadVars(const std::string &config,

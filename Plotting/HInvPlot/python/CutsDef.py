@@ -343,7 +343,53 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
     return GetCuts(cuts)
 
 def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
-    return getWCRCuts(cut, options, basic_cuts, ignore_met)
+    cuts = getWCRCuts(cut, options, basic_cuts, ignore_met)
+
+    # Loop through the WCR cuts. Replace some of them to create the anti-ID region.
+    # By doing it this way, the anti-ID region is always updated with regard to
+    # other changes in the analysis.
+
+    new_cuts = []
+    for cutobj in cuts:
+
+        # Rewrite the lepton pT cut to use base lepton pT.
+        if cutobj.GetCutName() == "CutL0Pt":
+            new_lep_pt = cutobj.cut_conf.replace("lepPt", "baselepPt")
+            lep_pt_cut = CutItem("CutL0Pt", conf=new_lep_pt, weight=cutobj.cut_wkey)
+            new_cuts.append(lep_pt_cut)
+
+        # Rewrite the "channel" cut to explicitly look at n_baselep and n_basemu.
+        # this short-circuits the "channel" computation in the C++ code to always
+        # use baseline leptons-- as desired for the anti-ID region.
+        elif cutobj.GetCutName() == "CutChannel":
+            chan_conf = ""
+
+            # If this is an electron channel, requre at least 1 baseline electron, no muons.
+            # And vice versa for muon channels.
+            if basic_cuts.chan[0] == 'e':
+                chan_conf += "n_baseel > 0 && n_basemu == 0"
+            else:
+                chan_conf += "n_basemu > 0 && n_baseel == 0"
+
+            # Now consider the possibility that we want an e+/e- channel (or the same for muons).
+            # Add a cut on baselepCh0.
+            if len(basic_cuts.chan) == 2:
+                if basic_cuts.chan[1] == "p":
+                    chan_conf += " && baselepCh0>0"
+                else:
+                    chan_conf += " && baselepCh0<0"
+
+            chan_cut = CutItem("CutChannel", conf=chan_conf, weight=cutobj.cut_wkey)
+            new_cuts.append(chan_cut)
+
+        else:
+            new_cuts.append(cutobj)
+
+    # Add a cut to veto signal leptons.
+    new_cuts.append(CutItem("CutNoSigLeps", "n_siglep == 0"))
+
+    # Return the modified cuts.
+    return new_cuts
 
 #-------------------------------------------------------------------------
 def GetCutsObject(reg,cuts,options,alg_name):
