@@ -48,6 +48,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   long int nFileEvt = 0;
   long int nFileEvtTot = 0;
   Bool_t m_isMC = true;
+  Bool_t m_UseExtMC = false;
   bool is2015;
   bool is2016;
   bool m_LooseSkim = true;
