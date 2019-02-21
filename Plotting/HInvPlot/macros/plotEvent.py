@@ -485,7 +485,7 @@ def main():
                     read_alg.AddNormalAlg(name_sr3f,  alg_sr3f)
         
                     (name_src,  alg_src)  = prepareSeqSRc (basic_cuts, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_src,  alg_sr2)
+                    read_alg.AddNormalAlg(name_src,  alg_src)
                     
 		    (name_sr1c,  alg_sr1c)  = prepareSeqSR1c (basic_cuts, alg_take=input_cut, syst=syst)
                     read_alg.AddNormalAlg(name_sr1c,  alg_sr1c)
