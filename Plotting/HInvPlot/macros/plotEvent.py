@@ -173,7 +173,9 @@ def main():
     #-----------------------------------------------------------------------------------------
     # Prepare selection keys
     #
-    anas    = ['allmjj']
+    anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
+    if options.analysis!='all':
+        anas = [options.analysis]
     chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']
 
     if options.chan != None:
@@ -237,8 +239,9 @@ def main():
                     #
                     # SR Cut based regions and algorithms with photon
                     #
-                    (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)
+                    if a=='allmjj':
+                        (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
+                        read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)
 
                     #
                     # ZCR Cut based regions and algorithms
