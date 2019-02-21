@@ -198,11 +198,13 @@ def metCuts(options, isLep=False):
 
 
 #-------------------------------------------------------------------------
-def qgCuts(sr, isLep=False):
+def mjjRegions(sr, isLep=False):
     if not isLep:
 	if sr==1:
-	    cuts = [CutItem('CutMjj','jj_mass > 1000.0 && jj_mass < 3000.0')]
+	    cuts = [CutItem('CutMjj','jj_mass > 1000.0 && jj_mass < 2000.0')]
 	elif sr==2:
+	    cuts = [CutItem('CutMjj','jj_mass > 2000.0 && jj_mass < 3000.0')]
+	elif sr==3:
 	    cuts = [CutItem('CutMjj','jj_mass > 3000.0')]
 	else:
 	    cuts = [CutItem('CutMjj','jj_mass > 1000.0')]
@@ -236,8 +238,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
 
     # VBF cuts
     cuts+=getVBFCuts(options, isLep=False)
-    cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
-
+    cuts+=mjjRegions(-1, isLep=False)
 
     #eta requirements on jets
 
@@ -270,8 +271,7 @@ def getSR1Cuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
 
     # VBF cuts
     cuts+=getVBFCuts(options, isLep=False)
-    cuts+=qgCuts(1,isLep=False) 
-    cuts += [CutItem('CutJetFlavor','jj_nmbGluons == 0.0')]
+    cuts+=mjjRegions(1,isLep=False) 
 
     return GetCuts(cuts)
 
@@ -302,8 +302,201 @@ def getSR2Cuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
 
     # VBF cuts
     cuts+=getVBFCuts(options, isLep=False)
-    cuts+=qgCuts(2,isLep=False) 
+    cuts+=mjjRegions(2,isLep=False) 
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getSR3Cuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh', 'n_ph==0')]
+    cuts += getJetCuts(options);
+
+    # add the extra cuts
+    cuts += ExtraCuts(options)
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += metCuts(options)
+
+    # VBF cuts
+    cuts+=getVBFCuts(options, isLep=False)
+    cuts+=mjjRegions(3,isLep=False) 
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getSRTagCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh', 'n_ph==0')]
+    cuts += getJetCuts(options);
+
+    # add the extra cuts
+    cuts += ExtraCuts(options)
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += metCuts(options)
+
+    # VBF cuts
+    cuts+=getVBFCuts(options, isLep=False)
+    cuts+=mjjRegions(-1, isLep=False)
     cuts += [CutItem('CutJetFlavor','jj_nmbGluons == 0.0')]
+
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getSR1TagCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh', 'n_ph==0')]
+    cuts += getJetCuts(options);
+
+    # add the extra cuts
+    cuts += ExtraCuts(options)
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += metCuts(options)
+
+    # VBF cuts
+    cuts+=getVBFCuts(options, isLep=False)
+    cuts+=mjjRegions(1,isLep=False) 
+    cuts += [CutItem('CutJetFlavor','jj_nmbGluons == 0.0')]
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getSR2TagCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh', 'n_ph==0')]
+    cuts += getJetCuts(options);
+
+    # add the extra cuts
+    cuts += ExtraCuts(options)
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += metCuts(options)
+
+    # VBF cuts
+    cuts+=getVBFCuts(options, isLep=False)
+    cuts+=mjjRegions(2,isLep=False) 
+    cuts += [CutItem('CutJetFlavor','jj_nmbGluons == 0.0')]
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getSR3TagCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh', 'n_ph==0')]
+    cuts += getJetCuts(options);
+
+    # add the extra cuts
+    cuts += ExtraCuts(options)
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += metCuts(options)
+
+    # VBF cuts
+    cuts+=getVBFCuts(options, isLep=False)
+    cuts+=mjjRegions(3,isLep=False) 
+    cuts += [CutItem('CutJetFlavor','jj_nmbGluons == 0.0')]
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getSRfCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh', 'n_ph==0')]
+    cuts += getJetCuts(options);
+
+    # add the extra cuts
+    cuts += ExtraCuts(options)
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += metCuts(options)
+
+    # VBF cuts
+    cuts+=getVBFCuts(options, isLep=False)
+
+    # qgTagging cuts
+    cuts+=mjjRegions(-1,isLep=False) 
+    cuts += [CutItem('PassPerfF','passPerfFTagging==2')];
 
     return GetCuts(cuts)
 
@@ -336,7 +529,7 @@ def getSR1fCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst=
     cuts+=getVBFCuts(options, isLep=False)
 
     # qgTagging cuts
-    cuts+=qgCuts(1,isLep=False) 
+    cuts+=mjjRegions(1,isLep=False) 
     cuts += [CutItem('PassPerfF','passPerfFTagging==2')];
 
     return GetCuts(cuts)
@@ -370,8 +563,76 @@ def getSR2fCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst=
     cuts+=getVBFCuts(options, isLep=False)
 
     # qgTagging cuts
-    cuts+=qgCuts(2,isLep=False) 
+    cuts+=mjjRegions(2,isLep=False) 
     cuts += [CutItem('PassPerfF','passPerfFTagging==2')];
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getSR3fCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh', 'n_ph==0')]
+    cuts += getJetCuts(options);
+
+    # add the extra cuts
+    cuts += ExtraCuts(options)
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += metCuts(options)
+
+    # VBF cuts
+    cuts+=getVBFCuts(options, isLep=False)
+
+    # qgTagging cuts
+    cuts+=mjjRegions(3,isLep=False) 
+    cuts += [CutItem('PassPerfF','passPerfFTagging==2')];
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getSRcCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh', 'n_ph==0')]
+    cuts += getJetCuts(options);
+
+    # add the extra cuts
+    cuts += ExtraCuts(options)
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += metCuts(options)
+
+    # VBF cuts
+    cuts+=getVBFCuts(options, isLep=False)
+
+    # qgTagging cuts
+    cuts+=mjjRegions(-1,isLep=False) 
+    cuts += [CutItem('PassPerfC','passPerfCTagging==2')];
 
     return GetCuts(cuts)
 
@@ -404,7 +665,7 @@ def getSR1cCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst=
     cuts+=getVBFCuts(options, isLep=False)
 
     # qgTagging cuts
-    cuts+=qgCuts(1,isLep=False) 
+    cuts+=mjjRegions(1,isLep=False) 
     cuts += [CutItem('PassPerfC','passPerfCTagging==2')];
 
     return GetCuts(cuts)
@@ -438,7 +699,41 @@ def getSR2cCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst=
     cuts+=getVBFCuts(options, isLep=False)
 
     # qgTagging cuts
-    cuts+=qgCuts(2,isLep=False) 
+    cuts+=mjjRegions(2,isLep=False) 
+    cuts += [CutItem('PassPerfC','passPerfCTagging==2')];
+
+    return GetCuts(cuts)
+
+#-------------------------------------------------------------------------
+def getSR3cCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    apply_weight='xeSFTrigWeight'
+    if syst=='xeSFTrigWeight__1up':
+        apply_weight='xeSFTrigWeight__1up'
+    elif syst=='xeSFTrigWeight__1down':
+        apply_weight='xeSFTrigWeight__1down'
+    cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
+    cuts += [CutItem('CutPh', 'n_ph==0')]
+    cuts += getJetCuts(options);
+
+    # add the extra cuts
+    cuts += ExtraCuts(options)
+    
+    if cut == 'BeforeMET':
+        return GetCuts(cuts)
+    if not ignore_met:
+        cuts += metCuts(options)
+
+    # VBF cuts
+    cuts+=getVBFCuts(options, isLep=False)
+
+    # qgTagging cuts
+    cuts+=mjjRegions(3,isLep=False) 
     cuts += [CutItem('PassPerfC','passPerfCTagging==2')];
 
     return GetCuts(cuts)
@@ -688,11 +983,151 @@ def preparePassEventForSR1(alg_name, options, basic_cuts, cut='BASIC',syst='Nomi
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
 
 #-------------------------------------------------------------------------
+def preparePassEventForSR2(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSR2Cuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSR3(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSR3Cuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSRTag(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSRTagCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSR1Tag(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSR1TagCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSR2Tag(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSR2TagCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSR3Tag(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSR3TagCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSRf(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSRfCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
 def preparePassEventForSR1f(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
 
     reg  = ROOT.Msl.Registry()
 
     cuts = getSR1fCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSR2f(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSR2fCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSR3f(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSR3fCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSRc(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSRcCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
 
     #
     # Fill Registry with cuts and samples for cut-flow
@@ -716,33 +1151,6 @@ def preparePassEventForSR1c(alg_name, options, basic_cuts, cut='BASIC',syst='Nom
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
 
 #-------------------------------------------------------------------------
-def preparePassEventForSR2(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
-
-    reg  = ROOT.Msl.Registry()
-
-    cuts = getSR2Cuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
-
-    #
-    # Fill Registry with cuts and samples for cut-flow
-    #
-    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
-
-    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
-#-------------------------------------------------------------------------
-def preparePassEventForSR2f(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
-
-    reg  = ROOT.Msl.Registry()
-
-    cuts = getSR2fCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
-
-    #
-    # Fill Registry with cuts and samples for cut-flow
-    #
-    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
-
-    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
-
-#-------------------------------------------------------------------------
 def preparePassEventForSR2c(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
 
     reg  = ROOT.Msl.Registry()
@@ -755,6 +1163,21 @@ def preparePassEventForSR2c(alg_name, options, basic_cuts, cut='BASIC',syst='Nom
     _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
 
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForSR3c(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getSR3cCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
 #-------------------------------------------------------------------------
 def preparePassEventForGamSR(alg_name, options, basic_cuts, cut='BASIC'):
 
