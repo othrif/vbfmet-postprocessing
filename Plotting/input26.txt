@@ -1,0 +1,12 @@
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/VBFH125.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/Z_strong.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/Z_EWK.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/W_strong.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/W_EWK.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/ggFH125.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/VH125.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/ttbar.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/VV.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/VVV.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/QCDw.root
+/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v26/QCDunw.root
