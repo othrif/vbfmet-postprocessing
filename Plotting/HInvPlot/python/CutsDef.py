@@ -408,7 +408,7 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
 
     # Debugging: print out the cuts.
     #print("Selection in anti-ID region (%s):" % (basic_cuts.chan))
-    #for cutobj in cuts:
+    #for cutobj in new_cuts:
     #    print("%s: %s" % (cutobj.cut_name, cutobj.cut_conf))
     #sys.exit(1)
 
