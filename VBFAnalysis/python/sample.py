@@ -1,12 +1,12 @@
 class sample(object):
-    def __init__(self,samplename="",syst=""):
+    def __init__(self,samplename="",syst="",Ext=False):
         self.sampleType=""
         self.sampleTypeList= []
         self.isMC=False
         self.runNumber=0
         self.runNumberS=""
         self.subfileN=""
-        self.load(samplename,syst)
+        self.load(samplename,syst,Ext)
         self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125","ggFH125","VH125","VBFHOther","QCDw","QCDunw","VVV","VV","data"] # do not change order
 
         self.sampleMap = {'data':['data'],
@@ -23,7 +23,7 @@ class sample(object):
                           'QCD':['QCDw','QCDunw'],
                           }
 
-    def load(self,samplename,syst):
+    def load(self,samplename,syst,Ext):
 
         if samplename == "":
             return
@@ -88,8 +88,18 @@ class sample(object):
                 self.sampleType = "Z_strong" # Z_strong_LowMass added to the Z_strong
             elif (self.runNumber >= 301020 and self.runNumber <= 301038):
                 self.sampleType = "Z_strongPow" #powheg
-            elif (self.runNumber >=309662  and self.runNumber <= 309679):
-                self.sampleType = "Z_strongExt" #extension
+            elif (self.runNumber >=309665  and self.runNumber <= 309673):
+                if Ext:
+                    self.sampleType = "Z_strong" #extension
+                else: 
+                    self.sampleType = "Z_strongExt"
+            elif (self.runNumber >=309674  and self.runNumber <= 309679):
+                if Ext:
+                    self.sampleType = "W_strong"
+                else:
+                    self.sampleType = "Z_strongExt"
+            elif (self.runNumber >=309662  and self.runNumber <= 309664):
+                self.sampleType = "Z_strongExt"
             elif (self.runNumber >=364216  and self.runNumber <= 364229):
                 self.sampleType = "Z_strongPTVExt" #other?
             elif (self.runNumber >= 363147 and self.runNumber <= 363170) or (self.runNumber >= 363123 and self.runNumber <= 363146) or (self.runNumber>=361510 and self.runNumber<=361519):

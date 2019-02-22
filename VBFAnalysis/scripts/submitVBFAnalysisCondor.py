@@ -19,6 +19,7 @@ parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", defa
 parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "/home/schae/testarea/HInv/source/VBFAnalysis/data/f_out_total_v05.root", help = "file with the total number of event processed" )
 parser.add_argument( "-p", "--proxyName", type = str, dest = "proxyName", default = "/home/schae/testarea/HInv/run/x509up_u20186", help = "proxy file for grid")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
+parser.add_argument("-e", "--UseExtMC", dest = "UseExtMC", action="store_true", default = False, help = "Use extended MC samples" )
 args, unknown = parser.parse_known_args()
 
 
@@ -64,7 +65,7 @@ if isFileMap:
     for container,contFileList in list_file.iteritems():
         #if not container.count('276181'):#'364184'):
         #    continue
-        s=VBFAnalysis.sample.sample(container)
+        s=VBFAnalysis.sample.sample(container,"",args.UseExtMC)
         isMC = s.getisMC()
         runNumberS = s.getrunNumberS()
         comma_sep_files=''
@@ -79,7 +80,7 @@ if isFileMap:
         samplePatternGlobal=''
 else:
     for sampledir in list_file:
-        s=VBFAnalysis.sample.sample(sampledir)
+        s=VBFAnalysis.sample.sample(sampledir,"",args.UseExtMC)
         isMC = s.getisMC()
         runNumberS = s.getrunNumberS()
         print 'RunNumber:',runNumberS
@@ -105,11 +106,15 @@ else:
 f.close()
 fMC.close()
 
+UseExtMC =""
+if args.UseExtMC:
+    UseExtMC = " --UseExtMC"
+
 for syst in systlist:
     print listofrunN
     if args.noSubmit:
         break
-    runCommand = '''athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "'''+samplePatternGlobal+'''$1" - --currentVariation '''+syst+''' --normFile '''+args.normFile
+    runCommand = '''athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "'''+samplePatternGlobal+'''$1" - --currentVariation '''+syst+''' --normFile '''+args.normFile+UseExtMC
     if isFileMap:
         runCommand+=''' --containerName $2'''
     writeCondorShell(workDir, buildDir, runCommand, syst, "VBFAnalysisCondorSub", proxyName=args.proxyName, slc7=args.slc7) #writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="VBFAnalysisCondorSub")

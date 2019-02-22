@@ -3,7 +3,7 @@
 """
 
 This is an example macro for plotting events.
-       
+
 """
 
 import os
@@ -70,7 +70,7 @@ def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=No
                                                   syst_name=syst,
                                                   Samples=samples,
                                                   PassAlg=alg_pass)]
-        
+
     return plot_algs
 
 #-----------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ def prepareSeqSR(basic_cuts, alg_take=None, syst='Nominal'):
 
     if basic_cuts.chan !='nn' or not passRegion(region):
         return ('', [])
-    
+
     pass_alg = hstudy.preparePassEventForSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
@@ -96,7 +96,7 @@ def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
 
     if basic_cuts.chan !='nn' or not passRegion(region):
         return ('', [])
-    
+
     pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
@@ -112,14 +112,28 @@ def prepareSeqWCR(basic_cuts, region, alg_take=None, syst='Nominal'):
     do_met_signif=False
     if basic_cuts.chan in ['ep','em','e']:
         do_met_signif=True
-    
+
     if basic_cuts.chan in ['ee','uu','ll','nn','eu'] or not passRegion(region):
         return ('', [])
-    
+
     pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+def prepareSeqWCRAntiID(basic_cuts, region, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'wcranti'
+
+    # The anti-ID region should always be e *or* mu; we don't want an
+    # inclusive lepton region.
+    if basic_cuts.chan in ['ee','uu','ll','nn','eu', 'l'] or not passRegion(region):
+        return ('', [])
+
+    pass_alg = hstudy.preparePassEventForWCRAntiID('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    plot_alg = prepareListPlot(selkey, alg_take, region=region, syst=syst)
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
 #-----------------------------------------------------------------------------------------
@@ -129,13 +143,13 @@ def prepareSeqZCR(basic_cuts, region, alg_take=None, syst='Nominal'):
     region = 'zcr'
     if basic_cuts.chan in ['ep','em','um','up','l','e','u','nn'] or not passRegion(region):
         return ('', [])
-    
+
     pass_alg = hstudy.preparePassEventForZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
-                
+
 #-----------------------------------------------------------------------------------------
 def main():
 
@@ -143,7 +157,7 @@ def main():
         log.error('Must pass at least one one input command argument or give an -i input.txt')
         sys.exit(1)
 
-    config.loadLibs(ROOT)     
+    config.loadLibs(ROOT)
 
     #-----------------------------------------------------------------------------------------
     # Prepare run numbers for requested samples and find input files
@@ -159,7 +173,9 @@ def main():
     #-----------------------------------------------------------------------------------------
     # Prepare selection keys
     #
-    anas    = ['allmjj']
+    anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
+    if options.analysis!='all':
+        anas = [options.analysis]
     chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']
 
     if options.chan != None:
@@ -179,42 +195,42 @@ def main():
         syst_list = syst_class.getsystematicsList()
     weight_syst_class = systematics.systematics('WeightSyst')
     weight_syst = weight_syst_class.getsystematicsList()
-        
+
     timeStart = time.time()
 
     print 'Running These systematics'
     for syst in syst_list:
         print syst
-    
+
     for syst in syst_list:
         print 'SYST: ',syst
         read_alg.ClearAlgs();
         if syst in weight_syst and (syst=='xeSFTrigWeight__1up' or syst=='xeSFTrigWeight__1down'):
             read_alg.SetSystName("Nominal")
             read_alg.SetWeightSystName("Nominal")
-        elif syst in weight_syst:            
+        elif syst in weight_syst:
             read_alg.SetSystName("Nominal")
-            read_alg.SetWeightSystName(syst)            
+            read_alg.SetWeightSystName(syst)
         else:
             read_alg.SetSystName(syst)
             read_alg.SetWeightSystName("Nominal")
         #-----------------------------------------------------------------------------------------
         # Common algorithms for computing additional event properties and event pre-selection
-        #     
+        #
         #plot_alg = hstudy.preparePlotEvent('plotEvent'+syst)
         plot_alg = hstudy.preparePlotEvent('plotEvent',syst_name=syst)
         read_alg.AddCommonAlg(plot_alg)
-        
+
         #-----------------------------------------------------------------------------------------
         # Cutflow algorithm list
         #
         input_cut = []
-        
+
         for sign in signs: # 0=opposite sign, 1=same sign
-            for a in anas:            
+            for a in anas:
                 for c in chans:
                     basic_cuts = hstudy.BasicCuts(Analysis=a, Chan=c, SameSign=sign)
-                        
+
                     #
                     # SR Cut based regions and algorithms
                     #
@@ -223,30 +239,34 @@ def main():
                     #
                     # SR Cut based regions and algorithms with photon
                     #
-                    (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)                    
-        
+                    if a=='allmjj':
+                        (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
+                        read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)
+
                     #
                     # ZCR Cut based regions and algorithms
                     #
                     (name_zcr,  alg_zcr)  = prepareSeqZCR (basic_cuts, a, alg_take=input_cut, syst=syst)
                     read_alg.AddNormalAlg(name_zcr,  alg_zcr)
-        
+
                     #
                     # WCR Cut based regions and algorithms
                     #
                     (name_wcr,  alg_wcr)  = prepareSeqWCR (basic_cuts, a, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_wcr,  alg_wcr)                  
-        
+                    read_alg.AddNormalAlg(name_wcr,  alg_wcr)
+
+                    (name_wcranti, alg_wcranti) = prepareSeqWCRAntiID(basic_cuts, a, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_wcranti, alg_wcranti)
+
         read_alg.RunConfForAlgs()
 
         #-----------------------------------------------------------------------------------------
         # Read selected input files and process events (real work is done here...)
-        #         
+        #
         for ifile in all_files:
             print 'File: ',ifile
             read_alg.ReadFile(ifile)
-    
+
         #-----------------------------------------------------------------------------------------
         # Save histograms from algorithms
         #
@@ -256,20 +276,20 @@ def main():
     #-----------------------------------------------------------------------------------------
     # Save histograms for limit setting
     #  ---- currently not configured.....
-    #if options.lfile and options.syst != None: 
+    #if options.lfile and options.syst != None:
     #    print '--------------------------------------------------------------------'
     #    log.info('Make limit inputs for: syst=%s' %options.syst)
     #    if options.tfile:
     #        tfile = ROOT.TFile(options.tfile, 'RECREATE')
     #    else:
     #        tfile = None
-    #        
+    #
     #    log.info('Write limit files...')
     #
     #    if tfile:
     #        tfile.Write()
     #        del tfile
-    
+
     log.info('All is done - total job time: %.1fs' %(time.time()-timeStart))
 
 #-----------------------------------------------------------------------------------------
@@ -277,4 +297,4 @@ def main():
 #
 if __name__ == '__main__':
     main()
-    
+
