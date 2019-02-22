@@ -44,6 +44,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
   double weightXETrigSF(const float met_pt, int syst);
+  float  GetDPhi(const float phi1, const float phi2);
 
  private: 
   int npevents = 0;
@@ -82,6 +83,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   vector <vector <TH1F*>> hCRZmm;
 
   Int_t m_extraVars = 0;
+  Int_t m_binning = 0;
+  Int_t m_metdef = 0;
 
   Double_t xeSFTrigWeight;
   Float_t met_significance;
@@ -129,6 +132,10 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tight_tst_et=-9999;
   Float_t met_tighter_tst_et=-9999;
   Float_t met_tenacious_tst_et=-9999;
+  Float_t met_tenacious_tst_phi=-9999;
+  Float_t met_tenacious_tst_nolep_et=-9999;
+  Float_t met_tenacious_tst_nolep_phi=-9999;
+
   std::vector<Float_t>* basemu_pt;
   std::vector<Float_t>* basemu_ptvarcone20;
   std::vector<Float_t>* baseel_pt;

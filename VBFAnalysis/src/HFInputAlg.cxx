@@ -4,14 +4,16 @@
 #include "PathResolver/PathResolver.h"
 //#include "xAODEventInfo/EventInfo.h"
 #include "TLorentzVector.h"
+#include <math.h>
 
 HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ){
   declareProperty("currentVariation", currentVariation = "Nominal", "current systematics, NONE means nominal");
   declareProperty("currentSample", currentSample = "W_strong", "current samples");
   declareProperty("isMC", isMC = true, "isMC flag, true means the sample is MC");
   declareProperty("isMadgraph", isMadgraph = false, "isMadgraph flag, true means the sample is Madgraph");
-  declareProperty("ExtraVars", m_extraVars = 0, "true if extra variables should be cut on" );
-  //declareProperty("Binning", m_extraVars = 0, "true if extra variables should be cut on" );
+  declareProperty("ExtraVars", m_extraVars = 0, "0=20.7 analysis, 1=lepton veto, object def, 2=loose cuts" );
+  declareProperty("Binning", m_binning = 0, "0=nominal binning. Other options with >0" );
+  declareProperty("METDef", m_metdef = 0, "0=loose. 1=tenacious" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
@@ -83,7 +85,14 @@ StatusCode HFInputAlg::initialize() {
       syst = "Nom";
     }
   }
-  for (int c=1;c<4;c++) {
+  int bins = 4;
+  if(m_binning==1){
+    bins=5;
+  }else if(m_binning==2){
+    bins=5;
+  }
+
+  for (int c=1;c<bins;c++) {
     hSR.push_back(HistoAppend(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC), string("SR"+to_string(c))));
     hCRWep.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosCR"+to_string(c))));
     hCRWen.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegCR"+to_string(c))));
@@ -207,6 +216,17 @@ StatusCode HFInputAlg::execute() {
   // removed extra top samples:
   if(runNumber==410649 || runNumber==410648 || runNumber==410472) return StatusCode::SUCCESS;
 
+  // modify the MET definition
+  if(m_metdef==1 && n_jet>1){ // changing to tenacious
+    met_tst_et = met_tenacious_tst_et;
+    met_tst_nolep_et = met_tenacious_tst_nolep_et;
+    met_tst_j1_dphi = fabs(GetDPhi(met_tenacious_tst_phi, jet_phi->at(0)));
+    met_tst_j2_dphi = fabs(GetDPhi(met_tenacious_tst_phi, jet_phi->at(1)));
+    met_tst_nolep_j1_dphi = fabs(GetDPhi(met_tenacious_tst_nolep_phi, jet_phi->at(0)));
+    met_tst_nolep_j2_dphi = fabs(GetDPhi(met_tenacious_tst_nolep_phi, jet_phi->at(1)));
+  }
+  //std::cout << "met_tst_nolep_j1_dphi: " << met_tst_nolep_j1_dphi << " met_tst_nolep_j2_dphi: " << met_tst_nolep_j2_dphi << " met_tst_et: " << met_tst_et << " met_tst_nolep_et: " << met_tst_nolep_et << std::endl;
+
   // extra vetos  
   bool leptonVeto = false;
   bool metSoftVeto = false;
@@ -306,6 +326,9 @@ StatusCode HFInputAlg::execute() {
   if (jj_mass < 1.5e6) bin = 0;
   else if (jj_mass < 2e6) bin = 1;
   else bin = 2;
+
+  if(m_binning==1 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin=3; // separate low MET bin
+  if(m_binning==2 && (n_jet>2))  bin=3; // separate extra jets
 
   if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
   if (CRWep) HistoFill(hCRWep[bin],w_final);
@@ -447,10 +470,13 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_eta",&jet_eta);
   m_tree->SetBranchAddress("jet_m",&jet_m);
 
-  if(m_extraVars>0){  
+  if(m_extraVars>0 || m_metdef>0){  
     m_tree->SetBranchStatus("met_soft_tst_et",1);
     m_tree->SetBranchStatus("met_tenacious_tst_et",1);
-    m_tree->SetBranchStatus("met_tighter_tst_et",1);
+    m_tree->SetBranchStatus("met_tenacious_tst_phi",1);
+    m_tree->SetBranchStatus("met_tenacious_tst_nolep_et",1);
+    m_tree->SetBranchStatus("met_tenacious_tst_nolep_phi",1);
+    //m_tree->SetBranchStatus("met_tighter_tst_et",1);
     m_tree->SetBranchStatus("met_tight_tst_et",1);
     m_tree->SetBranchStatus("jet_fjvt",1);
     m_tree->SetBranchStatus("baseel_pt",1);
@@ -460,8 +486,11 @@ StatusCode HFInputAlg::beginInputFile() {
 
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
     m_tree->SetBranchAddress("met_tenacious_tst_et",   &met_tenacious_tst_et);
+    m_tree->SetBranchAddress("met_tenacious_tst_phi",   &met_tenacious_tst_phi);
+    m_tree->SetBranchAddress("met_tenacious_tst_nolep_et",   &met_tenacious_tst_nolep_et);
+    m_tree->SetBranchAddress("met_tenacious_tst_nolep_phi",   &met_tenacious_tst_nolep_phi);
     m_tree->SetBranchAddress("met_tight_tst_et",       &met_tight_tst_et);
-    m_tree->SetBranchAddress("met_tighter_tst_et",     &met_tighter_tst_et);    
+    //m_tree->SetBranchAddress("met_tighter_tst_et",     &met_tighter_tst_et);    
     m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
     m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
     m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
@@ -495,4 +524,14 @@ double HFInputAlg::weightXETrigSF(const float met_pt, int syst=0) {
     else sf=1.0;
   }
   return sf;
+}
+
+float HFInputAlg::GetDPhi(const float phi1, const float phi2){
+  float dphi = phi1-phi2;
+  if ( dphi > M_PI ) {
+    dphi -= 2.0*M_PI;
+  } else if ( dphi <= -M_PI ) {
+    dphi += 2.0*M_PI;
+  }
+  return dphi;
 }

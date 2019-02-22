@@ -298,14 +298,14 @@ StatusCode VBFAnalysisAlg::initialize() {
     // Tenacious MET
     m_tree_out->Branch("met_tenacious_tst_et",   &met_tenacious_tst_et);
     m_tree_out->Branch("met_tenacious_tst_phi",  &met_tenacious_tst_phi);
+    m_tree_out->Branch("met_tenacious_tst_nolep_et",&met_tenacious_tst_nolep_et);
+    m_tree_out->Branch("met_tenacious_tst_nolep_phi",&met_tenacious_tst_nolep_phi);
 
     if(m_currentVariation=="Nominal"){
       m_tree_out->Branch("met_tenacious_tst_j1_dphi",&met_tenacious_tst_j1_dphi);
       m_tree_out->Branch("met_tenacious_tst_j2_dphi",&met_tenacious_tst_j2_dphi);
       m_tree_out->Branch("met_tenacious_tst_nolep_j1_dphi",&met_tenacious_tst_nolep_j1_dphi);
       m_tree_out->Branch("met_tenacious_tst_nolep_j2_dphi",&met_tenacious_tst_nolep_j2_dphi);
-      m_tree_out->Branch("met_tenacious_tst_nolep_et",&met_tenacious_tst_nolep_et);
-      m_tree_out->Branch("met_tenacious_tst_nolep_phi",&met_tenacious_tst_nolep_phi);
       m_tree_out->Branch("met_tight_tst_et",       &met_tight_tst_et);
       m_tree_out->Branch("met_tight_tst_phi",      &met_tight_tst_phi);
       //m_tree_out->Branch("met_tighter_tst_et",     &met_tighter_tst_et);
