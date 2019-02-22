@@ -86,11 +86,11 @@ StatusCode HFInputAlg::initialize() {
     }
   }
   int bins = 4;
-  if(m_binning==1){
-    bins=5;
-  }else if(m_binning==2){
-    bins=5;
-  }
+  if(m_binning==1)       bins=5; 
+  else if(m_binning==2)  bins=5;
+  else if(m_binning==3)  bins=7; // mjj binning
+  else if(m_binning==4)  bins=7; // mjj binning
+  else if(m_binning==5)  bins=7; // mjj binning
 
   for (int c=1;c<bins;c++) {
     hSR.push_back(HistoAppend(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC), string("SR"+to_string(c))));
@@ -235,6 +235,7 @@ StatusCode HFInputAlg::execute() {
   if(m_extraVars>0){
     //leptonVeto = (n_baseel>0 || n_basemu>0) && !(((n_el+n_mu)==1 && (n_baseel+n_basemu)==1) || ((n_el+n_mu)==2 && (n_baseel+n_basemu)==2));
     metSoftVeto = met_soft_tst_et>20.0e3;
+    if(m_extraVars==3) metSoftVeto=false;
     if(jet_fjvt->size()>1)
       fJVTVeto = fabs(jet_fjvt->at(0))>0.5 || fabs(jet_fjvt->at(1))>0.5;
     else fJVTVeto=true;
@@ -327,8 +328,12 @@ StatusCode HFInputAlg::execute() {
   else if (jj_mass < 2e6) bin = 1;
   else bin = 2;
 
+  // alternative binning approaches
   if(m_binning==1 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin=3; // separate low MET bin
   if(m_binning==2 && (n_jet>2))  bin=3; // separate extra jets
+  if(m_binning==3 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin+=3; // separate low MET bin, mjj binning
+  if(m_binning==4 && (n_jet>2))    bin+=3; // separate extra jets, mjj binning
+  if(m_binning==5 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
 
   if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
   if (CRWep) HistoFill(hCRWep[bin],w_final);

@@ -2,41 +2,15 @@ import ROOT
 
 
 regions=[
-'VBFjetSel_1Nom_SR1_obs_cuts',
-'VBFjetSel_2Nom_SR2_obs_cuts',
-'VBFjetSel_3Nom_SR3_obs_cuts',
-
-'VBFjetSel_1Nom_oneElePosCR1_obs_cuts',
-'VBFjetSel_2Nom_oneElePosCR2_obs_cuts',
-'VBFjetSel_3Nom_oneElePosCR3_obs_cuts',
-
-'VBFjetSel_1Nom_oneEleNegCR1_obs_cuts',
-'VBFjetSel_2Nom_oneEleNegCR2_obs_cuts',
-'VBFjetSel_3Nom_oneEleNegCR3_obs_cuts',
-
-'VBFjetSel_1Nom_oneElePosLowSigCR1_obs_cuts',
-'VBFjetSel_2Nom_oneElePosLowSigCR2_obs_cuts',
-'VBFjetSel_3Nom_oneElePosLowSigCR3_obs_cuts',
-
-'VBFjetSel_1Nom_oneEleNegLowSigCR1_obs_cuts',
-'VBFjetSel_2Nom_oneEleNegLowSigCR2_obs_cuts',
-'VBFjetSel_3Nom_oneEleNegLowSigCR3_obs_cuts',
-
-'VBFjetSel_1Nom_oneMuPosCR1_obs_cuts',
-'VBFjetSel_2Nom_oneMuPosCR2_obs_cuts',
-'VBFjetSel_3Nom_oneMuPosCR3_obs_cuts',
-
-'VBFjetSel_1Nom_oneMuNegCR1_obs_cuts',
-'VBFjetSel_2Nom_oneMuNegCR2_obs_cuts',
-'VBFjetSel_3Nom_oneMuNegCR3_obs_cuts',
-
-'VBFjetSel_1Nom_twoEleCR1_obs_cuts',
-'VBFjetSel_2Nom_twoEleCR2_obs_cuts',
-'VBFjetSel_3Nom_twoEleCR3_obs_cuts',
-
-'VBFjetSel_1Nom_twoMuCR1_obs_cuts',
-'VBFjetSel_2Nom_twoMuCR2_obs_cuts',
-'VBFjetSel_3Nom_twoMuCR3_obs_cuts',]
+'VBFjetSel_XNom_SRX_obs_cuts',
+'VBFjetSel_XNom_oneElePosCRX_obs_cuts',
+'VBFjetSel_XNom_oneEleNegCRX_obs_cuts',
+'VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts',
+'VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts',
+'VBFjetSel_XNom_oneMuPosCRX_obs_cuts',
+'VBFjetSel_XNom_oneMuNegCRX_obs_cuts',
+'VBFjetSel_XNom_twoEleCRX_obs_cuts',
+'VBFjetSel_XNom_twoMuCRX_obs_cuts',]
 
 #hdata_NONE_twoEleCR3_obs_cuts
 samples =['hVBFH125_',
@@ -59,7 +33,9 @@ samples =['hVBFH125_',
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_v26c.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_Madgraph_v26c.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhotonAllSyst_Madgraph_v26New.root')
-f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_NjetBin_v26c.root')
+f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LowMETBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_TenaciousMET_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Madgraph_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_FJVT.root')
@@ -72,34 +48,50 @@ for s in samples:
     line+=s+'\t'
     SumList+=[0.0]
 print line
+
+bins=[1,2,3,4,5,6,7,8,9]
 nRegion=0
-for r in regions:
-    line =r+'\t'
+sTot=0
+for bin_num in bins:
+    r=regions[0].replace('X','%s' %bin_num)
+    histname=samples[0]+r
+    h=f.Get(histname)
+    if not h:
+        sTot=bin_num-1
+        break
+for rmy in regions:
     if nRegion==0:
         for su in range(0,len(SumList)):
             SumList[su]=0.0
-    su=0
-    for s in samples:
-        histname=s+r
-        if s=='hdata_':
-            histname=s+'NONE_'+r[len('VBFjetSel_3Nom_'):]
-            #print histname
-        h=f.Get(histname)
-        integral=0.0
-        if h!=None:
-            e = ROOT.Double(0.0)
-            integral=h.IntegralAndError(0,1001,e)
-            line+='%0.2f +/- %0.2f\t' %(integral,e)
-            SumList[su]+=integral
+    for bin_num in bins:
+        r=rmy.replace('X','%s' %bin_num)
+        if bin_num<=sTot:
+            line =r+'\t'
         else:
-            line+='N/A\t' 
-        su+=1
-    print line
-    nRegion+=1
-    if nRegion==3:
-        nRegion=0
-        rline='Sum\t'
-        for su in range(0,len(SumList)):
-            rline+='%0.2f\t' %(SumList[su])
-        print rline
+            continue
+        su=0
+        for s in samples:
+            histname=s+r
+            if s=='hdata_':
+                histname=s+'NONE_'+r[len('VBFjetSel_3Nom_'):]
+                #print histname
+            h=f.Get(histname)
+            integral=0.0
+            if h!=None:
+                e = ROOT.Double(0.0)
+                integral=h.IntegralAndError(0,1001,e)
+                #line+='%0.2f +/- %0.2f\t' %(integral,e)
+                line+='%0.2f\t' %(integral)
+                SumList[su]+=integral
+            else:
+                line+='N/A\t' 
+            su+=1
+        print line
+        nRegion+=1
+        if nRegion==sTot:
+            nRegion=0
+            rline='Sum\t'
+            for su in range(0,len(SumList)):
+                rline+='%0.2f\t' %(SumList[su])
+            print rline
 print 'done'
