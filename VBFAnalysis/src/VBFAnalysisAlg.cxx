@@ -180,6 +180,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
+  m_tree_out->Branch("averageIntPerXing", &averageIntPerXing);
+  m_tree_out->Branch("n_vx", &n_vx);
   m_tree_out->Branch("n_jet",&n_jet);
   m_tree_out->Branch("n_el",&n_el);
   m_tree_out->Branch("n_mu",&n_mu);
@@ -929,6 +931,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("passGRL", 1);
   m_tree->SetBranchStatus("passPV", 1);
   m_tree->SetBranchStatus("passDetErr", 1);
+  m_tree->SetBranchStatus("n_vx", 1);
   m_tree->SetBranchStatus("passJetCleanLoose", 1);
   m_tree->SetBranchStatus("passJetCleanTight", 1);
   m_tree->SetBranchStatus("n_jet",1);
@@ -1092,6 +1095,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("passGRL", &passGRL);
   m_tree->SetBranchAddress("passPV", &passPV);
   m_tree->SetBranchAddress("passDetErr", &passDetErr);
+  m_tree->SetBranchAddress("n_vx", &n_vx);
   m_tree->SetBranchAddress("passJetCleanLoose", &passJetCleanLoose);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
   m_tree->SetBranchAddress("n_jet",&n_jet);

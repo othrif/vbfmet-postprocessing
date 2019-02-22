@@ -11,6 +11,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("isMC", isMC = true, "isMC flag, true means the sample is MC");
   declareProperty("isMadgraph", isMadgraph = false, "isMadgraph flag, true means the sample is Madgraph");
   declareProperty("ExtraVars", m_extraVars = 0, "true if extra variables should be cut on" );
+  //declareProperty("Binning", m_extraVars = 0, "true if extra variables should be cut on" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");

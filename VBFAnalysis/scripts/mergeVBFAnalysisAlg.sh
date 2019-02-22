@@ -1,5 +1,5 @@
 #!/bin/bash                                                                                                                                                                                                       
-OUTDIRM=v27Loose
+OUTDIRM=v27Looseb
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root

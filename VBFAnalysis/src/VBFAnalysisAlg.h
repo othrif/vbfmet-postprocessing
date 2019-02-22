@@ -114,6 +114,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t xeSFTrigWeight;
   Float_t xeSFTrigWeight__1up;
   Float_t xeSFTrigWeight__1down;
+  Int_t n_vx;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_HLT_xe100_mht_L1XE50;
