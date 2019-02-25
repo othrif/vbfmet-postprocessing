@@ -710,6 +710,12 @@ StatusCode VBFAnalysisAlg::execute() {
     passVjetsPTV=(!passVjetsPTV); // flip these
   }else passVjetsPTV=true;// others must pass
   
+  // Fixing a bug in the variables
+  if(jet_phi->size()>1){
+    met_tst_nolep_j1_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(0)));
+    met_tst_nolep_j2_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(1)));
+  }
+
   // Definiing a loose skimming
   float METCut = 150.0e3;
   float LeadJetPtCut = 80.0e3;
@@ -1290,3 +1296,13 @@ double VBFAnalysisAlg::weightXETrigSF(const float met_pt, int syst=0) {
   }
   return sf;
 }  
+
+float VBFAnalysisAlg::GetDPhi(const float phi1, const float phi2){
+  float dphi = phi1-phi2;
+  if ( dphi > M_PI ) {
+    dphi -= 2.0*M_PI;
+  } else if ( dphi <= -M_PI ) {
+    dphi += 2.0*M_PI;
+  }
+  return dphi;
+}
