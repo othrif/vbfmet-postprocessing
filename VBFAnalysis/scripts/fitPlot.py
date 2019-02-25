@@ -164,6 +164,10 @@ class HistClass(object):
             self.hname=hname.replace(var,"cuts")
         else:
             self.hname=hname
+            if not (hname.split("_")[-1]=="cuts"):
+                self.hist=None
+                return
+
         sp=self.hname.split("_")
         self.proc=sp[0][1:]
         if self.proc in ["W","Z"]:
@@ -582,6 +586,7 @@ def main(options):
         if "Ext" in key: continue
         if "Blind" in key: continue
         histObj=HistClass(key)
+        if not histObj.hist: continue
         if histObj.isSignal():
             addContent(hDict["signal"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
         elif histObj.proc in histNames+["data"]:
@@ -776,6 +781,7 @@ def compareMain(options):
             if "Ext" in key: continue
             if "Blind" in key: continue
             histObj=HistClass(key)
+            if not histObj.hist: continue
 
             if histObj.isBkg():
                 try:
