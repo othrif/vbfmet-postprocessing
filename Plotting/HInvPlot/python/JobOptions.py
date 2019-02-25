@@ -50,7 +50,7 @@ def getParser():
     p.add_option('--debug-alg',    type='string', default='no',          dest='debug_alg',  help='')
     p.add_option('--print-alg',    type='string', default='no',          dest='print_alg',  help='')
 
-    p.add_option('--region',       type='string', default='sr,sr1,sr2',          dest='region',     help='')    
+    p.add_option('--region',       type='string', default='sr,sr1,sr2,sr3,srtag,sr1tag,sr2tag,sr3tag,srf,sr1f,sr2f,sr3f,src,sr1c,sr2c,sr3c,zcr,wcr',          dest='region',     help='')    
     p.add_option('--chan',         type='string', default=None,          dest='chan',       help='')
     p.add_option('--njet',         type='string', default=None,          dest='njet',       help='')
     p.add_option('--syst',         type='string', default='Nominal',     dest='syst',       help='')
