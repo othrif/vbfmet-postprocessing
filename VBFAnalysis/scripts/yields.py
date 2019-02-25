@@ -37,7 +37,10 @@ samples =['hVBFH125_',
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLepZonly_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_DPhijjMjjBinningNjetBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLepDilepTrig_v26c.root')
-f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Madgraph_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
+f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_NjetBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LowMETBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLep_v26c.root')
@@ -96,7 +99,9 @@ for rmy in regions:
                 #line+='%0.2f\t' %(integral)
                 SumList[su]+=integral
                 SumErrList[su]+=e**2
-                if s!='hdata_':
+                if s=='hVBFH125_' or s=='hggFH125_' or s=='hVH125_':
+                    line+=''
+                elif s!='hdata_':
                     lineBkgErr+=e**2
                     lineBkg+=integral
                 else:
@@ -121,7 +126,9 @@ for rmy in regions:
             for su in range(0,len(SumList)):
                 #rline+='%0.2f\t' %(SumList[su])
                 rline+='%0.2f +/- %0.2f\t' %(SumList[su],math.sqrt(SumErrList[su]))
-                if samples[su]!='hdata_':
+                if samples[su]=='hVBFH125_' or samples[su]=='hggFH125_' or samples[su]=='hVH125_':
+                    pass
+                elif samples[su]!='hdata_':
                     totalBkg+=SumList[su]
                     totalBkgErr+=SumErrList[su]
                 else:
