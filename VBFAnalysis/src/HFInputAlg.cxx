@@ -97,6 +97,7 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==3)  bins=7; // mjj binning
   else if(m_binning==4)  bins=7; // mjj binning
   else if(m_binning==5)  bins=7; // mjj binning
+  else if(m_binning==6)  bins=8; // mjj binning + njet bin
 
   for (int c=1;c<bins;c++) {
     hSR.push_back(HistoAppend(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC), string("SR"+to_string(c))));
@@ -319,21 +320,23 @@ StatusCode HFInputAlg::execute() {
   bool muPtCut = n_mu>0 ? (mu_pt->at(0)>30.0e3) : false;
   bool muSubPtCut = n_mu>1 ? (mu_pt->at(1)>7.0e3) : false;
   bool elSubPtCut = n_el>1 ? (el_pt->at(1)>7.0e3) : false;
+  bool ZelPtCut = elPtCut;
+  bool ZmuPtCut = muPtCut;
   bool elChPos = n_el>0 ? (el_charge->at(0) > 0) : false;
   bool muChPos = n_mu>0 ? (mu_charge->at(0) > 0) : false;
   bool OppSignElCut = n_el>1 ? (el_charge->at(0)*el_charge->at(1) < 0) : false;
   bool OppSignMuCut = n_mu>1 ? (mu_charge->at(0)*mu_charge->at(1) < 0) : false;
   if(m_extraVars==4 || m_extraVars==5){
-    elPtCut = n_baseel>0 ? (baseel_pt->at(0)>30.0e3): false;
-    muPtCut = n_basemu>0 ? (basemu_pt->at(0)>30.0e3): false;
+    ZelPtCut = n_baseel>0 ? (baseel_pt->at(0)>30.0e3): false;
+    ZmuPtCut = n_basemu>0 ? (basemu_pt->at(0)>30.0e3): false;
     elSubPtCut = n_baseel>1 ? (baseel_pt->at(1)>7.0e3): false;
     muSubPtCut = n_basemu>1 ? (basemu_pt->at(1)>7.0e3): false;
-    We_lepVeto  = ((n_baseel == 1) && (n_basemu == 0));
-    Wm_lepVeto  = ((n_baseel == 0) && (n_basemu == 1));
+    //We_lepVeto  = ((n_baseel == 1) && (n_basemu == 0));
+    //Wm_lepVeto  = ((n_baseel == 0) && (n_basemu == 1));
     Zee_lepVeto = ((n_baseel == 2) && (n_basemu == 0));
     Zmm_lepVeto = ((n_baseel == 0) && (n_basemu == 2)); 
-    elChPos = n_baseel>0 ? (baseel_charge->at(0) > 0) : false;
-    muChPos = n_basemu>0 ? (basemu_charge->at(0) > 0) : false;
+    //elChPos = n_baseel>0 ? (baseel_charge->at(0) > 0) : false;
+    //muChPos = n_basemu>0 ? (basemu_charge->at(0) > 0) : false;
     OppSignElCut = n_baseel>1 ? (baseel_charge->at(0)*baseel_charge->at(1) < 0) : false;
     OppSignMuCut = n_basemu>1 ? (basemu_charge->at(0)*basemu_charge->at(1) < 0) : false;
 
@@ -356,8 +359,8 @@ StatusCode HFInputAlg::execute() {
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance <= 4.0)) CRWenLowSig = true;}
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (elPtCut) && (elSubPtCut) && (mll> 76.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (muPtCut) && (muSubPtCut) && (mll> 76.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 76.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 76.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
 
   Float_t w_final = 1;
   Float_t lumi = 36.1;
@@ -373,6 +376,9 @@ StatusCode HFInputAlg::execute() {
   if(m_binning==3 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin+=3; // separate low MET bin, mjj binning
   if(m_binning==4 && (n_jet>2))    bin+=3; // separate extra jets, mjj binning
   if(m_binning==5 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
+  // combo
+  if(m_binning==6 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
+  if(m_binning==6 && (n_jet>2))    bin=6; // separate dphijj, mjj binning, njet binning
 
   if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
   if (CRWep) HistoFill(hCRWep[bin],w_final);

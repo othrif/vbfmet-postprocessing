@@ -34,7 +34,8 @@ samples =['hVBFH125_',
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_Madgraph_v26c.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhotonAllSyst_Madgraph_v26New.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c.root')
-f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLepDilepTrig_v26c.root')
+f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLepZonly_v26c.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLepDilepTrig_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_NjetBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LowMETBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLep_v26c.root')
@@ -82,8 +83,8 @@ for rmy in regions:
             if h!=None:
                 e = ROOT.Double(0.0)
                 integral=h.IntegralAndError(0,1001,e)
-                #line+='%0.2f +/- %0.2f\t' %(integral,e)
-                line+='%0.2f\t' %(integral)
+                line+='%0.2f +/- %0.2f\t' %(integral,e)
+                #line+='%0.2f\t' %(integral)
                 SumList[su]+=integral
             else:
                 line+='N/A\t' 
