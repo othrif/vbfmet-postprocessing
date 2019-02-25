@@ -39,10 +39,12 @@ StatusCode HFInputAlg::initialize() {
   //Retrieves of tools you have configured in the joboptions go here
   //
   mu_charge= new std::vector<int>(0);
+  basemu_charge= new std::vector<int>(0);
   mu_pt= new std::vector<float>(0);
   mu_phi= new std::vector<float>(0);
   mu_eta= new std::vector<float>(0);
   el_charge= new std::vector<int>(0);
+  baseel_charge= new std::vector<int>(0);
   el_pt= new std::vector<float>(0);
   el_phi= new std::vector<float>(0);
   el_eta= new std::vector<float>(0);
@@ -54,8 +56,12 @@ StatusCode HFInputAlg::initialize() {
   jet_passJvt= new std::vector<int>(0); 
   jet_fjvt= new std::vector<float>(0);
   baseel_pt= new std::vector<float>(0);
+  baseel_eta= new std::vector<float>(0);
+  baseel_phi= new std::vector<float>(0);
   baseel_ptvarcone20= new std::vector<float>(0);
   basemu_pt= new std::vector<float>(0);
+  basemu_eta= new std::vector<float>(0);
+  basemu_phi= new std::vector<float>(0);
   basemu_ptvarcone20= new std::vector<float>(0); 
   
   cout<<"NAME of input tree in intialize ======="<<currentVariation<<endl;
@@ -279,7 +285,7 @@ StatusCode HFInputAlg::execute() {
   }
 
   bool trigger_lep_bool = (trigger_lep & 0x1)==0x1;
-  //if(m_extraVars) trigger_lep_bool = (trigger_lep>0);
+  if(m_extraVars==5) trigger_lep_bool = (trigger_lep>0);
 
   // compute the mll
   float mll=-999.0;
@@ -309,16 +315,49 @@ StatusCode HFInputAlg::execute() {
     Zee_lepVeto = ((n_baseel == 2) && (n_basemu == 0) && (n_el == 2));
     Zmm_lepVeto = ((n_baseel == 0) && (n_basemu == 2) && (n_mu == 2));
   }
+  bool elPtCut = n_el>0 ? (el_pt->at(0)>30.0e3) : false;
+  bool muPtCut = n_mu>0 ? (mu_pt->at(0)>30.0e3) : false;
+  bool muSubPtCut = n_mu>1 ? (mu_pt->at(1)>7.0e3) : false;
+  bool elSubPtCut = n_el>1 ? (el_pt->at(1)>7.0e3) : false;
+  bool elChPos = n_el>0 ? (el_charge->at(0) > 0) : false;
+  bool muChPos = n_mu>0 ? (mu_charge->at(0) > 0) : false;
+  bool OppSignElCut = n_el>1 ? (el_charge->at(0)*el_charge->at(1) < 0) : false;
+  bool OppSignMuCut = n_mu>1 ? (mu_charge->at(0)*mu_charge->at(1) < 0) : false;
+  if(m_extraVars==4 || m_extraVars==5){
+    elPtCut = n_baseel>0 ? (baseel_pt->at(0)>30.0e3): false;
+    muPtCut = n_basemu>0 ? (basemu_pt->at(0)>30.0e3): false;
+    elSubPtCut = n_baseel>1 ? (baseel_pt->at(1)>7.0e3): false;
+    muSubPtCut = n_basemu>1 ? (basemu_pt->at(1)>7.0e3): false;
+    We_lepVeto  = ((n_baseel == 1) && (n_basemu == 0));
+    Wm_lepVeto  = ((n_baseel == 0) && (n_basemu == 1));
+    Zee_lepVeto = ((n_baseel == 2) && (n_basemu == 0));
+    Zmm_lepVeto = ((n_baseel == 0) && (n_basemu == 2)); 
+    elChPos = n_baseel>0 ? (baseel_charge->at(0) > 0) : false;
+    muChPos = n_basemu>0 ? (basemu_charge->at(0) > 0) : false;
+    OppSignElCut = n_baseel>1 ? (baseel_charge->at(0)*baseel_charge->at(1) < 0) : false;
+    OppSignMuCut = n_basemu>1 ? (basemu_charge->at(0)*basemu_charge->at(1) < 0) : false;
 
+    // recompute mjll
+    if(n_baseel == 2){
+      l0.SetPtEtaPhiM(baseel_pt->at(0), baseel_eta->at(0),  baseel_phi->at(0), 0.511);
+      l1.SetPtEtaPhiM(baseel_pt->at(1), baseel_eta->at(1),  baseel_phi->at(1), 0.511);
+      mll = (l0+l1).M();
+    }
+    if(n_basemu == 2){
+      l0.SetPtEtaPhiM(basemu_pt->at(0), basemu_eta->at(0),  basemu_phi->at(0), 105.66);
+      l1.SetPtEtaPhiM(basemu_pt->at(1), basemu_eta->at(1),  basemu_phi->at(1), 105.66);
+      mll = (l0+l1).M();
+    }
+  }
   if (((trigger_met &0x1) == 0x1) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (SR_lepVeto)) SR = true;
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) > 0) & (met_significance > 4.0)) CRWep = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) < 0) & (met_significance > 4.0)) CRWen = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) > 0) & (met_significance <= 4.0)) CRWepLowSig = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (el_pt->at(0)>30.0e3)){ if ((el_charge->at(0) < 0) & (met_significance <= 4.0)) CRWenLowSig = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (mu_pt->at(0)>30.0e3)){ if ((mu_charge->at(0) > 0)) CRWmp = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (mu_pt->at(0)>30.0e3)){ if ((mu_charge->at(0) < 0)) CRWmn = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (el_pt->at(0)>30.0e3) && (el_pt->at(1)>7.0e3) && (mll> 76.0e3 && mll<116.0e3)){ if ((el_charge->at(0)*el_charge->at(1) < 0)) CRZee = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (mu_pt->at(0)>30.0e3) && (mu_pt->at(1)>7.0e3) && (mll> 76.0e3 && mll<116.0e3)){ if ((mu_charge->at(0)*mu_charge->at(1) < 0)) CRZmm = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (met_significance > 4.0)) CRWep = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance > 4.0)) CRWen = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (met_significance <= 4.0)) CRWepLowSig = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance <= 4.0)) CRWenLowSig = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (elPtCut) && (elSubPtCut) && (mll> 76.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (muPtCut) && (muSubPtCut) && (mll> 76.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
 
   Float_t w_final = 1;
   Float_t lumi = 36.1;
@@ -426,10 +465,12 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("met_tst_nolep_et",1);
   m_tree->SetBranchStatus("met_cst_jet",1);
   m_tree->SetBranchStatus("mu_charge",1);
+  m_tree->SetBranchStatus("basemu_charge",1);
   m_tree->SetBranchStatus("mu_pt",1);
   m_tree->SetBranchStatus("mu_phi",1);
   m_tree->SetBranchStatus("mu_eta",1);
   m_tree->SetBranchStatus("el_charge",1);
+  m_tree->SetBranchStatus("baseel_charge",1);
   m_tree->SetBranchStatus("el_pt",1);
   m_tree->SetBranchStatus("el_phi",1);
   m_tree->SetBranchStatus("el_eta",1);
@@ -462,8 +503,10 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("met_tst_nolep_et",&met_tst_nolep_et);
   m_tree->SetBranchAddress("met_cst_jet",&met_cst_jet);
   m_tree->SetBranchAddress("mu_charge",&mu_charge);
+  m_tree->SetBranchAddress("basemu_charge",&basemu_charge);
   m_tree->SetBranchAddress("mu_pt",&mu_pt);
   m_tree->SetBranchAddress("el_charge",&el_charge);
+  m_tree->SetBranchAddress("baseel_charge",&baseel_charge);
   m_tree->SetBranchAddress("el_pt",&el_pt);
   m_tree->SetBranchAddress("jet_pt",&jet_pt);
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
@@ -485,8 +528,12 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchStatus("met_tight_tst_et",1);
     m_tree->SetBranchStatus("jet_fjvt",1);
     m_tree->SetBranchStatus("baseel_pt",1);
+    m_tree->SetBranchStatus("baseel_eta",1);
+    m_tree->SetBranchStatus("baseel_phi",1);
     m_tree->SetBranchStatus("baseel_ptvarcone20",1);
     m_tree->SetBranchStatus("basemu_pt",1);
+    m_tree->SetBranchStatus("basemu_eta",1);
+    m_tree->SetBranchStatus("basemu_phi",1);
     m_tree->SetBranchStatus("basemu_ptvarcone20",1);
 
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
@@ -499,7 +546,11 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
     m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
     m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
+    m_tree->SetBranchAddress("baseel_eta",           &baseel_eta);
+    m_tree->SetBranchAddress("baseel_phi",           &baseel_phi);
     m_tree->SetBranchAddress("basemu_pt",           &basemu_pt);
+    m_tree->SetBranchAddress("basemu_eta",           &basemu_eta);
+    m_tree->SetBranchAddress("basemu_phi",           &basemu_phi);
     m_tree->SetBranchAddress("basemu_ptvarcone20",  &basemu_ptvarcone20);
   }
   return StatusCode::SUCCESS;

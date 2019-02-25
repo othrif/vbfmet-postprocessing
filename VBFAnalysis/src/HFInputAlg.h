@@ -112,10 +112,12 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tst_nolep_et;
   Double_t met_cst_jet;
   std::vector<Int_t>* mu_charge;
+  std::vector<Int_t>* basemu_charge;
   std::vector<Float_t>* mu_pt;
   std::vector<Float_t>* mu_phi;
   std::vector<Float_t>* mu_eta;
   std::vector<Int_t>* el_charge;
+  std::vector<Int_t>* baseel_charge;
   std::vector<Float_t>* el_pt;
   std::vector<Float_t>* el_phi;
   std::vector<Float_t>* el_eta;
@@ -137,8 +139,12 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tenacious_tst_nolep_phi=-9999;
 
   std::vector<Float_t>* basemu_pt;
+  std::vector<Float_t>* basemu_eta;
+  std::vector<Float_t>* basemu_phi;
   std::vector<Float_t>* basemu_ptvarcone20;
   std::vector<Float_t>* baseel_pt;
+  std::vector<Float_t>* baseel_eta;
+  std::vector<Float_t>* baseel_phi;
   std::vector<Float_t>* baseel_ptvarcone20;
   
 }; 
