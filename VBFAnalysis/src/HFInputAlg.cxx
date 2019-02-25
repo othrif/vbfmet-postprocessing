@@ -223,6 +223,19 @@ StatusCode HFInputAlg::execute() {
   // removed extra top samples:
   if(runNumber==410649 || runNumber==410648 || runNumber==410472) return StatusCode::SUCCESS;
 
+  //std::cout << "BEFORE met_tst_nolep_j1_dphi: " << met_tst_nolep_j1_dphi << " met_tst_nolep_j2_dphi: " << met_tst_nolep_j2_dphi << " met_tst_et: " << met_tst_et << " met_tst_nolep_et: " << met_tst_nolep_et
+  //	    << " met_tst_j1_dphi: " << met_tst_j1_dphi << " met_tst_j2_dphi: " << met_tst_j2_dphi	    
+  //<< std::endl;
+  if(n_jet>1){ // recomputing variables
+    met_tst_j1_dphi = fabs(GetDPhi(met_tst_phi, jet_phi->at(0)));
+    met_tst_j2_dphi = fabs(GetDPhi(met_tst_phi, jet_phi->at(1)));
+    met_tst_nolep_j1_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(0)));
+    met_tst_nolep_j2_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(1)));
+    //std::cout << "BEFORE-RECALC met_tst_nolep_j1_dphi: " << met_tst_nolep_j1_dphi << " met_tst_nolep_j2_dphi: " << met_tst_nolep_j2_dphi << " met_tst_et: " << met_tst_et << " met_tst_nolep_et: " << met_tst_nolep_et 
+    //<< " met_tst_j1_dphi: " << met_tst_j1_dphi << " met_tst_j2_dphi: " << met_tst_j2_dphi	    
+    //<< std::endl;
+  }
+
   // modify the MET definition
   if(m_metdef==1 && n_jet>1){ // changing to tenacious
     met_tst_et = met_tenacious_tst_et;
@@ -232,7 +245,9 @@ StatusCode HFInputAlg::execute() {
     met_tst_nolep_j1_dphi = fabs(GetDPhi(met_tenacious_tst_nolep_phi, jet_phi->at(0)));
     met_tst_nolep_j2_dphi = fabs(GetDPhi(met_tenacious_tst_nolep_phi, jet_phi->at(1)));
   }
-  //std::cout << "met_tst_nolep_j1_dphi: " << met_tst_nolep_j1_dphi << " met_tst_nolep_j2_dphi: " << met_tst_nolep_j2_dphi << " met_tst_et: " << met_tst_et << " met_tst_nolep_et: " << met_tst_nolep_et << std::endl;
+  //std::cout << "met_tst_nolep_j1_dphi: " << met_tst_nolep_j1_dphi << " met_tst_nolep_j2_dphi: " << met_tst_nolep_j2_dphi << " met_tst_et: " << met_tst_et << " met_tst_nolep_et: " << met_tst_nolep_et 
+  //<< " met_tst_j1_dphi: " << met_tst_j1_dphi << " met_tst_j2_dphi: " << met_tst_j2_dphi
+  //<< std::endl;
 
   // extra vetos  
   bool leptonVeto = false;
@@ -469,6 +484,8 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("met_tst_nolep_j2_dphi",1);
   m_tree->SetBranchStatus("met_tst_et",1);
   m_tree->SetBranchStatus("met_tst_nolep_et",1);
+  m_tree->SetBranchStatus("met_tst_phi",1);
+  m_tree->SetBranchStatus("met_tst_nolep_phi",1);
   m_tree->SetBranchStatus("met_cst_jet",1);
   m_tree->SetBranchStatus("mu_charge",1);
   m_tree->SetBranchStatus("basemu_charge",1);
@@ -507,6 +524,8 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);
   m_tree->SetBranchAddress("met_tst_et",&met_tst_et);
   m_tree->SetBranchAddress("met_tst_nolep_et",&met_tst_nolep_et);
+  m_tree->SetBranchAddress("met_tst_phi",&met_tst_phi);
+  m_tree->SetBranchAddress("met_tst_nolep_phi",&met_tst_nolep_phi);
   m_tree->SetBranchAddress("met_cst_jet",&met_cst_jet);
   m_tree->SetBranchAddress("mu_charge",&mu_charge);
   m_tree->SetBranchAddress("basemu_charge",&basemu_charge);

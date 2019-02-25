@@ -110,6 +110,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Double_t met_tst_nolep_j2_dphi;
   Float_t met_tst_et;
   Float_t met_tst_nolep_et;
+  Float_t met_tst_phi;
+  Float_t met_tst_nolep_phi;
   Double_t met_cst_jet;
   std::vector<Int_t>* mu_charge;
   std::vector<Int_t>* basemu_charge;
