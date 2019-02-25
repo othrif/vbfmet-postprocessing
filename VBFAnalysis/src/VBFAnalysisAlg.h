@@ -42,6 +42,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
   double weightXETrigSF(const float met_pt, int syst); 
   void computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi);
+  float GetDPhi(const float phi1, const float phi2);
  private: 
 
   int npevents = 0;
@@ -115,6 +116,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t xeSFTrigWeight;
   Float_t xeSFTrigWeight__1up;
   Float_t xeSFTrigWeight__1down;
+  Int_t n_vx;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_HLT_xe100_mht_L1XE50;

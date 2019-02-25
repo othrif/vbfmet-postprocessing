@@ -181,6 +181,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
+  m_tree_out->Branch("averageIntPerXing", &averageIntPerXing);
+  m_tree_out->Branch("n_vx", &n_vx);
   m_tree_out->Branch("n_jet",&n_jet);
   m_tree_out->Branch("n_el",&n_el);
   m_tree_out->Branch("n_mu",&n_mu);
@@ -296,14 +298,14 @@ StatusCode VBFAnalysisAlg::initialize() {
     // Tenacious MET
     m_tree_out->Branch("met_tenacious_tst_et",   &met_tenacious_tst_et);
     m_tree_out->Branch("met_tenacious_tst_phi",  &met_tenacious_tst_phi);
+    m_tree_out->Branch("met_tenacious_tst_nolep_et",&met_tenacious_tst_nolep_et);
+    m_tree_out->Branch("met_tenacious_tst_nolep_phi",&met_tenacious_tst_nolep_phi);
 
     if(m_currentVariation=="Nominal"){
       m_tree_out->Branch("met_tenacious_tst_j1_dphi",&met_tenacious_tst_j1_dphi);
       m_tree_out->Branch("met_tenacious_tst_j2_dphi",&met_tenacious_tst_j2_dphi);
       m_tree_out->Branch("met_tenacious_tst_nolep_j1_dphi",&met_tenacious_tst_nolep_j1_dphi);
       m_tree_out->Branch("met_tenacious_tst_nolep_j2_dphi",&met_tenacious_tst_nolep_j2_dphi);
-      m_tree_out->Branch("met_tenacious_tst_nolep_et",&met_tenacious_tst_nolep_et);
-      m_tree_out->Branch("met_tenacious_tst_nolep_phi",&met_tenacious_tst_nolep_phi);
       m_tree_out->Branch("met_tight_tst_et",       &met_tight_tst_et);
       m_tree_out->Branch("met_tight_tst_phi",      &met_tight_tst_phi);
       //m_tree_out->Branch("met_tighter_tst_et",     &met_tighter_tst_et);
@@ -708,6 +710,12 @@ StatusCode VBFAnalysisAlg::execute() {
     passVjetsPTV=(!passVjetsPTV); // flip these
   }else passVjetsPTV=true;// others must pass
   
+  // Fixing a bug in the variables
+  if(jet_phi->size()>1){
+    met_tst_nolep_j1_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(0)));
+    met_tst_nolep_j2_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(1)));
+  }
+
   // Definiing a loose skimming
   float METCut = 150.0e3;
   float LeadJetPtCut = 80.0e3;
@@ -959,6 +967,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("passGRL", 1);
   m_tree->SetBranchStatus("passPV", 1);
   m_tree->SetBranchStatus("passDetErr", 1);
+  m_tree->SetBranchStatus("n_vx", 1);
   m_tree->SetBranchStatus("passJetCleanLoose", 1);
   m_tree->SetBranchStatus("passJetCleanTight", 1);
   m_tree->SetBranchStatus("n_jet",1);
@@ -1122,6 +1131,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("passGRL", &passGRL);
   m_tree->SetBranchAddress("passPV", &passPV);
   m_tree->SetBranchAddress("passDetErr", &passDetErr);
+  m_tree->SetBranchAddress("n_vx", &n_vx);
   m_tree->SetBranchAddress("passJetCleanLoose", &passJetCleanLoose);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
   m_tree->SetBranchAddress("n_jet",&n_jet);
@@ -1286,3 +1296,13 @@ double VBFAnalysisAlg::weightXETrigSF(const float met_pt, int syst=0) {
   }
   return sf;
 }  
+
+float VBFAnalysisAlg::GetDPhi(const float phi1, const float phi2){
+  float dphi = phi1-phi2;
+  if ( dphi > M_PI ) {
+    dphi -= 2.0*M_PI;
+  } else if ( dphi <= -M_PI ) {
+    dphi += 2.0*M_PI;
+  }
+  return dphi;
+}
