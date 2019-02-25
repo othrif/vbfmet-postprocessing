@@ -47,8 +47,16 @@ styleDict["Zjets"]=[1,1,1,4,1001,0,0,0]
 styleDict["Wjets"]=[1,1,1,5,1001,0,0,0]
 styleDict["nonVjets"]=[1,1,1,6,1001,0,0,0]
 
-styleDict["VBFH125"]=[2,2,3,0,0,0,0,0]
-styleDict["GGFH125"]=[2,1,3,0,0,0,0,0]
+styleDict["VBFH125"]=[2,1,3,0,0,0,0,0]
+styleDict["GGFH125"]=[2,2,3,0,0,0,0,0]
+styleDict["ggFH125"]=[2,2,3,0,0,0,0,0]
+styleDict["VH125"]=[2,3,3,0,0,0,0,0]
+
+styleDict["W_strong"]=[1,1,1,8,1001,0,0,0]
+styleDict["Z_strong"]=[1,1,1,4,1001,0,0,0]
+styleDict["Z_EWK"]=[1,1,1,6,1001,0,0,0]
+styleDict["W_EWK"]=[1,1,1,7,1001,0,0,0]
+
 
 # Define the binning for each variable
 varBinning={}

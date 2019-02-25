@@ -153,25 +153,32 @@ class HistClass(object):
     regDict=None
     nBins=None
     systs=[]
-    def __init__(self, hname):
+    def __init__(self, hname,var=None):
 
         if HistClass.nBins==None:
             HistClass.nBins=HistClass.getNumberOfBins()
         if HistClass.regDict==None:
             HistClass.setRegDict()
 
-        self.hname=hname
-        sp=hname.split("_")
+        if var:
+            self.hname=hname.replace(var,"cuts")
+        else:
+            self.hname=hname
+            if not (hname.split("_")[-1]=="cuts"):
+                self.hist=None
+                return
+
+        sp=self.hname.split("_")
         self.proc=sp[0][1:]
         if self.proc in ["W","Z"]:
             self.proc+="_"+sp[1]
         self.reg=sp[-3]
         self.mr=self.reg[-1]
         self.syst_HIGH_LOW=""
-        if "NONE" in hname: # These are data hists
+        if "NONE" in self.hname: # These are data hists
             self.syst="Nom"
         else:
-            self.syst=hname[hname.find("VBFjetSel_")+11:hname.find("_"+self.reg)] #NOTE this only works for less than 10 bins. for more bins the "+11" has to change to +12
+            self.syst=self.hname[self.hname.find("VBFjetSel_")+11:self.hname.find("_"+self.reg)] #NOTE this only works for less than 10 bins. for more bins the "+11" has to change to +12
             if "Low" in self.syst:
                 self.syst=self.syst.replace("Low","")
                 self.syst_HIGH_LOW="Low"
@@ -180,7 +187,10 @@ class HistClass(object):
                 self.syst_HIGH_LOW="High"
         if HistClass.regDict is not None:
             self.nbin=HistClass.regDict[self.reg]
-        self.hist=HistClass.Irfile.Get(hname)
+        if var:
+            self.hist=HistClass.Irfile.Get(hname)
+        else:
+            self.hist=HistClass.Irfile.Get(self.hname)
         if self.hist is None:
             print "Could not retrieve histogram!", self.hname, HistClass.Irfile
 
@@ -214,7 +224,7 @@ class HistClass(object):
         return True
 
     def isBkg(self):
-        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet","VV","VVV","QCDuw"]:
+        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet","VV","VVV","QCDw"]:
             return True
         return False
 
@@ -286,6 +296,8 @@ class HistClass(object):
             sys.ecit(0)
         else:
             cls.regDict=OrderedDict()
+            if cls.nBins==None:
+                cls.nBins=cls.getNumberOfBins()
             for n in range(1,cls.nBins+1):
                 cls.regDict["SR{}".format(n)]=cls.nBins*8+n
                 cls.regDict["oneMuNegCR{}".format(n)]=cls.nBins*4+n
@@ -443,15 +455,20 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
 
 
 def getNumberOfBins(rfileInput):
-    rfile=ROOT.TFile(rfileInput)
+    tmpIrfile=ROOT.TFile(rfileInput)
     nbins=0
-    LOK=[k.GetName() for k in rfile.GetListOfKeys() if "VBFH" in k.GetName()]
+    LOK=None
+    for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet","data"]:
+        LOK=[k.GetName() for k in tmpIrfile.GetListOfKeys() if p in k.GetName()]
+        if len(LOK)==0:
+            continue
+        else:
+            break
     for k in LOK:
         for l in k.split("_"):
             if "Nom" in l:
                 if int(l.replace("Nom",""))>nbins:
                     nbins=int(l.replace("Nom",""))
-    rfile.Close()
     print "getNumberOfBins() detected {} bins".format(nbins)
     return nbins
 
@@ -569,6 +586,7 @@ def main(options):
         if "Ext" in key: continue
         if "Blind" in key: continue
         histObj=HistClass(key)
+        if not histObj.hist: continue
         if histObj.isSignal():
             addContent(hDict["signal"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
         elif histObj.proc in histNames+["data"]:
@@ -586,10 +604,15 @@ def main(options):
         hDict["bkgs"].Add(hDict[bkg])
 
 
-
     hStack=ROOT.THStack()
     for h in hists:
         hStack.Add(h)
+
+    if not options.unBlindSR:
+        # totalMC=get_THStack_sum(hStack)
+        for SRbin in regionBins["SR"]:
+            hDict["data"].SetBinContent(SRbin,bkgs.GetBinContent(SRbin))
+
     dummyHist.SetMaximum(hStack.GetMaximum()*1.4)
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
@@ -597,6 +620,7 @@ def main(options):
 
     systHist=hDict["bkgs"]
     if not options.syst=="":
+        tmpSys=VBFAnalysis.systematics.systematics(options.syst)
         print "Calculating systematic variations for %s systematics. This could take a while..."%options.syst
         totSystStackDict={}#This contains the total sum of hists of bkgs for a certain sytematic and region
         systVariationDict={} # This will contain the variation from the central value for each bin
@@ -615,7 +639,7 @@ def main(options):
             tmpHist=HistClass(k)
 
             if not(options.syst=="all"):
-                if not(is_in_list(tmpHist.syst, VBFAnalysis.systematics.systematics.systDict[options.syst])):
+                if not(is_in_list(tmpHist.syst, tmpSys.getsystematicsList())):
                     print "skipping:",tmpHist.syst
                     continue
 
@@ -633,7 +657,6 @@ def main(options):
                 if centralValue!=0: rat=diff/centralValue
 
                 print '{0:<10}'.format(tmpHist.proc), '{0:<20}'.format(tmpHist.reg), '{0:<20}'.format(systName), "\t",'{0:<15}'.format(str(rat)), "\t",'{0:<15}'.format(str(diff)),"\t",'{0:<15}'.format(str(tmpHist.hist.GetBinContent(options.nBin))),"+-",'{0:<15}'.format(str(tmpHist.hist.GetBinError(options.nBin))),"\t",'{0:<15}'.format(str(centralValue)),"+-",'{0:<15}'.format(str(centralHist.GetBinError(options.nBin)))
-            continue
 
 
 
@@ -668,6 +691,7 @@ def main(options):
     leg.Draw()
 
     texts = ATLAS.getATLASLabels(can, 0.2, 0.78, options.lumi, selkey="")
+
     for text in texts:
         text.Draw()
 
@@ -698,12 +722,23 @@ def main(options):
         can.GetPad(2).Update()
         can.cd(1)
 
-    preFitLabel=ROOT.TLatex(.03,.65,"#bf{Pre-Fit}")
-    preFitLabel.Draw()
-
     ROOT.gPad.RedrawAxis()
     ROOT.gPad.Modified()
     ROOT.gPad.Update()
+
+    can.cd(1)
+    blindStr=""
+    if not options.unBlindSR:
+        blindStr=", SR blinded"
+    preFitLabel=ROOT.TLatex(.5,.8,"Pre-Fit"+blindStr)
+    preFitLabel.SetNDC()
+    preFitLabel.SetTextFont(72)
+    preFitLabel.SetTextSize(0.055)
+    preFitLabel.SetTextAlign(11)    
+    preFitLabel.SetTextColor(ROOT.kBlack)
+    preFitLabel.Draw()
+
+
 
     can.Modified()
     can.Update()
@@ -746,6 +781,7 @@ def compareMain(options):
             if "Ext" in key: continue
             if "Blind" in key: continue
             histObj=HistClass(key)
+            if not histObj.hist: continue
 
             if histObj.isBkg():
                 try:
@@ -899,6 +935,156 @@ def compareMain(options):
         if options.saveAs:
             c1.SaveAs(("preFitCompare{}".format(p)+"."+options.saveAs).replace("/","_"))
 
+
+
+def plotVar(options):
+    if options.quite:
+        ROOT.gROOT.SetBatch(True)
+    # ATLAS.Style()
+    opt=options.plot.split(",")
+    var=opt[0]
+    reg=opt[1]
+    mjjBins=opt[2].split("_")
+
+    rfile=ROOT.TFile(options.input)
+
+    bkgDict={}
+    sigDict={}
+
+    HistClass.Irfile=rfile
+
+    hnames=[j.GetName() for j in rfile.GetListOfKeys() if (("Nom" in j.GetName() or "NONE" in j.GetName()) and var in j.GetName() and reg in j.GetName()) ]
+    for h in hnames:
+        hObj=HistClass(h, var)
+        if not (hObj.mr in mjjBins):
+            continue
+
+        if hObj.isSignal():
+            key=hObj.proc
+            try:
+                sigDict[key].Add(hObj.hist)
+            except:
+                sigDict[key]=hObj.hist.Clone(key)
+                sigDict[key].SetTitle(key)
+                Style.setStyles(sigDict[key], Style.styleDict[key])
+        signal=ROOT.THStack()
+        for h in sorted(sigDict.values()): #TODO this sorting does not work. implement lambda
+            signal.Add(h)
+
+
+
+        
+        if hObj.isBkg():
+            key=hObj.proc
+            if not ("W" in key or "Z" in key):
+                key="Others"
+            try:
+                bkgDict[key].Add(hObj.hist)
+            except:
+                bkgDict[key]=hObj.hist.Clone(key)
+                bkgDict[key].SetTitle(key)
+                Style.setStyles(bkgDict[key], Style.styleDict[key])
+        bkg=ROOT.THStack()
+        for h in sorted(bkgDict.values()): #TODO this sorting does not work. implement lambda
+            bkg.Add(h)
+
+
+        if hObj.isData():
+            key=hObj.proc
+            try:
+                dataH.Add(hObj.hist)
+            except:
+                dataH=hObj.hist.Clone(key)
+                dataH.SetTitle(key)
+                Style.setStyles(dataH, Style.styleDict[key])
+
+    if not(options.unBlindSR) and reg=="SR":
+        tmpBKG=get_THStack_sum(bkg)
+        dataH=tmpBKG.Clone("data blinded")
+        dataH.SetTitle("data blinded")
+        Style.setStyles(dataH, Style.styleDict["data"])
+
+    can=ROOT.TCanvas("c1","c1",1600,1000)
+    if options.ratio:
+        can.Divide(1,2)
+        can.cd(1)
+        ROOT.gPad.SetBottomMargin(0)
+        ROOT.gPad.SetRightMargin(0.1)
+        ROOT.gPad.SetPad(0,0.3,1,1)
+        can.cd(2)
+        ROOT.gPad.SetTopMargin(0)
+        ROOT.gPad.SetBottomMargin(0.35)
+        ROOT.gPad.SetRightMargin(0.1)
+        ROOT.gPad.SetPad(0,0,1,0.3)
+        can.cd(1)
+
+    bkg.Draw("hist")
+    signal.Draw("Psame")
+    if options.data:
+        dataH.Draw("PEsame")
+
+    bkg.GetXaxis().SetTitle(var)
+    bkg.GetYaxis().SetTitle("Entries")
+    bkg.SetTitle(reg+" "+",".join(mjjBins))
+
+    ROOT.gPad.BuildLegend(0.7,0.7,0.9,0.9)
+
+    texts = ATLAS.getATLASLabels(can, 0.4, 0.78, options.lumi, selkey="")
+    for text in texts:
+        text.Draw()
+
+    blindStr=""
+    if not options.unBlindSR and reg=="SR":
+        blindStr=", SR blinded"
+    preFitLabel=ROOT.TLatex(.7,.6,"Pre-Fit"+blindStr)
+    preFitLabel.SetNDC()
+    preFitLabel.SetTextFont(72)
+    preFitLabel.SetTextSize(0.055)
+    preFitLabel.SetTextAlign(11)    
+    preFitLabel.SetTextColor(ROOT.kBlack)
+    preFitLabel.Draw()
+
+    if options.ratio:
+        can.cd(2)
+        rHist=dataH.Clone("ratioHist")
+        rHist.Divide(get_THStack_sum(bkg))
+        rHist.GetYaxis().SetTitle("Data/MC")
+        rHist.GetXaxis().SetTitle(var)
+        rHist.GetYaxis().SetTitleOffset(.35)
+        rHist.GetYaxis().SetTitleSize(0.1)
+        rHist.GetXaxis().SetTitleOffset(.85)
+        rHist.GetXaxis().SetTitleSize(0.1)
+        rHist.GetYaxis().CenterTitle()
+        rHist.GetXaxis().SetLabelSize(0.1)
+        rHist.GetYaxis().SetLabelSize(0.1)
+        line1=dataH.Clone("line1")
+        for i in range(1,line1.GetNbinsX()+1):
+            line1.SetBinContent(i,1)
+        Style.setLineAttr(line1,2,2,3)
+        rHist.SetTitle("")
+        rHist.SetStats(0)
+        rHist.Draw()
+        line1.Draw("histsame")
+        can.GetPad(2).RedrawAxis()
+        can.GetPad(2).Modified()
+        can.GetPad(2).Update()
+        can.cd(1)
+
+    ROOT.gPad.RedrawAxis()
+    ROOT.gPad.Modified()
+    ROOT.gPad.Update()
+
+    can.Modified()
+    can.Update()
+
+    if not options.quite:
+        raw_input("Press Enter to continue")
+    if options.saveAs:
+        can.SaveAs(options.plot.replace(",","_")+"."+options.saveAs)
+    del can
+
+
+
 if __name__=='__main__':
     p = OptionParser()
 
@@ -909,6 +1095,7 @@ if __name__=='__main__':
     p.add_option('--nBin', type='int', default=1, help='Defines which bin is plotted')
     p.add_option('-s', '--syst', type='string', default="", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
     p.add_option('-d', '--data', action='store_true', help='Draw data')
+    p.add_option('--unBlindSR', action='store_true', help='Unblinds the SR bins')
     p.add_option('-r', '--ratio', action='store_true', help='Draw data/MC ratio in case of -i and adds ratios to tables for both -i and -c')
     p.add_option('--yieldTable', action='store_true', help='Produces yield table')
     p.add_option('--saveAs', type='string', help='Saves the canvas in a given format. example argument: pdf')
@@ -916,6 +1103,7 @@ if __name__=='__main__':
     p.add_option('--texTables', action='store_true', help='Saves tables as pdf. Only works together with --yieldTable')
 
 
+    p.add_option('--plot', default='', help='Plots a variable in a certain region. HFInputAlg.cxx produces these plots with the --doPlot flag . Only works with -i and not with -c. example: jj_mass,SR,1_2_3')
 
 
     for option in p.option_list:
@@ -929,7 +1117,9 @@ if __name__=='__main__':
     if options.compare:
         compareMain(options)
     elif options.input:
-        main(options)
+        if options.plot:
+            plotVar(options)
+        else:
+            main(options)
     else:
         print "Please give either --input or --compare!"
-
