@@ -32,7 +32,8 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
-				  hZPowMCIDQCD(0)
+				  hZPowMCIDQCD(0),
+				  hqgTagRegions(0)
 {
 }
 
@@ -115,6 +116,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
+  hqgTagRegions = GetTH1("qgTagRegions",  4,  0.0, 4.0);  
+
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
     fHistVec[fVarVec[a]] =  GetTH1(Mva::Convert2Str(fVarVec[a]),unsigned(fNBinVec[a]), float(fLoVec[a]), float(fHiVec[a]));
@@ -185,6 +188,18 @@ bool Msl::PlotEvent::DoExec(Event &event)
       hTruthTauDR ->Fill(event.truth_taus.at(0).GetVec().DeltaR(event.jets.at(iJet).GetVec()), weight);
     hTruthTauEta->Fill(event.truth_taus.at(0).eta, weight);
   }  
+
+
+  //for qgTagRegions
+  hqgTagRegions->Fill(0.0,weight);
+  if(event.GetVar(Mva::passPerfCTagging)==2) hqgTagRegions->Fill(3.0, weight);
+  if(event.GetVar(Mva::passPerfFTagging)==2) hqgTagRegions->Fill(2.0, weight);
+  if(event.GetVar(Mva::jj_nmbGluons)==0) hqgTagRegions->Fill(1.0, weight);
+  hqgTagRegions->GetXaxis()->SetBinLabel(1,"No Tagging");
+  hqgTagRegions->GetXaxis()->SetBinLabel(2,"Full Tagging");
+  hqgTagRegions->GetXaxis()->SetBinLabel(3,"Forward Tagging");
+  hqgTagRegions->GetXaxis()->SetBinLabel(4,"Central Tagging");
+
 
   // testing
   float max_j_eta=fabs(event.jets.at(0).eta);
