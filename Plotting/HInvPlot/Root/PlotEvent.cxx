@@ -112,7 +112,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hZMCIDQCD    = GetTH1("ZMCIDQCD",     100,  364099.5,364199.5);
   hWMCIDQCD    = GetTH1("WMCIDQCD",     100,  364155.5,364255.5);
   hZMadMCIDQCD = GetTH1("ZMadMCIDQCD",  10,  361509.5,361519.5);
-  hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 10,  363122.5,363222.5);  
+  hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 100, 363122.5,363222.5);  
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
@@ -156,7 +156,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //
   // Fill histograms
   //
-  //std::cout << "Run:" << event.RunNumber << std::endl;
+  //std::cout << "Run:" << " " << event.RunNumber << " event: " << event.EventNumber << std::endl;
   //FillHist(hZMCIDQCD,   Mva::jj_deta, event, weight);
   hZMCIDQCD->Fill(event.RunNumber, weight);
   hWMCIDQCD->Fill(event.RunNumber, weight);

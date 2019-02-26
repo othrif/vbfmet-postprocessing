@@ -18,6 +18,7 @@ arg_group = config.parser.add_argument_group("JobOptions", "Extra arguments spec
 arg_group.add_argument("--currentVariation", dest='currentVariation', default="Nominal", help="current systematics, default: Nominal")
 arg_group.add_argument("--normFile", dest='normFile', default="current.root", help="file with the total number of event processed")
 arg_group.add_argument("--containerName", dest='containerName', default="", help="container name used to look up the sample ID if not in the file path")
+arg_group.add_argument("--UseExtMC", dest="UseExtMC", action="store_true",default=False,help="Use extended MC samples")
 
 # parse the commandline options
 args = config.parse_args()
@@ -25,14 +26,14 @@ args = config.parse_args()
 ### Build sample from FilesInput and read its properties ###
 inputDir = str(jps.AthenaCommonFlags.FilesInput)
 print 'inputDir: ',inputDir
-s=VBFAnalysis.sample.sample(inputDir)
+s=VBFAnalysis.sample.sample(inputDir,"",args.UseExtMC)
 currentSample = s.getsampleType()
 isMC = s.getisMC()
 runNumber = s.getrunNumber()
 subfileN = s.getsubfileN()
 containerName = args.containerName
 if containerName!="":
-    s=VBFAnalysis.sample.sample(containerName)
+    s=VBFAnalysis.sample.sample(containerName,"",args.UseExtMC)
     currentSample = s.getsampleType()
     isMC = s.getisMC()
     runNumber = s.getrunNumber()
@@ -48,6 +49,8 @@ athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                    isMC = isMC,
                                    LooseSkim = True,
                                    ExtraVars=True,
+                                   UseExtMC=args.UseExtMC,
+                                   QGTagger=False,
                                    runNumberInput = runNumber);
 
 include("AthAnalysisBaseComps/SuppressLogging.py") #optional line

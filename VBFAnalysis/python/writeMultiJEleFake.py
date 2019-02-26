@@ -1,8 +1,21 @@
 #!/usr/bin/env python
 import ROOT
 
-def writeMultiJet():
+def writeMultiJet(Binning=0):
     multijets = [7.13, 2.24, 0.45]
+    if Binning==1:
+        multijets += [7.13] 
+    if Binning==2:
+        multijets += [0.45]
+    if Binning==3:
+        multijets += multijets
+    if Binning==4:
+        multijets += multijets
+    if Binning==5:
+        multijets += multijets
+    if Binning==6:
+        multijets += multijets
+        multijets += [0.45]
     a = 1
 
     f_multijet = ROOT.TFile("multijet.root", "recreate")
@@ -14,10 +27,22 @@ def writeMultiJet():
     f_multijet.Write()
     f_multijet.Close()
 
-def writeFakeEle():
+def writeFakeEle(Binning=0):
     f_fakeele = ROOT.TFile("fakeele.root", "recreate")
     fakeelesp = [9.3, 10.0, 4.6]
     fakeelesm = [9.3, 10.0, 4.6]
+    if Binning==1:
+        fakeelesp += [9.3]
+        fakeelesm += [9.3]
+    if Binning==2:
+        fakeelesp += [9.3]
+        fakeelesm += [9.3]
+    if Binning>2:
+        fakeelesp += fakeelesp
+        fakeelesm += fakeelesm
+    if Binning==6:
+        fakeelesp += [9.3]
+        fakeelesm += [9.3]
     a = 1
     for fakeelep in fakeelesp:
         fakeelem = fakeelesm[a-1]

@@ -84,3 +84,22 @@ submitHFInputCondor.py -n
 submitHFInputCondor.py
 ```
 You can change the list of systematics in VBFAnalysis/python/systematics.py and list of contributions in VBFAnalysis/python/sample.py.
+
+## Plotting output of HF Input Maker ##
+To plot all bins do (HFoutput.root is the file after merging the output of HF Input Maker). Add --unBlindSR to also show data in SRs:
+```bash
+fitPlot.py -i HFoutput.root --data --ratio
+```
+You can also print out tex tables of the yields and save them together with the plot as pdf:
+```bash
+fitPlot.py -i HFoutput.root --data --ratio --yieldTable --texTables -q --saveAs pdf
+```
+In case the HFinput was created with the --doPlot flag you can also plot the variables that were saved. Format: --plot VARIABLE,REGION,MJJBINS. REGION is for example SR,twoEleCR,oneMuPosCR,oneEleNegLowSig. Code checks if REGION is in the histname so just giving oneEle would include pos negative but also lowsig regions. MJJBINS are the bins plotted sperated by a "\_". To unblind use --unBlindSR. Example:
+```bash
+fitPlot.py -i HFoutput.root --plot jj_mass,SR,1_2_3 --data --ratio
+```
+To compare different root files you can use the --compare option instead of -i:
+```bash
+fitPlot.py --compare HFoutput1.root,HFoutput2.root,HFoutput3.root --data --ratio --yieldTable --texTables -q --saveAs png
+```
+

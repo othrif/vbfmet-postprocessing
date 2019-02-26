@@ -168,6 +168,8 @@ namespace Msl
     float xeSFTrigWeight__1up;
     float xeSFTrigWeight__1down;
     int   fRunNumber;
+    int   fRandomRunNumber;    
+    ULong64_t fEventNumber;    
     int   fCurrRunNumber;
     Mva::Sample fCurrSample;
 

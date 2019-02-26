@@ -28,7 +28,7 @@ p.add_option('--do-nf',        type='string', default=None,          dest='do_nf
 p.add_option('--extract-sig',  type='string', default=None,          dest='extract_sig')
 p.add_option('--syst-table',   type='string', default=None,          dest='syst_table')
 
-p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi')
+p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi') # 2017: 44307.4, 2018: 59937.2
 p.add_option('--ymin',         type='float',  default=None,          dest='ymin')
 p.add_option('--ymax',         type='float',  default=None,          dest='ymax')
 p.add_option('--xmax',         type='float',  default=None,          dest='xmax')
@@ -52,6 +52,7 @@ p.add_option('--save-algkey',   action='store_true', default=False,   dest='save
 p.add_option('--syst-fakes',    type='int',          default=0,       dest='syst_fakes')
 p.add_option('--syst-trkmet',   type='int',          default=0,       dest='syst_trkmet')
 p.add_option('--no-underflow',  action='store_true', default=False,   dest='no_underflow')
+p.add_option('--show-mc-stat-err',  action='store_true', default=False,   dest='show_mc_stat_err')
 
 p.add_option('--draw-syst',       action='store_true', default=False,   dest='draw_syst')
 p.add_option('--make-syst-table', action='store_true', default=False,   dest='make_syst_table')
@@ -78,7 +79,7 @@ mysyst = syst.systematics('All')
 mysystOneSided = syst.systematics('OneSided')
 
 # List of plots to symmeterize
-symm_list=[] 
+symm_list=[]
 
 #add asymetric uncertainties
 for key,v in mysystOneSided.getsystematicsOneSidedMap().iteritems():
@@ -95,7 +96,7 @@ def Style():
 
 #-------------------------------------------------------------------------
 def getSelKeyPath():
-    
+
     if options.save_algkey:
         return '%s_%s' %(options.selkey, options.algkey)
     return options.selkey
@@ -116,34 +117,38 @@ def getSelKeyLabel(selkey):
             elif selkey.count('_l'): proc = 'W#rightarrow l#nu'
             elif selkey.count('_e'): proc = 'W#rightarrow e#nu'
             elif selkey.count('_u'): proc = 'W#rightarrow#mu#nu'
-                           
+
         if selkey.count('sr_'):  proc += ', SR'
-        if selkey.count('wcr'): proc += ', WCR'
+        if selkey.count('wcr'):
+            if 'anti' in selkey:
+                proc += ', Anti-ID'
+            else:
+                proc += ', WCR'
         if selkey.count('zcr'): proc += ', ZCR'
 
     return proc
-    
+
 #-------------------------------------------------------------------------
 def getATLASLabels(pad, x, y, text=None, selkey=None):
-    
+
     l = ROOT.TLatex(x, y, 'ATLAS')
     l.SetNDC()
     l.SetTextFont(72)
     l.SetTextSize(0.055)
-    l.SetTextAlign(11)    
+    l.SetTextAlign(11)
     l.SetTextColor(ROOT.kBlack)
-    l.Draw()    
-    
+    l.Draw()
+
     delx = 0.05*pad.GetWh()/(pad.GetWw())
     labs = [l]
-    
+
     if True:
         p = ROOT.TLatex(x+0.15, y, ' Internal') #
         p.SetNDC()
         p.SetTextFont(42)
         p.SetTextSize(0.055)
         p.SetTextAlign(11)
-        p.SetTextColor(ROOT.kBlack)        
+        p.SetTextColor(ROOT.kBlack)
         p.Draw()
         labs += [p]
 
@@ -158,7 +163,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
 
     proc = getSelKeyLabel(selkey)
     if proc != None:
-        
+
         c = ROOT.TLatex(x, y-0.08, proc)
         c.SetNDC()
         c.SetTextFont(42)
@@ -166,12 +171,12 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         c.SetTextAlign(12)
         c.SetTextColor(ROOT.kBlack)
         labs += [c]
-       
+
     return labs
 
 #-------------------------------------------------------------------------
 def getHistPars(hist):
-    
+
     labels = {
         #
         # Kinematics histograms
@@ -185,24 +190,24 @@ def getHistPars(hist):
         'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},
-        'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},         
+        'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},
         'j0timing' : {'xtitle':'Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
-        'j1timing' : {'xtitle':'sub-Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},         
+        'j1timing' : {'xtitle':'sub-Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0.0, 'ymin':0.1, 'logy':False, 'LtoRCut':True, 'xmax':9.0},
         'n_jet_fwd'   : {'xtitle':'Number of extra Jets |eta|>2.5',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj30'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj40'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj50'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
-        'n_jet_cen'   : {'xtitle':'Number of extra Jets |eta|<2.5',               'ytitle':'Events', 'rebin':0},        
+        'n_jet_cen'   : {'xtitle':'Number of extra Jets |eta|<2.5',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwd'   : {'xtitle':'Number of extra Jets |eta|>2.5',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj30'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj40'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
-        'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},           
+        'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0},
 
-        'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
+        'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
         'muon_den_pt'   : {'xtitle':'Anti-Id Muon p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'lepEta' : {'xtitle':'Lepton #eta [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
@@ -210,31 +215,31 @@ def getHistPars(hist):
         'dphill' : {'xtitle':'#Delta #phi_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
         'jj_dphi' : {'xtitle':'#Delta #phi_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
         'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':1.0, 'logy':True},
-        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':1.0, 'logy':True, 'LtoRCut':False},        
-        'met_tst_phi'    : {'xtitle':'E_{T}^{miss} #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},        
+        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':1.0, 'logy':True, 'LtoRCut':False},
+        'met_tst_phi'    : {'xtitle':'E_{T}^{miss} #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},        
+        'met_tst_nolep_phi'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
-        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':False},        
-        'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':False},        
+        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':False},
+        'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':False},
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
-        'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':False},
-        'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':False},        
-    'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},        
+        'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
+        'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
+    'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},
     'met_soft_tst_et'     : {'xtitle':'MET Soft [GeV]'   ,         'ytitle':'Events',   'rebin':5,'ymin':0.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
-    'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},    
+    'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_mass'     : {'xtitle':'Truth m_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_deta'     : {'xtitle':'Truth #Delta#eta_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
     'truthJet1Pt'     : {'xtitle':'Truth sub-lead Jet p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'nTruthJetMatch'     : {'xtitle':'Number of Truth Matched Jets'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_baseel'     : {'xtitle':'Number of Base Electrons'   ,         'ytitle':'Events',   'ymin':0.1},
-    'n_tau'     : {'xtitle':'Number of Taus'   ,         'ytitle':'Events',   'ymin':0.1},    
+    'n_tau'     : {'xtitle':'Number of Taus'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_basemu'     : {'xtitle':'Number of Base Muons'   ,         'ytitle':'Events',   'ymin':0.1},
-    'n_truth_tau'     : {'xtitle':'Number of Truth taus'   ,         'ytitle':'Events',   'ymin':0.1},    
+    'n_truth_tau'     : {'xtitle':'Number of Truth taus'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tst_j1_dphi'     : {'xtitle':'#Delta#phi(j1,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tst_j2_dphi'     : {'xtitle':'#Delta#phi(j2,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'ptvarcone20'     : {'xtitle':'ptvarcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -242,30 +247,30 @@ def getHistPars(hist):
     'topoetcone20'     : {'xtitle':'topoetcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
 
     'mj34'     : {'xtitle':'m_{j3,j4} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'max_j_eta'     : {'xtitle':'max(#eta_{j1},#eta_{j2})'   ,         'ytitle':'Events',   'ymin':0.1},                                
-    'dRj1'     : {'xtitle':'#DeltaR(j1,j3)'   ,         'ytitle':'Events',   'ymin':0.1},                                
-    'dRj2'     : {'xtitle':'#DeltaR(j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},                                
-    'minDR'     : {'xtitle':'min #DeltaR(j1/j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},                                
+    'max_j_eta'     : {'xtitle':'max(#eta_{j1},#eta_{j2})'   ,         'ytitle':'Events',   'ymin':0.1},
+    'dRj1'     : {'xtitle':'#DeltaR(j1,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'dRj2'     : {'xtitle':'#DeltaR(j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'minDR'     : {'xtitle':'min #DeltaR(j1/j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
     'mj1'     : {'xtitle':'m_{j1,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'mj2'     : {'xtitle':'m_{j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'minDRmj2'     : {'xtitle':'minDR m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'min_mj3'     : {'xtitle':'min m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'min_mj3_over_mjj'     : {'xtitle':'min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},                                                
+    'min_mj3_over_mjj'     : {'xtitle':'min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},
     'centrality'     : {'xtitle':'j3 Centrality'   ,         'ytitle':'Events',   'ymin':0.1},
     'phcentrality'     : {'xtitle':'#gamma Centrality'   ,         'ytitle':'Events',   'ymin':0.1,'rebin':5},
     'phPt'     : {'xtitle':'#gamma p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'phEta'     : {'xtitle':'#gamma #eta'   ,         'ytitle':'Events',   'ymin':0.1},
-    'met_tst_ph_dphi'     : {'xtitle':'#Delta#phi(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},            
+    'met_tst_ph_dphi'     : {'xtitle':'#Delta#phi(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'Mtt'     : {'xtitle':'m_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'minDRLep'     : {'xtitle':'min #DeltaR(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},    
+    'minDRLep'     : {'xtitle':'min #DeltaR(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3Pt'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
-    'j3Eta'     : {'xtitle':'j3 #eta'   ,         'ytitle':'Events',   'ymin':0.1},                                        
+    'j3Eta'     : {'xtitle':'j3 #eta'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3Jvt'     : {'xtitle':'j3 Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3FJvt'     : {'xtitle':'j3 f-Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
-    'jetPt3'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events / 10 GeV',   'ymin':0.1, 'LtoRCut':False},                                                
-    'avgCentrality'     : {'xtitle':'Average jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},                                                
-    'maxCentrality'     : {'xtitle':'Max jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},                                                
-    'avgmj3_over_mjj'     : {'xtitle':'Average min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},  
+    'jetPt3'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events / 10 GeV',   'ymin':0.1, 'LtoRCut':False},
+    'avgCentrality'     : {'xtitle':'Average jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
+    'maxCentrality'     : {'xtitle':'Max jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
+    'avgmj3_over_mjj'     : {'xtitle':'Average min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
     'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},     
@@ -278,6 +283,7 @@ def getHistPars(hist):
     'jj_nmbGluons' : {'xtitle':'Number of gluon-initiated leading jets', 'ytitle':'Events', 'logy':True},
     'passPerfFTagging' : {'xtitle':'Passing jets:  q-initiated forward OR central', 'ytitle':'Events', 'logy':True},
     'passPerfCTagging' : {'xtitle':'Passing jets:  q-initiated central OR forward', 'ytitle':'Events', 'logy':True},
+    'qgTagRegions' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
         }
 
     try:
@@ -285,23 +291,23 @@ def getHistPars(hist):
     except KeyError:
         log.warning('getHistPars - unknown histogram: %s' %hist)
         return labels
-    
+
 #-------------------------------------------------------------------------
 def getLabelSortKey(sample):
-    
+
     if   sample == 'top2': return 1
-    elif sample == 'data': return 0    # 11     
+    elif sample == 'data': return 0    # 11
     elif sample == 'wzzz': return 2
     elif sample == 'wz': return 2
-    elif sample == 'zz': return 4               
+    elif sample == 'zz': return 4
     elif sample == 'smww': return 1 # was 3
     elif sample == 'top1': return 4
     elif sample == 'tall': return 5
-    elif sample == 'mqcd': return 5        
+    elif sample == 'mqcd': return 5
     elif sample == 'vvv': return 6
     elif sample == 'zldy': return 7
     elif sample == 'zjet': return 18
-    elif sample == 'qflip': return 3       
+    elif sample == 'qflip': return 3
     elif sample == 'zjhf': return 18
     elif sample == 'zvbf': return 18
     elif sample == 'zall': return 18
@@ -313,14 +319,14 @@ def getLabelSortKey(sample):
     elif sample == 'wjdte': return 16
     elif sample == 'wjdtm': return 17
     elif sample == 'zqcd': return 8
-    elif sample == 'zqcdMad': return 8        
+    elif sample == 'zqcdMad': return 8
     elif sample == 'hggf': return 9
     elif sample == 'hvbf': return 10
     #elif sample == 'data': return 11
     elif sample == 'bkgs': return 12
     elif sample == 'zewk': return 13
     elif sample == 'wqcd': return 14
-    elif sample == 'wqcdMad': return 14        
+    elif sample == 'wqcdMad': return 14
     elif sample == 'wewk': return 15
     elif sample == 'wdpi': return 16
     elif sample == 'wgas': return 17
@@ -329,24 +335,24 @@ def getLabelSortKey(sample):
     elif sample == 'higgs': return 20
     elif sample == 'jpsi': return 21
     elif sample == 'upsl': return 22
-    
+
     log.warning('getSampleSortKey - unknown key: %s' %sample)
     return 100
 
 #-------------------------------------------------------------------------
 def getSampleSortKey(sample):
-    
+
     if   sample == 'smww': return 1
     elif sample == 'zqcd': return 3
-    elif sample == 'zqcdMad': return 3        
+    elif sample == 'zqcdMad': return 3
     elif sample == 'zewk': return 1
     elif sample == 'wqcd': return -2
-    elif sample == 'wqcdMad': return -2            
+    elif sample == 'wqcdMad': return -2
     elif sample == 'wewk': return -1
     elif sample == 'top2': return 4
     elif sample == 'top1': return 5
     elif sample == 'tall': return 5
-    elif sample == 'mqcd': return 5        
+    elif sample == 'mqcd': return 5
     elif sample == 'vvv': return 6
     elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
@@ -360,39 +366,39 @@ def getSampleSortKey(sample):
 
 #-------------------------------------------------------------------------
 def getSampleLabel(sample):
-    
+
     if options.hscale != None:
         hlabel = '%s #times %d' %(options.hmass, options.hscale)
     else:
         hlabel = options.hmass
-    
+
     labels = {
         'smww': 'WW/W#gamma',
         'zjet': 'Z+jets',
-        'qflip': 'Charge Flip',        
+        'qflip': 'Charge Flip',
         'zqcd': 'Z+jets QCD',
-        'zqcdMad': 'Z+jets QCD',        
+        'zqcdMad': 'Z+jets QCD',
         'zewk': 'Z+jets EWK',
-        'mqcd': 'MJ',        
+        'mqcd': 'MJ',
         'wqcd': 'W+jets QCD',
-        'wqcdMad': 'W+jets QCD',        
-        'wewk': 'W+jets EWK',        
+        'wqcdMad': 'W+jets QCD',
+        'wewk': 'W+jets EWK',
         'top1': 'Single Top',
         'top2': 'Top', #'t#bar{t}',
-        'tall': 'Top',        
-        'vvv': 'VV/VVV',        
-        'zldy': 'Z low m.',        
+        'tall': 'Top',
+        'vvv': 'VV/VVV',
+        'zldy': 'Z low m.',
         'wzzz': 'ZV',#'WZ/ZZ',
         'wz': 'WZ',
-        'zz': 'ZZ',        
+        'zz': 'ZZ',
         'wgam': 'W#gamma',
         'wgas': 'W#gamma*',
         'zgas': 'Z#gamma*',
-        'htau':  '%s H#rightarrow#tau#tau'%options.hmass,        
+        'htau':  '%s H#rightarrow#tau#tau'%options.hmass,
         'hggf':  'ggF Higgs',
-        'higgs':  'Higgs',        
+        'higgs':  'Higgs',
         'hvbf':  'Higgs',
-        'ttv' : 't#bar{t}V+tV',        
+        'ttv' : 't#bar{t}V+tV',
         'data': 'Data',
         'bkgs': 'Total SM',
         }
@@ -416,7 +422,7 @@ def getColor(color_index):
                ROOT.kOrange,
                ROOT.kOrange-3,
                ]
-    
+
     if len(color_vec)>color_index:
         return color_vec[color_index]
     return color_index
@@ -432,35 +438,35 @@ def getStyle(sample):
     color_wewk = ROOT.kCyan   -9
     color_top1 = ROOT.kYellow +2
     color_top2 = ROOT.kYellow +1
-    color_tall = ROOT.kYellow +1 #ROOT.kRed+1    
+    color_tall = ROOT.kYellow +1 #ROOT.kRed+1
     color_wzzz = ROOT.kMagenta-3
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
-    color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3        
+    color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3
     color_vvv = ROOT.kOrange
     color_zldy = ROOT.kOrange-3
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
     color_wdpi = ROOT.kOrange-5
     color_wgas = ROOT.kOrange-7
-    color_zgas = ROOT.kOrange-7            
+    color_zgas = ROOT.kOrange-7
     color_higgs = ROOT.kViolet-9 #ROOT.kRed    +0
     color_higgsall = ROOT.kRed+1 #ROOT.kRed    +0
     color_bkgs = ROOT.kBlue   +1
     color_data = ROOT.kBlack
 
     styles = {
-        'zewk':{'color':color_zewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'zewk':{'color':color_zewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zqcd':{'color':color_zqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'zqcdMad':{'color':color_zqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'zqcdMad':{'color':color_zqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'wqcd':{'color':color_wqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'wqcdMad':{'color':color_wqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'wqcdMad':{'color':color_wqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'wewk':{'color':color_wewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top1':{'color':color_top1, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top2':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'mqcd':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'mqcd':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},                
-        'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},                
+        'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
         #'hggf':{'color':color_hggf, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         #'hvbf':{'color':color_hvbf, 'fill_style':0,    'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
@@ -476,40 +482,40 @@ def getStyle(sample):
     except KeyError:
         log.error('getLabel - unknown sample: %s' %sample)
         sys.exit(1)
-    
+
 #-------------------------------------------------------------------------
 def updateCanvas(can, name=None, leg=None, option = ''):
-    
+
     if not can:
         sys.exit(0)
 
-    can.Modified()        
+    can.Modified()
     can.Update()
 
     plist = can.GetPad(0).GetListOfPrimitives()
 
     hists = []
-    
+
     stath = 0.25
     staty = 1.0
     statw = 0.20
     statx = 0.80
-    
+
     for p in plist:
         try:
             if not p.InheritsFrom('TH1'):
                 continue
             p.GetYaxis().SetTitleSize(0.055)
-            #p.GetYaxis().SetTitleOffset(0.1)            
+            #p.GetYaxis().SetTitleOffset(0.1)
             hists.append(p)
             stats = p.FindObject('stats')
-            
+
             if stats:
                 stats.SetTextColor(p.GetLineColor())
                 stats.SetY1NDC(staty-stath)
                 stats.SetY2NDC(staty)
                 stats.SetX2NDC(statx+statw)
-                stats.SetX1NDC(statx)            
+                stats.SetX1NDC(statx)
                 staty = staty - stath
         except:
             print 'Failed'
@@ -532,7 +538,7 @@ def updateCanvas(can, name=None, leg=None, option = ''):
         if options.outdir != None:
             if not os.path.exists(options.outdir): os.system('mkdir %s' %(options.outdir))
             name = '%s/%s' %(options.outdir.rstrip(), name)
-        
+
         can.Print('%s.png' %name, 'png')
 
         if options.do_eps:
@@ -540,8 +546,8 @@ def updateCanvas(can, name=None, leg=None, option = ''):
 
         if options.do_pdf:
             #can.SaveAs('%s.pdf' %name)
-            can.Print('%s.pdf' %name, 'pdf')   
-    
+            can.Print('%s.pdf' %name, 'pdf')
+
 #-------------------------------------------------------------------------
 def rescaleFirstBin(hist, scale):
 
@@ -556,7 +562,7 @@ def rescaleFirstBin(hist, scale):
 
     xl = hist.GetXaxis().GetBinCenter (1)- 0.3*hist.GetXaxis().GetBinWidth(1)
     yl = hist.GetBinContent(1)+ 5.0*hist.GetBinError(1)
-    
+
     #c = ROOT.TLatex(0.15, 0.1, '#times %.1f' %scale)
     c = ROOT.TLatex(xl, yl, '#times %.1f' %scale)
     c.SetNDC(False)
@@ -570,9 +576,9 @@ def rescaleFirstBin(hist, scale):
 #-------------------------------------------------------------------------
 class HistEntry:
     """HistEntry - one histogram in a stacked plot"""
-        
+
     def __init__(self, hist, sample, hname, nf_map):
-        
+
         self.sample   = sample
         self.hname    = hname
         self.hist     = hist.Clone()
@@ -580,7 +586,7 @@ class HistEntry:
         self.leg_text = getSampleLabel(sample)
         self.text1st  = None
         self.nf_map   = nf_map
-        
+
         self.hist.SetStats    (False)
         self.hist.SetDirectory(0)
 
@@ -591,7 +597,7 @@ class HistEntry:
             self.hist.SetBinContent(1,self.hist.GetBinContent(0)+self.hist.GetBinContent(1))
             self.hist.SetBinError(1,math.sqrt(self.hist.GetBinError(0)**2+self.hist.GetBinError(1)**2))
             self.hist.SetBinContent(0,0)
-            self.hist.SetBinError(0,0)            
+            self.hist.SetBinError(0,0)
             last_bin=self.hist.GetNbinsX()
             # find last bin if option is set
             if 'xmax' in getHistPars(self.hname):
@@ -606,7 +612,7 @@ class HistEntry:
             self.hist.SetBinError(last_bin,my_err)
             for mbin in range(last_bin+1,self.hist.GetNbinsX()+2):
                 self.hist.SetBinContent(mbin,0.0)
-                self.hist.SetBinError(mbin,0.0)                
+                self.hist.SetBinError(mbin,0.0)
 
         if self.sample in self.nf_map:
             self.hist.Scale(self.nf_map[self.sample])
@@ -620,23 +626,23 @@ class HistEntry:
 
         style = getStyle   (sample)
         hpars = getHistPars(self.hname)
-        
+
         self.logy = 'logy' in hpars and hpars['logy']
         if options.do_logy:
             self.logy = options.do_logy
         if 'xtitle' in hpars:
             self.hist.GetXaxis().SetTitle(hpars['xtitle'])
         if 'ytitle' in hpars:
-            self.hist.GetYaxis().SetTitle(hpars['ytitle'])            
+            self.hist.GetYaxis().SetTitle(hpars['ytitle'])
         if 'color' in style:
             self.hist.SetLineColor(style['color'])
-            self.leg_opt = 'f'            
+            self.leg_opt = 'f'
 
             if 'fill_style' in style and style['fill_style'] > 0:
                 self.hist.SetLineColor(ROOT.kBlack)
                 self.hist.SetLineWidth(1)
                 self.hist.SetFillColor(style['color'])
-                self.hist.SetLineColor(style['color'])                
+                self.hist.SetLineColor(style['color'])
                 self.hist.SetFillStyle(style['fill_style'])
                 self.leg_opt = 'f'
 
@@ -654,17 +660,17 @@ class HistEntry:
             self.leg_opt = style['leg_opt']
 
         if 'rebin' in hpars and hpars['rebin'] > 1:
-            self.hist.Rebin(hpars['rebin'])        
+            self.hist.Rebin(hpars['rebin'])
         if 'scale1st' in hpars:
             self.text1st = rescaleFirstBin(self.hist, hpars['scale1st'])
-        
+
     def DrawHist(self, opt=None, leg=None, my_signal=False):
         if self.hist == None:
             return
 
-        if type(opt) == type(''):  
+        if type(opt) == type(''):
             if options.draw_norm: self.hist.DrawNormalized(opt)
-            else:                 self.hist.Draw(opt) 
+            else:                 self.hist.Draw(opt)
         if leg != None:
             if my_signal:
                 leg.AddEntry(self.hist, self.leg_text,"l")
@@ -677,15 +683,15 @@ class SystHists:
 
     def __init__(self):
         pass
-    
+
 #-------------------------------------------------------------------------
-def getSystSumSortKey(value):    
+def getSystSumSortKey(value):
     return math.fabs(value[1]-value[2])
 
 #-------------------------------------------------------------------------
 class DrawStack:
     """DrawStack - a set of histograms for one stacked plot"""
-        
+
     def __init__(self, name, file, sign, data, bkgs, nf_map, extract_sig, selkey=options.selkey):
 
         self.name   = name
@@ -702,7 +708,7 @@ class DrawStack:
         self.data = self.ReadSample(file, data)
         self.abkg = None
         self.bkgs = {}
-        self.extract_sig = {}        
+        self.extract_sig = {}
         self.pads = []
         self.pad  = None
 
@@ -711,23 +717,23 @@ class DrawStack:
         self.sys_sigs = {}
         self.error_map= {}
         self.bkg_sum = None
-        
+
         self.bkg_table = None
         self.sig_table = None
-        
+
         self.stack    = None
         self.stackeg  = None
         self.leg      = None
-        self.legr     = None        
+        self.legr     = None
         self.texts    = None
         self.ratio    = None
-        self.signif   = None        
-        self.signifCR = None        
-        self.err_bands= []    
+        self.signif   = None
+        self.signifCR = None
+        self.err_bands= []
         sum = 0.0
 
         self.sign.hist.SetLineWidth(2)
-        log.info('DrawStack  - integral=%5.2f sample=%s' %(self.data.hist.Integral(), 'data'))        
+        log.info('DrawStack  - integral=%5.2f sample=%s' %(self.data.hist.Integral(), 'data'))
         log.info('DrawStack  - integral=%5.2f sample=%s' %(self.sign.hist.Integral(), 'signal'))
         for bkg in bkgs:
             self.bkgs[bkg] = self.ReadSample(file, bkg)
@@ -744,7 +750,7 @@ class DrawStack:
             sum_err_total+=errdouble*errdouble
         sum_err_total=math.sqrt(sum_err_total)
         log.info('DrawStack  - integral=%5.2f +/- %5.2f sample=total bkg' %(sum,sum_err_total))
-            
+
     def GetHistPath(self, sample, syst=None):
 
         if self.name.count('lim') and options.syst_sel != None:
@@ -773,7 +779,7 @@ class DrawStack:
             #print 'COMPUTING systematic'
             hist_central_value = self.file_pointer.Get(path)
             self.Symmeterize(hist_central_value, hist)
-            
+
         return HistEntry(hist, sample, self.name, self.nf_map)
 
     #------------------------
@@ -781,8 +787,8 @@ class DrawStack:
         #
         # Symmeterize(nominal_histogram, variation_histogram)
         #    This function symmeterizes the systematics for the track met
-        #       using the lognormal variation: Nominal/Up_variation 
-        #    The variations for var/nom<0.5 are treated special so that very 
+        #       using the lognormal variation: Nominal/Up_variation
+        #    The variations for var/nom<0.5 are treated special so that very
         #       large variations do not occur because of low MC stats.
         for i in range(0,hnom.GetNbinsX()+1):
             diff_up = 1.0
@@ -794,7 +800,7 @@ class DrawStack:
 
     #-------------------------
     def ReadSystFiles(self, sfiles):
-        
+
         for syst, sfile in sfiles.iteritems():
             print syst
             # check if we need to symmeterize
@@ -804,9 +810,9 @@ class DrawStack:
                 DO_SYMM=True
                 if syst in mysystOneSided.getsystematicsOneSidedMap():
                     syst_key = mysystOneSided.getsystematicsOneSidedMap()[syst]
-            
+
             bkg_ent = None
-            
+
             for bkg in self.bkgs:
                 bhist = self.ReadSample(sfile, bkg, syst_key, DO_SYMM=DO_SYMM)
                 if bkg_ent == None:
@@ -826,14 +832,14 @@ class DrawStack:
     def GetTotalBkgHist(self):
 
         bhist = None
-        
+
         for bkg, ent in self.bkgs.iteritems():
             if bhist == None:
                 bhist = ent.hist.Clone()
                 bhist.SetDirectory(0)
             else:
                 bhist.Add(ent.hist)
-                
+
         return bhist
 
     #--------------------------
@@ -841,7 +847,7 @@ class DrawStack:
 
         sum_nom = 0.0
         sum_sys = []
-        
+
         for bkg, ent in self.bkgs.iteritems():
             sum_nom += ent.hist.Integral()
 
@@ -855,10 +861,10 @@ class DrawStack:
 
         h = ROOT.TH1D('bkg_syst', 'bkg_syst', len(sum_sys), 0.0, len(sum_sys))
         h.SetDirectory(0)
-        
+
         if sum_nom > 0.0:
             sum_sys = sorted(sum_sys, key = lambda val: val[0])
-            
+
             for i in range(0, len(sum_sys)):
                 sum = sum_sys[i]
                 h.SetBinContent(i+1, sum[1]/sum_nom)
@@ -870,7 +876,7 @@ class DrawStack:
 
         sum_nom = self.sign.hist.Integral()
         sum_sys = []
-        
+
         for sys, ent in self.sys_sigs.iteritems():
             sum_sys += [(sys, ent.hist.Integral(), sum_nom)]
 
@@ -884,7 +890,7 @@ class DrawStack:
 
         if sum_nom > 0.0:
             sum_sys = sorted(sum_sys, key = lambda val: val[0])
-            
+
             for i in range(0, len(sum_sys)):
                 sum = sum_sys[i]
                 h.SetBinContent(i+1, sum[1]/sum_nom)
@@ -895,30 +901,30 @@ class DrawStack:
                 h.GetXaxis().SetBinLabel(i+1, my_name)
 
         return h
-    
+
     #------------------------
     def GetBkgSystBinError(self, ibin):
 
         cbin = 0.0
         cval = 0.0
         cerr = 0.0
-        
+
         for bkg, ent in self.bkgs.iteritems():
             if ibin >= 0 and ibin <= ent.hist.GetNbinsX()+1:
                 cval += ent.hist.GetBinContent(ibin)
                 cbin  = ent.hist.GetBinCenter (ibin)
-                
+
         for sys, ent in self.sys_bkgs.iteritems():
-            if ibin >= 0 and ibin <= ent.hist.GetNbinsX()+1:                
+            if ibin >= 0 and ibin <= ent.hist.GetNbinsX()+1:
                 sval = ent.hist.GetBinContent(ibin)
                 cerr += (cval-sval)*(cval-sval)
 
                 ratio = 0.0
                 if cval > 0.0:
                     ratio = sval/cval
-                
+
                 log.debug('GetBkgSystBinError - bin=%3d center=%6.1f val=%3.2f: sval=%3.2f ratio=%1.2f syst=%s' %(ibin, cbin, cval, sval, ratio, sys))
-        
+
         return (cval, math.sqrt(cerr))
 
     #------------------------
@@ -932,17 +938,17 @@ class DrawStack:
         sig = self.sign.hist.Clone()
 
         sig.SetLineWidth(2)
-        sys.SetLineWidth(2) 
+        sys.SetLineWidth(2)
 
         sig.SetLineColor(1)
         sys.SetLineColor(2)
 
         hpars = getHistPars(self.name)
-        sys.GetXaxis().SetTitle(hpars['xtitle'])        
+        sys.GetXaxis().SetTitle(hpars['xtitle'])
         sys.GetXaxis().CenterTitle()
 
         sig_sum = sig.Integral()
-        sys_sum = sys.Integral()        
+        sys_sum = sys.Integral()
 
         log.info('   draw ratio')
         sys.Divide(sig)
@@ -956,11 +962,11 @@ class DrawStack:
         sys.GetYaxis().SetRangeUser(0.7, 1.3)
 
         sys.GetYaxis().SetTitle('Nominal/%s' %syst)
-        sys.GetYaxis().CenterTitle()        
+        sys.GetYaxis().CenterTitle()
         if options.draw_norm: sys.DrawNormalized('HIST')
         else: sys.Draw('HIST')
 
-        t = '#splitline{Nominal: %.3f}{%s: %.3f}' %(sig_sum, syst, sys_sum)        
+        t = '#splitline{Nominal: %.3f}{%s: %.3f}' %(sig_sum, syst, sys_sum)
         l = ROOT.TLatex(0.5, 0.85, t)
         l.SetNDC()
         l.SetTextFont(42)
@@ -970,14 +976,14 @@ class DrawStack:
         l.Draw()
 
         p = getSelKeyLabel(options.selkey) + ' (signal)'
-        if p != None:            
+        if p != None:
             c = ROOT.TLatex(0.2, 0.96, p)
             c.SetNDC()
             c.SetTextFont(42)
             c.SetTextSize(0.04)
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
-        
+
         updateCanvas(can, name='%s_%s_%s_sig' %(getSelKeyPath(), self.name, syst))
 
     #----------------------
@@ -991,23 +997,23 @@ class DrawStack:
         bkg = self.GetTotalBkgHist()
 
         bkg.SetLineWidth(2)
-        sys.SetLineWidth(2)        
+        sys.SetLineWidth(2)
 
         bkg.SetLineColor(1)
         sys.SetLineColor(4)
 
         bkg.SetFillColor(0)
-        bkg.SetFillStyle(0)        
+        bkg.SetFillStyle(0)
 
         sys.SetFillColor(0)
-        sys.SetFillStyle(0)  
+        sys.SetFillStyle(0)
 
         hpars = getHistPars(self.name)
-        sys.GetXaxis().SetTitle(hpars['xtitle'])        
+        sys.GetXaxis().SetTitle(hpars['xtitle'])
         sys.GetXaxis().CenterTitle()
 
         bkg_sum = bkg.Integral()
-        sys_sum = sys.Integral()        
+        sys_sum = sys.Integral()
 
         sys.Divide(bkg)
         log.info('   draw bkg ratio: min/max = %.2f/%.2f' %(sys.GetMinimum(), sys.GetMaximum()))
@@ -1015,35 +1021,35 @@ class DrawStack:
         if math.fabs(sys.GetMinimum()-1.0) < 0.15 and math.fabs(sys.GetMaximum()-1.0) < 0.15:
             sys.GetYaxis().SetRangeUser(0.80, 1.20)
         elif math.fabs(sys.GetMinimum()-1.0) < 0.7 and math.fabs(sys.GetMaximum()-1.0) < 0.7:
-            sys.GetYaxis().SetRangeUser(0.0, 1.80)            
+            sys.GetYaxis().SetRangeUser(0.0, 1.80)
         else:
             sys.GetYaxis().SetRangeUser(0.0, 3.0)
-        sys.GetYaxis().SetRangeUser(0.7, 1.3)            
-            
+        sys.GetYaxis().SetRangeUser(0.7, 1.3)
+
         sys.GetYaxis().SetTitle('%s/Nominal' %syst)
-        sys.GetYaxis().CenterTitle()        
-        
+        sys.GetYaxis().CenterTitle()
+
         if options.draw_norm: sys.DrawNormalized('HIST')
         else:  sys.Draw('HIST')
 
-        t = '#splitline{Nominal: %.2f}{%s: %.2f}' %(bkg_sum, syst, sys_sum)        
+        t = '#splitline{Nominal: %.2f}{%s: %.2f}' %(bkg_sum, syst, sys_sum)
         l = ROOT.TLatex(0.5, 0.85, t)
         l.SetNDC()
         l.SetTextFont(42)
         l.SetTextSize(0.04)
-        l.SetTextAlign(11)    
+        l.SetTextAlign(11)
         l.SetTextColor(ROOT.kBlack)
         l.Draw()
 
         p = getSelKeyLabel(options.selkey) + ' (sum of backgrounds)'
-        if p != None:            
+        if p != None:
             c = ROOT.TLatex(0.2, 0.96, p)
             c.SetNDC()
             c.SetTextFont(42)
             c.SetTextSize(0.04)
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
-        
+
         updateCanvas(can, name='%s_%s_%s_bkg' %(getSelKeyPath(), self.name, syst))
 
     #-------------------
@@ -1053,7 +1059,7 @@ class DrawStack:
         if len(self.pads)>1:
             self.pads[0].Clear()
             self.pads[1].Clear()
-            self.pads[0].cd()            
+            self.pads[0].cd()
             self.pads[0].SetBottomMargin(0.15);
         sys=[]
         ratio_sys = []
@@ -1064,8 +1070,8 @@ class DrawStack:
                 continue
             if isSignal:
                 sys       += [self.sys_sigs[s].hist.Clone()]
-                ratio_sys += [self.sys_sigs[s].hist.Clone()]                
-            else:                   
+                ratio_sys += [self.sys_sigs[s].hist.Clone()]
+            else:
                 sys       += [self.sys_bkgs[s].hist.Clone()]
                 ratio_sys += [self.sys_bkgs[s].hist.Clone()]
             iSys+=1
@@ -1077,16 +1083,16 @@ class DrawStack:
             mydata.SetLineWidth(2)
             mydata.SetLineColor(1)
             mydata.SetFillColor(0)
-            mydata.SetFillStyle(0)        
-        
+            mydata.SetFillStyle(0)
+
         bkg = self.GetTotalBkgHist()
         if isSignal:
-            bkg = self.sign.hist.Clone()            
+            bkg = self.sign.hist.Clone()
         bkg.SetLineWidth(2)
         bkg.SetLineColor(2)
         bkg.SetFillColor(0)
-        bkg.SetFillStyle(0)        
-        
+        bkg.SetFillStyle(0)
+
         hpars = getHistPars(self.name)
 
         bkg.GetXaxis().SetTitle(hpars['xtitle'])
@@ -1107,19 +1113,19 @@ class DrawStack:
             i+=1
             if max_bin<s.GetMaximum():
                 max_bin = s.GetMaximum()
-        
+
         bkg.GetYaxis().SetRangeUser(0.0, 1.2*max_bin)
         self.UpdateHist(bkg)
         bkg.Draw('HIST E0')
         if fillData:
-            mydata.Draw('SAME')        
+            mydata.Draw('SAME')
         for s in sys:
             s.Draw('HIST SAME')
 
         p = getSelKeyLabel(options.selkey) + ' (sum of backgrounds)'
         if isSignal:
-            p = getSelKeyLabel(options.selkey) + ' (sum of signal)'            
-        if p != None:            
+            p = getSelKeyLabel(options.selkey) + ' (sum of signal)'
+        if p != None:
             c = ROOT.TLatex(0.2, 0.96, p)
             c.SetNDC()
             c.SetTextFont(42)
@@ -1135,10 +1141,10 @@ class DrawStack:
         self.leg.SetBorderSize(0)
         self.leg.SetFillStyle (0)
         #self.leg.SetNColumns  (2)
-        self.leg.SetTextFont(42);    
+        self.leg.SetTextFont(42);
         self.leg.SetTextSize(0.04);
         if fillData:
-            self.leg.AddEntry(mydata, 'Data')                
+            self.leg.AddEntry(mydata, 'Data')
         self.leg.AddEntry(bkg,    'Nominal')
         i=0
         j=0
@@ -1146,7 +1152,7 @@ class DrawStack:
             if groupStart>0 and i<groupStart:
                 i+=1
                 continue
-            
+
             self.leg.AddEntry(sys[j],systs[i])
             i+=1
             j+=1
@@ -1157,14 +1163,14 @@ class DrawStack:
         # Draw the ratios
         if len(self.pads)>1:
             self.pads[1].cd()
-            
+
             # Set the ratio histograms
             tmp_color=3
             bkg_ratio=bkg.Clone()
             if fillData:
                 bkg_ratio.Divide(mydata)
             for s in ratio_sys:
-                
+
                 # Divide
                 if fillData:
                     s.Divide(mydata)
@@ -1183,7 +1189,7 @@ class DrawStack:
 
                 # Style
                 s.SetLineColor(getColor(tmp_color))
-                s.SetMarkerColor(getColor(tmp_color))                
+                s.SetMarkerColor(getColor(tmp_color))
                 s.SetLineWidth(2)
                 s.SetFillColor(0)
                 s.SetFillStyle(0)
@@ -1192,31 +1198,31 @@ class DrawStack:
                     if tmp_color==3:
                         self.UpdateHist(bkg_ratio)
                         bkg_ratio.GetYaxis().SetTitle('%s / Data' %'Syst')
-                        bkg_ratio.GetYaxis().SetRangeUser(0.80, 1.20)                        
+                        bkg_ratio.GetYaxis().SetRangeUser(0.80, 1.20)
                         bkg_ratio.Draw('HIST')
                 else:
-                    s.GetYaxis().SetTitle('%s / Nominal' %'Syst')                    
-                s.GetYaxis().CenterTitle()        
+                    s.GetYaxis().SetTitle('%s / Nominal' %'Syst')
+                s.GetYaxis().CenterTitle()
                 tmp_color+=1
-                
+
                 if tmp_color==4 and not fillData:
                     self.UpdateHist(s)
-                    s.GetYaxis().SetRangeUser(0.80, 1.20)                                            
+                    s.GetYaxis().SetRangeUser(0.80, 1.20)
                     s.Draw('HIST')
                 else:
-                    s.Draw('HIST SAME')                    
+                    s.Draw('HIST SAME')
 
         if isSignal:
             updateCanvas(can, name='%s_%s_%s%s_sig' %(getSelKeyPath(), self.name, 'systall',groupStart))
         else:
-            updateCanvas(can, name='%s_%s_%s%s_bkg' %(getSelKeyPath(), self.name, 'systall',groupStart))              
+            updateCanvas(can, name='%s_%s_%s%s_bkg' %(getSelKeyPath(), self.name, 'systall',groupStart))
 
     #------------------------------
     def PlotSystTables(self, can):
 
         self.bkg_table = self.PrintBkgSystYields()
         self.sig_table = self.PrintSigSystYields()
-        
+
         if self.bkg_table == None or self.sig_table == None:
             return
 
@@ -1225,17 +1231,17 @@ class DrawStack:
         #
         self.bkg_table.SetFillStyle(2001)
         self.bkg_table.SetFillColor(4)
-        
+
         self.bkg_table.SetStats(False)
         self.bkg_table.GetYaxis().SetRangeUser(0.82, 1.18)
 
         self.bkg_table.GetYaxis().SetTitle('Systematics/Nominal')
         self.bkg_table.GetYaxis().CenterTitle()
-        self.bkg_table.GetYaxis().SetTitleOffset(1.0)         
+        self.bkg_table.GetYaxis().SetTitleOffset(1.0)
         self.bkg_table.GetYaxis().SetTitleSize(0.05)
-        self.bkg_table.GetYaxis().SetLabelSize(0.05)        
+        self.bkg_table.GetYaxis().SetLabelSize(0.05)
         self.bkg_table.GetXaxis().SetLabelSize(0.05)
-                
+
         if options.draw_norm: self.bkg_table.DrawNormalized('HBAR')
         else: self.bkg_table.Draw('HBAR')
 
@@ -1248,7 +1254,7 @@ class DrawStack:
             c.SetTextSize(0.04)
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
-        
+
         updateCanvas(can, name='%s_%s_bkg_table' %(getSelKeyPath(), self.name))
 
         #
@@ -1256,16 +1262,16 @@ class DrawStack:
         #
         self.sig_table.SetFillStyle(2001)
         self.sig_table.SetFillColor(2)
-        
+
         self.sig_table.SetStats(False)
         #self.sig_table.GetYaxis().SetRangeUser(0.82, 1.18)
-        self.sig_table.GetYaxis().SetRangeUser(0.82, 1.18)        
+        self.sig_table.GetYaxis().SetRangeUser(0.82, 1.18)
 
         self.sig_table.GetYaxis().SetTitle('Systematics/Nominal')
         self.sig_table.GetYaxis().CenterTitle()
-        self.sig_table.GetYaxis().SetTitleOffset(1.0)         
+        self.sig_table.GetYaxis().SetTitleOffset(1.0)
         self.sig_table.GetYaxis().SetTitleSize(0.05)
-        self.sig_table.GetYaxis().SetLabelSize(0.05)        
+        self.sig_table.GetYaxis().SetLabelSize(0.05)
         self.sig_table.GetXaxis().SetLabelSize(0.05)
 
         my_line = ROOT.TLine(1.0,0,1.0,len(self.sys_sigs))
@@ -1282,20 +1288,20 @@ class DrawStack:
             c.SetTextSize(0.04)
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
-        
+
         updateCanvas(can, name='%s_%s_sig_table' %(getSelKeyPath(), self.name))
     #-------------------------------------
     def IsLogy(self):
         if options.do_logy: return True
         if options.no_logy: return False
-        
+
         if self.sign != None and self.sign.logy:
             return True
         if self.data != None and self.data.logy:
             return True
 
         return False
-    
+
     #-------------------------------------
     def GetErrorHists(self):
         bkg_herr = self.stack.GetHistogram().Clone()
@@ -1304,22 +1310,22 @@ class DrawStack:
             norm_hists_bkg+=[hg.hist.Clone()]
             bkg_herr.Add(hg.hist)
         return norm_hists_bkg,bkg_herr
-    
+
     #-------------------------------------
     def Draw(self, can):
         log.info('DrawStack - draw: %s' %self.name)
-        
+
         #self.leg = ROOT.TLegend(0.58, 0.72, 0.85, 0.89)
-        self.leg = ROOT.TLegend(0.51, 0.67, 0.93, 0.89)        
+        self.leg = ROOT.TLegend(0.51, 0.67, 0.93, 0.89)
         self.leg.SetBorderSize(0)
         self.leg.SetFillStyle (0)
-        self.leg.SetTextFont(42);    
+        self.leg.SetTextFont(42);
         self.leg.SetTextSize(0.04);
         self.leg1= ROOT.TLegend(0.51, 0.52, 0.83, 0.67)
         self.leg1.SetBorderSize(0)
         self.leg1.SetFillStyle (0)
-        self.leg1.SetTextFont(42);    
-        self.leg1.SetTextSize(0.04);        
+        self.leg1.SetTextFont(42);
+        self.leg1.SetTextSize(0.04);
         self.pads=[]
         can.cd()
         if options.do_ratio or options.force_ratio:
@@ -1329,13 +1335,13 @@ class DrawStack:
             lineWidth = 2;
             markerStyle = 20;
             padScaling      = 0.75 / (1. - ratioPadRatio) ;
-            ratioPadScaling = 0.75*(1. / ratioPadRatio) ;  
+            ratioPadScaling = 0.75*(1. / ratioPadRatio) ;
             ROOT.gStyle.SetPadTopMargin(0.065);
             ROOT.gStyle.SetPadRightMargin(0.05);
             ROOT.gStyle.SetPadBottomMargin(0.16);
             ROOT.gStyle.SetPadLeftMargin(0.16);
             ROOT.gStyle.SetTitleXOffset(1.0);
-            ROOT.gStyle.SetTitleYOffset(1.28);            
+            ROOT.gStyle.SetTitleYOffset(1.28);
             self.pads.append( ROOT.TPad('pad0','pad0', 0.0, ratioPadRatio, 1.0, 1.0) )
             self.pads.append( ROOT.TPad('pad1','pad1', 0.0, 0.0, 1.0, ratioPadRatio) )
 
@@ -1344,25 +1350,25 @@ class DrawStack:
             self.pads[0].SetTickx(True);
             self.pads[0].SetTicky(True);
             #self.pads[1].SetTopMargin(.01);
-            self.pads[1].SetBottomMargin(.4);            
+            self.pads[1].SetBottomMargin(.4);
             #self.pads[1].SetBottomMargin(ratioPadScaling * self.pads[1].GetBottomMargin());
             self.pads[1].SetGridy(True);
             self.pads[1].SetTickx(True);
             self.pads[1].SetTicky(True);
-            
+
             self.legr= ROOT.TLegend(0.07, 0.01, 0.35, 0.28)
             self.legr.SetBorderSize(0)
             self.legr.SetFillStyle (0)
-            self.legr.SetTextFont(42);    
+            self.legr.SetTextFont(42);
             self.legr.SetTextSize(0.09);
             if False:
                 self.pads[0].SetTicky(0)
-                # Margins                                                                                                                               
+                # Margins
                 tmargin = 0.05
                 lmargin = 0.15
                 rmargin = 0.28
-                bmargin = 0.18              
-                
+                bmargin = 0.18
+
                 for pad in self.pads:
                     pad.SetFrameLineColor(0)
                     pad.SetLeftMargin(lmargin)
@@ -1381,7 +1387,7 @@ class DrawStack:
                     self.pads[1].SetBottomMargin(tmargin+bmargin)
                     self.pads[1].SetFrameLineColor(1)
                     self.pads[1].SetRightMargin(rmargin_)
-                    self.pads[1].SetTicky(1) # RHS ticks 
+                    self.pads[1].SetTicky(1) # RHS ticks
             else:
                 if len(self.pads)>1:
                     self.pads[0].SetBottomMargin(0.0)
@@ -1402,20 +1408,20 @@ class DrawStack:
 
         self.CreateStack()
 
-        if options.draw_norm: self.bkg_sum.DrawNormalized('HIST') 
+        if options.draw_norm: self.bkg_sum.DrawNormalized('HIST')
         else:                 self.stack.Draw('HIST')
 
         if not options.stack_signal:
             self.UpdateHist(self.sign.hist,self.sign.sample)
             self.sign.DrawHist('SAME HIST', self.leg, True)
-        self.UpdateStack()                    
+        self.UpdateStack()
         if options.do_ratio or options.force_ratio:
-            #self.UpdateStack()            
+            #self.UpdateStack()
             bx = self.stack.GetXaxis();
             by = self.stack.GetYaxis();
             #if not options.draw_norm:
             #    bx = self.bkg_sum.GetXaxis();
-            #    by = self.bkg_sum.GetYaxis();                
+            #    by = self.bkg_sum.GetYaxis();
             bx.SetTitleSize(ROOT.gStyle.GetTitleSize("x") * padScaling);
             bx.SetLabelSize(ROOT.gStyle.GetLabelSize("x") * padScaling);
             by.SetTitleSize(ROOT.gStyle.GetTitleSize("y") * padScaling);
@@ -1424,10 +1430,10 @@ class DrawStack:
             bx.SetLabelColor(0);
             bx.SetTickLength(bx.GetTickLength() * padScaling);
             #print 'OFFSET'
-            bx.SetLabelOffset(1.2); 
+            bx.SetLabelOffset(1.2);
             bx.SetLabelSize(0.03);
             bx.SetTitle("")
-            #bx.SetTitle("")            
+            #bx.SetTitle("")
             by.SetRangeUser(0,80);
             by.SetTitleSize(0.055);
             by.SetTitleOffset(1.28);
@@ -1439,7 +1445,7 @@ class DrawStack:
         if self.data != None and not options.blind:
             #self.data.hist.GetXaxis().SetLabelColor(0)
             self.data.hist.GetXaxis().SetTitle("")
-            self.data.DrawHist('SAME', None)        
+            self.data.DrawHist('SAME', None)
 
         if True:
             self.bkg_sum.SetLineColor(ROOT.kRed)
@@ -1449,7 +1455,7 @@ class DrawStack:
             else: self.bkg_sum.Draw('HIST SAME')
             self.bkg_sum_alt=self.bkg_sum.Clone()
             self.bkg_sum_alt.SetLineColor(ROOT.kRed)
-            self.bkg_sum_alt.SetMarkerColor(ROOT.kRed)            
+            self.bkg_sum_alt.SetMarkerColor(ROOT.kRed)
             self.bkg_sum_alt.SetMarkerSize(0)
             self.bkg_sum_alt.SetFillColor(1)
             self.bkg_sum_alt.SetFillStyle(3004)
@@ -1475,13 +1481,13 @@ class DrawStack:
                 val, err = self.GetBkgSystBinError(ibin)
                 bkg_herr.SetBinContent(ibin, val)
                 bkg_herr.SetBinError  (ibin, err)
-                
+
             self.stackeg = ROOT.TGraphAsymmErrors(bkg_herr)
 
             #self.stackeg.SetFillStyle(3005)
             self.stackeg.SetFillStyle(3004)
             self.stackeg.SetFillColor(1)
-            self.stackeg.GetXaxis().SetLabelColor(0)            
+            self.stackeg.GetXaxis().SetLabelColor(0)
             #self.stackeg.Draw('2')
         #
         # Draw chi2 for stack and data
@@ -1489,14 +1495,14 @@ class DrawStack:
         if True and not options.blind:
             chi2 = self.data.hist.Chi2Test      (self.bkg_sum, 'UW CHI2')
             kval = self.data.hist.KolmogorovTest(self.bkg_sum, '')
-            
+
             log.info('Draw - %s: chi2 = %.2f' %(self.name, chi2))
             log.info('Draw - %s: KS   = %.2f' %(self.name, kval))
-            
+
             self.ks_text = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
             self.ks_text.SetNDC()
             self.ks_text.SetTextSize(0.045)
-            self.ks_text.SetTextAlign(11)    
+            self.ks_text.SetTextAlign(11)
             self.ks_text.SetTextColor(ROOT.kBlack)
 
         # Plot - calculating the systematic error bands
@@ -1518,7 +1524,7 @@ class DrawStack:
         self.error_map['bkg'].SetFillColor(ROOT.kBlack)
         self.error_map['bkg'].SetMarkerColor(1)
         self.error_map['bkg'].SetMarkerSize(0)
-        self.error_map['bkg'].SetLineColor(1)        
+        self.error_map['bkg'].SetLineColor(1)
         if options.draw_norm: pass #self.error_map['bkg'].DrawNormalized('SAMEE2')
         else: self.error_map['bkg'].Draw('SAMEE2')
 
@@ -1530,20 +1536,20 @@ class DrawStack:
             if self.name=='ptll_over_met':
                 cut=0.4
             if self.name=='ptj0_over_met':
-                cut=1.9                               
+                cut=1.9
             self.arrow = ROOT.TArrow( cut, 0.2, cut, 0.0, 0.04, '|>' )
             self.arrow.SetFillStyle( 1001 )
             self.arrow.SetLineColor( ROOT.kRed )
-            self.arrow.SetFillColor( ROOT.kRed )        
+            self.arrow.SetFillColor( ROOT.kRed )
             self.arrow.Draw()
             self.my_line2 = ROOT.TLine(cut,0.0,cut,0.3*self.stack.GetMaximum())
             if options.do_logy:
-                self.my_line2 = ROOT.TLine(cut,0.0,cut,0.06*self.stack.GetMaximum())            
+                self.my_line2 = ROOT.TLine(cut,0.0,cut,0.06*self.stack.GetMaximum())
             self.my_line2.SetLineColor(ROOT.kRed)
             self.my_line2.SetLineWidth(2)
             self.my_line2.SetLineStyle(1)
             self.my_line2.Draw('same')
-        
+
         if options.do_ratio or options.force_ratio:
             # Ratio
             ipad = 1
@@ -1561,21 +1567,21 @@ class DrawStack:
             self.UpdateHist(self.ratio)
             self.ratio.SetMinimum(0.25)
             self.ratio.SetMaximum(1.75)
-            
+
             if options.do_nf!=None:
                 samples = options.do_nf.split(',')
                 if options.blind:
                     self.ratio=self.sign.hist.Clone()
                     self.signif=self.sign.hist.Clone()
-                    self.signifCR=self.sign.hist.Clone()                    
+                    self.signifCR=self.sign.hist.Clone()
                 else:
                     self.ratio=self.data.hist.Clone()
                 den=None
-                tot_bkg=0.0; tot_data=0.0; 
-                tot_data=self.ratio.Integral(4,101)                
+                tot_bkg=0.0; tot_data=0.0;
+                tot_data=self.ratio.Integral(4,101)
 
                 for bkg, ent in self.bkgs.iteritems():
-                    if bkg in samples:                        
+                    if bkg in samples:
                         if den==None:
                             den=ent.hist.Clone()
                         else:
@@ -1583,16 +1589,24 @@ class DrawStack:
                     else:
                         self.ratio.Add(ent.hist, -1.0)
                         tot_bkg+=ent.hist.Integral(4,101)
-                        
+
                 # set MC error to zero.
-                #for i in range()
-                self.ratio.Divide(den)
+                den_tmp=den.Clone() # removing the mc stat uncertainty from the ratio...
+                if options.show_mc_stat_err:
+                    for i in range(0,den_tmp.GetNbinsX()):
+                        den_tmp.SetBinError(i,0.0)
+                self.ratio.Divide(den_tmp)
                 for i in range(0,self.ratio.GetNbinsX()+1):
                     if i<6:
                         print self.ratio.GetXaxis().GetBinLowEdge(i),' mean: ',self.ratio.GetBinContent(i),' +/- ',self.ratio.GetBinError(i)
 
             else:
-                self.ratio.Divide(self.bkg_sum)                
+                # set MC error to zero.
+                den_tmp=self.bkg_sum.Clone() # removing the mc stat uncertainty from the ratio...
+                if options.show_mc_stat_err:
+                    for i in range(0,den_tmp.GetNbinsX()):
+                        den_tmp.SetBinError(i,0.0)
+                self.ratio.Divide(den_tmp)
                 # compute the mu-error
                 if options.blind:
                     leftToRight=True
@@ -1609,7 +1623,10 @@ class DrawStack:
                         if not leftToRight:
                             cut_Nsig = self.sign.hist.Integral(ibin,10001)
                             cut_Nbkg = self.bkg_sum.Integral(ibin,10001)
-                            
+                        if leftToRight==2: # do this bin-by-bin
+                            cut_Nsig = self.sign.hist.Integral(ibin,ibin)
+                            cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
+
                         #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
                             self.signif.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg)/cut_Nsig)
@@ -1620,12 +1637,16 @@ class DrawStack:
                             if ('wqcd'+madgraph) in self.bkgs and 'wewk' in self.bkgs:
                                 wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['wewk'].hist.Integral(0,ibin)
                                 if not leftToRight:
-                                    wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['wewk'].hist.Integral(ibin,10001)                                
-                            
+                                    wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['wewk'].hist.Integral(ibin,10001)
+                                if leftToRight==2:
+                                    wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['wewk'].hist.Integral(ibin,ibin)
+
                             if ('zqcd'+madgraph) in self.bkgs and 'zewk' in self.bkgs:
                                 zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
                                 if not leftToRight:
                                     zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['zewk'].hist.Integral(ibin,10001)
+                                if leftToRight==2:
+                                    zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
                                 total_zcr=-100.0
                                 #print 'self.zcr_stack: ',self.zcr_stack
                                 if self.zcr_stack and not self.zcr_stack.bkg_sum:
@@ -1633,13 +1654,15 @@ class DrawStack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
                                 if not leftToRight and self.zcr_stack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,10001)
+                                if (leftToRight==2) and self.zcr_stack:
+                                    total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)                                    
                                 if total_zcr>0.0:
                                     total_zcr = 1.0/math.sqrt(total_zcr)
                                 #print total_zcr
-                                self.signifCR.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig)                             
-            
+                                self.signifCR.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig)
+
             # Set Names
-            pars = getHistPars(self.name)            
+            pars = getHistPars(self.name)
             if 'xtitle' in pars and self.bkg_sum.GetXaxis() != None:
                 self.ratio.GetXaxis().SetTitle(pars['xtitle'])
             if options.blind:
@@ -1650,7 +1673,7 @@ class DrawStack:
             #    for i in range(0,self.ratio.GetNbinsX()+1):
             #        self.ratio.SetBinError(i,0.0)
             #        self.ratio.SetBinContent(i,0.0)
-                    
+
             # Setting the size of ratio font
             bx = self.ratio.GetXaxis();
             by = self.ratio.GetYaxis();
@@ -1663,17 +1686,17 @@ class DrawStack:
                 self.signif.SetLineStyle(1);
                 self.signif.SetMarkerSize(0.05);
                 self.signif.SetLineColor(2);
-                self.signif.SetMarkerColor(2);                
+                self.signif.SetMarkerColor(2);
                 self.signif.SetLineWidth(2);
                 self.signifCR.SetLineStyle(1);
                 self.signifCR.SetMarkerSize(0.05);
                 self.signifCR.SetLineColor(3);
                 self.signifCR.SetMarkerColor(3);
                 self.signifCR.SetLineWidth(2);
-                
+
             self.ratio.SetLineColor(ROOT.kBlack);
             self.ratio.SetLineWidth(2);
-            
+
             #print 'Y:',ROOT.gStyle.GetTitleY();
             #ROOT.gStyle.SetTitleY(0.5);
             bx.SetTitleSize(ROOT.gStyle.GetTitleSize("x") * ratioPadScaling);
@@ -1691,7 +1714,7 @@ class DrawStack:
             bx.SetLabelOffset(0.02);
             bx.SetTitleSize(0.14);
             bx.SetTitleOffset(1.2);
-            
+
             by.SetRangeUser(0,2);
             if options.blind:
                 by.SetRangeUser(0,0.799);
@@ -1699,12 +1722,12 @@ class DrawStack:
             by.SetLabelOffset(0.0125);
             by.SetTitleSize(0.14);
             by.SetTitleOffset(0.5);
-            by.SetNdivisions(5);            
-            
+            by.SetNdivisions(5);
+
             self.ratio.DrawCopy()
 
             #
-            # Draw ratio error band                                              
+            # Draw ratio error band
             #
             self.error_map['bkg_ratio'] = syst_ratio.Clone()
             #self.error_map['bkg_ratio'].SetFillStyle(3354)
@@ -1736,7 +1759,7 @@ class DrawStack:
 
         if len(hists)<2:
             log.info('MvaPlot - ERROR plot_syst_err_band does not have enough histograms to compute uncertainity: %s' %(len(hists)))
-        
+
         # Draw
         nom=None
         nom = self.bkg_sum.Clone()
@@ -1744,9 +1767,9 @@ class DrawStack:
             syst.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             syst.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             # This REMOVES THE MC STAT uncertainty from the syst band
-            syst.SetPointEYhigh(i-1,0.0)
-            syst.SetPointEYlow(i-1,0.0)
-            
+            if not options.show_mc_stat_err:
+                syst.SetPointEYhigh(i-1,0.0)
+                syst.SetPointEYlow(i-1,0.0)
             if other_syst:
                 m=i
                 e1=other_syst.GetErrorYhigh(m-1)
@@ -1760,7 +1783,7 @@ class DrawStack:
         # iterate over the systematics
         for sys, ent in self.sys_bkgs.iteritems():
             if True:
-                #print 'sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()                
+                #print 'sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()
                 for m in range(1,nom.GetNbinsX()+1):
                     nom_val=nom.GetBinContent(m)
                     e1=(ent.hist.GetBinContent(m)-nom_val)
@@ -1774,25 +1797,25 @@ class DrawStack:
                         e2=syst.GetErrorYlow(m-1)
                         new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
                         syst.SetPointEYlow(m-1,new_e)
-        #    
-        # Calculate the systematic band for a ratio plot  
-        #  
+        #
+        # Calculate the systematic band for a ratio plot
+        #
         x1=ROOT.Double()
         y1=ROOT.Double()
         for i in range(0,self.bkg_sum.GetNbinsX()):
             syst_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
-            syst_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)        
+            syst_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
         for j in range(1,tot_bkg.GetNbinsX()+1):
-            # Set Y value to 1  
+            # Set Y value to 1
             syst_ratio.GetPoint(j-1,x1,y1)
             syst_ratio.SetPoint(j-1,x1,1.0)
             val=tot_bkg.GetBinContent(j)
             if val==0.0:
                 continue
 
-            #  
-            # Normalize error  
-            #   
+            #
+            # Normalize error
+            #
             eyu=syst.GetErrorYhigh   (j-1)/val
             eyd=syst.GetErrorYlow    (j-1)/val
             syst_ratio.SetPointEYhigh(j-1,eyu)
@@ -1804,7 +1827,7 @@ class DrawStack:
     def CreateStack(self):
         self.stack   = ROOT.THStack(self.name, self.name)
         self.bkg_sum = None
-    
+
         for bkg in sorted(self.bkgs.keys(), key=getSampleSortKey):
 
             if self.bkgs[bkg].sample=='smww' or self.bkgs[bkg].sample=='wzzz': ## doug wzzz
@@ -1812,7 +1835,7 @@ class DrawStack:
                     my_err = self.bkgs[bkg].hist.GetBinError(bb)
                     my_int = self.bkgs[bkg].hist.GetBinContent(bb)
                     self.bkgs[bkg].hist.SetBinError(bb,math.sqrt(my_err**2+(0.09*my_int)**2))
-            
+
             he = self.bkgs[bkg]
             self.stack.Add(he.hist)
 
@@ -1830,12 +1853,12 @@ class DrawStack:
             self.leg.AddEntry(self.data.hist,'Data')
             self.bkg_sum_altb=self.data.hist.Clone()
             self.bkg_sum_altb.SetLineColor(ROOT.kRed)
-            self.bkg_sum_altb.SetMarkerColor(ROOT.kRed)            
+            self.bkg_sum_altb.SetMarkerColor(ROOT.kRed)
             self.bkg_sum_altb.SetMarkerSize(0)
             self.bkg_sum_altb.SetFillColor(1)
             #self.bkg_sum_altb.SetFillStyle(3005)
-            self.bkg_sum_altb.SetFillStyle(3004)            
-                        
+            self.bkg_sum_altb.SetFillStyle(3004)
+
         for bkg in sorted(self.bkgs.keys(), key=getLabelSortKey):
             he = self.bkgs[bkg]
             he.DrawHist(None, self.leg)
@@ -1844,10 +1867,10 @@ class DrawStack:
     def UpdateStack(self):
 
         pars = getHistPars(self.name)
-        
+
         if 'xtitle' in pars and self.stack.GetXaxis() != None:
             self.stack.GetXaxis().SetTitle(pars['xtitle'])
-        
+
         if 'ytitle' in pars and self.stack.GetYaxis() != None:
             self.stack.GetYaxis().SetTitle(pars['ytitle'])
 
@@ -1859,7 +1882,7 @@ class DrawStack:
             else:
                 self.stack.SetMaximum( 1.8*ymax)
                 self.stack.SetMinimum(0.0)
-                
+
         if 'ymin' in pars:
             self.stack.SetMinimum(pars['ymin'])
         elif options.ymin != None:
@@ -1888,7 +1911,7 @@ class DrawStack:
         pars = getHistPars(self.name)
         if 'xtitle' in pars and h.GetXaxis() != None:
             h.GetXaxis().SetTitle(pars['xtitle'])
-        
+
         if 'ytitle' in pars and h.GetYaxis() != None:
             h.GetYaxis().SetTitle(pars['ytitle'])
 
@@ -1900,7 +1923,7 @@ class DrawStack:
             else:
                 h.SetMaximum( 1.3*ymax)
                 h.SetMinimum(0.0)
-                
+
         if 'ymin' in pars:
             h.SetMinimum(pars['ymin'])
         elif options.ymin != None:
@@ -1921,7 +1944,7 @@ class DrawStack:
                 h.SetLineWidth(style['line_width'])
             if 'line_style' in style:
                 h.SetLineStyle(style['line_style'])
-            
+
         if 'xmax' in pars:
             h.GetXaxis().SetRangeUser(0.0,pars['xmax'])
         elif options.xmax != None:
@@ -1930,10 +1953,10 @@ class DrawStack:
     #--------------------
     def GetYaxisMax(self):
         ymax = 0.0
-        
+
         ymax = max([ymax, self.GetHistMax(self.data.hist)])
         ymax = max([ymax, self.GetHistMax(self.sign.hist)])
-        
+
         if self.stack != None:
             ymax = max([ymax, self.stack.GetMaximum()])
 
@@ -1946,7 +1969,7 @@ class DrawStack:
         for ibin in range(1, hist.GetNbinsX()+1):
             val = hist.GetBinContent(ibin)
             err = hist.GetBinError  (ibin)
-            
+
             if val > 0.0:
                 if ymax == None:
                     ymax = val + err
@@ -1973,7 +1996,7 @@ def syst_names():
                    'el_eff_n':'Electron Eff Down',
                    'el_eff_p':'Electron Eff Up',
                    'ees_low_p': 'Electron Scale Low p_{T} Up',
-                   'ees_low_n': 'Electron Scale Low p_{T} Down',                   
+                   'ees_low_n': 'Electron Scale Low p_{T} Down',
                    'btag_cj_p':'Btag Charm Up',
                    'btag_cj_n':'Btag Charm Down',
                    'btag_lj_n':'Btag Light Down',
@@ -1995,7 +2018,7 @@ def syst_names():
                     'eer_n':'Electron Resolution Down',
                     'bch_up' : 'BCH Up',
                     'bch_dn' : 'BCH Down',
-                    
+
                    'jer':'JER',
                    'pileup_p':'Pileup Up',
                    'pileup_n':'Pileup Down',
@@ -2005,7 +2028,7 @@ def syst_names():
                    'el_stat_fr_p':'Electron FR Stat Up',
                    'el_stat_fr_n':'Electron FR Stat Down',
                    'mu_stat_fr_p':'Muon FR Stat Up',
-                   'mu_stat_fr_n':'Muon FR Stat Down',                   
+                   'mu_stat_fr_n':'Muon FR Stat Down',
                     'lep_corr_fr_p':'FR Closure Up',
                     'lep_corr_fr_n':'FR Closure Down',
                    }
@@ -2023,16 +2046,16 @@ def writeSystTex(table_name, stack):
     out.write('\\resizebox{\\textwidth}{!} { \n')
     out.write('\\begin{tabular}{l||llll|l}\n')
     out.write('\\hline\\hline\n')
-        
+
     syst_name_map=syst_names()
-    
+
     bkg_herr =  stack.sys_bkgs
     deleteme,hnom = stack.GetErrorHists()
     nom_err=ROOT.Double(0.0)
     nom_val = hnom.IntegralAndError(0,2001,nom_err)
     systs=[]
     total_uncer_up=0.0
-    total_uncer_down=0.0    
+    total_uncer_down=0.0
     for sys, ent in bkg_herr.iteritems():
         if nom_val<=0.0:
             nom_val=1.0
@@ -2045,8 +2068,8 @@ def writeSystTex(table_name, stack):
         if my_ratio>0.0:
             total_uncer_up+=my_ratio*my_ratio
         else:
-            total_uncer_down+=my_ratio*my_ratio            
-   
+            total_uncer_down+=my_ratio*my_ratio
+
     # Sort systematics
     for i in range(0,len(systs)):
 
@@ -2070,9 +2093,9 @@ def writeSystTex(table_name, stack):
                     my_space=''
                     for nnn in range(0,25-len(s[0])):
                         my_space+=' '
-                    line= s[0]+my_space+' & '+'%0.4f \\\\' %(s[1])                    
+                    line= s[0]+my_space+' & '+'%0.4f \\\\' %(s[1])
                     #line=' & '+'%0.4f ' %(s[1])
-                    out.write('%s\n' %line)            
+                    out.write('%s\n' %line)
     else:
 
         for s in systs:
@@ -2083,12 +2106,12 @@ def writeSystTex(table_name, stack):
             line= s[0]+my_space+' & '+'%0.4f \\\\' %(s[1])
             #line= s[0]
             #line='%s & '+'%0.4f ' %(s[0],s[1])
-            out.write('%s\n' %line)        
+            out.write('%s\n' %line)
     # Print errors
     my_err_up=math.sqrt(total_uncer_up)
-    my_err_dw=math.sqrt(total_uncer_down)    
+    my_err_dw=math.sqrt(total_uncer_down)
     syst_err_up=my_err_up*nom_val
-    syst_err_dw=my_err_dw*nom_val    
+    syst_err_dw=my_err_dw*nom_val
     data_val= stack.data.hist.Integral(0,1001)
     data_err = math.sqrt(data_val)
 
@@ -2099,7 +2122,7 @@ def writeSystTex(table_name, stack):
     out.write('\\end{tabular}\n')
     out.write('}\n')
     out.close()
-    
+
 #-------------------------------------------------------------------------
 def main():
 
@@ -2126,7 +2149,7 @@ def main():
     print 'Reading nSyst: ',len(mysyst.getsystematicsList())
     for ia in mysyst.getsystematicsList():
         sfiles[ia]=rfile
-    
+
     #
     # Select histograms and samples for stacks
     #
@@ -2135,7 +2158,7 @@ def main():
         bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv']#,'zldy'
     else:
         bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv'] #,'mqcd','zldy'
-        
+
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
 
@@ -2143,7 +2166,7 @@ def main():
     extract_sig=[]
     if options.extract_sig!=None:
         extract_sig = options.extract_sig.split(',')
-        
+
     vars = ['mll', 'ptll', 'pttot', 'mt', 'dphill', 'outbdt', 'outknn']
     nf_map={}
     if options.sf_file!=None:
@@ -2174,12 +2197,12 @@ def main():
 
     for var in vars:
 
-        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)            
+        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)
         print 'nSYST: ',len(sfiles)
         if options.draw_syst:
             if len(sfiles)>0:
                 stack.ReadSystFiles(sfiles)
-            
+
         stack.Draw(can)
         stacks += [stack]
 
@@ -2204,20 +2227,20 @@ def main():
                 stack.PlotSystBkg(syst, can)
 
     if options.syst == 'SysAll' and options.make_syst_table:
-        
+
         ROOT.gStyle.SetPadLeftMargin  (0.28)
         ROOT.gStyle.SetPadRightMargin (0.08)
         ROOT.gStyle.SetPadBottomMargin(0.10)
-        
+
         can = ROOT.TCanvas('table', 'table', 600, 850)
         can.Draw()
         can.cd()
-        
+
         for stack in stacks:
             stack.PlotSystTables(can)
     if options.syst_table:
         writeSystTex(options.syst_table, stack)
-            
+
     # Delete Memory
     can.Clear()
     del stacks

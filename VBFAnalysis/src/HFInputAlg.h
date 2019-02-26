@@ -44,6 +44,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
   double weightXETrigSF(const float met_pt, int syst);
+  float  GetDPhi(const float phi1, const float phi2);
 
  private: 
   int npevents = 0;
@@ -82,6 +83,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   vector <vector <TH1F*>> hCRZmm;
 
   Int_t m_extraVars = 0;
+  Int_t m_binning = 0;
+  Int_t m_metdef = 0;
 
   Double_t xeSFTrigWeight;
   Float_t met_significance;
@@ -96,6 +99,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t n_ph;
   Int_t n_el;
   Int_t n_mu;
+  Int_t n_baseel;
+  Int_t n_basemu;
   Double_t jj_mass;
   Double_t jj_deta;
   Double_t jj_dphi;
@@ -105,12 +110,16 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Double_t met_tst_nolep_j2_dphi;
   Float_t met_tst_et;
   Float_t met_tst_nolep_et;
+  Float_t met_tst_phi;
+  Float_t met_tst_nolep_phi;
   Double_t met_cst_jet;
   std::vector<Int_t>* mu_charge;
+  std::vector<Int_t>* basemu_charge;
   std::vector<Float_t>* mu_pt;
   std::vector<Float_t>* mu_phi;
   std::vector<Float_t>* mu_eta;
   std::vector<Int_t>* el_charge;
+  std::vector<Int_t>* baseel_charge;
   std::vector<Float_t>* el_pt;
   std::vector<Float_t>* el_phi;
   std::vector<Float_t>* el_eta;
@@ -127,9 +136,17 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tight_tst_et=-9999;
   Float_t met_tighter_tst_et=-9999;
   Float_t met_tenacious_tst_et=-9999;
+  Float_t met_tenacious_tst_phi=-9999;
+  Float_t met_tenacious_tst_nolep_et=-9999;
+  Float_t met_tenacious_tst_nolep_phi=-9999;
+
   std::vector<Float_t>* basemu_pt;
+  std::vector<Float_t>* basemu_eta;
+  std::vector<Float_t>* basemu_phi;
   std::vector<Float_t>* basemu_ptvarcone20;
   std::vector<Float_t>* baseel_pt;
+  std::vector<Float_t>* baseel_eta;
+  std::vector<Float_t>* baseel_phi;
   std::vector<Float_t>* baseel_ptvarcone20;
   
 }; 
