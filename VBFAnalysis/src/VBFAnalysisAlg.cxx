@@ -258,27 +258,28 @@ StatusCode VBFAnalysisAlg::initialize() {
     }
 
     m_tree_out->Branch("jet_fjvt",&jet_fjvt);    
+
+    m_tree_out->Branch("basemu_pt",           &basemu_pt);
+    m_tree_out->Branch("basemu_eta",          &basemu_eta);
+    m_tree_out->Branch("basemu_phi",          &basemu_phi);
+    m_tree_out->Branch("basemu_charge",          &basemu_charge);
+    m_tree_out->Branch("basemu_ptvarcone30",  &basemu_ptvarcone30);
+    m_tree_out->Branch("baseel_pt",           &baseel_pt);
+    m_tree_out->Branch("baseel_eta",          &baseel_eta);
+    m_tree_out->Branch("baseel_phi",          &baseel_phi);
+    m_tree_out->Branch("baseel_charge",          &baseel_charge);
+    m_tree_out->Branch("baseel_ptvarcone20",  &baseel_ptvarcone20);
     if(m_currentVariation=="Nominal"){
-      m_tree_out->Branch("basemu_pt",           &basemu_pt);
-      m_tree_out->Branch("basemu_eta",          &basemu_eta);
-      m_tree_out->Branch("basemu_phi",          &basemu_phi);
-      m_tree_out->Branch("basemu_charge",          &basemu_charge);
+      m_tree_out->Branch("basemu_ptvarcone20",  &basemu_ptvarcone20);
       m_tree_out->Branch("basemu_z0",           &basemu_z0);
       m_tree_out->Branch("basemu_d0sig",           &basemu_d0sig);
-      m_tree_out->Branch("basemu_ptvarcone20",  &basemu_ptvarcone20);
-      m_tree_out->Branch("basemu_ptvarcone30",  &basemu_ptvarcone30);
       m_tree_out->Branch("basemu_topoetcone20",  &basemu_topoetcone20);
       m_tree_out->Branch("basemu_topoetcone30",  &basemu_topoetcone30);
       m_tree_out->Branch("basemu_type",         &basemu_type);
       if(m_isMC) m_tree_out->Branch("basemu_truthOrigin",  &basemu_truthOrigin);
       if(m_isMC) m_tree_out->Branch("basemu_truthType",    &basemu_truthType);
-      m_tree_out->Branch("baseel_pt",           &baseel_pt);
-      m_tree_out->Branch("baseel_eta",          &baseel_eta);
-      m_tree_out->Branch("baseel_phi",          &baseel_phi);
-      m_tree_out->Branch("baseel_charge",          &baseel_charge);
       m_tree_out->Branch("baseel_z0",           &baseel_z0);
       m_tree_out->Branch("baseel_d0sig",        &baseel_d0sig);
-      m_tree_out->Branch("baseel_ptvarcone20",  &baseel_ptvarcone20);
       //m_tree_out->Branch("baseel_ptvarcone30",  &baseel_ptvarcone30);
       m_tree_out->Branch("baseel_topoetcone20",  &baseel_topoetcone20);
       //m_tree_out->Branch("baseel_topoetcone30",  &baseel_topoetcone30);
@@ -391,7 +392,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   // check that we don't have too many events
   if(nFileEvt>nFileEvtTot){
-    ATH_MSG_ERROR("VBFAnaysisAlg::execute: Too  many events:  " << nFileEvt << " total evts: " << nFileEvtTot);
+    if(m_currentVariation=="Nominal") ATH_MSG_ERROR("VBFAnaysisAlg::execute: Too  many events:  " << nFileEvt << " total evts: " << nFileEvtTot);
     return StatusCode::SUCCESS;
   }
 
