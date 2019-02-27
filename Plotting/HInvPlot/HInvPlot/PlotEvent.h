@@ -117,6 +117,8 @@ namespace Msl
     TH1                        *hj3Eta;      
     TH1                        *hj3Jvt;      
     TH1                        *hj3FJvt;      
+    TH1                        *hmuDR;      
+    TH1                        *hmuEta;
     
     TH1                        *hZMCIDQCD;
     TH1                        *hWMCIDQCD;

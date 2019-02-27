@@ -40,7 +40,7 @@ samples =['hVBFH125_',
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Madgraph_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
-f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix.root')
+f=ROOT.TFile.Open('/tmp/SumHF_LooseCuts_ZeroPhoton_SystAll_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_NjetBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LowMETBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLep_v26c.root')
@@ -50,6 +50,7 @@ f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix.
 #f=ROOT.TFile.Open('SumHF_nj2.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_FixedLepTrig.root')
 #f=ROOT.TFile.Open('SumHF.root')
+
 SumList=[]
 SumErrList=[]
 line='Region\t'
@@ -139,3 +140,16 @@ for rmy in regions:
             rline+='%0.3f\t%0.3f +/- %0.3f\t' %(totalBkgFracErr, totalData/totalBkg, math.sqrt(totalBkgFracErr**2+1./totalData)*(totalData/totalBkg))
             print rline
 print 'done'
+
+
+# Collect systematics
+tobj = f.GetListOfKeys()
+for sample in samples:
+    for i in tobj:
+    
+        vname=i.GetName()
+        #print vname
+        if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
+            h=f.Get(vname)
+            intBkg=h.Integral()
+            print '%0.2f ' %(intBkg)+vname 
