@@ -1619,6 +1619,9 @@ class DrawStack:
                         if not leftToRight:
                             cut_Nsig = self.sign.hist.Integral(ibin,10001)
                             cut_Nbkg = self.bkg_sum.Integral(ibin,10001)
+                        if leftToRight==2: # do this bin-by-bin
+                            cut_Nsig = self.sign.hist.Integral(ibin,ibin)
+                            cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
 
                         #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
@@ -1631,11 +1634,15 @@ class DrawStack:
                                 wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['wewk'].hist.Integral(0,ibin)
                                 if not leftToRight:
                                     wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['wewk'].hist.Integral(ibin,10001)
+                                if leftToRight==2:
+                                    wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['wewk'].hist.Integral(ibin,ibin)
 
                             if ('zqcd'+madgraph) in self.bkgs and 'zewk' in self.bkgs:
                                 zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
                                 if not leftToRight:
                                     zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['zewk'].hist.Integral(ibin,10001)
+                                if leftToRight==2:
+                                    zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
                                 total_zcr=-100.0
                                 #print 'self.zcr_stack: ',self.zcr_stack
                                 if self.zcr_stack and not self.zcr_stack.bkg_sum:
@@ -1643,6 +1650,8 @@ class DrawStack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
                                 if not leftToRight and self.zcr_stack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,10001)
+                                if (leftToRight==2) and self.zcr_stack:
+                                    total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)                                    
                                 if total_zcr>0.0:
                                     total_zcr = 1.0/math.sqrt(total_zcr)
                                 #print total_zcr

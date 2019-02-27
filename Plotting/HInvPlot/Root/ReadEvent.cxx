@@ -974,7 +974,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->met_nolep.SetPtEtaPhiM(event->GetVar(Mva::met_tst_nolep_et),0.0,event->GetVar(Mva::met_tst_nolep_phi),0.0);
 
     // refill the deltaPhi met jet
-    if(fMETChoice!="met_tst_et"){
+    if(fMETChoice!="met_tst_et" || true){
       if(event->jets.size()>1){
 	event->RepVar(Mva::met_tst_j1_dphi,fabs(event->met.DeltaPhi(event->jets.at(0).GetLVec())));
 	event->RepVar(Mva::met_tst_j2_dphi,fabs(event->met.DeltaPhi(event->jets.at(1).GetLVec())));
