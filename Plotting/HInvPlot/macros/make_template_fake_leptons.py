@@ -29,6 +29,8 @@ def main():
     parser.add_argument('-t', '--text', dest="text", default="", help="Text to put on the legend.")
     parser.add_argument('-r', '--region', dest="region", default="wcranti_allmjj_e", help="Region from HInvPlot to look at.")
     parser.add_argument('-v', '--var', dest="var", default="met_significance", help="Variable to plot.")
+    parser.add_argument('-c', '--cutoff', dest="cutoff", default=40, type=int, help="Threshold value at which to take the ratio.")
+    parser.add_argument('-b', '--rebin', dest="rebin", default=10, help="Number to rebin by when drawing the template shape plot.")
     args = parser.parse_args()
 
     filename = os.path.abspath(args.filename)
@@ -56,48 +58,18 @@ def main():
             sys.exit(1)
     print("")
 
-    # Taken from drawStack.py-- rebin so 1 bin = 1 sqrt(GeV)
-    data_hist.Rebin(10)
-
-    canvas = ROOT.TCanvas("canvas", "canvas", 800, 600)
-    data_hist.Draw()
-    canvas.Update()
-
-    data_hist.GetXaxis().SetTitle("MET Significance [GeV^{1/2}]")
-    data_hist.GetYaxis().SetTitle("Events")
-
-    ROOT.ATLASLabel(0.65, 0.85, "Internal")
-
-    legend = ROOT.TLegend(0.55, 0.7, 0.92, 0.85)
-
-    legend_header = "AntiID Template Shape"
-    #legend.SetHeader(legend_header, "C")
-    legend.AddEntry(0, legend_header, "")
-    if not args.text == "":
-        legend.AddEntry(0, args.text, "")
-    legend.SetBorderSize(0)
-    legend.SetFillColor(0)
-    legend.Draw()
-
-    output_name = "anti_id_template.eps"
-    if args.name != "":
-        output_name = args.name + "_" + output_name
-    canvas.SaveAs(output_name)
-    if args.wait:
-        raw_input()
-
     # Okay, now make a new histogram to get the uncertainty!
     two_bin_initial = ROOT.TH1F("two_bins_initial", "two_bins_initial", 2, 0, 2)
     two_bin_final = ROOT.TH1F("two_bins_final", "two_bins_final", 2, 0, 2)
 
     # Integrate from 0 to 4 and retrieve the integrated error.
     low_error = ROOT.Double()
-    low = data_hist.IntegralAndError(0, 4, low_error)
+    low = data_hist.IntegralAndError(0, args.cutoff, low_error)
     low_var = float(low_error)**2
 
     # Integrate from 4 and above (bin 5+) and retrieve the integrated error.
     high_error = ROOT.Double()
-    high = data_hist.IntegralAndError(5, data_hist.GetNbinsX()+2, high_error)
+    high = data_hist.IntegralAndError(args.cutoff + 1, data_hist.GetNbinsX()+2, high_error)
     high_var = float(high_error)**2
 
     # Fill one histogram with the number of low (<4) and high (>4) events.
@@ -143,6 +115,39 @@ def main():
     print("Ratio (TEfficiency) = %f +/- %f" % (ratio, ratio_error))
     print("Ratio (Binomial) = %f +/- %f" % (ratio, ratio_bin_error))
     print("")
+
+    # Now that we've made the estimate, draw the MEt significance template shape.
+
+    # Taken from drawStack.py-- rebin so 1 bin = 1 sqrt(GeV)
+    # Actually, make this configurable parameter.
+    data_hist.Rebin(args.rebin)
+
+    canvas = ROOT.TCanvas("canvas", "canvas", 800, 600)
+    data_hist.Draw()
+    canvas.Update()
+
+    data_hist.GetXaxis().SetTitle("MET Significance [GeV^{1/2}]")
+    data_hist.GetYaxis().SetTitle("Events")
+
+    ROOT.ATLASLabel(0.65, 0.85, "Internal")
+
+    legend = ROOT.TLegend(0.55, 0.7, 0.92, 0.85)
+
+    legend_header = "AntiID Template Shape"
+    #legend.SetHeader(legend_header, "C")
+    legend.AddEntry(0, legend_header, "")
+    if not args.text == "":
+        legend.AddEntry(0, args.text, "")
+    legend.SetBorderSize(0)
+    legend.SetFillColor(0)
+    legend.Draw()
+
+    output_name = "anti_id_template.eps"
+    if args.name != "":
+        output_name = args.name + "_" + output_name
+    canvas.SaveAs(output_name)
+    if args.wait:
+        raw_input()
 
 if __name__ == '__main__':
     main()
