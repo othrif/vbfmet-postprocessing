@@ -228,7 +228,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
         #cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
         cuts += basic_cuts.GetMjjCut()
     else:
-        cuts += [CutItem('CutDEtajj','jj_deta > 4.0')]
+        cuts += [CutItem('CutDEtajj','jj_deta > 3.8')]
         #cuts += [CutItem('CutDEtajjV','jj_deta > 2.5')]
         #cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
         cuts += basic_cuts.GetMjjCut()
