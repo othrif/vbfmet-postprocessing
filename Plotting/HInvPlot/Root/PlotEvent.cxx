@@ -116,7 +116,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
-  hqgTagRegions = GetTH1("qgTagRegions",  4,  0.0, 4.0);  
+  hqgTagRegions = GetTH1("qgTagRegions",  7,  0.0, 7.0);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -192,13 +192,20 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
   //for qgTagRegions
   hqgTagRegions->Fill(0.0,weight);
-  if(event.GetVar(Mva::passPerfCTagging)==2) hqgTagRegions->Fill(3.0, weight);
-  if(event.GetVar(Mva::passPerfFTagging)==2) hqgTagRegions->Fill(2.0, weight);
+  if(event.GetVar(Mva::passPerfCTagging)==2) hqgTagRegions->Fill(5.0, weight);
+  else hqgTagRegions->Fill(6.0,weight);
+  if(event.GetVar(Mva::passPerfFTagging)==2) hqgTagRegions->Fill(3.0, weight);
+  else hqgTagRegions->Fill(4.0,weight);
   if(event.GetVar(Mva::jj_nmbGluons)==0) hqgTagRegions->Fill(1.0, weight);
+  else hqgTagRegions->Fill(2.0,weight);
+
   hqgTagRegions->GetXaxis()->SetBinLabel(1,"No Tagging");
   hqgTagRegions->GetXaxis()->SetBinLabel(2,"Full Tagging");
-  hqgTagRegions->GetXaxis()->SetBinLabel(3,"Forward Tagging");
-  hqgTagRegions->GetXaxis()->SetBinLabel(4,"Central Tagging");
+  hqgTagRegions->GetXaxis()->SetBinLabel(3,"Fail Full Tagging");
+  hqgTagRegions->GetXaxis()->SetBinLabel(4,"Forward Tagging");
+  hqgTagRegions->GetXaxis()->SetBinLabel(5,"Fail Forward Tagging");
+  hqgTagRegions->GetXaxis()->SetBinLabel(6,"Central Tagging");
+  hqgTagRegions->GetXaxis()->SetBinLabel(7,"Fail Central Tagging");
 
 
   // testing

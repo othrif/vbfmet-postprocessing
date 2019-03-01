@@ -22,8 +22,8 @@ log = config.getLog('plotEvent.py')
 
 #import PyCintex,
 import ROOT
-#import HInvPlot.CutsDef as hstudy
-import HInvPlot.CutsDef_qgSR as hstudy
+import HInvPlot.CutsDef as hstudy
+#import HInvPlot.CutsDef_qgSR as hstudy
 import HInvPlot.Input   as hinput
 
 #-----------------------------------------------------------------------------------------
@@ -89,6 +89,7 @@ def prepareSeqSR(basic_cuts, alg_take=None, syst='Nominal'):
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
+"""
 #-----------------------------------------------------------------------------------------
 def prepareSeqSR1(basic_cuts, alg_take=None, syst='Nominal'):
 
@@ -312,6 +313,7 @@ def prepareSeqSR3c(basic_cuts, alg_take=None, syst='Nominal'):
 
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
+"""
 
 #-----------------------------------------------------------------------------------------
 def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
@@ -462,7 +464,7 @@ def main():
                     #
                     (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
                     read_alg.AddNormalAlg(name_sr,  alg_sr)
-       
+       		    """
                     #
                     # SR Cut based regions for qgTagging studies
                     #
@@ -511,6 +513,7 @@ def main():
         
                     (name_sr3c,  alg_sr3c)  = prepareSeqSR3c (basic_cuts, alg_take=input_cut, syst=syst)
                     read_alg.AddNormalAlg(name_sr3c,  alg_sr3c)
+		    """
 
                     #
                     # SR Cut based regions and algorithms with photon
