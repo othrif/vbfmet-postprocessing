@@ -24,7 +24,9 @@ class BasicCuts:
 
     def __init__(self, Analysis, Chan, SameSign=0):
 
-        if Analysis not in ['allmjj','mjj1000','mjj1500','mjj2000']:
+        if Analysis not in ['allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2',
+                            'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
+                                'njgt2']:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
 
         self.analysis = Analysis
@@ -32,15 +34,32 @@ class BasicCuts:
         self.SameSign = SameSign
         self.MjjLowerCut   = 1000.0
         self.MjjUpperCut   = -1.0
-        if Analysis=='mjj1000':
+        self.DPhijjLowerCut   = -1.0
+        self.DPhijjUpperCut   = 1.8
+        self.NjetCut   = 'n_jet > 1 && n_jet < 5'
+        if Analysis.count('mjj1000'):
             self.MjjLowerCut   = 1000.0
             self.MjjUpperCut   = 1500.0
-        if Analysis=='mjj1500':
+        if Analysis.count('mjj1500'):
             self.MjjLowerCut   = 1500.0
             self.MjjUpperCut   = 2000.0
-        if Analysis=='mjj2000':
+        if Analysis.count('mjj2000'):
             self.MjjLowerCut   = 2000.0
             self.MjjUpperCut   = -1.0
+        if Analysis.count('dphijj1'):
+            self.DPhijjLowerCut   = -1
+            self.DPhijjUpperCut   = 1.0
+        if Analysis.count('dphijj2'):
+            self.DPhijjLowerCut   = 1.0
+            self.DPhijjUpperCut   = 1.8
+        if Analysis.count('njgt2'): # single bin
+            self.MjjLowerCut   = 1000.0
+            self.MjjUpperCut   = -1.0
+            self.DPhijjLowerCut   = -1.0
+            self.DPhijjUpperCut   = 1.8
+            self.NjetCut = 'n_jet > 2 && n_jet < 5'
+        if Analysis.count('nj2'): 
+            self.NjetCut = 'n_jet == 2'
             
     def PadKey(self, key, val, pf=None, sf=None):
         if len(key) > 0: key += '_'
@@ -77,6 +96,18 @@ class BasicCuts:
         if self.MjjUpperCut>0.0:
             cutMjj.AddCut(CutItem('High', 'jj_mass < %s' %(self.MjjUpperCut)), 'AND')
         return [cutMjj]
+    
+    def GetDPhijjCut(self):
+        cutDPhijj = CutItem('CutDPhijj')
+        if self.DPhijjLowerCut>0.0:
+            cutDPhijj.AddCut(CutItem('Low',  'jj_dphi > %s' %(self.DPhijjLowerCut)), 'AND')
+        if self.DPhijjUpperCut>0.0:
+            cutDPhijj.AddCut(CutItem('High', 'jj_dphi < %s' %(self.DPhijjUpperCut)), 'AND')
+        return [cutDPhijj]
+    
+    def GetNjetCut(self):
+        cutNjet = CutItem('CutNjet', self.NjetCut)
+        return [cutNjet]
 
 #-------------------------------------------------------------------------
 def getLepChannelCuts(basic_cuts):
@@ -143,7 +174,7 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False):
     else:
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
 
-
+    # Cut is under discussion
     #if not isEMu:
     #    cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
     cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
@@ -152,7 +183,7 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False):
     return cuts
 
 #-------------------------------------------------------------------------
-def getJetCuts(options, isPh=False):
+def getJetCuts(basic_cuts, options, isPh=False):
 
     if not isPh:
         if options.r207Ana:
@@ -164,7 +195,8 @@ def getJetCuts(options, isPh=False):
         else:
             # New Cuts
             #cuts += [CutItem('CutNjetCen',  'n_jet_cenj == 0')]
-            cuts  = [CutItem('CutNjet',             'n_jet > 1 && n_jet < 5')]
+            #cuts  = [CutItem('CutNjet',             'n_jet > 1 && n_jet < 5')]
+            cuts = basic_cuts.GetNjetCut()
             cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
             cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
 
@@ -182,7 +214,8 @@ def getJetCuts(options, isPh=False):
 #-------------------------------------------------------------------------
 def getVBFCuts(options, basic_cuts, isLep=False):
 
-    cuts = [CutItem('CutDPhijj',   'jj_dphi < 1.8')]
+    #cuts = [CutItem('CutDPhijj',   'jj_dphi < 1.8')]
+    cuts = basic_cuts.GetDPhijjCut()
     if not isLep:
         cuts += [CutItem('CutDPhiMetj0','met_tst_j1_dphi > 1.0')]
         cuts += [CutItem('CutDPhiMetj1','met_tst_j2_dphi > 1.0')]
@@ -240,7 +273,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
     cuts += [CutItem('CutPh', 'n_ph==0')]
-    cuts += getJetCuts(options);
+    cuts += getJetCuts(basic_cuts, options);
 
     # add the extra cuts
     cuts += ExtraCuts(options)
@@ -264,7 +297,7 @@ def getGamSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
     cuts += [CutItem('CutPh',       'n_ph==1')]
-    cuts += getJetCuts(options, isPh=True);
+    cuts += getJetCuts(basic_cuts, options, isPh=True);
 
     # add the extra cuts
     cuts += ExtraCuts(options)
@@ -296,7 +329,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += [CutItem('CutPh', 'n_ph==0')]
     cuts += getLepChannelCuts(basic_cuts)
-    cuts += getJetCuts(options);
+    cuts += getJetCuts(basic_cuts, options);
     if basic_cuts.chan=='eu':
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
         cuts += [CutItem('CutNbjet',  'n_bjet < 0.5')]
@@ -344,7 +377,7 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += [CutItem('CutPh', 'n_ph==0')]
     cuts += getLepChannelCuts(basic_cuts)
-    cuts += getJetCuts(options);
+    cuts += getJetCuts(basic_cuts, options);
     cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
 
     # add the extra cuts
