@@ -21,24 +21,9 @@ ROOT.SetAtlasStyle()
 
 import argparse
 
-def main():
-    parser = argparse.ArgumentParser(description="A script to make template plots for lepton fake estimation.")
-    parser.add_argument('filename', default="output.root", help="Output file from HInvPlot to run over.")
-    parser.add_argument('-w', '--wait', action="store_true", dest="wait", help="Wait after drawing plot.")
-    parser.add_argument('-n', '--name', dest="name", default="", help="The name of the plot to create.")
-    parser.add_argument('-t', '--text', dest="text", default="", help="Text to put on the legend.")
-    parser.add_argument('-r', '--region', dest="region", default="wcranti_allmjj_e", help="Region from HInvPlot to look at.")
-    parser.add_argument('-v', '--var', dest="var", default="met_significance", help="Variable to plot.")
-    parser.add_argument('-c', '--cutoff', dest="cutoff", default=40, type=int, help="Threshold value at which to take the ratio.")
-    parser.add_argument('-b', '--rebin', dest="rebin", default=10, help="Number to rebin by when drawing the template shape plot.")
-    args = parser.parse_args()
+import collections
 
-    filename = os.path.abspath(args.filename)
-
-    tfile = ROOT.TFile(filename)
-    keys = tfile.GetListOfKeys()
-
-    region = "pass_" + args.region + "_Nominal"
+def compute_ratio(args, tfile, region):
     histname = os.path.join(region, "plotEvent_data", args.var)
 
     # TODO XXX: should we make this configurable?
@@ -99,7 +84,10 @@ def main():
     error = max(efficiency.GetEfficiencyErrorLow(1), efficiency.GetEfficiencyErrorUp(1))
 
     # ...or, we can compute the error using binomial statistics instead.
-    binomial_error = 1/(low+high) * math.sqrt(low * (1 - low/(low+high)))
+    try:
+        binomial_error = 1/(low+high) * math.sqrt(low * (1 - low/(low+high)))
+    except ValueError:
+        binomial_error = 0
 
     # Regardless of what we do, we need to propagate the error on the efficiency
     # to the error on the ratio, which should be the same regardless.
@@ -138,16 +126,66 @@ def main():
     legend.AddEntry(0, legend_header, "")
     if not args.text == "":
         legend.AddEntry(0, args.text, "")
+    legend.AddEntry(0, "Ratio: %0.2f +/- %0.2f" % (ratio, ratio_bin_error), "")
     legend.SetBorderSize(0)
     legend.SetFillColor(0)
     legend.Draw()
 
-    output_name = "anti_id_template.eps"
+    output_name = "anti_id_template_" + region + ".eps"
     if args.name != "":
         output_name = args.name + "_" + output_name
     canvas.SaveAs(output_name)
     if args.wait:
         raw_input()
+
+    return ratio, ratio_bin_error
+
+def main():
+    parser = argparse.ArgumentParser(description="A script to make template plots for lepton fake estimation.")
+    parser.add_argument('filename', default="output.root", help="Output file from HInvPlot to run over.")
+    parser.add_argument('-w', '--wait', action="store_true", dest="wait", help="Wait after drawing plot.")
+    parser.add_argument('-n', '--name', dest="name", default="", help="The name of the plot to create.")
+    parser.add_argument('-t', '--text', dest="text", default="", help="Text to put on the legend.")
+    parser.add_argument('-r', '--region', dest="region", default="wcranti_allmjj_e", help="Region from HInvPlot to look at.")
+    parser.add_argument('-v', '--var', dest="var", default="met_significance", help="Variable to plot.")
+    parser.add_argument('-c', '--cutoff', dest="cutoff", default=40, type=int, help="Threshold value at which to take the ratio.")
+    parser.add_argument('-b', '--rebin', dest="rebin", default=10, help="Number to rebin by when drawing the template shape plot.")
+    parser.add_argument('-a', '--all', dest="all", action="store_true", help="Run estimate for all regions. Ignore -r.")
+    parser.add_argument('-p', '--plusminus', dest="plusminus", action="store_true", help="Run estimate for ep and em regions too.")
+    args = parser.parse_args()
+
+    filename = os.path.abspath(args.filename)
+
+    tfile = ROOT.TFile(filename)
+    keys = tfile.GetListOfKeys()
+
+    if not args.all:
+        region = "pass_" + args.region + "_Nominal"
+        compute_ratio(args, tfile, region)
+
+    # If the 'all' flag is passed, loop through the ROOT file.
+    # Run this for all wcranti regions.
+    else:
+        ratios = collections.OrderedDict()
+        maxlen = -1
+        for key in keys:
+            region = key.GetName()
+            if "pass_wcranti" not in region:
+                continue
+            if not ('e_Nominal' in region):
+                if not (args.plusminus and ('em_Nominal' in region or 'ep_Nominal' in region)):
+                    continue
+            print("Calculating estimate for region: " + region)
+            ratio, ratio_error = compute_ratio(args, tfile, region)
+            ratios[region] = (ratio, ratio_error)
+            print("")
+            if len(region) >= maxlen:
+                maxlen = len(region)
+
+        for name, (ratio, ratio_error) in ratios.iteritems():
+            # I really should use new python string formatting for this.
+            message = "%-" + str(maxlen) +  "s = %f +/- %f"
+            print(message % (str(name), ratio, ratio_error))
 
 if __name__ == '__main__':
     main()
