@@ -173,7 +173,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   if(m_currentVariation=="Nominal"){ // only write for the nominal
     m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
     m_tree_out->Branch("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
-    m_tree_out->Branch("mcEventWeights",&mcEventWeights);
+    if(m_theoVariation) m_tree_out->Branch("mcEventWeights",&mcEventWeights);
   }
   if(m_currentVariation=="Nominal") m_tree_out->Branch("eleANTISF",&eleANTISF);
   m_tree_out->Branch("runNumber",&runNumber);
@@ -848,20 +848,20 @@ StatusCode VBFAnalysisAlg::execute() {
     regDecision["CRZ"]=(CRZee || CRZmm);
 
     for(auto reg : regions){
-      for(int i=0; i<115; i++)
+      for(int i=0; i<115; i++){
         if(regDecision[reg])
           hist("jj_mass_"+reg+"_index_"+to_string(i))->Fill(jj_mass/1e6, w*mcEventWeights->at(i));
-        if(regDecision[reg])
-        {
-          hist( "jj_mass_"+reg+"_nominal" )->Fill(jj_mass/1e6, w);
-          hist( "scales/jj_mass_"+reg+"_fac_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(8));
-          hist( "scales/jj_mass_"+reg+"_fac_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(6));
-          hist( "scales/jj_mass_"+reg+"_renorm_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(9));
-          hist( "scales/jj_mass_"+reg+"_renorm_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(5));
-          hist( "scales/jj_mass_"+reg+"_both_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(10));
-          hist( "scales/jj_mass_"+reg+"_both_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(4));
-          for(unsigned int j = 11; j <= 110; j++)
-            hist( "PDF/jj_mass_"+reg+"_pdf"+to_string(j-11) )->Fill(jj_mass/1e6, w*mcEventWeights->at(j));
+      }
+      if(regDecision[reg]){
+	hist( "jj_mass_"+reg+"_nominal" )->Fill(jj_mass/1e6, w);
+	hist( "scales/jj_mass_"+reg+"_fac_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(8));
+	hist( "scales/jj_mass_"+reg+"_fac_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(6));
+	hist( "scales/jj_mass_"+reg+"_renorm_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(9));
+	hist( "scales/jj_mass_"+reg+"_renorm_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(5));
+	hist( "scales/jj_mass_"+reg+"_both_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(10));
+	hist( "scales/jj_mass_"+reg+"_both_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(4));
+	for(unsigned int j = 11; j <= 110; j++)
+	  hist( "PDF/jj_mass_"+reg+"_pdf"+to_string(j-11) )->Fill(jj_mass/1e6, w*mcEventWeights->at(j));
       }
     }
   }
