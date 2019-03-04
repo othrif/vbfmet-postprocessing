@@ -21,11 +21,14 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "normFile", m_normFile = "current.root", "path to a file with the number of events processed" );
   declareProperty( "mcCampaign", m_mcCampaign = "mc16a", "mcCampaign of the mc sample. only read if isMC is true" );
   declareProperty( "UseExtMC", m_UseExtMC = false, "Use extended MC samples");
+  declareProperty( "theoVariation", m_theoVariation = false, "Do theory systematic variations");
 }
 
 
 VBFAnalysisAlg::~VBFAnalysisAlg() {}
 
+const std::string regions[] = {"Incl","SR","CRWe","CRWm","CRW","CRZee", "CRZmm","CRZ"};
+const std::string variations[] = {"fac_up","fac_down","renorm_up","renorm_down","both_up","both_down"};
 
 StatusCode VBFAnalysisAlg::initialize() {
   ATH_MSG_INFO ("Initializing " << name() << "...");
@@ -55,7 +58,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   }
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
-  xeSFTrigWeight__1down=1.0;    
+  xeSFTrigWeight__1down=1.0;
 
   j3_centrality = new std::vector<float>(0);
   j3_dRj1 = new std::vector<float>(0);
@@ -117,8 +120,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   jet_fjvt= new std::vector<float>(0);
   jet_timing= new std::vector<float>(0);
   jet_passJvt= new std::vector<int>(0);
-  jet_PartonTruthLabelID = new std::vector<int>(0); 
-  jet_ConeTruthLabelID = new std::vector<int>(0); 
+  jet_PartonTruthLabelID = new std::vector<int>(0);
+  jet_ConeTruthLabelID = new std::vector<int>(0);
   jet_NTracks = new std::vector<std::vector<unsigned short> >(0);
   jet_NTracks_PV = new std::vector<unsigned short>(0);
   jet_SumPtTracks = new std::vector<std::vector<float> >(0);
@@ -154,6 +157,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   tau_phi = new std::vector<float>(0);
   tau_eta = new std::vector<float>(0);
 
+  mcEventWeights = new std::vector<float>(0);
+
   //    if(runNumber >= 276262 && runNumber <= 284484) is2015 =true;
   //    else if(runNumber >= 296939 && runNumber <= 311481) is2016 =true;
   //    else throw std::invalid_argument("runNumber could not be identified with a dataset :o");
@@ -162,14 +167,15 @@ StatusCode VBFAnalysisAlg::initialize() {
   treeTitleOut = m_currentSample+m_currentVariation;
   treeNameOut = m_currentSample+m_currentVariation;
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
-  m_tree_out->Branch("w",&w); 
-  //m_tree_out->Branch("nloEWKWeight",&nloEWKWeight); 
+  m_tree_out->Branch("w",&w);
+  //m_tree_out->Branch("nloEWKWeight",&nloEWKWeight);
   m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight);
   if(m_currentVariation=="Nominal"){ // only write for the nominal
-    m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up); 
+    m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
     m_tree_out->Branch("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
+    m_tree_out->Branch("mcEventWeights",&mcEventWeights);
   }
-  if(m_currentVariation=="Nominal") m_tree_out->Branch("eleANTISF",&eleANTISF); 
+  if(m_currentVariation=="Nominal") m_tree_out->Branch("eleANTISF",&eleANTISF);
   m_tree_out->Branch("runNumber",&runNumber);
   m_tree_out->Branch("randomRunNumber",&randomRunNumber);
   m_tree_out->Branch("eventNumber",&eventNumber);
@@ -209,8 +215,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("jet_timing",&jet_timing);
   m_tree_out->Branch("mu_phi",&mu_phi);
   m_tree_out->Branch("el_phi",&el_phi);
-  m_tree_out->Branch("mu_eta",&mu_eta);    
-  m_tree_out->Branch("el_eta",&el_eta); 
+  m_tree_out->Branch("mu_eta",&mu_eta);
+  m_tree_out->Branch("el_eta",&el_eta);
   m_tree_out->Branch("jet_phi",&jet_phi);
   m_tree_out->Branch("jet_eta",&jet_eta);
   m_tree_out->Branch("jet_m",&jet_m);
@@ -257,7 +263,7 @@ StatusCode VBFAnalysisAlg::initialize() {
       if(m_isMC) m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
     }
 
-    m_tree_out->Branch("jet_fjvt",&jet_fjvt);    
+    m_tree_out->Branch("jet_fjvt",&jet_fjvt);
     if(m_currentVariation=="Nominal"){
       m_tree_out->Branch("basemu_pt",           &basemu_pt);
       m_tree_out->Branch("basemu_eta",          &basemu_eta);
@@ -328,12 +334,12 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("truth_mu_eta",&truth_mu_eta);
       m_tree_out->Branch("truth_mu_phi",&truth_mu_phi);
     }else{
-      truth_tau_pt=0; truth_tau_eta=0; truth_tau_phi=0; 
+      truth_tau_pt=0; truth_tau_eta=0; truth_tau_phi=0;
       truth_el_pt=0;  truth_el_eta=0;  truth_el_phi=0;
       truth_mu_pt=0;  truth_mu_eta=0;  truth_mu_phi=0;
     }
   }
-  
+
   if(m_currentVariation=="Nominal" && m_isMC){
     m_tree_out->Branch("GenMET_pt", &GenMET_pt);
     m_tree_out->Branch("met_truth_et", &met_truth_et);
@@ -345,13 +351,26 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("truth_jet_m",  &truth_jet_m);
     m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
   }else{
-    truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0; 
+    truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0;
   }
-  //Register the output TTree 
+  //Register the output TTree
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
-  MapNgen(); //fill std::map with dsid->Ngen 
+  MapNgen(); //fill std::map with dsid->Ngen
+
+  if(m_theoVariation){
+    for (auto reg : regions){
+      ANA_CHECK (book (TH1F (Form("jj_mass_%s_nominal",reg.c_str()), ";m_{jj} [TeV];Entries", 50, 0, 5)));
+    for(int i=0; i<115; i++)
+      ANA_CHECK (book (TH1F (Form("all/jj_mass_%s_index_%d", reg.c_str(), i), ";m_{jj} [TeV];Entries", 50, 0, 5)));
+    for (auto var : variations)
+      ANA_CHECK (book (TH1F (Form("scales/jj_mass_%s_%s",reg.c_str(),var.c_str()), ";m_{jj} [TeV];Entries", 50, 0, 5)));
+    for(int j=0; j<100; j++)
+      ANA_CHECK (book (TH1F (Form("PDF/jj_mass_%s_pdf%d",reg.c_str(),j), ";m_{jj} [TeV];Entries", 50, 0, 5)));
+   }
+  }
+
   ATH_MSG_DEBUG ("Done Initializing");
-  
+
   std::ostringstream runNumberss;
   runNumberss << runNumber;
   outputName = m_currentSample+m_currentVariation+runNumberss.str();
@@ -376,13 +395,13 @@ StatusCode VBFAnalysisAlg::MapNgen(){
 
   for(int i=1; i<=h_Gen->GetNbinsX();i++){
     TString tmp = h_Gen->GetXaxis()->GetBinLabel(i);
-    int dsid = tmp.Atoi(); 
-    double N = h_Gen->GetBinContent(i); 
-    Ngen[dsid]=N; 
+    int dsid = tmp.Atoi();
+    double N = h_Gen->GetBinContent(i);
+    Ngen[dsid]=N;
     //std::cout << "input: " << dsid << " " << N << std::endl;
    }
-  
-  return StatusCode::SUCCESS; 
+
+  return StatusCode::SUCCESS;
 
 }
 
@@ -399,7 +418,7 @@ StatusCode VBFAnalysisAlg::execute() {
   m_tree->GetEntry(nFileEvt);
 
   // iterate event count
-  ++nFileEvt; 
+  ++nFileEvt;
   if (runNumber != m_runNumberInput){ //HACK to hard set the run number except for the filtered samples
     if(!((m_runNumberInput>=309662 && m_runNumberInput<=309679) || m_runNumberInput==310502)) ATH_MSG_ERROR("VBFAnaysisAlg::execute: runNumber " << runNumber << " != m_runNumberInput " << m_runNumberInput << " " << jj_dphi << " avg: " << averageIntPerXing);
     runNumber=m_runNumberInput;
@@ -424,7 +443,7 @@ StatusCode VBFAnalysisAlg::execute() {
   bool CRZtt = false;
 
   // Fill
-  truth_jj_mass =-1.0;  
+  truth_jj_mass =-1.0;
   if(m_isMC && truth_jet_pt && truth_jet_pt->size()>1){
     TLorentzVector tmp, jjtruth;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
@@ -439,14 +458,14 @@ StatusCode VBFAnalysisAlg::execute() {
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
   if(m_isMC && jet_pt && jet_pt->size()>1){
-    TLorentzVector tmp, jj; 
-    tmp.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0),jet_phi->at(0),jet_m->at(0));    
+    TLorentzVector tmp, jj;
+    tmp.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0),jet_phi->at(0),jet_m->at(0));
     jj=tmp;
-    tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));    
+    tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));
     jj+=tmp;
     xeSFTrigWeight = weightXETrigSF(met_tst_et, 0); // met was used in the end instead of jj.Pt()
     xeSFTrigWeight__1up = weightXETrigSF(met_tst_et, 1);
-    xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, 2);     
+    xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, 2);
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
@@ -497,7 +516,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==361518) crossSection =  110.08*1.2283;
     else if(runNumber==361519) crossSection =  43.469*1.2283;
     else if(runNumber==309668) crossSection =  592.36*0.9728*0.001043;
-    else  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb 
+    else  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb
 
     // corrections for the filtered samples
     if(runNumber==309662) crossSection *= 0.9331*0.9702;
@@ -518,7 +537,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==309678) crossSection *= 0.5632*0.9702;
     else if(runNumber==309679) crossSection *= 0.2691*0.9702;
     else if(runNumber==310502) crossSection *= 0.95325;
-    
+
     double NgenCorrected = 0.;
     if (m_UseExtMC) {
       vector<int> samplesfilter = {309665,309666,309667,309668,309669,309670,309671,309672,309673,309674,309675,309676,309677,309678,309679};
@@ -534,7 +553,7 @@ StatusCode VBFAnalysisAlg::execute() {
 	if (passVjetsFilter) {
 	  if(Ngen[runNumber]>0 && Ngen[samplesfilter.at(index_i)] > 0){
 	    NgenCorrected = (Ngen[samplesfilter.at(index_i)]/filtereffs.at(index_i)+Ngen[runNumber]);
-	  } 
+	  }
 	} else {
 	  NgenCorrected = Ngen[runNumber];
 	}
@@ -544,8 +563,8 @@ StatusCode VBFAnalysisAlg::execute() {
     } else {
       NgenCorrected = Ngen[runNumber];
     }
-    if(NgenCorrected>0)  weight = crossSection/NgenCorrected; 
-    else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber ); 
+    if(NgenCorrected>0)  weight = crossSection/NgenCorrected;
+    else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber );
     ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
   } else {
     weight = 1;
@@ -576,7 +595,7 @@ StatusCode VBFAnalysisAlg::execute() {
     	  for(unsigned iMuo=0; iMuo<basemu_pt->size(); ++iMuo){
     	    if(basemu_pt->at(iMuo)>4.0e3){
     	      tmp.SetPtEtaPhi(basemu_pt->at(iMuo),basemu_eta->at(iMuo),basemu_phi->at(iMuo));
-    	      if(tauvec.DeltaR(tmp)<0.2) passOR=false;  
+    	      if(tauvec.DeltaR(tmp)<0.2) passOR=false;
     	    }
     	  }
     	}// end base muon overlap
@@ -608,7 +627,7 @@ StatusCode VBFAnalysisAlg::execute() {
       j1v.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0), jet_phi->at(0), jet_m->at(0));
       j2v.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1), jet_phi->at(1), jet_m->at(1));
       for(unsigned iJet=2; iJet<jet_pt->size(); ++iJet){
-	tmp.SetPtEtaPhiM(jet_pt->at(iJet), jet_eta->at(iJet), jet_phi->at(iJet), jet_m->at(iJet)); 
+	tmp.SetPtEtaPhiM(jet_pt->at(iJet), jet_eta->at(iJet), jet_phi->at(iJet), jet_m->at(iJet));
 	float dRj1=tmp.DeltaR(j1v);
 	float dRj2=tmp.DeltaR(j2v);
 	j3_dRj1->push_back(dRj1);
@@ -633,7 +652,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   // Load the PV parameters for jets
-  if(m_QGTagger && jet_NTracks){ 
+  if(m_QGTagger && jet_NTracks){
     jet_NTracks_PV->clear();
     jet_SumPtTracks_PV->clear();
     for(unsigned iJet=0; iJet<jet_NTracks->size(); ++iJet){
@@ -685,8 +704,8 @@ StatusCode VBFAnalysisAlg::execute() {
 	     (runNumber>=364159 && runNumber<=364161) || // Wmunu 70-140 all three
 	     (runNumber>=364187 && runNumber<=364189) || // Wtaunu 70-140 all three
 	     (runNumber>=364162 && runNumber<=364163) || // Wmunu 140-280 CVBV+cFilter
-	     (runNumber>=364176 && runNumber<=364177) || // Wenu 140-280 CVBV+cFilter 
-	     (runNumber>=364190 && runNumber<=364191) || // Wtaunu 140-280 CVBV+cFilter 
+	     (runNumber>=364176 && runNumber<=364177) || // Wenu 140-280 CVBV+cFilter
+	     (runNumber>=364190 && runNumber<=364191) || // Wtaunu 140-280 CVBV+cFilter
 	     (runNumber>=364103 && runNumber<=364103) || // Zmm 70-140 CVBV
 	     (runNumber>=364132 && runNumber<=364132) || // Ztautau_MAXHTPTV70_140_CFBV
 	     (runNumber>=364145 && runNumber<=364146) || // Znn 70-140 CVBV, c Filter
@@ -701,15 +720,15 @@ StatusCode VBFAnalysisAlg::execute() {
   //364168-364169,364182-364183,364196-364197
   if((runNumber>=364216 && runNumber<=364229)){ // QCD NLO sherpa extension samples for pTV
   }else if((runNumber>=364112 && runNumber<=364113) || // Zmm 500, 1000
-	   (runNumber>=364126 && runNumber<=364127) || // Zee 500, 1000    
-	   (runNumber>=364140 && runNumber<=364141) || // Ztt 500, 1000    
-	   (runNumber>=364154 && runNumber<=364155) || // Znn 500, 1000    
+	   (runNumber>=364126 && runNumber<=364127) || // Zee 500, 1000
+	   (runNumber>=364140 && runNumber<=364141) || // Ztt 500, 1000
+	   (runNumber>=364154 && runNumber<=364155) || // Znn 500, 1000
 	   (runNumber>=364168 && runNumber<=364169) || // Wmunu 500, 1000
 	   (runNumber>=364182 && runNumber<=364183) || // Wenu 500, 1000
 	   (runNumber>=364196 && runNumber<=364197)){  // Wtaunu 500, 1000
     passVjetsPTV=(!passVjetsPTV); // flip these
   }else passVjetsPTV=true;// others must pass
-  
+
   // Fixing a bug in the variables
   if(jet_phi->size()>1){
     met_tst_nolep_j1_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(0)));
@@ -757,11 +776,11 @@ StatusCode VBFAnalysisAlg::execute() {
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
   }else if(n_baseel == 1 && baseel_pt->size()==1){
-    met_significance = met_tst_et/1000/sqrt((baseel_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);    
+    met_significance = met_tst_et/1000/sqrt((baseel_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
   }else if(n_mu == 1){
-    met_significance = met_tst_et/1000/sqrt((mu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);    
+    met_significance = met_tst_et/1000/sqrt((mu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
   }else if(n_basemu == 1){
-    met_significance = met_tst_et/1000/sqrt((basemu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);    
+    met_significance = met_tst_et/1000/sqrt((basemu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
   }else {
     met_significance = 0;
   }
@@ -815,6 +834,37 @@ StatusCode VBFAnalysisAlg::execute() {
   }else{ eleANTISF=1.0; }
 
   w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF*nloEWKWeight;
+
+  if(m_theoVariation){
+    std::map<TString,bool> regDecision;
+    regDecision["Incl"]=true;
+    regDecision["SR"]=SR;
+    regDecision["CRWe"]=(CRWep || CRWen);
+    regDecision["CRWm"]=(CRWmp || CRWmn);
+    regDecision["CRW"]= (CRWep || CRWen || CRWmp || CRWmn);
+    regDecision["CRZee"]=CRZee;
+    regDecision["CRZmm"]=CRZmm;
+    regDecision["CRZ"]=(CRZee || CRZmm);
+
+    for(auto reg : regions){
+      for(int i=0; i<115; i++)
+        if(regDecision[reg])
+          hist("jj_mass_"+reg+"_index_"+to_string(i))->Fill(jj_mass/1e6, w*mcEventWeights->at(i));
+        if(regDecision[reg])
+        {
+          hist( "jj_mass_"+reg+"_nominal" )->Fill(jj_mass/1e6, w);
+          hist( "scales/jj_mass_"+reg+"_fac_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(8));
+          hist( "scales/jj_mass_"+reg+"_fac_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(6));
+          hist( "scales/jj_mass_"+reg+"_renorm_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(9));
+          hist( "scales/jj_mass_"+reg+"_renorm_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(5));
+          hist( "scales/jj_mass_"+reg+"_both_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(10));
+          hist( "scales/jj_mass_"+reg+"_both_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(4));
+          for(unsigned int j = 11; j <= 110; j++)
+            hist( "PDF/jj_mass_"+reg+"_pdf"+to_string(j-11) )->Fill(jj_mass/1e6, w*mcEventWeights->at(j));
+      }
+    }
+  }
+
   //
   /// compute the systematics weights
   //
@@ -830,11 +880,11 @@ StatusCode VBFAnalysisAlg::execute() {
 
   for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
-    tmp_puWeight = puWeight;	    
-    tmp_jvtSFWeight = jvtSFWeight;	    
-    tmp_fjvtSFWeight = fjvtSFWeight;    
-    tmp_elSFWeight = elSFWeight;	    
-    tmp_muSFWeight = muSFWeight;	    
+    tmp_puWeight = puWeight;
+    tmp_jvtSFWeight = jvtSFWeight;
+    tmp_fjvtSFWeight = fjvtSFWeight;
+    tmp_elSFWeight = elSFWeight;
+    tmp_muSFWeight = muSFWeight;
     tmp_elSFTrigWeight = elSFTrigWeight;
     tmp_muSFTrigWeight = muSFTrigWeight;
     tmp_eleANTISF = eleANTISF;
@@ -888,7 +938,7 @@ void VBFAnalysisAlg::computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_ph
 }
 
 
-StatusCode VBFAnalysisAlg::beginInputFile() { 
+StatusCode VBFAnalysisAlg::beginInputFile() {
   //
   //This method is called at the start of each input file, even if
   //the input file contains no events. Accumulate metadata information here
@@ -906,10 +956,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_treeName = "MiniNtuple";
   if(m_currentVariation!="Nominal")
     m_treeName = "MiniNtuple_"+m_currentVariation;
-  std::cout << "Tree: " << m_treeName << std::endl;  
+  std::cout << "Tree: " << m_treeName << std::endl;
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
   if(!m_tree) ATH_MSG_ERROR("VBFAnaysisAlg::beginInputFile - tree is invalid " << m_tree);
-  
+
   nFileEvtTot=m_tree->GetEntries();
   m_tree->SetBranchStatus("*",0);
   // add the systematics weights to the nominal
@@ -921,7 +971,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       if(tMapFloat.find(var_name)==tMapFloat.end()){
 	tMapFloat[var_name]=-999.0;
 	tMapFloatW[var_name]=-999.0;
-	m_tree_out->Branch("w"+var_name,&(tMapFloatW[var_name]));	
+	m_tree_out->Branch("w"+var_name,&(tMapFloatW[var_name]));
       }
       m_tree->SetBranchStatus(var_name, 1);
       m_tree->SetBranchAddress(var_name, &(tMapFloat[var_name]));
@@ -932,8 +982,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
       tMapFloat["nloEWKWeight__1up"]=-999.0;
       tMapFloatW["nloEWKWeight__1up"]=-999.0;
-      m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));	
-    }    
+      m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
+    }
     if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
       tMapFloat["nloEWKWeight__1down"]=-999.0;
       tMapFloatW["nloEWKWeight__1down"]=-999.0;
@@ -946,6 +996,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("eventNumber", 1);
   m_tree->SetBranchStatus("averageIntPerXing", 1);
   m_tree->SetBranchStatus("mcEventWeight", 1);
+  m_tree->SetBranchStatus("mcEventWeights", 1);
   m_tree->SetBranchStatus("puWeight", 1);
   m_tree->SetBranchStatus("jvtSFWeight", 1);
   m_tree->SetBranchStatus("fjvtSFWeight", 1);
@@ -1109,6 +1160,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("eventNumber", &eventNumber);
   m_tree->SetBranchAddress("averageIntPerXing", &averageIntPerXing);
   m_tree->SetBranchAddress("mcEventWeight", &mcEventWeight);
+  m_tree->SetBranchAddress("mcEventWeights", &mcEventWeights);
   m_tree->SetBranchAddress("puWeight", &puWeight);
   m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);
   m_tree->SetBranchAddress("fjvtSFWeight", &fjvtSFWeight);
@@ -1184,7 +1236,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   if(m_isMC){
     m_tree->SetBranchAddress("met_truth_et",  &met_truth_et);
     m_tree->SetBranchAddress("met_truth_phi",  &met_truth_phi);
-    m_tree->SetBranchAddress("met_truth_sumet",  &met_truth_sumet);    
+    m_tree->SetBranchAddress("met_truth_sumet",  &met_truth_sumet);
   }
   if(m_isMC && m_currentVariation=="Nominal"){
     m_tree->SetBranchAddress("truth_jet_pt", &truth_jet_pt);
@@ -1193,7 +1245,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("truth_jet_m",  &truth_jet_m);
     if(foundGenMET) m_tree->SetBranchAddress("GenMET_pt",  &GenMET_pt);
   }
-  
+
     if(m_currentVariation=="Nominal" && m_contLep){
       m_tree->SetBranchAddress("contel_pt",           &contel_pt);
       m_tree->SetBranchAddress("contel_eta",          &contel_eta);
@@ -1230,14 +1282,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     //m_tree->SetBranchAddress("baseel_topoetcone30",  &baseel_topoetcone30);
     if(m_isMC) m_tree->SetBranchAddress("baseel_truthOrigin",  &baseel_truthOrigin);
     if(m_isMC) m_tree->SetBranchAddress("baseel_truthType",    &baseel_truthType);
-    
+
     m_tree->SetBranchAddress("ph_pt",           &ph_pt);
     m_tree->SetBranchAddress("ph_phi",          &ph_phi);
     m_tree->SetBranchAddress("ph_eta",          &ph_eta);
     m_tree->SetBranchAddress("tau_pt",           &tau_pt);
     m_tree->SetBranchAddress("tau_phi",          &tau_phi);
     m_tree->SetBranchAddress("tau_eta",          &tau_eta);
-    
+
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
     m_tree->SetBranchAddress("met_soft_tst_phi",       &met_soft_tst_phi);
     m_tree->SetBranchAddress("met_soft_tst_sumet",     &met_soft_tst_sumet);
@@ -1254,7 +1306,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     //m_tree->SetBranchAddress("met_tighter_tst_nolep_et",     &met_tighter_tst_nolep_et);
     //m_tree->SetBranchAddress("met_tighter_tst_nolep_phi",    &met_tighter_tst_nolep_phi);
     m_tree->SetBranchAddress("metsig_tst",             &metsig_tst);
-  
+
     if(m_currentVariation=="Nominal" && m_isMC){
       m_tree->SetBranchAddress("truth_tau_pt", &truth_tau_pt);
       m_tree->SetBranchAddress("truth_tau_eta",&truth_tau_eta);
@@ -1295,7 +1347,7 @@ double VBFAnalysisAlg::weightXETrigSF(const float met_pt, int syst=0) {
     else sf=1.0;
   }
   return sf;
-}  
+}
 
 float VBFAnalysisAlg::GetDPhi(const float phi1, const float phi2){
   float dphi = phi1-phi2;

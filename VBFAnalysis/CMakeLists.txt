@@ -34,14 +34,14 @@ atlas_add_library( VBFAnalysisLib src/*.cxx
   xAODMuon
   xAODRootAccess
   PathResolver
-  SUSYToolsLib 
+  SUSYToolsLib
 )
 
 # if you add athena components (tools, algorithms) to this package
 # these lines are needed so you can configure them in joboptions
 atlas_add_component( VBFAnalysis src/components/*.cxx
                       NOCLIDDB
-                      LINK_LIBRARIES VBFAnalysisLib 
+                      LINK_LIBRARIES VBFAnalysisLib
 )
 
 # if you add an application (exe) to this package
@@ -54,6 +54,7 @@ atlas_add_component( VBFAnalysis src/components/*.cxx
 atlas_install_python_modules( python/*.py )
 atlas_install_python_modules( python/*/*.py )
 atlas_install_scripts( scripts/*.py )
+atlas_install_scripts( scripts/*.sh )
 atlas_install_joboptions( share/*.py )
 atlas_install_data( data/* )
 # You can access your data from code using path resolver, e.g.

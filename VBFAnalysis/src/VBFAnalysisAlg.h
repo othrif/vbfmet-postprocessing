@@ -11,15 +11,15 @@
 #include "TTree.h"
 #include "TH1D.h"
 #include <vector>
-#include <map> 
+#include <map>
 #include <iostream>
 
 using namespace std;
 
-class VBFAnalysisAlg: public ::AthAnalysisAlgorithm { 
- public: 
+class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
+ public:
   VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator );
-  virtual ~VBFAnalysisAlg(); 
+  virtual ~VBFAnalysisAlg();
 
   ///uncomment and implement methods as required
 
@@ -40,10 +40,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   ///histSvc()         : ServiceHandle to output ROOT service (writing TObjects)
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
-  double weightXETrigSF(const float met_pt, int syst); 
+  double weightXETrigSF(const float met_pt, int syst);
   void computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi);
   float GetDPhi(const float phi1, const float phi2);
- private: 
+
+ private:
 
   int npevents = 0;
   long int nFileEvt = 0;
@@ -58,16 +59,16 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool m_QGTagger   = true;
   TTree *m_tree = 0;
   TTree *m_tree_out = 0;
-  SUSY::CrossSectionDB *my_XsecDB; 
+  SUSY::CrossSectionDB *my_XsecDB;
   //  const TFile outputFile;
   TString m_treeName = "MiniNtuple";
   TString outputFileName = "ntuple";
 
-  TH1D *h_Gen; 
-  std::map<int,double> Ngen; 
+  TH1D *h_Gen;
+  std::map<int,double> Ngen;
 
-  //Maps for types of Tree things 
-  std::map<TString, int>   tMapInt; 
+  //Maps for types of Tree things
+  std::map<TString, int>   tMapInt;
   std::map<TString, Float_t> tMapFloat;
   std::map<TString, Float_t> tMapFloatW;
 
@@ -87,6 +88,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::string treeNameOut="nominal";
   std::string treeTitleOut="nominal";
   std::string m_mcCampaign;
+  bool m_theoVariation;
 
   Float_t crossSection;
   Double_t weight;
@@ -280,6 +282,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* tau_phi;
   std::vector<Float_t>* tau_eta;
 
+  std::vector<Float_t>* mcEventWeights;
+
   TBranch    *b_mu_charge;
   TBranch    *b_mu_pt;
   TBranch    *b_mu_phi;
@@ -307,6 +311,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TBranch    *b_tau_eta;
   TBranch    *b_tau_phi;
 
-}; 
+  TBranch    *b_mcEventWeights;
+
+};
 
 #endif //> !VBFANALYSIS_VBFANALYSISALG_H
