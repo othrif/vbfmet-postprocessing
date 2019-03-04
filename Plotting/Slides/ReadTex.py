@@ -447,11 +447,12 @@ def AddQCD(map1, n='out.table'):
             
 if __name__ == "__main__":
 
-    f=open('vbf.tex','w')
-    f.write(GetHeader('Validation of 2017 ntuples'))
+    f=open('vbf_dphiBug.tex','w')
+    f.write(GetHeader('Validation of MET DPhi Bug ntuples'))
 
-    dir1='../Baseline2017/'
+    dir1='../Baseline2018/'
     dir2='../Baseline201516/'
+    dir1='../Baseline2016BugFix/'
     samples = [['pass_wcr_allmjj_e_','pass_wcr_allmjj_u_'],['pass_zcr_allmjj_ee_','pass_zcr_allmjj_uu_'],
                    ['pass_sr_allmjj_nn_']
                    ]
@@ -465,9 +466,9 @@ if __name__ == "__main__":
         i=0        
         for fi in filelist:
             if len(s)==2:
-                f.write(Get4Chart(names=[dir2+s[0]+fi,dir2+s[1]+fi,dir1+s[0]+fi,dir1+s[1]+fi], title=titles[i],xtitle='2015 and 2016',ytitle='2017'))
+                f.write(Get4Chart(names=[dir2+s[0]+fi,dir2+s[1]+fi,dir1+s[0]+fi,dir1+s[1]+fi], title=titles[i],xtitle='2015 and 2016',ytitle='Bug Fix'))
             elif len(s)==1:
-                f.write(Get2Chart(names=[dir2+s[0]+fi,dir1+s[0]+fi], title='SR '+titles[i],xtitle='2015 and 2016',ytitle='2017'))                
+                f.write(Get2Chart(names=[dir2+s[0]+fi,dir1+s[0]+fi], title='SR '+titles[i],xtitle='2015 and 2016',ytitle='Bug Fix'))                
             i+=1
     f.write(GetEnd())
     f.close()
