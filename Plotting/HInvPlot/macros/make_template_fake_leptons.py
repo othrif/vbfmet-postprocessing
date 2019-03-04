@@ -27,7 +27,7 @@ def compute_ratio(args, tfile, region):
     histname = os.path.join(region, "plotEvent_data", args.var)
 
     # TODO XXX: should we make this configurable?
-    valid_mcs = ["wewk", "wqcd", "zewk", "zqcd"]
+    valid_mcs = ["wewk", "wqcd", "zewk", "zqcd", "top2", "vvv"]
 
     data_hist = tfile.Get(histname)
     print("Reading histogram: " + histname)
