@@ -107,6 +107,9 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hj3Eta            = GetTH1("j3Eta",            22,  -4.5,  4.5);
   hj3Jvt            = GetTH1("j3Jvt",            12,  -0.2,  1.0);
   hj3FJvt           = GetTH1("j3FJvt",           22,  -0.2,  2.0);
+
+  hmuDR           = GetTH1("muDR",           25,  0.0,  5.0);
+  hmuEta          = GetTH1("muEta",          30,  0.0,  3.0);    
   
   hZMCIDQCD    = GetTH1("ZMCIDQCD",     100,  364099.5,364199.5);
   hWMCIDQCD    = GetTH1("WMCIDQCD",     100,  364155.5,364255.5);
@@ -171,6 +174,17 @@ bool Msl::PlotEvent::DoExec(Event &event)
     hTruthElEta->Fill(event.truth_el.at(0).eta, weight);
   }
 
+  if(event.muons.size()>1){
+    hmuDR->Fill(event.muons.at(0).GetVec().DeltaR(event.muons.at(1).GetVec()), weight);
+    hmuEta->Fill(event.muons.at(0).eta, weight);
+    hmuEta->Fill(event.muons.at(1).eta, weight);        
+  }
+  if(event.electrons.size()>1){
+    hmuDR->Fill(event.electrons.at(0).GetVec().DeltaR(event.electrons.at(1).GetVec()), weight);
+    hmuEta->Fill(event.electrons.at(0).eta, weight);
+    hmuEta->Fill(event.electrons.at(1).eta, weight);        
+  }
+  
   if(event.basemu.size()>0){
     hBaseMuPt ->Fill(event.basemu.at(0).pt, weight);
     hBaseMuEta->Fill(event.basemu.at(0).eta, weight);

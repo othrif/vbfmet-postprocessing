@@ -15,7 +15,7 @@ ls /tmp/v20/* &> input.txt
 # to plot run:
 python HInvPlot/macros/plotEvent.py -i input.txt 
 
-# must specify the year for 2017 and 2018 to set the right triggers and the lumi
+# must specify the year for 2017 and 2018 to set the right triggers and the lumi. Lumi for 2018 is 59937
  python HInvPlot/macros/plotEvent.py  -i v27Loose.txt  -r /tmp/v27Loose.root  --r207Ana  --year 2017 --OverlapPh  --int-lumi 44307.4
 
 To add new variables, you must add them to Root/VarEvent.cxx and its header. The binning is defined in python/Vars.py. If you want to create a variable from the existing information, then you also need to fill it in Root/ReadEvent.cxx. Follow an example like mll.
