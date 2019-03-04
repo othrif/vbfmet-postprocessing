@@ -33,7 +33,9 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
 				  hZPowMCIDQCD(0),
-				  hqgTagRegions(0)
+				  hqgTagRegions(0),
+				  hnTrackCut0(0),
+				  hnTrackCut1(0)
 {
 }
 
@@ -116,7 +118,9 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
-  hqgTagRegions = GetTH1("qgTagRegions",  7,  0.0, 7.0);  
+  hqgTagRegions = GetTH1("qgTagRegions",  11,  0.0, 11.0);  
+  hnTrackCut0 = GetTH1("nTrackCut0",  40,  0.0, 40.0);  
+  hnTrackCut1 = GetTH1("nTrackCut1",  40,  0.0, 40.0);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -198,6 +202,15 @@ bool Msl::PlotEvent::DoExec(Event &event)
   else hqgTagRegions->Fill(4.0,weight);
   if(event.GetVar(Mva::jj_nmbGluons)==0) hqgTagRegions->Fill(1.0, weight);
   else hqgTagRegions->Fill(2.0,weight);
+  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5 and event.GetVar(Mva::jetNTracks0)<12)|| -2.5>event.jets.at(0).eta || event.jets.at(0).eta>2.5){
+    if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5 and event.GetVar(Mva::jetNTracks1)<12)|| -2.5>event.jets.at(1).eta || event.jets.at(1).eta>2.5) hqgTagRegions->Fill(7.0,weight);
+  }
+  else hqgTagRegions->Fill(8.0,weight);
+  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5 and event.GetVar(Mva::jetTrackWidth0)<0.18)|| -2.5>event.jets.at(0).eta || event.jets.at(0).eta>2.5){
+    if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5 and event.GetVar(Mva::jetTrackWidth1)<0.18)|| -2.5>event.jets.at(1).eta || event.jets.at(1).eta>2.5) hqgTagRegions->Fill(9.0,weight);
+  }
+  else hqgTagRegions->Fill(10.0,weight);
+
 
   hqgTagRegions->GetXaxis()->SetBinLabel(1,"No Tagging");
   hqgTagRegions->GetXaxis()->SetBinLabel(2,"Full Tagging");
@@ -206,7 +219,16 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hqgTagRegions->GetXaxis()->SetBinLabel(5,"Fail Forward Tagging");
   hqgTagRegions->GetXaxis()->SetBinLabel(6,"Central Tagging");
   hqgTagRegions->GetXaxis()->SetBinLabel(7,"Fail Central Tagging");
+  hqgTagRegions->GetXaxis()->SetBinLabel(8,"NTracks<12");
+  hqgTagRegions->GetXaxis()->SetBinLabel(9,"Fail NTracks<12");
+  hqgTagRegions->GetXaxis()->SetBinLabel(10,"TrackWidth<0.18");
+  hqgTagRegions->GetXaxis()->SetBinLabel(11,"Fail TrackWidth<0.18");
 
+
+  for(int cut=0; cut<40; cut++){
+    if(event.GetVar(Mva::jetNTracks0)<cut) hnTrackCut0->Fill(cut,weight);
+    if(event.GetVar(Mva::jetNTracks1)<cut) hnTrackCut1->Fill(cut,weight);
+  }
 
   // testing
   float max_j_eta=fabs(event.jets.at(0).eta);

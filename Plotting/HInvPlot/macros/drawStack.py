@@ -183,7 +183,7 @@ def getHistPars(hist):
         #
         'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5},
         'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
-        'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':False},
+        'etPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':False},
         'jetEta1': {'xtitle':'Sub-Leading jet #eta'  ,       'ytitle':'Events', 'rebin':5},
         'jet1Phi': {'xtitle':'Sub-Leading jet #phi'  ,       'ytitle':'Events', 'rebin':2},
         'jetPt1' : {'xtitle':'p_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':False},
@@ -274,14 +274,16 @@ def getHistPars(hist):
     'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
     'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},     
-    'jetTrackWidth0' : {'xtitle':'Track Width (leading)',          'ytitle':'Events', 'logy':True},
-    'jetTrackWidth1' : {'xtitle':'Track Width (subleading)',          'ytitle':'Events', 'logy':True},
+    'jetTrackWidth0' : {'xtitle':'Track Width (leading)',          'ytitle':'Events', 'logy':True, 'LtoRCut':False},
+    'jetTrackWidth1' : {'xtitle':'Track Width (subleading)',          'ytitle':'Events', 'logy':True, 'LtoRCut':False},
     'jetNTracks0' : {'xtitle':'NTracks (leading)',          'ytitle':'Events','logy':True},
     'jetNTracks1' : {'xtitle':'NTracks (subleading)',          'ytitle':'Events', 'logy':True},
     'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
     'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
     'jj_nmbGluons' : {'xtitle':'Number of gluon-initiated leading jets', 'ytitle':'Events', 'logy':True},
     'qgTagRegions' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
+    'nTrackCut0' : {'xtitle':'NTrack cut (leading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
+    'nTrackCut1' : {'xtitle':'NTrack cut (subleading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
         }
 
     try:

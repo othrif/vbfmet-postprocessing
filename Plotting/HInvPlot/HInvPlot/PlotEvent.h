@@ -127,6 +127,8 @@ namespace Msl
     TH1                        *hZPowMCIDQCD;    
 
     TH1			       *hqgTagRegions;
+    TH1			       *hnTrackCut0;
+    TH1			       *hnTrackCut1;
 
     std::map<Mva::Var,TH1*>    fHistVec;
   };
