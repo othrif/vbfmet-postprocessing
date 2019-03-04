@@ -173,7 +173,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   if(m_currentVariation=="Nominal"){ // only write for the nominal
     m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
     m_tree_out->Branch("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
-    m_tree_out->Branch("mcEventWeights",&mcEventWeights);
+    if(m_theoVariation) m_tree_out->Branch("mcEventWeights",&mcEventWeights);
   }
   if(m_currentVariation=="Nominal") m_tree_out->Branch("eleANTISF",&eleANTISF);
   m_tree_out->Branch("runNumber",&runNumber);
@@ -264,27 +264,28 @@ StatusCode VBFAnalysisAlg::initialize() {
     }
 
     m_tree_out->Branch("jet_fjvt",&jet_fjvt);
+
+    m_tree_out->Branch("basemu_pt",           &basemu_pt);
+    m_tree_out->Branch("basemu_eta",          &basemu_eta);
+    m_tree_out->Branch("basemu_phi",          &basemu_phi);
+    m_tree_out->Branch("basemu_charge",          &basemu_charge);
+    m_tree_out->Branch("basemu_ptvarcone30",  &basemu_ptvarcone30);
+    m_tree_out->Branch("baseel_pt",           &baseel_pt);
+    m_tree_out->Branch("baseel_eta",          &baseel_eta);
+    m_tree_out->Branch("baseel_phi",          &baseel_phi);
+    m_tree_out->Branch("baseel_charge",          &baseel_charge);
+    m_tree_out->Branch("baseel_ptvarcone20",  &baseel_ptvarcone20);
     if(m_currentVariation=="Nominal"){
-      m_tree_out->Branch("basemu_pt",           &basemu_pt);
-      m_tree_out->Branch("basemu_eta",          &basemu_eta);
-      m_tree_out->Branch("basemu_phi",          &basemu_phi);
-      m_tree_out->Branch("basemu_charge",          &basemu_charge);
+      m_tree_out->Branch("basemu_ptvarcone20",  &basemu_ptvarcone20);
       m_tree_out->Branch("basemu_z0",           &basemu_z0);
       m_tree_out->Branch("basemu_d0sig",           &basemu_d0sig);
-      m_tree_out->Branch("basemu_ptvarcone20",  &basemu_ptvarcone20);
-      m_tree_out->Branch("basemu_ptvarcone30",  &basemu_ptvarcone30);
       m_tree_out->Branch("basemu_topoetcone20",  &basemu_topoetcone20);
       m_tree_out->Branch("basemu_topoetcone30",  &basemu_topoetcone30);
       m_tree_out->Branch("basemu_type",         &basemu_type);
       if(m_isMC) m_tree_out->Branch("basemu_truthOrigin",  &basemu_truthOrigin);
       if(m_isMC) m_tree_out->Branch("basemu_truthType",    &basemu_truthType);
-      m_tree_out->Branch("baseel_pt",           &baseel_pt);
-      m_tree_out->Branch("baseel_eta",          &baseel_eta);
-      m_tree_out->Branch("baseel_phi",          &baseel_phi);
-      m_tree_out->Branch("baseel_charge",          &baseel_charge);
       m_tree_out->Branch("baseel_z0",           &baseel_z0);
       m_tree_out->Branch("baseel_d0sig",        &baseel_d0sig);
-      m_tree_out->Branch("baseel_ptvarcone20",  &baseel_ptvarcone20);
       //m_tree_out->Branch("baseel_ptvarcone30",  &baseel_ptvarcone30);
       m_tree_out->Branch("baseel_topoetcone20",  &baseel_topoetcone20);
       //m_tree_out->Branch("baseel_topoetcone30",  &baseel_topoetcone30);
@@ -410,7 +411,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   // check that we don't have too many events
   if(nFileEvt>nFileEvtTot){
-    ATH_MSG_ERROR("VBFAnaysisAlg::execute: Too  many events:  " << nFileEvt << " total evts: " << nFileEvtTot);
+    if(m_currentVariation=="Nominal") ATH_MSG_ERROR("VBFAnaysisAlg::execute: Too  many events:  " << nFileEvt << " total evts: " << nFileEvtTot);
     return StatusCode::SUCCESS;
   }
 
@@ -740,7 +741,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float LeadJetPtCut = 80.0e3;
   float subLeadJetPtCut = 50.0e3;
   float MjjCut =8e5;
-  float DEtajjCut =3.8;
+  float DEtajjCut =3.5;
 
   if(m_LooseSkim && m_currentVariation=="Nominal"){
     METCut = 140.0e3;
@@ -847,20 +848,20 @@ StatusCode VBFAnalysisAlg::execute() {
     regDecision["CRZ"]=(CRZee || CRZmm);
 
     for(auto reg : regions){
-      for(int i=0; i<115; i++)
+      for(int i=0; i<115; i++){
         if(regDecision[reg])
           hist("jj_mass_"+reg+"_index_"+to_string(i))->Fill(jj_mass/1e6, w*mcEventWeights->at(i));
-        if(regDecision[reg])
-        {
-          hist( "jj_mass_"+reg+"_nominal" )->Fill(jj_mass/1e6, w);
-          hist( "scales/jj_mass_"+reg+"_fac_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(8));
-          hist( "scales/jj_mass_"+reg+"_fac_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(6));
-          hist( "scales/jj_mass_"+reg+"_renorm_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(9));
-          hist( "scales/jj_mass_"+reg+"_renorm_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(5));
-          hist( "scales/jj_mass_"+reg+"_both_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(10));
-          hist( "scales/jj_mass_"+reg+"_both_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(4));
-          for(unsigned int j = 11; j <= 110; j++)
-            hist( "PDF/jj_mass_"+reg+"_pdf"+to_string(j-11) )->Fill(jj_mass/1e6, w*mcEventWeights->at(j));
+      }
+      if(regDecision[reg]){
+	hist( "jj_mass_"+reg+"_nominal" )->Fill(jj_mass/1e6, w);
+	hist( "scales/jj_mass_"+reg+"_fac_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(8));
+	hist( "scales/jj_mass_"+reg+"_fac_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(6));
+	hist( "scales/jj_mass_"+reg+"_renorm_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(9));
+	hist( "scales/jj_mass_"+reg+"_renorm_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(5));
+	hist( "scales/jj_mass_"+reg+"_both_up" )->Fill(jj_mass/1e6, w*mcEventWeights->at(10));
+	hist( "scales/jj_mass_"+reg+"_both_down" )->Fill(jj_mass/1e6, w*mcEventWeights->at(4));
+	for(unsigned int j = 11; j <= 110; j++)
+	  hist( "PDF/jj_mass_"+reg+"_pdf"+to_string(j-11) )->Fill(jj_mass/1e6, w*mcEventWeights->at(j));
       }
     }
   }
@@ -980,13 +981,13 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   // add nloEWK
   if(m_currentVariation=="Nominal"){
     if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
-      tMapFloat["nloEWKWeight__1up"]=-999.0;
-      tMapFloatW["nloEWKWeight__1up"]=-999.0;
+      tMapFloat["nloEWKWeight__1up"]=1.0;
+      tMapFloatW["nloEWKWeight__1up"]=1.0;
       m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
-    }
+    }    
     if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
-      tMapFloat["nloEWKWeight__1down"]=-999.0;
-      tMapFloatW["nloEWKWeight__1down"]=-999.0;
+      tMapFloat["nloEWKWeight__1down"]=1.0;
+      tMapFloatW["nloEWKWeight__1down"]=1.0;
       m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
     }
   }
