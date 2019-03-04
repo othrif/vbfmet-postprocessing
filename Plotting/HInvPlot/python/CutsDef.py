@@ -336,6 +336,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
         cuts += [CutItem('CutMass',   'Mtt < 116.0 && Mtt > 76.0')]
     else:
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+        #cuts += [CutItem('CutL0Pt',  'lepPt1 > 18.0')]        
         #cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]
         cutMass = CutItem('CutMass')
         cutMass.AddCut(CutItem('Mll',  'mll < 116.0 && mll > 76.0'), 'OR')
