@@ -284,6 +284,8 @@ def getHistPars(hist):
     'qgTagRegions' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
     'nTrackCut0' : {'xtitle':'NTrack cut (leading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
     'nTrackCut1' : {'xtitle':'NTrack cut (subleading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
+    'TrackWidthCut0' : {'xtitle':'Track Width cut (leading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
+    'TrackWidthCut1' : {'xtitle':'Track Width cut (subleading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
         }
 
     try:

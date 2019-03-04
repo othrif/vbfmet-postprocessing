@@ -35,7 +35,9 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZPowMCIDQCD(0),
 				  hqgTagRegions(0),
 				  hnTrackCut0(0),
-				  hnTrackCut1(0)
+				  hnTrackCut1(0),
+				  hTrackWidthCut0(0),
+				  hTrackWidthCut1(0)
 {
 }
 
@@ -124,6 +126,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hqgTagRegions = GetTH1("qgTagRegions",  11,  0.0, 11.0);  
   hnTrackCut0 = GetTH1("nTrackCut0",  40,  0.0, 40.0);  
   hnTrackCut1 = GetTH1("nTrackCut1",  40,  0.0, 40.0);  
+  hTrackWidthCut0 = GetTH1("TrackWidthCut0",  80,  0.0, 0.4);  
+  hTrackWidthCut1 = GetTH1("TrackWidthCut1",  80,  0.0, 0.4);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -242,6 +246,11 @@ bool Msl::PlotEvent::DoExec(Event &event)
   for(int cut=0; cut<40; cut++){
     if(event.GetVar(Mva::jetNTracks0)<cut) hnTrackCut0->Fill(cut,weight);
     if(event.GetVar(Mva::jetNTracks1)<cut) hnTrackCut1->Fill(cut,weight);
+  }
+
+  for(float cut2=0.0; cut2<0.4; cut2+=0.005){
+    if(event.GetVar(Mva::jetTrackWidth0)<cut2) hTrackWidthCut0->Fill(cut2,weight);
+    if(event.GetVar(Mva::jetTrackWidth1)<cut2) hTrackWidthCut1->Fill(cut2,weight);
   }
 
   // testing
