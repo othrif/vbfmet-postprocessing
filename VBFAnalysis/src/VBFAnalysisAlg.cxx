@@ -722,7 +722,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float LeadJetPtCut = 80.0e3;
   float subLeadJetPtCut = 50.0e3;
   float MjjCut =8e5;
-  float DEtajjCut =3.8;
+  float DEtajjCut =3.5;
 
   if(m_LooseSkim && m_currentVariation=="Nominal"){
     METCut = 140.0e3;
@@ -931,13 +931,13 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   // add nloEWK
   if(m_currentVariation=="Nominal"){
     if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
-      tMapFloat["nloEWKWeight__1up"]=-999.0;
-      tMapFloatW["nloEWKWeight__1up"]=-999.0;
+      tMapFloat["nloEWKWeight__1up"]=1.0;
+      tMapFloatW["nloEWKWeight__1up"]=1.0;
       m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));	
     }    
     if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
-      tMapFloat["nloEWKWeight__1down"]=-999.0;
-      tMapFloatW["nloEWKWeight__1down"]=-999.0;
+      tMapFloat["nloEWKWeight__1down"]=1.0;
+      tMapFloatW["nloEWKWeight__1down"]=1.0;
       m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
     }
   }
