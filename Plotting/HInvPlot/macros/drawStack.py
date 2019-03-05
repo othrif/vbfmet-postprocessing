@@ -2135,8 +2135,6 @@ def writeSystTex(table_name, stack):
 #-------------------------------------------------------------------------
 def main():
 
-    print "AS - IN MAIN"
-
     if len(args) != 1:
         log.error('Need exactly one input argument: %s' %str(args))
         sys.exit(1)
@@ -2156,7 +2154,6 @@ def main():
         sys.exit(1)
 
     rfile  = ROOT.TFile(rpath, 'READ')
-    print "AS - rfile "+str(rfile)
 
     sfiles={}
     print 'Reading nSyst: ',len(mysyst.getsystematicsList())
@@ -2224,9 +2221,7 @@ def main():
         else:
             cname='%s_%s_%s' %(getSelKeyPath(), var, options.syst)
 
-	print "IN MAIN - WITH VAR "+str(var)
         updateCanvas(can, name=cname)
-	print "IN MAIN - UPDATED CANVAS"
 
 
         if options.syst_see == 'allsyst':
