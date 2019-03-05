@@ -38,12 +38,13 @@ p.add_option('--blind',         action='store_true', default=False,   dest='blin
 p.add_option('--madgraph',      action='store_true', default=False,   dest='madgraph')
 p.add_option('--do-eps',        action='store_true', default=False,   dest='do_eps')
 p.add_option('--do-pdf',        action='store_true', default=False,   dest='do_pdf')
+p.add_option('--do-root',       action='store_true', default=False,   dest='do_root')
 p.add_option('--do-logy',       action='store_true', default=False,   dest='do_logy')
 p.add_option('--no-logy',       action='store_true', default=False,   dest='no_logy')
 p.add_option('--draw-norm',     action='store_true', default=False,   dest='draw_norm')
 p.add_option('--do-ratio',      action='store_true', default=False,   dest='do_ratio')
 p.add_option('--force-ratio',   action='store_true', default=False,   dest='force_ratio')
-p.add_option('--stack-signal',  action='store_true',default=False,   dest='stack_signal')
+p.add_option('--stack-signal',  action='store_true', default=False,   dest='stack_signal')
 
 p.add_option('--debug',         action='store_true', default=False,   dest='debug')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
@@ -541,8 +542,14 @@ def updateCanvas(can, name=None, leg=None, option = ''):
             can.Print('%s.eps' %name, 'eps')
 
         if options.do_pdf:
-            #can.SaveAs('%s.pdf' %name)
+	    #can.SaveAs('%s.pdf' %name)
             can.Print('%s.pdf' %name, 'pdf')
+
+        if options.do_root:
+	    outfile  = ROOT.TFile("hists_"+args[0], "NEW")
+	    can.Write()
+	    outfile.Close()
+
 
 #-------------------------------------------------------------------------
 def rescaleFirstBin(hist, scale):
@@ -2122,6 +2129,8 @@ def writeSystTex(table_name, stack):
 #-------------------------------------------------------------------------
 def main():
 
+    print "AS - IN MAIN"
+
     if len(args) != 1:
         log.error('Need exactly one input argument: %s' %str(args))
         sys.exit(1)
@@ -2141,6 +2150,8 @@ def main():
         sys.exit(1)
 
     rfile  = ROOT.TFile(rpath, 'READ')
+    print "AS - rfile "+str(rfile)
+
     sfiles={}
     print 'Reading nSyst: ',len(mysyst.getsystematicsList())
     for ia in mysyst.getsystematicsList():
@@ -2207,7 +2218,10 @@ def main():
         else:
             cname='%s_%s_%s' %(getSelKeyPath(), var, options.syst)
 
+	print "IN MAIN - WITH VAR "+str(var)
         updateCanvas(can, name=cname)
+	print "IN MAIN - UPDATED CANVAS"
+
 
         if options.syst_see == 'allsyst':
 
