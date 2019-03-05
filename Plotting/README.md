@@ -10,14 +10,19 @@ rc find_packages
 rc compile
 ```
 
-# place the ntuples into a line separated text file
-#ls /afs/cern.ch/user/r/rzou/workspace/public/STPostProcessing/run/newmicro/microtuples/* &> input.txt
+Then, copy the ntuples from eos to a local directory, and put
+a list of their names into a newline separated text file. For instance,
+to copy the v20 ntuples:
+
+```
 cp -rf /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v20 /tmp/v20
 ls /tmp/v20/* &> input.txt
+```
 
 NOTE: data is not blinded in this setup. So comment it out in the input file.
 
-To plot run:
+To plot, run:
+
 ```
 python HInvPlot/macros/plotEvent.py -i input.txt 
 ```
