@@ -282,10 +282,10 @@ def getHistPars(hist):
     'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
     'jj_nmbGluons' : {'xtitle':'Number of gluon-initiated leading jets', 'ytitle':'Events', 'logy':True},
     'qgTagRegions' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
-    'nTrackCut0' : {'xtitle':'NTrack cut (leading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
-    'nTrackCut1' : {'xtitle':'NTrack cut (subleading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
-    'TrackWidthCut0' : {'xtitle':'Track Width cut (leading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
-    'TrackWidthCut1' : {'xtitle':'Track Width cut (subleading)', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
+    'nTrackCut0' : {'xtitle':'NTrack cut (leading)', 'ytitle':'Events', 'LtoRCut':2},
+    'nTrackCut1' : {'xtitle':'NTrack cut (subleading)', 'ytitle':'Events', 'LtoRCut':2},
+    'TrackWidthCut0' : {'xtitle':'Track Width cut (leading)', 'ytitle':'Events', 'LtoRCut':2},
+    'TrackWidthCut1' : {'xtitle':'Track Width cut (subleading)', 'ytitle':'Events', 'LtoRCut':2},
         }
 
     try:
