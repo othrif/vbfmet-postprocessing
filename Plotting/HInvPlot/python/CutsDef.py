@@ -175,8 +175,8 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False):
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
 
     # Cut is under discussion
-    #if not isEMu:
-    #    cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
+    if not isEMu:
+        cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
     cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
