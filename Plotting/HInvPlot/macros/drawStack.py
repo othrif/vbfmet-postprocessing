@@ -118,14 +118,21 @@ def getSelKeyLabel(selkey):
             elif selkey.count('_e'): proc = 'W#rightarrow e#nu'
             elif selkey.count('_u'): proc = 'W#rightarrow#mu#nu'
 
-        if selkey.count('sr_'):  proc += ', SR'
-        if selkey.count('wcr'):
+        if selkey.count('LowMETQCD_'):  proc += ', Low MET QCD'        
+        elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'        
+        elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'        
+        elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
+        elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<1TeV'
+        elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
+        elif selkey.count('njgt2_'):  proc += ',2<N_{jet}>5 SR'            
+        elif selkey.count('sr_'):  proc += ', SR'
+        elif selkey.count('wcr'):
             if 'anti' in selkey:
                 proc += ', Anti-ID'
             else:
                 proc += ', WCR'
-        if selkey.count('zcr'): proc += ', ZCR'
-
+        elif selkey.count('zcr'): proc += ', ZCR'
+        if selkey.count('FJVT_'):  proc += ',f-jvt'                    
     return proc
 
 #-------------------------------------------------------------------------
@@ -134,7 +141,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
     l = ROOT.TLatex(x, y, 'ATLAS')
     l.SetNDC()
     l.SetTextFont(72)
-    l.SetTextSize(0.055)
+    l.SetTextSize(0.07)
     l.SetTextAlign(11)
     l.SetTextColor(ROOT.kBlack)
     l.Draw()
@@ -146,7 +153,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p = ROOT.TLatex(x+0.15, y, ' Internal') #
         p.SetNDC()
         p.SetTextFont(42)
-        p.SetTextSize(0.055)
+        p.SetTextSize(0.065)
         p.SetTextAlign(11)
         p.SetTextColor(ROOT.kBlack)
         p.Draw()
@@ -155,7 +162,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(options.int_lumi/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
-        a.SetTextSize(0.04)
+        a.SetTextSize(0.05)
         a.SetTextAlign(12)
         a.SetTextColor(ROOT.kBlack)
         a.Draw()
@@ -164,10 +171,10 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
     proc = getSelKeyLabel(selkey)
     if proc != None:
 
-        c = ROOT.TLatex(x, y-0.08, proc)
+        c = ROOT.TLatex(x, y-0.1, proc)
         c.SetNDC()
         c.SetTextFont(42)
-        c.SetTextSize(0.04)
+        c.SetTextSize(0.05)
         c.SetTextAlign(12)
         c.SetTextColor(ROOT.kBlack)
         labs += [c]
@@ -300,6 +307,7 @@ def getLabelSortKey(sample):
     elif sample == 'top1': return 4
     elif sample == 'tall': return 5
     elif sample == 'mqcd': return 5
+    elif sample == 'dqcd': return 5
     elif sample == 'vvv': return 6
     elif sample == 'zldy': return 7
     elif sample == 'zjet': return 18
@@ -349,6 +357,7 @@ def getSampleSortKey(sample):
     elif sample == 'top1': return 5
     elif sample == 'tall': return 5
     elif sample == 'mqcd': return 5
+    elif sample == 'dqcd': return 5
     elif sample == 'vvv': return 6
     elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
@@ -376,6 +385,7 @@ def getSampleLabel(sample):
         'zqcdMad': 'Z+jets QCD',
         'zewk': 'Z+jets EWK',
         'mqcd': 'MJ',
+        'dqcd': 'MJ',
         'wqcd': 'W+jets QCD',
         'wqcdMad': 'W+jets QCD',
         'wewk': 'W+jets EWK',
@@ -459,7 +469,8 @@ def getStyle(sample):
         'wewk':{'color':color_wewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top1':{'color':color_top1, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top2':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'mqcd':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'mqcd':{'color':color_wdpi, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'dqcd':{'color':color_wdpi, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
@@ -563,7 +574,7 @@ def rescaleFirstBin(hist, scale):
     c = ROOT.TLatex(xl, yl, '#times %.1f' %scale)
     c.SetNDC(False)
     c.SetTextFont(42)
-    c.SetTextSize(0.035)
+    c.SetTextSize(0.05)
     c.SetTextAlign(12)
     c.SetTextColor(ROOT.kBlack)
 
@@ -1312,7 +1323,7 @@ class DrawStack:
         log.info('DrawStack - draw: %s' %self.name)
 
         #self.leg = ROOT.TLegend(0.58, 0.72, 0.85, 0.89)
-        self.leg = ROOT.TLegend(0.51, 0.67, 0.93, 0.89)
+        self.leg = ROOT.TLegend(0.64, 0.5, 0.99, 0.89)
         self.leg.SetBorderSize(0)
         self.leg.SetFillStyle (0)
         self.leg.SetTextFont(42);
@@ -1458,7 +1469,7 @@ class DrawStack:
         self.leg.Draw()
         self.leg1.Draw()
 
-        self.texts = getATLASLabels(can, 0.19, 0.86, selkey=self.selkey)
+        self.texts = getATLASLabels(can, 0.19, 0.85, selkey=self.selkey)
         for text in self.texts:
             text.Draw()
 
@@ -1497,7 +1508,7 @@ class DrawStack:
 
             self.ks_text = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
             self.ks_text.SetNDC()
-            self.ks_text.SetTextSize(0.045)
+            self.ks_text.SetTextSize(0.055)
             self.ks_text.SetTextAlign(11)
             self.ks_text.SetTextColor(ROOT.kBlack)
 
@@ -2153,7 +2164,7 @@ def main():
     if options.madgraph:
         bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv']#,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv'] #,'mqcd','zldy'
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy'
 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']

@@ -54,6 +54,7 @@ Msl::ReadEvent::ReadEvent():
   fLumi         (1.0),
   fLoadBaseLep  (false),
   fOverlapPh    (false),
+  fIsDDQCD      (false),
   genCutFlow    (0),
   procCutFlow0  (0),
   rawCutFlow    (0)
@@ -78,6 +79,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::METChoice",     fMETChoice);
   reg.Get("ReadEvent::Trees",         fTrees);
   reg.Get("ReadEvent::Files",         fFiles);
+  reg.Get("ReadEvent::MaxNEvent",     fMaxNEvent);
 
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
   reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
@@ -557,6 +559,7 @@ void Msl::ReadEvent::Read(const std::string &path)
     //
     std::string treeName = std::string(rtree->GetName());
     fisMC = (treeName.find("data")==std::string::npos);
+    fIsDDQCD=(treeName.find("QCDDDNominal")!=std::string::npos); // QCDDD
     Init(rtree);
     ReadTree(rtree); // Processes the events
 
@@ -591,6 +594,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
   Event alg_evt;
 
+  // vars to skip loading in QCD
+  std::set<Mva::Var> fSkipVarsQCD;
+  //fSkipVarsQCD.insert(Mva::met_soft_tst_phi);
+  
   for(int i = 0; i < nevent; i++) {
     //
     // Clear event
@@ -600,10 +607,21 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // read in tree
     rtree->GetEntry(i);
 
+    
+    if(fRunNumber==-123) fIsDDQCD=true;
+
     // Fill event
     for(unsigned a=0; a<fVarVec.size(); ++a){
+      if(fIsDDQCD && fSkipVarsQCD.find(fVarVec.at(a).var)!=fSkipVarsQCD.end()) continue;//skip missing vars in QCD
       event->AddVar(fVarVec.at(a).var, fVarVec.at(a).GetVal());
     }
+    //if(fIsDDQCD){
+    //  event->AddVar(Mva::passJetCleanTight, 1);
+    //  event->AddVar(Mva::passVjetsFilter, 1);
+    //  event->AddVar(Mva::passVjetsPTV, 1);
+    //  event->AddVar(Mva::trigger_met_encoded, 1);
+    //  event->AddVar(Mva::trigger_met_encodedv2, 1);
+    //}
 
     event->RunNumber = fRunNumber;
     event->RandomRunNumber = fRandomRunNumber;    
@@ -617,6 +635,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }else{
       if(!fMCEventCount) event->SetWeight((fWeight*fLumi));
       else  event->SetWeight(1.0);
+      if(fIsDDQCD) event->SetWeight(fWeight);
       if(fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
 	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
@@ -717,7 +736,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     for(unsigned iJet=0; iJet<jet_pt->size(); ++iJet){
       RecParticle new_jet;
       new_jet.pt  = jet_pt->at(iJet)/1.0e3;
-      new_jet.m   = jet_m->at(iJet)/1.0e3;
+      if(jet_m && jet_m->size()>iJet) new_jet.m   = jet_m->at(iJet)/1.0e3;
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));
@@ -725,13 +744,13 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(jet_NTracks && jet_NTracks->size()>iJet) new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));
       if(jet_PartonTruthLabelID && jet_PartonTruthLabelID->size()>iJet) new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));
 
-      if(jet_jvt->size()>iJet){
+      if(jet_jvt && jet_jvt->size()>iJet){
 	float jvt = jet_jvt->at(iJet);
 	if(fabs(new_jet.eta)>2.5) jvt=jvt<0? jvt : -0.15;
 	if(fabs(new_jet.pt)>120.0) jvt=-0.2;
 	new_jet.AddVar(Mva::jvt,jvt);
       }
-      if(jet_fjvt->size()>iJet)new_jet.AddVar(Mva::fjvt,jet_fjvt->at(iJet));
+      if(jet_fjvt && jet_fjvt->size()>iJet)new_jet.AddVar(Mva::fjvt,jet_fjvt->at(iJet));
       if(jet_pt->at(iJet)>fJetVetoPt) ++nJet;
       event->jets.push_back(new_jet);
     }

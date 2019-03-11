@@ -24,7 +24,7 @@ class BasicCuts:
 
     def __init__(self, Analysis, Chan, SameSign=0):
 
-        if Analysis not in ['allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2',
+        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2',
                             'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
                                 'njgt2']:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
@@ -36,10 +36,31 @@ class BasicCuts:
         self.MjjUpperCut   = -1.0
         self.DPhijjLowerCut   = -1.0
         self.DPhijjUpperCut   = 1.8
+        self.DEtajjLowerCut   = 3.8
+        self.DEtajjUpperCut   = -1.0
         self.NjetCut   = 'n_jet > 1 && n_jet < 5'
         if Analysis.count('mjj1000'):
             self.MjjLowerCut   = 1000.0
             self.MjjUpperCut   = 1500.0
+        if Analysis.count('LowMETQCDVR'):
+            self.MjjLowerCut   = 200.0
+            self.MjjUpperCut   = -1
+            self.DEtajjLowerCut   = 2.8
+            self.DEtajjUpperCut   = 3.8
+            self.NjetCut = 'n_jet == 2'
+        if Analysis.count('LowMETQCDSR'):
+            self.MjjLowerCut   = 1000.0
+            self.MjjUpperCut   = -1
+            self.DEtajjLowerCut   = 3.8
+            self.DEtajjUpperCut   = -1
+            self.NjetCut = 'n_jet == 2'
+        if Analysis.count('deta25'):
+            self.DEtajjLowerCut = 2.5
+            self.DEtajjUpperCut = 3.8
+            self.MjjLowerCut   = 200.0
+        if Analysis.count('mjjLow200'):
+            self.MjjLowerCut   = 200.0
+            self.MjjUpperCut   = 1000.0
         if Analysis.count('mjj1500'):
             self.MjjLowerCut   = 1500.0
             self.MjjUpperCut   = 2000.0
@@ -104,6 +125,14 @@ class BasicCuts:
         if self.DPhijjUpperCut>0.0:
             cutDPhijj.AddCut(CutItem('High', 'jj_dphi < %s' %(self.DPhijjUpperCut)), 'AND')
         return [cutDPhijj]
+    
+    def GetDEtajjCut(self):
+        cutDEtajj = CutItem('CutDEtajj')
+        if self.DEtajjLowerCut>0.0:
+            cutDEtajj.AddCut(CutItem('Low',  'jj_deta > %s' %(self.DEtajjLowerCut)), 'AND')
+        if self.DEtajjUpperCut>0.0:
+            cutDEtajj.AddCut(CutItem('High', 'jj_deta < %s' %(self.DEtajjUpperCut)), 'AND')
+        return [cutDEtajj]    
     
     def GetNjetCut(self):
         cutNjet = CutItem('CutNjet', self.NjetCut)
@@ -228,7 +257,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
         #cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
         cuts += basic_cuts.GetMjjCut()
     else:
-        cuts += [CutItem('CutDEtajj','jj_deta > 3.8')]
+        cuts += basic_cuts.GetDEtajjCut() #[CutItem('CutDEtajj','jj_deta > 3.8')]
         #cuts += [CutItem('CutDEtajjV','jj_deta > 2.5')]
         #cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
         cuts += basic_cuts.GetMjjCut()
@@ -236,7 +265,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
     return cuts
 
 #-------------------------------------------------------------------------
-def metCuts(options, isLep=False):
+def metCuts(basic_cuts, options, isLep=False):
     met_choice = 'met_tst_et' #options.met_choice . the met_choice is filled into this variable
     if isLep:
         met_choice=met_choice.replace('_tst','_tst_nolep')
@@ -246,11 +275,17 @@ def metCuts(options, isLep=False):
         cuts = [cutMET]
         cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 150.0')]
     else:
-        cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
-        cutMET.AddCut(CutItem('LowMET', '%s > 150.0 && j0fjvt < 0.2 && j1fjvt < 0.2' %(met_choice)), 'OR')
-        cuts = [cutMET]
-        #cuts += [CutItem('CutMetLow',       '%s > 100.0' %(options.met_choice))]
-        cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 120.0')]
+        if basic_cuts.analysis.count('LowMETQCD'):
+            cutMET.AddCut(CutItem('HighMET', '%s < 150.0 && %s > 100.0' %(met_choice,met_choice)), 'AND')
+            if basic_cuts.analysis.count('FJVT'):
+                cutMET.AddCut(CutItem('FJVT', 'j0fjvt < 0.2 && j1fjvt < 0.2'), 'AND')
+            cuts = [cutMET]            
+        else:
+            cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
+            cutMET.AddCut(CutItem('LowMET', '%s > 150.0 && j0fjvt < 0.2 && j1fjvt < 0.2' %(met_choice)), 'OR')
+            cuts = [cutMET]
+            #cuts += [CutItem('CutMetLow',       '%s > 100.0' %(options.met_choice))]
+            cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 120.0')]
     return cuts
 
 #-------------------------------------------------------------------------
@@ -281,7 +316,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        cuts += metCuts(options)
+        cuts += metCuts(basic_cuts,options)
 
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=False)
@@ -358,7 +393,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        cuts += metCuts(options, True)
+        cuts += metCuts(basic_cuts, options, True)
 
     if basic_cuts.chan=='ee':
         cuts += [CutItem('CutLepVeto',   'n_mu == 0')]
@@ -387,7 +422,7 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        cuts += metCuts(options, True)
+        cuts += metCuts(basic_cuts,options, True)
     if do_met_signif:
         cuts += [CutItem('CutMetSignif','met_significance > 4.0')]
     # VBF cuts
@@ -513,7 +548,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['top2'] = ['top2']
     bkgs['vvv']  = ['vvv']
     #bkgs['zldy'] = ['zldy']
-    bkgs['mqcd'] = ['mqcd']
+    bkgs['dqcd'] = ['dqcd']
     #bkgs['tall'] = ['top2','top1']
     #bkgs['tall'] = ['top2','top1']
 
@@ -539,7 +574,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     # Save samples (type list by hand to preserve order)
     #
     if reg != None and key != None:
-        reg.SetVal(key, 'higgs,top2,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
+        reg.SetVal(key, 'higgs,top2,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 
