@@ -38,6 +38,7 @@ p.add_option('--blind',         action='store_true', default=False,   dest='blin
 p.add_option('--madgraph',      action='store_true', default=False,   dest='madgraph')
 p.add_option('--do-eps',        action='store_true', default=False,   dest='do_eps')
 p.add_option('--do-pdf',        action='store_true', default=False,   dest='do_pdf')
+p.add_option('--do-root',        action='store_true', default=False,   dest='do_root')
 p.add_option('--do-logy',       action='store_true', default=False,   dest='do_logy')
 p.add_option('--no-logy',       action='store_true', default=False,   dest='no_logy')
 p.add_option('--draw-norm',     action='store_true', default=False,   dest='draw_norm')
@@ -554,6 +555,9 @@ def updateCanvas(can, name=None, leg=None, option = ''):
         if options.do_pdf:
             #can.SaveAs('%s.pdf' %name)
             can.Print('%s.pdf' %name, 'pdf')
+        if options.do_root:
+            #can.SaveAs('%s.pdf' %name)
+            can.Print('%s.pdf' %name, 'root')
 
 #-------------------------------------------------------------------------
 def rescaleFirstBin(hist, scale):
