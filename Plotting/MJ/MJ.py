@@ -122,6 +122,7 @@ mystruct.jet_timing = ROOT.std.vector('float')()
 mystruct.jet_jvt = ROOT.std.vector('float')()
 mystruct.jet_fjvt = ROOT.std.vector('float')()
 mystruct.jet_NTracks = ROOT.std.vector('unsigned short')()
+
 tree_out.Branch( 'jet_pt',  mystruct.jet_pt)
 tree_out.Branch( 'jet_eta', mystruct.jet_eta)
 tree_out.Branch( 'jet_phi', mystruct.jet_phi)
@@ -179,26 +180,59 @@ for e in tree:
     # apply MET cuts
     if not (e.MET>100.0):
         continue
+    # counting njet
+    mystruct.n_jet=0
+    allJets=0
+    for jetPt in e.JetPt:
+        allJets+=1
+        if jetPt>25.0:
+            mystruct.n_jet+=1
+    minNjet = min(5,mystruct.n_jet)
+    
     # apply jet cut
-    if e.NJets>4:
+    if mystruct.n_jet>4 or mystruct.n_jet<2:
         continue
     h1.Fill(2, weight)
 
+    mystruct.jet_pt.clear();
+    mystruct.jet_eta.clear();
+    mystruct.jet_phi.clear();
+    mystruct.jet_m.clear();
+    mystruct.jet_timing.clear();
+    mystruct.jet_jvt.clear();
+    mystruct.jet_fjvt.clear();
+    mystruct.jet_NTracks.clear();    
+    ijetUsed=0
+    for i in range(0,allJets):
+        if not (e.JetPt[i]>25.0):
+            continue
+        mystruct.jet_pt.push_back(e.JetPt[i]*GeV)
+        mystruct.jet_eta.push_back(e.JetEta[i])
+        mystruct.jet_phi.push_back(e.JetPhi[i])
+        mystruct.jet_m.push_back(e.JetM[i]*GeV)
+        mystruct.jet_timing.push_back(0.0)
+        mystruct.jet_jvt.push_back(e.JetJVT[i])
+        mystruct.jet_NTracks.push_back(e.JetNTracks[i])
+        if IsLoose:
+            mystruct.jet_fjvt.push_back(0.0)
+        else:
+            mystruct.jet_fjvt.push_back(e.JetFJVT[i])
+    
     # jet cuts
     met.SetPtEtaPhiM(e.MET, 0.0, e.METphi, 0.0)
-    v1.SetPtEtaPhiM(e.JetPt[0],e.JetEta[0],e.JetPhi[0],e.JetM[0])
-    v2.SetPtEtaPhiM(e.JetPt[1],e.JetEta[1],e.JetPhi[1],e.JetM[1])
-    if e.NJets>2:
-        v3.SetPtEtaPhiM(e.JetPt[2],e.JetEta[2],e.JetPhi[2],e.JetM[2])
-    if e.NJets>3:
-        v4.SetPtEtaPhiM(e.JetPt[3],e.JetEta[3],e.JetPhi[3],e.JetM[3])
+    v1.SetPtEtaPhiM(mystruct.jet_pt[0],mystruct.jet_eta[0],mystruct.jet_phi[0],mystruct.jet_m[0])
+    v2.SetPtEtaPhiM(mystruct.jet_pt[1],mystruct.jet_eta[1],mystruct.jet_phi[1],mystruct.jet_m[1])
+    if mystruct.n_jet>2:
+        v3.SetPtEtaPhiM(mystruct.jet_pt[2],mystruct.jet_eta[2],mystruct.jet_phi[2],mystruct.jet_m[2])
+    if mystruct.n_jet>3:
+        v4.SetPtEtaPhiM(mystruct.jet_pt[3],mystruct.jet_eta[3],mystruct.jet_phi[3],mystruct.jet_m[3])
 
     # compute vars
     #j1_met_dphi=3
     #j2_met_dphi=3
     j1_met_dphi = abs(v1.DeltaPhi(met))
     j2_met_dphi = abs(v2.DeltaPhi(met))
-    jj_deta = abs(e.JetEta[0] - e.JetEta[1])
+    jj_deta = abs(mystruct.jet_eta[0] - mystruct.jet_eta[1])
     jj_dphi = abs(v1.DeltaPhi(v2))
     # dphijj cut
     if jj_dphi >1.8:
@@ -207,7 +241,7 @@ for e in tree:
     #jj_dphi=5
     jj_mass = (v1+v2).M()
     # write output tree
-    mystruct.jj_mass = jj_mass*GeV
+    mystruct.jj_mass = jj_mass
     mystruct.jj_dphi = jj_dphi
     mystruct.jj_deta = jj_deta
     mystruct.w = weight
@@ -239,11 +273,10 @@ for e in tree:
     mystruct.met_tst_nolep_j1_dphi = j1_met_dphi
     mystruct.met_tst_nolep_j2_dphi = j2_met_dphi
     mystruct.metsig_tst=e.METsig
-    
-    minNjet = min(5,e.NJets)
+            
     #print minNjet
     for j in range(2,minNjet):
-        centrality = math.exp(-4.0/jj_deta**2 * (e.JetEta[j] - (e.JetEta[0]+e.JetEta[1])/2.0)**2);
+        centrality = math.exp(-4.0/jj_deta**2 * (mystruct.jet_eta[j] - (mystruct.jet_eta[0]+mystruct.jet_eta[1])/2.0)**2);
         if centrality>mystruct.maxCentrality:
             mystruct.maxCentrality = centrality
         if j==2:
@@ -267,32 +300,11 @@ for e in tree:
     mystruct.n_mu=0
     mystruct.n_basemu=0
     mystruct.n_baseel=0
-    mystruct.n_jet=e.NJets
+    #mystruct.n_jet=e.NJets
     mystruct.n_bjet=e.BTags
     mystruct.n_vx=int(e.NVtx)
     mystruct.trigger_met=1
     mystruct.trigger_lep=0
-    mystruct.jet_pt.clear();
-    mystruct.jet_eta.clear();
-    mystruct.jet_phi.clear();
-    mystruct.jet_m.clear();
-    mystruct.jet_timing.clear();
-    mystruct.jet_jvt.clear();
-    mystruct.jet_fjvt.clear();
-    mystruct.jet_NTracks.clear();    
-    
-    for i in range(0,minNjet):
-        mystruct.jet_pt.push_back(e.JetPt[i]*GeV)
-        mystruct.jet_eta.push_back(e.JetEta[i])
-        mystruct.jet_phi.push_back(e.JetPhi[i])
-        mystruct.jet_m.push_back(e.JetM[i]*GeV)
-        mystruct.jet_timing.push_back(0.0)
-        mystruct.jet_jvt.push_back(e.JetJVT[i])
-        mystruct.jet_NTracks.push_back(e.JetNTracks[i])        
-        if IsLoose:
-            mystruct.jet_fjvt.push_back(0.0)
-        else:
-            mystruct.jet_fjvt.push_back(e.JetFJVT[i])
 
     tree_out.Fill()
     
@@ -304,7 +316,7 @@ for e in tree:
     if not (e.MHT>120.0):
         continue
     h1.Fill(4, weight)
-    if e.NJets!=2:
+    if mystruct.n_jet!=2:
         continue
     h1.Fill(5, weight)
     # met soft
@@ -313,10 +325,10 @@ for e in tree:
     h1.Fill(6, weight)
 
     # jet pT cuts
-    if not (e.JetPt[0]>80.0):
+    if not (mystruct.jet_pt[0]>80.0):
         continue
     h1.Fill(7, weight)
-    if not (e.JetPt[1]>50.0):
+    if not (mystruct.jet_pt[1]>50.0):
         continue
     h1.Fill(8, weight)
 
@@ -328,7 +340,7 @@ for e in tree:
         continue
     h1.Fill(10, weight)
     # opposite hemi
-    oppHemi = (e.JetEta[0] * e.JetEta[1])
+    oppHemi = (mystruct.jet_eta[0] * mystruct.jet_eta[1])
     if oppHemi>0:
         continue
     h1.Fill(11, weight)

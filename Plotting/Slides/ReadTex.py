@@ -475,7 +475,7 @@ if __name__ == "__main__":
 
     f=open('vbf_qcd_validation.tex','w')
     f.write(GetHeader('Validation of QCD ntuples'))
-    dir1='../QCDVR/'
+    dir1='../QCDVRLoose/'
     samples = [['pass_sr_mjjLow200_nn_','pass_sr_deta25_nn_'],['pass_sr_LowMETQCD_nn_','pass_sr_LowMETQCDFJVT_nn_'],
                    ['pass_sr_LowMETQCDVR_nn_','pass_sr_LowMETQCDVRFJVT_nn_'],
                    ['pass_sr_LowMETQCDSR_nn_','pass_sr_LowMETQCDSRFJVT_nn_'],                   
