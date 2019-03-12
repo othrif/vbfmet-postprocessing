@@ -693,6 +693,7 @@ def prepareBkgRuns(keys,options=None):
                     '426009':'JZ9',
                     }
     bkg_qcdw = {
+                   '-123':'Loose',
                    '310502':'powerlaw',
                    '304784':'powerlaw',                   
                    '361020':'JZ0W',
