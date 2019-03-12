@@ -280,7 +280,7 @@ StatusCode HFInputAlg::execute() {
     if(m_extraVars>1){
       METCut=150.0e3;
       METCSTJetCut=120.0e3;
-      jj_detaCut=4.0;
+      jj_detaCut=3.8;
       jetCut = (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05);
     }
   }
