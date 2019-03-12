@@ -162,6 +162,7 @@ namespace Msl
     bool                        fOverlapPh;
     bool                        fMergeExt;
     bool                        fMergePTV;
+    bool                        fIsDDQCD;
     // Input vars
     float fWeight;
     float xeSFTrigWeight;
@@ -170,7 +171,7 @@ namespace Msl
     int   fRunNumber;
     int   fRandomRunNumber;    
     ULong64_t fEventNumber;    
-    int   fCurrRunNumber;
+    int   fCurrRunNumber;    
     Mva::Sample fCurrSample;
 
     std::vector<float> *el_charge;

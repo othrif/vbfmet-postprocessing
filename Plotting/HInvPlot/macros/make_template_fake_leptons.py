@@ -21,26 +21,13 @@ ROOT.SetAtlasStyle()
 
 import argparse
 
-def main():
-    parser = argparse.ArgumentParser(description="A script to make template plots for lepton fake estimation.")
-    parser.add_argument('filename', default="output.root", help="Output file from HInvPlot to run over.")
-    parser.add_argument('-w', '--wait', action="store_true", dest="wait", help="Wait after drawing plot.")
-    parser.add_argument('-n', '--name', dest="name", default="", help="The name of the plot to create.")
-    parser.add_argument('-t', '--text', dest="text", default="", help="Text to put on the legend.")
-    parser.add_argument('-r', '--region', dest="region", default="wcranti_allmjj_e", help="Region from HInvPlot to look at.")
-    parser.add_argument('-v', '--var', dest="var", default="met_significance", help="Variable to plot.")
-    args = parser.parse_args()
+import collections
 
-    filename = os.path.abspath(args.filename)
-
-    tfile = ROOT.TFile(filename)
-    keys = tfile.GetListOfKeys()
-
-    region = "pass_" + args.region + "_Nominal"
+def compute_ratio(args, tfile, region):
     histname = os.path.join(region, "plotEvent_data", args.var)
 
     # TODO XXX: should we make this configurable?
-    valid_mcs = ["wewk", "wqcd", "zewk", "zqcd"]
+    valid_mcs = ["wewk", "wqcd", "zewk", "zqcd", "top2", "vvv"]
 
     data_hist = tfile.Get(histname)
     print("Reading histogram: " + histname)
@@ -56,48 +43,18 @@ def main():
             sys.exit(1)
     print("")
 
-    # Taken from drawStack.py-- rebin so 1 bin = 1 sqrt(GeV)
-    data_hist.Rebin(10)
-
-    canvas = ROOT.TCanvas("canvas", "canvas", 800, 600)
-    data_hist.Draw()
-    canvas.Update()
-
-    data_hist.GetXaxis().SetTitle("MET Significance [GeV^{1/2}]")
-    data_hist.GetYaxis().SetTitle("Events")
-
-    ROOT.ATLASLabel(0.65, 0.85, "Internal")
-
-    legend = ROOT.TLegend(0.55, 0.7, 0.92, 0.85)
-
-    legend_header = "AntiID Template Shape"
-    #legend.SetHeader(legend_header, "C")
-    legend.AddEntry(0, legend_header, "")
-    if not args.text == "":
-        legend.AddEntry(0, args.text, "")
-    legend.SetBorderSize(0)
-    legend.SetFillColor(0)
-    legend.Draw()
-
-    output_name = "anti_id_template.eps"
-    if args.name != "":
-        output_name = args.name + "_" + output_name
-    canvas.SaveAs(output_name)
-    if args.wait:
-        raw_input()
-
     # Okay, now make a new histogram to get the uncertainty!
     two_bin_initial = ROOT.TH1F("two_bins_initial", "two_bins_initial", 2, 0, 2)
     two_bin_final = ROOT.TH1F("two_bins_final", "two_bins_final", 2, 0, 2)
 
     # Integrate from 0 to 4 and retrieve the integrated error.
     low_error = ROOT.Double()
-    low = data_hist.IntegralAndError(0, 4, low_error)
+    low = data_hist.IntegralAndError(0, args.cutoff, low_error)
     low_var = float(low_error)**2
 
     # Integrate from 4 and above (bin 5+) and retrieve the integrated error.
     high_error = ROOT.Double()
-    high = data_hist.IntegralAndError(5, data_hist.GetNbinsX()+2, high_error)
+    high = data_hist.IntegralAndError(args.cutoff + 1, data_hist.GetNbinsX()+2, high_error)
     high_var = float(high_error)**2
 
     # Fill one histogram with the number of low (<4) and high (>4) events.
@@ -127,7 +84,10 @@ def main():
     error = max(efficiency.GetEfficiencyErrorLow(1), efficiency.GetEfficiencyErrorUp(1))
 
     # ...or, we can compute the error using binomial statistics instead.
-    binomial_error = 1/(low+high) * math.sqrt(low * (1 - low/(low+high)))
+    try:
+        binomial_error = 1/(low+high) * math.sqrt(low * (1 - low/(low+high)))
+    except ValueError:
+        binomial_error = 0
 
     # Regardless of what we do, we need to propagate the error on the efficiency
     # to the error on the ratio, which should be the same regardless.
@@ -143,6 +103,89 @@ def main():
     print("Ratio (TEfficiency) = %f +/- %f" % (ratio, ratio_error))
     print("Ratio (Binomial) = %f +/- %f" % (ratio, ratio_bin_error))
     print("")
+
+    # Now that we've made the estimate, draw the MEt significance template shape.
+
+    # Taken from drawStack.py-- rebin so 1 bin = 1 sqrt(GeV)
+    # Actually, make this configurable parameter.
+    data_hist.Rebin(args.rebin)
+
+    canvas = ROOT.TCanvas("canvas", "canvas", 800, 600)
+    data_hist.Draw()
+    canvas.Update()
+
+    data_hist.GetXaxis().SetTitle("MET Significance [GeV^{1/2}]")
+    data_hist.GetYaxis().SetTitle("Events")
+
+    ROOT.ATLASLabel(0.65, 0.85, "Internal")
+
+    legend = ROOT.TLegend(0.55, 0.7, 0.92, 0.85)
+
+    legend_header = "AntiID Template Shape"
+    #legend.SetHeader(legend_header, "C")
+    legend.AddEntry(0, legend_header, "")
+    if not args.text == "":
+        legend.AddEntry(0, args.text, "")
+    legend.AddEntry(0, "Ratio: %0.2f +/- %0.2f" % (ratio, ratio_bin_error), "")
+    legend.SetBorderSize(0)
+    legend.SetFillColor(0)
+    legend.Draw()
+
+    output_name = "anti_id_template_" + region + ".eps"
+    if args.name != "":
+        output_name = args.name + "_" + output_name
+    canvas.SaveAs(output_name)
+    if args.wait:
+        raw_input()
+
+    return ratio, ratio_bin_error
+
+def main():
+    parser = argparse.ArgumentParser(description="A script to make template plots for lepton fake estimation.")
+    parser.add_argument('filename', default="output.root", help="Output file from HInvPlot to run over.")
+    parser.add_argument('-w', '--wait', action="store_true", dest="wait", help="Wait after drawing plot.")
+    parser.add_argument('-n', '--name', dest="name", default="", help="The name of the plot to create.")
+    parser.add_argument('-t', '--text', dest="text", default="", help="Text to put on the legend.")
+    parser.add_argument('-r', '--region', dest="region", default="wcranti_allmjj_e", help="Region from HInvPlot to look at.")
+    parser.add_argument('-v', '--var', dest="var", default="met_significance", help="Variable to plot.")
+    parser.add_argument('-c', '--cutoff', dest="cutoff", default=40, type=int, help="Threshold value at which to take the ratio.")
+    parser.add_argument('-b', '--rebin', dest="rebin", default=10, help="Number to rebin by when drawing the template shape plot.")
+    parser.add_argument('-a', '--all', dest="all", action="store_true", help="Run estimate for all regions. Ignore -r.")
+    parser.add_argument('-p', '--plusminus', dest="plusminus", action="store_true", help="Run estimate for ep and em regions too.")
+    args = parser.parse_args()
+
+    filename = os.path.abspath(args.filename)
+
+    tfile = ROOT.TFile(filename)
+    keys = tfile.GetListOfKeys()
+
+    if not args.all:
+        region = "pass_" + args.region + "_Nominal"
+        compute_ratio(args, tfile, region)
+
+    # If the 'all' flag is passed, loop through the ROOT file.
+    # Run this for all wcranti regions.
+    else:
+        ratios = collections.OrderedDict()
+        maxlen = -1
+        for key in keys:
+            region = key.GetName()
+            if "pass_wcranti" not in region:
+                continue
+            if not ('e_Nominal' in region):
+                if not (args.plusminus and ('em_Nominal' in region or 'ep_Nominal' in region)):
+                    continue
+            print("Calculating estimate for region: " + region)
+            ratio, ratio_error = compute_ratio(args, tfile, region)
+            ratios[region] = (ratio, ratio_error)
+            print("")
+            if len(region) >= maxlen:
+                maxlen = len(region)
+
+        for name, (ratio, ratio_error) in ratios.iteritems():
+            # I really should use new python string formatting for this.
+            message = "%-" + str(maxlen) +  "s = %f +/- %f"
+            print(message % (str(name), ratio, ratio_error))
 
 if __name__ == '__main__':
     main()

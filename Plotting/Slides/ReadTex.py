@@ -363,6 +363,32 @@ def Get2Chart(names=[], title='Check Modelling',xtitle='',ytitle=''):
 
     return line
 
+#--------------------------------------------------------
+def GetList(ls=[],title='Check Modelling'):
+    #
+    # Makes a page with itemized list
+    #
+    line='\\frame{\\frametitle{%s}\n' %(title)
+    line+='\\begin{itemize}\n'
+    for l in ls:
+        line+='\\item %s\n' %l
+    line+='\\end{itemize}\n'
+    line+='}\n'
+
+    return line
+
+#--------------------------------------------------------
+def GetVRTable(title='Check Modelling'):
+    #
+    # Makes a page with itemized list
+    #
+    line='\\frame{\\frametitle{%s}\n' %(title)
+    line+='\\begin{table}\n'
+    #line+='\\begin{table}\n'    
+    line+='\\end{table}\n'
+    line+='}\n'
+
+    return line
 
 #--------------------------------------------------------
 def GetEnd():
@@ -447,31 +473,70 @@ def AddQCD(map1, n='out.table'):
             
 if __name__ == "__main__":
 
-    f=open('vbf_dphiBug.tex','w')
-    f.write(GetHeader('Validation of MET DPhi Bug ntuples'))
-
-    dir1='../Baseline2018/'
-    dir2='../Baseline201516/'
-    dir1='../Baseline2016BugFix/'
-    samples = [['pass_wcr_allmjj_e_','pass_wcr_allmjj_u_'],['pass_zcr_allmjj_ee_','pass_zcr_allmjj_uu_'],
-                   ['pass_sr_allmjj_nn_']
+    f=open('vbf_qcd_validation.tex','w')
+    f.write(GetHeader('Validation of QCD ntuples'))
+    dir1='../QCDVRLoose/'
+    samples = [['pass_sr_mjjLow200_nn_','pass_sr_deta25_nn_'],['pass_sr_LowMETQCD_nn_','pass_sr_LowMETQCDFJVT_nn_'],
+                   ['pass_sr_LowMETQCDVR_nn_','pass_sr_LowMETQCDVRFJVT_nn_'],
+                   ['pass_sr_LowMETQCDSR_nn_','pass_sr_LowMETQCDSRFJVT_nn_'],                   
                    ]
-        #jj_mass,jj_dphi,met_tst_et,met_tst_nolep_et,jj_deta,met_significance,met_tst_et,lepPt0 
+
     filelist = ['Nominal_jj_mass_Nominal.pdf','Nominal_jj_deta_Nominal.pdf',
-                    'Nominal_jj_dphi_Nominal.pdf','Nominal_met_tst_et_Nominal.pdf',
-                    'Nominal_met_tst_nolep_et_Nominal.pdf','Nominal_met_significance_Nominal.pdf',
-                    'Nominal_lepPt0_Nominal.pdf']
-    titles = ['Jet Invariant Mass', 'Jet rapidity separation', 'Jet $\\phi$ Separation','MET','MET no leptons', 'MET Significance','Leading lepton $p_{T}$']
+                    'Nominal_jj_dphi_Nominal.pdf','Nominal_met_tenacious_tst_et_Nominal.pdf',
+                    'Nominal_met_soft_tst_et_Nominal.pdf','Nominal_j0fjvt_Nominal.pdf',
+                    'Nominal_j1fjvt_Nominal.pdf','Nominal_jetPt0_Nominal.pdf','Nominal_jetPt1_Nominal.pdf','Nominal_n_jet_Nominal.pdf']
+    titles = ['Jet Invariant Mass', 'Jet rapidity separation', 'Jet $\\phi$ Separation','MET','MET soft', 'Lead Jet fjvt','SubLead Jet fjvt','Leading Jet $p_{T}$','SubLeading Jet $p_{T}$','Number of Jets']
     for s in samples:
         i=0        
         for fi in filelist:
-            if len(s)==2:
-                f.write(Get4Chart(names=[dir2+s[0]+fi,dir2+s[1]+fi,dir1+s[0]+fi,dir1+s[1]+fi], title=titles[i],xtitle='2015 and 2016',ytitle='Bug Fix'))
-            elif len(s)==1:
-                f.write(Get2Chart(names=[dir2+s[0]+fi,dir1+s[0]+fi], title='SR '+titles[i],xtitle='2015 and 2016',ytitle='Bug Fix'))                
+            xtitle=''
+            ytitle=''
+            titleR='LowMET'
+            if s[0].count('LowMETQCDSR'):
+                titleR='LowMET2j'
+            if s[0].count('LowMETQCDVR'):
+                titleR='LowDEtajj'
+            if s[1].count('FJVT'):
+                xtitle+='No FJVT'
+                ytitle+='With FJVT'
+            if s[0].count('mjjLow200'):
+                #xtitle='Low $M_{jj}<1000$ GeV'
+                #ytitle='$2.5<\\Delta\\eta_{jj}<3.8$'
+                xtitle='LowMjj'
+                ytitle='DEta25'
+                titleR='QCD Validation'
+            f.write(Get2Chart(names=[dir1+s[0]+fi,dir1+s[1]+fi], title=titleR+' '+titles[i],xtitle=xtitle,ytitle=ytitle))                
             i+=1
     f.write(GetEnd())
     f.close()
+        
+    #f=open('vbf_dphiBug.tex','w')
+    #f.write(GetHeader('Validation of MET DPhi Bug ntuples'))
+    #
+    #dir1='../Baseline2018/'
+    #dir2='../Baseline201516/'
+    #dir1='../Baseline2016BugFix/'
+    #samples = [['pass_wcr_allmjj_e_','pass_wcr_allmjj_u_'],['pass_zcr_allmjj_ee_','pass_zcr_allmjj_uu_'],
+    #               ['pass_sr_allmjj_nn_']
+    #               ]
+    #    #jj_mass,jj_dphi,met_tst_et,met_tst_nolep_et,jj_deta,met_significance,met_tst_et,lepPt0 
+    #filelist = ['Nominal_jj_mass_Nominal.pdf','Nominal_jj_deta_Nominal.pdf',
+    #                'Nominal_jj_dphi_Nominal.pdf','Nominal_met_tst_et_Nominal.pdf',
+    #                'Nominal_met_tst_nolep_et_Nominal.pdf','Nominal_met_significance_Nominal.pdf',
+    #                'Nominal_lepPt0_Nominal.pdf']
+    #titles = ['Jet Invariant Mass', 'Jet rapidity separation', 'Jet $\\phi$ Separation','MET','MET no leptons', 'MET Significance','Leading lepton $p_{T}$']
+    #for s in samples:
+    #    i=0        
+    #    for fi in filelist:
+    #        if len(s)==2:
+    #            f.write(Get4Chart(names=[dir2+s[0]+fi,dir2+s[1]+fi,dir1+s[0]+fi,dir1+s[1]+fi], title=titles[i],xtitle='2015 and 2016',ytitle='Bug Fix'))
+    #        elif len(s)==1:
+    #            f.write(Get2Chart(names=[dir2+s[0]+fi,dir1+s[0]+fi], title='SR '+titles[i],xtitle='2015 and 2016',ytitle='Bug Fix'))                
+    #        i+=1
+    #f.write(GetEnd())
+    #f.close()
+
+    
     #ls = os.listdir('/Users/schaefer/PENN_physics/testarea/AtlasMuonFakes/CAFAna/HWWMVACode/VBFStudies/noMETCut/WWCR/wwcr_1jet/mtw40')
 
     #for i in ls:
