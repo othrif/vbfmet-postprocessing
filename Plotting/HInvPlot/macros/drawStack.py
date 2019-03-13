@@ -711,8 +711,9 @@ class DrawStack:
         self.nf_map = nf_map
         self.file_pointer = file
         self.zcr_stack = None
-        if options.blind and self.selkey=='pass_sr_allmjj_nn_Nominal':
-            self.zcr_stack = DrawStack(name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_allmjj_ll_Nominal')
+        if options.blind and self.selkey.count('pass_sr') and self.selfkey.count('_nn_Nominal'): #and self.selkey=='pass_sr_allmjj_nn_Nominal':
+            replace_sr_name = self.selfkey[self.selfkey.find('pass_sr_')+len('pass_sr_'): self.selfkey.find('_nn_Nominal')]
+            self.zcr_stack = DrawStack(name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_'+replace_sr_name+'_ll_Nominal')
         self.sign = self.ReadSample(file, sign)
         if options.hscale!=None:
             self.sign.hist.Scale(float(options.hscale))
