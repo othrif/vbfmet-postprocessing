@@ -566,9 +566,12 @@ def updateCanvas(can, name=None, leg=None, option = ''):
         if options.do_pdf:
 	    #can.SaveAs('%s.pdf' %name)
             can.Print('%s.pdf' %name, 'pdf')
+
         if options.do_root:
-            #can.SaveAs('%s.pdf' %name)
-            can.Print('%s.pdf' %name, 'root')
+	    outfile  = ROOT.TFile("hists_"+name+".root", "RECREATE")
+	    can.Write()
+	    outfile.Close()
+	    print "file "+str(outfile)+" has been created"
 
         if options.do_root:
 	    outfile  = ROOT.TFile("hists_"+args[0], "NEW")
