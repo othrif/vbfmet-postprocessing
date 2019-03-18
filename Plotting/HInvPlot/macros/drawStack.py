@@ -288,6 +288,7 @@ def getHistPars(hist):
         'jetNTracks1' : {'xtitle':'NTracks (subleading)',          'ytitle':'Events', 'LtoRCut':False},
         'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
         'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
+	'n_vx' : {'xtitle':'n_vx', 'ytitle':'Events','LtoRCut':False},
         }
 
     try:

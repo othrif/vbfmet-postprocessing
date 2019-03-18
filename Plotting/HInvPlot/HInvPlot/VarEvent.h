@@ -152,7 +152,8 @@ namespace Msl
       jetNTracks1,
       jetPartonTruthLabelID,
       jetPartonTruthLabelID0,
-      jetPartonTruthLabelID1
+      jetPartonTruthLabelID1,
+      n_vx
     };
 
     std::string       AsStr(Var var);
