@@ -33,11 +33,16 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
 				  hZPowMCIDQCD(0),
-				  hqgTagRegions(0),
+				  hqgTagPerf(0),
+				  hqgTagNTrack(0),
+				  hqgTagTrackWidth(0),
+				  hqgTagSum(0),
 				  hnTrackCut0(0),
 				  hnTrackCut1(0),
 				  hTrackWidthCut0(0),
-				  hTrackWidthCut1(0)
+				  hTrackWidthCut1(0),
+				  hnTrackCutSum(0),
+				  hTrackWidthCutSum(0)
 {
 }
 
@@ -123,11 +128,16 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
-  hqgTagRegions = GetTH1("qgTagRegions",  22,  0.0, 22.0);  
+  hqgTagPerf = GetTH1("qgTagPerf",  9,  0.0, 9.0);  
+  hqgTagNTrack = GetTH1("qgTagNTrack",  13,  0.0, 13.0);  
+  hqgTagTrackWidth = GetTH1("qgTagTrackWidth",  13,  0.0, 13.0);  
+  hqgTagSum = GetTH1("qgTagSum",  25,  0.0, 25.0);  
   hnTrackCut0 = GetTH1("nTrackCut0",  40,  0.0, 40.0);  
   hnTrackCut1 = GetTH1("nTrackCut1",  40,  0.0, 40.0);  
   hTrackWidthCut0 = GetTH1("TrackWidthCut0",  80,  0.0, 0.4);  
   hTrackWidthCut1 = GetTH1("TrackWidthCut1",  80,  0.0, 0.4);  
+  hnTrackCutSum = GetTH1("nTrackCutSum",  80,  0.0, 80.0);  
+  hTrackWidthCutSum = GetTH1("TrackWidthCutSum",  160,  0.0, 0.8);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -212,66 +222,109 @@ bool Msl::PlotEvent::DoExec(Event &event)
   }  
 
 
-  //for qgTagRegions
-  hqgTagRegions->Fill(0.0,weight);
-  if(event.GetVar(Mva::passPerfCTagging)==2) hqgTagRegions->Fill(5.0, weight);
-  else hqgTagRegions->Fill(6.0,weight);
-  if(event.GetVar(Mva::passPerfFTagging)==2) hqgTagRegions->Fill(3.0, weight);
-  else hqgTagRegions->Fill(4.0,weight);
-  if(event.GetVar(Mva::jj_nmbGluons)==0) hqgTagRegions->Fill(1.0, weight);
-  else hqgTagRegions->Fill(2.0,weight);
-  //NTrack bins
-  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5 and event.GetVar(Mva::jetNTracks0)<10)|| -2.5>event.jets.at(0).eta || event.jets.at(0).eta>2.5){
-    if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5 and event.GetVar(Mva::jetNTracks1)<10)|| -2.5>event.jets.at(1).eta || event.jets.at(1).eta>2.5) hqgTagRegions->Fill(7.0,weight);
-  }
-  else hqgTagRegions->Fill(8.0,weight);
-  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5 and event.GetVar(Mva::jetNTracks0)<12)|| -2.5>event.jets.at(0).eta || event.jets.at(0).eta>2.5){
-    if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5 and event.GetVar(Mva::jetNTracks1)<12)|| -2.5>event.jets.at(1).eta || event.jets.at(1).eta>2.5) hqgTagRegions->Fill(9.0,weight);
-  }
-  else hqgTagRegions->Fill(10.0,weight);
-  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5 and event.GetVar(Mva::jetNTracks0)<12)|| -2.5>event.jets.at(0).eta || event.jets.at(0).eta>2.5) hqgTagRegions->Fill(11.0,weight);
-  else hqgTagRegions->Fill(12.0,weight);
+  //for qgTagPerf
+  hqgTagPerf->Fill(1.0,weight);
+  if(event.GetVar(Mva::passPerfCTagging)==2) hqgTagPerf->Fill(6.0, weight);
+  else hqgTagPerf->Fill(7.0,weight);
+  if(event.GetVar(Mva::passPerfFTagging)==2) hqgTagPerf->Fill(4.0, weight);
+  else hqgTagPerf->Fill(5.0,weight);
+  if(event.GetVar(Mva::jj_nmbGluons)==0) hqgTagPerf->Fill(2.0, weight);
+  else hqgTagPerf->Fill(3.0,weight);
 
-  //TrackWidth bins
-  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5 and event.GetVar(Mva::jetTrackWidth0)<0.05)|| -2.5>event.jets.at(0).eta || event.jets.at(0).eta>2.5){
-    if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5 and event.GetVar(Mva::jetTrackWidth1)<0.05)|| -2.5>event.jets.at(1).eta || event.jets.at(1).eta>2.5) hqgTagRegions->Fill(13.0,weight);
-  }
-  else hqgTagRegions->Fill(14.0,weight);
-  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5 and event.GetVar(Mva::jetTrackWidth0)<0.08)|| -2.5>event.jets.at(0).eta || event.jets.at(0).eta>2.5){
-    if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5 and event.GetVar(Mva::jetTrackWidth1)<0.08)|| -2.5>event.jets.at(1).eta || event.jets.at(1).eta>2.5) hqgTagRegions->Fill(15.0,weight);
-  }
-  else hqgTagRegions->Fill(16.0,weight);
-  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5 and event.GetVar(Mva::jetTrackWidth0)<0.1)|| -2.5>event.jets.at(0).eta || event.jets.at(0).eta>2.5){
-    if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5 and event.GetVar(Mva::jetTrackWidth1)<0.1)|| -2.5>event.jets.at(1).eta || event.jets.at(1).eta>2.5) hqgTagRegions->Fill(17.0,weight);
-  }
-  else hqgTagRegions->Fill(18.0,weight);
-  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5 and event.GetVar(Mva::jetTrackWidth0)<0.18)|| -2.5>event.jets.at(0).eta || event.jets.at(0).eta>2.5){
-    if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5 and event.GetVar(Mva::jetTrackWidth1)<0.18)|| -2.5>event.jets.at(1).eta || event.jets.at(1).eta>2.5) hqgTagRegions->Fill(19.0,weight);
-  }
-  else hqgTagRegions->Fill(20.0,weight);
+  hqgTagPerf->GetXaxis()->SetBinLabel(1," ");
+  hqgTagPerf->GetXaxis()->SetBinLabel(2,"No Tagging");
+  hqgTagPerf->GetXaxis()->SetBinLabel(3,"Full Tagging");
+  hqgTagPerf->GetXaxis()->SetBinLabel(4,"Fail Full Tagging");
+  hqgTagPerf->GetXaxis()->SetBinLabel(5,"Forward Tagging");
+  hqgTagPerf->GetXaxis()->SetBinLabel(6,"Fail Forward Tagging");
+  hqgTagPerf->GetXaxis()->SetBinLabel(7,"Central Tagging");
+  hqgTagPerf->GetXaxis()->SetBinLabel(8,"Fail Central Tagging");
 
 
-  hqgTagRegions->GetXaxis()->SetBinLabel(1,"No Tagging");
-  hqgTagRegions->GetXaxis()->SetBinLabel(2,"Full Tagging");
-  hqgTagRegions->GetXaxis()->SetBinLabel(3,"Fail Full Tagging");
-  hqgTagRegions->GetXaxis()->SetBinLabel(4,"Forward Tagging");
-  hqgTagRegions->GetXaxis()->SetBinLabel(5,"Fail Forward Tagging");
-  hqgTagRegions->GetXaxis()->SetBinLabel(6,"Central Tagging");
-  hqgTagRegions->GetXaxis()->SetBinLabel(7,"Fail Central Tagging");
-  hqgTagRegions->GetXaxis()->SetBinLabel(8,"NTracks<10");
-  hqgTagRegions->GetXaxis()->SetBinLabel(9,"Fail NTracks<10");
-  hqgTagRegions->GetXaxis()->SetBinLabel(10,"NTracks<12");
-  hqgTagRegions->GetXaxis()->SetBinLabel(11,"Fail NTracks<12");
-  hqgTagRegions->GetXaxis()->SetBinLabel(12,"NTracks0<12");
-  hqgTagRegions->GetXaxis()->SetBinLabel(13,"Fail NTracks0<12");
-  hqgTagRegions->GetXaxis()->SetBinLabel(14,"TrackWidth<0.05");
-  hqgTagRegions->GetXaxis()->SetBinLabel(15,"Fail TrackWidth<0.05");
-  hqgTagRegions->GetXaxis()->SetBinLabel(16,"TrackWidth<0.08");
-  hqgTagRegions->GetXaxis()->SetBinLabel(17,"Fail TrackWidth<0.08");
-  hqgTagRegions->GetXaxis()->SetBinLabel(18,"TrackWidth<0.1");
-  hqgTagRegions->GetXaxis()->SetBinLabel(19,"Fail TrackWidth<0.1");
-  hqgTagRegions->GetXaxis()->SetBinLabel(20,"TrackWidth<0.18");
-  hqgTagRegions->GetXaxis()->SetBinLabel(21,"Fail TrackWidth<0.18");
+  float forw=2.5;
+
+  //qgTagNTrack
+  hqgTagNTrack->Fill(1.0,weight);
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<5)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<5)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(2.0,weight);
+  }
+  else hqgTagNTrack->Fill(3.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<5)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw) hqgTagNTrack->Fill(4.0,weight);
+  else hqgTagNTrack->Fill(5.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<10)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<10)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(6.0,weight);
+  }
+  else hqgTagNTrack->Fill(7.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<12)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<12)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(8.0,weight);
+  }
+  else hqgTagNTrack->Fill(9.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<12)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw) hqgTagNTrack->Fill(10.0,weight);
+  else hqgTagNTrack->Fill(11.0,weight);
+
+  hqgTagNTrack->GetXaxis()->SetBinLabel(1," ");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(2,"No Tagging");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(3,"NTracks<5");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(4,"Fail NTracks<5");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(5,"NTracks0<5");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(6,"Fail NTracks0<5");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(7,"NTracks<10");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(8,"Fail NTracks<10");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(9,"NTracks<12");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(10,"Fail NTracks<12");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(11,"NTracks0<12");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(12,"Fail NTracks0<12");
+
+
+  //qgTagTrackWidth
+  hqgTagTrackWidth->Fill(1.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.05)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.05)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(2.0,weight);
+  }
+  else hqgTagTrackWidth->Fill(3.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.08)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.08)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(4.0,weight);
+  }
+  else hqgTagTrackWidth->Fill(5.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.08)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw)hqgTagTrackWidth->Fill(6.0,weight);
+  else hqgTagTrackWidth->Fill(7.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.1)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.1)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(8.0,weight);
+  }
+  else hqgTagTrackWidth->Fill(9.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.18)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.18)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(10.0,weight);
+  }
+  else hqgTagTrackWidth->Fill(11.0,weight);
+
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(1," ");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(2,"No Tagging");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(3,"TrackWidth<0.05");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(4,"Fail TrackWidth<0.05");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(5,"TrackWidth<0.08");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(6,"Fail TrackWidth<0.08");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(7,"TrackWidth0<0.08");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(8,"Fail TrackWidth0<0.08");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(9,"TrackWidth<0.1");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(10,"Fail TrackWidth<0.1");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(11,"TrackWidth<0.18");
+  hqgTagTrackWidth->GetXaxis()->SetBinLabel(12,"Fail TrackWidth<0.18");
+
+
+  //qgTagSum
+  hqgTagSum->Fill(1.0,weight);
+
+  hqgTagSum->GetXaxis()->SetBinLabel(1," ");
+  hqgTagSum->GetXaxis()->SetBinLabel(2,"No Tagging");
 
 
   for(int cut=0; cut<40; cut++){
@@ -282,6 +335,14 @@ bool Msl::PlotEvent::DoExec(Event &event)
   for(float cut2=0.00025; cut2<0.4; cut2+=0.005){
     if(event.GetVar(Mva::jetTrackWidth0)<cut2) hTrackWidthCut0->Fill(cut2,weight);
     if(event.GetVar(Mva::jetTrackWidth1)<cut2) hTrackWidthCut1->Fill(cut2,weight);
+  }
+
+  for(int cut=0; cut<80; cut++){
+    if(event.GetVar(Mva::jetNTracks0)+event.GetVar(Mva::jetNTracks1)<cut) hnTrackCutSum->Fill(cut,weight);
+  }
+
+  for(float cut2=0.00025; cut2<0.8; cut2+=0.005){
+    if(event.GetVar(Mva::jetTrackWidth0)+event.GetVar(Mva::jetTrackWidth1)<cut2) hTrackWidthCutSum->Fill(cut2,weight);
   }
 
   // testing

@@ -128,11 +128,16 @@ namespace Msl
     TH1                        *hWMadMCIDQCD;
     TH1                        *hZPowMCIDQCD;    
 
-    TH1			       *hqgTagRegions;
+    TH1			       *hqgTagPerf;
+    TH1			       *hqgTagNTrack;
+    TH1			       *hqgTagTrackWidth;
+    TH1			       *hqgTagSum;
     TH1			       *hnTrackCut0;
     TH1			       *hnTrackCut1;
     TH1			       *hTrackWidthCut0;
     TH1			       *hTrackWidthCut1;
+    TH1			       *hnTrackCutSum;
+    TH1			       *hTrackWidthCutSum;
 
     std::map<Mva::Var,TH1*>    fHistVec;
   };
