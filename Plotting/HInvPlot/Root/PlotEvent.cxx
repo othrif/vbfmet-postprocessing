@@ -42,7 +42,10 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hTrackWidthCut0(0),
 				  hTrackWidthCut1(0),
 				  hnTrackCutSum(0),
-				  hTrackWidthCutSum(0)
+				  hTrackWidthCutSum(0),
+				  hnTrackSum(0),
+				  hTrackWidthSum(0)
+
 {
 }
 
@@ -131,11 +134,13 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hqgTagPerf = GetTH1("qgTagPerf",  9,  0.0, 9.0);  
   hqgTagNTrack = GetTH1("qgTagNTrack",  13,  0.0, 13.0);  
   hqgTagTrackWidth = GetTH1("qgTagTrackWidth",  13,  0.0, 13.0);  
-  hqgTagSum = GetTH1("qgTagSum",  25,  0.0, 25.0);  
+  hqgTagSum = GetTH1("qgTagSum",  13,  0.0, 13.0);  
   hnTrackCut0 = GetTH1("nTrackCut0",  40,  0.0, 40.0);  
   hnTrackCut1 = GetTH1("nTrackCut1",  40,  0.0, 40.0);  
   hTrackWidthCut0 = GetTH1("TrackWidthCut0",  80,  0.0, 0.4);  
   hTrackWidthCut1 = GetTH1("TrackWidthCut1",  80,  0.0, 0.4);  
+  hnTrackSum = GetTH1("nTrackSum",  80,  0.0, 80.0);  
+  hTrackWidthSum = GetTH1("TrackWidthSum",  160,  0.0, 0.8);  
   hnTrackCutSum = GetTH1("nTrackCutSum",  80,  0.0, 80.0);  
   hTrackWidthCutSum = GetTH1("TrackWidthCutSum",  160,  0.0, 0.8);  
 
@@ -241,7 +246,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hqgTagPerf->GetXaxis()->SetBinLabel(8,"Fail Central Tagging");
 
 
-  float forw=2.5;
+  float forw=2.1;
 
   //qgTagNTrack
   hqgTagNTrack->Fill(1.0,weight);
@@ -323,8 +328,33 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //qgTagSum
   hqgTagSum->Fill(1.0,weight);
 
+  if (event.GetVar(Mva::jetNTracks0)+event.GetVar(Mva::jetNTracks1)<5) hqgTagSum->Fill(2.0,weight);
+  else hqgTagSum->Fill(3.0,weight);  
+
+  if (event.GetVar(Mva::jetNTracks0)+event.GetVar(Mva::jetNTracks1)<10) hqgTagSum->Fill(4.0,weight);
+  else hqgTagSum->Fill(5.0,weight);  
+
+  if (event.GetVar(Mva::jetNTracks0)+event.GetVar(Mva::jetNTracks1)<15) hqgTagSum->Fill(6.0,weight);
+  else hqgTagSum->Fill(7.0,weight);  
+
+  if (event.GetVar(Mva::jetTrackWidth0)+event.GetVar(Mva::jetTrackWidth1)<0.05) hqgTagSum->Fill(8.0,weight);
+  else hqgTagSum->Fill(9.0,weight);  
+
+  if (event.GetVar(Mva::jetTrackWidth0)+event.GetVar(Mva::jetTrackWidth1)<0.1) hqgTagSum->Fill(10.0,weight);
+  else hqgTagSum->Fill(11.0,weight);  
+
   hqgTagSum->GetXaxis()->SetBinLabel(1," ");
   hqgTagSum->GetXaxis()->SetBinLabel(2,"No Tagging");
+  hqgTagSum->GetXaxis()->SetBinLabel(3,"NTrackSum<5");
+  hqgTagSum->GetXaxis()->SetBinLabel(4,"Fail NTrackSum<5");
+  hqgTagSum->GetXaxis()->SetBinLabel(5,"NTrackSum<10");
+  hqgTagSum->GetXaxis()->SetBinLabel(6,"Fail NTrackSum<10");
+  hqgTagSum->GetXaxis()->SetBinLabel(7,"NTrackSum<15");
+  hqgTagSum->GetXaxis()->SetBinLabel(8,"Fail NTrackSum<15");
+  hqgTagSum->GetXaxis()->SetBinLabel(9,"TrackWidthSum<0.05");
+  hqgTagSum->GetXaxis()->SetBinLabel(10,"Fail TrackWidthSum<0.05");
+  hqgTagSum->GetXaxis()->SetBinLabel(11,"Fail TrackWidthSum<0.1");
+  hqgTagSum->GetXaxis()->SetBinLabel(12,"Fail TrackWidthSum<0.1");
 
 
   for(int cut=0; cut<40; cut++){
@@ -344,6 +374,11 @@ bool Msl::PlotEvent::DoExec(Event &event)
   for(float cut2=0.00025; cut2<0.8; cut2+=0.005){
     if(event.GetVar(Mva::jetTrackWidth0)+event.GetVar(Mva::jetTrackWidth1)<cut2) hTrackWidthCutSum->Fill(cut2,weight);
   }
+
+	
+  hnTrackSum->Fill(event.GetVar(Mva::jetNTracks0)+event.GetVar(Mva::jetNTracks1),weight);
+  hTrackWidthSum->Fill(event.GetVar(Mva::jetTrackWidth0)+event.GetVar(Mva::jetTrackWidth1),weight);
+
 
   // testing
   float max_j_eta=fabs(event.jets.at(0).eta);

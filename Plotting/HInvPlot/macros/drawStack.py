@@ -299,6 +299,8 @@ def getHistPars(hist):
     'TrackWidthCut1' : {'xtitle':'Track Width cut (subleading)', 'ytitle':'Events', 'LtoRCut':2},
     'nTrackCutSum' : {'xtitle':'NTrack cut (sum)', 'ytitle':'Events', 'LtoRCut':2},
     'TrackWidthCutSum' : {'xtitle':'Track Width cut (sum)', 'ytitle':'Events', 'LtoRCut':2},
+    'nTrackSum' : {'xtitle':'NTrack (sum)', 'ytitle':'Events', 'LtoRCut':False},
+    'TrackWidthSum' : {'xtitle':'Track Width (sum)', 'ytitle':'Events', 'LtoRCut':False},
         }
 
     try:
@@ -572,11 +574,6 @@ def updateCanvas(can, name=None, leg=None, option = ''):
 	    can.Write()
 	    outfile.Close()
 	    print "file "+str(outfile)+" has been created"
-
-        if options.do_root:
-	    outfile  = ROOT.TFile("hists_"+args[0], "NEW")
-	    can.Write()
-	    outfile.Close()
 
 
 #-------------------------------------------------------------------------
