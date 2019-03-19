@@ -38,13 +38,13 @@ p.add_option('--blind',         action='store_true', default=False,   dest='blin
 p.add_option('--madgraph',      action='store_true', default=False,   dest='madgraph')
 p.add_option('--do-eps',        action='store_true', default=False,   dest='do_eps')
 p.add_option('--do-pdf',        action='store_true', default=False,   dest='do_pdf')
-p.add_option('--do-root',        action='store_true', default=False,   dest='do_root')
+p.add_option('--do-root',       action='store_true', default=False,   dest='do_root')
 p.add_option('--do-logy',       action='store_true', default=False,   dest='do_logy')
 p.add_option('--no-logy',       action='store_true', default=False,   dest='no_logy')
 p.add_option('--draw-norm',     action='store_true', default=False,   dest='draw_norm')
 p.add_option('--do-ratio',      action='store_true', default=False,   dest='do_ratio')
 p.add_option('--force-ratio',   action='store_true', default=False,   dest='force_ratio')
-p.add_option('--stack-signal',  action='store_true',default=False,   dest='stack_signal')
+p.add_option('--stack-signal',  action='store_true', default=False,   dest='stack_signal')
 
 p.add_option('--debug',         action='store_true', default=False,   dest='debug')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
@@ -553,11 +553,14 @@ def updateCanvas(can, name=None, leg=None, option = ''):
             can.Print('%s.eps' %name, 'eps')
 
         if options.do_pdf:
-            #can.SaveAs('%s.pdf' %name)
+	    #can.SaveAs('%s.pdf' %name)
             can.Print('%s.pdf' %name, 'pdf')
+
         if options.do_root:
-            #can.SaveAs('%s.pdf' %name)
-            can.Print('%s.pdf' %name, 'root')
+	    outfile  = ROOT.TFile("hists_"+name+".root", "RECREATE")
+	    can.Write()
+	    outfile.Close()
+	    print "file "+str(outfile)+" has been created"
 
 #-------------------------------------------------------------------------
 def rescaleFirstBin(hist, scale):
@@ -711,8 +714,9 @@ class DrawStack:
         self.nf_map = nf_map
         self.file_pointer = file
         self.zcr_stack = None
-        if options.blind and self.selkey=='pass_sr_allmjj_nn_Nominal':
-            self.zcr_stack = DrawStack(name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_allmjj_ll_Nominal')
+        if options.blind and self.selkey.count('pass_sr') and self.selkey.count('_nn_Nominal'): #and self.selkey=='pass_sr_allmjj_nn_Nominal':
+            replace_sr_name = self.selkey[self.selkey.find('pass_sr_')+len('pass_sr_'): self.selkey.find('_nn_Nominal')]
+            self.zcr_stack = DrawStack(name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_'+replace_sr_name+'_ll_Nominal')
         self.sign = self.ReadSample(file, sign)
         if options.hscale!=None:
             self.sign.hist.Scale(float(options.hscale))
@@ -2156,6 +2160,7 @@ def main():
         sys.exit(1)
 
     rfile  = ROOT.TFile(rpath, 'READ')
+
     sfiles={}
     print 'Reading nSyst: ',len(mysyst.getsystematicsList())
     for ia in mysyst.getsystematicsList():
@@ -2223,6 +2228,7 @@ def main():
             cname='%s_%s_%s' %(getSelKeyPath(), var, options.syst)
 
         updateCanvas(can, name=cname)
+
 
         if options.syst_see == 'allsyst':
 
