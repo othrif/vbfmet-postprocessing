@@ -374,8 +374,8 @@ StatusCode HFInputAlg::execute() {
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance <= 4.0)) CRWenLowSig = true;}
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 76.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 76.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
 
   Float_t w_final = 1;
   Float_t lumi = 36.1;

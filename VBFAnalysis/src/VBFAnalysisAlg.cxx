@@ -744,7 +744,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float DEtajjCut =3.5;
 
   if(m_LooseSkim && m_currentVariation=="Nominal"){
-    METCut = 140.0e3;
+    METCut = 100.0e3;
     LeadJetPtCut = 60.0e3; // 60.0e3
     subLeadJetPtCut = 40.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
@@ -761,7 +761,7 @@ StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG ("n_jet = 2!");
   if (!(n_jet == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
   if (!(n_jet == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
-  if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < 1.8) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+  if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < 2.0) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
   ATH_MSG_DEBUG ("Pass VBF cuts!");
   // encoding met triggers
   trigger_met_encoded=0;
@@ -770,8 +770,14 @@ StatusCode VBFAnalysisAlg::execute() {
   if (trigger_HLT_xe90_mht_L1XE50 == 1)  trigger_met_encoded+=0x4;
   if (trigger_HLT_xe70_mht == 1)         trigger_met_encoded+=0x8;
   if (trigger_HLT_noalg_L1J400 == 1)     trigger_met_encoded+=0x10;
+  
+  unsigned metRunNumber = randomRunNumber;
+  if(!m_isMC) metRunNumber=runNumber;
+  if((metRunNumber<=284484 && trigger_HLT_xe70_mht==1) ||                  // 2015
+     (metRunNumber>284484 && 284484<=304008 && trigger_HLT_xe90_mht_L1XE50==1) ||  // 2016
+     (metRunNumber>304008 && trigger_HLT_xe110_mht_L1XE50==1) ||           // 2016
+     trigger_HLT_noalg_L1J400 ==1 ) trigger_met = 1; else trigger_met = 0; // 2015+2016
 
-  if (trigger_HLT_xe100_mht_L1XE50 == 1 || trigger_HLT_xe110_mht_L1XE50 == 1 || trigger_HLT_xe90_mht_L1XE50 == 1) trigger_met = 1; else trigger_met = 0;
   bool passMETTrig = trigger_met_encodedv2>0 || trigger_met>0;
   ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
