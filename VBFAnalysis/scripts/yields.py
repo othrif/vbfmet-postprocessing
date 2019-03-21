@@ -1,6 +1,6 @@
 import ROOT
 import math
-
+import sys
 regions=[
 'VBFjetSel_XNom_SRX_obs_cuts',
 'VBFjetSel_XNom_oneElePosCRX_obs_cuts',
@@ -43,7 +43,11 @@ samples =['hVBFH125_',
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Madgraph_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix.root')
-f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('/home/schae/testarea/HInv/runLoosev26Syst/SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_DPhijjMjjBinningNjetBin_v26c_DPhiFix_QCDEst_J400.root')
+f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_LooseLepDilepTrig_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_NjetBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LowMETBin_v26c.root')
@@ -145,7 +149,7 @@ for rmy in regions:
             print rline
 print 'done'
 
-
+sys.exit(0)
 # Collect systematics
 tobj = f.GetListOfKeys()
 for sample in samples:
