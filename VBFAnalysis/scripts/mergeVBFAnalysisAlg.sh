@@ -1,5 +1,5 @@
 #!/bin/bash                                                                                                                                                                                                       
-OUTDIRM=v26LooseJ400
+OUTDIRM=v28bLoose
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
