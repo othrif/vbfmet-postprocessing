@@ -4,7 +4,7 @@ import ROOT
 def writeMultiJet(Binning=0):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
-    multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
+    #multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
     if Binning==1:
         multijets = [3.0, 0.5, 0.1, 112.] 
     if Binning==2:
