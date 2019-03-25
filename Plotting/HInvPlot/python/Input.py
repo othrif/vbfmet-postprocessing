@@ -477,6 +477,33 @@ def prepareBkgRuns(keys,options=None):
                     '364153':'TBD',
                     '364154':'TBD',
                     '364155':'Znunu_MAXHTPTV1000',
+                    # mc16e samples
+                    '366010':'pt70bfilter',
+                    '366011':'pt100',
+                    '366012':'pt100',
+                    '366013':'pt100',
+                    '366014':'pt140',
+                    '366015':'pt140',
+                    '366016':'pt140',
+                    '366017':'pt280',
+                    '366018':'pt280',
+                    '366019':'pt70CVBV',
+                    '366020':'pt100',
+                    '366021':'pt100',
+                    '366022':'pt100',
+                    '366023':'pt140',
+                    '366024':'pt140',
+                    '366025':'pt140',
+                    '366026':'pt280',
+                    #'366027':'pt280', # does not exist
+                    '366028':'pt70cfilter',
+                    '366029':'pt100',
+                    '366030':'pt100',
+                    '366031':'pt100',
+                    '366032':'pt140',
+                    '366033':'pt140',
+                    '366034':'pt140',
+                    '366035':'pt280',
                     }
     bkg_zqcd={}
     bkg_zqcd.update(bkg_zqcd_zmm)
@@ -796,7 +823,7 @@ def prepareBkgRuns(keys,options=None):
                         '364215':'TBD',                        
                         }
 
-    if options.mergePTV:
+    if options.mergePTV or options.year==2018:
         for ki,yi in bkg_vbfPTVExt.iteritems():
             if yi[0]=='W': bkg_wqcd[ki]=yi
             elif yi[0]=='Z': bkg_zqcd[ki]=yi 

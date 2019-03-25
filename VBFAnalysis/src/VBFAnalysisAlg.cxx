@@ -43,11 +43,13 @@ StatusCode VBFAnalysisAlg::initialize() {
 
   if(m_isMC){
     std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
-    xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
-    std::cout << "Cross section: " << xSecFilePath << std::endl;
-    my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
+    //xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
+    //my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
     //xSecFilePath = "/home/schae/testarea/HInv/source/VBFAnalysis/data/PMGxsecDB_mc16.txt";
-    //my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, false);
+    xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt";
+    xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
+    std::cout << "Cross section using local file: " << xSecFilePath << std::endl;
+    my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, false);
     //my_XsecDB->loadFile(xSecFilePath);
     //my_XsecDB->extend(xSecFilePath);
     // if( (runNumber == 308567 || runNumber == 308276 ) ){
@@ -778,7 +780,7 @@ StatusCode VBFAnalysisAlg::execute() {
      (metRunNumber>304008 && trigger_HLT_xe110_mht_L1XE50==1) ||           // 2016
      trigger_HLT_noalg_L1J400 ==1 ) trigger_met = 1; else trigger_met = 0; // 2015+2016
 
-  bool passMETTrig = trigger_met_encodedv2>0 || trigger_met>0;
+  bool passMETTrig = trigger_met_encodedv2>0 || trigger_met>0 || trigger_met_encoded>0;
   ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);

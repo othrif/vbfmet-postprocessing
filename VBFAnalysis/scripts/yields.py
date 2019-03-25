@@ -1,16 +1,17 @@
 import ROOT
 import math
-
+import sys
 regions=[
 'VBFjetSel_XNom_SRX_obs_cuts',
+'VBFjetSel_XNom_twoEleCRX_obs_cuts',
+'VBFjetSel_XNom_twoMuCRX_obs_cuts',
 'VBFjetSel_XNom_oneElePosCRX_obs_cuts',
 'VBFjetSel_XNom_oneEleNegCRX_obs_cuts',
-'VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts',
-'VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts',
 'VBFjetSel_XNom_oneMuPosCRX_obs_cuts',
 'VBFjetSel_XNom_oneMuNegCRX_obs_cuts',
-'VBFjetSel_XNom_twoEleCRX_obs_cuts',
-'VBFjetSel_XNom_twoMuCRX_obs_cuts',]
+'VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts',
+'VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts',
+]
 
 #hdata_NONE_twoEleCR3_obs_cuts
 samples =['hVBFH125_',
@@ -25,6 +26,21 @@ samples =['hVBFH125_',
           'heleFakes_',
           'hmultijet_',
           'hdata_',
+]
+
+samplesPrint =['Samples','VBFH125',
+          'ggFH125',
+          'VH125',
+          'Z QCD',
+          'Z EWK',
+          'W QCD',
+          'W EWK',
+          'ttbar',
+          'QCD',
+          'eleFakes',
+          'multijet',
+          'data',
+          'total bkg','data/bkg'
 ]
 
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhotonAllSyst_v26New.root')
@@ -43,7 +59,25 @@ samples =['hVBFH125_',
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Madgraph_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix.root')
-f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('/home/schae/testarea/HInv/runLoosev26Syst/SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_DPhijjMjjBinningNjetBin_v26c_DPhiFix_QCDEst_J400.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_v26c_DPhiFix_J400_XSSig.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400_XSSig.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_XSSig_METTenac.root')
+f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_XSSig_METMuonTrigOR.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400.root')#
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_SigXS.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFix_QCDEst.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBin_v26c_DPhiFixQCDEst_J400_SigXS.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBin_v26c_DPhiFixQCDEst_J400_XSSig.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_XSSig.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_LooseLepDilepTrig_v26c_DPhiFix.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_NjetBin_v26c.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LowMETBin_v26c.root')
@@ -74,6 +108,8 @@ for bin_num in bins:
     if not h:
         sTot=bin_num-1
         break
+
+region_cf=[]
 for rmy in regions:
     if nRegion==0:
         for su in range(0,len(SumList)):
@@ -128,7 +164,18 @@ for rmy in regions:
             totalBkg=0
             totalBkgErr=0
             rline='Sum\t'
+            sreg=['Region']
+            if r.count('twoEle'):  sreg=['Zee']
+            elif r.count('twoMu'):  sreg=['Zmm']
+            elif r.count('oneEleNegLowSigC'):  sreg=['WenminusLowMetSig']
+            elif r.count('oneElePosLowSigC'):  sreg=['WenplusLowMetSig']
+            elif r.count('oneEleNeg'):  sreg=['Wenminus']
+            elif r.count('oneElePos'):  sreg=['Wenplus']
+            elif r.count('oneMuNeg'):  sreg=['Wmnminus']
+            elif r.count('oneMuPos'):  sreg=['Wmnplus']
+            elif r.count('_SR'):  sreg=['SR']
             for su in range(0,len(SumList)):
+                sreg+=[SumList[su]]
                 #rline+='%0.2f\t' %(SumList[su])
                 rline+='%0.2f +/- %0.2f\t' %(SumList[su],math.sqrt(SumErrList[su]))
                 if samples[su]=='hVBFH125_' or samples[su]=='hggFH125_' or samples[su]=='hVH125_':
@@ -138,14 +185,41 @@ for rmy in regions:
                     totalBkgErr+=SumErrList[su]
                 else:
                     totalData=SumList[su]
-            
+            sreg+=[totalBkg]
+            region_cf+=[sreg]            
             #bkgFracErr
             totalBkgFracErr = math.sqrt(totalBkgErr)/totalBkg
             rline+='%0.3f\t%0.3f +/- %0.3f\t' %(totalBkgFracErr, totalData/totalBkg, math.sqrt(totalBkgFracErr**2+1./totalData)*(totalData/totalBkg))
             print rline
 print 'done'
 
-
+print ''
+print '\\resizebox{\\textwidth}{!}{ '
+print '\\begin{tabular}{l|ccccccccc}'
+cline=''
+for b in range(0,len(region_cf[0])+1):
+    cline=samplesPrint[b]+'\t& '
+    for r in range(0,len(region_cf)):
+    #for b in range(0,len(samples)+2):
+        extra=''
+        if b==0:
+            cline+='%s\t& ' %(region_cf[r][b])
+            extra='\\hline\\hline'
+        elif b>=len(region_cf[0]):
+            cline+='%0.3f\t& ' %(region_cf[r][b-2]/region_cf[r][b-1] )
+        elif b==len(region_cf[0])-2:# data
+            cline+='%0.0f\t& ' %(region_cf[r][b])
+        else:
+            cline+='%0.1f\t& ' %(region_cf[r][b] )
+            if b==len(region_cf[0])-3:# mj
+                extra='\\hline\\hline'
+            if b==len(region_cf[0])-1:# total bkg
+                extra='\\hline'
+    print cline.rstrip().rstrip('&')+'\\\\'+extra
+    cline=''
+print '\\end{tabular}'
+print '}'
+sys.exit(0)
 # Collect systematics
 tobj = f.GetListOfKeys()
 for sample in samples:
