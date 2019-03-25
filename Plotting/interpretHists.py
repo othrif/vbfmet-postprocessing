@@ -39,6 +39,8 @@ bins=hist[2].GetSize()-2
 sbHist=TH1D("hist","hist",bins,0.,float(bins))
 srootbHist=TH1D("hist1","hist1",bins,0.,float(bins))
 srootbZNormHist=TH1D("hist2","QG Tagging Regions - "+mjjIn,bins,0.,float(bins))
+
+print "Function values: Bin, S/B, sigma_mu, sigma_mu Norm"
 for i in range(bins):
 	sb=float("{0:.3f}".format(hist[2].GetBinContent(i+1)))
 	srb=float("{0:.3f}".format(hist[4].GetBinContent(i+1)))
@@ -50,6 +52,7 @@ for i in range(bins):
 	print str(i)+" & "+str(sb)+" & "+str(srb)+" & "+str(srbz)+" \\\ \hline"
 
 
+print "Yields: Bin, Higgs, Background"
 for i in range(bins):
             print str(i)+" & "+"{0:.3f}".format(higgsHist.GetBinContent(i+1))+" & "+"{0:.3f}".format(bkgdHist.GetBinContent(i+1))+" \\\ \hline"
 
