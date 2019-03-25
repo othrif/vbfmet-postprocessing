@@ -59,6 +59,5 @@ atlas_install_joboptions( share/*.py )
 atlas_install_data( data/* )
 # You can access your data from code using path resolver, e.g.
 # PathResolverFindCalibFile("VBFAnalysis/file.txt")
-
-
+#PathResolverFindCalibFile("VBFAnalysis/data/PMGxsecDB_mc16.txt")
 

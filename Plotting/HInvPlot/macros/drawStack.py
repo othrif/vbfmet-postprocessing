@@ -191,17 +191,17 @@ def getHistPars(hist):
         #
         'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5},
         'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
-        'etPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':False},
+        'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
         'jetEta1': {'xtitle':'Sub-Leading jet #eta'  ,       'ytitle':'Events', 'rebin':5},
         'jet1Phi': {'xtitle':'Sub-Leading jet #phi'  ,       'ytitle':'Events', 'rebin':2},
-        'jetPt1' : {'xtitle':'p_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':False},
+        'jetPt1' : {'xtitle':'p_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
         'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
-        'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},
-        'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},
+        'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
         'j0timing' : {'xtitle':'Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1timing' : {'xtitle':'sub-Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
-        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0.0, 'ymin':0.1, 'logy':False, 'LtoRCut':True, 'xmax':9.0},
+        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0.0, 'ymin':0.1, 'logy':False, 'LtoRCut':1, 'xmax':9.0},
         'n_jet_fwd'   : {'xtitle':'Number of extra Jets |eta|>2.5',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj30'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
@@ -222,20 +222,19 @@ def getHistPars(hist):
         'lepPhi' : {'xtitle':'Lepton #phi [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'dphill' : {'xtitle':'#Delta #phi_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
         'jj_dphi' : {'xtitle':'#Delta #phi_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
-        'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':1.0, 'logy':True},
-        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':1.0, 'logy':True, 'LtoRCut':False},
+        'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':5,  'ymin':0.1, 'logy':False, 'LtoRCut':1},
+        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':1.0, 'logy':True, 'LtoRCut':0},
         'met_tst_phi'    : {'xtitle':'E_{T}^{miss} #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_phi'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
-        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':False},
-        'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':False},
+        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':0},
+        'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
         'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
     'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},
-    'met_soft_tst_et'     : {'xtitle':'MET Soft [GeV]'   ,         'ytitle':'Events',   'rebin':5,'ymin':0.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
@@ -271,7 +270,7 @@ def getHistPars(hist):
     'met_tst_ph_dphi'     : {'xtitle':'#Delta#phi(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'Mtt'     : {'xtitle':'m_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'minDRLep'     : {'xtitle':'min #DeltaR(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'j3Pt'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
+    'j3Pt'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':0},
     'j3Eta'     : {'xtitle':'j3 #eta'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3Jvt'     : {'xtitle':'j3 Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3FJvt'     : {'xtitle':'j3 f-Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -505,7 +504,7 @@ def getStyle(sample):
         sys.exit(1)
 
 #-------------------------------------------------------------------------
-def updateCanvas(can, name=None, leg=None, option = ''):
+def updateCanvas(can, name=None, leg=None, option = '', data_hist=None, bkg_sum_hist=None):
 
     if not can:
         sys.exit(0)
@@ -566,14 +565,22 @@ def updateCanvas(can, name=None, leg=None, option = ''):
             can.Print('%s.eps' %name, 'eps')
 
         if options.do_pdf:
-	    #can.SaveAs('%s.pdf' %name)
             can.Print('%s.pdf' %name, 'pdf')
 
         if options.do_root:
-	    outfile  = ROOT.TFile("hists_"+name+".root", "RECREATE")
-	    can.Write()
-	    outfile.Close()
-	    print "file "+str(outfile)+" has been created"
+            #outfile  = ROOT.TFile("hists_"+name+".root", "RECREATE")
+            outfile  = ROOT.TFile('%s.root' %name, "RECREATE")
+            can.Write()
+            if data_hist:
+                data_hist.hist.SetDirectory(outfile)
+                data_hist.hist.SetName("data_"+data_hist.hist.GetName())                
+                data_hist.hist.Write()
+            if bkg_sum_hist:
+                bkg_sum_hist.SetDirectory(outfile)
+                bkg_sum_hist.SetName("totbkg_"+bkg_sum_hist.GetName())
+                bkg_sum_hist.Write()                
+            outfile.Close()
+            print "file "+str(outfile)+" has been created"
 
 
 #-------------------------------------------------------------------------
@@ -730,7 +737,10 @@ class DrawStack:
         self.zcr_stack = None
         if options.blind and self.selkey.count('pass_sr') and self.selkey.count('_nn_Nominal'): #and self.selkey=='pass_sr_allmjj_nn_Nominal':
             replace_sr_name = self.selkey[self.selkey.find('pass_sr_')+len('pass_sr_'): self.selkey.find('_nn_Nominal')]
-            self.zcr_stack = DrawStack(name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_'+replace_sr_name+'_ll_Nominal')
+            zcr_name=copy.copy(name)
+            if zcr_name.count('_tst_et') and not zcr_name.count('_nolep') and not zcr_name.count('soft'):
+                zcr_name = zcr_name.replace('_tst_et','_tst_nolep_et')
+            self.zcr_stack = DrawStack(zcr_name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_'+replace_sr_name+'_ll_Nominal')
         self.sign = self.ReadSample(file, sign)
         if options.hscale!=None:
             self.sign.hist.Scale(float(options.hscale))
@@ -1013,7 +1023,7 @@ class DrawStack:
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
 
-        updateCanvas(can, name='%s_%s_%s_sig' %(getSelKeyPath(), self.name, syst))
+        updateCanvas(can, name='%s_%s_%s_sig' %(getSelKeyPath(), self.name, syst, self.data, self.bkg_sum))
 
     #----------------------
     def PlotSystBkg(self, syst, can):
@@ -1079,7 +1089,7 @@ class DrawStack:
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
 
-        updateCanvas(can, name='%s_%s_%s_bkg' %(getSelKeyPath(), self.name, syst))
+        updateCanvas(can, name='%s_%s_%s_bkg' %(getSelKeyPath(), self.name, syst, self.data, self.bkg_sum))
 
     #-------------------
     def PlotManySyst(self, systs, can, isSignal=False, fillData=False, groupStart=-1, groupEnd=-1):
@@ -1638,57 +1648,87 @@ class DrawStack:
                 self.ratio.Divide(den_tmp)
                 # compute the mu-error
                 if options.blind:
-                    leftToRight=True
+                    leftToRight=1
                     CUTRANGE = range(0,self.signif.GetNbinsX()+1)
                     if 'LtoRCut' in getHistPars(self.name):
                         leftToRight = getHistPars(self.name)['LtoRCut']
                     for ibinA in CUTRANGE:
                         ibin = ibinA
-                        if not leftToRight:
+                        if leftToRight==0:
                             ibin = self.signif.GetNbinsX() - ibinA
                         #print ibin
                         cut_Nsig = self.sign.hist.Integral(0,ibin)
                         cut_Nbkg = self.bkg_sum.Integral(0,ibin)
-                        if not leftToRight:
+                        cut_NsigOpp=0.0
+                        cut_NbkgOpp=0.0
+                        if leftToRight==0:
                             cut_Nsig = self.sign.hist.Integral(ibin,10001)
                             cut_Nbkg = self.bkg_sum.Integral(ibin,10001)
-                        if leftToRight==2: # do this bin-by-bin
+                        elif leftToRight==2: # do this bin-by-bin
                             cut_Nsig = self.sign.hist.Integral(ibin,ibin)
                             cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
+                        elif leftToRight==3: # add bins together
+                            cut_NsigOpp = self.sign.hist.Integral(ibin+1,10001)
+                            cut_NbkgOpp = self.bkg_sum.Integral(ibin+1,10001)                            
 
                         #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
-                            self.signif.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg)/cut_Nsig)
+                            signifV = 2.0*math.sqrt(cut_Nbkg)/cut_Nsig
+                            if cut_NsigOpp>0.0:
+                                signifVOpp = 2.0*math.sqrt(cut_NbkgOpp)/cut_NsigOpp
+                                if  leftToRight==3 and signifV>0.0 and signifVOpp>0.0: # add bins together
+                                    signifV = 1./math.sqrt(1./signifV**2+1./signifVOpp**2)
+                            self.signif.SetBinContent(ibin, signifV)
                             wBKG=0.0
                             madgraph=''
                             if options.madgraph:
                                 madgraph='Mad'
                             if ('wqcd'+madgraph) in self.bkgs and 'wewk' in self.bkgs:
                                 wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['wewk'].hist.Integral(0,ibin)
-                                if not leftToRight:
+                                wBKGOpp=0.0
+                                if leftToRight==0:
                                     wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['wewk'].hist.Integral(ibin,10001)
-                                if leftToRight==2:
+                                elif leftToRight==2:
                                     wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['wewk'].hist.Integral(ibin,ibin)
+                                elif leftToRight==3: # add bins together
+                                    wBKGOpp = self.bkgs['wqcd'+madgraph].hist.Integral(ibin+1,10001)+self.bkgs['wewk'].hist.Integral(ibin+1,10001)
 
                             if ('zqcd'+madgraph) in self.bkgs and 'zewk' in self.bkgs:
                                 zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
-                                if not leftToRight:
+                                zBKGOpp=0.0
+                                if leftToRight==0:
                                     zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['zewk'].hist.Integral(ibin,10001)
-                                if leftToRight==2:
+                                elif leftToRight==2:
                                     zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
+                                elif leftToRight==3: # add bins together
+                                    zBKGOpp = self.bkgs['zqcd'+madgraph].hist.Integral(ibin+1,10001)+self.bkgs['zewk'].hist.Integral(ibin+1,10001)
                                 total_zcr=-100.0
+                                total_zcrOpp=-100.0
                                 #print 'self.zcr_stack: ',self.zcr_stack
                                 if self.zcr_stack and not self.zcr_stack.bkg_sum:
                                     self.zcr_stack.bkg_sum = self.zcr_stack.GetTotalBkgHist()
-                                    total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
-                                if not leftToRight and self.zcr_stack:
+                                total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
+                                if leftToRight==0 and self.zcr_stack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,10001)
-                                if (leftToRight==2) and self.zcr_stack:
-                                    total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)                                    
+                                elif (leftToRight==2) and self.zcr_stack:
+                                    total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)
+                                elif leftToRight==3: # add bins together
+                                    total_zcrOpp = self.zcr_stack.bkg_sum.Integral(ibin+1,10001)
                                 if total_zcr>0.0:
                                     total_zcr = 1.0/math.sqrt(total_zcr)
-                                #print total_zcr
-                                self.signifCR.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig)
+                                if total_zcrOpp>0.0:
+                                    total_zcrOpp = 1.0/math.sqrt(total_zcrOpp)
+                                #print ibin,cut_Nbkg,total_zcr,zBKG,wBKG,cut_Nsig,(2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig)
+                                signifVal = 2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig
+                                if leftToRight==3: # add bins together
+                                    signifValOpp=0.0
+                                    if cut_NsigOpp>0.0:
+                                        signifValOpp = 2.0*math.sqrt(cut_NbkgOpp + (zBKGOpp*total_zcrOpp)**2 +(wBKGOpp*0.015)**2 )/cut_NsigOpp
+                                    if signifValOpp>0.0 and signifVal>0:
+                                        signifVal = 1./math.sqrt(1./signifValOpp**2+1./signifVal**2)
+                                    elif signifValOpp>0.0 and not signifVal>0:
+                                        signifVal=signifValOpp
+                                self.signifCR.SetBinContent(ibin, signifVal)
 
             # Set Names
             pars = getHistPars(self.name)
@@ -1772,7 +1812,8 @@ class DrawStack:
             if options.blind:
                 self.ratio.Draw('same hist')
                 self.signif.Draw('same hist')
-                self.signifCR.Draw('same hist')
+                self.signifCR.GetYaxis().SetRangeUser(0,2);
+                self.signifCR.Draw('hist same')
                 self.legr.Clear()
                 self.legr.AddEntry(self.ratio,'S/B')
                 self.legr.AddEntry(self.signif,'#sigma_{#mu} Stat 95% CL')
@@ -2241,7 +2282,7 @@ def main():
         else:
             cname='%s_%s_%s' %(getSelKeyPath(), var, options.syst)
 
-        updateCanvas(can, name=cname)
+        updateCanvas(can, name=cname, data_hist=stack.data, bkg_sum_hist=stack.bkg_sum)
 
 
         if options.syst_see == 'allsyst':
