@@ -491,7 +491,7 @@ def getStyle(sample):
         sys.exit(1)
 
 #-------------------------------------------------------------------------
-def updateCanvas(can, name=None, leg=None, option = ''):
+def updateCanvas(can, name=None, leg=None, option = '', data_hist=None, bkg_sum_hist=None):
 
     if not can:
         sys.exit(0)
@@ -555,8 +555,17 @@ def updateCanvas(can, name=None, leg=None, option = ''):
             can.Print('%s.pdf' %name, 'pdf')
 
         if options.do_root:
-            outfile  = ROOT.TFile("hists_"+name+".root", "RECREATE")
+            #outfile  = ROOT.TFile("hists_"+name+".root", "RECREATE")
+            outfile  = ROOT.TFile('%s.root' %name, "RECREATE")
             can.Write()
+            if data_hist:
+                data_hist.hist.SetDirectory(outfile)
+                data_hist.hist.SetName("data_"+data_hist.hist.GetName())                
+                data_hist.hist.Write()
+            if bkg_sum_hist:
+                bkg_sum_hist.SetDirectory(outfile)
+                bkg_sum_hist.SetName("totbkg_"+bkg_sum_hist.GetName())
+                bkg_sum_hist.Write()                
             outfile.Close()
             print "file "+str(outfile)+" has been created"
 
@@ -1000,7 +1009,7 @@ class DrawStack:
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
 
-        updateCanvas(can, name='%s_%s_%s_sig' %(getSelKeyPath(), self.name, syst))
+        updateCanvas(can, name='%s_%s_%s_sig' %(getSelKeyPath(), self.name, syst, self.data, self.bkg_sum))
 
     #----------------------
     def PlotSystBkg(self, syst, can):
@@ -1066,7 +1075,7 @@ class DrawStack:
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
 
-        updateCanvas(can, name='%s_%s_%s_bkg' %(getSelKeyPath(), self.name, syst))
+        updateCanvas(can, name='%s_%s_%s_bkg' %(getSelKeyPath(), self.name, syst, self.data, self.bkg_sum))
 
     #-------------------
     def PlotManySyst(self, systs, can, isSignal=False, fillData=False, groupStart=-1, groupEnd=-1):
@@ -2259,7 +2268,7 @@ def main():
         else:
             cname='%s_%s_%s' %(getSelKeyPath(), var, options.syst)
 
-        updateCanvas(can, name=cname)
+        updateCanvas(can, name=cname, data_hist=stack.data, bkg_sum_hist=stack.bkg_sum)
 
 
         if options.syst_see == 'allsyst':

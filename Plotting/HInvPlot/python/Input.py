@@ -343,8 +343,9 @@ def prepareBkgRuns(keys,options=None):
         #
         #
         
-    sig_VH125     = {'308072':'VH125',
-                         '308071':'VH125',
+    sig_VH125     = {'308072':'ZH125',
+                         '308071':'WpH125',
+                         '308070':'WmH125',                         
                          }
     sig_ggF125 = {'308284':'ggF125',}
     #sig_ggF125 = {'364162':'Wmunu_MAXHTPTV140_280_CVetoBVeto',}
