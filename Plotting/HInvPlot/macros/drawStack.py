@@ -289,17 +289,17 @@ def getHistPars(hist):
     'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
     'jj_nmbGluons' : {'xtitle':'Number of gluon-initiated leading jets', 'ytitle':'Events', 'logy':True},
     'qgTagPerf' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
-    'qgTagNTrack' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
-    'qgTagTrackWidth' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
-    'qgTagSum' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
+    'qgTagNTrack' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
+    'qgTagTrackWidth' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
+    'qgTagSum' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
     'nTrackCut0' : {'xtitle':'NTrack cut (leading)', 'ytitle':'Events', 'LtoRCut':2},
     'nTrackCut1' : {'xtitle':'NTrack cut (subleading)', 'ytitle':'Events', 'LtoRCut':2},
     'TrackWidthCut0' : {'xtitle':'Track Width cut (leading)', 'ytitle':'Events', 'LtoRCut':2},
     'TrackWidthCut1' : {'xtitle':'Track Width cut (subleading)', 'ytitle':'Events', 'LtoRCut':2},
     'nTrackCutSum' : {'xtitle':'NTrack cut (sum)', 'ytitle':'Events', 'LtoRCut':2},
     'TrackWidthCutSum' : {'xtitle':'Track Width cut (sum)', 'ytitle':'Events', 'LtoRCut':2},
-    'nTrackSum' : {'xtitle':'NTrack (sum)', 'ytitle':'Events', 'LtoRCut':False},
-    'TrackWidthSum' : {'xtitle':'Track Width (sum)', 'ytitle':'Events', 'LtoRCut':False},
+    'nTrackSum' : {'xtitle':'NTrack (sum)', 'ytitle':'Events', 'LtoRCut':2},
+    'TrackWidthSum' : {'xtitle':'Track Width (sum)', 'ytitle':'Events', 'LtoRCut':2},
         }
 
     try:
@@ -1670,15 +1670,32 @@ class DrawStack:
                         elif leftToRight==3: # add bins together
                             cut_NsigOpp = self.sign.hist.Integral(ibin+1,10001)
                             cut_NbkgOpp = self.bkg_sum.Integral(ibin+1,10001)                            
+                        elif (leftToRight==4 and ibin%2==0): # pair every 2 bins together
+                            cut_Nsig = self.sign.hist.GetBinContent(ibin-2)
+                            cut_Nbkg = self.bkg_sum.GetBinContent(ibin-2)
+                            cut_NsigOpp = self.sign.hist.GetBinContent(ibin-1)
+                            cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin-1)
+                            if ibin==2: #For leading Nominal bin (unpaired)
+                                cut_Nsig = self.sign.hist.Integral(ibin,ibin)
+                                cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
+                        elif (leftToRight==4 and ibin%2==1): # pair every 2 bins together
+                            cut_Nsig = self.sign.hist.GetBinContent(ibin-1)
+                            cut_Nbkg = self.bkg_sum.GetBinContent(ibin-1)
+                            cut_NsigOpp = self.sign.hist.GetBinContent(ibin)
+                            cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin)
+                            if ibin==1: #For leading Nominal bin (unpaired)
+                                cut_Nsig = self.sign.hist.Integral(ibin,ibin)
+                                cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
 
                         #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
                             signifV = 2.0*math.sqrt(cut_Nbkg)/cut_Nsig
                             if cut_NsigOpp>0.0:
                                 signifVOpp = 2.0*math.sqrt(cut_NbkgOpp)/cut_NsigOpp
-                                if  leftToRight==3 and signifV>0.0 and signifVOpp>0.0: # add bins together
+                                if  (leftToRight==3 or leftToRight==4) and signifV>0.0 and signifVOpp>0.0: # add bins together
                                     signifV = 1./math.sqrt(1./signifV**2+1./signifVOpp**2)
                             self.signif.SetBinContent(ibin, signifV)
+
                             wBKG=0.0
                             madgraph=''
                             if options.madgraph:
@@ -1692,6 +1709,16 @@ class DrawStack:
                                     wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['wewk'].hist.Integral(ibin,ibin)
                                 elif leftToRight==3: # add bins together
                                     wBKGOpp = self.bkgs['wqcd'+madgraph].hist.Integral(ibin+1,10001)+self.bkgs['wewk'].hist.Integral(ibin+1,10001)
+                                elif leftToRight==4 and ibin%2==0:# pair every 2 bins together
+                                    wBKG = self.bkgs['wqcd'+madgraph].hist.GetBinContent(ibin-2)+self.bkgs['wewk'].hist.GetBinContent(ibin-2)
+                                    wBKGOpp = self.bkgs['wqcd'+madgraph].hist.GetBinContent(ibin-1)+self.bkgs['wewk'].hist.GetBinContent(ibin-1)
+                                    if ibin==2:#For leading Nominal bin (unpaired)
+                                        wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['wewk'].hist.Integral(ibin,ibin)
+                                elif leftToRight==4 and ibin%2==1:# pair every 2 bins together
+                                    wBKG = self.bkgs['wqcd'+madgraph].hist.GetBinContent(ibin-1)+self.bkgs['wewk'].hist.GetBinContent(ibin-1)
+                                    wBKGOpp = self.bkgs['wqcd'+madgraph].hist.GetBinContent(ibin)+self.bkgs['wewk'].hist.GetBinContent(ibin)
+                                    if ibin==1:#For leading Nominal bin (unpaired)
+                                        wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['wewk'].hist.Integral(ibin,ibin)
 
                             if ('zqcd'+madgraph) in self.bkgs and 'zewk' in self.bkgs:
                                 zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
@@ -1702,6 +1729,16 @@ class DrawStack:
                                     zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
                                 elif leftToRight==3: # add bins together
                                     zBKGOpp = self.bkgs['zqcd'+madgraph].hist.Integral(ibin+1,10001)+self.bkgs['zewk'].hist.Integral(ibin+1,10001)
+                                elif leftToRight==4 and ibin%2==0:# pair every 2 bins together
+                                    zBKG = self.bkgs['zqcd'+madgraph].hist.GetBinContent(ibin-2)+self.bkgs['zewk'].hist.GetBinContent(ibin-2)
+                                    zBKGOpp = self.bkgs['zqcd'+madgraph].hist.GetBinContent(ibin-1)+self.bkgs['zewk'].hist.GetBinContent(ibin-1)
+                                    if ibin==2:#For leading Nominal bin (unpaired)
+                                        zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
+                                elif leftToRight==4 and ibin%2==1:# pair every 2 bins together
+                                    zBKG = self.bkgs['zqcd'+madgraph].hist.GetBinContent(ibin-1)+self.bkgs['zewk'].hist.GetBinContent(ibin-1)
+                                    zBKGOpp = self.bkgs['zqcd'+madgraph].hist.GetBinContent(ibin)+self.bkgs['zewk'].hist.GetBinContent(ibin)
+                                    if ibin==1:#For leading Nominal bin (unpaired)
+                                        zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
                                 total_zcr=-100.0
                                 total_zcrOpp=-100.0
                                 #print 'self.zcr_stack: ',self.zcr_stack
@@ -1714,13 +1751,23 @@ class DrawStack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)
                                 elif leftToRight==3: # add bins together
                                     total_zcrOpp = self.zcr_stack.bkg_sum.Integral(ibin+1,10001)
+                                elif leftToRight==4 and ibin%2==0:# pair every 2 bins together
+                                    total_zcr = self.zcr_stack.bkg_sum.GetBinContent(ibin-2)
+                                    total_zcrOpp = self.zcr_stack.bkg_sum.GetBinContent(ibin-1)
+                                    if ibin==2:#For leading Nominal bin (unpaired)
+                                        total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)
+                                elif leftToRight==4 and ibin%2==1:# pair every 2 bins together
+                                    total_zcr = self.zcr_stack.bkg_sum.GetBinContent(ibin-1)
+                                    total_zcrOpp = self.zcr_stack.bkg_sum.GetBinContent(ibin)
+                                    if ibin==1:#For leading Nominal bin (unpaired)
+                                        total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)
                                 if total_zcr>0.0:
                                     total_zcr = 1.0/math.sqrt(total_zcr)
                                 if total_zcrOpp>0.0:
                                     total_zcrOpp = 1.0/math.sqrt(total_zcrOpp)
                                 #print ibin,cut_Nbkg,total_zcr,zBKG,wBKG,cut_Nsig,(2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig)
                                 signifVal = 2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig
-                                if leftToRight==3: # add bins together
+                                if leftToRight==3 or leftToRight==4: # add bins together
                                     signifValOpp=0.0
                                     if cut_NsigOpp>0.0:
                                         signifValOpp = 2.0*math.sqrt(cut_NbkgOpp + (zBKGOpp*total_zcrOpp)**2 +(wBKGOpp*0.015)**2 )/cut_NsigOpp
