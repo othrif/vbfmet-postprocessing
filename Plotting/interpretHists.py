@@ -75,6 +75,9 @@ sbHist=TH1D("hist","hist",bins,0.,float(bins))
 sigMuHist=TH1D("hist1","hist1",bins,0.,float(bins))
 sigMuZNormHist=TH1D("hist2","QG Tagging Regions - "+mjjIn,bins,0.,float(bins))
 
+if save:
+	table=open("SBs_table.txt","w+")
+
 #Refill new histograms with rounded ratio values, and print values to terminal
 print "Function values: Bin, S/B, sigma_mu, sigma_mu Norm"
 for i in range(bins):
@@ -86,15 +89,19 @@ for i in range(bins):
 	sigMuZNormHist.Fill(i,srbz)
 	sigMuZNormHist.GetXaxis().SetBinLabel(i+1,hist[2].GetXaxis().GetBinLabel(i+1))
 	print str(i)+" & "+str(sb)+" & "+str(srb)+" & "+str(srbz)+" \\\ \hline"
+	if save:
+		table.write(str(i)+" & "+str(sb)+" & "+str(srb)+" & "+str(srbz)+" \\\ \hline \n" )
 
 #Print yields to terminal
 print "Yields: Bin, Higgs, Background"
 for i in range(bins):
-	    print str(i)+" & "+"{0:.3f}".format(higgsHist.GetBinContent(i+1))+" & "+"{0:.3f}".format(bkgdHist.GetBinContent(i+1))+" \\\ \hline"
-
+	print str(i)+" & "+"{0:.3f}".format(higgsHist.GetBinContent(i+1))+" & "+"{0:.3f}".format(bkgdHist.GetBinContent(i+1))+" \\\ \hline"
+	if save:
+		table.write(str(i)+" & "+"{0:.3f}".format(higgsHist.GetBinContent(i+1))+" & "+"{0:.3f}".format(bkgdHist.GetBinContent(i+1))+" \\\ \hline \n" )
+	
 #Format output plot
 legend=TLegend(0.5,0.7,0.7,0.9)
-ratioCan=TCanvas("ratioCan","ratioCan",1200,600)
+ratioCan=TCanvas("ratioCan","ratioCan",800,600)
 sigMuZNormHist.Draw("hist text15 same")
 sbHist.Draw("same hist text15")
 sbHist.SetLineColor(kBlack)
@@ -116,4 +123,5 @@ legend.Draw()
 
 if save:
 	ratioCan.SaveAs("SBs_"+mjjIn+".png")
-
+	print "Saved "+str(table)
+	table.close()
