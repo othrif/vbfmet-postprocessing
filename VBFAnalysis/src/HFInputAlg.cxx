@@ -343,7 +343,7 @@ StatusCode HFInputAlg::execute() {
   bool muChPos = n_mu>0 ? (mu_charge->at(0) > 0) : false;
   bool OppSignElCut = n_el>1 ? (el_charge->at(0)*el_charge->at(1) < 0) : false;
   bool OppSignMuCut = n_mu>1 ? (mu_charge->at(0)*mu_charge->at(1) < 0) : false;
-  if(m_extraVars==4 || m_extraVars==5){
+  if(m_extraVars==4 || m_extraVars==5 || m_extraVars==6 || m_extraVars==7){
     ZelPtCut = n_baseel>0 ? (baseel_pt->at(0)>30.0e3): false;
     ZmuPtCut = n_basemu>0 ? (basemu_pt->at(0)>30.0e3): false;
     elSubPtCut = n_baseel>1 ? (baseel_pt->at(1)>7.0e3): false;
