@@ -547,8 +547,8 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['wewk'] = ['wewk']
     bkgs['zewk'] = ['zewk']
     #bkgs['top1'] = ['top1']
-    bkgs['top2'] = ['top2']
-    bkgs['vvv']  = ['vvv']
+    bkgs['tall'] = ['top2','vvv']
+    #bkgs['vvv']  = ['vvv']
     #bkgs['zldy'] = ['zldy']
     bkgs['dqcd'] = ['dqcd']
     #bkgs['tall'] = ['top2','top1']
@@ -576,7 +576,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     # Save samples (type list by hand to preserve order)
     #
     if reg != None and key != None:
-        reg.SetVal(key, 'higgs,top2,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
+        reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 
