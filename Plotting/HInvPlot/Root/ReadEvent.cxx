@@ -1084,10 +1084,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // run selected for 2017
     if(!fisMC) fRandomRunNumber = fRunNumber;
-    if(fRandomRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))                                    trigger_met_encodedv2_new=4; //HLT_xe90_pufit_L1XE50; // period B
+    if(fRandomRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))                                    trigger_met_encodedv2_new=4; //HLT_xe90_pufit_L1XE50;    // period B
     else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
     else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
-    else if(340453>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;
+    else if(340453>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
 
     // Change the leptons to base leptons - after filling the event
