@@ -625,7 +625,7 @@ def MakeRatio(indir1, indir2, plot_name,can):
     dpltv1.Divide(dpltv2)
     bpltv1.Divide(bpltv2)
     rpltv1.Divide(rpltv2)
-    dpltv1.GetYaxis().SetTitle('15+16 / 17')
+    dpltv1.GetYaxis().SetTitle('15+16 / 18')
     dpltv1.GetYaxis().SetRangeUser(0.0,2.0)    
     #dpltv1.GetYaxis().SetTitle('15+16 / 18')    
     dpltv1.SetLineColor(1)
@@ -654,8 +654,8 @@ def MakeRatio(indir1, indir2, plot_name,can):
         bpltv1.GetYaxis().SetRangeUser(0.0,2.0)
         bpltv1.Draw('e')
 
-    #eff = 36100.0/59937.0
-    eff = 36100.0/44307.4
+    eff = 36100.0/59937.0
+    #eff = 36100.0/44307.4
     for i in range(0,exp_ratio.GetNbinsX()+1):
         exp_ratio.SetBinError(i,0.02*eff)
         exp_ratio_one.SetBinError(i,0.02*eff)        
@@ -712,11 +712,11 @@ if __name__ == "__main__":
     can.Draw()
     can.cd()
     
-    f=open('vbf_2017_ratios.tex','w')
-    f.write(GetHeader('Ratios of 2017'))
-    dir1='/tmp/v26LooseJ400Nominal/'
+    f=open('vbf_2018_NoJetCut_ratios.tex','w')
+    f.write(GetHeader('Ratios of 2018'))
+    dir1='/tmp/v26LooseJ400Nominal_NoJetCut/'
     #dir2='/tmp/v28bLooseNominal/'    
-    dir2='/tmp/v27LooseNominal2/'    
+    dir2='/tmp/v28bLooseNominal_NoJetCut/'    
 
     #,'Nominal_met_tenacious_tst_et_Nominal.pdf',]
     filelist = ['Nominal_jj_mass_Nominal.pdf','Nominal_jj_deta_Nominal.pdf',
@@ -729,7 +729,7 @@ if __name__ == "__main__":
         i=0        
         for fi in filelist:
             n = MakeRatio(dir1,dir2,s+fi, can)
-            f.write(Get3Chart(names=[dir1+s+fi,dir2+s+fi,n], title=titles[i],xtitle='2015 and 2016',ytitle='2017'))
+            f.write(Get3Chart(names=[dir1+s+fi,dir2+s+fi,n], title=titles[i],xtitle='2015 and 2016',ytitle='2018'))
             i+=1
     f.write(GetEnd())
     f.close()
