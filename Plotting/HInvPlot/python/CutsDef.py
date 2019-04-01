@@ -81,7 +81,7 @@ class BasicCuts:
             self.NjetCut = 'n_jet > 2 && n_jet < 5'
         if Analysis.count('nj2'): 
             self.NjetCut = 'n_jet == 2'
-            
+
     def PadKey(self, key, val, pf=None, sf=None):
         if len(key) > 0: key += '_'
         if pf != None: key += pf
@@ -218,6 +218,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
         if options.r207Ana:
             cuts=[]
             cuts = [CutItem('CutNjet',  'n_jet == 2')]
+            #cuts = [CutItem('CutNjet',  'n_jet < 4')]
             cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
             cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
             return cuts
@@ -302,7 +303,8 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     if options.year==2017:
         cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4', weight=apply_weight)]
     elif options.year==2018:
-        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 3', weight=apply_weight)]
+        #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 3', weight=apply_weight)]
+        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5', weight=apply_weight)]
     else:
         cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)] 
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
