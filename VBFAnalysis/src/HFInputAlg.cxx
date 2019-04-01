@@ -63,6 +63,7 @@ StatusCode HFInputAlg::initialize() {
   basemu_eta= new std::vector<float>(0);
   basemu_phi= new std::vector<float>(0);
   basemu_ptvarcone20= new std::vector<float>(0); 
+  basemu_ptvarcone30= new std::vector<float>(0); 
   
   cout<<"NAME of input tree in intialize ======="<<currentVariation<<endl;
   if (currentSample == "data") isMC = false;
@@ -346,8 +347,10 @@ StatusCode HFInputAlg::execute() {
   if(m_extraVars==4 || m_extraVars==5 || m_extraVars==6 || m_extraVars==7){
     ZelPtCut = n_baseel>0 ? (baseel_pt->at(0)>30.0e3): false;
     ZmuPtCut = n_basemu>0 ? (basemu_pt->at(0)>30.0e3): false;
+    //elSubPtCut = n_baseel>1 ? (baseel_pt->at(1)>7.0e3 && (baseel_ptvarcone20->at(1)/baseel_pt->at(1))<0.3): false;
+    //muSubPtCut = n_basemu>1 ? (basemu_pt->at(1)>7.0e3 && (basemu_ptvarcone30->at(1)/basemu_pt->at(1))<0.3): false;    
     elSubPtCut = n_baseel>1 ? (baseel_pt->at(1)>7.0e3): false;
-    muSubPtCut = n_basemu>1 ? (basemu_pt->at(1)>7.0e3): false;
+    muSubPtCut = n_basemu>1 ? (basemu_pt->at(1)>7.0e3): false;    
     //We_lepVeto  = ((n_baseel == 1) && (n_basemu == 0));
     //Wm_lepVeto  = ((n_baseel == 0) && (n_basemu == 1));
     Zee_lepVeto = ((n_baseel == 2) && (n_basemu == 0));
@@ -562,6 +565,7 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchStatus("basemu_eta",1);
     m_tree->SetBranchStatus("basemu_phi",1);
     m_tree->SetBranchStatus("basemu_ptvarcone20",1);
+    m_tree->SetBranchStatus("basemu_ptvarcone30",1);
 
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
     m_tree->SetBranchAddress("met_tenacious_tst_et",   &met_tenacious_tst_et);
@@ -579,6 +583,7 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchAddress("basemu_eta",           &basemu_eta);
     m_tree->SetBranchAddress("basemu_phi",           &basemu_phi);
     m_tree->SetBranchAddress("basemu_ptvarcone20",  &basemu_ptvarcone20);
+    m_tree->SetBranchAddress("basemu_ptvarcone30",  &basemu_ptvarcone30);
   }
   return StatusCode::SUCCESS;
 }
