@@ -542,10 +542,27 @@ def prepareBkgRuns(keys,options=None):
         #'410648':'Wt_DR_dilepton_top',
         #'410649':'Wt_DR_dilepton_antitop',
         }
+        
+    # default!!! Powheg+Pythia 8
+    bkg_top1 = {
+        '410658':'tchan_top',
+        '410659':'tchan_antitop',
+        '410646':'Wt_top',
+        '410647':'Wt_top',
+        '410644':'schan_top',
+        '410645':'schan_antitop',
+        }
+        
     bkg_top2.update(bkg_top1)
     bkg_top_other = {'410472':'ttbar(w/dil)',#                remove dilepton
                      '410648':'Wt_DR_dilepton_top',
-                     '410649':'Wt_DR_dilepton_antitop',       
+                     '410649':'Wt_DR_dilepton_antitop',
+                     '410642':'tchan_lept_top',
+                     '410643':'tchan_lept_antitop',
+                     '410644':'schan_top_lept',
+                     '410645':'schan_antitop_lept',
+                     '410646':'Wt_top_incl',
+                     '410647':'Wt_antitop_incl',                     
         }
     bkg_z_strong_madgraph_znn = {'361515':'Znn_Np0',
                       '361516':'Znn_Np1',
@@ -823,10 +840,13 @@ def prepareBkgRuns(keys,options=None):
                         '364215':'TBD',                        
                         }
 
-    if options.mergePTV or options.year==2018:
+    if options.mergePTV:
         for ki,yi in bkg_vbfPTVExt.iteritems():
             if yi[0]=='W': bkg_wqcd[ki]=yi
-            elif yi[0]=='Z': bkg_zqcd[ki]=yi 
+            elif yi[0]=='Z': bkg_zqcd[ki]=yi
+    if options.year==2018:
+        for ki,yi in bkg_vbfPTVExt.iteritems():
+            if yi.count('Znunu'): bkg_zqcd[ki]=yi
     if options.mergeExt:
         for ki,yi in bkg_vbfExt.iteritems():
             if yi[0]=='W': bkg_wqcd[ki]=yi
@@ -872,7 +892,11 @@ def prepareBkgRuns(keys,options=None):
                 }
 
     if not options.mergePTV:
-        bkg_keys['wdpi'].update(bkg_vbfPTVExt)
+        if  not options.year==2018:
+            bkg_keys['wdpi'].update(bkg_vbfPTVExt)
+        else:
+            for ki,yi in bkg_vbfPTVExt.iteritems():
+                if not yi.count('Znunu'): bkg_keys['wdpi'][ki]=yi
     if not options.mergeExt:
         bkg_keys['wdpi'].update(bkg_vbfExt)
     if False:
