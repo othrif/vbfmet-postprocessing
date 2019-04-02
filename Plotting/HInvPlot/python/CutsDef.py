@@ -177,7 +177,7 @@ def FilterCuts(options):
     return cuts
 
 #-------------------------------------------------------------------------
-def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False):
+def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
     cuts = []
 
     if options.r207Ana:
@@ -196,10 +196,15 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False):
     if isEMu:
         cuts += [CutItem('CutBaseLep','n_baselep == 2')]
     elif n_mu>=0 and n_el>=0:
-        cuts += [CutItem('CutBaseLep','n_baselep == %s' %(n_mu))]
+        cuts += [CutItem('CutBaseLep',  'n_baselep == %s' %(n_mu))]
+        if not options.LoadBaseLep or isWCR:
+            cuts += [CutItem('CutSignalLep','n_siglep == %s' %(n_mu))]        
     elif n_mu>=0 or n_el>=0:
         cuts += [CutItem('CutBaseMu','n_basemu == %s' %(n_mu))]
         cuts += [CutItem('CutBaseEl','n_baseel == %s' %(n_el))]
+        if not options.LoadBaseLep:
+            cuts += [CutItem('CutSignalMu','n_mu == %s' %(n_mu))]
+            cuts += [CutItem('CutSignalEl','n_el == %s' %(n_el))]            
     else:
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
 
@@ -376,7 +381,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
         cuts += [CutItem('CutMass',   'Mtt < 116.0 && Mtt > 66.0')]
     else:
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
-        #cuts += [CutItem('CutL0Pt',  'lepPt1 > 18.0')]        
+        cuts += [CutItem('CutL1Pt',  'lepPt1 > 7.0')]
         #cuts += [CutItem('CutMll',   'mll < 116.0 && mll > 76.0')]
         cutMass = CutItem('CutMass')
         cutMass.AddCut(CutItem('Mll',  'mll < 116.0 && mll > 66.0'), 'OR')
@@ -400,10 +405,11 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     if not ignore_met:
         cuts += metCuts(basic_cuts, options, True)
 
-    if basic_cuts.chan=='ee':
-        cuts += [CutItem('CutLepVeto',   'n_mu == 0')]
-    if basic_cuts.chan=='uu':
-        cuts += [CutItem('CutLepVeto',   'n_el == 0')]
+    if not options.LoadBaseLep:
+        if basic_cuts.chan=='ee':
+            cuts += [CutItem('CutLepVeto',   'n_mu == 0')]
+        if basic_cuts.chan=='uu':
+            cuts += [CutItem('CutLepVeto',   'n_el == 0')]
 
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=True)
@@ -422,7 +428,7 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
     cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
 
     # add the extra cuts
-    cuts += ExtraCuts(options, 1,1)
+    cuts += ExtraCuts(options, 1,1, isWCR=True)
 
     if cut == 'BeforeMET':
         return GetCuts(cuts)

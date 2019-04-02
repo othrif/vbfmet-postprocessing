@@ -547,11 +547,11 @@ def prepareBkgRuns(keys,options=None):
     bkg_top1 = {
         '410658':'tchan_top', #lepton filtered
         '410659':'tchan_antitop',
-        '410646':'Wt_top',
-        '410647':'Wt_top',
         '410644':'schan_top',
         '410645':'schan_antitop',
-        }
+        '410646':'Wt_top',
+        '410647':'Wt_top',
+        } #410643,410642,410648,410649
         
     bkg_top2.update(bkg_top1)
     bkg_top_other = {'410472':'ttbar(w/dil)',#                remove dilepton
