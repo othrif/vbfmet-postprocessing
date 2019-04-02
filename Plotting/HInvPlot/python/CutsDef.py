@@ -230,7 +230,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
         else:
             # New Cuts
             #cuts += [CutItem('CutNjetCen',  'n_jet_cenj == 0')]
-            #cuts  = [CutItem('CutNjet',             'n_jet > 1 && n_jet < 5')]
+            #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
             cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
             cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
