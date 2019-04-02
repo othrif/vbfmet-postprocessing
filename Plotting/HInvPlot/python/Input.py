@@ -545,7 +545,7 @@ def prepareBkgRuns(keys,options=None):
         
     # default!!! Powheg+Pythia 8
     bkg_top1 = {
-        '410658':'tchan_top',
+        '410658':'tchan_top', #lepton filtered
         '410659':'tchan_antitop',
         '410646':'Wt_top',
         '410647':'Wt_top',
@@ -559,10 +559,10 @@ def prepareBkgRuns(keys,options=None):
                      '410649':'Wt_DR_dilepton_antitop',
                      '410642':'tchan_lept_top',
                      '410643':'tchan_lept_antitop',
-                     '410644':'schan_top_lept',
-                     '410645':'schan_antitop_lept',
-                     '410646':'Wt_top_incl',
-                     '410647':'Wt_antitop_incl',                     
+                     #'410644':'schan_top_lept',
+                     #'410645':'schan_antitop_lept',
+                     #'410646':'Wt_top_incl',
+                     #'410647':'Wt_antitop_incl',                     
         }
     bkg_z_strong_madgraph_znn = {'361515':'Znn_Np0',
                       '361516':'Znn_Np1',

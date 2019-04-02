@@ -222,7 +222,8 @@ StatusCode HFInputAlg::execute() {
   if(!passSample)  return StatusCode::SUCCESS;
 
   // removed extra top samples:
-  if(runNumber==410649 || runNumber==410648 || runNumber==410472) return StatusCode::SUCCESS;
+  //std::cout << "runNumber:"<<runNumber << std::endl;
+  if(runNumber==410649 || runNumber==410648 || runNumber==410472 || runNumber==410642 || runNumber==410643) return StatusCode::SUCCESS;
 
   //std::cout << "BEFORE met_tst_nolep_j1_dphi: " << met_tst_nolep_j1_dphi << " met_tst_nolep_j2_dphi: " << met_tst_nolep_j2_dphi << " met_tst_et: " << met_tst_et << " met_tst_nolep_et: " << met_tst_nolep_et
   //	    << " met_tst_j1_dphi: " << met_tst_j1_dphi << " met_tst_j2_dphi: " << met_tst_j2_dphi	    
