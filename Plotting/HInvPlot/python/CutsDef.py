@@ -366,8 +366,10 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
 
     cuts = FilterCuts(options)
 
-    #cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
-    cuts += [CutItem('CutTrig',      'trigger_lep > 0')]    
+    if options.r207Ana:
+        cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
+    else:
+        cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     #cuts += [CutItem('CutTrig',      'trigger_lep > 0 || trigger_met>0')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += [CutItem('CutPh', 'n_ph==0')]
