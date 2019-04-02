@@ -839,6 +839,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_mu.pt  = truth_mu_pt->at(iMu)/1.0e3;
 	new_mu.eta = truth_mu_eta->at(iMu);
 	new_mu.phi = truth_mu_phi->at(iMu);
+	new_mu.m   = 0.10566;
 	event->truth_mu.push_back(new_mu);
       }
       //event->RepVar(Mva::n_truth_mu, truth_mu_pt->size());
@@ -903,6 +904,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_ele.pt  = base_pt/1.0e3;
 	new_ele.eta = baseel_eta->at(iEl);
 	new_ele.phi = baseel_phi->at(iEl);
+	new_ele.m   = 0.000511;
         new_ele.AddVar(Mva::charge, baseel_charge->at(iEl));
 
         // Store the ptvarcone{20,30} and the topoetcone.
@@ -928,6 +930,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_muo.pt  = base_pt/1.0e3;
 	new_muo.eta = basemu_eta->at(iMu);
 	new_muo.phi = basemu_phi->at(iMu);
+	new_muo.m   = 0.10566;
         new_muo.AddVar(Mva::charge, basemu_charge->at(iMu));
 
         // Store the ptvarcone{20,30} and the topoetcone.
