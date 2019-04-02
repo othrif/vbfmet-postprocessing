@@ -545,7 +545,7 @@ def prepareBkgRuns(keys,options=None):
         
     # default!!! Powheg+Pythia 8
     bkg_top1 = {
-        '410658':'tchan_top',
+        '410658':'tchan_top', #lepton filtered
         '410659':'tchan_antitop',
         '410644':'schan_top',
         '410645':'schan_antitop',
