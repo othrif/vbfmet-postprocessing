@@ -54,6 +54,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Bool_t isHigh = true;
   Bool_t weightSyst=false;
   Bool_t doPlot = false;
+  Bool_t doDuplicateCheck = false;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
