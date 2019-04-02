@@ -18,6 +18,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
   declareProperty("doPlot", doPlot =false, "doPlot flag, true means the output contains variable distributions");
+  declareProperty("doDuplicateCheck", doDuplicateCheck =false, "doDuplicateCheck flag, true means the run and event numbers are printed");
   //declareProperty( "Property", m_nProperty = 0, "My Example Integer Property" ); //example property declaration
 }
 
@@ -303,10 +304,13 @@ StatusCode HFInputAlg::execute() {
   }
 
   bool trigger_lep_bool = (trigger_lep & 0x1)==0x1;
-  if(m_extraVars>=5) trigger_lep_bool = (trigger_lep>0);
-  bool trigger_lep_ZMM_bool = trigger_lep_bool;
-  if(m_extraVars==6) trigger_lep_ZMM_bool=((trigger_met &0x1) == 0x1);
-  if(m_extraVars==7 && ((trigger_met &0x1) == 0x1)) trigger_lep_ZMM_bool=true;
+  bool trigger_lep_Zee_bool = trigger_lep_bool;
+  bool trigger_lep_Zmm_bool = trigger_lep_bool;
+  bool trigger_lep_Wmu_bool = trigger_lep_bool;
+  if(m_extraVars>=5) { trigger_lep_Zmm_bool = (trigger_lep>0);  trigger_lep_Zee_bool = (trigger_lep>0); }
+
+  if(m_extraVars==6) { trigger_lep_Zmm_bool=((trigger_met &0x1) == 0x1); trigger_lep_Wmu_bool = ((trigger_met &0x1) == 0x1); }
+  if(m_extraVars==7 && ((trigger_met &0x1) == 0x1)){ trigger_lep_Zmm_bool=true; trigger_lep_Wmu_bool=true; }
   // compute the mll
   float mll=-999.0;
   TLorentzVector l0, l1;
@@ -378,11 +382,17 @@ StatusCode HFInputAlg::execute() {
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance > 4.0)) CRWen = true;}
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (met_significance <= 4.0)) CRWepLowSig = true;}
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance <= 4.0)) CRWenLowSig = true;}
-  if ((trigger_lep_ZMM_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
-  if ((trigger_lep_ZMM_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
-  if ((trigger_lep_ZMM_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
+  if ((trigger_lep_Wmu_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
+  if ((trigger_lep_Wmu_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
+  if ((trigger_lep_Zee_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
+  if ((trigger_lep_Zmm_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
 
+
+  // do duplicate check
+  if(doDuplicateCheck){
+    if(CRZee || CRZmm) std::cout << "ZCR " << runNumber << " " << eventNumber << std::endl;
+    if(SR) std::cout << "SR " << runNumber << " " << eventNumber << std::endl;
+  }
   Float_t w_final = 1;
   Float_t lumi = 36.1;
   if (isMC) w_final = w*1000*lumi;
