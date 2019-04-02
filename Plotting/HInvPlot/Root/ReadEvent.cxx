@@ -656,7 +656,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->RepVar(Mva::xeSFTrigWeight__1up,   xeSFTrigWeight__1up);
     event->RepVar(Mva::xeSFTrigWeight__1down, xeSFTrigWeight__1down);
 
-    if(fLoadBaseLep){
+    if(fLoadBaseLep && false){
       // Fill Electrons with the baseline electrons for this looser lepton selection
       for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
 	RecParticle new_ele;
@@ -1095,7 +1095,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
 
     // Change the leptons to base leptons - after filling the event
-    //if(fLoadBaseLep) ChangeLep(*event);
+    if(fLoadBaseLep) ChangeLep(*event);
 
     if(i % 10000 == 0 && i > 0) {
       cout << "Processed " << setw(10) << right << i << " events" << endl;
@@ -1400,35 +1400,64 @@ void Msl::ReadEvent::ChangeLep(Event &event)
   // met_tst_nolep_et,met_tst_nolep_phi, ptll, mll, lepPt0, lepPt1, lepCh0, lepCh1
   //event->baseel;
   //event->basemu; mtautau
-  TVector3 met, met_beforeRemove;
-  met.SetPtEtaPhi(event.met.Pt(), 0.0, event.met.Phi());
-  met_beforeRemove=met;
-
-  unsigned n_el=0;
-  unsigned n_mu=0;
+  //
+  //unsigned n_el=0;
+  //unsigned n_mu=0;
   std::vector<TLorentzVector> my_leps;
-  for(unsigned i=0; i<event.baseel.size(); ++i)
-    if(baseel_ptvarcone20->at(i)/baseel_pt->at(i)<0.2){
-      met+=event.baseel.at(i).GetVec();
-      ++n_el;
-      my_leps.push_back(event.baseel.at(i).GetLVec());
+  for(unsigned i=0; i<event.baseel.size(); ++i){
+    my_leps.push_back(event.baseel.at(i).GetLVec());
+  }
+  if(event.baseel.size()==2 && event.basemu.size()==0){
+    event.RepVar(Mva::lepCh0, event.baseel.at(0).GetVar(Mva::charge));
+    event.RepVar(Mva::lepCh1, event.baseel.at(1).GetVar(Mva::charge));
+
+    unsigned chanFlavor=0;
+    if(event.baseel.size()==2 && (event.baseel.at(0).GetVar(Mva::charge)*event.baseel.at(1).GetVar(Mva::charge))>0) chanFlavor=8;
+    if(event.baseel.size()==2 && (event.baseel.at(0).GetVar(Mva::charge)*event.baseel.at(1).GetVar(Mva::charge))<0) chanFlavor=9;
+    if(chanFlavor>0)
+      event.RepVar(Mva::chanFlavor, chanFlavor);
+  }
+  if(event.baseel.size()==0 && event.basemu.size()==2){
+    event.RepVar(Mva::lepCh0, event.basemu.at(0).GetVar(Mva::charge));
+    event.RepVar(Mva::lepCh1, event.basemu.at(1).GetVar(Mva::charge));
+    
+    unsigned chanFlavor=0;
+    if(event.basemu.size()==2 && (event.basemu.at(0).GetVar(Mva::charge)*event.basemu.at(1).GetVar(Mva::charge))>0) chanFlavor=6;
+    if(event.basemu.size()==2 && (event.basemu.at(0).GetVar(Mva::charge)*event.basemu.at(1).GetVar(Mva::charge))<0) chanFlavor=7;
+    if(chanFlavor>0)
+      event.RepVar(Mva::chanFlavor, chanFlavor);
+  }
+  if(event.baseel.size()==1 && event.basemu.size()==1){
+    if(event.baseel.at(0).pt>event.basemu.at(0).pt ){
+      event.RepVar(Mva::lepCh0, event.baseel.at(0).GetVar(Mva::charge));
+      event.RepVar(Mva::lepCh1, event.basemu.at(0).GetVar(Mva::charge));
+    }else{
+      event.RepVar(Mva::lepCh0, event.basemu.at(0).GetVar(Mva::charge));
+      event.RepVar(Mva::lepCh1, event.baseel.at(0).GetVar(Mva::charge));
     }
+  }
+  //  if(baseel_ptvarcone20->at(i)/baseel_pt->at(i)<0.2){
+  //    met+=event.baseel.at(i).GetVec();
+  //    ++n_el;
+  //    my_leps.push_back(event.baseel.at(i).GetLVec());
+  //  }
   for(unsigned i=0; i<event.basemu.size(); ++i)
-    if(basemu_ptvarcone20->at(i)/basemu_pt->at(i)<0.2){
-      met+=event.basemu.at(i).GetVec();
-      ++n_mu;
-      my_leps.push_back(event.basemu.at(i).GetLVec());
-    }
+    my_leps.push_back(event.basemu.at(i).GetLVec());
+  //  if(basemu_ptvarcone20->at(i)/basemu_pt->at(i)<0.2){
+  //    met+=event.basemu.at(i).GetVec();
+  //    ++n_mu;
+  //    
+  //  }
 
   // removing the leptons
-  event.RepVar(Mva::met_tst_nolep_et,  met.Pt());
-  event.RepVar(Mva::met_tst_nolep_phi, met.Phi());
-  if(event.jets.size()>1){
-    event.RepVar(Mva::met_tst_nolep_j1_dphi, met.DeltaPhi(event.jets.at(0).GetVec()));
-    event.RepVar(Mva::met_tst_nolep_j2_dphi, met.DeltaPhi(event.jets.at(1).GetVec()));
-  }
-  event.RepVar(Mva::n_el, n_el);
-  event.RepVar(Mva::n_mu, n_mu);
+  //event.RepVar(Mva::met_tst_nolep_et,  met.Pt());
+  //event.RepVar(Mva::met_tst_nolep_phi, met.Phi());
+  //if(event.jets.size()>1){
+  //  event.RepVar(Mva::met_tst_nolep_j1_dphi, met.DeltaPhi(event.jets.at(0).GetVec()));
+  //  event.RepVar(Mva::met_tst_nolep_j2_dphi, met.DeltaPhi(event.jets.at(1).GetVec()));
+  //}
+  //event.RepVar(Mva::n_el, n_el);
+  //event.RepVar(Mva::n_mu, n_mu);
   // sort leptons
   std::sort(my_leps.begin(),my_leps.end(),SortPhysicsObject("pt"));
   if(my_leps.size()>0)  event.RepVar(Mva::lepPt0, my_leps.at(0).Pt());
@@ -1445,7 +1474,7 @@ void Msl::ReadEvent::ChangeLep(Event &event)
   double x1=-999., x2=-999.,mtt=-999.;
   if(my_leps.size()>1)
     event.GetX1X2(my_leps.at(0), my_leps.at(1),
-		  make_pair<float,float>(met_beforeRemove.Px(), met_beforeRemove.Py()),  x1, x2);
+		  make_pair<float,float>(event.met.Px(), event.met.Py()),  x1, x2);
   if(x1>0.0 && x2>0.0) mtt=event.GetVar(Mva::mll)/TMath::Sqrt(x1*x2);
   event.RepVar(Mva::Mtt, mtt);
 }
