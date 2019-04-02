@@ -249,7 +249,6 @@ def getJetCuts(basic_cuts, options, isPh=False):
 #-------------------------------------------------------------------------
 def getVBFCuts(options, basic_cuts, isLep=False):
 
-    #cuts = [CutItem('CutDPhijj',   'jj_dphi < 1.8')]
     cuts = basic_cuts.GetDPhijjCut()
     if not isLep:
         cuts += [CutItem('CutDPhiMetj0','met_tst_j1_dphi > 1.0')]
@@ -260,12 +259,9 @@ def getVBFCuts(options, basic_cuts, isLep=False):
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
     if options.r207Ana:
         cuts += [CutItem('CutDEtajj','jj_deta > 4.8')]
-        #cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
         cuts += basic_cuts.GetMjjCut()
     else:
-        cuts += basic_cuts.GetDEtajjCut() #[CutItem('CutDEtajj','jj_deta > 3.8')]
-        #cuts += [CutItem('CutDEtajjV','jj_deta > 2.5')]
-        #cuts += [CutItem('CutMjj','jj_mass > 1000.0')]
+        cuts += basic_cuts.GetDEtajjCut() 
         cuts += basic_cuts.GetMjjCut()
 
     return cuts
