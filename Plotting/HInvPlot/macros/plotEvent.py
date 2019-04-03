@@ -104,6 +104,36 @@ def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
 #-----------------------------------------------------------------------------------------
+def prepareSeqGamZCR(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'gamzcr'
+
+    if (basic_cuts.chan not in ['ll','ee','uu']) or not passRegion(region):
+        return ('', [])
+
+    pass_alg = hstudy.preparePassEventForGamZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+#-----------------------------------------------------------------------------------------
+def prepareSeqGamWCR(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'gamwcr'
+
+    if not( basic_cuts.chan in ['l','e','u']) or not passRegion(region):
+        return ('', [])
+
+    pass_alg = hstudy.preparePassEventForGamWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+#-----------------------------------------------------------------------------------------
 def prepareSeqWCR(basic_cuts, region, alg_take=None, syst='Nominal'):
 
     selkey = basic_cuts.GetSelKey()
@@ -243,12 +273,17 @@ def main():
                     #
                     (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
                     read_alg.AddNormalAlg(name_sr,  alg_sr)
+
                     #
                     # SR Cut based regions and algorithms with photon
                     #
                     if a=='allmjj':
                         (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
                         read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)
+                        (name_zcr_gam,  alg_zcr_gam)  = prepareSeqGamZCR (basic_cuts, alg_take=input_cut, syst=syst)
+                        read_alg.AddNormalAlg(name_zcr_gam,  alg_zcr_gam)
+                        (name_wcr_gam,  alg_wcr_gam)  = prepareSeqGamWCR (basic_cuts, alg_take=input_cut, syst=syst)
+                        read_alg.AddNormalAlg(name_wcr_gam,  alg_wcr_gam)
 
                     #
                     # ZCR Cut based regions and algorithms

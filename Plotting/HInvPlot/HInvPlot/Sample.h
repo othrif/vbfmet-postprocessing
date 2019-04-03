@@ -81,6 +81,8 @@ namespace Msl
       kVbfZh,
       kWDPI,
       kttv,
+      kttg,
+      kpho,
       kvvv,
       kJPsi,
       kUpsl,

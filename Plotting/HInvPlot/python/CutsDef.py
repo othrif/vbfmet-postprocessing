@@ -182,14 +182,14 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
 
     if options.r207Ana:
         if isEMu:
-            cuts += [CutItem('CutBaseLep','n_siglep == 2')]
+            cuts += [CutItem('CutSignalLep','n_siglep == 2')]
         elif n_mu>=0 and n_el>=0:
-            cuts += [CutItem('CutBaseLep','n_siglep == %s' %(n_mu))]
+            cuts += [CutItem('CutSignalLep','n_siglep == %s' %(n_mu))]
         elif n_mu>=0 or n_el>=0:
-            cuts += [CutItem('CutBaseMu','n_mu == %s' %(n_mu))]
-            cuts += [CutItem('CutBaseEl','n_el == %s' %(n_el))]
+            cuts += [CutItem('CutSignalMu','n_mu == %s' %(n_mu))]
+            cuts += [CutItem('CutSignalEl','n_el == %s' %(n_el))]
         else:
-            cuts += [CutItem('CutBaseLep','n_baselep == 0')]
+            cuts += [CutItem('CutSignalLep','n_baselep == 0')]
         return cuts
     #cuts += [CutItem('CutTruthFilter','TruthFilter < 0.5')]
     #return cuts
@@ -327,30 +327,45 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     return GetCuts(cuts)
 
 #-------------------------------------------------------------------------
-def getGamSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
+def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR'):
 
     cuts = FilterCuts(options)
 
     cuts += [CutItem('CutTrig',      'trigger_met == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
-    cuts += getLepChannelCuts(basic_cuts)
+    if Region=='SR':
+        cuts += getLepChannelCuts(basic_cuts)
+    elif Region=='ZCR':
+        if basic_cuts.chan=='ee':
+            cuts += [CutItem('CutEl','n_el == 2')]
+        if basic_cuts.chan=='uu':
+            cuts += [CutItem('CutMu','n_mu == 2')]
+        cuts += [CutItem('CutSignalLep','n_siglep == 2')]
+    elif Region=='WCR':
+        if basic_cuts.chan=='e':
+            cuts += [CutItem('CutEl','n_el == 1')]
+        if basic_cuts.chan=='u':
+            cuts += [CutItem('CutMu','n_mu == 1')]
+        cuts += [CutItem('CutSignalLep','n_siglep == 1')]
+        
     cuts += [CutItem('CutPh',       'n_ph==1')]
     cuts += getJetCuts(basic_cuts, options, isPh=True);
 
-    # add the extra cuts
-    cuts += ExtraCuts(options)
+    # add the extra cuts...decide if we want these
+    #cuts += ExtraCuts(options)
 
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        cuts += [CutItem('CutMet',       '%s > 150.0' %(options.met_choice))]
-        #cuts += [CutItem('CutMetLow',       '%s > 100.0' %(options.met_choice))]
-        #cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 150.0')]
+        if Region=='SR':
+            met_choice=options.met_choice
+        elif Region=='WCR' or Region=='ZCR':
+            met_choice=options.met_choice.replace('_tst','_tst_nolep')
+        cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
 
     cuts += [CutItem('CutDPhiMetPh','met_tst_ph_dphi > 1.8')]
     cuts += [CutItem('CutPhCentrality','phcentrality > 0.4')]
     # VBF cuts
-    #cuts+=getVBFCuts(options, basic_cuts, isLep=False)
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
     cuts += [CutItem('CutDEtajj','jj_deta > 2.5')]
     cuts += [CutItem('CutMjj','jj_mass > 250.0')]
@@ -551,20 +566,25 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['zqcd'] = ['zqcd']
     bkgs['wewk'] = ['wewk']
     bkgs['zewk'] = ['zewk']
-    #bkgs['top1'] = ['top1']
     bkgs['tall'] = ['top2','vvv']
-    #bkgs['vvv']  = ['vvv']
-    #bkgs['zldy'] = ['zldy']
     bkgs['dqcd'] = ['dqcd']
-    #bkgs['tall'] = ['top2','top1']
-    #bkgs['tall'] = ['top2','top1']
+    if options.OverlapPh:
+        bkgs['ttg']  = ['ttg']
+        bkgs['pho']  = ['pho']
+        bkgs['wgam'] = ['wgam']
+        bkgs['zgam'] = ['zgam']
 
     other={}
     other['dqcd']    = ['dqcd']
     other['zqcdMad'] = ['zqcdMad']
     other['wqcdMad'] = ['wqcdMad']
     other['zqcdPow'] = ['zqcdPow']
-
+    if not options.OverlapPh:
+        other['ttg']  = ['ttg']
+        other['pho']  = ['pho']
+        other['wgam'] = ['wgam']
+        other['zgam'] = ['zgam']
+        
     samples = {}
     samples.update(sigs)
     samples.update(bkgs)
@@ -581,7 +601,10 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     # Save samples (type list by hand to preserve order)
     #
     if reg != None and key != None:
-        reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
+        if options.OverlapPh:
+            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,ttg,pho,wgam,zgam,bkgs,data')
+        else:
+            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 
@@ -640,7 +663,35 @@ def preparePassEventForGamSR(alg_name, options, basic_cuts, cut='BASIC'):
 
     reg  = ROOT.Msl.Registry()
 
-    cuts = getGamSRCuts(cut, options, basic_cuts, ignore_met=options.ignore_met)
+    cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, Region='SR')
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForGamZCR(alg_name, options, basic_cuts, cut='BASIC'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, Region='ZCR')
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+
+#-------------------------------------------------------------------------
+def preparePassEventForGamWCR(alg_name, options, basic_cuts, cut='BASIC'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, Region='WCR')
 
     #
     # Fill Registry with cuts and samples for cut-flow
