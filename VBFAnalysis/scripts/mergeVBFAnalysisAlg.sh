@@ -28,3 +28,8 @@ hadd $OUTDIRM/VBFHOther.root  VBFHOther*.root
 hadd $OUTDIRM/ggFH125.root  ggFH125*.root
 hadd $OUTDIRM/VH125.root  VH125*.root
 
+
+#hadd $OUTDIRM/Wg_strong.root Wg_strong*root
+#hadd $OUTDIRM/Zg_strong.root Zg_strong*root
+#hadd $OUTDIRM/ttg_strong.root ttg_strong*root
+#hadd $OUTDIRM/SinglePhoton.root SinglePhoton*root
