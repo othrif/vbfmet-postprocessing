@@ -221,17 +221,20 @@ def main():
     anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
     if options.analysis!='all':
         anas = [options.analysis]
+    if options.analysis.count('RedChan'):
+        anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
     if options.analysis=='metsf':
         anas = ['metsf','metsfxe70','metsfxe90','metsfxe110','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400']
-    if options.analysis=='allmjjdphijj':
+    if options.analysis.count('allmjjdphijj'):
         anas = ['allmjj','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2']
-    if options.analysis=='allmjjdphijjnj':
+    if options.analysis.count('allmjjdphijjnj'):
         anas = ['allmjj','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','njgt2']
     chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']        
     if options.analysis=='qcd':
         anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT']
         chans   = ['nn']
-
+    if options.analysis.count('RedChan'):
+        chans   = ['nn','ee','uu','ll','l','e','u']
     if options.chan != None:
         chans = options.chan.split(',')
 
