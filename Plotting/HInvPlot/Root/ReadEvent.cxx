@@ -1092,11 +1092,29 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
     else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K  
 
-    // 2018 update trigger for later periods => value 5 for 
+    // 2018 update trigger for later periods => value 5 for
     if     (350067>fRandomRunNumber  && fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8)==0x8))     trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
 
+    // 2015+2016 encoding
+    int trigger_met_encoded = event->GetVar(Mva::trigger_met_encoded);
+    int runPeriod = 0;
+    if(fRandomRunNumber<=284484)                                  runPeriod = 1;
+    else if(fRandomRunNumber >284484 && fRandomRunNumber<=304008) runPeriod = 2;
+    else if(fRandomRunNumber >304008)                             runPeriod = 3;      
+    int trigger_met_byrun=0; // for the computation of the met trigger SF
+    if(fRandomRunNumber<=284484 && (trigger_met_encoded & 0x8))                             { trigger_met_byrun=1;  }// 2015
+    if(fRandomRunNumber >284484 && fRandomRunNumber<=304008 && (trigger_met_encoded & 0x4)) { trigger_met_byrun=2;  }// 2016
+    if(fRandomRunNumber >304008 && (trigger_met_encoded & 0x2))                             { trigger_met_byrun=3;  }// 2016
+    if(trigger_met_byrun==0 && (trigger_met_encoded & 0x10) ==1 ){
+      if(fRandomRunNumber<=284484)                                  trigger_met_byrun = 4;
+      else if(fRandomRunNumber >284484 && fRandomRunNumber<=304008) trigger_met_byrun = 5;
+      else if(fRandomRunNumber >304008)                             trigger_met_byrun = 6;   
+    }// 2015+2016
+    event->RepVar(Mva::trigger_met_byrun, trigger_met_byrun);
+    event->RepVar(Mva::runPeriod,         runPeriod);    
+    
     // Change the leptons to base leptons - after filling the event
     if(fLoadBaseLep) ChangeLep(*event);
 
