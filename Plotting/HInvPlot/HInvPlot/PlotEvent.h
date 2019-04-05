@@ -140,6 +140,18 @@ namespace Msl
     TH1			       *hTrackWidthCutSum;
     TH1			       *hnTrackSum;
     TH1			       *hTrackWidthSum;
+    TH1			       *hjetNTracks025;
+    TH1			       *hjetNTracks125;
+    TH1			       *hjetTrackWidth025;
+    TH1			       *hjetTrackWidth125;
+    TH1			       *hjetNTracks021;
+    TH1			       *hjetNTracks121;
+    TH1			       *hjetTrackWidth021;
+    TH1			       *hjetTrackWidth121;
+    TH1			       *hjetNTracks02125;
+    TH1			       *hjetNTracks12125;
+    TH1			       *hjetTrackWidth02125;
+    TH1			       *hjetTrackWidth12125;
 
     std::map<Mva::Var,TH1*>    fHistVec;
   };

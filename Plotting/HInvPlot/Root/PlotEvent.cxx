@@ -44,7 +44,19 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hnTrackCutSum(0),
 				  hTrackWidthCutSum(0),
 				  hnTrackSum(0),
-				  hTrackWidthSum(0)
+				  hTrackWidthSum(0),
+				  hjetNTracks025(0),
+				  hjetNTracks125(0),
+				  hjetTrackWidth025(0),
+				  hjetTrackWidth125(0),
+				  hjetNTracks021(0),
+				  hjetNTracks121(0),
+				  hjetTrackWidth021(0),
+				  hjetTrackWidth121(0),
+				  hjetNTracks02125(0),
+				  hjetNTracks12125(0),
+				  hjetTrackWidth02125(0),
+				  hjetTrackWidth12125(0)
 
 {
 }
@@ -143,6 +155,18 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hTrackWidthSum = GetTH1("TrackWidthSum",  160,  0.0, 0.8);  
   hnTrackCutSum = GetTH1("nTrackCutSum",  80,  0.0, 80.0);  
   hTrackWidthCutSum = GetTH1("TrackWidthCutSum",  160,  0.0, 0.8);  
+  hjetNTracks025 = GetTH1("jetNTracks025",  40,  0.0, 40.0);  
+  hjetNTracks125 = GetTH1("jetNTracks125",  40,  0.0, 40.0);  
+  hjetTrackWidth025 = GetTH1("jetTrackWidth025",  50,  0.0, 1.0);  
+  hjetTrackWidth125 = GetTH1("jetTrackWidth125",  50,  0.0, 1.0);  
+  hjetNTracks021 = GetTH1("jetNTracks021",  40,  0.0, 40.0);  
+  hjetNTracks121 = GetTH1("jetNTracks121",  40,  0.0, 40.0);  
+  hjetTrackWidth021 = GetTH1("jetTrackWidth021",  50,  0.0, 1.0);  
+  hjetTrackWidth121 = GetTH1("jetTrackWidth121",  50,  0.0, 1.0);  
+  hjetNTracks02125 = GetTH1("jetNTracks02125",  40,  0.0, 40.0);  
+  hjetNTracks12125 = GetTH1("jetNTracks12125",  40,  0.0, 40.0);  
+  hjetTrackWidth02125 = GetTH1("jetTrackWidth02125",  50,  0.0, 1.0);  
+  hjetTrackWidth12125 = GetTH1("jetTrackWidth12125",  50,  0.0, 1.0);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -226,6 +250,19 @@ bool Msl::PlotEvent::DoExec(Event &event)
     hTruthTauEta->Fill(event.truth_taus.at(0).eta, weight);
   }  
 
+  //qg with Eta req
+  if(-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5) hjetNTracks025->Fill(event.GetVar(Mva::jetNTracks0),weight);
+  if(-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5) hjetNTracks125->Fill(event.GetVar(Mva::jetNTracks1),weight);
+  if(-2.5<event.jets.at(0).eta and event.jets.at(0).eta<2.5) hjetTrackWidth025->Fill(event.GetVar(Mva::jetTrackWidth0),weight);
+  if(-2.5<event.jets.at(1).eta and event.jets.at(1).eta<2.5) hjetTrackWidth125->Fill(event.GetVar(Mva::jetTrackWidth1),weight);
+  if(-2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.1) hjetNTracks021->Fill(event.GetVar(Mva::jetNTracks0),weight);
+  if(-2.1<event.jets.at(1).eta and event.jets.at(1).eta<2.1) hjetNTracks121->Fill(event.GetVar(Mva::jetNTracks1),weight);
+  if(-2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.1) hjetTrackWidth021->Fill(event.GetVar(Mva::jetTrackWidth0),weight);
+  if(-2.1<event.jets.at(1).eta and event.jets.at(1).eta<2.1) hjetTrackWidth121->Fill(event.GetVar(Mva::jetTrackWidth1),weight);
+  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<-2.1) || (2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.5)) hjetNTracks02125->Fill(event.GetVar(Mva::jetNTracks0),weight);
+  if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<-2.1) || (2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.5)) hjetNTracks12125->Fill(event.GetVar(Mva::jetNTracks1),weight);
+  if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<-2.1) || (2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.5)) hjetTrackWidth02125->Fill(event.GetVar(Mva::jetTrackWidth0),weight);
+  if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<-2.1) || (2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.5)) hjetTrackWidth12125->Fill(event.GetVar(Mva::jetTrackWidth1),weight);
 
   //for qgTagPerf
   hqgTagPerf->Fill(1.0,weight);
@@ -246,9 +283,10 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hqgTagPerf->GetXaxis()->SetBinLabel(8,"Fail Central Tagging");
 
 
-  float forw=2.1;
 
   //qgTagNTrack
+  float forw=2.1;
+
   hqgTagNTrack->Fill(1.0,weight);
   if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<5)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
     if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<5)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(2.0,weight);
@@ -375,7 +413,6 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(event.GetVar(Mva::jetTrackWidth0)+event.GetVar(Mva::jetTrackWidth1)<cut2) hTrackWidthCutSum->Fill(cut2,weight);
   }
 
-	
   hnTrackSum->Fill(event.GetVar(Mva::jetNTracks0)+event.GetVar(Mva::jetNTracks1),weight);
   hTrackWidthSum->Fill(event.GetVar(Mva::jetTrackWidth0)+event.GetVar(Mva::jetTrackWidth1),weight);
 
