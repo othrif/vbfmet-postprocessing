@@ -38,6 +38,8 @@ namespace Msl
       trigger_met,
       trigger_met_encoded,      
       trigger_met_encodedv2,
+      trigger_met_byrun,
+      runPeriod,      
       trigger_lep,
       passJetCleanTight,
       xeSFTrigWeight,
