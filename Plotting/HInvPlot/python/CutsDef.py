@@ -27,7 +27,7 @@ class BasicCuts:
         if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2',
                             'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
                                 'njgt2',
-                                'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400']:
+                                'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400']:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
 
         self.analysis = Analysis
@@ -334,24 +334,24 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
 def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR'):
 
     cuts = FilterCuts(options)
-    if basic_cuts.GetSelKey().count('trigxe70'):
-        cuts += [CutItem('CutMETTrig', 'trigger_met_byrun == 1')]
-    elif basic_cuts.GetSelKey().count('trigxe70J400'):
-        cuts += [CutItem('CutMETTrig', 'trigger_met_byrun == 1 || trigger_met_byrun == 4')]
+    if basic_cuts.GetSelKey().count('trigxe70J400'):
+        cuts += [CutItem('CutMETTrigxe70J400', 'trigger_met_byrun == 1 || trigger_met_byrun == 4')]
+    elif basic_cuts.GetSelKey().count('trigxe70'):
+        cuts += [CutItem('CutMETTrigxe70', 'trigger_met_byrun == 1')]
     elif basic_cuts.GetSelKey().count('trigxe90J400'):
-        cuts += [CutItem('CutMETTrig', 'trigger_met_byrun == 2 || trigger_met_byrun == 5')]
+        cuts += [CutItem('CutMETTrigxe90J400', 'trigger_met_byrun == 2 || trigger_met_byrun == 5')]
     elif basic_cuts.GetSelKey().count('trigxe110J400'):
-        cuts += [CutItem('CutMETTrig', 'trigger_met_byrun == 3 || trigger_met_byrun == 6')]        
+        cuts += [CutItem('CutMETTrigxe110J400', 'trigger_met_byrun == 3 || trigger_met_byrun == 6')]        
     elif basic_cuts.GetSelKey().count('trigxe90'):
-        cuts += [CutItem('CutMETTrig', 'trigger_met_byrun == 2')]
+        cuts += [CutItem('CutMETTrigxe90', 'trigger_met_byrun == 2')]
     elif basic_cuts.GetSelKey().count('trigxe110'):
-        cuts += [CutItem('CutMETTrig', 'trigger_met_byrun == 3')]
+        cuts += [CutItem('CutMETTrigxe110', 'trigger_met_byrun == 3')]
     elif basic_cuts.GetSelKey().count('metsfxe70'):
-        cuts += [CutItem('CutMETTrigRuns', 'runPeriod == 1')]        
+        cuts += [CutItem('CutMETTrigRuns1', 'runPeriod == 1')]        
     elif basic_cuts.GetSelKey().count('metsfxe90'):
-        cuts += [CutItem('CutMETTrigRuns', 'runPeriod == 2')]        
+        cuts += [CutItem('CutMETTrigRuns2', 'runPeriod == 2')]        
     elif basic_cuts.GetSelKey().count('metsfxe110'):
-        cuts += [CutItem('CutMETTrigRuns', 'runPeriod == 3')]        
+        cuts += [CutItem('CutMETTrigRuns3', 'runPeriod == 3')]        
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     met_choice=options.met_choice
     isLep=False
