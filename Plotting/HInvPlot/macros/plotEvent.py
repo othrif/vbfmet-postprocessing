@@ -222,9 +222,9 @@ def main():
     if options.analysis!='all':
         anas = [options.analysis]
     if options.analysis.count('RedChan'):
-        anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
+        anas    = ['allmjj']#,'mjj1000','mjj1500','mjj2000']
     if options.analysis=='metsf':
-        anas = ['metsf','metsfxe70','metsfxe90','metsfxe110','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400']
+        anas = ['metsf','metsfxe70','metsfxe90','metsfxe110','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400']
     if options.analysis.count('allmjjdphijj'):
         anas = ['allmjj','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2']
     if options.analysis.count('allmjjdphijjnj'):
