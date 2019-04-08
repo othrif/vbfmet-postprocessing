@@ -1107,7 +1107,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if(fRandomRunNumber<=284484 && (trigger_met_encoded & 0x8))                             { trigger_met_byrun=1;  }// 2015
     if(fRandomRunNumber >284484 && fRandomRunNumber<=304008 && (trigger_met_encoded & 0x4)) { trigger_met_byrun=2;  }// 2016
     if(fRandomRunNumber >304008 && (trigger_met_encoded & 0x2))                             { trigger_met_byrun=3;  }// 2016
-    if(trigger_met_byrun==0 && (trigger_met_encoded & 0x10) ==1 ){
+    if(trigger_met_byrun==0 && (trigger_met_encoded & 0x10) == 0x10 ){
       if(fRandomRunNumber<=284484)                                  trigger_met_byrun = 4;
       else if(fRandomRunNumber >284484 && fRandomRunNumber<=304008) trigger_met_byrun = 5;
       else if(fRandomRunNumber >304008)                             trigger_met_byrun = 6;   
