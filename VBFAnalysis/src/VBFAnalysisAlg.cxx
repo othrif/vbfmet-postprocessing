@@ -776,7 +776,7 @@ StatusCode VBFAnalysisAlg::execute() {
   unsigned metRunNumber = randomRunNumber;
   if(!m_isMC) metRunNumber=runNumber;
   if((metRunNumber<=284484 && trigger_HLT_xe70_mht==1) ||                  // 2015
-     (metRunNumber>284484 && 284484<=304008 && trigger_HLT_xe90_mht_L1XE50==1) ||  // 2016
+     (metRunNumber>284484 && metRunNumber<=304008 && trigger_HLT_xe90_mht_L1XE50==1) ||  // 2016
      (metRunNumber>304008 && trigger_HLT_xe110_mht_L1XE50==1) ||           // 2016
      trigger_HLT_noalg_L1J400 ==1 ) trigger_met = 1; else trigger_met = 0; // 2015+2016
 

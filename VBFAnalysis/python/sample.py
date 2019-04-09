@@ -7,7 +7,7 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst,Ext)
-        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125","ggFH125","VH125","VBFHOther","QCDw","QCDunw","VVV","VV","data"] # do not change order
+        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125","ggFH125","VH125","VBFHOther","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',"data"] # do not change order
 
         self.sampleMap = {'data':['data'],
                           'W_EWK':['W_EWK'],
@@ -18,6 +18,12 @@ class sample(object):
                           'Z_strongExt':['Z_strongExt'],
                           'Z_strongPTVExt':['Z_strongPTVExt'],
                           'VV_VVV':['VV','VVV'],
+                          'Zg_strong':['Zg_strong'],
+                          'Wg_strong':['Wg_strong'],
+                          'ttg':['ttg'],
+                          'SinglePhoton':['SinglePhoton'],
+                          'SinglePhotonBCL':['SinglePhotonBCL'],
+                          'VqqGam':['VqqGam'],
                           'signal':['VBFH125','ggFH125','VH125'],
                           'VBFHOther':['VBFHOther'],
                           'QCD':['QCDw','QCDunw'],
@@ -56,6 +62,18 @@ class sample(object):
         if (self.isMC):
             if ((self.runNumber >= 308096 and self.runNumber <= 308098) or (self.runNumber == 363489)):
                 self.sampleType = "W_EWK"
+            elif (self.runNumber >= 364500 and self.runNumber <= 364519):
+                self.sampleType = "Zg_strong"
+            elif (self.runNumber >= 364520 and self.runNumber <= 364535):
+                self.sampleType = "Wg_strong"
+            elif (self.runNumber >= 410082 and self.runNumber <= 410084):
+                self.sampleType = "ttg"
+            elif (self.runNumber >= 364541 and self.runNumber <= 364547):
+                self.sampleType = "SinglePhoton" 
+            elif (self.runNumber >= 361040 and self.runNumber <= 361062):
+                self.sampleType = "SinglePhotonBCL" 
+            elif (self.runNumber >= 305435 and self.runNumber <= 305444):
+                self.sampleType = "VqqGam" 
             elif (self.runNumber >= 364156 and self.runNumber <= 364197):
                 self.sampleType = "W_strong"
             elif (self.runNumber >= 363600 and self.runNumber <= 363671):

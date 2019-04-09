@@ -545,13 +545,13 @@ def prepareBkgRuns(keys,options=None):
         
     # default!!! Powheg+Pythia 8
     bkg_top1 = {
-        '410658':'tchan_top',
+        '410658':'tchan_top', #lepton filtered
         '410659':'tchan_antitop',
-        '410646':'Wt_top',
-        '410647':'Wt_top',
         '410644':'schan_top',
         '410645':'schan_antitop',
-        }
+        '410646':'Wt_top',
+        '410647':'Wt_top',
+        } #410643,410642,410648,410649
         
     bkg_top2.update(bkg_top1)
     bkg_top_other = {'410472':'ttbar(w/dil)',#                remove dilepton
@@ -559,10 +559,10 @@ def prepareBkgRuns(keys,options=None):
                      '410649':'Wt_DR_dilepton_antitop',
                      '410642':'tchan_lept_top',
                      '410643':'tchan_lept_antitop',
-                     '410644':'schan_top_lept',
-                     '410645':'schan_antitop_lept',
-                     '410646':'Wt_top_incl',
-                     '410647':'Wt_antitop_incl',                     
+                     #'410644':'schan_top_lept',
+                     #'410645':'schan_antitop_lept',
+                     #'410646':'Wt_top_incl',
+                     #'410647':'Wt_antitop_incl',                     
         }
     bkg_z_strong_madgraph_znn = {'361515':'Znn_Np0',
                       '361516':'Znn_Np1',
@@ -839,7 +839,54 @@ def prepareBkgRuns(keys,options=None):
                         '364214':'TBD',
                         '364215':'TBD',                        
                         }
+    bkg_sherpa_zg = {'364500':'eegamma_pty_7_15',
+                     '364501':'eegamma_pty_15_35',
+                     '364502':'eegamma_pty_35_70',
+                     '364503':'eegamma_pty_70_140',
+                     '364504':'eegamma_pty_140_E',
+                     '364505':'mmgamma_pty_7_15',
+                     '364506':'mmgamma_pty_15_35',
+                     '364507':'mmgamma_pty_35_70',
+                     '364508':'mmgamma_pty_70_140',
+                     '364509':'mmgamma_pty_140_E',
+                     '364510':'ttgamma_pty_7_15',
+                     '364511':'ttgamma_pty_15_35',
+                     '364512':'ttgamma_pty_35_70',
+                     '364513':'ttgamma_pty_70_140',
+                     '364514':'ttgamma_pty_140_E',
+                     '364515':'nngamma_pty_7_15',
+                     '364516':'nngamma_pty_15_35',
+                     '364517':'nngamma_pty_35_70',
+                     '364518':'nngamma_pty_70_140',
+                     '364519':'nngamma_pty_140_E',
+                 }
 
+    bkg_sherpa_wg = {'364521':'engamma_pty_7_15',
+                     '364522':'engamma_pty_15_35',
+                     '364523':'engamma_pty_35_70',
+                     '364524':'engamma_pty_70_140',
+                     '364525':'engamma_pty_140_E',
+                     '364526':'mngamma_pty_7_15',
+                     '364527':'mngamma_pty_15_35',
+                     '364528':'mngamma_pty_35_70',
+                     '364529':'mngamma_pty_70_140',
+                     '364530':'mngamma_pty_140_E',
+                     '364531':'tngamma_pty_7_15',
+                     '364532':'tngamma_pty_15_35',
+                     '364533':'tngamma_pty_35_70',
+                     '364534':'tngamma_pty_70_140',
+                     '364535':'tngamma_pty_140_E',
+                 }
+    bkg_ttg = {'410082':'ttgamma_noallhad',}
+    bkg_pho = {'364541':'SinglePhoton_pty_17_35',
+               '364542':'SinglePhoton_pty_35_70',
+               '364543':'SinglePhoton_pty_70_140',
+               '364544':'SinglePhoton_pty_140_280',
+               '364545':'SinglePhoton_pty_280_500',
+               '364546':'SinglePhoton_pty_500_1000',
+               '364547':'SinglePhoton_pty_1000_E',
+           }
+    
     if options.mergePTV:
         for ki,yi in bkg_vbfPTVExt.iteritems():
             if yi[0]=='W': bkg_wqcd[ki]=yi
@@ -880,6 +927,10 @@ def prepareBkgRuns(keys,options=None):
                 'zqcdMad':bkg_z_strong_madgraph,
                 'wqcdMad':bkg_w_strong_madgraph,
                 'wdpi':bkg_top_other,
+                'wgam':bkg_sherpa_wg,
+                'zgam':bkg_sherpa_zg,
+                'ttg':bkg_ttg,
+                'pho':bkg_pho,
                 #'zqcdMad':bkg_zqcd,
                 #'wqcdMad':bkg_wqcd,
                 #'hvbf':bkg_w_strong_madgraph_wmnu,

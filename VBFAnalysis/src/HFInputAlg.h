@@ -54,6 +54,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Bool_t isHigh = true;
   Bool_t weightSyst=false;
   Bool_t doPlot = false;
+  Bool_t doDuplicateCheck = false;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
@@ -144,6 +145,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* basemu_eta;
   std::vector<Float_t>* basemu_phi;
   std::vector<Float_t>* basemu_ptvarcone20;
+  std::vector<Float_t>* basemu_ptvarcone30;
   std::vector<Float_t>* baseel_pt;
   std::vector<Float_t>* baseel_eta;
   std::vector<Float_t>* baseel_phi;
