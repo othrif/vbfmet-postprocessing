@@ -750,7 +750,7 @@ StatusCode VBFAnalysisAlg::execute() {
     LeadJetPtCut = 60.0e3; // 60.0e3
     subLeadJetPtCut = 40.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
-    DEtajjCut =3.5; // 3.5
+    DEtajjCut =2.5; // 3.5
   }
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
