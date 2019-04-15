@@ -272,7 +272,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
 
 #-------------------------------------------------------------------------
 def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0):
-    met_choice = 'met_tst_et' #options.met_choice . the met_choice is filled into this variable
+    met_choice = options.met_choice # the met_choice is filled into this variable
     if isLep:
         met_choice=met_choice.replace('_tst','_tst_nolep')
     cutMET = CutItem('CutMet')
