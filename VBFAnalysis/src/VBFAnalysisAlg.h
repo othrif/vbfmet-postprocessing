@@ -40,7 +40,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   ///histSvc()         : ServiceHandle to output ROOT service (writing TObjects)
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
-  double weightXETrigSF(const float met_pt, int syst);
+  double weightXETrigSF(const float met_pt, unsigned metRunNumber, int syst);
   void computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi);
   float GetDPhi(const float phi1, const float phi2);
 

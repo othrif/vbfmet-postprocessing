@@ -457,6 +457,8 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   // MET trigger scale factor
+  unsigned metRunNumber = randomRunNumber;
+  if(!m_isMC) metRunNumber=runNumber;
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
@@ -466,9 +468,9 @@ StatusCode VBFAnalysisAlg::execute() {
     jj=tmp;
     tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));
     jj+=tmp;
-    xeSFTrigWeight = weightXETrigSF(met_tst_et, 0); // met was used in the end instead of jj.Pt()
-    xeSFTrigWeight__1up = weightXETrigSF(met_tst_et, 1);
-    xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, 2);
+    xeSFTrigWeight        = weightXETrigSF(met_tst_et, metRunNumber, 0); // met was used in the end instead of jj.Pt()
+    xeSFTrigWeight__1up   = weightXETrigSF(met_tst_et, metRunNumber, 1);
+    xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, metRunNumber, 2);
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
@@ -1332,13 +1334,27 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   return StatusCode::SUCCESS;
 }
 
-double VBFAnalysisAlg::weightXETrigSF(const float met_pt, int syst=0) {
+double VBFAnalysisAlg::weightXETrigSF(const float met_pt, unsigned metRunNumber, int syst=0) {
   // 20.7 values
   //static const double p0 = 59.3407;
   //static const double p1 = 54.9134;
   // For MET tight
-  static const double p0 = 99.4255;
-  static const double p1 = 38.6145;
+  //double p0 = 99.4255;
+  //double p1 = 38.6145;
+  // For MET Tenacious
+  double p0 = 99.4255;
+  double p1 = 38.6145;
+  double e0 = 0.000784094;
+  double e1 = 0.05;
+  if(metRunNumber<=284484)                        { p0 = 110.396; p1 = 19.4147; e1 = 0.08; }  // 2015 xe70
+  if(metRunNumber>284484 && metRunNumber<=304008) { p0 = 111.684; p1 = 19.147;  e1 = 0.066;}  // 2016 xe90
+  if(metRunNumber>304008)                         { p0 = 101.759; p1 = 36.5069; e1 = 0.08; }   // 2016 xe110
+  if(325713<=metRunNumber && metRunNumber<=328393) { p0 = 86.6614; p1 = 49.8935; e1 = 0.05; } // 2017 xe90_pufit_L1XE50
+  if(329385<=metRunNumber && metRunNumber<=330470) { p0 = 103.780; p1 = 57.2547; e1 = 0.05; } // 2017 xe100_pufit_L1XE55
+  if(330857<=metRunNumber && metRunNumber<=331975) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
+  if(331975<=metRunNumber && metRunNumber<=341649) { p0 = 103.152; p1 = 38.6121; e1 = 0.05; } // 2017 xe110_pufit_L1XE50
+  if(350067>metRunNumber  && metRunNumber>=348800) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
+  if(350067>metRunNumber  && metRunNumber>=348800) { p0 = 107.509; p1 = 32.0065; e1 = 0.05; } // 2018 xe110_xe65_L1XE50
 
   double x = met_pt / 1.0e3;
   if (x < 100) { return 0; }
@@ -1349,10 +1365,10 @@ double VBFAnalysisAlg::weightXETrigSF(const float met_pt, int syst=0) {
 
   // linear parameterization of the systematics
   if(syst==1){ // up variation
-    if(x<210.0) sf+=((0.000784094)*(150-x)+0.05)*0.6;
+    if(x<210.0) sf+=((e0)*(150-x)+e1)*0.6;
     else sf=1.0;
   }else if(syst==2){ // down
-    if(x<210.0)sf-=((0.000784094)*(150-x)+0.05)*0.6;
+    if(x<210.0)sf-=((e0)*(150-x)+e1)*0.6;
     else sf=1.0;
   }
   return sf;

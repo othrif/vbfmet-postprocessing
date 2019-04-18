@@ -41,7 +41,7 @@ class BasicCuts:
         self.DEtajjUpperCut   = -1.0
         self.NjetCut   = 'n_jet > 1 && n_jet < 5'
         if Analysis.count('metsf'):
-            self.DEtajjLowerCut   = 3.5
+            self.DEtajjLowerCut   = 3.5 # was 3.5
             self.MjjLowerCut   = 500.0
             #self.NjetCut   = 'n_jet == 3'
         if Analysis.count('mjj1000'):
@@ -370,6 +370,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     # cuts
     cuts += [CutItem('CutPh', 'n_ph==0')]
+    #cuts = [CutItem('CutNjet2',  'n_jet == 2')]
     cuts += getJetCuts(basic_cuts, options);
     cuts += [CutItem('CutMet',       '%s > 100.0' %(met_choice))]
     # does the vertex matter? does the CST met cut matter? does the fjvt cuts matter?
