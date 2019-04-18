@@ -1,3 +1,76 @@
+import math
+
+#-----------------------------------------
+def BinomialErr(n2, n1, err1=0.0):
+    err=0.0
+    if n1==0:
+        return err
+    total_num=n1
+    if err1>0.0:
+        total_num = (n1/err1)**2
+
+            
+    eff = n2/n1
+    if total_num<0.0:
+        return 1;
+    if total_num<1.3 and total_num>0.0 and eff==1.0:
+        return 0.3/math.sqrt(total_num);
+    elif total_num<1500.3 and total_num>0.0 and eff==1.0:
+        return 0.15/math.sqrt(total_num);
+    
+    if eff>1.0:
+        print 'eff too high',eff
+        #print total_num
+        if total_num>0.0:
+            return 1.0/math.sqrt(total_num);
+        else:
+            return 1.0
+    if eff<0.0:
+        print 'eff too low',eff
+        return 0
+    err = math.sqrt(eff*(1.0-eff)/total_num)
+    return err
+
+#-----------------------------------------
+def DivideBin(n1,d1):
+
+    m = n1.Clone()
+    for i in range(0,n1.GetNbinsX()+1):
+
+        r=0.0
+        if n1.GetBinContent(i)>0.0:
+            r = d1.GetBinContent(i)/n1.GetBinContent(i)
+        err = BinomialErr(d1.GetBinContent(i), n1.GetBinContent(i), n1.GetBinError(i))
+        #print err
+        m.SetBinContent(i,r)
+        m.SetBinError(i,err)
+    return m
+#-----------------------------------------
+def ComputeEff(nums, dens, w=1.0):
+
+    if len(nums)!=1:
+        print 'ERROR doing it wrong'
+
+    num = nums[0]
+    den = dens[0]
+
+    ratio = num.Clone()
+    ratio.Divide(den)  
+    ratios=[]
+
+    # Set the binomial errors
+    for i in range(0,num.GetNbinsX()+1):
+        ratio.SetBinError(i, BinomialErr(num.GetBinContent(i), den.GetBinContent(i), den.GetBinError(i)))
+
+    ratios+=[ratio]
+
+    #ratio1 = num.Clone()
+    #ratio1.Divide(den1)
+    ## Set the binomial errors
+    #for i in range(0,num.GetNbinsX()+1):
+    #    ratio1.SetBinError(i, BinomialErr(num.GetBinContent(i), den.GetBinContent(i), den.GetBinError(i)))
+    #ratios+=[ratio1]    
+    return ratios
 
 #---------------------------------------------------------------------
 # Make logger object
