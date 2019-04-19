@@ -14,15 +14,15 @@ def BinomialErr(n2, n1, err1=0.0):
     if total_num<0.0:
         return 1;
     if total_num<1.3 and total_num>0.0 and eff==1.0:
-        return 0.3/math.sqrt(total_num);
+        return 0.2/math.sqrt(total_num);
     elif total_num<1500.3 and total_num>0.0 and eff==1.0:
-        return 0.15/math.sqrt(total_num);
+        return 0.05/math.sqrt(total_num);
     
     if eff>1.0:
         print 'eff too high',eff
         #print total_num
         if total_num>0.0:
-            return 1.0/math.sqrt(total_num);
+            return 0.5/math.sqrt(total_num);
         else:
             return 1.0
     if eff<0.0:

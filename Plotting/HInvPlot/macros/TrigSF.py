@@ -55,7 +55,7 @@ def GetHists(f,cut_path, zcut_path, mvar):
 
     rebin=2
     plts = [dplot,wQCDplot,wEWKplot,zQCDplot,zEWKplot,bkgTot]
-    if not mvar.count('nolep'):
+    if not mvar.count('nolep') or True:
         for p in plts:
             p.Rebin(rebin)
     
@@ -183,9 +183,11 @@ def DrawSF(can,trig,lep, mvar, fname):
     #can.WaitPrimitive()
     #raw_input('waiting...')
     can.SaveAs(fname+'_'+den_path+'_SF.pdf')
-
+    print 'Wfunc'
     Wfunc=DoFit('WSFFit'+fname+'_'+den_path,SFW)
+    print 'Zfunc'    
     Zfunc=DoFit('ZSFFit'+fname+'_'+den_path,SFZ)
+    print 'bkgfunc'    
     bkgfunc=DoFit('bkgSFFit'+fname+'_'+den_path,SFBkg)
     
     can.Update()
@@ -247,7 +249,8 @@ def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110'):
     
     plts[0].GetXaxis().SetTitle('Loose MET [GeV]')
     #if mvar.count('tenacious'):
-    plts[0].GetXaxis().SetTitle('Tenacious MET [GeV]')    
+    plts[0].GetXaxis().SetTitle('Tenacious MET [GeV]')
+    #plts[0].GetXaxis().SetRangeUser(0.6,1.2)
     plts[0].GetYaxis().SetTitle(ytitle)
     for p in plts:
         p.SetLineColor(color)
@@ -258,6 +261,7 @@ def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110'):
             p.Draw('same')
         leg.AddEntry(p,names[color-1])
         color+=1
+        p.GetYaxis().SetRangeUser(0.6,1.2)
 
     leg.Draw()
     texts = getATLASLabels(can, 0.2, 0.88,trig)
@@ -285,19 +289,22 @@ if __name__ == "__main__":
     #f = ROOT.TFile.Open('v26metsf_v6_tenac_detajj25.root')
     #f = ROOT.TFile.Open('v26metsf_v6_tenac_detajj25_njet2.root')      
     mvar = 'met_tenacious_tst_et'
+    #mvar = 'met_cst_jet'
     trig='xe90'
     lep='u'
-    fname='v26metsf_v6_tenac_detajj25'
+    fname='v26metsf_v8_tenac_detjj25'
+    #fname='v26metsf_v8_tenac_detjj25_CST120'
     xe90_u_detajj25 = DrawSF(can,trig,lep, mvar, fname)
     trig='xe70'    
     xe70_u_detajj25 = DrawSF(can,trig,lep, mvar, fname)
 
     
-    trig='xe70'
+    trig='xe110'
     mvar = 'met_tst_et'
-    fname='v26metsf_v6_tenac_detajj25'
+    #fname='v26metsf_v8_tenac_detjj25_CST120'
+    fname='v26metsf_v8_tenac_detjj25_loose'
     xe110_u_detajj25_metLoose = DrawSF(can,trig,lep, mvar, fname)
-    fname='v26metsf_v7_tenac_fjvtCST120'
+    fname='v26metsf_v8_tenac_detjj25_CST120'
     xe110_u_cst120_metLoose = DrawSF(can,trig,lep, mvar, fname)
     
     #[SFZ,SFW,SFBkg,deff[0],weff[0],zeff[0],bkgeff[0],Wfunc,Zfunc,bkgfunc]
@@ -310,20 +317,27 @@ if __name__ == "__main__":
     fname='v26metsf_v4_tenac'
     xe110_e_tenac = DrawSF(can,trig,lep, mvar, fname)
     lep='u'
-    xe110_u_tenac = DrawSF(can,trig,lep, mvar, fname)    
-    fname='v26metsf_v6_tenac_detajj25'
+    xe110_u_tenac = DrawSF(can,trig,lep, mvar, fname)
+    #fname='v26metsf_v6_tenac_detajj25'
+    fname='v26metsf_v8_tenac_detjj25'
     lep='e'    
     xe110_e_detajj25 = DrawSF(can,trig,lep, mvar, fname)
     lep='u'
+    #fname='v26metsf_v8_tenac_detjj25_CST120'
+    print 'xe110_u_detajj25'
     xe110_u_detajj25 = DrawSF(can,trig,lep, mvar, fname)
 
     fname='v26metsf_v7_tenac_fjvt'
     xe110_u_fjvt = DrawSF(can,trig,lep, mvar, fname)
-    fname='v26metsf_v7_tenac_fjvtCST120'
+    #fname='v26metsf_v7_tenac_fjvtCST120'
+    fname='v26metsf_v8_tenac_detjj25_CST120'
+    print fname
     xe110_u_fjvtCST120 = DrawSF(can,trig,lep, mvar, fname)
-    fname='v26metsf_v7_tenac_fjvtCST120'
+    #fname='v26metsf_v7_tenac_fjvtCST120'
+    fname='v26metsf_v8_tenac_detjj25_CST120'
     lep='e'
     xe110_e_fjvtCST120 = DrawSF(can,trig,lep, mvar, fname)
+    #fname='v26metsf_v7_tenac_fjvt'
     fname='v26metsf_v7_tenac_fjvt'
     xe110_e_fjvt = DrawSF(can,trig,lep, mvar, fname)   
     #print xe110_e_nj3
