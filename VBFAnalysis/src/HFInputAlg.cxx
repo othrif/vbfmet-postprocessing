@@ -288,10 +288,12 @@ StatusCode HFInputAlg::execute() {
     }
   }
   xeSFTrigWeight=1.0;
+  unsigned metRunNumber = randomRunNumber;
+  if(!isMC) metRunNumber=runNumber;
   if(isMC){ // the MET trigger SF is turned off in the up variation. so it will be =1.
-    xeSFTrigWeight = weightXETrigSF(met_tst_et, 0); // met was used in the end instead of jj.Pt() 
-    if(currentVariation=="xeSFTrigWeight__1up")   xeSFTrigWeight = weightXETrigSF(met_tst_et, 1);
-    if(currentVariation=="xeSFTrigWeight__1down") xeSFTrigWeight = weightXETrigSF(met_tst_et, 2);
+    xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 0); // met was used in the end instead of jj.Pt() 
+    if(currentVariation=="xeSFTrigWeight__1up")   xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 1);
+    if(currentVariation=="xeSFTrigWeight__1down") xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 2);
   }
 
   // MET choice to be implemented...
@@ -481,6 +483,7 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchAddress("w", &w);
   }
   m_tree->SetBranchStatus("runNumber", 1);
+  m_tree->SetBranchStatus("randomRunNumber", 1);
   m_tree->SetBranchStatus("eventNumber", 1);
   m_tree->SetBranchStatus("passJetCleanTight", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
@@ -520,6 +523,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_timing",1);
 
   m_tree->SetBranchAddress("runNumber",&runNumber);
+  m_tree->SetBranchAddress("randomRunNumber",&randomRunNumber);
   m_tree->SetBranchAddress("eventNumber",&eventNumber);
   m_tree->SetBranchAddress("trigger_met", &trigger_met);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
@@ -599,13 +603,27 @@ StatusCode HFInputAlg::beginInputFile() {
   return StatusCode::SUCCESS;
 }
 
-double HFInputAlg::weightXETrigSF(const float met_pt, int syst=0) {
+double HFInputAlg::weightXETrigSF(const float met_pt, unsigned metRunNumber, int syst=0) {
   // 20.7 values
   //static const double p0 = 59.3407;
   //static const double p1 = 54.9134;
   // For MET tight
-  static const double p0 = 99.4255;
-  static const double p1 = 38.6145;
+  //double p0 = 99.4255;
+  //double p1 = 38.6145;
+  // For MET Tenacious
+  double p0 = 99.4255;
+  double p1 = 38.6145;
+  double e0 = 0.000784094;
+  double e1 = 0.05;
+  if(metRunNumber<=284484)                        { p0 = 110.396; p1 = 19.4147; e1 = 0.06; }  // 2015 xe70
+  if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 111.684; p1 = 19.147;  e1 = 0.08; }  // 2016 xe90
+  if(metRunNumber>302872)                         { p0 = 68.8679; p1 = 54.0594; e1 = 0.06; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
+  if(325713<=metRunNumber && metRunNumber<=328393) { p0 = 86.6614; p1 = 49.8935; e1 = 0.05; } // 2017 xe90_pufit_L1XE50
+  if(329385<=metRunNumber && metRunNumber<=330470) { p0 = 103.780; p1 = 57.2547; e1 = 0.05; } // 2017 xe100_pufit_L1XE55
+  if(330857<=metRunNumber && metRunNumber<=331975) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
+  if(331975<=metRunNumber && metRunNumber<=341649) { p0 = 103.152; p1 = 38.6121; e1 = 0.05; } // 2017 xe110_pufit_L1XE50
+  if(350067>metRunNumber  && metRunNumber>=348800) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
+  if(350067>metRunNumber  && metRunNumber>=348800) { p0 = 107.509; p1 = 32.0065; e1 = 0.05; } // 2018 xe110_xe65_L1XE50
 
   double x = met_pt / 1.0e3;
   if (x < 100) { return 0; }
@@ -616,10 +634,10 @@ double HFInputAlg::weightXETrigSF(const float met_pt, int syst=0) {
 
   // linear parameterization of the systematics
   if(syst==1){ // up variation
-    if(x<210.0) sf+=((0.000784094)*(150-x)+0.05)*0.6;
+    if(x<210.0) sf+=((e0)*(150-x)+e1)*0.6;
     else sf=1.0;
   }else if(syst==2){ // down
-    if(x<210.0)sf-=((0.000784094)*(150-x)+0.05)*0.6;
+    if(x<210.0)sf-=((e0)*(150-x)+e1)*0.6;
     else sf=1.0;
   }
   return sf;
