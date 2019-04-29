@@ -281,25 +281,6 @@ def getHistPars(hist):
     'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
     'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},     
-    'jetTrackWidth0' : {'xtitle':'Track Width (leading)',          'ytitle':'Events', 'logy':True, 'LtoRCut':False},
-    'jetTrackWidth1' : {'xtitle':'Track Width (subleading)',          'ytitle':'Events', 'logy':True, 'LtoRCut':False},
-    'jetNTracks0' : {'xtitle':'NTracks (leading)',          'ytitle':'Events','logy':True},
-    'jetNTracks1' : {'xtitle':'NTracks (subleading)',          'ytitle':'Events', 'logy':True},
-    'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
-    'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
-    'jj_nmbGluons' : {'xtitle':'Number of gluon-initiated leading jets', 'ytitle':'Events', 'logy':True},
-    'qgTagPerf' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
-    'qgTagNTrack' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
-    'qgTagTrackWidth' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
-    'qgTagSum' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
-    'nTrackCut0' : {'xtitle':'NTrack cut (leading)', 'ytitle':'Events', 'LtoRCut':2},
-    'nTrackCut1' : {'xtitle':'NTrack cut (subleading)', 'ytitle':'Events', 'LtoRCut':2},
-    'TrackWidthCut0' : {'xtitle':'Track Width cut (leading)', 'ytitle':'Events', 'LtoRCut':2},
-    'TrackWidthCut1' : {'xtitle':'Track Width cut (subleading)', 'ytitle':'Events', 'LtoRCut':2},
-    'nTrackCutSum' : {'xtitle':'NTrack cut (sum)', 'ytitle':'Events', 'LtoRCut':2},
-    'TrackWidthCutSum' : {'xtitle':'Track Width cut (sum)', 'ytitle':'Events', 'LtoRCut':2},
-    'nTrackSum' : {'xtitle':'NTrack (sum)', 'ytitle':'Events', 'LtoRCut':2},
-    'TrackWidthSum' : {'xtitle':'Track Width (sum)', 'ytitle':'Events', 'LtoRCut':2},
         }
 
     try:
@@ -1671,19 +1652,23 @@ class DrawStack:
                             cut_NsigOpp = self.sign.hist.Integral(ibin+1,10001)
                             cut_NbkgOpp = self.bkg_sum.Integral(ibin+1,10001)                            
                         elif (leftToRight==4 and ibin%2==0): # pair every 2 bins together
-                            cut_Nsig = self.sign.hist.GetBinContent(ibin-2)
-                            cut_Nbkg = self.bkg_sum.GetBinContent(ibin-2)
-                            cut_NsigOpp = self.sign.hist.GetBinContent(ibin-1)
-                            cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin-1)
-                            if ibin==2: #For leading Nominal bin (unpaired)
+                            cut_Nsig = self.sign.hist.GetBinContent(ibin)
+                            cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
+			    if ibin!=0 and ibin!=2: #0 included in CUTRANGE but not in actual histograms - binning starts at 1
+                                cut_NsigOpp = self.sign.hist.GetBinContent(ibin)
+                                cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin)
+                                cut_Nsig = self.sign.hist.GetBinContent(ibin-1)
+                                cut_Nbkg = self.bkg_sum.GetBinContent(ibin-1)
+			    else:
                                 cut_Nsig = self.sign.hist.Integral(ibin,ibin)
                                 cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
                         elif (leftToRight==4 and ibin%2==1): # pair every 2 bins together
-                            cut_Nsig = self.sign.hist.GetBinContent(ibin-1)
-                            cut_Nbkg = self.bkg_sum.GetBinContent(ibin-1)
-                            cut_NsigOpp = self.sign.hist.GetBinContent(ibin)
-                            cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin)
-                            if ibin==1: #For leading Nominal bin (unpaired)
+			    if ibin!=1:
+                                cut_NsigOpp = self.sign.hist.GetBinContent(ibin+1)
+                                cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin+1)
+                                cut_Nsig = self.sign.hist.GetBinContent(ibin)
+                                cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
+			    else:
                                 cut_Nsig = self.sign.hist.Integral(ibin,ibin)
                                 cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
 
