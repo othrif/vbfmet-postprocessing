@@ -144,7 +144,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
   hqgTagPerf = GetTH1("qgTagPerf",  9,  0.0, 9.0);  
-  hqgTagNTrack = GetTH1("qgTagNTrack",  13,  0.0, 13.0);  
+  hqgTagNTrack = GetTH1("qgTagNTrack",  15,  0.0, 15.0);  
   hqgTagTrackWidth = GetTH1("qgTagTrackWidth",  13,  0.0, 13.0);  
   hqgTagSum = GetTH1("qgTagSum",  13,  0.0, 13.0);  
   hnTrackCut0 = GetTH1("nTrackCut0",  40,  0.0, 40.0);  
@@ -285,42 +285,53 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
 
   //qgTagNTrack
-  float forw=2.1;
+  float forw=2.5;
 
   hqgTagNTrack->Fill(1.0,weight);
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<5)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<5)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(2.0,weight);
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<3)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<3)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(2.0,weight);
+    else hqgTagNTrack->Fill(3.0,weight);
   }
   else hqgTagNTrack->Fill(3.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<5)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw) hqgTagNTrack->Fill(4.0,weight);
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<5)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<5)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(4.0,weight);
+    else hqgTagNTrack->Fill(5.0,weight);
+  }
   else hqgTagNTrack->Fill(5.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<10)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<10)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(6.0,weight);
-  }
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<5)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw) hqgTagNTrack->Fill(6.0,weight);
   else hqgTagNTrack->Fill(7.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<12)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<12)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(8.0,weight);
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<10)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<10)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(8.0,weight);
+    else hqgTagNTrack->Fill(9.0,weight);
   }
   else hqgTagNTrack->Fill(9.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<12)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw) hqgTagNTrack->Fill(10.0,weight);
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<12)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<12)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(10.0,weight);
+    else hqgTagNTrack->Fill(11.0,weight);
+  }
   else hqgTagNTrack->Fill(11.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<12)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw) hqgTagNTrack->Fill(12.0,weight);
+  else hqgTagNTrack->Fill(13.0,weight);
 
   hqgTagNTrack->GetXaxis()->SetBinLabel(1," ");
   hqgTagNTrack->GetXaxis()->SetBinLabel(2,"No Tagging");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(3,"NTracks<5");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(4,"Fail NTracks<5");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(5,"NTracks0<5");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(6,"Fail NTracks0<5");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(7,"NTracks<10");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(8,"Fail NTracks<10");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(9,"NTracks<12");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(10,"Fail NTracks<12");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(11,"NTracks0<12");
-  hqgTagNTrack->GetXaxis()->SetBinLabel(12,"Fail NTracks0<12");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(3,"NTracks<3");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(4,"Fail NTracks<3");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(5,"NTracks<5");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(6,"Fail NTracks<5");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(7,"NTracks0<5");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(8,"Fail NTracks0<5");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(9,"NTracks<10");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(10,"Fail NTracks<10");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(11,"NTracks<12");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(12,"Fail NTracks<12");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(13,"NTracks0<12");
+  hqgTagNTrack->GetXaxis()->SetBinLabel(14,"Fail NTracks0<12");
 
 
   //qgTagTrackWidth
@@ -328,11 +339,13 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
   if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.05)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
     if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.05)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(2.0,weight);
+    else hqgTagTrackWidth->Fill(3.0,weight);
   }
   else hqgTagTrackWidth->Fill(3.0,weight);
 
   if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.08)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
     if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.08)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(4.0,weight);
+    else hqgTagTrackWidth->Fill(5.0,weight);
   }
   else hqgTagTrackWidth->Fill(5.0,weight);
 
@@ -341,11 +354,13 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
   if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.1)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
     if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.1)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(8.0,weight);
+    else hqgTagTrackWidth->Fill(9.0,weight);
   }
   else hqgTagTrackWidth->Fill(9.0,weight);
 
   if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.18)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
     if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.18)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(10.0,weight);
+    else hqgTagTrackWidth->Fill(11.0,weight);
   }
   else hqgTagTrackWidth->Fill(11.0,weight);
 
