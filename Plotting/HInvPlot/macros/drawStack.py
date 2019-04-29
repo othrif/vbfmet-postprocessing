@@ -77,7 +77,7 @@ if not options.wait:
 
 log = config.getLog('drawStack.py', debug=options.debug)
 mysyst = syst.systematics('All')
-mysystOneSided = syst.systematics('OneSided')
+mysystOneSided = syst.systematics('OneSidedDown')
 
 # List of plots to symmeterize
 symm_list=[]
@@ -815,8 +815,9 @@ class DrawStack:
         log.debug('ReadSample - integral=%5.1f sample=%s, syst=%s' %(hist.Integral(), sample, syst))
 
         if DO_SYMM:
-            #print 'COMPUTING systematic'
-            hist_central_value = self.file_pointer.Get(path)
+            nom_path = self.GetHistPath(sample, 'Nominal')
+            #print 'COMPUTING systematic',nom_path
+            hist_central_value = self.file_pointer.Get(nom_path)
             self.Symmeterize(hist_central_value, hist)
 
         return HistEntry(hist, sample, self.name, self.nf_map)
@@ -865,7 +866,7 @@ class DrawStack:
             bkg_ent.sample = 'bkgs'
             self.sys_bkgs[syst] = bkg_ent
             #print 'integral: ',bkg_ent.hist.Integral()
-            self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst, DO_SYMM=DO_SYMM)
+            self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst_key, DO_SYMM=DO_SYMM)
 
     #-------------------------
     def GetTotalBkgHist(self):
@@ -1127,6 +1128,7 @@ class DrawStack:
         bkg = self.GetTotalBkgHist()
         if isSignal:
             bkg = self.sign.hist.Clone()
+            bkg.SetDirectory(0)
         bkg.SetLineWidth(2)
         bkg.SetLineColor(2)
         bkg.SetFillColor(0)
@@ -1141,7 +1143,9 @@ class DrawStack:
         tmp_color=3
         i=0
         for s in sys:
-
+            if not s:
+                print  'not a valid hist: ',s
+                continue
             log.info('PlotManySyst - %s: %s Mean: %0.2f RMS: %0.2f' %(self.name, systs[i], s.GetMean(), s.GetRMS()))
             s.SetLineColor(getColor(tmp_color))
             s.SetMarkerColor(getColor(tmp_color))
@@ -1154,7 +1158,7 @@ class DrawStack:
                 max_bin = s.GetMaximum()
 
         bkg.GetYaxis().SetRangeUser(0.0, 1.2*max_bin)
-        self.UpdateHist(bkg)
+        self.UpdateHist(bkg, ignore_max=True)
         bkg.Draw('HIST E0')
         if fillData:
             mydata.Draw('SAME')
@@ -1220,7 +1224,7 @@ class DrawStack:
                 if math.fabs(s.GetMinimum()-1.0) < 0.15 and math.fabs(s.GetMaximum()-1.0) < 0.15:
                     s.GetYaxis().SetRangeUser(0.80, 1.20)
                 elif math.fabs(s.GetMinimum()-1.0) < 0.5 and math.fabs(s.GetMaximum()-1.0) < 0.5:
-                    s.GetYaxis().SetRangeUser(0.50, 1.50)
+                    s.GetYaxis().SetRangeUser(0.501, 1.499)
                 elif math.fabs(s.GetMinimum()-1.0) < 1.0 and math.fabs(s.GetMaximum()-1.0) < 1.0:
                     s.GetYaxis().SetRangeUser(0.0, 2.00)
                 else:
@@ -1245,7 +1249,7 @@ class DrawStack:
                 tmp_color+=1
 
                 if tmp_color==4 and not fillData:
-                    self.UpdateHist(s)
+                    self.UpdateHist(s,ignore_max=True)
                     s.GetYaxis().SetRangeUser(0.80, 1.20)
                     s.Draw('HIST')
                 else:
@@ -1831,7 +1835,7 @@ class DrawStack:
             bx.SetTitleSize(0.14);
             bx.SetTitleOffset(1.2);
 
-            by.SetRangeUser(0,2);
+            by.SetRangeUser(0.501, 1.499);
             if options.blind:
                 by.SetRangeUser(0,0.799);
             by.SetLabelSize(0.13);
@@ -1859,7 +1863,7 @@ class DrawStack:
             if options.blind:
                 self.ratio.Draw('same hist')
                 self.signif.Draw('same hist')
-                self.signifCR.GetYaxis().SetRangeUser(0,2);
+                self.signifCR.GetYaxis().SetRangeUser(0.5,1.5);
                 self.signifCR.Draw('hist same')
                 self.legr.Clear()
                 self.legr.AddEntry(self.ratio,'S/B')
@@ -2023,7 +2027,7 @@ class DrawStack:
         elif options.xmax != None:
             self.stack.GetXaxis().SetRangeUser(options.xmin,options.xmax)
     #--------------------
-    def UpdateHist(self,h, sample=None):
+    def UpdateHist(self, h, sample=None, ignore_max=False):
 
         pars = getHistPars(self.name)
         if 'xtitle' in pars and h.GetXaxis() != None:
@@ -2032,7 +2036,9 @@ class DrawStack:
         if 'ytitle' in pars and h.GetYaxis() != None:
             h.GetYaxis().SetTitle(pars['ytitle'])
 
-        ymax = self.GetYaxisMax()
+        ymax=-1.0
+        if not ignore_max:
+            ymax = self.GetYaxisMax()
         if ymax > 0.0:
             if self.IsLogy():
                 h.SetMaximum(15.0*ymax)
@@ -2196,7 +2202,7 @@ def writeSystTex(table_name, stack):
                 systs[i]=systs[j]
                 systs[j]=tmp
 
-    my_order=mysyst.getsystematicsList()
+    my_order=mysyst.getsystematicsListWithDown()
     if True:
         for key in my_order:
             for s in systs:
@@ -2264,8 +2270,8 @@ def main():
     rfile  = ROOT.TFile(rpath, 'READ')
 
     sfiles={}
-    print 'Reading nSyst: ',len(mysyst.getsystematicsList())
-    for ia in mysyst.getsystematicsList():
+    print 'Reading nSyst: ',len(mysyst.getsystematicsListWithDown())
+    for ia in mysyst.getsystematicsListWithDown():
         sfiles[ia]=rfile
 
     #
@@ -2331,9 +2337,7 @@ def main():
 
         updateCanvas(can, name=cname, data_hist=stack.data, bkg_sum_hist=stack.bkg_sum)
 
-
         if options.syst_see == 'allsyst':
-
             grouping=10
             syst_group = len(sfiles.keys())/grouping+1
             for i in range(0, syst_group):
