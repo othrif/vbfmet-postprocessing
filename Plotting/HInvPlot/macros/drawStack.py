@@ -300,7 +300,7 @@ def getHistPars(hist):
     'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
     'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
     'jj_nmbGluons' : {'xtitle':'Number of gluon-initiated leading jets', 'ytitle':'Events', 'logy':True},
-    'qgTagPerf' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':2},
+    'qgTagPerf' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
     'qgTagNTrack' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
     'qgTagTrackWidth' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
     'qgTagSum' : {'xtitle':'', 'ytitle':'Events', 'logy':True, 'LtoRCut':4},
@@ -1683,19 +1683,23 @@ class DrawStack:
                             cut_NsigOpp = self.sign.hist.Integral(ibin+1,10001)
                             cut_NbkgOpp = self.bkg_sum.Integral(ibin+1,10001)                            
                         elif (leftToRight==4 and ibin%2==0): # pair every 2 bins together
-                            cut_Nsig = self.sign.hist.GetBinContent(ibin-2)
-                            cut_Nbkg = self.bkg_sum.GetBinContent(ibin-2)
-                            cut_NsigOpp = self.sign.hist.GetBinContent(ibin-1)
-                            cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin-1)
-                            if ibin==2: #For leading Nominal bin (unpaired)
+                            cut_Nsig = self.sign.hist.GetBinContent(ibin)
+                            cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
+			    if ibin!=0 and ibin!=2: #0 included in CUTRANGE but not in actual histograms - binning starts at 1
+                                cut_NsigOpp = self.sign.hist.GetBinContent(ibin)
+                                cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin)
+                                cut_Nsig = self.sign.hist.GetBinContent(ibin-1)
+                                cut_Nbkg = self.bkg_sum.GetBinContent(ibin-1)
+			    else:
                                 cut_Nsig = self.sign.hist.Integral(ibin,ibin)
                                 cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
                         elif (leftToRight==4 and ibin%2==1): # pair every 2 bins together
-                            cut_Nsig = self.sign.hist.GetBinContent(ibin-1)
-                            cut_Nbkg = self.bkg_sum.GetBinContent(ibin-1)
-                            cut_NsigOpp = self.sign.hist.GetBinContent(ibin)
-                            cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin)
-                            if ibin==1: #For leading Nominal bin (unpaired)
+			    if ibin!=1:
+                                cut_NsigOpp = self.sign.hist.GetBinContent(ibin+1)
+                                cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin+1)
+                                cut_Nsig = self.sign.hist.GetBinContent(ibin)
+                                cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
+			    else:
                                 cut_Nsig = self.sign.hist.Integral(ibin,ibin)
                                 cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
 
