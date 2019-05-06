@@ -37,6 +37,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hqgTagNTrack(0),
 				  hqgTagTrackWidth(0),
 				  hqgTagSum(0),
+				  hQGTaggerSim(0),
 				  hnTrackCut0(0),
 				  hnTrackCut1(0),
 				  hTrackWidthCut0(0),
@@ -56,7 +57,8 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hjetNTracks02125(0),
 				  hjetNTracks12125(0),
 				  hjetTrackWidth02125(0),
-				  hjetTrackWidth12125(0)
+				  hjetTrackWidth12125(0),
+				  hjetNTrackPT(0)
 
 {
 }
@@ -147,6 +149,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hqgTagNTrack = GetTH1("qgTagNTrack",  15,  0.0, 15.0);  
   hqgTagTrackWidth = GetTH1("qgTagTrackWidth",  13,  0.0, 13.0);  
   hqgTagSum = GetTH1("qgTagSum",  13,  0.0, 13.0);  
+  hQGTaggerSim = GetTH1("qgTaggerSim",  7,  0.0, 7.0);  
   hnTrackCut0 = GetTH1("nTrackCut0",  40,  0.0, 40.0);  
   hnTrackCut1 = GetTH1("nTrackCut1",  40,  0.0, 40.0);  
   hTrackWidthCut0 = GetTH1("TrackWidthCut0",  80,  0.0, 0.4);  
@@ -167,6 +170,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hjetNTracks12125 = GetTH1("jetNTracks12125",  40,  0.0, 40.0);  
   hjetTrackWidth02125 = GetTH1("jetTrackWidth02125",  50,  0.0, 1.0);  
   hjetTrackWidth12125 = GetTH1("jetTrackWidth12125",  50,  0.0, 1.0);  
+
+  hjetNTrackPT = GetTH2("jetNTrackPT",  40,  0.0, 40.0, 100, 0.0, 500.0);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -264,6 +269,14 @@ bool Msl::PlotEvent::DoExec(Event &event)
   if((-2.5<event.jets.at(0).eta and event.jets.at(0).eta<-2.1) || (2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.5)) hjetTrackWidth02125->Fill(event.GetVar(Mva::jetTrackWidth0),weight);
   if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<-2.1) || (2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.5)) hjetTrackWidth12125->Fill(event.GetVar(Mva::jetTrackWidth1),weight);
 
+  //jetNTrackPT - 2D histogram for central jets NTrack vs pT
+  float forw=2.5;
+
+  for(int jet=0; jet<2;++jet){
+    if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==0) hjetNTrackPT->Fill(event.GetVar(Mva::jetNTracks0),event.jets.at(jet).pt,weight);
+    else if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==1) hjetNTrackPT->Fill(event.GetVar(Mva::jetNTracks1),event.jets.at(jet).pt,weight);
+  }
+
   //for qgTagPerf
   hqgTagPerf->Fill(1.0,weight);
   if(event.GetVar(Mva::passPerfCTagging)==2) hqgTagPerf->Fill(6.0, weight);
@@ -285,8 +298,6 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
 
   //qgTagNTrack
-  float forw=2.5;
-
   hqgTagNTrack->Fill(1.0,weight);
   if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<3)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
     if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<3)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(2.0,weight);
@@ -408,6 +419,35 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hqgTagSum->GetXaxis()->SetBinLabel(10,"Fail TrackWidthSum<0.05");
   hqgTagSum->GetXaxis()->SetBinLabel(11,"Fail TrackWidthSum<0.1");
   hqgTagSum->GetXaxis()->SetBinLabel(12,"Fail TrackWidthSum<0.1");
+
+  //QGTaggerSim - values/method taken from defaults in Reconstruction/Jet/BoostedJetTaggers for JetQGTagger
+  float slope=9.779;
+  float intercept=-32.28;
+  float lin0 = (slope*event.jets.at(0).pt)+intercept;
+  float lin1 = (slope*event.jets.at(1).pt)+intercept;
+  float log0 = (slope*TMath::Log10(event.jets.at(0).pt))+intercept;
+  float log1 = (slope*TMath::Log10(event.jets.at(1).pt))+intercept;
+
+  hQGTaggerSim->Fill(1.0,weight);
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<lin0)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<lin1)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSim->Fill(2.0,weight);
+    else hQGTaggerSim->Fill(3.0,weight);
+  }
+  else hQGTaggerSim->Fill(3.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<log0)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<log1)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSim->Fill(4.0,weight);
+    else hQGTaggerSim->Fill(5.0,weight);
+  }
+  else hQGTaggerSim->Fill(5.0,weight);
+
+  hQGTaggerSim->GetXaxis()->SetBinLabel(1," ");
+  hQGTaggerSim->GetXaxis()->SetBinLabel(2,"No Tagging");
+  hQGTaggerSim->GetXaxis()->SetBinLabel(3,"Default linear_pt");
+  hQGTaggerSim->GetXaxis()->SetBinLabel(4,"Fail Default linear_pt");
+  hQGTaggerSim->GetXaxis()->SetBinLabel(5,"Default log_pt");
+  hQGTaggerSim->GetXaxis()->SetBinLabel(6,"Fail Default log_pt");
+
 
 
   for(int cut=0; cut<40; cut++){

@@ -132,6 +132,7 @@ namespace Msl
     TH1			       *hqgTagNTrack;
     TH1			       *hqgTagTrackWidth;
     TH1			       *hqgTagSum;
+    TH1			       *hQGTaggerSim;
     TH1			       *hnTrackCut0;
     TH1			       *hnTrackCut1;
     TH1			       *hTrackWidthCut0;
@@ -152,6 +153,8 @@ namespace Msl
     TH1			       *hjetNTracks12125;
     TH1			       *hjetTrackWidth02125;
     TH1			       *hjetTrackWidth12125;
+
+    TH2			       *hjetNTrackPT;
 
     std::map<Mva::Var,TH1*>    fHistVec;
   };
