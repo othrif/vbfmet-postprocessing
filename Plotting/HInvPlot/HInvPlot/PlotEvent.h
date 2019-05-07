@@ -155,6 +155,8 @@ namespace Msl
     TH1			       *hjetTrackWidth12125;
 
     TH2			       *hjetNTrackPT;
+    TH2			       *hjetNTrackPTq;
+    TH2			       *hjetNTrackPTg;
 
     std::map<Mva::Var,TH1*>    fHistVec;
   };

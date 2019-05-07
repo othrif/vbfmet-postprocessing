@@ -58,7 +58,9 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hjetNTracks12125(0),
 				  hjetTrackWidth02125(0),
 				  hjetTrackWidth12125(0),
-				  hjetNTrackPT(0)
+				  hjetNTrackPT(0),
+				  hjetNTrackPTq(0),
+				  hjetNTrackPTg(0)
 
 {
 }
@@ -171,7 +173,9 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hjetTrackWidth02125 = GetTH1("jetTrackWidth02125",  50,  0.0, 1.0);  
   hjetTrackWidth12125 = GetTH1("jetTrackWidth12125",  50,  0.0, 1.0);  
 
-  hjetNTrackPT = GetTH2("jetNTrackPT",  40,  0.0, 40.0, 100, 0.0, 500.0);  
+  hjetNTrackPT = GetTH2("jetNTrackPT", 100, 0.0, 500.0, 40, 0.0, 40.0);  
+  hjetNTrackPTq = GetTH2("jetNTrackPTq", 100, 0.0, 500.0, 40, 0.0, 40.0);  
+  hjetNTrackPTg = GetTH2("jetNTrackPTg", 100, 0.0, 500.0, 40, 0.0, 40.0);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -273,8 +277,16 @@ bool Msl::PlotEvent::DoExec(Event &event)
   float forw=2.5;
 
   for(int jet=0; jet<2;++jet){
-    if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==0) hjetNTrackPT->Fill(event.GetVar(Mva::jetNTracks0),event.jets.at(jet).pt,weight);
-    else if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==1) hjetNTrackPT->Fill(event.GetVar(Mva::jetNTracks1),event.jets.at(jet).pt,weight);
+    if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==0){
+	hjetNTrackPT->Fill(event.GetVar(event.jets.at(jet).pt,Mva::jetNTracks0),weight);
+	if(event.GetVar(Mva::jetPartonTruthLabelID0)==21) hjetNTrackPTg->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
+	else hjetNTrackPTq->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
+    }
+    else if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==1){
+	hjetNTrackPT->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);
+	if(event.GetVar(Mva::jetPartonTruthLabelID1)==21) hjetNTrackPTg->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);	
+	else hjetNTrackPTq->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);	
+    }
   }
 
   //for qgTagPerf

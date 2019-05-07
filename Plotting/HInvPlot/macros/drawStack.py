@@ -313,7 +313,9 @@ def getHistPars(hist):
     'TrackWidthCutSum' : {'xtitle':'Track Width cut (sum)', 'ytitle':'Events', 'LtoRCut':2},
     'nTrackSum' : {'xtitle':'NTrack (sum)', 'ytitle':'Events', 'LtoRCut':2},
     'TrackWidthSum' : {'xtitle':'Track Width (sum)', 'ytitle':'Events', 'LtoRCut':2},
-    'jetNTrackPT' : {'xtitle':'NTracks', 'ytitle':'jet p_T [GeV]'},
+    'jetNTrackPT' : {'xtitle':'jet p_T [GeV]', 'ytitle':'NTracks'},
+    'jetNTrackPTq' : {'xtitle':'quark jet p_T [GeV]', 'ytitle':'NTracks'},
+    'jetNTrackPTg' : {'xtitle':'gluon jet p_T [GeV]', 'ytitle':'NTracks'},
         }
 
     try:
