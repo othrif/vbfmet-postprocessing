@@ -278,7 +278,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
   for(int jet=0; jet<2;++jet){
     if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==0){
-	hjetNTrackPT->Fill(event.GetVar(event.jets.at(jet).pt,Mva::jetNTracks0),weight);
+	hjetNTrackPT->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);
 	if(event.GetVar(Mva::jetPartonTruthLabelID0)==21) hjetNTrackPTg->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
 	else hjetNTrackPTq->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
     }
