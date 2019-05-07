@@ -208,7 +208,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
-  if(fWeightSystName=="Nominal"){
+  if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){
@@ -550,7 +550,8 @@ void Msl::ReadEvent::Read(const std::string &path)
     //
     // Identify the systematic type
     //
-    if(fTrees.at(i).find(fSystName)==std::string::npos) continue;
+    fIsDDQCD=(fTrees.at(i).find("QCDDD")!=std::string::npos); // QCDDD
+    if(fTrees.at(i).find(fSystName)==std::string::npos && !fIsDDQCD) continue;
 
     log() << "Read - Running systematic: " << fSystName << " on tree: " << fTrees.at(i) <<std::endl;
 
@@ -1100,17 +1101,19 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // 2015+2016 encoding
     int trigger_met_encoded = event->GetVar(Mva::trigger_met_encoded);
     int runPeriod = 0;
+    //int midRun = 303982; // was 302872
+    int midRun = 302872; // was 302872
     if(fRandomRunNumber<=284484)                                  runPeriod = 1;
-    else if(fRandomRunNumber >284484 && fRandomRunNumber<=302872) runPeriod = 2;
-    else if(fRandomRunNumber >302872)                             runPeriod = 3;      
+    else if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun) runPeriod = 2;
+    else if(fRandomRunNumber >midRun)                             runPeriod = 3;      
     int trigger_met_byrun=0; // for the computation of the met trigger SF
     if(fRandomRunNumber<=284484 && (trigger_met_encoded & 0x8))                             { trigger_met_byrun=1;  }// 2015
-    if(fRandomRunNumber >284484 && fRandomRunNumber<=302872 && (trigger_met_encoded & 0x4)) { trigger_met_byrun=2;  }// 2016 -D3
-    if(fRandomRunNumber >302872 && (trigger_met_encoded & 0x2))                             { trigger_met_byrun=3;  }// 2016
+    if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun && (trigger_met_encoded & 0x4)) { trigger_met_byrun=2;  }// 2016 -D3
+    if(fRandomRunNumber >midRun && (trigger_met_encoded & 0x2))                             { trigger_met_byrun=3;  }// 2016
     if(trigger_met_byrun==0 && (trigger_met_encoded & 0x10) == 0x10 ){
       if(fRandomRunNumber<=284484)                                  trigger_met_byrun = 4;
-      else if(fRandomRunNumber >284484 && fRandomRunNumber<=302872) trigger_met_byrun = 5;
-      else if(fRandomRunNumber >302872)                             trigger_met_byrun = 6;   
+      else if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun) trigger_met_byrun = 5;
+      else if(fRandomRunNumber >midRun)                             trigger_met_byrun = 6;   
     }// 2015+2016
     event->RepVar(Mva::trigger_met_byrun, trigger_met_byrun);
     event->RepVar(Mva::runPeriod,         runPeriod);    

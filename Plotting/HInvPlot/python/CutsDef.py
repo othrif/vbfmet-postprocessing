@@ -42,7 +42,7 @@ class BasicCuts:
         self.NjetCut   = 'n_jet > 1 && n_jet < 5'
         if Analysis.count('metsf'):
             self.DEtajjLowerCut   = 3.5 # was 3.5
-            self.MjjLowerCut   = 500.0
+            self.MjjLowerCut   = 2000.0
             #self.NjetCut   = 'n_jet == 3'
         if Analysis.count('mjj1000'):
             self.MjjLowerCut   = 1000.0
@@ -356,6 +356,9 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     met_choice=options.met_choice
     isLep=False
+    #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
+    #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
+
     if basic_cuts.chan=='e':
         cuts += [CutItem('CutLepTrig', 'trigger_lep == 1')]
         cuts += [CutItem('CutEl','n_el == 1')]

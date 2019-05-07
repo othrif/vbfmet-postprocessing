@@ -53,7 +53,7 @@ athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                    LooseSkim = True,
                                    ExtraVars=True,
                                    UseExtMC=args.UseExtMC,
-                                   QGTagger=False,
+                                   QGTagger=True,
                                    runNumberInput = runNumber,
                                    theoVariation = args.theoVariation and isSherpaVjets
                                    );

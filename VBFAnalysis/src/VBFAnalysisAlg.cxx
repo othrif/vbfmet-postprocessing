@@ -2,8 +2,6 @@
 #include "VBFAnalysisAlg.h"
 #include "SUSYTools/SUSYCrossSection.h"
 #include "PathResolver/PathResolver.h"
-//#include "xAODEventInfo/EventInfo.h"
-#include <vector>
 #include "TLorentzVector.h"
 #include <math.h>       /* exp */
 
@@ -41,6 +39,13 @@ StatusCode VBFAnalysisAlg::initialize() {
   cout << "isMC: " << m_isMC << endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
 
+  // initialize jet container
+  m_newJets = new xAOD::JetContainer();
+  m_newJetsAux = new xAOD::AuxContainerBase();
+  m_newJets->setStore( m_newJetsAux ); //< Connect the two  
+  xAOD::Jet* new_jet = new xAOD::Jet();
+  m_newJets->push_back(new_jet);
+  
   if(m_isMC){
     std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
     //xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
@@ -57,7 +62,42 @@ StatusCode VBFAnalysisAlg::initialize() {
     // }else {
     //   w_VBFhiggs =1.;
     // }
-  }
+
+    // qg tagging
+    m_qgVars.clear();
+    m_systSet.clear();
+    m_qgVars.push_back("JET_QG_Nominal");
+
+    asg::AnaToolHandle<CP::IJetQGTagger> my_handleNom;
+    my_handleNom.setTypeAndName("CP::JetQGTagger/JetQGTagger_VBF");
+    my_handleNom.setProperty("NTrackCut", 5);
+    my_handleNom.setProperty("CalibArea", "/share/t3data2/schae/qgcalibfiles/");
+    my_handleNom.retrieve();
+    m_jetQGTool[m_qgVars.at(0)]=my_handleNom;
+    m_systSet["JET_QG_Nominal"] = CP::SystematicSet(""); //my_syst_nominal_set;
+    if(m_currentVariation=="Nominal"){
+      // loading the systematics
+      const CP::SystematicRegistry& registry = CP::SystematicRegistry::getInstance();
+      const CP::SystematicSet& recommendedSystematics = registry.recommendedSystematics();
+      // add all recommended systematics
+      for (const auto& systSet : CP::make_systematics_vector(recommendedSystematics)) {
+	TString nameRunThisSyst="";
+	for (const auto& sys : systSet) {
+	  std::cout << "syst: " << sys.name() << " base: " << sys.basename() << std::endl;
+	  // select only QG tagging
+	  if(sys.basename().find("JET_QG_")!=std::string::npos){
+	    std::cout << "QG syst Loaded: " << sys.name() << std::endl;
+	    nameRunThisSyst=sys.name();
+	  }
+	}
+	if(nameRunThisSyst!=""){
+	  m_qgVars.push_back(nameRunThisSyst);
+	  m_systSet[nameRunThisSyst] = CP::SystematicSet(std::string(nameRunThisSyst.Data()));
+	}
+      }
+    }// end qg systematics setup
+  }// end nominal check
+
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
@@ -386,7 +426,6 @@ StatusCode VBFAnalysisAlg::finalize() {
   //Things that happen once at the end of the event loop go here
   //
 
-
   return StatusCode::SUCCESS;
 }
 
@@ -660,14 +699,40 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_QGTagger && jet_NTracks){
     jet_NTracks_PV->clear();
     jet_SumPtTracks_PV->clear();
+
+    static SG::AuxElement::Accessor<int> acc_NumTrkPt500PV("NumTrkPt500PV");
+    static SG::AuxElement::ConstAccessor<float> acc_qgTaggerDec("qgTagger");
+    static SG::AuxElement::ConstAccessor<float> acc_qgTaggerWeight("qgTaggerWeight");
+
+    for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
+      tMapFloat [m_qgVars.at(iQG)]=1.0;
+    }
+
     for(unsigned iJet=0; iJet<jet_NTracks->size(); ++iJet){
       if(jet_NTracks->at(iJet).size()>0)     jet_NTracks_PV    ->push_back(jet_NTracks->at(iJet)[0]);
       if(jet_SumPtTracks->at(iJet).size()>0) jet_SumPtTracks_PV->push_back(jet_SumPtTracks->at(iJet)[0]);
+
+      // loading the qg tagger for systematics
+      xAOD::Jet* new_jet = m_newJets->at(0);
+      const xAOD::JetFourMom_t newp4(jet_pt->at(iJet), jet_eta->at(iJet), jet_phi->at(iJet), jet_m->at(iJet));
+      new_jet->setJetP4(newp4); 
+
+      acc_NumTrkPt500PV(*new_jet) = jet_NTracks->at(iJet)[0];
+      new_jet->auxdata<int>("truthjet_nCharged") = 10;//jet->getAttribute<int>("truthjet_nCharged");
+      new_jet->auxdata<int>("truthjet_pdgid") = jet_PartonTruthLabelID->at(iJet); //jet->getAttribute<int>("PartonTruthLabelID");
+      new_jet->auxdata<float>("truthjet_eta") = 0.0; //jet->getAttribute<float>("truthjet_eta");
+      new_jet->auxdata<float>("truthjet_pt") = 1000.0; //jet->getAttribute<float>("truthjet_pt");
+      // Loop over QG systematics
+      for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
+	m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]);
+	m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, NULL, 1); // add qg taging
+	tMapFloat[m_qgVars.at(iQG)] *= acc_qgTaggerWeight(*new_jet);
+      }
     }
   }
 
   // refill the base leptons
-  if(n_baseel>baseel_pt->size()){
+  if(n_baseel>int(baseel_pt->size())){
     for(unsigned a=0; a<el_pt->size(); ++a){
       unsigned fillIndx=0;
       for(unsigned b=0; b<baseel_pt->size(); ++b){
@@ -681,7 +746,7 @@ StatusCode VBFAnalysisAlg::execute() {
       baseel_charge->insert(baseel_charge->begin()+fillIndx,el_charge->at(a));
     }
   }
-  if(n_basemu>basemu_pt->size()){
+  if(n_basemu>int(basemu_pt->size())){
     for(unsigned a=0; a<mu_pt->size(); ++a){
       unsigned fillIndx=0;
       for(unsigned b=0; b<basemu_pt->size(); ++b){
@@ -752,7 +817,7 @@ StatusCode VBFAnalysisAlg::execute() {
     LeadJetPtCut = 60.0e3; // 60.0e3
     subLeadJetPtCut = 40.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
-    DEtajjCut =2.5; // 3.5
+    DEtajjCut =3.5; // 3.5
   }
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
@@ -763,8 +828,8 @@ StatusCode VBFAnalysisAlg::execute() {
   if (n_jet < 2) return StatusCode::SUCCESS;
   if (!(n_jet == 2) && !m_LooseSkim) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("n_jet = 2!");
-  if (!(n_jet == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
-  if (!(n_jet == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
+  if (!(unsigned(n_jet) == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
+  if (!(unsigned(n_jet) == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
   if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < 2.0) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
   ATH_MSG_DEBUG ("Pass VBF cuts!");
   // encoding met triggers
@@ -775,8 +840,6 @@ StatusCode VBFAnalysisAlg::execute() {
   if (trigger_HLT_xe70_mht == 1)         trigger_met_encoded+=0x8;
   if (trigger_HLT_noalg_L1J400 == 1)     trigger_met_encoded+=0x10;
   
-  unsigned metRunNumber = randomRunNumber;
-  if(!m_isMC) metRunNumber=runNumber;
   if((metRunNumber<=284484 && trigger_HLT_xe70_mht==1) ||                                // 2015
      (metRunNumber>284484 && metRunNumber<=302872 && trigger_HLT_xe90_mht_L1XE50==1) ||  // 2016
      (metRunNumber>302872 && trigger_HLT_xe110_mht_L1XE50==1) ||           // 2016
@@ -888,6 +951,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_muSFTrigWeight = muSFTrigWeight;
   float tmp_eleANTISF = eleANTISF;
   float tmp_nloEWKWeight = nloEWKWeight;
+  float tmp_qgTagWeight = 1.0; // assuming the default weight is 1.0 for qg tagging
 
   for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
@@ -900,6 +964,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_muSFTrigWeight = muSFTrigWeight;
     tmp_eleANTISF = eleANTISF;
     tmp_nloEWKWeight = nloEWKWeight;
+    tmp_qgTagWeight = 1.0; // default value is 1
 
     if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
@@ -909,6 +974,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("nloEWKWeight"))   tmp_nloEWKWeight=tMapFloat[it->first];
+    else if(it->first.Contains("JET_QG_"))        tmp_qgTagWeight=tMapFloat[it->first];
     else if(it->first.Contains("eleANTISF")){
       tmp_eleANTISF=tMapFloat[it->first];
       tmp_eleANTISF=std::min<float>(tmp_eleANTISF,1.5);
@@ -920,10 +986,10 @@ StatusCode VBFAnalysisAlg::execute() {
 
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight);
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight;
   }//end systematic weight loop
 
-  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR)) return StatusCode::SUCCESS;
   double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
@@ -975,6 +1041,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("*",0);
   // add the systematics weights to the nominal
   TObjArray *var_list = m_tree->GetListOfBranches();
+
   for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) {
     TString var_name = var_list->At(a)->GetName();
     if(var_name.Contains("__1up") || var_name.Contains("__1down")){
@@ -1000,6 +1067,13 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       tMapFloatW["nloEWKWeight__1down"]=1.0;
       m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
     }
+    for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
+      if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){ 
+	tMapFloat[m_qgVars.at(iQG)]=1.0; 
+	tMapFloatW[m_qgVars.at(iQG)]=1.0;
+	m_tree_out->Branch("w"+m_qgVars.at(iQG),&(tMapFloatW[m_qgVars.at(iQG)])); 
+      }
+    }// end qg variables
   }
 
   m_tree->SetBranchStatus("runNumber", 1);

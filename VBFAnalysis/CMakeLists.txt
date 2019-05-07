@@ -7,11 +7,14 @@ atlas_depends_on_subdirs( PUBLIC
                           Control/xAODRootAccess
                           Event/xAOD/xAODEventInfo
                           Event/xAOD/xAODJet
+			  Event/xAOD/xAODCore
                           Event/xAOD/xAODMissingET
+			  Reconstruction/Jet/BoostedJetTaggers
 #                          xAODAnaHelpers
                           PRIVATE
                           Event/xAOD/xAODEgamma
                           Event/xAOD/xAODMuon
+			  PhysicsAnalysis/AnalysisCommon/PATInterfaces
                           Tools/PathResolver )
 
 # Declare external dependencies ... default here is to include ROOT
@@ -30,10 +33,13 @@ atlas_add_library( VBFAnalysisLib src/*.cxx
   xAODEgamma
   xAODEventInfo
   xAODJet
+  xAODCore
   xAODMissingET
   xAODMuon
+  BoostedJetTaggersLib
   xAODRootAccess
   PathResolver
+  PATInterfaces
   SUSYToolsLib
 )
 
