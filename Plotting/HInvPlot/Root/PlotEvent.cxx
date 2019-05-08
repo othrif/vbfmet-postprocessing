@@ -62,7 +62,8 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hjetTrackWidth12125(0),
 				  hjetNTrackPT(0),
 				  hjetNTrackPTq(0),
-				  hjetNTrackPTg(0)
+				  hjetNTrackPTg(0),
+				  hjetNTrackPTpu(0)
 
 {
 }
@@ -180,6 +181,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hjetNTrackPT = GetTH2("jetNTrackPT", 100, 0.0, 500.0, 40, 0.0, 40.0);  
   hjetNTrackPTq = GetTH2("jetNTrackPTq", 100, 0.0, 500.0, 40, 0.0, 40.0);  
   hjetNTrackPTg = GetTH2("jetNTrackPTg", 100, 0.0, 500.0, 40, 0.0, 40.0);  
+  hjetNTrackPTpu = GetTH2("jetNTrackPTpu", 100, 0.0, 500.0, 40, 0.0, 40.0);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -284,11 +286,13 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==0){
 	hjetNTrackPT->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);
 	if(event.GetVar(Mva::jetPartonTruthLabelID0)==21) hjetNTrackPTg->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
+	else if(event.GetVar(Mva::jetPartonTruthLabelID0)==0) hjetNTrackPTpu->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
 	else hjetNTrackPTq->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
     }
     else if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==1){
 	hjetNTrackPT->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);
 	if(event.GetVar(Mva::jetPartonTruthLabelID1)==21) hjetNTrackPTg->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);	
+	else if(event.GetVar(Mva::jetPartonTruthLabelID1)==0) hjetNTrackPTpu->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);	
 	else hjetNTrackPTq->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);	
     }
   }

@@ -318,6 +318,7 @@ def getHistPars(hist):
     'jetNTrackPT' : {'xtitle':'jet p_T [GeV]', 'ytitle':'NTracks'},
     'jetNTrackPTq' : {'xtitle':'quark jet p_T [GeV]', 'ytitle':'NTracks'},
     'jetNTrackPTg' : {'xtitle':'gluon jet p_T [GeV]', 'ytitle':'NTracks'},
+    'jetNTrackPTpu' : {'xtitle':'gluon jet p_T [GeV]', 'ytitle':'NTracks'},
         }
 
     try:
