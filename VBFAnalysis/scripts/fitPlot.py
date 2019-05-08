@@ -13,7 +13,8 @@ import math
 import VBFAnalysis.ATLAS as ATLAS
 import VBFAnalysis.Style as Style
 from optparse import OptionParser
-import VBFAnalysis.systematics
+import VBFAnalysis.systematics as vbf_syst
+#import HInvPlot.systematics as vbf_syst
 
 import numpy as np
 
@@ -30,8 +31,6 @@ def is_in_list(name, li):
     for l in li:
         if name in l: return True
     return False
-
-
 
 class texTable(object):
     # This class is supposed to make the creating of tables simple
@@ -153,6 +152,7 @@ class HistClass(object):
     regDict=None
     nBins=None
     systs=[]
+    onesided=False
     def __init__(self, hname,var=None):
 
         if HistClass.nBins==None:
@@ -202,7 +202,7 @@ class HistClass(object):
         if self.syst_HIGH_LOW=="":
             print "This is not a systematic variation with up/down.", self.hname
             return
-        for k,v in VBFAnalysis.systematics.systematics.getsystematicsOneSidedMap().iteritems():
+        for k,v in vbf_syst.systematics.getsystematicsOneSidedMap().iteritems():
             if self.syst in v:
                 print "This is a one sided systematic can't get other variation!", self.hname
                 return None
@@ -335,13 +335,11 @@ def getBinsError(hist, bins):
         BE+=hist.GetBinError(bn) # FIXME squared or not?
     return BE
 
-
 def getBinsYield(hist, bins):
     BC=0
     for bn in bins:
         BC+=hist.GetBinContent(bn)
     return BC
-
 
 def removeLabel(leg, name):
     LOP=leg.GetListOfPrimitives()
@@ -362,7 +360,24 @@ def make_legend(can):
     leg.SetTextFont(42)
     leg.SetTextSize(0.04)
     #leg.SetNColumns  (2)
+    NameDict ={'ttbar':'Top+VV/VVV',
+                   'Z_EWK':'EWK Z',
+                   'W_EWK':'EWK W',
+                   'Z_strong':'QCD Z',
+                   'W_strong':'QCD W',
+                   'signal':'Higgs',
+                   'data':'Data',                   
+                   'eleFakes':'e-fakes',
+                   'multijet':'Multijet',
+                   }
+    for i in leg.GetListOfPrimitives():
+        if i.GetLabel() not in ['signal','data']:
+            i.GetObject().SetLineColor(i.GetObject().GetFillColor())
+            i.GetObject().SetMarkerColor(i.GetObject().GetFillColor())
+        if i.GetLabel() in NameDict:
+            i.SetLabel(NameDict[i.GetLabel()])
     removeLabel(leg, 'dummy')
+    removeLabel(leg, 'Others')
     nEntries=len(leg.GetListOfPrimitives())
     #leg.SetY1(0.9-nEntries*0.04)
     return leg
@@ -539,8 +554,6 @@ def main(options):
     regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]
     regionBins["lowsigWCRenu"]=regionBins["lowsigWCRep"]+regionBins["lowsigWCRen"]
 
-
-
     #setting dummyHist
     for k in regDict:
         dummyHist.GetXaxis().SetBinLabel(regDict[k],k)
@@ -548,8 +561,6 @@ def main(options):
     dummyHist.SetMinimum(1)
     dummyHist.GetYaxis().SetTitle("Events")
     dummyHist.Draw()
-
-
 
     hists=[]
     for hname in histNames[::-1]:
@@ -592,18 +603,24 @@ def main(options):
         elif histObj.proc in histNames+["data"]:
             addContent(hDict[histObj.proc], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
         else:
-            print key, "could not be identified correctly! BinContent will be added to Others"
-            addContent(hDict["Others"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
+            if not key.count('hQCDw_'):
+                print key, "could not be identified correctly! BinContent will be added to Others"
+                addContent(hDict["Others"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
 
 
     #defining bkg hist
     bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","eleFakes","multijet"]+["Others"]
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*9,0,nbins*9)
     hDict["bkgs"]=bkgs
+    hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
     for bkg in bkgsList:
         hDict["bkgs"].Add(hDict[bkg])
-
-
+        hDict["bkgsStat"].Add(hDict[bkg])
+    # Set the MC stat uncertainties to 0 in the systematics plot
+    if not options.show_mc_stat_err:
+        for i in range(0,hDict["bkgs"].GetNbinsX()):
+            hDict["bkgs"].SetBinError(i,0.0)
+            
     hStack=ROOT.THStack()
     for h in hists:
         hStack.Add(h)
@@ -617,10 +634,25 @@ def main(options):
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
 
-
     systHist=hDict["bkgs"]
+    systHistAsym = ROOT.TGraphAsymmErrors(systHist)
+    hDict["bkgsAsymErr"] = systHistAsym
+
+    # collect the one-sided systematics
+    mysystOneSided = vbf_syst.systematics('OneSided')
+    one_sided_list = []
+    for s in mysystOneSided.getsystematicsList():
+        s_lift=s
+        if s_lift.count('__1up'):
+            s_lift=s[:-5]
+        one_sided_list+=[s_lift]
+
+    for i in range(0,systHist.GetNbinsX()):
+        systHistAsym.SetPointEXhigh(i-1,systHist.GetXaxis().GetBinWidth(i)/2.0)
+        systHistAsym.SetPointEXlow(i-1,systHist.GetXaxis().GetBinWidth(i)/2.0)
+
     if not options.syst=="":
-        tmpSys=VBFAnalysis.systematics.systematics(options.syst)
+        tmpSys=vbf_syst.systematics(options.syst)
         print "Calculating systematic variations for %s systematics. This could take a while..."%options.syst
         totSystStackDict={}#This contains the total sum of hists of bkgs for a certain sytematic and region
         systVariationDict={} # This will contain the variation from the central value for each bin
@@ -638,51 +670,68 @@ def main(options):
             if "theoFactors" in k or "NONEBlind" in k: continue
             tmpHist=HistClass(k)
 
-            if not(options.syst=="all"):
+            # check if this is a one sided systematic
+            if tmpHist.syst in one_sided_list:
+                tmpHist.onesided=True
+            
+            if not(options.syst=="All"):
                 if not(is_in_list(tmpHist.syst, tmpSys.getsystematicsList())):
                     print "skipping:",tmpHist.syst
                     continue
 
             if not(tmpHist.isSystDict()): continue
-            # if tmpHist.isSignal(): continue # FIXME revisit this
+            if tmpHist.isSignal(): continue # FIXME revisit this. decide if we want the signal uncertainties added?
             systName=tmpHist.syst+"_"+tmpHist.syst_HIGH_LOW
             centralHist=rfile.Get(k.replace(tmpHist.syst+tmpHist.syst_HIGH_LOW, "Nom"))
             centralValue=centralHist.GetBinContent(options.nBin)
             # centralValue=hDict[tmpHist.proc].GetBinContent(tmpHist.nbin)
             diff=tmpHist.hist.GetBinContent(options.nBin)-centralValue
 
-
             if "R" in tmpHist.reg:
                 rat="nan"
                 if centralValue!=0: rat=diff/centralValue
 
-                print '{0:<10}'.format(tmpHist.proc), '{0:<20}'.format(tmpHist.reg), '{0:<20}'.format(systName), "\t",'{0:<15}'.format(str(rat)), "\t",'{0:<15}'.format(str(diff)),"\t",'{0:<15}'.format(str(tmpHist.hist.GetBinContent(options.nBin))),"+-",'{0:<15}'.format(str(tmpHist.hist.GetBinError(options.nBin))),"\t",'{0:<15}'.format(str(centralValue)),"+-",'{0:<15}'.format(str(centralHist.GetBinError(options.nBin)))
-
-
+                #print '{0:<10}'.format(tmpHist.proc), '{0:<20}'.format(tmpHist.reg), '{0:<20}'.format(systName), "\t",'{0:<15}'.format(str(rat)), "\t",'{0:<15}'.format(str(diff)),"\t",'{0:<15}'.format(str(tmpHist.hist.GetBinContent(options.nBin))),"+-",'{0:<15}'.format(str(tmpHist.hist.GetBinError(options.nBin))),"\t",'{0:<15}'.format(str(centralValue)),"+-",'{0:<15}'.format(str(centralHist.GetBinError(options.nBin)))
 
             if diff>0:
                 binVariationHigh2[tmpHist.nbin]+=diff**2
             else:
                 binVariationLow2[tmpHist.nbin]+=diff**2
-
+            #add the other for one-sided systematics
+            if tmpHist.onesided:
+                if diff>0:
+                    binVariationLow2[tmpHist.nbin]+=diff**2
+                else:
+                    binVariationHigh2[tmpHist.nbin]+=diff**2
+                    
         for b in range(1,len(regDict)+1):
             lowVariation=math.sqrt(binVariationLow2[b])
             highVariation=math.sqrt(binVariationHigh2[b])
             print "bin, lowVariation, highVariation:",b, lowVariation, highVariation
             systVariationDict[b]=(lowVariation+highVariation)/2.
             systHist.SetBinError(b, math.sqrt(systVariationDict[b]**2+systHist.GetBinError(b)**2))
-
+            # asymmetric unc.
+            ey_high=systHistAsym.GetErrorYhigh(b-1)
+            new_e = ROOT.Double(math.sqrt(ey_high*ey_high+highVariation*highVariation))
+            systHistAsym.SetPointEYhigh(b-1,new_e)
+            ey_low=systHistAsym.GetErrorYlow(b-1)
+            new_e = ROOT.Double(math.sqrt(ey_low*ey_low+lowVariation*lowVariation))
+            systHistAsym.SetPointEYlow(b-1,new_e)
+            
         systHist.SetTitle("Systematics")
         print "Done!"
     else:
         systHist.SetTitle("MC stat")
 
     ROOT.gStyle.SetErrorX(0.5)
-    Style.setStyles(systHist,[0,0,0,1,3018,0,0,0])
-    systHist.Draw("same e2")
+    fillStyle = 3004 # was 3018
+    Style.setStyles(systHist,[0,0,0,1,fillStyle,0,0,0])
+    Style.setStyles(hDict["bkgsStat"],[0,0,0,1,fillStyle,0,0,0])
+    Style.setStyles(hDict["bkgsAsymErr"],[0,0,0,1,fillStyle,0,0,0])
+    #systHist.Draw("same e2") # smooths the errors assuming they are symmetric
+    systHistAsym.Draw("same e2")
 
     print "Systematics found:",HistClass.systs
-
 
     if options.yieldTable:
         make_yieldTable(regDict, regionBins, hDict, data, nbins, options.texTables)
@@ -690,7 +739,7 @@ def main(options):
     leg=make_legend(ROOT.gPad)
     leg.Draw()
 
-    texts = ATLAS.getATLASLabels(can, 0.2, 0.78, options.lumi, selkey="")
+    texts = ATLAS.getATLASLabels(can, 0.2, 0.86, options.lumi, selkey="")
 
     for text in texts:
         text.Draw()
@@ -698,7 +747,12 @@ def main(options):
     if options.ratio:
         can.cd(2)
         rHist=data.Clone("ratioHist")
-        rHist.Divide(bkgs)
+        rbkgs = hDict["bkgsStat"].Clone()
+        if options.show_mc_stat_err:
+            for i in range(0,rbkgs.GetNbinsX()+1):
+                rbkgs.SetBinError(i,0.0)
+        
+        rHist.Divide(rbkgs)
         rHist.GetYaxis().SetTitle("Data/MC")
         rHist.GetYaxis().SetTitleOffset(.35)
         rHist.GetYaxis().SetTitleSize(0.1)
@@ -716,7 +770,35 @@ def main(options):
 
         rHist.Draw()
         line1.Draw("histsame")
+        if options.show_mc_stat_err or options.syst!="":
+            if options.show_mc_stat_err:
+                bkgs = hDict["bkgsStat"].Clone() # this only holds the MC stat uncertainty
+            for i in range(0,rbkgs.GetNbinsX()+1):
+                rbkgs.SetBinContent(i,1.0)
+                e1 = 0.0;
+                if bkgs.GetBinContent(i)!=0.0:
+                    e1=bkgs.GetBinError(i)/bkgs.GetBinContent(i)
+                rbkgs.SetBinError(i,e1)
 
+            # load the asymmetric
+            systHistAsymRatio = systHistAsym.Clone()
+            x1=ROOT.Double()
+            y1=ROOT.Double()
+            for j in range(1,bkgs.GetNbinsX()+1):
+                # Set Y value to 1
+                systHistAsymRatio.GetPoint(j-1,x1,y1)
+                systHistAsymRatio.SetPoint(j-1,x1,1.0)
+                val=bkgs.GetBinContent(j)
+                eyu=systHistAsym.GetErrorYhigh   (j-1)/val
+                eyd=systHistAsym.GetErrorYlow    (j-1)/val
+                systHistAsymRatio.SetPointEYhigh(j-1,eyu)
+                systHistAsymRatio.SetPointEYlow (j-1,eyd)
+
+            #rbkgs.Draw('same e2') # divides (up-down)/2 for symmetric unc.
+            systHistAsymRatio.Draw('same e2')
+            rHist.Draw('same')
+            line1.Draw("histsame")
+                
         can.GetPad(2).RedrawAxis()
         can.GetPad(2).Modified()
         can.GetPad(2).Update()
@@ -730,7 +812,7 @@ def main(options):
     blindStr=""
     if not options.unBlindSR:
         blindStr=", SR blinded"
-    preFitLabel=ROOT.TLatex(.5,.8,"Pre-Fit"+blindStr)
+    preFitLabel=ROOT.TLatex(.5,.86,"Pre-Fit"+blindStr)
     preFitLabel.SetNDC()
     preFitLabel.SetTextFont(72)
     preFitLabel.SetTextSize(0.055)
@@ -920,8 +1002,13 @@ def compareMain(options):
         legX=0.2
         legY=0.9
         leg=ROOT.TLegend(legX,legY-len(histDict)*0.05,legX+0.3,legY)
+        
         for k in histDict:
-            leg.AddEntry(histDict[k][p],openRfiles[k].GetName(),"l")
+            entry_name =openRfiles[k].GetName()
+            #print 'entry_name: ',entry_name
+            #if entry_name in NameDict:
+            #    entry_name=NameDict[entry_name]
+            leg.AddEntry(histDict[k][p],entry_name,"l")
             histDict[k][p].Draw("Ehistsame")
         texts = ATLAS.getATLASLabels(c1, 0.54, 0.78, options.lumi, selkey="")
         for text in texts:
@@ -1101,6 +1188,7 @@ if __name__=='__main__':
     p.add_option('--saveAs', type='string', help='Saves the canvas in a given format. example argument: pdf')
     p.add_option('-q', '--quite', action='store_true', help='activates Batch mode')
     p.add_option('--texTables', action='store_true', help='Saves tables as pdf. Only works together with --yieldTable')
+    p.add_option('--show-mc-stat-err', action='store_true',  dest='show_mc_stat_err', help='Shows the MC stat uncertainties separately from the data ratio error')    
 
 
     p.add_option('--plot', default='', help='Plots a variable in a certain region. HFInputAlg.cxx produces these plots with the --doPlot flag . Only works with -i and not with -c. example: jj_mass,SR,1_2_3')
