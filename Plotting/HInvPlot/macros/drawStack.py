@@ -68,7 +68,7 @@ atlas_style_path = options.atlas_style_path
 import ROOT
 import HInvPlot.JobOptions as config
 import HInvPlot.CutsDef    as hstudy
-import HInvPlot.systematics as syst
+import HInvPlot.systematics as import_syst
 
 #config.setPlotDefaults(ROOT)
 
@@ -76,8 +76,8 @@ if not options.wait:
     ROOT.gROOT.SetBatch(True)
 
 log = config.getLog('drawStack.py', debug=options.debug)
-mysyst = syst.systematics('All')
-mysystOneSided = syst.systematics('OneSidedDown')
+mysyst = import_syst.systematics('All')
+mysystOneSided = import_syst.systematics('OneSidedDown')
 
 # List of plots to symmeterize
 symm_list=[]
@@ -1552,8 +1552,8 @@ class DrawStack:
         norm_hists_bkg=[]
         for hk,hg in self.bkgs.iteritems(): norm_hists_bkg+=[hg.hist.Clone()]
         syst_hist_bkg=ROOT.TGraphAsymmErrors(self.bkg_sum); self.err_bands+=[syst_hist_bkg]
-        syst_ratio=syst_hist_bkg.Clone();                   self.err_bands+=[syst_ratio]
-        self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
+        syst_ratio=syst_hist_bkg.Clone(); self.err_bands+=[syst_ratio]
+        syst_jes_ratio = self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
 
         # Setting the draw options
         syst_hist_bkg.SetFillStyle(3004)
@@ -1856,8 +1856,16 @@ class DrawStack:
             self.error_map['bkg_ratio'].SetMarkerColor(1)
             self.error_map['bkg_ratio'].SetMarkerSize(0)
             self.error_map['bkg_ratio'].SetLineColor(1)
-
-            self.error_map['bkg_ratio'].Draw('SAME E2')
+            self.error_map['bkg_ratio'].Draw('SAME E2')            
+            # JES error ratio
+            if syst_jes_ratio:
+                self.error_map['syst_jes_ratio'] = syst_jes_ratio.Clone()
+                self.error_map['syst_jes_ratio'].SetFillColor(0)
+                self.error_map['syst_jes_ratio'].SetLineColor(3)            
+                self.error_map['syst_jes_ratio'].SetLineWidth(2)
+                self.error_map['syst_jes_ratio'].SetMarkerColor(3)
+                self.error_map['syst_jes_ratio'].SetLineStyle(1)
+                self.error_map['syst_jes_ratio'].Draw('SAME E1') #HIST
 
             # Overlay the ratio plot on top of errors
             if options.blind:
@@ -1901,6 +1909,12 @@ class DrawStack:
                 new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
                 syst.SetPointEYlow(m-1,new_e)
 
+        if False:
+            mysyst_jes = import_syst.systematics('JES')
+            syst_jesr = syst.Clone()
+            syst_jesr.SetName('syst_jesr')
+        else:
+            syst_jesr=None
         # iterate over the systematics
         for sys, ent in self.sys_bkgs.iteritems():
             if True:
@@ -1918,18 +1932,38 @@ class DrawStack:
                         e2=syst.GetErrorYlow(m-1)
                         new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
                         syst.SetPointEYlow(m-1,new_e)
+                    # adding the jes systematics
+                    if syst_jesr and sys in mysyst_jes.getsystematicsList():
+                        if e1>0:
+                            e2=syst_jesr.GetErrorYhigh(m-1)
+                            new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
+                            syst_jesr.SetPointEYhigh(m-1,new_e)
+                        elif e1<0:
+                            e2=syst_jesr.GetErrorYlow(m-1)
+                            new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
+                            syst_jesr.SetPointEYlow(m-1,new_e)                        
         #
         # Calculate the systematic band for a ratio plot
         #
         x1=ROOT.Double()
         y1=ROOT.Double()
+        syst_jesr_ratio=None
+        if syst_jesr:
+            syst_jesr_ratio = syst_ratio.Clone()        
         for i in range(0,self.bkg_sum.GetNbinsX()):
             syst_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             syst_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+            if syst_jesr_ratio:
+                syst_jesr_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+                syst_jesr_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+
+
         for j in range(1,tot_bkg.GetNbinsX()+1):
             # Set Y value to 1
             syst_ratio.GetPoint(j-1,x1,y1)
             syst_ratio.SetPoint(j-1,x1,1.0)
+            if syst_jesr_ratio:
+                syst_jesr_ratio.SetPoint(j-1,x1,1.0)
             val=tot_bkg.GetBinContent(j)
             if val==0.0:
                 continue
@@ -1941,9 +1975,15 @@ class DrawStack:
             eyd=syst.GetErrorYlow    (j-1)/val
             syst_ratio.SetPointEYhigh(j-1,eyu)
             syst_ratio.SetPointEYlow (j-1,eyd)
+            # JES
+            if syst_jesr_ratio:
+                eyu=syst_jesr.GetErrorYhigh   (j-1)/val
+                eyd=syst_jesr.GetErrorYlow    (j-1)/val
+                syst_jesr_ratio.SetPointEYhigh(j-1,eyu)
+                syst_jesr_ratio.SetPointEYlow (j-1,eyd)           
             #print 'err up: ',eyu,' down: ',eyd
 
-        return
+        return syst_jesr_ratio
 
     def CreateStack(self):
         self.stack   = ROOT.THStack(self.name, self.name)
@@ -2279,9 +2319,9 @@ def main():
     #
     #bkgs = ['zewk', 'zqcd','wewk','wqcd','top1','top2']
     if options.madgraph:
-        bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv']#,'zldy'
+        bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
