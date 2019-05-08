@@ -33,124 +33,124 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
 				  hZPowMCIDQCD(0),
-				  hqgTagPerf(0),
-				  hqgTagNTrack(0),
-				  hqgTagTrackWidth(0),
-				  hqgTagSum(0),
-				  hQGTaggerSim(0),
-				  hQGTaggerSimLog(0),
-				  hQGTaggerSimLin(0),
-				  hnTrackCut0(0),
-				  hnTrackCut1(0),
-				  hTrackWidthCut0(0),
-				  hTrackWidthCut1(0),
-				  hnTrackCutSum(0),
-				  hTrackWidthCutSum(0),
-				  hnTrackSum(0),
-				  hTrackWidthSum(0),
-				  hjetNTracks025(0),
-				  hjetNTracks125(0),
-				  hjetTrackWidth025(0),
-				  hjetTrackWidth125(0),
-				  hjetNTracks021(0),
-				  hjetNTracks121(0),
-				  hjetTrackWidth021(0),
-				  hjetTrackWidth121(0),
-				  hjetNTracks02125(0),
-				  hjetNTracks12125(0),
-				  hjetTrackWidth02125(0),
-				  hjetTrackWidth12125(0),
-				  hjetNTrackPT(0),
-				  hjetNTrackPTq(0),
-				  hjetNTrackPTg(0),
-				  hjetNTrackPTpu(0)
+				  hqgtagperf(0),
+				  hqgtagntrack(0),
+				  hqgtagtrackwidth(0),
+				  hqgtagsum(0),
+				  hqgtaggersim(0),
+				  hqgtaggersimlog(0),
+				  hqgtaggersimlin(0),
+				  hntrackcut0(0),
+				  hntrackcut1(0),
+				  htrackwidthcut0(0),
+				  htrackwidthcut1(0),
+				  hntrackcutsum(0),
+				  htrackwidthcutsum(0),
+				  hntracksum(0),
+				  htrackwidthsum(0),
+				  hjetntracks025(0),
+				  hjetntracks125(0),
+				  hjettrackwidth025(0),
+				  hjettrackwidth125(0),
+				  hjetntracks021(0),
+				  hjetntracks121(0),
+				  hjettrackwidth021(0),
+				  hjettrackwidth121(0),
+				  hjetntracks02125(0),
+				  hjetntracks12125(0),
+				  hjettrackwidth02125(0),
+				  hjettrackwidth12125(0),
+				  hjetntrackpt(0),
+				  hjetntrackptq(0),
+				  hjetntrackptg(0),
+				  hjetntrackptpu(0)
 
 {
 }
 
 //-----------------------------------------------------------------------------
-Msl::PlotEvent::~PlotEvent()
+msl::plotevent::~plotevent()
 {
 }
 
 //-----------------------------------------------------------------------------
-void Msl::PlotEvent::DoConf(const Registry &reg)
+void msl::plotevent::doconf(const registry &reg)
 {
   //
-  // Read self-configuration
+  // read self-configuration
   //
-  IExecAlg::DoConf(reg);
+  iexecalg::doconf(reg);
 
-  reg.Get("PlotEvent::NBin",      fNBin      = 50);
-  reg.Get("PlotEvent::NBinLim",   fNBinLim   =  0);
-  reg.Get("PlotEvent::DetailLvl", fDetailLvl =  0);
+  reg.get("plotevent::nbin",      fnbin      = 50);
+  reg.get("plotevent::nbinlim",   fnbinlim   =  0);
+  reg.get("plotevent::detaillvl", fdetaillvl =  0);
 
-  reg.Get("PlotEvent::SelKey" , fSelKey);
-  reg.Get("PlotEvent::Region" , fRegion);
-  reg.Get("PlotEvent::VarPref", fVarPref);
+  reg.get("plotevent::selkey" , fselkey);
+  reg.get("plotevent::region" , fregion);
+  reg.get("plotevent::varpref", fvarpref);
 
-  fVarVec =  Mva::ReadVars(reg, "PlotEvent::VarVec", GetAlgName());
-  reg.Get("PlotEvent::NBinVec", fNBinVec);  
-  reg.Get("PlotEvent::LoVec",   fLoVec);  
-  reg.Get("PlotEvent::HiVec",   fHiVec);  
-
-  //
-  // Read configuration for selecting MC samples
-  //
-  fSample.FillSample(reg, "PlotEvent::Samples");
+  fvarvec =  mva::readvars(reg, "plotevent::varvec", getalgname());
+  reg.get("plotevent::nbinvec", fnbinvec);  
+  reg.get("plotevent::lovec",   flovec);  
+  reg.get("plotevent::hivec",   fhivec);  
 
   //
-  // Convert string keys to Mva::Key enum values
+  // read configuration for selecting mc samples
   //
-  fVars = Mva::ReadVars(reg, "PlotEvent::Vars", fName);
+  fsample.fillsample(reg, "plotevent::samples");
 
   //
-  // Created histograms
+  // convert string keys to mva::key enum values
   //
-  hTruthMuPt   = GetTH1("truthMuPt",    50,  0.0,   100.0);
-  hTruthMuEta  = GetTH1("truthMuEta",   45,  -4.5,   4.5);  
-  hBaseMuPt    = GetTH1("baseMuPt",    50,  0.0,   100.0);
-  hBaseMuEta   = GetTH1("baseMuEta",   45,  -4.5,   4.5);
-  hTruthElPt   = GetTH1("truthElPt",    50,  0.0,   100.0);
-  hTruthElEta  = GetTH1("truthElEta",   45,  -4.5,   4.5);  
-  hBaseElPt    = GetTH1("baseElPt",    50,  0.0,   100.0);
-  hBaseElEta   = GetTH1("baseElEta",   45,  -4.5,   4.5);
-  hTruthTauPt  = GetTH1("truthTauPt",    50,  0.0,   100.0);
-  hTruthTauDR  = GetTH1("truthTauDR",    100,  0.0,   10.0);
-  hTruthTauEta = GetTH1("truthTauEta",   45,  -4.5,   4.5);
-  hminDRLep = GetTH1("minDRLep",   60,  0.0,   6.0);
-  hptvarcone20  = GetTH1("ptvarcone20",   12,  -0.2,   1.0);  
-  hptvarcone30  = GetTH1("ptvarcone30",   12,  -0.2,   1.0);  
-  htopoetcone20 = GetTH1("topoetcone20",  12,  -0.2,   1.0);  
+  fvars = mva::readvars(reg, "plotevent::vars", fname);
+
+  //
+  // created histograms
+  //
+  htruthmupt   = getth1("truthmupt",    50,  0.0,   100.0);
+  htruthmueta  = getth1("truthmueta",   45,  -4.5,   4.5);  
+  hbasemupt    = getth1("basemupt",    50,  0.0,   100.0);
+  hbasemueta   = getth1("basemueta",   45,  -4.5,   4.5);
+  htruthelpt   = getth1("truthelpt",    50,  0.0,   100.0);
+  htrutheleta  = getth1("trutheleta",   45,  -4.5,   4.5);  
+  hbaseelpt    = getth1("baseelpt",    50,  0.0,   100.0);
+  hbaseeleta   = getth1("baseeleta",   45,  -4.5,   4.5);
+  htruthtaupt  = getth1("truthtaupt",    50,  0.0,   100.0);
+  htruthtaudr  = getth1("truthtaudr",    100,  0.0,   10.0);
+  htruthtaueta = getth1("truthtaueta",   45,  -4.5,   4.5);
+  hmindrlep = getth1("mindrlep",   60,  0.0,   6.0);
+  hptvarcone20  = getth1("ptvarcone20",   12,  -0.2,   1.0);  
+  hptvarcone30  = getth1("ptvarcone30",   12,  -0.2,   1.0);  
+  htopoetcone20 = getth1("topoetcone20",  12,  -0.2,   1.0);  
   
   // extra vars
-  hmj34             = GetTH1("mj34",             50,  0.0,   1000.0);		  
-  hmax_j_eta        = GetTH1("max_j_eta",        45,  0.0,   4.5);    	  
-  hdRj1             = GetTH1("dRj1",             20,  0.0,   10.0);		  
-  hdRj2             = GetTH1("dRj2",             20,  0.0,   10.0);		  
-  hminDR            = GetTH1("minDR",            20,  0.0,  10.0);		  
-  hmj1              = GetTH1("mj1",              50,  0.0,   2000.0);		  
-  hmj2              = GetTH1("mj2",              50,  0.0,   2000.0);		  
-  hminDRmj2         = GetTH1("minDRmj2",         50,  0.0,   2000.0);    	  
-  hmin_mj3          = GetTH1("min_mj3",          50,  0.0,   2000.0);	  
-  hmin_mj3_over_mjj = GetTH1("min_mj3_over_mjj", 25,  0.0,   1.0);
-  hcentrality       = GetTH1("centrality",       25,  0.0,   1.0);
-  hj3Pt             = GetTH1("j3Pt",             20,  0.0,   200.0);
-  hj3Eta            = GetTH1("j3Eta",            22,  -4.5,  4.5);
-  hj3Jvt            = GetTH1("j3Jvt",            12,  -0.2,  1.0);
-  hj3FJvt           = GetTH1("j3FJvt",           22,  -0.2,  2.0);
+  hmj34             = getth1("mj34",             50,  0.0,   1000.0);		  
+  hmax_j_eta        = getth1("max_j_eta",        45,  0.0,   4.5);    	  
+  hdrj1             = getth1("drj1",             20,  0.0,   10.0);		  
+  hdrj2             = getth1("drj2",             20,  0.0,   10.0);		  
+  hmindr            = getth1("mindr",            20,  0.0,  10.0);		  
+  hmj1              = getth1("mj1",              50,  0.0,   2000.0);		  
+  hmj2              = getth1("mj2",              50,  0.0,   2000.0);		  
+  hmindrmj2         = getth1("mindrmj2",         50,  0.0,   2000.0);    	  
+  hmin_mj3          = getth1("min_mj3",          50,  0.0,   2000.0);	  
+  hmin_mj3_over_mjj = getth1("min_mj3_over_mjj", 25,  0.0,   1.0);
+  hcentrality       = getth1("centrality",       25,  0.0,   1.0);
+  hj3pt             = getth1("j3pt",             20,  0.0,   200.0);
+  hj3eta            = getth1("j3eta",            22,  -4.5,  4.5);
+  hj3jvt            = getth1("j3jvt",            12,  -0.2,  1.0);
+  hj3fjvt           = getth1("j3fjvt",           22,  -0.2,  2.0);
 
-  hmuDR           = GetTH1("muDR",           25,  0.0,  5.0);
-  hmuEta          = GetTH1("muEta",          30,  0.0,  3.0);    
+  hmudr           = getth1("mudr",           25,  0.0,  5.0);
+  hmueta          = getth1("mueta",          30,  0.0,  3.0);    
   
-  hZMCIDQCD    = GetTH1("ZMCIDQCD",     100,  364099.5,364199.5);
-  hWMCIDQCD    = GetTH1("WMCIDQCD",     100,  364155.5,364255.5);
-  hZMadMCIDQCD = GetTH1("ZMadMCIDQCD",  10,  361509.5,361519.5);
-  hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 100, 363122.5,363222.5);  
-  hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
-  hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
+  hzmcidqcd    = getth1("zmcidqcd",     100,  364099.5,364199.5);
+  hwmcidqcd    = getth1("wmcidqcd",     100,  364155.5,364255.5);
+  hzmadmcidqcd = getth1("zmadmcidqcd",  10,  361509.5,361519.5);
+  hzmad2mcidqcd= getth1("zmad2mcidqcd", 100, 363122.5,363222.5);  
+  hwmadmcidqcd = getth1("wmadmcidqcd",  74,  363599.5,363673.5);
+  hzpowmcidqcd = getth1("zpowmcidqcd",  19,  301019.5,301038.5);  
 
-  hqgTagPerf = GetTH1("qgTagPerf",  9,  0.0, 9.0);  
+  hqgtagperf = getth1("qgtagperf",  9,  0.0, 9.0);  
   hqgTagNTrack = GetTH1("qgTagNTrack",  15,  0.0, 15.0);  
   hqgTagTrackWidth = GetTH1("qgTagTrackWidth",  13,  0.0, 13.0);  
   hqgTagSum = GetTH1("qgTagSum",  13,  0.0, 13.0);  
@@ -281,6 +281,11 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
   //jetNTrackPT - 2D histogram for central jets NTrack vs pT
   float forw=2.5;
+  bool isCentral0=true;
+  bool isCentral1=true;
+  if(event.jets.at(0).eta<-forw or forw<event.jets.at(0).eta) isCentral0=false;
+  if(event.jets.at(1).eta<-forw or forw<event.jets.at(1).eta) isCentral1=false;
+
 
   for(int jet=0; jet<2;++jet){
     if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==0){
@@ -299,13 +304,20 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
   //for qgTagPerf
   hqgTagPerf->Fill(1.0,weight);
-  if(event.GetVar(Mva::passPerfCTagging)==2) hqgTagPerf->Fill(6.0, weight);
-  else hqgTagPerf->Fill(7.0,weight);
-  if(event.GetVar(Mva::passPerfFTagging)==2) hqgTagPerf->Fill(4.0, weight);
-  else hqgTagPerf->Fill(5.0,weight);
-  if(event.GetVar(Mva::jj_nmbGluons)==0) hqgTagPerf->Fill(2.0, weight);
-  else hqgTagPerf->Fill(3.0,weight);
+  bool isQuark0=true;
+  bool isQuark1=true;
+  if(event.GetVar(Mva::jetPartonTruthLabelID0)==21 or event.GetVar(Mva::jetPartonTruthLabelID0)==0) isQuark0=false;
+  if(event.GetVar(Mva::jetPartonTruthLabelID1)==21 or event.GetVar(Mva::jetPartonTruthLabelID1)==0) isQuark1=false;
 
+  if(isQuark0 and isQuark1) hqgTagPerf->Fill(2.0,weight);
+  else hqgTagPerf->Fill(3.0,weight);
+  
+  if(((not isCentral0 and isQuark0) or isCentral0)and((not isCentral1 and isQuark1) or isCentral1)) hqgTagPerf->Fill(4.0,weight);
+  else hqgTagPerf->Fill(5.0,weight);
+
+  if(((isCentral0 and isQuark0) or not isCentral0)and((isCentral1 and isQuark1) or not isCentral1)) hqgTagPerf->Fill(6.0,weight);
+  else hqgTagPerf->Fill(7.0,weight);
+ 
   hqgTagPerf->GetXaxis()->SetBinLabel(1," ");
   hqgTagPerf->GetXaxis()->SetBinLabel(2,"No Tagging");
   hqgTagPerf->GetXaxis()->SetBinLabel(3,"Full Tagging");
@@ -319,34 +331,34 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
   //qgTagNTrack
   hqgTagNTrack->Fill(1.0,weight);
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<3)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<3)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(2.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<3)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<3)or not isCentral1) hqgTagNTrack->Fill(2.0,weight);
     else hqgTagNTrack->Fill(3.0,weight);
   }
   else hqgTagNTrack->Fill(3.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<5)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<5)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(4.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<5)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<5)or not isCentral1) hqgTagNTrack->Fill(4.0,weight);
     else hqgTagNTrack->Fill(5.0,weight);
   }
   else hqgTagNTrack->Fill(5.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<5)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw) hqgTagNTrack->Fill(6.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<5)or not isCentral0) hqgTagNTrack->Fill(6.0,weight);
   else hqgTagNTrack->Fill(7.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<10)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<10)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(8.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<10)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<10)or not isCentral1) hqgTagNTrack->Fill(8.0,weight);
     else hqgTagNTrack->Fill(9.0,weight);
   }
   else hqgTagNTrack->Fill(9.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<12)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<12)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagNTrack->Fill(10.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<12)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<12)or not isCentral1) hqgTagNTrack->Fill(10.0,weight);
     else hqgTagNTrack->Fill(11.0,weight);
   }
   else hqgTagNTrack->Fill(11.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<12)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw) hqgTagNTrack->Fill(12.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<12)or not isCentral0) hqgTagNTrack->Fill(12.0,weight);
   else hqgTagNTrack->Fill(13.0,weight);
 
   hqgTagNTrack->GetXaxis()->SetBinLabel(1," ");
@@ -368,29 +380,29 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //qgTagTrackWidth
   hqgTagTrackWidth->Fill(1.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.05)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.05)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(2.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetTrackWidth0)<0.05)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetTrackWidth1)<0.05)or not isCentral1) hqgTagTrackWidth->Fill(2.0,weight);
     else hqgTagTrackWidth->Fill(3.0,weight);
   }
   else hqgTagTrackWidth->Fill(3.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.08)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.08)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(4.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetTrackWidth0)<0.08)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetTrackWidth1)<0.08)or not isCentral1) hqgTagTrackWidth->Fill(4.0,weight);
     else hqgTagTrackWidth->Fill(5.0,weight);
   }
   else hqgTagTrackWidth->Fill(5.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.08)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw)hqgTagTrackWidth->Fill(6.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetTrackWidth0)<0.08)or not isCentral0)hqgTagTrackWidth->Fill(6.0,weight);
   else hqgTagTrackWidth->Fill(7.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.1)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.1)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(8.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetTrackWidth0)<0.1)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetTrackWidth1)<0.1)or not isCentral1) hqgTagTrackWidth->Fill(8.0,weight);
     else hqgTagTrackWidth->Fill(9.0,weight);
   }
   else hqgTagTrackWidth->Fill(9.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetTrackWidth0)<0.18)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetTrackWidth1)<0.18)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hqgTagTrackWidth->Fill(10.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetTrackWidth0)<0.18)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetTrackWidth1)<0.18)or not isCentral1) hqgTagTrackWidth->Fill(10.0,weight);
     else hqgTagTrackWidth->Fill(11.0,weight);
   }
   else hqgTagTrackWidth->Fill(11.0,weight);
@@ -450,14 +462,14 @@ bool Msl::PlotEvent::DoExec(Event &event)
   float log1 = (slope*TMath::Log10(event.jets.at(1).pt*1000))+intercept;
 
   hQGTaggerSim->Fill(1.0,weight);
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<lin0)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<lin1)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSim->Fill(2.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<lin0)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<lin1)or not isCentral1) hQGTaggerSim->Fill(2.0,weight);
     else hQGTaggerSim->Fill(3.0,weight);
   }
   else hQGTaggerSim->Fill(3.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<log0)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<log1)|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSim->Fill(4.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<log0)or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<log1)or not isCentral1) hQGTaggerSim->Fill(4.0,weight);
     else hQGTaggerSim->Fill(5.0,weight);
   }
   else hQGTaggerSim->Fill(5.0,weight);
@@ -473,41 +485,42 @@ bool Msl::PlotEvent::DoExec(Event &event)
   float log10pt1 = TMath::Log10(event.jets.at(1).pt*1000);
 
   hQGTaggerSimLog->Fill(1.0,weight);
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(7*log10pt0-20))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(7*log10pt1-20))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(2.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(7*log10pt0-20))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(7*log10pt1-20))or not isCentral1) hQGTaggerSimLog->Fill(2.0,weight);
     else hQGTaggerSimLog->Fill(3.0,weight);
   }
   else hQGTaggerSimLog->Fill(3.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(8*log10pt0-25))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(8*log10pt1-25))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(4.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(8*log10pt0-25))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(8*log10pt1-25))or not isCentral1) hQGTaggerSimLog->Fill(4.0,weight);
     else hQGTaggerSimLog->Fill(5.0,weight);
   }
   else hQGTaggerSimLog->Fill(5.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(9*log10pt0-30))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(9*log10pt1-30))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(6.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(9*log10pt0-30))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(9*log10pt1-30))or not isCentral1) hQGTaggerSimLog->Fill(6.0,weight);
     else hQGTaggerSimLog->Fill(7.0,weight);
   }
   else hQGTaggerSimLog->Fill(7.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(10*log10pt0-35))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(10*log10pt1-35))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(8.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(10*log10pt0-35))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(10*log10pt1-35))or not isCentral1) hQGTaggerSimLog->Fill(8.0,weight);
     else hQGTaggerSimLog->Fill(9.0,weight);
   }
   else hQGTaggerSimLog->Fill(9.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(11*log10pt0-40))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(11*log10pt1-40))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(10.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(11*log10pt0-40))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(11*log10pt1-40))or not isCentral1) hQGTaggerSimLog->Fill(10.0,weight);
     else hQGTaggerSimLog->Fill(11.0,weight);
   }
   else hQGTaggerSimLog->Fill(11.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(12*log10pt0-45))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(12*log10pt1-45))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(12.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(12*log10pt0-45))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(12*log10pt1-45))or not isCentral1) hQGTaggerSimLog->Fill(12.0,weight);
     else hQGTaggerSimLog->Fill(13.0,weight);
   }
   else hQGTaggerSimLog->Fill(13.0,weight);
+
 
   hQGTaggerSimLog->GetXaxis()->SetBinLabel(1," ");
   hQGTaggerSimLog->GetXaxis()->SetBinLabel(2,"No Tagging");
@@ -528,41 +541,42 @@ bool Msl::PlotEvent::DoExec(Event &event)
   float pt1 = event.jets.at(1).pt*1000;
 
   hQGTaggerSimLin->Fill(1.0,weight);
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00006*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00006*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(2.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(0.00006*pt0+5))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(0.00006*pt1+5))or not isCentral1) hQGTaggerSimLin->Fill(2.0,weight);
     else hQGTaggerSimLin->Fill(3.0,weight);
   }
   else hQGTaggerSimLin->Fill(3.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00008*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00008*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(4.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(0.00008*pt0+5))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(0.00008*pt1+5))or not isCentral1) hQGTaggerSimLin->Fill(4.0,weight);
     else hQGTaggerSimLin->Fill(5.0,weight);
   }
   else hQGTaggerSimLin->Fill(5.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00009*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00009*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(6.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(0.00009*pt0+5))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(0.00009*pt1+5))or not isCentral1) hQGTaggerSimLin->Fill(6.0,weight);
     else hQGTaggerSimLin->Fill(7.0,weight);
   }
   else hQGTaggerSimLin->Fill(7.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.0001*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.0001*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(8.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(0.0001*pt0+5))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(0.0001*pt1+5))or not isCentral1) hQGTaggerSimLin->Fill(8.0,weight);
     else hQGTaggerSimLin->Fill(9.0,weight);
   }
   else hQGTaggerSimLin->Fill(9.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00011*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00011*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(10.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(0.00011*pt0+5))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(0.00011*pt1+5))or not isCentral1) hQGTaggerSimLin->Fill(10.0,weight);
     else hQGTaggerSimLin->Fill(11.0,weight);
   }
   else hQGTaggerSimLin->Fill(11.0,weight);
 
-  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00012*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
-    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00012*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(12.0,weight);
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(0.00012*pt0+5))or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(0.00012*pt1+5))or not isCentral1) hQGTaggerSimLin->Fill(12.0,weight);
     else hQGTaggerSimLin->Fill(13.0,weight);
   }
   else hQGTaggerSimLin->Fill(13.0,weight);
+
 
   hQGTaggerSimLin->GetXaxis()->SetBinLabel(1," ");
   hQGTaggerSimLin->GetXaxis()->SetBinLabel(2,"No Tagging");
