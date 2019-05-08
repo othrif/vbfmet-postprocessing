@@ -10,16 +10,34 @@ import os
 import sys
 import ROOT
 import math
+import pickle
 import VBFAnalysis.ATLAS as ATLAS
 import VBFAnalysis.Style as Style
 from optparse import OptionParser
-import VBFAnalysis.systematics as vbf_syst
-#import HInvPlot.systematics as vbf_syst
+#import VBFAnalysis.systematics as vbf_syst
+import HInvPlot.systematics as vbf_syst
 
 import numpy as np
 
 from collections import OrderedDict
 
+def LoadPickleFiles(dir_name):
+
+    if not os.path.exists(dir_name):
+        print 'Pickle directory does not exist'
+        sys.exit(0)
+    fnames=[]
+    for f in os.listdir(dir_name):
+        if f.count('pickle'):
+            fnames+=[dir_name.rstrip('/')+'/'+f]
+        
+    print 'Loaded post fit files:',fnames
+
+    fpickles = []
+    for f in fnames:
+        fpickles+=[pickle.load(open(f,'rb'))]
+    return fpickles
+    
 def addContent(hist, nbin, content, error):
     newE=math.sqrt(hist.GetBinError(nbin)**2+error**2)
     newC=hist.GetBinContent(nbin)+content
@@ -607,7 +625,33 @@ def main(options):
                 print key, "could not be identified correctly! BinContent will be added to Others"
                 addContent(hDict["Others"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
 
-
+    postFitPickles=None
+    if options.postFitPickleDir!=None:
+        hist_array_keys = [i.GetName() for i in hists]
+        postFitPickles = LoadPickleFiles(options.postFitPickleDir)
+        for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
+            pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
+            for pickle_key in fpickle.keys():
+                if not ('Fitted_events_' in pickle_key): # only process the fitted events here
+                    continue
+                #if ('Fitted_events_VBFH' in pickle_key): # skip signal
+                #    continue
+                pickle_key_remFit = pickle_key[len('Fitted_events_'):]
+                m=0
+                for i in hist_array_keys:                    
+                    if i in pickle_key_remFit:
+                        break
+                    m+=1
+                if m>=len(hists):
+                    print 'Post fit - could not find (fine if signal): ',pickle_key
+                    continue
+                histToSet = hists[m]
+                #print 'check',regDict['oneEleNegCR1'] #+'_cuts' need to strip '_cuts'
+                ireg=0
+                for iname in pickle_region_names:
+                    histToSet.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg])
+                    ireg+=1
+                
     #defining bkg hist
     bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","eleFakes","multijet"]+["Others"]
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*9,0,nbins*9)
@@ -620,7 +664,7 @@ def main(options):
     if not options.show_mc_stat_err:
         for i in range(0,hDict["bkgs"].GetNbinsX()):
             hDict["bkgs"].SetBinError(i,0.0)
-            
+
     hStack=ROOT.THStack()
     for h in hists:
         hStack.Add(h)
@@ -650,7 +694,7 @@ def main(options):
     for i in range(0,systHist.GetNbinsX()):
         systHistAsym.SetPointEXhigh(i-1,systHist.GetXaxis().GetBinWidth(i)/2.0)
         systHistAsym.SetPointEXlow(i-1,systHist.GetXaxis().GetBinWidth(i)/2.0)
-
+        
     if not options.syst=="":
         tmpSys=vbf_syst.systematics(options.syst)
         print "Calculating systematic variations for %s systematics. This could take a while..."%options.syst
@@ -723,6 +767,34 @@ def main(options):
     else:
         systHist.SetTitle("MC stat")
 
+    # adding the post fit errors. these should include the mc stat uncertainties
+    if postFitPickles!=None:
+        for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
+            pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
+            for pickle_key in fpickle.keys():
+                if not ('Fitted_err_' in pickle_key): # only process the fitted events here
+                    continue
+                pickle_key_remFit = pickle_key[len('Fitted_err_'):]
+                m=0
+                for i in hist_array_keys:                    
+                    if i in pickle_key_remFit:
+                        break
+                    m+=1
+                if m>=len(hists):
+                    print 'Post fit syst band - could not find (fine if signal): ',pickle_key
+                    continue
+                histToSet = hists[m]
+                ireg=0
+                #print fpickle[pickle_key]
+                for iname in pickle_region_names:
+                    ey_low=systHistAsym.GetErrorYlow(regDict[iname.rstrip('_cuts')]-1)
+                    ey_new = fpickle[pickle_key][ireg]
+                    e_new = math.sqrt(ey_low*ey_low+ey_new*ey_new)
+                    #print 'e_new:',e_new
+                    systHistAsym.SetPointEYlow(regDict[iname.rstrip('_cuts')]-1,e_new)
+                    systHistAsym.SetPointEYhigh(regDict[iname.rstrip('_cuts')]-1,e_new)
+                    ireg+=1
+        
     ROOT.gStyle.SetErrorX(0.5)
     fillStyle = 3004 # was 3018
     Style.setStyles(systHist,[0,0,0,1,fillStyle,0,0,0])
@@ -748,7 +820,7 @@ def main(options):
         can.cd(2)
         rHist=data.Clone("ratioHist")
         rbkgs = hDict["bkgsStat"].Clone()
-        if options.show_mc_stat_err:
+        if options.show_mc_stat_err or options.postFitPickleDir!=None: # removing mc stat unc.
             for i in range(0,rbkgs.GetNbinsX()+1):
                 rbkgs.SetBinError(i,0.0)
         
@@ -770,7 +842,7 @@ def main(options):
 
         rHist.Draw()
         line1.Draw("histsame")
-        if options.show_mc_stat_err or options.syst!="":
+        if options.show_mc_stat_err or options.syst!="" or options.postFitPickleDir!=None:
             if options.show_mc_stat_err:
                 bkgs = hDict["bkgsStat"].Clone() # this only holds the MC stat uncertainty
             for i in range(0,rbkgs.GetNbinsX()+1):
@@ -812,15 +884,16 @@ def main(options):
     blindStr=""
     if not options.unBlindSR:
         blindStr=", SR blinded"
-    preFitLabel=ROOT.TLatex(.5,.86,"Pre-Fit"+blindStr)
+    namingScheme="Pre-Fit"
+    if options.postFitPickleDir!=None:
+        namingScheme="Post-Fit"
+    preFitLabel=ROOT.TLatex(.5,.86,namingScheme+blindStr)
     preFitLabel.SetNDC()
     preFitLabel.SetTextFont(72)
     preFitLabel.SetTextSize(0.055)
     preFitLabel.SetTextAlign(11)    
     preFitLabel.SetTextColor(ROOT.kBlack)
     preFitLabel.Draw()
-
-
 
     can.Modified()
     can.Update()
@@ -896,8 +969,6 @@ def compareMain(options):
     dummyHist.SetStats(0)
     for k in HistClass.regDict:
         dummyHist.GetXaxis().SetBinLabel(HistClass.regDict[k],k)
-
-
 
     for p in histDict[0]:
         colmNames=[k for k in HistClass.regDict]
@@ -1023,7 +1094,6 @@ def compareMain(options):
             c1.SaveAs(("preFitCompare{}".format(p)+"."+options.saveAs).replace("/","_"))
 
 
-
 def plotVar(options):
     if options.quite:
         ROOT.gROOT.SetBatch(True)
@@ -1058,9 +1128,6 @@ def plotVar(options):
         for h in sorted(sigDict.values()): #TODO this sorting does not work. implement lambda
             signal.Add(h)
 
-
-
-        
         if hObj.isBkg():
             key=hObj.proc
             if not ("W" in key or "Z" in key):
@@ -1071,6 +1138,7 @@ def plotVar(options):
                 bkgDict[key]=hObj.hist.Clone(key)
                 bkgDict[key].SetTitle(key)
                 Style.setStyles(bkgDict[key], Style.styleDict[key])
+                
         bkg=ROOT.THStack()
         for h in sorted(bkgDict.values()): #TODO this sorting does not work. implement lambda
             bkg.Add(h)
@@ -1170,8 +1238,6 @@ def plotVar(options):
         can.SaveAs(options.plot.replace(",","_")+"."+options.saveAs)
     del can
 
-
-
 if __name__=='__main__':
     p = OptionParser()
 
@@ -1188,11 +1254,9 @@ if __name__=='__main__':
     p.add_option('--saveAs', type='string', help='Saves the canvas in a given format. example argument: pdf')
     p.add_option('-q', '--quite', action='store_true', help='activates Batch mode')
     p.add_option('--texTables', action='store_true', help='Saves tables as pdf. Only works together with --yieldTable')
+    p.add_option('--postFitPickleDir', type='string', default=None, help='Directory of post fit yields pickle files. expects the files end in .pickle')    
     p.add_option('--show-mc-stat-err', action='store_true',  dest='show_mc_stat_err', help='Shows the MC stat uncertainties separately from the data ratio error')    
-
-
     p.add_option('--plot', default='', help='Plots a variable in a certain region. HFInputAlg.cxx produces these plots with the --doPlot flag . Only works with -i and not with -c. example: jj_mass,SR,1_2_3')
-
 
     for option in p.option_list:
         if option.default != ("NO", "DEFAULT"):
