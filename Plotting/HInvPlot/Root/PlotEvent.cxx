@@ -38,6 +38,8 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hqgTagTrackWidth(0),
 				  hqgTagSum(0),
 				  hQGTaggerSim(0),
+				  hQGTaggerSimLog(0),
+				  hQGTaggerSimLin(0),
 				  hnTrackCut0(0),
 				  hnTrackCut1(0),
 				  hTrackWidthCut0(0),
@@ -152,6 +154,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hqgTagTrackWidth = GetTH1("qgTagTrackWidth",  13,  0.0, 13.0);  
   hqgTagSum = GetTH1("qgTagSum",  13,  0.0, 13.0);  
   hQGTaggerSim = GetTH1("qgTaggerSim",  7,  0.0, 7.0);  
+  hQGTaggerSimLog = GetTH1("qgTaggerSimLog",  15,  0.0, 15.0);  
+  hQGTaggerSimLin = GetTH1("qgTaggerSimLin",  15,  0.0, 15.0);  
   hnTrackCut0 = GetTH1("nTrackCut0",  40,  0.0, 40.0);  
   hnTrackCut1 = GetTH1("nTrackCut1",  40,  0.0, 40.0);  
   hTrackWidthCut0 = GetTH1("TrackWidthCut0",  80,  0.0, 0.4);  
@@ -433,12 +437,13 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hqgTagSum->GetXaxis()->SetBinLabel(12,"Fail TrackWidthSum<0.1");
 
   //QGTaggerSim - values/method taken from defaults in Reconstruction/Jet/BoostedJetTaggers for JetQGTagger
+  //use pT in MeV
   float slope=9.779;
   float intercept=-32.28;
-  float lin0 = (slope*event.jets.at(0).pt)+intercept;
-  float lin1 = (slope*event.jets.at(1).pt)+intercept;
-  float log0 = (slope*TMath::Log10(event.jets.at(0).pt))+intercept;
-  float log1 = (slope*TMath::Log10(event.jets.at(1).pt))+intercept;
+  float lin0 = (slope*event.jets.at(0).pt*1000)+intercept;
+  float lin1 = (slope*event.jets.at(1).pt*1000)+intercept;
+  float log0 = (slope*TMath::Log10(event.jets.at(0).pt*1000))+intercept;
+  float log1 = (slope*TMath::Log10(event.jets.at(1).pt*1000))+intercept;
 
   hQGTaggerSim->Fill(1.0,weight);
   if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<lin0)|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
@@ -460,8 +465,119 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hQGTaggerSim->GetXaxis()->SetBinLabel(5,"Default log_pt");
   hQGTaggerSim->GetXaxis()->SetBinLabel(6,"Fail Default log_pt");
 
+  float log10pt0 = TMath::Log10(event.jets.at(0).pt*1000);
+  float log10pt1 = TMath::Log10(event.jets.at(1).pt*1000);
+
+  hQGTaggerSimLog->Fill(1.0,weight);
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(7*log10pt0-20))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(7*log10pt1-20))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(2.0,weight);
+    else hQGTaggerSimLog->Fill(3.0,weight);
+  }
+  else hQGTaggerSimLog->Fill(3.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(8*log10pt0-25))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(8*log10pt1-25))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(4.0,weight);
+    else hQGTaggerSimLog->Fill(5.0,weight);
+  }
+  else hQGTaggerSimLog->Fill(5.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(9*log10pt0-30))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(9*log10pt1-30))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(6.0,weight);
+    else hQGTaggerSimLog->Fill(7.0,weight);
+  }
+  else hQGTaggerSimLog->Fill(7.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(10*log10pt0-35))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(10*log10pt1-35))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(8.0,weight);
+    else hQGTaggerSimLog->Fill(9.0,weight);
+  }
+  else hQGTaggerSimLog->Fill(9.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(11*log10pt0-40))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(11*log10pt1-40))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(10.0,weight);
+    else hQGTaggerSimLog->Fill(11.0,weight);
+  }
+  else hQGTaggerSimLog->Fill(11.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(12*log10pt0-45))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(12*log10pt1-45))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLog->Fill(12.0,weight);
+    else hQGTaggerSimLog->Fill(13.0,weight);
+  }
+  else hQGTaggerSimLog->Fill(13.0,weight);
+
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(1," ");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(2,"No Tagging");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(3,"7Log10(pT)-20");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(4,"Fail");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(5,"8Log10(pT)-25");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(6,"Fail");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(7,"9Log10(pT)-30");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(8,"Fail");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(9,"10Log10(pT)-35");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(10,"Fail");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(11,"11Log10(pT)-40");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(12,"Fail");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(13,"12Log10(pT)-45");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(14,"Fail");
+
+  float pt0 = event.jets.at(0).pt*1000;
+  float pt1 = event.jets.at(1).pt*1000;
+
+  hQGTaggerSimLin->Fill(1.0,weight);
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00006*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00006*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(2.0,weight);
+    else hQGTaggerSimLin->Fill(3.0,weight);
+  }
+  else hQGTaggerSimLin->Fill(3.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00008*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00008*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(4.0,weight);
+    else hQGTaggerSimLin->Fill(5.0,weight);
+  }
+  else hQGTaggerSimLin->Fill(5.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00009*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00009*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(6.0,weight);
+    else hQGTaggerSimLin->Fill(7.0,weight);
+  }
+  else hQGTaggerSimLin->Fill(7.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.0001*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.0001*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(8.0,weight);
+    else hQGTaggerSimLin->Fill(9.0,weight);
+  }
+  else hQGTaggerSimLin->Fill(9.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00011*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00011*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(10.0,weight);
+    else hQGTaggerSimLin->Fill(11.0,weight);
+  }
+  else hQGTaggerSimLin->Fill(11.0,weight);
+
+  if((-forw<event.jets.at(0).eta and event.jets.at(0).eta<forw and event.GetVar(Mva::jetNTracks0)<(0.00012*pt0+5))|| -forw>event.jets.at(0).eta || event.jets.at(0).eta>forw){
+    if((-forw<event.jets.at(1).eta and event.jets.at(1).eta<forw and event.GetVar(Mva::jetNTracks1)<(0.00012*pt1+5))|| -forw>event.jets.at(1).eta || event.jets.at(1).eta>forw) hQGTaggerSimLin->Fill(12.0,weight);
+    else hQGTaggerSimLin->Fill(13.0,weight);
+  }
+  else hQGTaggerSimLin->Fill(13.0,weight);
+
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(1," ");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(2,"No Tagging");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(3,"6e-5pT+5");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(4,"Fail");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(5,"8e-5pT+5");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(6,"Fail");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(7,"9e-5pT+5");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(8,"Fail");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(9,"10e-5pT+5");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(10,"Fail");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(11,"11e-5pT+5");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(12,"Fail");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(13,"12e-5pT+5");
+  hQGTaggerSimLin->GetXaxis()->SetBinLabel(14,"Fail");
 
 
+
+  //QG variable distributions with eta requirements
   for(int cut=0; cut<40; cut++){
     if(event.GetVar(Mva::jetNTracks0)<cut) hnTrackCut0->Fill(cut,weight);
     if(event.GetVar(Mva::jetNTracks1)<cut) hnTrackCut1->Fill(cut,weight);

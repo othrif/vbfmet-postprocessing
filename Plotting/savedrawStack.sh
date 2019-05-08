@@ -1,10 +1,8 @@
 out=$1
 reg=$2
-chan=$3
-var=$4
+var=$3
 
 key1='pass_'
-key2='_allmjj_'
-key3='_Nominal'
+key2='_Nominal'
 
-python HInvPlot/macros/drawStack.py $out --vars $var --selkey "$key1$reg$key2$chan$key3" --do-ratio --atlas-style /export/home/asteinhe/atlasstyle/ --blind --do-eps --save
+python HInvPlot/macros/drawStack.py $out --vars $var --selkey "$key1$reg$key2" --do-ratio --atlas-style /export/home/asteinhe/atlasstyle/ --blind --do-pdf --do-root --save

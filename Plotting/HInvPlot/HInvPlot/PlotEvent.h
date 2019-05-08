@@ -133,6 +133,8 @@ namespace Msl
     TH1			       *hqgTagTrackWidth;
     TH1			       *hqgTagSum;
     TH1			       *hQGTaggerSim;
+    TH1			       *hQGTaggerSimLog;
+    TH1			       *hQGTaggerSimLin;
     TH1			       *hnTrackCut0;
     TH1			       *hnTrackCut1;
     TH1			       *hTrackWidthCut0;
