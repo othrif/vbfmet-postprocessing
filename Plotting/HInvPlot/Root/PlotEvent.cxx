@@ -33,124 +33,123 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
 				  hZPowMCIDQCD(0),
-				  hqgtagperf(0),
-				  hqgtagntrack(0),
-				  hqgtagtrackwidth(0),
-				  hqgtagsum(0),
-				  hqgtaggersim(0),
-				  hqgtaggersimlog(0),
-				  hqgtaggersimlin(0),
-				  hntrackcut0(0),
-				  hntrackcut1(0),
-				  htrackwidthcut0(0),
-				  htrackwidthcut1(0),
-				  hntrackcutsum(0),
-				  htrackwidthcutsum(0),
-				  hntracksum(0),
-				  htrackwidthsum(0),
-				  hjetntracks025(0),
-				  hjetntracks125(0),
-				  hjettrackwidth025(0),
-				  hjettrackwidth125(0),
-				  hjetntracks021(0),
-				  hjetntracks121(0),
-				  hjettrackwidth021(0),
-				  hjettrackwidth121(0),
-				  hjetntracks02125(0),
-				  hjetntracks12125(0),
-				  hjettrackwidth02125(0),
-				  hjettrackwidth12125(0),
-				  hjetntrackpt(0),
-				  hjetntrackptq(0),
-				  hjetntrackptg(0),
-				  hjetntrackptpu(0)
+				  hqgTagPerf(0),
+				  hqgTagNTrack(0),
+				  hqgTagTrackWidth(0),
+				  hqgTagSum(0),
+				  hQGTaggerSim(0),
+				  hQGTaggerSimLog(0),
+				  hQGTaggerSimLin(0),
+				  hnTrackCut0(0),
+				  hnTrackCut1(0),
+				  hTrackWidthCut0(0),
+				  hTrackWidthCut1(0),
+				  hnTrackCutSum(0),
+				  hTrackWidthCutSum(0),
+				  hnTrackSum(0),
+				  hTrackWidthSum(0),
+				  hjetNTracks025(0),
+				  hjetNTracks125(0),
+				  hjetTrackWidth025(0),
+				  hjetTrackWidth125(0),
+				  hjetNTracks021(0),
+				  hjetNTracks121(0),
+				  hjetTrackWidth021(0),
+				  hjetTrackWidth121(0),
+				  hjetNTracks02125(0),
+				  hjetNTracks12125(0),
+				  hjetTrackWidth02125(0),
+				  hjetTrackWidth12125(0),
+				  hjetNTrackPT(0),
+				  hjetNTrackPTq(0),
+				  hjetNTrackPTg(0),
+				  hjetNTrackPTpu(0)
 
 {
 }
 
-//-----------------------------------------------------------------------------
-msl::plotevent::~plotevent()
+//----------------------------------------------------------------------------f
+Msl::PlotEvent::~PlotEvent()
 {
 }
 
 //-----------------------------------------------------------------------------
-void msl::plotevent::doconf(const registry &reg)
+void Msl::PlotEvent::DoConf(const Registry &reg)
 {
   //
-  // read self-configuration
+  // Read self-configuration
   //
-  iexecalg::doconf(reg);
+  IExecAlg::DoConf(reg);
 
-  reg.get("plotevent::nbin",      fnbin      = 50);
-  reg.get("plotevent::nbinlim",   fnbinlim   =  0);
-  reg.get("plotevent::detaillvl", fdetaillvl =  0);
+  reg.Get("PlotEvent::NBin",      fNBin      = 50);
+  reg.Get("PlotEvent::NBinLim",   fNBinLim   =  0);
+  reg.Get("PlotEvent::DetailLvl", fDetailLvl =  0);
 
-  reg.get("plotevent::selkey" , fselkey);
-  reg.get("plotevent::region" , fregion);
-  reg.get("plotevent::varpref", fvarpref);
+  reg.Get("PlotEvent::SelKey" , fSelKey);
+  reg.Get("PlotEvent::Region" , fRegion);
+  reg.Get("PlotEvent::VarPref", fVarPref);
 
-  fvarvec =  mva::readvars(reg, "plotevent::varvec", getalgname());
-  reg.get("plotevent::nbinvec", fnbinvec);  
-  reg.get("plotevent::lovec",   flovec);  
-  reg.get("plotevent::hivec",   fhivec);  
-
-  //
-  // read configuration for selecting mc samples
-  //
-  fsample.fillsample(reg, "plotevent::samples");
+  fVarVec =  Mva::ReadVars(reg, "PlotEvent::VarVec", GetAlgName());
+  reg.Get("PlotEvent::NBinVec", fNBinVec);  
+  reg.Get("PlotEvent::LoVec",   fLoVec);  
+  reg.Get("PlotEvent::HiVec",   fHiVec);  
 
   //
-  // convert string keys to mva::key enum values
+  // Read configuration for selecting MC samples
   //
-  fvars = mva::readvars(reg, "plotevent::vars", fname);
+  fSample.FillSample(reg, "PlotEvent::Samples");
 
   //
-  // created histograms
+  // Convert string keys to Mva::Key enum values
   //
-  htruthmupt   = getth1("truthmupt",    50,  0.0,   100.0);
-  htruthmueta  = getth1("truthmueta",   45,  -4.5,   4.5);  
-  hbasemupt    = getth1("basemupt",    50,  0.0,   100.0);
-  hbasemueta   = getth1("basemueta",   45,  -4.5,   4.5);
-  htruthelpt   = getth1("truthelpt",    50,  0.0,   100.0);
-  htrutheleta  = getth1("trutheleta",   45,  -4.5,   4.5);  
-  hbaseelpt    = getth1("baseelpt",    50,  0.0,   100.0);
-  hbaseeleta   = getth1("baseeleta",   45,  -4.5,   4.5);
-  htruthtaupt  = getth1("truthtaupt",    50,  0.0,   100.0);
-  htruthtaudr  = getth1("truthtaudr",    100,  0.0,   10.0);
-  htruthtaueta = getth1("truthtaueta",   45,  -4.5,   4.5);
-  hmindrlep = getth1("mindrlep",   60,  0.0,   6.0);
-  hptvarcone20  = getth1("ptvarcone20",   12,  -0.2,   1.0);  
-  hptvarcone30  = getth1("ptvarcone30",   12,  -0.2,   1.0);  
-  htopoetcone20 = getth1("topoetcone20",  12,  -0.2,   1.0);  
+  fVars = Mva::ReadVars(reg, "PlotEvent::Vars", fName);
+
+  //
+  // Created histograms
+  //
+  hTruthMuPt   = GetTH1("truthMuPt",    50,  0.0,   100.0);
+  hTruthMuEta  = GetTH1("truthMuEta",   45,  -4.5,   4.5);  
+  hBaseMuPt    = GetTH1("baseMuPt",    50,  0.0,   100.0);
+  hBaseMuEta   = GetTH1("baseMuEta",   45,  -4.5,   4.5);
+  hTruthElPt   = GetTH1("truthElPt",    50,  0.0,   100.0);
+  hTruthElEta  = GetTH1("truthElEta",   45,  -4.5,   4.5);  
+  hBaseElPt    = GetTH1("baseElPt",    50,  0.0,   100.0);
+  hBaseElEta   = GetTH1("baseElEta",   45,  -4.5,   4.5);
+  hTruthTauPt  = GetTH1("truthTauPt",    50,  0.0,   100.0);
+  hTruthTauDR  = GetTH1("truthTauDR",    100,  0.0,   10.0);
+  hTruthTauEta = GetTH1("truthTauEta",   45,  -4.5,   4.5);
+  hminDRLep = GetTH1("minDRLep",   60,  0.0,   6.0);
+  hptvarcone20  = GetTH1("ptvarcone20",   12,  -0.2,   1.0);  
+  hptvarcone30  = GetTH1("ptvarcone30",   12,  -0.2,   1.0);  
+  htopoetcone20 = GetTH1("topoetcone20",  12,  -0.2,   1.0);  
   
   // extra vars
-  hmj34             = getth1("mj34",             50,  0.0,   1000.0);		  
-  hmax_j_eta        = getth1("max_j_eta",        45,  0.0,   4.5);    	  
-  hdrj1             = getth1("drj1",             20,  0.0,   10.0);		  
-  hdrj2             = getth1("drj2",             20,  0.0,   10.0);		  
-  hmindr            = getth1("mindr",            20,  0.0,  10.0);		  
-  hmj1              = getth1("mj1",              50,  0.0,   2000.0);		  
-  hmj2              = getth1("mj2",              50,  0.0,   2000.0);		  
-  hmindrmj2         = getth1("mindrmj2",         50,  0.0,   2000.0);    	  
-  hmin_mj3          = getth1("min_mj3",          50,  0.0,   2000.0);	  
-  hmin_mj3_over_mjj = getth1("min_mj3_over_mjj", 25,  0.0,   1.0);
-  hcentrality       = getth1("centrality",       25,  0.0,   1.0);
-  hj3pt             = getth1("j3pt",             20,  0.0,   200.0);
-  hj3eta            = getth1("j3eta",            22,  -4.5,  4.5);
-  hj3jvt            = getth1("j3jvt",            12,  -0.2,  1.0);
-  hj3fjvt           = getth1("j3fjvt",           22,  -0.2,  2.0);
+  hmj34             = GetTH1("mj34",             50,  0.0,   1000.0);		  
+  hmax_j_eta        = GetTH1("max_j_eta",        45,  0.0,   4.5);    	  
+  hdRj1             = GetTH1("dRj1",             20,  0.0,   10.0);		  
+  hdRj2             = GetTH1("dRj2",             20,  0.0,   10.0);		  
+  hminDR            = GetTH1("minDR",            20,  0.0,  10.0);		  
+  hmj1              = GetTH1("mj1",              50,  0.0,   2000.0);		  
+  hmj2              = GetTH1("mj2",              50,  0.0,   2000.0);		  
+  hminDRmj2         = GetTH1("minDRmj2",         50,  0.0,   2000.0);    	  
+  hmin_mj3          = GetTH1("min_mj3",          50,  0.0,   2000.0);	  
+  hmin_mj3_over_mjj = GetTH1("min_mj3_over_mjj", 25,  0.0,   1.0);
+  hcentrality       = GetTH1("centrality",       25,  0.0,   1.0);
+  hj3Pt             = GetTH1("j3Pt",             20,  0.0,   200.0);
+  hj3Eta            = GetTH1("j3Eta",            22,  -4.5,  4.5);
+  hj3Jvt            = GetTH1("j3Jvt",            12,  -0.2,  1.0);
+  hj3FJvt           = GetTH1("j3FJvt",           22,  -0.2,  2.0);
 
-  hmudr           = getth1("mudr",           25,  0.0,  5.0);
-  hmueta          = getth1("mueta",          30,  0.0,  3.0);    
+  hmuDR           = GetTH1("muDR",           25,  0.0,  5.0);
+  hmuEta          = GetTH1("muEta",          30,  0.0,  3.0);    
   
-  hzmcidqcd    = getth1("zmcidqcd",     100,  364099.5,364199.5);
-  hwmcidqcd    = getth1("wmcidqcd",     100,  364155.5,364255.5);
-  hzmadmcidqcd = getth1("zmadmcidqcd",  10,  361509.5,361519.5);
-  hzmad2mcidqcd= getth1("zmad2mcidqcd", 100, 363122.5,363222.5);  
-  hwmadmcidqcd = getth1("wmadmcidqcd",  74,  363599.5,363673.5);
-  hzpowmcidqcd = getth1("zpowmcidqcd",  19,  301019.5,301038.5);  
+  hZMCIDQCD    = GetTH1("ZMCIDQCD",     100,  364099.5,364199.5);
+  hWMCIDQCD    = GetTH1("WMCIDQCD",     100,  364155.5,364255.5);
+  hZMadMCIDQCD = GetTH1("ZMadMCIDQCD",  10,  361509.5,361519.5);
+  hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 100, 363122.5,363222.5);  
+  hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
+  hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
-  hqgtagperf = getth1("qgtagperf",  9,  0.0, 9.0);  
   hqgTagNTrack = GetTH1("qgTagNTrack",  15,  0.0, 15.0);  
   hqgTagTrackWidth = GetTH1("qgTagTrackWidth",  13,  0.0, 13.0);  
   hqgTagSum = GetTH1("qgTagSum",  13,  0.0, 13.0);  
