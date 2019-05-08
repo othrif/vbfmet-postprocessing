@@ -16,7 +16,7 @@ def BinomialErr(n2, n1, err1=0.0):
     if total_num<1.3 and total_num>0.0 and eff==1.0:
         return 0.2/math.sqrt(total_num);
     elif total_num<1500.3 and total_num>0.0 and eff==1.0:
-        return 0.05/math.sqrt(total_num);
+        return 0.01/math.sqrt(total_num);
     
     if eff>1.0:
         print 'eff too high',eff
