@@ -280,7 +280,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<-2.1) || (2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.5)) hjetTrackWidth12125->Fill(event.GetVar(Mva::jetTrackWidth1),weight);
 
   //jetNTrackPT - 2D histogram for central jets NTrack vs pT
-  float forw=2.5;
+  float forw=2.1;
   bool isCentral0=true;
   bool isCentral1=true;
   if(event.jets.at(0).eta<-forw or forw<event.jets.at(0).eta) isCentral0=false;
@@ -291,13 +291,13 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==0){
 	hjetNTrackPT->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);
 	if(event.GetVar(Mva::jetPartonTruthLabelID0)==21) hjetNTrackPTg->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
-	else if(event.GetVar(Mva::jetPartonTruthLabelID0)==0) hjetNTrackPTpu->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
+	else if(event.GetVar(Mva::jetPartonTruthLabelID0)<0) hjetNTrackPTpu->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
 	else hjetNTrackPTq->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks0),weight);	
     }
     else if(-forw<event.jets.at(jet).eta and event.jets.at(jet).eta<forw and jet==1){
 	hjetNTrackPT->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);
 	if(event.GetVar(Mva::jetPartonTruthLabelID1)==21) hjetNTrackPTg->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);	
-	else if(event.GetVar(Mva::jetPartonTruthLabelID1)==0) hjetNTrackPTpu->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);	
+	else if(event.GetVar(Mva::jetPartonTruthLabelID1)<0) hjetNTrackPTpu->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);	
 	else hjetNTrackPTq->Fill(event.jets.at(jet).pt,event.GetVar(Mva::jetNTracks1),weight);	
     }
   }
@@ -306,8 +306,8 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
   bool isQuark0=true;
   bool isQuark1=true;
-  if(event.GetVar(Mva::jetPartonTruthLabelID0)==21 or event.GetVar(Mva::jetPartonTruthLabelID0)==0) isQuark0=false;
-  if(event.GetVar(Mva::jetPartonTruthLabelID1)==21 or event.GetVar(Mva::jetPartonTruthLabelID1)==0) isQuark1=false;
+  if(event.GetVar(Mva::jetPartonTruthLabelID0)==21 or event.GetVar(Mva::jetPartonTruthLabelID0)<0) isQuark0=false;
+  if(event.GetVar(Mva::jetPartonTruthLabelID1)==21 or event.GetVar(Mva::jetPartonTruthLabelID1)<0) isQuark1=false;
 
   hqgTagPerf->Fill(1.0,weight);
 
