@@ -150,6 +150,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
+  hqgTagPerf = GetTH1("qgTagPerf",  9,  0.0, 9.0);  
   hqgTagNTrack = GetTH1("qgTagNTrack",  15,  0.0, 15.0);  
   hqgTagTrackWidth = GetTH1("qgTagTrackWidth",  13,  0.0, 13.0);  
   hqgTagSum = GetTH1("qgTagSum",  13,  0.0, 13.0);  
