@@ -71,7 +71,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     asg::AnaToolHandle<CP::IJetQGTagger> my_handleNom;
     my_handleNom.setTypeAndName("CP::JetQGTagger/JetQGTagger_VBF");
     my_handleNom.setProperty("NTrackCut", 5);
-    my_handleNom.setProperty("CalibArea", "/share/t3data2/schae/qgcalibfiles/");
+    my_handleNom.setProperty("UseJetVars", 1);
     my_handleNom.retrieve();
     m_jetQGTool[m_qgVars.at(0)]=my_handleNom;
     m_systSet["JET_QG_Nominal"] = CP::SystematicSet(""); //my_syst_nominal_set;
@@ -725,7 +725,7 @@ StatusCode VBFAnalysisAlg::execute() {
       // Loop over QG systematics
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]);
-	m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, NULL, 1); // add qg taging
+	m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, NULL); // add qg taging
 	tMapFloat[m_qgVars.at(iQG)] *= acc_qgTaggerWeight(*new_jet);
       }
     }
