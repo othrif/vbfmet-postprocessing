@@ -55,13 +55,6 @@ StatusCode VBFAnalysisAlg::initialize() {
     xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
     std::cout << "Cross section using local file: " << xSecFilePath << std::endl;
     my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, false);
-    //my_XsecDB->loadFile(xSecFilePath);
-    //my_XsecDB->extend(xSecFilePath);
-    // if( (runNumber == 308567 || runNumber == 308276 ) ){
-    //   if(truthHiggs_pt->size() > 0) w_VBFhiggs =  -0.000342 * truthHiggs_pt->at(0)/GeV - 0.0708;
-    // }else {
-    //   w_VBFhiggs =1.;
-    // }
 
     // qg tagging
     m_qgVars.clear();
@@ -70,9 +63,9 @@ StatusCode VBFAnalysisAlg::initialize() {
 
     asg::AnaToolHandle<CP::IJetQGTagger> my_handleNom;
     my_handleNom.setTypeAndName("CP::JetQGTagger/JetQGTagger_VBF");
-    my_handleNom.setProperty("NTrackCut", 5);
-    my_handleNom.setProperty("UseJetVars", 1);
-    my_handleNom.retrieve();
+    ANA_CHECK(my_handleNom.setProperty("NTrackCut", 5));
+    ANA_CHECK(my_handleNom.setProperty("UseJetVars", 1));
+    ANA_CHECK(my_handleNom.retrieve());
     m_jetQGTool[m_qgVars.at(0)]=my_handleNom;
     m_systSet["JET_QG_Nominal"] = CP::SystematicSet(""); //my_syst_nominal_set;
     if(m_currentVariation=="Nominal"){
@@ -724,7 +717,7 @@ StatusCode VBFAnalysisAlg::execute() {
       new_jet->auxdata<float>("truthjet_pt") = 1000.0; //jet->getAttribute<float>("truthjet_pt");
       // Loop over QG systematics
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
-	m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]);
+	ANA_CHECK(m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]));
 	m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, NULL); // add qg taging
 	tMapFloat[m_qgVars.at(iQG)] *= acc_qgTaggerWeight(*new_jet);
       }
