@@ -47,8 +47,6 @@ stack=inFile.Get("stack")
 saveInput = raw_input("Save plots? (T/F) ")
 save = BooleanInput(saveInput)
 
-mjjIn = raw_input("Which Mjj bin? (For plot labeling) ")
-
 #Create empty place-holders for the contents of stack
 hist=[0]*10
 count=-1
@@ -69,14 +67,15 @@ for pad in list0:
 #Assign readable titles to important histograms - may need to be updated depending on running (sb, etc also hardcoded)
 higgsHist=hist[0]
 bkgdHist=hist[1]
+varName=higgsHist.GetName()
 
 bins=hist[2].GetSize()-2
 sbHist=TH1D("hist","hist",bins,0.,float(bins))
 sigMuHist=TH1D("hist1","hist1",bins,0.,float(bins))
-sigMuZNormHist=TH1D("hist2","QG Tagging Regions - "+mjjIn,bins,0.,float(bins))
+sigMuZNormHist=TH1D("hist2","QG Tagging Regions",bins,0.,float(bins))
 
 if save:
-	table=open("SBs_table.txt","w+")
+	table=open("SBs_table_"+str(varName)+".txt","w+")
 
 #Refill new histograms with rounded ratio values, and print values to terminal
 print "Function values: Bin, S/B, sigma_mu, sigma_mu Norm"
@@ -122,6 +121,6 @@ legend.Draw()
 
 
 if save:
-	ratioCan.SaveAs("SBs_"+mjjIn+".png")
+	ratioCan.SaveAs("SBs_"+str(varName)+".png")
 	print "Saved "+str(table)
 	table.close()
