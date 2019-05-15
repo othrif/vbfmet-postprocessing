@@ -189,7 +189,7 @@ def getHistPars(hist):
         #
         # Kinematics histograms
         #
-        'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5},
+        'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5}, #5
         'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
         'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
         'jetEta1': {'xtitle':'Sub-Leading jet #eta'  ,       'ytitle':'Events', 'rebin':5},
@@ -213,7 +213,8 @@ def getHistPars(hist):
         'n_jet_cenj30'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj40'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
-        'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0},
+        'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0,'ymin':0.1, 'logy':True,'LtoRCut':1},
+        'tmva'  : {'xtitle':'BDT Score',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},        
 
         'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
@@ -235,7 +236,7 @@ def getHistPars(hist):
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
         'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
     'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},
-    'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -1658,24 +1659,21 @@ class DrawStack:
                         elif (leftToRight==4 and ibin%2==0): # pair every 2 bins together
                             cut_Nsig = self.sign.hist.GetBinContent(ibin)
                             cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
-			    if ibin!=0 and ibin!=2: #0 included in CUTRANGE but not in actual histograms - binning starts at 1
+                            if ibin!=0 and ibin!=2: #0 included in CUTRANGE but not in actual histograms - binning starts at 1
                                 cut_NsigOpp = self.sign.hist.GetBinContent(ibin)
                                 cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin)
                                 cut_Nsig = self.sign.hist.GetBinContent(ibin-1)
                                 cut_Nbkg = self.bkg_sum.GetBinContent(ibin-1)
-			    else:
-                                cut_Nsig = self.sign.hist.Integral(ibin,ibin)
-                                cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
                         elif (leftToRight==4 and ibin%2==1): # pair every 2 bins together
-			    if ibin!=1:
+                            if ibin!=1:
                                 cut_NsigOpp = self.sign.hist.GetBinContent(ibin+1)
                                 cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin+1)
                                 cut_Nsig = self.sign.hist.GetBinContent(ibin)
                                 cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
-			    else:
-                                cut_Nsig = self.sign.hist.Integral(ibin,ibin)
-                                cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
-
+                        #else:
+                        #    cut_Nsig = self.sign.hist.Integral(ibin,ibin)
+                        #    cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
+                                
                         #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
                             signifV = 2.0*math.sqrt(cut_Nbkg)/cut_Nsig
@@ -1764,6 +1762,7 @@ class DrawStack:
                                         signifVal = 1./math.sqrt(1./signifValOpp**2+1./signifVal**2)
                                     elif signifValOpp>0.0 and not signifVal>0:
                                         signifVal=signifValOpp
+                                #print signifVal
                                 self.signifCR.SetBinContent(ibin, signifVal)
 
             # Set Names
@@ -1856,7 +1855,7 @@ class DrawStack:
             if options.blind:
                 self.ratio.Draw('same hist')
                 self.signif.Draw('same hist')
-                self.signifCR.GetYaxis().SetRangeUser(0.5,1.5);
+                self.signifCR.GetYaxis().SetRangeUser(0.0,1.5);
                 self.signifCR.Draw('hist same')
                 self.legr.Clear()
                 self.legr.AddEntry(self.ratio,'S/B')
@@ -2306,7 +2305,8 @@ def main():
     if options.madgraph:
         bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
+        #bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv' 
 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
