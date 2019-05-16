@@ -2305,8 +2305,8 @@ def main():
     if options.madgraph:
         bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
-        #bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv' 
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
+        #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv' 
 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
