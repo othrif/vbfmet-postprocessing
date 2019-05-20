@@ -33,7 +33,7 @@ myvars = [    ['jj_deta', '50', '0.0', '10.0'],
               #['met_tighter_tst_phi', '32', '0.0', '3.2'],              
               ['met_soft_tst_phi', '32', '0.0', '3.2'],              
               ['met_cst_jet', '100', '0.0', '500.0'],
-              #['met_truth_et', '100', '0.0', '500.0'],
+              ['met_truth_et', '100', '0.0', '500.0'],
               ]
 myvars_notplotted = [['trigger_met_encoded', '2', '0.0', '1.0'],
                          ['trigger_met_encodedv2', '2', '0.0', '1.0'],
@@ -100,6 +100,7 @@ myplots = [
               ['met_tst_ph_dphi', '12', '0.0', '3.15'],
               ['met_tst_j3_dphi', '32', '0.0', '3.2'],
               ['max_j3_dr', '20', '0.0', '10.0'],
+              ['tmva', '40', '-2.0', '2.0'],
     ]
 syst_filter_vars = ['met_soft_tst_phi',
                     'met_soft_tst_sumet',

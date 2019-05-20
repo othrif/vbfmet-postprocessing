@@ -68,7 +68,7 @@ atlas_style_path = options.atlas_style_path
 import ROOT
 import HInvPlot.JobOptions as config
 import HInvPlot.CutsDef    as hstudy
-import HInvPlot.systematics as syst
+import HInvPlot.systematics as import_syst
 
 #config.setPlotDefaults(ROOT)
 
@@ -76,8 +76,8 @@ if not options.wait:
     ROOT.gROOT.SetBatch(True)
 
 log = config.getLog('drawStack.py', debug=options.debug)
-mysyst = syst.systematics('All')
-mysystOneSided = syst.systematics('OneSided')
+mysyst = import_syst.systematics('All')
+mysystOneSided = import_syst.systematics('OneSidedDown')
 
 # List of plots to symmeterize
 symm_list=[]
@@ -189,7 +189,7 @@ def getHistPars(hist):
         #
         # Kinematics histograms
         #
-        'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5},
+        'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5}, #5
         'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
         'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
         'jetEta1': {'xtitle':'Sub-Leading jet #eta'  ,       'ytitle':'Events', 'rebin':5},
@@ -213,7 +213,8 @@ def getHistPars(hist):
         'n_jet_cenj30'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj40'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
-        'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0},
+        'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0,'ymin':0.1, 'logy':True,'LtoRCut':1},
+        'tmva'  : {'xtitle':'BDT Score',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},        
 
         'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
@@ -235,7 +236,7 @@ def getHistPars(hist):
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
         'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
     'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},
-    'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -834,8 +835,9 @@ class DrawStack:
         log.debug('ReadSample - integral=%5.1f sample=%s, syst=%s' %(hist.Integral(), sample, syst))
 
         if DO_SYMM:
-            #print 'COMPUTING systematic'
-            hist_central_value = self.file_pointer.Get(path)
+            nom_path = self.GetHistPath(sample, 'Nominal')
+            #print 'COMPUTING systematic',nom_path
+            hist_central_value = self.file_pointer.Get(nom_path)
             self.Symmeterize(hist_central_value, hist)
 
         return HistEntry(hist, sample, self.name, self.nf_map)
@@ -884,7 +886,7 @@ class DrawStack:
             bkg_ent.sample = 'bkgs'
             self.sys_bkgs[syst] = bkg_ent
             #print 'integral: ',bkg_ent.hist.Integral()
-            self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst, DO_SYMM=DO_SYMM)
+            self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst_key, DO_SYMM=DO_SYMM)
 
     #-------------------------
     def GetTotalBkgHist(self):
@@ -1146,6 +1148,7 @@ class DrawStack:
         bkg = self.GetTotalBkgHist()
         if isSignal:
             bkg = self.sign.hist.Clone()
+            bkg.SetDirectory(0)
         bkg.SetLineWidth(2)
         bkg.SetLineColor(2)
         bkg.SetFillColor(0)
@@ -1160,7 +1163,9 @@ class DrawStack:
         tmp_color=3
         i=0
         for s in sys:
-
+            if not s:
+                print  'not a valid hist: ',s
+                continue
             log.info('PlotManySyst - %s: %s Mean: %0.2f RMS: %0.2f' %(self.name, systs[i], s.GetMean(), s.GetRMS()))
             s.SetLineColor(getColor(tmp_color))
             s.SetMarkerColor(getColor(tmp_color))
@@ -1173,7 +1178,7 @@ class DrawStack:
                 max_bin = s.GetMaximum()
 
         bkg.GetYaxis().SetRangeUser(0.0, 1.2*max_bin)
-        self.UpdateHist(bkg)
+        self.UpdateHist(bkg, ignore_max=True)
         bkg.Draw('HIST E0')
         if fillData:
             mydata.Draw('SAME')
@@ -1239,7 +1244,7 @@ class DrawStack:
                 if math.fabs(s.GetMinimum()-1.0) < 0.15 and math.fabs(s.GetMaximum()-1.0) < 0.15:
                     s.GetYaxis().SetRangeUser(0.80, 1.20)
                 elif math.fabs(s.GetMinimum()-1.0) < 0.5 and math.fabs(s.GetMaximum()-1.0) < 0.5:
-                    s.GetYaxis().SetRangeUser(0.50, 1.50)
+                    s.GetYaxis().SetRangeUser(0.501, 1.499)
                 elif math.fabs(s.GetMinimum()-1.0) < 1.0 and math.fabs(s.GetMaximum()-1.0) < 1.0:
                     s.GetYaxis().SetRangeUser(0.0, 2.00)
                 else:
@@ -1264,7 +1269,7 @@ class DrawStack:
                 tmp_color+=1
 
                 if tmp_color==4 and not fillData:
-                    self.UpdateHist(s)
+                    self.UpdateHist(s,ignore_max=True)
                     s.GetYaxis().SetRangeUser(0.80, 1.20)
                     s.Draw('HIST')
                 else:
@@ -1567,8 +1572,8 @@ class DrawStack:
         norm_hists_bkg=[]
         for hk,hg in self.bkgs.iteritems(): norm_hists_bkg+=[hg.hist.Clone()]
         syst_hist_bkg=ROOT.TGraphAsymmErrors(self.bkg_sum); self.err_bands+=[syst_hist_bkg]
-        syst_ratio=syst_hist_bkg.Clone();                   self.err_bands+=[syst_ratio]
-        self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
+        syst_ratio=syst_hist_bkg.Clone(); self.err_bands+=[syst_ratio]
+        syst_jes_ratio = self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
 
         # Setting the draw options
         syst_hist_bkg.SetFillStyle(3004)
@@ -1692,24 +1697,21 @@ class DrawStack:
                         elif (leftToRight==4 and ibin%2==0): # pair every 2 bins together
                             cut_Nsig = self.sign.hist.GetBinContent(ibin)
                             cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
-			    if ibin!=0 and ibin!=2: #0 included in CUTRANGE but not in actual histograms - binning starts at 1
+                            if ibin!=0 and ibin!=2: #0 included in CUTRANGE but not in actual histograms - binning starts at 1
                                 cut_NsigOpp = self.sign.hist.GetBinContent(ibin)
                                 cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin)
                                 cut_Nsig = self.sign.hist.GetBinContent(ibin-1)
                                 cut_Nbkg = self.bkg_sum.GetBinContent(ibin-1)
-			    else:
-                                cut_Nsig = self.sign.hist.Integral(ibin,ibin)
-                                cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
                         elif (leftToRight==4 and ibin%2==1): # pair every 2 bins together
-			    if ibin!=1:
+                            if ibin!=1:
                                 cut_NsigOpp = self.sign.hist.GetBinContent(ibin+1)
                                 cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin+1)
                                 cut_Nsig = self.sign.hist.GetBinContent(ibin)
                                 cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
-			    else:
-                                cut_Nsig = self.sign.hist.Integral(ibin,ibin)
-                                cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
-
+                        #else:
+                        #    cut_Nsig = self.sign.hist.Integral(ibin,ibin)
+                        #    cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
+                                
                         #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
                             signifV = 2.0*math.sqrt(cut_Nbkg)/cut_Nsig
@@ -1798,6 +1800,7 @@ class DrawStack:
                                         signifVal = 1./math.sqrt(1./signifValOpp**2+1./signifVal**2)
                                     elif signifValOpp>0.0 and not signifVal>0:
                                         signifVal=signifValOpp
+                                #print signifVal
                                 self.signifCR.SetBinContent(ibin, signifVal)
 
             # Set Names
@@ -1854,7 +1857,7 @@ class DrawStack:
             bx.SetTitleSize(0.14);
             bx.SetTitleOffset(1.2);
 
-            by.SetRangeUser(0,2);
+            by.SetRangeUser(0.501, 1.499);
             if options.blind:
                 by.SetRangeUser(0,0.799);
             by.SetLabelSize(0.13);
@@ -1875,14 +1878,22 @@ class DrawStack:
             self.error_map['bkg_ratio'].SetMarkerColor(1)
             self.error_map['bkg_ratio'].SetMarkerSize(0)
             self.error_map['bkg_ratio'].SetLineColor(1)
-
-            self.error_map['bkg_ratio'].Draw('SAME E2')
+            self.error_map['bkg_ratio'].Draw('SAME E2')            
+            # JES error ratio
+            if syst_jes_ratio:
+                self.error_map['syst_jes_ratio'] = syst_jes_ratio.Clone()
+                self.error_map['syst_jes_ratio'].SetFillColor(0)
+                self.error_map['syst_jes_ratio'].SetLineColor(3)            
+                self.error_map['syst_jes_ratio'].SetLineWidth(2)
+                self.error_map['syst_jes_ratio'].SetMarkerColor(3)
+                self.error_map['syst_jes_ratio'].SetLineStyle(1)
+                self.error_map['syst_jes_ratio'].Draw('SAME E1') #HIST
 
             # Overlay the ratio plot on top of errors
             if options.blind:
                 self.ratio.Draw('same hist')
                 self.signif.Draw('same hist')
-                self.signifCR.GetYaxis().SetRangeUser(0,2);
+                self.signifCR.GetYaxis().SetRangeUser(0.0,1.5);
                 self.signifCR.Draw('hist same')
                 self.legr.Clear()
                 self.legr.AddEntry(self.ratio,'S/B')
@@ -1920,6 +1931,12 @@ class DrawStack:
                 new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
                 syst.SetPointEYlow(m-1,new_e)
 
+        if False:
+            mysyst_jes = import_syst.systematics('JES')
+            syst_jesr = syst.Clone()
+            syst_jesr.SetName('syst_jesr')
+        else:
+            syst_jesr=None
         # iterate over the systematics
         for sys, ent in self.sys_bkgs.iteritems():
             if True:
@@ -1937,18 +1954,38 @@ class DrawStack:
                         e2=syst.GetErrorYlow(m-1)
                         new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
                         syst.SetPointEYlow(m-1,new_e)
+                    # adding the jes systematics
+                    if syst_jesr and sys in mysyst_jes.getsystematicsList():
+                        if e1>0:
+                            e2=syst_jesr.GetErrorYhigh(m-1)
+                            new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
+                            syst_jesr.SetPointEYhigh(m-1,new_e)
+                        elif e1<0:
+                            e2=syst_jesr.GetErrorYlow(m-1)
+                            new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
+                            syst_jesr.SetPointEYlow(m-1,new_e)                        
         #
         # Calculate the systematic band for a ratio plot
         #
         x1=ROOT.Double()
         y1=ROOT.Double()
+        syst_jesr_ratio=None
+        if syst_jesr:
+            syst_jesr_ratio = syst_ratio.Clone()        
         for i in range(0,self.bkg_sum.GetNbinsX()):
             syst_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             syst_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+            if syst_jesr_ratio:
+                syst_jesr_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+                syst_jesr_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+
+
         for j in range(1,tot_bkg.GetNbinsX()+1):
             # Set Y value to 1
             syst_ratio.GetPoint(j-1,x1,y1)
             syst_ratio.SetPoint(j-1,x1,1.0)
+            if syst_jesr_ratio:
+                syst_jesr_ratio.SetPoint(j-1,x1,1.0)
             val=tot_bkg.GetBinContent(j)
             if val==0.0:
                 continue
@@ -1960,9 +1997,15 @@ class DrawStack:
             eyd=syst.GetErrorYlow    (j-1)/val
             syst_ratio.SetPointEYhigh(j-1,eyu)
             syst_ratio.SetPointEYlow (j-1,eyd)
+            # JES
+            if syst_jesr_ratio:
+                eyu=syst_jesr.GetErrorYhigh   (j-1)/val
+                eyd=syst_jesr.GetErrorYlow    (j-1)/val
+                syst_jesr_ratio.SetPointEYhigh(j-1,eyu)
+                syst_jesr_ratio.SetPointEYlow (j-1,eyd)           
             #print 'err up: ',eyu,' down: ',eyd
 
-        return
+        return syst_jesr_ratio
 
     def CreateStack(self):
         self.stack   = ROOT.THStack(self.name, self.name)
@@ -2046,7 +2089,7 @@ class DrawStack:
         elif options.xmax != None:
             self.stack.GetXaxis().SetRangeUser(options.xmin,options.xmax)
     #--------------------
-    def UpdateHist(self,h, sample=None):
+    def UpdateHist(self, h, sample=None, ignore_max=False):
 
         pars = getHistPars(self.name)
         if 'xtitle' in pars and h.GetXaxis() != None:
@@ -2055,7 +2098,9 @@ class DrawStack:
         if 'ytitle' in pars and h.GetYaxis() != None:
             h.GetYaxis().SetTitle(pars['ytitle'])
 
-        ymax = self.GetYaxisMax()
+        ymax=-1.0
+        if not ignore_max:
+            ymax = self.GetYaxisMax()
         if ymax > 0.0:
             if self.IsLogy():
                 h.SetMaximum(15.0*ymax)
@@ -2219,7 +2264,7 @@ def writeSystTex(table_name, stack):
                 systs[i]=systs[j]
                 systs[j]=tmp
 
-    my_order=mysyst.getsystematicsList()
+    my_order=mysyst.getsystematicsListWithDown()
     if True:
         for key in my_order:
             for s in systs:
@@ -2287,8 +2332,8 @@ def main():
     rfile  = ROOT.TFile(rpath, 'READ')
 
     sfiles={}
-    print 'Reading nSyst: ',len(mysyst.getsystematicsList())
-    for ia in mysyst.getsystematicsList():
+    print 'Reading nSyst: ',len(mysyst.getsystematicsListWithDown())
+    for ia in mysyst.getsystematicsListWithDown():
         sfiles[ia]=rfile
 
     #
@@ -2296,9 +2341,10 @@ def main():
     #
     #bkgs = ['zewk', 'zqcd','wewk','wqcd','top1','top2']
     if options.madgraph:
-        bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv']#,'zldy'
+        bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
+        #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv' 
 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
@@ -2354,9 +2400,7 @@ def main():
 
         updateCanvas(can, name=cname, data_hist=stack.data, bkg_sum_hist=stack.bkg_sum)
 
-
         if options.syst_see == 'allsyst':
-
             grouping=10
             syst_group = len(sfiles.keys())/grouping+1
             for i in range(0, syst_group):

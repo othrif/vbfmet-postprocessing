@@ -32,6 +32,8 @@ def GetHists(f,cut_path, zcut_path, mvar):
     wEWKpath = cut_path+'/plotEvent_wewk/'+mvar
     zQCDpath = zcut_path+'/plotEvent_zqcd/'+mvar
     zEWKpath = zcut_path+'/plotEvent_zewk/'+mvar
+    #zQCDpath = zcut_path+'/plotEvent_zqcdMad/'+mvar
+    #zEWKpath = zcut_path+'/plotEvent_zewk/'+mvar
 
     zBkgEWKpath = cut_path+'/plotEvent_zewk/'+mvar
     zBkgQCDpath = cut_path+'/plotEvent_zqcd/'+mvar
@@ -53,7 +55,7 @@ def GetHists(f,cut_path, zcut_path, mvar):
     zQCDplot = f.Get(zQCDpath).Clone()
     zEWKplot = f.Get(zEWKpath).Clone()
 
-    rebin=2
+    rebin=3
     plts = [dplot,wQCDplot,wEWKplot,zQCDplot,zEWKplot,bkgTot]
     if not mvar.count('nolep') or True:
         for p in plts:
@@ -74,8 +76,27 @@ def DoFit(name, hist):
     func.SetName(name)
     return func
 
-def DrawSF(can,trig,lep, mvar, fname):
-
+def DrawError(trig, input_hist):
+    input_err = input_hist.Clone()
+    input_err.SetDirectory(0)
+    
+    p0 = 68.8679; p1 = 54.0594; e0=0.000784094; e1 = 0.06;
+    if trig.count('xe70'):
+        p0 = 110.396; p1 = 19.4147; e1 = 0.06;
+    elif trig.count('xe90'):
+        p0 = 111.684; p1 = 19.147;  e1 = 0.08;
+    for i in range(0,input_err.GetNbinsX()+1):
+        x=input_err.GetXaxis().GetBinCenter(i)
+        val = 0.5*(1+ROOT.TMath.Erf((x-p0)/(ROOT.TMath.Sqrt(2)*p1)))
+        err = ((e0)*(150-x)+e1)*0.6
+        if x>210:
+            err=0.01
+        input_err.SetBinContent(i,val)
+        input_err.SetBinError(i,err)
+    return input_err
+    
+def DrawSF(can,trig,lep, mvar, fname):    
+    
     if lep=='u':
         #met_tenacious_tst_et
         mvar = mvar.replace('_tst_et','_tst_nolep_et')
@@ -114,6 +135,8 @@ def DrawSF(can,trig,lep, mvar, fname):
     bkgeff[0].SetLineColor(4)
     bkgeff[0].SetMarkerColor(4)
 
+    trig_err = DrawError(trig, bkgeff[0]);
+    
     can.Clear()
     can.Draw()
     can.cd()
@@ -185,15 +208,15 @@ def DrawSF(can,trig,lep, mvar, fname):
     can.SaveAs(fname+'_'+den_path+'_SF.pdf')
     print 'Wfunc'
     Wfunc=DoFit('WSFFit'+fname+'_'+den_path,SFW)
-    print 'Zfunc'    
+    print 'Zfunc'
     Zfunc=DoFit('ZSFFit'+fname+'_'+den_path,SFZ)
-    print 'bkgfunc'    
+    print 'bkgfunc'
     bkgfunc=DoFit('bkgSFFit'+fname+'_'+den_path,SFBkg)
     
     can.Update()
     #can.WaitPrimitive()
     f.Close()
-    return [SFZ,SFW,SFBkg,deff[0],weff[0],zeff[0],bkgeff[0],Wfunc,Zfunc,bkgfunc]
+    return [SFZ,SFW,SFBkg,deff[0],weff[0],zeff[0],bkgeff[0],Wfunc,Zfunc,bkgfunc,trig_err]
 
 def getATLASLabels(pad, x, y, text=None, selkey=None):
     l = ROOT.TLatex(x, y, 'ATLAS')
@@ -237,7 +260,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         labs += [c]
     return labs
         
-def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110'):
+def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110',input_err=None):
     print plts
     can.Clear();
     color=1
@@ -257,12 +280,20 @@ def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110'):
         p.SetMarkerColor(color)
         if color==1:
             p.Draw()
+            if input_err:
+                input_err.SetLineColor(ROOT.kMagenta)
+                input_err.SetMarkerColor(ROOT.kMagenta)
+                input_err.SetFillColor(ROOT.kMagenta)
+                input_err.SetFillStyle(3003)
+                input_err.Draw('same e5')
+                p.Draw('same')                
         else:
             p.Draw('same')
         leg.AddEntry(p,names[color-1])
         color+=1
         p.GetYaxis().SetRangeUser(0.6,1.2)
-
+    if input_err:
+        leg.AddEntry(input_err,'Fit+Err')
     leg.Draw()
     texts = getATLASLabels(can, 0.2, 0.88,trig)
     for t in texts:
@@ -281,6 +312,7 @@ if __name__ == "__main__":
     mvar = 'met_tst_et'
     fname='v26metsf_v5_tenac_njet2'
     fname='v26metsf_v8_tenac_nj3'
+    fname='v26metsf_v3'
     #fname='v26metsf_v8_tenac_nj3_detjj25'
     #fname='v26metsf_v8_tenac_nj3'
     #f = ROOT.TFile.Open('v26metsf_v4_tenac.root')
@@ -288,18 +320,19 @@ if __name__ == "__main__":
     #f = ROOT.TFile.Open('v26metsf_v7_tenac_fjvtCST120.root')
     #f = ROOT.TFile.Open('v26metsf_v6_tenac_detajj25.root')
     #f = ROOT.TFile.Open('v26metsf_v6_tenac_detajj25_njet2.root')      
-    mvar = 'met_tenacious_tst_et'
+    #mvar = 'met_tenacious_tst_et'
     #mvar = 'met_cst_jet'
     trig='xe90'
     lep='u'
     fname='v26metsf_v8_tenac_detjj25'
+    fname='v26metsf_v3'
     #fname='v26metsf_v8_tenac_detjj25_CST120'
     xe90_u_detajj25 = DrawSF(can,trig,lep, mvar, fname)
-    trig='xe70'    
+    trig='xe70'
     xe70_u_detajj25 = DrawSF(can,trig,lep, mvar, fname)
 
     
-    trig='xe110'
+    trig='xe70'
     mvar = 'met_tst_et'
     #fname='v26metsf_v8_tenac_detjj25_CST120'
     fname='v26metsf_v8_tenac_detjj25_loose'
@@ -318,14 +351,43 @@ if __name__ == "__main__":
     xe110_e_tenac = DrawSF(can,trig,lep, mvar, fname)
     lep='u'
     xe110_u_tenac = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_v8_tenac_detjj25'
+    xe110_u_tenac_eta25 = DrawSF(can,trig,lep, mvar, fname)    
+    fname='v26metsf_nobias_2TeV'
+    fname='v26metsf_nobias_2TeV_loose'    
+    xe110_u_2TeV = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_nobias_15TeV'    
+    xe110_u_15TeV = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_nobias_1TeV'
+    xe110_u_1TeV = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_nobias_bothforward'
+    xe110_u_bothfwd = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_nobias_eta25'
+    xe110_u_eta25_nobias = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_nobias'
+    xe110_u_nobias = DrawSF(can,trig,lep, mvar, fname)
+
+    fname='v26metsf_bias_1TeV'
+    xe110_u_bias_1TeV = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_bias_15TeV'
+    xe110_u_bias_15TeV = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_bias_2TeV'
+    xe110_u_bias_2TeV = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_bias_bothfwd'
+    xe110_u_bias_bothfwd = DrawSF(can,trig,lep, mvar, fname)
+    
     #fname='v26metsf_v6_tenac_detajj25'
     fname='v26metsf_v8_tenac_detjj25'
     lep='e'    
     xe110_e_detajj25 = DrawSF(can,trig,lep, mvar, fname)
     lep='u'
     #fname='v26metsf_v8_tenac_detjj25_CST120'
+    #fname='v26metsf_nobias'
     print 'xe110_u_detajj25'
     xe110_u_detajj25 = DrawSF(can,trig,lep, mvar, fname)
+    fname='v26metsf_nobias'
+    print 'xe110_u_detajj25'
+    xe110_nn_detajj25 = DrawSF(can,trig,lep, mvar, fname)
 
     fname='v26metsf_v7_tenac_fjvt'
     xe110_u_fjvt = DrawSF(can,trig,lep, mvar, fname)
@@ -351,19 +413,20 @@ if __name__ == "__main__":
     DrawList(can,[xe110_u_tenac[2],xe110_u_detajj25[2],xe110_u_fjvt[2],xe110_u_fjvtCST120[2],xe110_u_fjvtCST120[0],xe110_e_fjvtCST120[0]],['#mu','#mu LooserCuts','fjvt','fjvt+cst120','Z in SR','Z SR lep'],trig+'u_default_vs_detajj25_vs_fjvt_cst120',trig=trig)
     DrawList(can,[xe110_e_tenac[2],xe110_e_detajj25[2],xe110_e_fjvt[2],xe110_e_fjvtCST120[2],xe110_e_fjvtCST120[0]],['e','e LooserCuts','fjvt','fjvt+cst120','Z in SR'],trig+'e_default_vs_detajj25_vs_fjvt_cst120',trig=trig)   
     DrawList(can,[xe110_u_tenac[4],xe110_u_detajj25[4],xe110_u_fjvt[4],xe110_u_fjvtCST120[4],xe110_u_fjvtCST120[4],xe110_e_fjvtCST120[5]],['#mu','#mu LooserCuts','fjvt','fjvt+cst120','Z in SR','Z SR lep'],trig+'u_eff_default_vs_detajj25_vs_fjvt_cst120',trig=trig)
-    DrawList(can,[xe110_e_tenac[5],xe110_e_detajj25[5],xe110_e_fjvt[5],xe110_e_fjvtCST120[5]],['#nu#nu','#nu#nu |#Delta#eta_{jj}|>2.5','fjvt','fjvt+cst120','Z in SR'],trig+'nn_Zeff_default_vs_detajj25_vs_fjvt_cst120',trig=trig)  
+    DrawList(can,[xe110_nn_detajj25[5],xe110_e_detajj25[5],xe110_e_fjvt[5],xe110_e_fjvtCST120[5],xe110_u_2TeV[5]],['#nu#nu','#nu#nu |#Delta#eta_{jj}|>2.5','fjvt','fjvt+cst120','Z in SR','M_{jj}>2TeV'],trig+'nn_Zeff_default_vs_detajj25_vs_fjvt_cst120',trig=trig)
+    DrawList(can,[xe110_u_nobias[5],xe110_u_eta25_nobias[5],xe110_u_1TeV[5],xe110_u_15TeV[5],xe110_u_2TeV[5]],['#nu#nu','#nu#nu |#Delta#eta_{jj}|>2.5','M_{jj}>1TeV','M_{jj}>1.5TeV','M_{jj}>2TeV'],trig+'nn_Zeff_default_vs_detajj25_vs_mjj',trig=trig)      
     DrawList(can,[xe110_e_tenac[4],xe110_e_detajj25[4],xe110_e_fjvt[4],xe110_e_fjvtCST120[4]],['e','e |#Delta#eta_{jj}|>2.5','fjvt','fjvt+cst120','Z in SR'],trig+'e_Zeff_default_vs_detajj25_vs_fjvt_cst120',trig=trig)
     
     # Wbkg Eff
     DrawList(can,[xe110_e_tenac[6],xe110_e_detajj25[6],xe110_e_fjvt[6],xe110_e_fjvtCST120[6]],['e','e |#Delta#eta_{jj}|>2.5','fjvt cuts','fjvt cuts+cst120','Z in SR'],trig+'eBkg_Weff_default_vs_detajj25_vs_fjvt_cst120',trig=trig)
     DrawList(can,[xe110_u_tenac[6],xe110_u_detajj25[6],xe110_u_fjvt[6],xe110_u_fjvtCST120[6]],['#mu','#mu |#Delta#eta_{jj}|>2.5','fjvt cuts','fjvt cuts+cst120','Z in SR'],trig+'uBkg_Weff_default_vs_detajj25_vs_fjvt_cst120',trig=trig)
     # trigger SF
-    DrawList(can,[xe110_e_tenac[1],xe110_e_detajj25[1],xe110_e_fjvt[1],xe110_e_fjvtCST120[1]],['e','e |#Delta#eta_{jj}|>2.5','fjvt cuts','fjvt cuts+cst120','Z in SR'],trig+'eBkg_WSF_default_vs_detajj25_vs_fjvt_cst120',ytitle='Trigger SF',trig=trig)
-    DrawList(can,[xe110_u_tenac[1],xe110_u_detajj25[1],xe110_u_fjvt[1],xe110_u_fjvtCST120[1]],['#mu','#mu |#Delta#eta_{jj}|>2.5','fjvt cuts','fjvt cuts+cst120','Z in SR'],trig+'uBkg_WSF_default_vs_detajj25_vs_fjvt_cst120',ytitle='Trigger SF',trig=trig)
+    DrawList(can,[xe110_e_tenac[1],xe110_e_detajj25[1],xe110_e_fjvt[1],xe110_e_fjvtCST120[1]],['e','e |#Delta#eta_{jj}|>2.5','fjvt cuts','fjvt cuts+cst120','Z in SR'],trig+'eBkg_WSF_default_vs_detajj25_vs_fjvt_cst120',ytitle='Trigger SF',trig=trig,input_err=xe110_u_detajj25_metLoose[10])
+    DrawList(can,[xe110_u_tenac[1],xe110_u_detajj25[1],xe110_u_fjvt[1],xe110_u_fjvtCST120[1]],['#mu','#mu |#Delta#eta_{jj}|>2.5','fjvt cuts','fjvt cuts+cst120','Z in SR'],trig+'uBkg_WSF_default_vs_detajj25_vs_fjvt_cst120',ytitle='Trigger SF',trig=trig,input_err=xe110_u_detajj25_metLoose[10])
     # lepton comparison
     #DrawList(can,[xe110_e_detajj25[6],xe110_u_detajj25[6],xe110_e_detajj25[5]],['e','#mu','#nu#nu',],'e_default_vs_detajj25_vs_fjvt_cst120')
-    DrawList(can,[xe110_e_detajj25[6],xe110_u_detajj25[6],xe110_e_detajj25[5]],['e','#mu','#nu#nu'],trig+'e_vs_mu_vs_nn_eff',trig=trig)
-    DrawList(can,[xe110_e_detajj25[2],xe110_u_detajj25[2]],['e','#mu','#nu#nu'],trig+'e_vs_mu_SF',ytitle='Trigger SF',trig=trig)
+    DrawList(can,[xe110_e_detajj25[6],xe110_u_detajj25[6],xe110_nn_detajj25[5]],['e','#mu','#nu#nu'],trig+'e_vs_mu_vs_nn_eff',trig=trig)
+    DrawList(can,[xe110_e_detajj25[2],xe110_nn_detajj25[2]],['e','#mu','#nu#nu'],trig+'e_vs_mu_SF',ytitle='Trigger SF',trig=trig)
 
 
     DrawList(can,[xe110_u_detajj25[2],xe110_u_detajj25_metLoose[2]],['#mu Loose','#mu Tenacious'],trig+'Tenacious_vs_Loose_SF',ytitle='Trigger SF',trig=trig)
@@ -373,6 +436,10 @@ if __name__ == "__main__":
     DrawList(can,[xe110_u_fjvtCST120[6],xe110_u_cst120_metLoose[6]],['#mu Loose','#mu Tenacious'],'Tenacious_vs_Loose_CST_Eff',ytitle='Trigger Eff',trig=trig) 
 
     # Compare triggers
-    DrawList(can,[xe70_u_detajj25[2],xe90_u_detajj25[2],xe110_u_detajj25[2]],['#mu xe70','#mu xe90','#mu xe110'],'xeComparison_SF', ytitle='Trigger SF',trig='xe70,90,110')
+    DrawList(can,[xe70_u_detajj25[2],xe90_u_detajj25[2],xe110_u_detajj25[2]],['#mu xe70','#mu xe90','#mu xe110'],'xeComparison_SF', ytitle='Trigger SF',trig='xe70,90,110',input_err=xe110_u_detajj25_metLoose[10])
     DrawList(can,[xe70_u_detajj25[6],xe90_u_detajj25[6],xe110_u_detajj25[6]],['#mu xe70','#mu xe90','#mu xe110'],'xeComparison_Eff',ytitle='Trigger Eff',trig='xe70,90,110')        
+
+
+    DrawList(can,[xe110_u_tenac_eta25[6],xe110_u_bias_1TeV[6],xe110_u_bias_15TeV[6],xe110_u_bias_2TeV[6],xe110_u_bias_bothfwd[6]],['#mu |#Delta#eta_{jj}|>2.5','#mu m_{jj}>1 TeV','m_{jj}>1.5TeV','m_{jj}>2 TeV','both fwd'],trig+'mu_biasmjj_Eff',ytitle='Trigger Eff',trig=trig)
+    DrawList(can,[xe110_u_bias_15TeV[2],xe110_u_bias_2TeV[2],xe110_u_bias_bothfwd[2],xe110_u_tenac_eta25[2],xe110_u_bias_1TeV[2]],['m_{jj}>1.5TeV','m_{jj}>2 TeV','both fwd','#mu |#Delta#eta_{jj}|>2.5','#mu m_{jj}>1 TeV'],trig+'mu_biasmjj_SF',ytitle='Trigger SF',trig=trig,input_err=xe110_u_detajj25_metLoose[10])            
     

@@ -20,6 +20,7 @@
 #include "TTree.h"
 #include "TChain.h"
 #include "TH1D.h"
+#include "TMVA/Reader.h"
 
 // Local
 #include "Event.h"
@@ -130,6 +131,12 @@ namespace Msl
     std::string                 fMETChoice_phi;
     std::string                 fMETChoice_nolep;    
     std::string                 fMETChoice_nolep_phi;
+
+    // TMVA
+    TMVA::Reader                *fTMVAReader;
+    std::string                 fTMVAWeightPath;
+    std::vector<float>         fTMVAVars;
+    TString                     fMVAName;
     
     std::vector<std::string>    fTrees;
     std::vector<std::string>    fFiles;
