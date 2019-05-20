@@ -155,7 +155,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hqgTagTrackWidth = GetTH1("qgTagTrackWidth",  13,  0.0, 13.0);  
   hqgTagSum = GetTH1("qgTagSum",  13,  0.0, 13.0);  
   hQGTaggerSim = GetTH1("qgTaggerSim",  7,  0.0, 7.0);  
-  hQGTaggerSimLog = GetTH1("qgTaggerSimLog",  15,  0.0, 15.0);  
+  hQGTaggerSimLog = GetTH1("qgTaggerSimLog",  17,  0.0, 17.0);  
   hQGTaggerSimLin = GetTH1("qgTaggerSimLin",  15,  0.0, 15.0);  
   hnTrackCut0 = GetTH1("nTrackCut0",  40,  0.0, 40.0);  
   hnTrackCut1 = GetTH1("nTrackCut1",  40,  0.0, 40.0);  
@@ -280,7 +280,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   if((-2.5<event.jets.at(1).eta and event.jets.at(1).eta<-2.1) || (2.1<event.jets.at(0).eta and event.jets.at(0).eta<2.5)) hjetTrackWidth12125->Fill(event.GetVar(Mva::jetTrackWidth1),weight);
 
   //jetNTrackPT - 2D histogram for central jets NTrack vs pT
-  float forw=2.1;
+  float forw=2.5;
   bool isCentral0=true;
   bool isCentral1=true;
   if(event.jets.at(0).eta<-forw or forw<event.jets.at(0).eta) isCentral0=false;
@@ -524,6 +524,11 @@ bool Msl::PlotEvent::DoExec(Event &event)
   }
   else hQGTaggerSimLog->Fill(13.0,weight);
 
+  if((isCentral0 and event.GetVar(Mva::jetNTracks0)<(4*log10pt0-5)) or not isCentral0){
+    if((isCentral1 and event.GetVar(Mva::jetNTracks1)<(4*log10pt1-5)) or not isCentral1) hQGTaggerSimLog->Fill(14.0,weight);
+    else hQGTaggerSimLog->Fill(15.0,weight);
+  }
+  else hQGTaggerSimLog->Fill(15.0,weight);
 
   hQGTaggerSimLog->GetXaxis()->SetBinLabel(1," ");
   hQGTaggerSimLog->GetXaxis()->SetBinLabel(2,"No Tagging");
@@ -539,6 +544,8 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hQGTaggerSimLog->GetXaxis()->SetBinLabel(12,"Fail");
   hQGTaggerSimLog->GetXaxis()->SetBinLabel(13,"12Log10(pT)-45");
   hQGTaggerSimLog->GetXaxis()->SetBinLabel(14,"Fail");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(15,"4Log10(pT)-5");
+  hQGTaggerSimLog->GetXaxis()->SetBinLabel(16,"Fail");
 
   float pt0 = event.jets.at(0).pt*1000;
   float pt1 = event.jets.at(1).pt*1000;

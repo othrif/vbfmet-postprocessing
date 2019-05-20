@@ -205,6 +205,12 @@ void fitPlot(string fileName=""){
 	saveFnCanvas(name,f_testLog);
     }
   }
+
+  //add log function from Natasha
+  TF1 *f_logNat = new TF1("logNat",logFn,0,500,2);
+  f_logNat->SetParameters(4,-5);
+  testLogFns.push_back(f_logNat);
+
   vector<int> goodLogFns;
   goodLogFns.push_back(0);
   goodLogFns.push_back(6);
@@ -217,6 +223,7 @@ void fitPlot(string fileName=""){
   goodLogFns.push_back(34);
   goodLogFns.push_back(35);
   goodLogFns.push_back(41);
+  goodLogFns.push_back(42); //logNat
 
   for (auto i = 0; i<goodLogFns.size(); ++i){
     char name[1024];
