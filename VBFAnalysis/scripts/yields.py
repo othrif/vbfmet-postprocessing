@@ -75,7 +75,7 @@ samplesPrint =['Samples','VBFH125',
 #f=ROOT.TFile.Open('SumHF_delete.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMETTenac_v26c_DPhiFixQCDEst_J400_XSSig_TopFix_TrigFix.root')
 #f=ROOT.TFile.Open('/home/schae/testarea/HInv/runLoosev26/SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_final.root')
-f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_doPlot.root')
+f=ROOT.TFile.Open('/tmp/SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_UpdateMETSF.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400.root')#
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_SigXS.root')
@@ -228,12 +228,15 @@ print '}'
 sys.exit(0)
 # Collect systematics
 tobj = f.GetListOfKeys()
+mye=ROOT.Double(0.0)
 for sample in samples:
     for i in tobj:
     
         vname=i.GetName()
         #print vname
-        if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
+        #if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
+        if vname.count('VBFjetSel') and vname.count('_oneEleNegLowSigCR3_') and vname.count(sample):
             h=f.Get(vname)
-            intBkg=h.Integral()
-            print '%0.2f ' %(intBkg)+vname 
+            intBkg=h.IntegralAndError(0,1001,mye)
+            #print '%0.2f ' %(intBkg)+vname 
+            print '%0.2f +/- %0.2f ' %(intBkg,mye)+vname 
