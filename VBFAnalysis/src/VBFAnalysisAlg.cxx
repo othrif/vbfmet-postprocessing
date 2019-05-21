@@ -48,9 +48,6 @@ StatusCode VBFAnalysisAlg::initialize() {
   
   if(m_isMC){
     std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
-    //xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
-    //my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
-    //xSecFilePath = "/home/schae/testarea/HInv/source/VBFAnalysis/data/PMGxsecDB_mc16.txt";
     xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt";
     xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
     std::cout << "Cross section using local file: " << xSecFilePath << std::endl;
@@ -711,10 +708,10 @@ StatusCode VBFAnalysisAlg::execute() {
       new_jet->setJetP4(newp4); 
 
       acc_NumTrkPt500PV(*new_jet) = jet_NTracks->at(iJet)[0];
-      new_jet->auxdata<int>("truthjet_nCharged") = 10;//jet->getAttribute<int>("truthjet_nCharged");
-      new_jet->auxdata<int>("truthjet_pdgid") = jet_PartonTruthLabelID->at(iJet); //jet->getAttribute<int>("PartonTruthLabelID");
-      new_jet->auxdata<float>("truthjet_eta") = 0.0; //jet->getAttribute<float>("truthjet_eta");
-      new_jet->auxdata<float>("truthjet_pt") = 1000.0; //jet->getAttribute<float>("truthjet_pt");
+      new_jet->auxdata<int>("DFCommonJets_QGTagger_truthjet_nCharged") = 10;//jet->getAttribute<int>("truthjet_nCharged");
+      new_jet->auxdata<int>("PartonTruthLabelID") = jet_PartonTruthLabelID->at(iJet); //jet->getAttribute<int>("PartonTruthLabelID");
+      new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_eta") = 0.0; //jet->getAttribute<float>("truthjet_eta");
+      new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_pt") = 1000.0; //jet->getAttribute<float>("truthjet_pt");
       // Loop over QG systematics
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	ANA_CHECK(m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]));

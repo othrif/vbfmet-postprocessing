@@ -24,7 +24,7 @@ class BasicCuts:
 
     def __init__(self, Analysis, Chan, SameSign=0):
 
-        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2',
+        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest',
                             'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
                                 'njgt2',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400']:
@@ -69,6 +69,10 @@ class BasicCuts:
         if Analysis.count('mjj1500'):
             self.MjjLowerCut   = 1500.0
             self.MjjUpperCut   = 2000.0
+        if Analysis.count('mjj1500TrigTest'):
+            self.MjjLowerCut   = 1500.0
+            self.MjjUpperCut   = -1
+            self.DEtajjLowerCut = 4.2 # remove
         if Analysis.count('mjj2000'):
             self.MjjLowerCut   = 2000.0
             self.MjjUpperCut   = -1.0
@@ -241,7 +245,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
             cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
 
             cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
-            cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
+            cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')] # move to 50
             #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
@@ -310,7 +314,8 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
         cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4', weight=apply_weight)]
     elif options.year==2018:
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 3', weight=apply_weight)]
-        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5', weight=apply_weight)]
+        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5', weight=apply_weight)] # use this one
+        #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11')]
     else:
         cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)] 
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
@@ -324,7 +329,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        cuts += metCuts(basic_cuts,options)
+        cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=120.0)
 
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=False)

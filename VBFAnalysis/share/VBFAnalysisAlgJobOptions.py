@@ -43,8 +43,10 @@ if containerName!="":
 print inputDir, " ", currentSample, " ", str(runNumber)
 jps.AthenaCommonFlags.HistOutputs = ["MYSTREAM:"+currentSample+args.currentVariation+str(runNumber)+subfileN+".root"]  #optional, register output files like this. MYSTREAM is used in the code
 isSherpaVjets = runNumber in range(308092, 308098+1) or runNumber in range(364100, 364197+1) or runNumber in range(309662, 309679+1)
+
 if args.theoVariation and args.currentVariation == "Nominal" and isSherpaVjets:
   jps.AthenaCommonFlags.HistOutputs = ["ANALYSIS:theoVariation_"+currentSample+args.currentVariation+str(runNumber)+subfileN+".root"]
+
 athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                    currentVariation = args.currentVariation,
                                    normFile = args.normFile,
