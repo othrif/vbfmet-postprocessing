@@ -47,6 +47,9 @@ Msl::ReadEvent::AlgData::AlgData(const std::string &key):
 Msl::ReadEvent::ReadEvent():
   fSystName     ("Nominal"),
   fWeightSystName("Nominal"),
+  fTMVAReader   (nullptr),
+  fTMVAWeightPath(""),
+  fMVAName      (""),
   fDebug        (false),
   fPrint        (false),
   fPrintEvent   (false),
@@ -64,6 +67,7 @@ Msl::ReadEvent::ReadEvent():
 //-----------------------------------------------------------------------------
 Msl::ReadEvent::~ReadEvent()
 {
+  if(fTMVAReader){ delete fTMVAReader; fTMVAReader = nullptr; }
 }
 
 //-----------------------------------------------------------------------------
@@ -81,6 +85,8 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Files",         fFiles);
   reg.Get("ReadEvent::MaxNEvent",     fMaxNEvent);
 
+  reg.Get("ReadEvent::TMVAWeightPath",     fTMVAWeightPath);
+  
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
   reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
   reg.Get("ReadEvent::OverlapPh",     fOverlapPh);
@@ -94,6 +100,19 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Lumi",          fLumi = 1.0);
   fDir="";
 
+  if(fTMVAWeightPath!=""){
+    fTMVAReader = new TMVA::Reader( "!Color:!Silent" );
+    fMVAName =  "BDT method";
+    for(unsigned i=0; i<6; ++i) fTMVAVars.push_back(0.0);
+    fTMVAReader->AddVariable("jj_mass", &fTMVAVars[0]);
+    fTMVAReader->AddVariable("jj_dphi", &fTMVAVars[1]);
+    fTMVAReader->AddVariable("jj_deta", &fTMVAVars[2]);
+    fTMVAReader->AddVariable("met_tst_et", &fTMVAVars[3]);
+    fTMVAReader->AddVariable("jet1_pt", &fTMVAVars[4]);
+    fTMVAReader->AddVariable("jet2_pt", &fTMVAVars[5]);
+    fTMVAReader->BookMVA( fMVAName, fTMVAWeightPath);
+  }
+  
   // set met phi
   fMETChoice_phi = fMETChoice;
   fMETChoice_phi.replace(fMETChoice_phi.end()-2, fMETChoice_phi.end(),"phi");
@@ -1130,6 +1149,18 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     ++fCountEvents;
 
+    // Process TMVA
+    if(fTMVAReader){
+      // fill the variables
+      fTMVAVars[0]=event->GetVar(Mva::jj_mass);
+      fTMVAVars[1]=event->GetVar(Mva::jj_dphi);
+      fTMVAVars[2]=event->GetVar(Mva::jj_deta);
+      fTMVAVars[3]=event->GetVar(Mva::met_tst_et);
+      fTMVAVars[4]=event->GetVar(Mva::jetPt0);
+      fTMVAVars[5]=event->GetVar(Mva::jetPt1);
+      event->AddVar(Mva::tmva, fTMVAReader->EvaluateMVA( fTMVAVars, fMVAName ));
+    }else { event->AddVar(Mva::tmva, 0.0); }
+    
     //
     // Process sub-algorithms
     //

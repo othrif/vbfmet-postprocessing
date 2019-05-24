@@ -239,12 +239,15 @@ print '}'
 sys.exit(0)
 # Collect systematics
 tobj = f.GetListOfKeys()
+mye=ROOT.Double(0.0)
 for sample in samples:
     for i in tobj:
     
         vname=i.GetName()
         #print vname
-        if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
+        #if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
+        if vname.count('VBFjetSel') and vname.count('_oneEleNegLowSigCR3_') and vname.count(sample):
             h=f.Get(vname)
-            intBkg=h.Integral()
-            print '%0.2f ' %(intBkg)+vname 
+            intBkg=h.IntegralAndError(0,1001,mye)
+            #print '%0.2f ' %(intBkg)+vname 
+            print '%0.2f +/- %0.2f ' %(intBkg,mye)+vname 

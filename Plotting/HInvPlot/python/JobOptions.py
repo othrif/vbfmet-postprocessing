@@ -16,7 +16,7 @@ def BinomialErr(n2, n1, err1=0.0):
     if total_num<1.3 and total_num>0.0 and eff==1.0:
         return 0.2/math.sqrt(total_num);
     elif total_num<1500.3 and total_num>0.0 and eff==1.0:
-        return 0.05/math.sqrt(total_num);
+        return 0.01/math.sqrt(total_num);
     
     if eff>1.0:
         print 'eff too high',eff
@@ -133,7 +133,8 @@ def getParser():
     p.add_option('--var',          type='string', default='Mll',         dest='var',        help='MT variable used for limits')
     p.add_option('--lep-sign',     type='string', default='0',           dest='lep_sign',   help='Lepton Sign...0 is opposite sign, 1 is SS')
     p.add_option('--trees',        type='string', default='',      dest='trees',      help='Tree name: QCDunwNominal,VBFH125Nominal,VH125Nominal,VVVNominal,W_strongNominal,Z_strongNominal,Z_strongPTVExtNominal,Z_strong_VBFFiltNominal,ggFH125Nominal,QCDwNominal,VBFHOtherNominal,VVNominal,W_EWKNominal,Z_EWKNominal,Z_strongExtNominal,Z_strong_LowMassNominal,dataNominal,ttbarNominal')
-    p.add_option('--trig-name',    type='string', default='',            dest='trig_name',  help='Trigger name if wanted. TRIG_xe80_tclcw, TRIG_lep, TRIG_2mu8_EFxe40_tclcw') 
+    p.add_option('--trig-name',    type='string', default='',            dest='trig_name',  help='Trigger name if wanted. TRIG_xe80_tclcw, TRIG_lep, TRIG_2mu8_EFxe40_tclcw')
+    p.add_option('--mva-weights-path',    type='string', default='',            dest='mva_weights_path',  help='full path to weights files for tmva')     
     p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
     p.add_option('--mergePTV',  action='store_true', default=False,   dest='mergePTV',          help='Merge the pTV slices')
     p.add_option('--mergeExt',  action='store_true', default=False,   dest='mergeExt',          help='Merge the Sherpa extension slices')
