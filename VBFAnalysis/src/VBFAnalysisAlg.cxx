@@ -14,6 +14,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "LooseSkim", m_LooseSkim = true, "true if loose skimming is requested" );
   declareProperty( "ExtraVars", m_extraVars = true, "true if extra variables should be output" );
   declareProperty( "QGTagger", m_QGTagger = true, "true if extra variables should be output for QGTagger" );
+  declareProperty( "METTrigPassThru", m_METTrigPassThru = false, "true if require no met triggers" );
   declareProperty( "ContLep", m_contLep = false, "true if container lepton variables should be output" );
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "current sytematics of the tree" );
   declareProperty( "normFile", m_normFile = "current.root", "path to a file with the number of events processed" );
@@ -51,7 +52,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt";
     xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
     std::cout << "Cross section using local file: " << xSecFilePath << std::endl;
-    my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, false);
+    my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, true);
 
     // qg tagging
     m_qgVars.clear();
@@ -551,7 +552,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==361519) crossSection =  43.469*1.2283;
     else if(runNumber==309668) crossSection =  592.36*0.9728*0.001043;
     else  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb
-
+    std::cout << "crossSection: " << crossSection << " " << runNumber << std::endl;
     // corrections for the filtered samples
     if(runNumber==309662) crossSection *= 0.9331*0.9702;
     else if(runNumber==309663) crossSection *= 0.9527*0.9702;
@@ -836,6 +837,7 @@ StatusCode VBFAnalysisAlg::execute() {
      trigger_HLT_noalg_L1J400 ==1 ) trigger_met = 1; else trigger_met = 0; // 2015+2016
 
   bool passMETTrig = trigger_met_encodedv2>0 || trigger_met>0 || trigger_met_encoded>0;
+  if(m_METTrigPassThru) passMETTrig=true;
   ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
@@ -859,7 +861,8 @@ StatusCode VBFAnalysisAlg::execute() {
   }else{
     passMETCut = (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut); // || met_tighter_tst_et > METCut);
     passMETNoLepCut = (met_tst_nolep_et > METCut || met_tenacious_tst_nolep_et > METCut || met_tight_tst_nolep_et > METCut);// || met_tighter_tst_nolep_et > METCut);
-    if ((passMETTrig) && (passMETCut) && (n_el == 0) && (n_mu == 0)) SR = true;
+    //if ((passMETTrig) && (passMETCut) && (n_el == 0) && (n_mu == 0)) SR = true;
+    if ((passMETCut) && (n_el == 0) && (n_mu == 0)) SR = true;
     // saving the base leptons for the fake lepton estimate. This is done in the loose skimming
     OneElec = (n_el == 1 || n_baseel==1); // n_el should be a subset of baseel ... will need to modify for the systematics in v27Loose
     OneMuon = (n_mu == 1 || n_basemu==1);// n_mu should be a subset of basemu

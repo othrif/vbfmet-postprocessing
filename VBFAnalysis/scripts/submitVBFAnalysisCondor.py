@@ -20,6 +20,7 @@ parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default 
 parser.add_argument( "-p", "--proxyName", type = str, dest = "proxyName", default = "/home/schae/testarea/HInv/run/x509up_u20186", help = "proxy file for grid")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
 parser.add_argument("-e", "--UseExtMC", dest = "UseExtMC", action="store_true", default = False, help = "Use extended MC samples" )
+parser.add_argument( "--METTrigPassThru", dest = "METTrigPassThru", action="store_true", default = False, help = "Use met trigger pass through" )
 args, unknown = parser.parse_known_args()
 
 
@@ -109,6 +110,8 @@ fMC.close()
 UseExtMC =""
 if args.UseExtMC:
     UseExtMC = " --UseExtMC"
+if args.METTrigPassThru:
+    UseExtMC += " --METTrigPassThru"
 
 for syst in systlist:
     print listofrunN

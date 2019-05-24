@@ -66,6 +66,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool m_extraVars = true;
   bool m_contLep   = false;
   bool m_QGTagger   = true;
+  bool m_METTrigPassThru = false;
   TTree *m_tree = 0;
   TTree *m_tree_out = 0;
   SUSY::CrossSectionDB *my_XsecDB;
