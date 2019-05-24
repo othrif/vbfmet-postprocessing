@@ -246,8 +246,8 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
         cuts = [CutItem('CutNjet',  'n_jet == 2')]
-        cuts += [CutItem('CutJ0Pt',  'jetPt0 > 50.0')]
-        cuts += [CutItem('CutJ1Pt',  'jetPt1 > 35.0')]
+        cuts += [CutItem('CutJ0Pt',  'jetPt0 > 60.0')]
+        cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
 
     return cuts
 
@@ -408,7 +408,10 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
 
     # add the extra cuts...decide if we want these
     #cuts += ExtraCuts(options)
-
+    cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]
+    cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
+    cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
+    
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
@@ -422,7 +425,8 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     cuts += [CutItem('CutPhCentrality','phcentrality > 0.4')]
     # VBF cuts
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
-    cuts += [CutItem('CutDEtajj','jj_deta > 2.5')]
+    cuts += [CutItem('CutDEtajj','jj_deta > 3.0')]
+    cuts += [CutItem('CutDPhijj','jj_dphi < 2.0')]
     cuts += [CutItem('CutMjj','jj_mass > 250.0')]
 
     return GetCuts(cuts)
