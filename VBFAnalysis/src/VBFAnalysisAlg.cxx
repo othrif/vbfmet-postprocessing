@@ -774,8 +774,8 @@ StatusCode VBFAnalysisAlg::execute() {
   if (trigger_HLT_xe90_mht_L1XE50 == 1)  trigger_met_encoded+=0x4;
   if (trigger_HLT_xe70_mht == 1)         trigger_met_encoded+=0x8;
   if (trigger_HLT_noalg_L1J400 == 1)     trigger_met_encoded+=0x10;
-  
-  unsigned metRunNumber = randomRunNumber;
+
+  metRunNumber = randomRunNumber;
   if(!m_isMC) metRunNumber=runNumber;
   if((metRunNumber<=284484 && trigger_HLT_xe70_mht==1) ||                                // 2015
      (metRunNumber>284484 && metRunNumber<=302872 && trigger_HLT_xe90_mht_L1XE50==1) ||  // 2016
@@ -994,7 +994,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       tMapFloat["nloEWKWeight__1up"]=1.0;
       tMapFloatW["nloEWKWeight__1up"]=1.0;
       m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
-    }    
+    }
     if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
       tMapFloat["nloEWKWeight__1down"]=1.0;
       tMapFloatW["nloEWKWeight__1down"]=1.0;
