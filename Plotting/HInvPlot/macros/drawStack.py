@@ -45,6 +45,7 @@ p.add_option('--draw-norm',     action='store_true', default=False,   dest='draw
 p.add_option('--do-ratio',      action='store_true', default=False,   dest='do_ratio')
 p.add_option('--force-ratio',   action='store_true', default=False,   dest='force_ratio')
 p.add_option('--stack-signal',  action='store_true', default=False,   dest='stack_signal')
+p.add_option('--ph-ana',  action='store_true', default=False,   dest='ph_ana')
 
 p.add_option('--debug',         action='store_true', default=False,   dest='debug')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
@@ -324,6 +325,10 @@ def getLabelSortKey(sample):
     #elif sample == 'data': return 11
     elif sample == 'bkgs': return 12
     elif sample == 'zewk': return 13
+    elif sample == 'ttg': return 13        
+    elif sample == 'zgam': return 13        
+    elif sample == 'wgam': return 13        
+    elif sample == 'pho': return 13        
     elif sample == 'wqcd': return 14
     elif sample == 'wqcdMad': return 14
     elif sample == 'wewk': return 15
@@ -360,6 +365,10 @@ def getSampleSortKey(sample):
     elif sample == 'hvbf': return 9
     elif sample == 'data': return -10
     elif sample == 'bkgs': return 11
+    elif sample == 'ttg': return 13        
+    elif sample == 'zgam': return 13        
+    elif sample == 'wgam': return 13        
+    elif sample == 'pho': return 13        
 
     log.warning('getLabelSortKey - unknown key: %s' %sample)
     return 100
@@ -395,6 +404,9 @@ def getSampleLabel(sample):
         'wgam': 'W#gamma',
         'wgas': 'W#gamma*',
         'zgas': 'Z#gamma*',
+        'zgam': 'Z#gamma',        
+        'ttg': 't#bar{t}#gamma',
+        'pho': '#gamma+j',
         'htau':  '%s H#rightarrow#tau#tau'%options.hmass,
         'hggf':  'ggF Higgs',
         'higgs':  'Higgs',
@@ -447,6 +459,8 @@ def getStyle(sample):
     color_zldy = ROOT.kOrange-3
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
+    color_ttg = ROOT.kBlue   -9
+    color_pho = ROOT.kGreen -3  
     color_wdpi = ROOT.kOrange-5
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
@@ -467,6 +481,10 @@ def getStyle(sample):
         'mqcd':{'color':color_wdpi, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'dqcd':{'color':color_wdpi, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'pho':{'color':color_pho, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'wgam':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
@@ -2306,8 +2324,9 @@ def main():
         bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
         bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
-        #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv' 
-
+        #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
+        if options.ph_ana:
+            bkgs = ['ttg', 'zgam','wgam','pho'] #,'mqcd','zldy','vvv' 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
 
