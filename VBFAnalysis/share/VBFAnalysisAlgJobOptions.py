@@ -20,6 +20,7 @@ arg_group.add_argument("--normFile", dest='normFile', default="current.root", he
 arg_group.add_argument("--containerName", dest='containerName', default="", help="container name used to look up the sample ID if not in the file path")
 arg_group.add_argument("--UseExtMC", dest="UseExtMC", action="store_true",default=False,help="Use extended MC samples")
 arg_group.add_argument("--METTrigPassThru", dest="METTrigPassThru", action="store_true",default=False,help="Pass through for the met trigger skim")
+arg_group.add_argument("--QGTagger", dest="QGTagger", action="store_true",default=False,help="Run the QGTagger when true")
 arg_group.add_argument("--theoVariation", dest='theoVariation', action="store_true", default=False, help="do theory systematic variations, default: False")
 
 # parse the commandline options
@@ -57,7 +58,7 @@ athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                    ExtraVars=True,
                                    UseExtMC=args.UseExtMC,
                                    METTrigPassThru=args.METTrigPassThru,
-                                   QGTagger=True,
+                                   QGTagger=args.QGTagger,
                                    runNumberInput = runNumber,
                                    theoVariation = args.theoVariation and isSherpaVjets
                                    );

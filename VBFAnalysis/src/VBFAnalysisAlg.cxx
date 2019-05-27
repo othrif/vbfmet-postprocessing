@@ -13,7 +13,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
   declareProperty( "LooseSkim", m_LooseSkim = true, "true if loose skimming is requested" );
   declareProperty( "ExtraVars", m_extraVars = true, "true if extra variables should be output" );
-  declareProperty( "QGTagger", m_QGTagger = true, "true if extra variables should be output for QGTagger" );
+  declareProperty( "QGTagger", m_QGTagger = false, "true if extra variables should be output for QGTagger" );
   declareProperty( "METTrigPassThru", m_METTrigPassThru = false, "true if require no met triggers" );
   declareProperty( "ContLep", m_contLep = false, "true if container lepton variables should be output" );
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "current sytematics of the tree" );
@@ -552,7 +552,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==361519) crossSection =  43.469*1.2283;
     else if(runNumber==309668) crossSection =  592.36*0.9728*0.001043;
     else  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb
-    std::cout << "crossSection: " << crossSection << " " << runNumber << std::endl;
+    //std::cout << "crossSection: " << crossSection << " " << runNumber << std::endl;
     // corrections for the filtered samples
     if(runNumber==309662) crossSection *= 0.9331*0.9702;
     else if(runNumber==309663) crossSection *= 0.9527*0.9702;
@@ -716,7 +716,7 @@ StatusCode VBFAnalysisAlg::execute() {
       // Loop over QG systematics
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	ANA_CHECK(m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]));
-	m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, NULL); // add qg taging
+	m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, nullptr); // add qg taging
 	tMapFloat[m_qgVars.at(iQG)] *= acc_qgTaggerWeight(*new_jet);
       }
     }

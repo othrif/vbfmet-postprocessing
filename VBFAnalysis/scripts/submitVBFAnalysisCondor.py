@@ -21,6 +21,7 @@ parser.add_argument( "-p", "--proxyName", type = str, dest = "proxyName", defaul
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
 parser.add_argument("-e", "--UseExtMC", dest = "UseExtMC", action="store_true", default = False, help = "Use extended MC samples" )
 parser.add_argument( "--METTrigPassThru", dest = "METTrigPassThru", action="store_true", default = False, help = "Use met trigger pass through" )
+parser.add_argument( "--QGTagger", dest = "QGTagger", action="store_true", default = False, help = "Use qgtagger. available in releases newer than 21.2.76" )
 args, unknown = parser.parse_known_args()
 
 
@@ -112,6 +113,8 @@ if args.UseExtMC:
     UseExtMC = " --UseExtMC"
 if args.METTrigPassThru:
     UseExtMC += " --METTrigPassThru"
+if args.QGTagger:
+    UseExtMC += " --QGTagger"
 
 for syst in systlist:
     print listofrunN
