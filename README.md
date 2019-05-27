@@ -16,12 +16,11 @@ VBFAnalysis/python/job_configurations package allows users to add user defined f
 cd $TestArea
 git clone ssh://git@gitlab.cern.ch:7999/VBFInv/STPostProcessing.git source/
 mkdir build;cd build
-acmSetup AthAnalysis,21.2.58
+acmSetup AthAnalysis,21.2.75
 acm compile
 ```
 
 ## Future setup ##
-
 ```bash
 cd $TestArea/build
 acmSetup
@@ -36,7 +35,6 @@ python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/uchicagoFileMa
 
 # to check the number of raw. The RAW counts need to be saved. Add the -r 1 option.
 python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/uchicagoFileMap_v15Loose.p -o fout_v15raw.root -r 1
-
 
 ## Run VBFAnalysisAlg ##
 This generates the micro ntuples.
