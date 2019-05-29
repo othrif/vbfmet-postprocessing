@@ -831,8 +831,6 @@ StatusCode VBFAnalysisAlg::execute() {
   if (trigger_HLT_xe70_mht == 1)         trigger_met_encoded+=0x8;
   if (trigger_HLT_noalg_L1J400 == 1)     trigger_met_encoded+=0x10;
 
-  metRunNumber = randomRunNumber;
-  if(!m_isMC) metRunNumber=runNumber;
   if((metRunNumber<=284484 && trigger_HLT_xe70_mht==1) ||                                // 2015
      (metRunNumber>284484 && metRunNumber<=302872 && trigger_HLT_xe90_mht_L1XE50==1) ||  // 2016
      (metRunNumber>302872 && trigger_HLT_xe110_mht_L1XE50==1) ||           // 2016

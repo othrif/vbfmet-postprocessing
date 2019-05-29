@@ -1152,13 +1152,14 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Process TMVA
     if(fTMVAReader){
       // fill the variables
-      fTMVAVars[0]=event->GetVar(Mva::jj_mass);
+      fTMVAVars[0]=event->GetVar(Mva::jj_mass)*1.0e3;
       fTMVAVars[1]=event->GetVar(Mva::jj_dphi);
       fTMVAVars[2]=event->GetVar(Mva::jj_deta);
-      fTMVAVars[3]=event->GetVar(Mva::met_tst_et);
-      fTMVAVars[4]=event->GetVar(Mva::jetPt0);
-      fTMVAVars[5]=event->GetVar(Mva::jetPt1);
+      fTMVAVars[3]=event->GetVar(Mva::met_tst_et)*1.0e3;
+      fTMVAVars[4]=event->GetVar(Mva::jetPt0)*1.0e3;
+      fTMVAVars[5]=event->GetVar(Mva::jetPt1)*1.0e3;
       event->AddVar(Mva::tmva, fTMVAReader->EvaluateMVA( fTMVAVars, fMVAName ));
+      //std::cout << "inputs: " << fTMVAVars[0] << " " << fTMVAVars[1] << " " << fTMVAVars[2] << " " << fTMVAVars[3] << " " << fTMVAVars[4] << " " << fTMVAVars[5] << " " << event->GetVar(Mva::tmva) << std::endl;
     }else { event->AddVar(Mva::tmva, 0.0); }
     
     //
