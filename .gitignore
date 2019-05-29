@@ -1,4 +1,6 @@
 *.pyc
+*.png
+*.pdf
 */RootCore/lib
 */RootCore/root_config_generic
 */RootCore/obj
