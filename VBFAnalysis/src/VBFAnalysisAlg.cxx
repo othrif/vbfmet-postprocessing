@@ -63,6 +63,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     my_handleNom.setTypeAndName("CP::JetQGTagger/JetQGTagger_VBF");
     ANA_CHECK(my_handleNom.setProperty("NTrackCut", 5));
     ANA_CHECK(my_handleNom.setProperty("UseJetVars", 1));
+    ANA_CHECK(my_handleNom.setProperty("cuttype", "threshold"));
     ANA_CHECK(my_handleNom.retrieve());
     m_jetQGTool[m_qgVars.at(0)]=my_handleNom;
     m_systSet["JET_QG_Nominal"] = CP::SystematicSet(""); //my_syst_nominal_set;
@@ -294,6 +295,11 @@ StatusCode VBFAnalysisAlg::initialize() {
       }
       if(m_isMC) m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
       if(m_isMC) m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
+    }else{
+      if(m_QGTagger){
+      	m_tree_out->Branch("jet_NTracks",&jet_NTracks_PV);
+      //	if(m_isMC) m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
+      }
     }
 
     m_tree_out->Branch("jet_fjvt",&jet_fjvt);
@@ -712,7 +718,7 @@ StatusCode VBFAnalysisAlg::execute() {
       new_jet->auxdata<int>("DFCommonJets_QGTagger_truthjet_nCharged") = 10;//jet->getAttribute<int>("truthjet_nCharged");
       new_jet->auxdata<int>("PartonTruthLabelID") = jet_PartonTruthLabelID->at(iJet); //jet->getAttribute<int>("PartonTruthLabelID");
       new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_eta") = 0.0; //jet->getAttribute<float>("truthjet_eta");
-      new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_pt") = 1000.0; //jet->getAttribute<float>("truthjet_pt");
+      new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_pt") = 50000.0; //jet->getAttribute<float>("truthjet_pt");
       // Loop over QG systematics
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	ANA_CHECK(m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]));
