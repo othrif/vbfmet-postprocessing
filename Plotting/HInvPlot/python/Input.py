@@ -887,6 +887,41 @@ def prepareBkgRuns(keys,options=None):
                '364546':'SinglePhoton_pty_500_1000',
                '364547':'SinglePhoton_pty_1000_E',
            }
+    bkg_pho_v2 = {'361040':'SinglePhoton_',
+                      '361041':'SinglePhoton_',
+                      '361042':'SinglePhoton_',
+                      '361043':'SinglePhoton_',
+                      '361044':'SinglePhoton_',
+                  '361045':'SinglePhoton_',                      
+                  '361046':'SinglePhoton_',
+                  '361047':'SinglePhoton_',
+                  '361048':'SinglePhoton_',
+                  '361049':'SinglePhoton_',                  
+                  '361050':'SinglePhoton_',                  
+                  '361051':'SinglePhoton_',                  
+                  '361052':'SinglePhoton_',                  
+                  '361053':'SinglePhoton_',                  
+                  '361054':'SinglePhoton_',                  
+                  '361055':'SinglePhoton_',                  
+                  '361056':'SinglePhoton_',                  
+                  '361057':'SinglePhoton_',                  
+                  '361058':'SinglePhoton_',                  
+                  '361059':'SinglePhoton_',                  
+                  '361060':'SinglePhoton_',                  
+                  '361061':'SinglePhoton_',                  
+                  '361062':'SinglePhoton_',
+                  } #305444
+    bkg_Vqq_gamma = {'305435':'TBD',
+                         '305436':'TBD',
+                         '305437':'TBD',
+                         '305438':'TBD',
+                         '305439':'TBD',
+                         '305440':'TBD',
+                         '305441':'TBD',
+                         '305442':'TBD',
+                         '305443':'TBD',
+                         '305444':'TBD',
+                         }
     
     if options.mergePTV:
         for ki,yi in bkg_vbfPTVExt.iteritems():
@@ -932,6 +967,7 @@ def prepareBkgRuns(keys,options=None):
                 'zgam':bkg_sherpa_zg,
                 'ttg':bkg_ttg,
                 'pho':bkg_pho,
+                'phoAlt':bkg_pho_v2,
                 #'zqcdMad':bkg_zqcd,
                 #'wqcdMad':bkg_wqcd,
                 #'hvbf':bkg_w_strong_madgraph_wmnu,
@@ -961,6 +997,7 @@ def prepareBkgRuns(keys,options=None):
         extra_samples=bkg_vbfFiltZ
         extra_samples.update(bkg_z_strong_powheg)
         bkg_keys['wdpi'].update(extra_samples)
+        bkg_keys['wdpi'].update(bkg_Vqq_gamma)        
         
     #
     # Select MC samples 

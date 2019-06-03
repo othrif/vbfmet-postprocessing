@@ -46,30 +46,16 @@ def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=No
     #
     # Make alg for all events - this algorithm stores events for MakeInput
     #
-    #plot_var = [] #options.var]
-    #print 'alg_suff',alg_suff
-    #plot_alg = hstudy.preparePlotEvent('plotEvent%s' %alg_suff,
-    #                                   Vars=plot_var,
-    #                                   SelKey=selkey,
-    #                                   Region=region,
-    #                                   PassAlg=alg_pass,
-    #                                   NBinLim=nbin_lim)
-    #
-    #if type(alg_take) == type([]):
-    #    alg_take += [plot_alg]
-
-    #
-    # Make plot algorithm for MC samples
-    #
-    #plot_algs = [plot_alg]
     plot_algs=[]
     if not skip_samples:
 
         for key, samples in hstudy.fillSampleList(options=options).iteritems():
             plot_algs += [hstudy.preparePlotEvent('plotEvent%s_%s%s' %(alg_suff, key, my_cut_key),
                                                   syst_name=syst,
+                                                  DetailLvl=options.DetailLvl,
                                                   Samples=samples,
                                                   PassAlg=alg_pass)]
+                                                
 
     return plot_algs
 
@@ -274,8 +260,7 @@ def main():
         #-----------------------------------------------------------------------------------------
         # Common algorithms for computing additional event properties and event pre-selection
         #
-        #plot_alg = hstudy.preparePlotEvent('plotEvent'+syst)
-        plot_alg = hstudy.preparePlotEvent('plotEvent',syst_name=syst)
+        plot_alg = hstudy.preparePlotEvent('plotEvent',syst_name=syst,DetailLvl=options.DetailLvl)
         read_alg.AddCommonAlg(plot_alg)
 
         #-----------------------------------------------------------------------------------------

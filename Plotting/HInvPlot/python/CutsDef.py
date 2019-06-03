@@ -638,6 +638,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     if options.OverlapPh:
         bkgs['ttg']  = ['ttg']
         bkgs['pho']  = ['pho']
+        bkgs['phoAlt']  = ['phoAlt']
         bkgs['wgam'] = ['wgam']
         bkgs['zgam'] = ['zgam']
 
@@ -649,6 +650,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     if not options.OverlapPh:
         other['ttg']  = ['ttg']
         other['pho']  = ['pho']
+        other['phoAlt']  = ['phoAlt']
         other['wgam'] = ['wgam']
         other['zgam'] = ['zgam']
         
@@ -669,7 +671,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     #
     if reg != None and key != None:
         if options.OverlapPh:
-            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,ttg,pho,wgam,zgam,bkgs,data')
+            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,ttg,pho,phoAlt,wgam,zgam,bkgs,data')
         else:
             reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
         for k, v in samples.iteritems():
@@ -829,7 +831,7 @@ def prepareFillEvent(alg_name, options):
     return ExecBase(alg_name, 'FillEvent', ROOT.Msl.FillEvent(), reg)
 
 #-------------------------------------------------------------------------
-def preparePlotEvent(alg_name, syst_name, *arguments, **keywords):
+def preparePlotEvent(alg_name, syst_name, DetailLvl, *arguments, **keywords):
 
     alg = ROOT.Msl.PlotEvent()
     reg = ROOT.Msl.Registry()
@@ -837,12 +839,11 @@ def preparePlotEvent(alg_name, syst_name, *arguments, **keywords):
     reg.SetVal('PlotEvent::Debug',       'no')
     reg.SetVal('PlotEvent::Print',       'no')
     reg.SetVal('PlotEvent::VarPref',     'var_')
-    reg.SetVal('PlotEvent::DetailLvl',   1)
-    #reg.SetVal('PlotEvent::Debug',       'yes')
-    reg.SetVal('PlotEvent::VarVec',      ','.join((get_vars.GetPltStr(0,syst_name))))
-    reg.SetVal('PlotEvent::NBinVec',     ','.join((get_vars.GetPltStr(1,syst_name))))
-    reg.SetVal('PlotEvent::LoVec',       ','.join((get_vars.GetPltStr(2,syst_name))))
-    reg.SetVal('PlotEvent::HiVec',       ','.join((get_vars.GetPltStr(3,syst_name))))
+    reg.SetVal('PlotEvent::DetailLvl',   DetailLvl)
+    reg.SetVal('PlotEvent::VarVec',      ','.join((get_vars.GetPltStr(0,syst_name,DetailLvl=DetailLvl))))
+    reg.SetVal('PlotEvent::NBinVec',     ','.join((get_vars.GetPltStr(1,syst_name,DetailLvl=DetailLvl))))
+    reg.SetVal('PlotEvent::LoVec',       ','.join((get_vars.GetPltStr(2,syst_name,DetailLvl=DetailLvl))))
+    reg.SetVal('PlotEvent::HiVec',       ','.join((get_vars.GetPltStr(3,syst_name,DetailLvl=DetailLvl))))
 
     pass_algs = []
 
