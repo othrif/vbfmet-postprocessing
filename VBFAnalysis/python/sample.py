@@ -102,6 +102,8 @@ class sample(object):
                 self.sampleType = "ttbar" # VV moved to ttbar+other
             elif (self.runNumber >= 364242 and self.runNumber <= 364249 or self.runNumber==364253):
                 self.sampleType = "ttbar" # VVV moved to ttbar+other
+            elif (self.runNumber == 410658 or self.runNumber <= 410659):
+                self.sampleType = "ttbar" # tchan top
             elif (self.runNumber >= 364198 and self.runNumber <= 364215):
                 self.sampleType = "Z_strong" # Z_strong_LowMass added to the Z_strong
             elif (self.runNumber >= 301020 and self.runNumber <= 301038):

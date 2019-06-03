@@ -2,11 +2,20 @@
 #define VBFANALYSIS_VBFANALYSISALG_H 1
 
 #include "AthAnalysisBaseComps/AthAnalysisAlgorithm.h"
+#include <AsgTools/AnaToolHandle.h>
 #include "SUSYTools/SUSYCrossSection.h"
+#include "BoostedJetTaggers/IJetQGTagger.h"
+#include "BoostedJetTaggers/JetQGTagger.h"
+#include "xAODJet/Jet.h"
+#include "xAODJet/JetContainer.h"
+#include "xAODCore/AuxContainerBase.h"
 
 //Example ROOT Includes
 //#include "TTree.h"
 //#include "TH1D.h"
+// For making the systematics list and looping through it
+#include "PATInterfaces/SystematicsUtil.h"
+#include "PATInterfaces/SystematicRegistry.h"
 
 #include "TTree.h"
 #include "TH1D.h"
@@ -57,9 +66,12 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool m_extraVars = true;
   bool m_contLep   = false;
   bool m_QGTagger   = true;
+  bool m_METTrigPassThru = false;
   TTree *m_tree = 0;
   TTree *m_tree_out = 0;
   SUSY::CrossSectionDB *my_XsecDB;
+  std::map<TString,asg::AnaToolHandle<CP::IJetQGTagger> >      m_jetQGTool;                     //! 
+  std::map<TString,CP::SystematicSet>        m_systSet;                     //! 
   //  const TFile outputFile;
   TString m_treeName = "MiniNtuple";
   TString outputFileName = "ntuple";
@@ -71,6 +83,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::map<TString, int>   tMapInt;
   std::map<TString, Float_t> tMapFloat;
   std::map<TString, Float_t> tMapFloatW;
+  vector<TString> m_qgVars;
+
+  // jet container
+  xAOD::JetContainer* m_newJets;
+  xAOD::AuxContainerBase* m_newJetsAux;
 
    //Example algorithm property, see constructor for declaration:
    //int m_nProperty = 0;
@@ -98,6 +115,9 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t trigger_met_encoded;
   Int_t trigger_met_encodedv2;
   Int_t l1_met_trig_encoded;
+  Int_t lumiBlock;
+  Int_t bcid;
+  Int_t BCIDDistanceFromFront;
   Bool_t passVjetsFilter;
   Bool_t passVjetsPTV;
 

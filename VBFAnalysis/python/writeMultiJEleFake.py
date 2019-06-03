@@ -5,6 +5,8 @@ def writeMultiJet(Binning=0):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
     #multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
+    if Binning==-1:
+        multijets = [31.0, 14.5, 13.0, 30.0, 14.0, 13.0]
     if Binning==1:
         multijets = [3.0, 0.5, 0.1, 112.] 
     if Binning==2:
@@ -40,7 +42,7 @@ def writeFakeEle(Binning=0):
     if Binning==2:
         fakeelesp += [5.3]
         fakeelesm += [5.3]
-    if Binning>2:
+    if Binning>2 or Binning==-1:
         fakeelesp = [10.4, 10.0, 5.3, 14.5, 14.2, 6.2]
         fakeelesm = [10.4, 10.0, 5.3, 14.5, 14.2, 6.2]
     if Binning==6:

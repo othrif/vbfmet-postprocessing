@@ -75,7 +75,15 @@ samplesPrint =['Samples','VBFH125',
 #f=ROOT.TFile.Open('SumHF_delete.root')
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMETTenac_v26c_DPhiFixQCDEst_J400_XSSig_TopFix_TrigFix.root')
 #f=ROOT.TFile.Open('/home/schae/testarea/HInv/runLoosev26/SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_final.root')
-f=ROOT.TFile.Open('/tmp/SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_UpdateMETSF.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_doPlot.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_UpdateMETSF_doPlot.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_Tenac_UpdateMETSF_METTrig.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_Tenac_UpdateMETSF.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_Tenac_UpdateMETSF_lepMETTrig.root')
+#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400_XSSig_badTrig.root')
+f=ROOT.TFile.Open('Sum_NominalOnly_QG.root')
+#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400.root')#
 #f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_SigXS.root')
@@ -161,6 +169,10 @@ for rmy in regions:
         bkgFracErr= math.sqrt(lineBkgErr)/lineBkg
         line +='%0.3f\t' %(bkgFracErr)
         #line +='%0.2f\t' %(lineData/lineBkg)
+        if lineData<1.0:
+            lineData=1.0
+        if lineBkg<1.0:
+            lineBkg=1.0
         line +='%0.3f +/- %0.3f\t' %(lineData/lineBkg, math.sqrt(1./lineData+bkgFracErr**2)*(lineData/lineBkg))
         print line
         nRegion+=1
