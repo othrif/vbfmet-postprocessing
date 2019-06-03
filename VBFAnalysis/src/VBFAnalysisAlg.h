@@ -115,6 +115,9 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t trigger_met_encoded;
   Int_t trigger_met_encodedv2;
   Int_t l1_met_trig_encoded;
+  Int_t lumiBlock;
+  Int_t bcid;
+  Int_t BCIDDistanceFromFront;
   Bool_t passVjetsFilter;
   Bool_t passVjetsPTV;
 

@@ -285,6 +285,10 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("mj34",&mj34);
       m_tree_out->Branch("max_j_eta",&max_j_eta);
 
+      m_tree_out->Branch("lb",&lumiBlock);
+      m_tree_out->Branch("bcid",&bcid);
+      m_tree_out->Branch("BCIDDistanceFromFront",&BCIDDistanceFromFront);
+
       if(m_QGTagger){
 	m_tree_out->Branch("jet_NTracks",&jet_NTracks_PV);
 	m_tree_out->Branch("jet_SumPtTracks",&jet_SumPtTracks_PV);
@@ -1151,6 +1155,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 
   if(m_extraVars){
 
+    m_tree->SetBranchStatus("lumiBlock",1);
+    m_tree->SetBranchStatus("bcid",1);
+    m_tree->SetBranchStatus("BCIDDistanceFromFront",1);
+
     m_tree->SetBranchStatus("ph_pt",1);
     m_tree->SetBranchStatus("ph_phi",1);
     m_tree->SetBranchStatus("ph_eta",1);
@@ -1279,6 +1287,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_mu_baseline",&n_basemu);
   m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_bjet",            &n_bjet);
+  m_tree->SetBranchAddress("lumiBlock",&lumiBlock);
+  m_tree->SetBranchAddress("bcid",&bcid);
+  m_tree->SetBranchAddress("BCIDDistanceFromFront",&BCIDDistanceFromFront);
 
   m_tree->SetBranchAddress("jj_mass",&jj_mass);
   m_tree->SetBranchAddress("jj_deta",&jj_deta);

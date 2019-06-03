@@ -10,6 +10,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("currentVariation", currentVariation = "Nominal", "current systematics, NONE means nominal");
   declareProperty("currentSample", currentSample = "W_strong", "current samples");
   declareProperty("isMC", isMC = true, "isMC flag, true means the sample is MC");
+  declareProperty("year", year = 2016, "year, 2017 and 2018 to set the lumi");
   declareProperty("isMadgraph", isMadgraph = false, "isMadgraph flag, true means the sample is Madgraph");
   declareProperty("ExtraVars", m_extraVars = 0, "0=20.7 analysis, 1=lepton veto, object def, 2=loose cuts" );
   declareProperty("Binning", m_binning = 0, "0=nominal binning. Other options with >0" );
@@ -56,6 +57,7 @@ StatusCode HFInputAlg::initialize() {
   jet_timing= new std::vector<float>(0); 
   jet_passJvt= new std::vector<int>(0); 
   jet_fjvt= new std::vector<float>(0);
+  jet_NTracks = new std::vector<unsigned short>(0);
   baseel_pt= new std::vector<float>(0);
   baseel_eta= new std::vector<float>(0);
   baseel_phi= new std::vector<float>(0);
@@ -71,6 +73,7 @@ StatusCode HFInputAlg::initialize() {
   cout<< "CURRENT  sample === "<< currentSample<<endl;
   std::cout << "Running Extra Veto? " << m_extraVars << std::endl;
   std::cout << "is a weightSyst? " << weightSyst << std::endl;
+  std::cout << "binning? " << m_binning << std::endl;
 
   std::string syst;
   bool replacedHigh = false;
@@ -95,6 +98,7 @@ StatusCode HFInputAlg::initialize() {
   }
   int bins = 4;
   if(m_binning==1)       bins=5; 
+  else if(m_binning==-1) bins=7; // first pass of the qgtagging 
   else if(m_binning==2)  bins=5;
   else if(m_binning==3)  bins=7; // mjj binning
   else if(m_binning==4)  bins=7; // mjj binning
@@ -257,7 +261,13 @@ StatusCode HFInputAlg::execute() {
   bool metSoftVeto = false;
   bool fJVTVeto = false;
   bool JetTimingVeto = false;
+  bool JetQGTagger = false;
   if(m_extraVars>0){
+
+    if(jet_NTracks && jet_NTracks->size()>0 && (fabs(jet_eta->at(0))<2.1 && jet_NTracks->at(0)>5))
+      JetQGTagger=true;
+    if(jet_NTracks && jet_NTracks->size()>1 && (fabs(jet_eta->at(1))<2.1 && jet_NTracks->at(1)>5))
+      JetQGTagger=true;
     //leptonVeto = (n_baseel>0 || n_basemu>0) && !(((n_el+n_mu)==1 && (n_baseel+n_basemu)==1) || ((n_el+n_mu)==2 && (n_baseel+n_basemu)==2));
     metSoftVeto = met_soft_tst_et>20.0e3;
     if(m_extraVars==3) metSoftVeto=false;
@@ -397,6 +407,8 @@ StatusCode HFInputAlg::execute() {
   }
   Float_t w_final = 1;
   Float_t lumi = 36.1;
+  if(year==2017)      lumi = 44.3074;
+  else if(year==2018) lumi = 59.9372;
   if (isMC) w_final = w*1000*lumi;
   int bin = 0;
   if (jj_mass < 1.5e6) bin = 0;
@@ -404,6 +416,7 @@ StatusCode HFInputAlg::execute() {
   else bin = 2;
 
   // alternative binning approaches
+  if(m_binning==-1 && JetQGTagger) bin+=3;
   if(m_binning==1 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin=3; // separate low MET bin
   if(m_binning==2 && (n_jet>2))  bin=3; // separate extra jets
   if(m_binning==3 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin+=3; // separate low MET bin, mjj binning
@@ -572,6 +585,7 @@ StatusCode HFInputAlg::beginInputFile() {
     //m_tree->SetBranchStatus("met_tighter_tst_et",1);
     m_tree->SetBranchStatus("met_tight_tst_et",1);
     m_tree->SetBranchStatus("jet_fjvt",1);
+    m_tree->SetBranchStatus("jet_NTracks",1);
     m_tree->SetBranchStatus("baseel_pt",1);
     m_tree->SetBranchStatus("baseel_eta",1);
     m_tree->SetBranchStatus("baseel_phi",1);
@@ -590,6 +604,7 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchAddress("met_tight_tst_et",       &met_tight_tst_et);
     //m_tree->SetBranchAddress("met_tighter_tst_et",     &met_tighter_tst_et);    
     m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
+    m_tree->SetBranchAddress("jet_NTracks",         &jet_NTracks);
     m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
     m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
     m_tree->SetBranchAddress("baseel_eta",           &baseel_eta);

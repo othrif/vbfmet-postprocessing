@@ -48,6 +48,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
 
  private: 
   int npevents = 0;
+  int year     = 2016;
   Bool_t isMC = true;
   Bool_t isMadgraph = true;
   Bool_t doLowNom = false; //put nominal yields for "Low" histogram for asymmetric systematics for HistFitter
@@ -133,6 +134,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_timing;
   std::vector<Int_t>* jet_passJvt;
   std::vector<Float_t>* jet_fjvt;
+  std::vector<unsigned short> *jet_NTracks;
   
   Float_t met_soft_tst_et=-9999; 
   Float_t met_tight_tst_et=-9999;
