@@ -99,8 +99,37 @@ myplots = [
               ['met_tst_ph_dphi', '12', '0.0', '3.15'],
               ['met_tst_j3_dphi', '32', '0.0', '3.2'],
               ['max_j3_dr', '20', '0.0', '10.0'],
-              ['tmva', '40', '-2.0', '2.0'],
+              ['tmva', '40', '-1.0', '1.0'],
+              #['bcid', '100', '-0.5', '99.5'],
+              ['bcidPos', '100', '-0.5', '99.5'],
     ]
+    
+# drawn with the detail plotting option
+jetplots=[['bcidPos', '100', '-0.5', '99.5'],
+              ['n_jet_fwd', '6', '-0.5', '5.5'],
+              ['n_jet_fwdj', '6', '-0.5', '5.5'],
+              ['n_jet_fwdj30', '6', '-0.5', '5.5'],
+              ['n_jet_fwdj40', '6', '-0.5', '5.5'],
+              ['n_jet_fwdj50', '6', '-0.5', '5.5'],              
+              ['n_jet_cen', '6', '-0.5', '5.5'],
+              ['n_jet_cenj', '6', '-0.5', '5.5'],
+              ['n_jet_cenj30', '6', '-0.5', '5.5'],
+              ['n_jet_cenj40', '6', '-0.5', '5.5'],
+              ['n_jet_cenj50', '6', '-0.5', '5.5'],
+              ['jetPt0', '500', '0.0', '500.0'], 
+              ['jetPt1', '500', '0.0', '500.0'],
+              ['jetEta0', '90', '-4.5', '4.5'],              
+              ['jetEta1', '90', '-4.5', '4.5'],                            
+              ['j0jvt', '48', '-0.2', '1.0'],              
+              ['j1jvt', '48', '-0.2', '1.0'],                            
+              ['j0fjvt', '100', '0.0', '2.0'],              
+              ['j1fjvt', '100', '0.0', '2.0'],
+              ['jj_deta', '50', '0.0', '10.0'],
+              ['jj_dphi', '32', '0.0', '3.2'],
+              ['jj_mass', '50', '0.0', '5000.0'],
+              ['nTruthJetMatch', '5', '-0.5', '4.5'],
+              ['met_tst_et', '100', '0.0', '500.0'],
+              ]
 syst_filter_vars = ['met_soft_tst_phi',
                     'met_soft_tst_sumet',
                     'met_tight_tst_et',
@@ -122,6 +151,7 @@ mev_vars = ['jj_mass',
             'met_cst_jet',
             'met_truth_et',
                 ]
+    
 def GetVarStr(entry=0, syst_name='Nominal'):
     varstr = []
     all_vars = myvars+myvars_notplotted
@@ -137,11 +167,13 @@ def GetVarStr(entry=0, syst_name='Nominal'):
         varstr  +=[i[entry]]
     return varstr
 
-def GetPltStr(entry=0, syst_name='Nominal'):
+def GetPltStr(entry=0, syst_name='Nominal', DetailLvl=0):
     varstr = []
     allvars = []
     allvars += myplots
     allvars += myvars
+    if DetailLvl==1:
+        allvars=jetplots
     for i in allvars:
         skip=False
         if syst_name!='Nominal':

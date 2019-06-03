@@ -821,7 +821,7 @@ def prepareFillEvent(alg_name, options):
     return ExecBase(alg_name, 'FillEvent', ROOT.Msl.FillEvent(), reg)
 
 #-------------------------------------------------------------------------
-def preparePlotEvent(alg_name, syst_name, *arguments, **keywords):
+def preparePlotEvent(alg_name, syst_name, DetailLvl, *arguments, **keywords):
 
     alg = ROOT.Msl.PlotEvent()
     reg = ROOT.Msl.Registry()
@@ -829,12 +829,11 @@ def preparePlotEvent(alg_name, syst_name, *arguments, **keywords):
     reg.SetVal('PlotEvent::Debug',       'no')
     reg.SetVal('PlotEvent::Print',       'no')
     reg.SetVal('PlotEvent::VarPref',     'var_')
-    reg.SetVal('PlotEvent::DetailLvl',   1)
-    #reg.SetVal('PlotEvent::Debug',       'yes')
-    reg.SetVal('PlotEvent::VarVec',      ','.join((get_vars.GetPltStr(0,syst_name))))
-    reg.SetVal('PlotEvent::NBinVec',     ','.join((get_vars.GetPltStr(1,syst_name))))
-    reg.SetVal('PlotEvent::LoVec',       ','.join((get_vars.GetPltStr(2,syst_name))))
-    reg.SetVal('PlotEvent::HiVec',       ','.join((get_vars.GetPltStr(3,syst_name))))
+    reg.SetVal('PlotEvent::DetailLvl',   DetailLvl)
+    reg.SetVal('PlotEvent::VarVec',      ','.join((get_vars.GetPltStr(0,syst_name,DetailLvl=DetailLvl))))
+    reg.SetVal('PlotEvent::NBinVec',     ','.join((get_vars.GetPltStr(1,syst_name,DetailLvl=DetailLvl))))
+    reg.SetVal('PlotEvent::LoVec',       ','.join((get_vars.GetPltStr(2,syst_name,DetailLvl=DetailLvl))))
+    reg.SetVal('PlotEvent::HiVec',       ','.join((get_vars.GetPltStr(3,syst_name,DetailLvl=DetailLvl))))
 
     pass_algs = []
 
