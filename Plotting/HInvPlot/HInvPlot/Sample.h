@@ -83,6 +83,7 @@ namespace Msl
       kttv,
       kttg,
       kpho,
+      kphoAlt,
       kvvv,
       kJPsi,
       kUpsl,

@@ -630,6 +630,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     if options.OverlapPh:
         bkgs['ttg']  = ['ttg']
         bkgs['pho']  = ['pho']
+        bkgs['phoAlt']  = ['phoAlt']
         bkgs['wgam'] = ['wgam']
         bkgs['zgam'] = ['zgam']
 
@@ -641,6 +642,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     if not options.OverlapPh:
         other['ttg']  = ['ttg']
         other['pho']  = ['pho']
+        other['phoAlt']  = ['phoAlt']
         other['wgam'] = ['wgam']
         other['zgam'] = ['zgam']
         
@@ -661,7 +663,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     #
     if reg != None and key != None:
         if options.OverlapPh:
-            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,ttg,pho,wgam,zgam,bkgs,data')
+            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,ttg,pho,phoAlt,wgam,zgam,bkgs,data')
         else:
             reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
         for k, v in samples.iteritems():

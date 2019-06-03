@@ -967,6 +967,7 @@ def prepareBkgRuns(keys,options=None):
                 'zgam':bkg_sherpa_zg,
                 'ttg':bkg_ttg,
                 'pho':bkg_pho,
+                'phoAlt':bkg_pho_v2,
                 #'zqcdMad':bkg_zqcd,
                 #'wqcdMad':bkg_wqcd,
                 #'hvbf':bkg_w_strong_madgraph_wmnu,
@@ -996,7 +997,6 @@ def prepareBkgRuns(keys,options=None):
         extra_samples=bkg_vbfFiltZ
         extra_samples.update(bkg_z_strong_powheg)
         bkg_keys['wdpi'].update(extra_samples)
-        bkg_keys['wdpi'].update(bkg_pho_v2)        
         bkg_keys['wdpi'].update(bkg_Vqq_gamma)        
         
     #
