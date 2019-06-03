@@ -71,7 +71,7 @@ if args.isMadgraph:
     extraCommand+=' --isMadgraph '
 if args.doPlot:
     extraCommand+=' --doPlot '
-if int(args.Binning)>0:
+if int(args.Binning)!=0:
     extraCommand+=' --Binning '+args.Binning
 for syst in systlist:
     isLow = ""    
