@@ -45,6 +45,7 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::JetVetoPt',     options.jet_veto_pt) 
         self.read_reg.SetVal('ReadEvent::LoadBaseLep',   options.LoadBaseLep)
         self.read_reg.SetVal('ReadEvent::OverlapPh',     options.OverlapPh)
+        self.read_reg.SetVal('ReadEvent::BTagCut',       options.BTagCut)
         self.read_reg.SetVal('ReadEvent::TMVAWeightPath',options.mva_weights_path)
         self.read_reg.SetVal('ReadEvent::TrigString',    options.trig_name)  # specify a trigger from the command line
         self.read_reg.SetVal('ReadEvent::mergePTV',      options.mergePTV)  

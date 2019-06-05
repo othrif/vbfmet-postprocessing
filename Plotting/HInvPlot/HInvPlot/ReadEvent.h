@@ -164,6 +164,7 @@ namespace Msl
     // External
     float                       fInputCount;
     float                       fLumi;
+    float                       fBTagCut;
     bool                        fisMC;
     bool                        fLoadBaseLep;
     bool                        fOverlapPh;
@@ -200,6 +201,7 @@ namespace Msl
     std::vector<float> *jet_phi;
     std::vector<float> *jet_jvt;
     std::vector<float> *jet_fjvt;
+    std::vector<float> *jet_btag_weight;
     std::vector<float> *jet_TrackWidth;
     //std::vector<std::vector<unsigned short> > *jet_NTracks;
     std::vector<unsigned short> *jet_NTracks;

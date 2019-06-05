@@ -118,6 +118,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t lumiBlock;
   Int_t bcid;
   Int_t BCIDDistanceFromFront;
+  Bool_t passBatman;
   Bool_t passVjetsFilter;
   Bool_t passVjetsPTV;
 
@@ -276,6 +277,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_HECFrac;
   std::vector<Float_t>* jet_EMFrac;
   std::vector<Float_t>* jet_fch;
+  std::vector<Float_t>* jet_btag_weight;
 
   std::vector<Float_t>* truth_jet_pt;
   std::vector<Float_t>* truth_jet_eta;
