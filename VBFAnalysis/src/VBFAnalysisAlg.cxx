@@ -164,6 +164,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   jet_HECFrac = new std::vector<float>(0);
   jet_EMFrac = new std::vector<float>(0);
   jet_fch = new std::vector<float>(0);
+  jet_btag_weight = new std::vector<float>(0);
 
   truth_jet_pt= new std::vector<float>(0);
   truth_jet_eta= new std::vector<float>(0);
@@ -217,6 +218,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("trigger_met_encodedv2", &trigger_met_encodedv2);
   m_tree_out->Branch("l1_met_trig_encoded", &l1_met_trig_encoded);
   if(m_extraVars) m_tree_out->Branch("trigger_met_encoded", &trigger_met_encoded);
+  m_tree_out->Branch("passBatman", &passBatman );
   m_tree_out->Branch("passVjetsFilter", &passVjetsFilter );
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("trigger_lep", &trigger_lep);
@@ -275,6 +277,7 @@ StatusCode VBFAnalysisAlg::initialize() {
 
     if(m_currentVariation=="Nominal"){
 
+      m_tree_out->Branch("jet_btag_weight",&jet_btag_weight);
       m_tree_out->Branch("j3_centrality",&j3_centrality);
       m_tree_out->Branch("j3_min_mj_over_mjj",&j3_min_mj_over_mjj);
       m_tree_out->Branch("j3_dRj1",&j3_dRj1);
@@ -1101,6 +1104,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("trigger_lep", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("l1_met_trig_encoded", 1);
+  m_tree->SetBranchStatus("passBatman", 1);
   m_tree->SetBranchStatus("passVjetsFilter", 1);
   m_tree->SetBranchStatus("passVjetsPTV", 1);
   m_tree->SetBranchStatus("passGRL", 1);
@@ -1142,6 +1146,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_m",1);
   m_tree->SetBranchStatus("jet_jvt",1);
   m_tree->SetBranchStatus("jet_timing",1);
+  m_tree->SetBranchStatus("jet_btag_weight",1);
   m_tree->SetBranchStatus("jet_PartonTruthLabelID",1);
   m_tree->SetBranchStatus("jet_ConeTruthLabelID",1);
   if(m_QGTagger){
@@ -1270,6 +1275,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   //m_tree->SetBranchAddress("trigger_met", &trigger_met); // just testing being copying directly
   m_tree->SetBranchAddress("trigger_met", &trigger_met_encodedv2);
   m_tree->SetBranchAddress("l1_met_trig_encoded", &l1_met_trig_encoded);
+  m_tree->SetBranchAddress("passBatman", &passBatman);
   m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
   m_tree->SetBranchAddress("passVjetsPTV", &passVjetsPTV);
   m_tree->SetBranchAddress("passGRL", &passGRL);
@@ -1319,6 +1325,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
   m_tree->SetBranchAddress("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
   m_tree->SetBranchAddress("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
+  if(m_currentVariation=="Nominal"){
+    m_tree->SetBranchAddress("jet_btag_weight",&jet_btag_weight);
+  }
   //if(foundGenMET) m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);
   if(m_QGTagger){
     m_tree->SetBranchAddress("jet_NTracks",&jet_NTracks);

@@ -129,6 +129,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case met_tst_ph_dphi:	  return "met_tst_ph_dphi";
     case passVjetsFilter:	  return "passVjetsFilter";
     case passVjetsPTV:	          return "passVjetsPTV";
+    case jetBtagWeight:           return "jetBtagWeight";
     case jetTrackWidth:           return "jetTrackWidth";
     case jetTrackWidth0:          return "jetTrackWidth0";
     case jetTrackWidth1:	  return "jetTrackWidth1";
@@ -265,6 +266,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "met_tst_ph_dphi")	 return met_tst_ph_dphi;
   if(var == "passVjetsFilter")	 return passVjetsFilter;
   if(var == "passVjetsPTV")	 return passVjetsPTV;
+  if(var == "jetBtagWeight")     return jetBtagWeight;
   if(var == "jetTrackWidth")     return jetTrackWidth;
   if(var == "jetTrackWidth0")    return jetTrackWidth0;
   if(var == "jetTrackWidth1")    return jetTrackWidth1;
@@ -488,6 +490,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(met_tst_ph_dphi);
     vars.push_back(passVjetsFilter);
     vars.push_back(passVjetsPTV);
+    vars.push_back(jetBtagWeight);
     vars.push_back(jetTrackWidth);
     vars.push_back(jetTrackWidth0);
     vars.push_back(jetTrackWidth1);

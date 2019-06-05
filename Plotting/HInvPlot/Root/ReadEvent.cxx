@@ -55,6 +55,7 @@ Msl::ReadEvent::ReadEvent():
   fPrintEvent   (false),
   fMaxNEvent(-1),
   fLumi         (1.0),
+  fBTagCut     (-10),
   fLoadBaseLep  (false),
   fOverlapPh    (false),
   fIsDDQCD      (false),
@@ -92,6 +93,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::OverlapPh",     fOverlapPh);
   reg.Get("ReadEvent::mergeExt",      fMergeExt);
   reg.Get("ReadEvent::mergePTV",      fMergePTV);
+  reg.Get("ReadEvent::BTagCut",       fBTagCut);
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -172,6 +174,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   jet_m      = new std::vector<float>();
   jet_jvt    = new std::vector<float>();
   jet_fjvt   = new std::vector<float>();
+  jet_btag_weight    = new std::vector<float>();
   jet_TrackWidth   = new std::vector<float>();
   jet_NTracks   = new std::vector<unsigned short>();
   jet_PartonTruthLabelID   = new std::vector<float>();
@@ -277,6 +280,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("jet_phi",   &jet_phi);
   tree->SetBranchAddress("jet_jvt",   &jet_jvt);
   tree->SetBranchAddress("jet_fjvt",   &jet_fjvt);
+  tree->SetBranchAddress("jet_btag_weight",   &jet_btag_weight);
   tree->SetBranchAddress("jet_TrackWidth",   &jet_TrackWidth);
   tree->SetBranchAddress("jet_NTracks",   &jet_NTracks);
   tree->SetBranchAddress("jet_PartonTruthLabelID",   &jet_PartonTruthLabelID);
@@ -761,6 +765,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));
+      if(jet_btag_weight && jet_btag_weight->size()>iJet) new_jet.AddVar(Mva::jetBtagWeight,jet_btag_weight->at(iJet));
       if(jet_TrackWidth && jet_TrackWidth->size()>iJet) new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));
       if(jet_NTracks && jet_NTracks->size()>iJet) new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));
       if(jet_PartonTruthLabelID && jet_PartonTruthLabelID->size()>iJet) new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));
@@ -806,6 +811,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // forward jets relative to the leading two jets
     float maxPosEta=0.0, maxNegEta=0.0;
+    unsigned nBjet=0;
     if(event->jets.size()>1){
       maxPosEta=std::max(event->jets.at(0).eta,event->jets.at(1).eta);
       maxNegEta=std::min(event->jets.at(0).eta,event->jets.at(1).eta);
@@ -821,8 +827,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(event->jets.at(iJet).pt>30.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj30;
       if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj40;
       if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj50;
+
+      if(fBTagCut>-5.0 && fabs(event->jets.at(iJet).eta)<2.5 && event->jets.at(iJet).HasVar(Mva::jetBtagWeight) && fBTagCut<event->jets.at(iJet).GetVar(Mva::jetBtagWeight)) ++nBjet;
     }
 
+    if(fBTagCut>-5) event->RepVar(Mva::n_bjet, nBjet); 
     if(fJetVetoPt>0.0)
       event->RepVar(Mva::n_jet, nJet);
     //if(nJet25!=event->GetVar(Mva::n_jet)) std::cout << "error in jet counting" << nJet25 << " "  << event->GetVar(Mva::n_jet) << std::endl;

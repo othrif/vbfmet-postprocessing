@@ -146,6 +146,7 @@ namespace Msl
       met_tst_ph_dphi,
       passVjetsFilter,
       passVjetsPTV,
+      jetBtagWeight,
       jetTrackWidth,
       jetTrackWidth0,
       jetTrackWidth1,

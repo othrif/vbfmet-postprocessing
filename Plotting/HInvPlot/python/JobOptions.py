@@ -143,6 +143,7 @@ def getParser():
     # Should try to reduce these number of options
     p.add_option('--skim',         action='store_true', default=False,   dest='skim',           help='Skim ntuples to met trigger or 3L')
     p.add_option('--jet-veto-pt',  type='float'       , default=-10,     dest='jet_veto_pt',    help='pT for jet veto')
+    p.add_option('--BTagCut',  type='float'       , default=-10,     dest='BTagCut',    help='BTagCut for tagging: 0.86, 0.66, 0.38, -0.15 for the 60, 70, 77, and 85 OP')
     p.add_option('--DetailLvl',    type='int'       ,   default=0,       dest='DetailLvl',      help='Integer for detail level of plotting. =1 plots jet variables only')
     
     p.add_option('--vv-vr',    action='store_true', default=False,   dest='vv_vr',            help='Run the VV VR')
