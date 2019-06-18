@@ -830,7 +830,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) )) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (n_jet < 2) return StatusCode::SUCCESS;
-  if (!(n_jet == 2) && !m_LooseSkim) return StatusCode::SUCCESS;
+  if (!(n_jet < 5) && !m_LooseSkim) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("n_jet = 2!");
   if (!(unsigned(n_jet) == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
   if (!(unsigned(n_jet) == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
