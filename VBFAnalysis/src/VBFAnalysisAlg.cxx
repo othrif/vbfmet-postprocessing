@@ -2,8 +2,6 @@
 #include "VBFAnalysisAlg.h"
 #include "SUSYTools/SUSYCrossSection.h"
 #include "PathResolver/PathResolver.h"
-//#include "xAODEventInfo/EventInfo.h"
-#include <vector>
 #include "TLorentzVector.h"
 #include <math.h>       /* exp */
 
@@ -15,7 +13,8 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
   declareProperty( "LooseSkim", m_LooseSkim = true, "true if loose skimming is requested" );
   declareProperty( "ExtraVars", m_extraVars = true, "true if extra variables should be output" );
-  declareProperty( "QGTagger", m_QGTagger = true, "true if extra variables should be output for QGTagger" );
+  declareProperty( "QGTagger", m_QGTagger = false, "true if extra variables should be output for QGTagger" );
+  declareProperty( "METTrigPassThru", m_METTrigPassThru = false, "true if require no met triggers" );
   declareProperty( "ContLep", m_contLep = false, "true if container lepton variables should be output" );
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "current sytematics of the tree" );
   declareProperty( "normFile", m_normFile = "current.root", "path to a file with the number of events processed" );
@@ -41,21 +40,56 @@ StatusCode VBFAnalysisAlg::initialize() {
   cout << "isMC: " << m_isMC << endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
 
+  // initialize jet container
+  m_newJets = new xAOD::JetContainer();
+  m_newJetsAux = new xAOD::AuxContainerBase();
+  m_newJets->setStore( m_newJetsAux ); //< Connect the two  
+  xAOD::Jet* new_jet = new xAOD::Jet();
+  m_newJets->push_back(new_jet);
+  
   if(m_isMC){
     std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+    xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt";
     xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
-    std::cout << "Cross section: " << xSecFilePath << std::endl;
-    my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
-    //xSecFilePath = "/home/schae/testarea/HInv/source/VBFAnalysis/data/PMGxsecDB_mc16.txt";
-    //my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, false);
-    //my_XsecDB->loadFile(xSecFilePath);
-    //my_XsecDB->extend(xSecFilePath);
-    // if( (runNumber == 308567 || runNumber == 308276 ) ){
-    //   if(truthHiggs_pt->size() > 0) w_VBFhiggs =  -0.000342 * truthHiggs_pt->at(0)/GeV - 0.0708;
-    // }else {
-    //   w_VBFhiggs =1.;
-    // }
-  }
+    std::cout << "Cross section using local file: " << xSecFilePath << std::endl;
+    my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, true);
+
+    // qg tagging
+    m_qgVars.clear();
+    m_systSet.clear();
+    m_qgVars.push_back("JET_QG_Nominal");
+
+    asg::AnaToolHandle<CP::IJetQGTagger> my_handleNom;
+    my_handleNom.setTypeAndName("CP::JetQGTagger/JetQGTagger_VBF");
+    ANA_CHECK(my_handleNom.setProperty("NTrackCut", 5));
+    ANA_CHECK(my_handleNom.setProperty("UseJetVars", 1));
+    ANA_CHECK(my_handleNom.setProperty("cuttype", "threshold"));
+    ANA_CHECK(my_handleNom.retrieve());
+    m_jetQGTool[m_qgVars.at(0)]=my_handleNom;
+    m_systSet["JET_QG_Nominal"] = CP::SystematicSet(""); //my_syst_nominal_set;
+    if(m_currentVariation=="Nominal"){
+      // loading the systematics
+      const CP::SystematicRegistry& registry = CP::SystematicRegistry::getInstance();
+      const CP::SystematicSet& recommendedSystematics = registry.recommendedSystematics();
+      // add all recommended systematics
+      for (const auto& systSet : CP::make_systematics_vector(recommendedSystematics)) {
+	TString nameRunThisSyst="";
+	for (const auto& sys : systSet) {
+	  std::cout << "syst: " << sys.name() << " base: " << sys.basename() << std::endl;
+	  // select only QG tagging
+	  if(sys.basename().find("JET_QG_")!=std::string::npos){
+	    std::cout << "QG syst Loaded: " << sys.name() << std::endl;
+	    nameRunThisSyst=sys.name();
+	  }
+	}
+	if(nameRunThisSyst!=""){
+	  m_qgVars.push_back(nameRunThisSyst);
+	  m_systSet[nameRunThisSyst] = CP::SystematicSet(std::string(nameRunThisSyst.Data()));
+	}
+      }
+    }// end qg systematics setup
+  }// end nominal check
+
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
@@ -130,6 +164,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   jet_HECFrac = new std::vector<float>(0);
   jet_EMFrac = new std::vector<float>(0);
   jet_fch = new std::vector<float>(0);
+  jet_btag_weight = new std::vector<float>(0);
 
   truth_jet_pt= new std::vector<float>(0);
   truth_jet_eta= new std::vector<float>(0);
@@ -183,6 +218,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("trigger_met_encodedv2", &trigger_met_encodedv2);
   m_tree_out->Branch("l1_met_trig_encoded", &l1_met_trig_encoded);
   if(m_extraVars) m_tree_out->Branch("trigger_met_encoded", &trigger_met_encoded);
+  m_tree_out->Branch("passBatman", &passBatman );
   m_tree_out->Branch("passVjetsFilter", &passVjetsFilter );
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("trigger_lep", &trigger_lep);
@@ -241,6 +277,7 @@ StatusCode VBFAnalysisAlg::initialize() {
 
     if(m_currentVariation=="Nominal"){
 
+      m_tree_out->Branch("jet_btag_weight",&jet_btag_weight);
       m_tree_out->Branch("j3_centrality",&j3_centrality);
       m_tree_out->Branch("j3_min_mj_over_mjj",&j3_min_mj_over_mjj);
       m_tree_out->Branch("j3_dRj1",&j3_dRj1);
@@ -250,6 +287,10 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("j3_min_mj",&j3_min_mj);
       m_tree_out->Branch("mj34",&mj34);
       m_tree_out->Branch("max_j_eta",&max_j_eta);
+
+      m_tree_out->Branch("lb",&lumiBlock);
+      m_tree_out->Branch("bcid",&bcid);
+      m_tree_out->Branch("BCIDDistanceFromFront",&BCIDDistanceFromFront);
 
       if(m_QGTagger){
 	m_tree_out->Branch("jet_NTracks",&jet_NTracks_PV);
@@ -261,6 +302,11 @@ StatusCode VBFAnalysisAlg::initialize() {
       }
       if(m_isMC) m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
       if(m_isMC) m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
+    }else{
+      if(m_QGTagger){
+      	m_tree_out->Branch("jet_NTracks",&jet_NTracks_PV);
+      //	if(m_isMC) m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
+      }
     }
 
     m_tree_out->Branch("jet_fjvt",&jet_fjvt);
@@ -384,7 +430,6 @@ StatusCode VBFAnalysisAlg::finalize() {
   //Things that happen once at the end of the event loop go here
   //
 
-
   return StatusCode::SUCCESS;
 }
 
@@ -455,6 +500,8 @@ StatusCode VBFAnalysisAlg::execute() {
   }
 
   // MET trigger scale factor
+  unsigned metRunNumber = randomRunNumber;
+  if(!m_isMC) metRunNumber=runNumber;
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
@@ -464,9 +511,9 @@ StatusCode VBFAnalysisAlg::execute() {
     jj=tmp;
     tmp.SetPtEtaPhiM(jet_pt->at(1), jet_eta->at(1),jet_phi->at(1),jet_m->at(1));
     jj+=tmp;
-    xeSFTrigWeight = weightXETrigSF(met_tst_et, 0); // met was used in the end instead of jj.Pt()
-    xeSFTrigWeight__1up = weightXETrigSF(met_tst_et, 1);
-    xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, 2);
+    xeSFTrigWeight        = weightXETrigSF(met_tst_et, metRunNumber, 0); // met was used in the end instead of jj.Pt()
+    xeSFTrigWeight__1up   = weightXETrigSF(met_tst_et, metRunNumber, 1);
+    xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, metRunNumber, 2);
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
@@ -518,7 +565,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(runNumber==361519) crossSection =  43.469*1.2283;
     else if(runNumber==309668) crossSection =  592.36*0.9728*0.001043;
     else  crossSection = my_XsecDB->xsectTimesEff(runNumber);//xs in pb
-
+    //std::cout << "crossSection: " << crossSection << " " << runNumber << std::endl;
     // corrections for the filtered samples
     if(runNumber==309662) crossSection *= 0.9331*0.9702;
     else if(runNumber==309663) crossSection *= 0.9527*0.9702;
@@ -656,14 +703,40 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_QGTagger && jet_NTracks){
     jet_NTracks_PV->clear();
     jet_SumPtTracks_PV->clear();
+
+    static SG::AuxElement::Accessor<int> acc_NumTrkPt500PV("NumTrkPt500PV");
+    static SG::AuxElement::ConstAccessor<float> acc_qgTaggerDec("qgTagger");
+    static SG::AuxElement::ConstAccessor<float> acc_qgTaggerWeight("qgTaggerWeight");
+
+    for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
+      tMapFloat [m_qgVars.at(iQG)]=1.0;
+    }
+
     for(unsigned iJet=0; iJet<jet_NTracks->size(); ++iJet){
       if(jet_NTracks->at(iJet).size()>0)     jet_NTracks_PV    ->push_back(jet_NTracks->at(iJet)[0]);
       if(jet_SumPtTracks->at(iJet).size()>0) jet_SumPtTracks_PV->push_back(jet_SumPtTracks->at(iJet)[0]);
+
+      // loading the qg tagger for systematics
+      xAOD::Jet* new_jet = m_newJets->at(0);
+      const xAOD::JetFourMom_t newp4(jet_pt->at(iJet), jet_eta->at(iJet), jet_phi->at(iJet), jet_m->at(iJet));
+      new_jet->setJetP4(newp4); 
+
+      acc_NumTrkPt500PV(*new_jet) = jet_NTracks->at(iJet)[0];
+      new_jet->auxdata<int>("DFCommonJets_QGTagger_truthjet_nCharged") = 10;//jet->getAttribute<int>("truthjet_nCharged");
+      new_jet->auxdata<int>("PartonTruthLabelID") = jet_PartonTruthLabelID->at(iJet); //jet->getAttribute<int>("PartonTruthLabelID");
+      new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_eta") = 0.0; //jet->getAttribute<float>("truthjet_eta");
+      new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_pt") = 50000.0; //jet->getAttribute<float>("truthjet_pt");
+      // Loop over QG systematics
+      for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
+	ANA_CHECK(m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]));
+	m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, nullptr); // add qg taging
+	tMapFloat[m_qgVars.at(iQG)] *= acc_qgTaggerWeight(*new_jet);
+      }
     }
   }
 
   // refill the base leptons
-  if(n_baseel>baseel_pt->size()){
+  if(n_baseel>int(baseel_pt->size())){
     for(unsigned a=0; a<el_pt->size(); ++a){
       unsigned fillIndx=0;
       for(unsigned b=0; b<baseel_pt->size(); ++b){
@@ -677,7 +750,7 @@ StatusCode VBFAnalysisAlg::execute() {
       baseel_charge->insert(baseel_charge->begin()+fillIndx,el_charge->at(a));
     }
   }
-  if(n_basemu>basemu_pt->size()){
+  if(n_basemu>int(basemu_pt->size())){
     for(unsigned a=0; a<mu_pt->size(); ++a){
       unsigned fillIndx=0;
       for(unsigned b=0; b<basemu_pt->size(); ++b){
@@ -744,7 +817,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float DEtajjCut =3.5;
 
   if(m_LooseSkim && m_currentVariation=="Nominal"){
-    METCut = 140.0e3;
+    METCut = 100.0e3;
     LeadJetPtCut = 60.0e3; // 60.0e3
     subLeadJetPtCut = 40.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
@@ -759,9 +832,9 @@ StatusCode VBFAnalysisAlg::execute() {
   if (n_jet < 2) return StatusCode::SUCCESS;
   if (!(n_jet == 2) && !m_LooseSkim) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("n_jet = 2!");
-  if (!(n_jet == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
-  if (!(n_jet == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
-  if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < 1.8) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+  if (!(unsigned(n_jet) == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
+  if (!(unsigned(n_jet) == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
+  if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < 2.0) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
   ATH_MSG_DEBUG ("Pass VBF cuts!");
   // encoding met triggers
   trigger_met_encoded=0;
@@ -771,8 +844,13 @@ StatusCode VBFAnalysisAlg::execute() {
   if (trigger_HLT_xe70_mht == 1)         trigger_met_encoded+=0x8;
   if (trigger_HLT_noalg_L1J400 == 1)     trigger_met_encoded+=0x10;
 
-  if (trigger_HLT_xe100_mht_L1XE50 == 1 || trigger_HLT_xe110_mht_L1XE50 == 1 || trigger_HLT_xe90_mht_L1XE50 == 1) trigger_met = 1; else trigger_met = 0;
-  bool passMETTrig = trigger_met_encodedv2>0 || trigger_met>0;
+  if((metRunNumber<=284484 && trigger_HLT_xe70_mht==1) ||                                // 2015
+     (metRunNumber>284484 && metRunNumber<=302872 && trigger_HLT_xe90_mht_L1XE50==1) ||  // 2016
+     (metRunNumber>302872 && trigger_HLT_xe110_mht_L1XE50==1) ||           // 2016
+     trigger_HLT_noalg_L1J400 ==1 ) trigger_met = 1; else trigger_met = 0; // 2015+2016
+
+  bool passMETTrig = trigger_met_encodedv2>0 || trigger_met>0 || trigger_met_encoded>0;
+  if(m_METTrigPassThru) passMETTrig=true;
   ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
@@ -796,7 +874,8 @@ StatusCode VBFAnalysisAlg::execute() {
   }else{
     passMETCut = (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut); // || met_tighter_tst_et > METCut);
     passMETNoLepCut = (met_tst_nolep_et > METCut || met_tenacious_tst_nolep_et > METCut || met_tight_tst_nolep_et > METCut);// || met_tighter_tst_nolep_et > METCut);
-    if ((passMETTrig) && (passMETCut) && (n_el == 0) && (n_mu == 0)) SR = true;
+    //if ((passMETTrig) && (passMETCut) && (n_el == 0) && (n_mu == 0)) SR = true;
+    if ((passMETCut) && (n_el == 0) && (n_mu == 0)) SR = true;
     // saving the base leptons for the fake lepton estimate. This is done in the loose skimming
     OneElec = (n_el == 1 || n_baseel==1); // n_el should be a subset of baseel ... will need to modify for the systematics in v27Loose
     OneMuon = (n_mu == 1 || n_basemu==1);// n_mu should be a subset of basemu
@@ -878,6 +957,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_muSFTrigWeight = muSFTrigWeight;
   float tmp_eleANTISF = eleANTISF;
   float tmp_nloEWKWeight = nloEWKWeight;
+  float tmp_qgTagWeight = 1.0; // assuming the default weight is 1.0 for qg tagging
 
   for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
@@ -890,6 +970,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_muSFTrigWeight = muSFTrigWeight;
     tmp_eleANTISF = eleANTISF;
     tmp_nloEWKWeight = nloEWKWeight;
+    tmp_qgTagWeight = 1.0; // default value is 1
 
     if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
@@ -899,6 +980,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("nloEWKWeight"))   tmp_nloEWKWeight=tMapFloat[it->first];
+    else if(it->first.Contains("JET_QG_"))        tmp_qgTagWeight=tMapFloat[it->first];
     else if(it->first.Contains("eleANTISF")){
       tmp_eleANTISF=tMapFloat[it->first];
       tmp_eleANTISF=std::min<float>(tmp_eleANTISF,1.5);
@@ -910,10 +992,10 @@ StatusCode VBFAnalysisAlg::execute() {
 
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight);
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight;
   }//end systematic weight loop
 
-  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR)) return StatusCode::SUCCESS;
   double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
@@ -965,6 +1047,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("*",0);
   // add the systematics weights to the nominal
   TObjArray *var_list = m_tree->GetListOfBranches();
+
   for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) {
     TString var_name = var_list->At(a)->GetName();
     if(var_name.Contains("__1up") || var_name.Contains("__1down")){
@@ -984,12 +1067,19 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       tMapFloat["nloEWKWeight__1up"]=1.0;
       tMapFloatW["nloEWKWeight__1up"]=1.0;
       m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
-    }    
+    }
     if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
       tMapFloat["nloEWKWeight__1down"]=1.0;
       tMapFloatW["nloEWKWeight__1down"]=1.0;
       m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
     }
+    for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
+      if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){ 
+	tMapFloat[m_qgVars.at(iQG)]=1.0; 
+	tMapFloatW[m_qgVars.at(iQG)]=1.0;
+	m_tree_out->Branch("w"+m_qgVars.at(iQG),&(tMapFloatW[m_qgVars.at(iQG)])); 
+      }
+    }// end qg variables
   }
 
   m_tree->SetBranchStatus("runNumber", 1);
@@ -1014,6 +1104,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("trigger_lep", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("l1_met_trig_encoded", 1);
+  m_tree->SetBranchStatus("passBatman", 1);
   m_tree->SetBranchStatus("passVjetsFilter", 1);
   m_tree->SetBranchStatus("passVjetsPTV", 1);
   m_tree->SetBranchStatus("passGRL", 1);
@@ -1055,6 +1146,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_m",1);
   m_tree->SetBranchStatus("jet_jvt",1);
   m_tree->SetBranchStatus("jet_timing",1);
+  m_tree->SetBranchStatus("jet_btag_weight",1);
   m_tree->SetBranchStatus("jet_PartonTruthLabelID",1);
   m_tree->SetBranchStatus("jet_ConeTruthLabelID",1);
   if(m_QGTagger){
@@ -1067,6 +1159,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   }
 
   if(m_extraVars){
+
+    m_tree->SetBranchStatus("lumiBlock",1);
+    m_tree->SetBranchStatus("bcid",1);
+    m_tree->SetBranchStatus("BCIDDistanceFromFront",1);
 
     m_tree->SetBranchStatus("ph_pt",1);
     m_tree->SetBranchStatus("ph_phi",1);
@@ -1179,6 +1275,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   //m_tree->SetBranchAddress("trigger_met", &trigger_met); // just testing being copying directly
   m_tree->SetBranchAddress("trigger_met", &trigger_met_encodedv2);
   m_tree->SetBranchAddress("l1_met_trig_encoded", &l1_met_trig_encoded);
+  m_tree->SetBranchAddress("passBatman", &passBatman);
   m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
   m_tree->SetBranchAddress("passVjetsPTV", &passVjetsPTV);
   m_tree->SetBranchAddress("passGRL", &passGRL);
@@ -1196,6 +1293,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_mu_baseline",&n_basemu);
   m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_bjet",            &n_bjet);
+  m_tree->SetBranchAddress("lumiBlock",&lumiBlock);
+  m_tree->SetBranchAddress("bcid",&bcid);
+  m_tree->SetBranchAddress("BCIDDistanceFromFront",&BCIDDistanceFromFront);
 
   m_tree->SetBranchAddress("jj_mass",&jj_mass);
   m_tree->SetBranchAddress("jj_deta",&jj_deta);
@@ -1225,6 +1325,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
   m_tree->SetBranchAddress("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
   m_tree->SetBranchAddress("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
+  if(m_currentVariation=="Nominal"){
+    m_tree->SetBranchAddress("jet_btag_weight",&jet_btag_weight);
+  }
   //if(foundGenMET) m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);
   if(m_QGTagger){
     m_tree->SetBranchAddress("jet_NTracks",&jet_NTracks);
@@ -1324,13 +1427,27 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   return StatusCode::SUCCESS;
 }
 
-double VBFAnalysisAlg::weightXETrigSF(const float met_pt, int syst=0) {
+double VBFAnalysisAlg::weightXETrigSF(const float met_pt, unsigned metRunNumber, int syst=0) {
   // 20.7 values
   //static const double p0 = 59.3407;
   //static const double p1 = 54.9134;
   // For MET tight
-  static const double p0 = 99.4255;
-  static const double p1 = 38.6145;
+  //double p0 = 99.4255;
+  //double p1 = 38.6145;
+  // For MET Tenacious
+  double p0 = 99.4255;
+  double p1 = 38.6145;
+  double e0 = 0.000784094;
+  double e1 = 0.05;
+  if(metRunNumber<=284484)                        { p0 = 110.396; p1 = 19.4147; e1 = 0.06; }  // 2015 xe70
+  if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 111.684; p1 = 19.147;  e1 = 0.08; }  // 2016 xe90
+  if(metRunNumber>302872)                         { p0 = 68.8679; p1 = 54.0594; e1 = 0.06; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
+  if(325713<=metRunNumber && metRunNumber<=328393) { p0 = 86.6614; p1 = 49.8935; e1 = 0.05; } // 2017 xe90_pufit_L1XE50
+  if(329385<=metRunNumber && metRunNumber<=330470) { p0 = 103.780; p1 = 57.2547; e1 = 0.05; } // 2017 xe100_pufit_L1XE55
+  if(330857<=metRunNumber && metRunNumber<=331975) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
+  if(331975<=metRunNumber && metRunNumber<=341649) { p0 = 103.152; p1 = 38.6121; e1 = 0.05; } // 2017 xe110_pufit_L1XE50
+  if(350067>metRunNumber  && metRunNumber>=348800) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
+  if(350067>metRunNumber  && metRunNumber>=348800) { p0 = 107.509; p1 = 32.0065; e1 = 0.05; } // 2018 xe110_xe65_L1XE50
 
   double x = met_pt / 1.0e3;
   if (x < 100) { return 0; }
@@ -1341,10 +1458,10 @@ double VBFAnalysisAlg::weightXETrigSF(const float met_pt, int syst=0) {
 
   // linear parameterization of the systematics
   if(syst==1){ // up variation
-    if(x<210.0) sf+=((0.000784094)*(150-x)+0.05)*0.6;
+    if(x<210.0) sf+=((e0)*(150-x)+e1)*0.6;
     else sf=1.0;
   }else if(syst==2){ // down
-    if(x<210.0)sf-=((0.000784094)*(150-x)+0.05)*0.6;
+    if(x<210.0)sf-=((e0)*(150-x)+e1)*0.6;
     else sf=1.0;
   }
   return sf;

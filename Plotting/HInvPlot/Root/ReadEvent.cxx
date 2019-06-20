@@ -47,11 +47,15 @@ Msl::ReadEvent::AlgData::AlgData(const std::string &key):
 Msl::ReadEvent::ReadEvent():
   fSystName     ("Nominal"),
   fWeightSystName("Nominal"),
+  fTMVAReader   (nullptr),
+  fTMVAWeightPath(""),
+  fMVAName      (""),
   fDebug        (false),
   fPrint        (false),
   fPrintEvent   (false),
   fMaxNEvent(-1),
   fLumi         (1.0),
+  fBTagCut     (-10),
   fLoadBaseLep  (false),
   fOverlapPh    (false),
   fIsDDQCD      (false),
@@ -64,6 +68,7 @@ Msl::ReadEvent::ReadEvent():
 //-----------------------------------------------------------------------------
 Msl::ReadEvent::~ReadEvent()
 {
+  if(fTMVAReader){ delete fTMVAReader; fTMVAReader = nullptr; }
 }
 
 //-----------------------------------------------------------------------------
@@ -81,11 +86,14 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Files",         fFiles);
   reg.Get("ReadEvent::MaxNEvent",     fMaxNEvent);
 
+  reg.Get("ReadEvent::TMVAWeightPath",     fTMVAWeightPath);
+  
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
   reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
   reg.Get("ReadEvent::OverlapPh",     fOverlapPh);
   reg.Get("ReadEvent::mergeExt",      fMergeExt);
   reg.Get("ReadEvent::mergePTV",      fMergePTV);
+  reg.Get("ReadEvent::BTagCut",       fBTagCut);
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -94,6 +102,19 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Lumi",          fLumi = 1.0);
   fDir="";
 
+  if(fTMVAWeightPath!=""){
+    fTMVAReader = new TMVA::Reader( "!Color:!Silent" );
+    fMVAName =  "BDT method";
+    for(unsigned i=0; i<6; ++i) fTMVAVars.push_back(0.0);
+    fTMVAReader->AddVariable("jj_mass", &fTMVAVars[0]);
+    fTMVAReader->AddVariable("jj_dphi", &fTMVAVars[1]);
+    fTMVAReader->AddVariable("jj_deta", &fTMVAVars[2]);
+    fTMVAReader->AddVariable("met_tst_et", &fTMVAVars[3]);
+    fTMVAReader->AddVariable("jet1_pt", &fTMVAVars[4]);
+    fTMVAReader->AddVariable("jet2_pt", &fTMVAVars[5]);
+    fTMVAReader->BookMVA( fMVAName, fTMVAWeightPath);
+  }
+  
   // set met phi
   fMETChoice_phi = fMETChoice;
   fMETChoice_phi.replace(fMETChoice_phi.end()-2, fMETChoice_phi.end(),"phi");
@@ -153,6 +174,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   jet_m      = new std::vector<float>();
   jet_jvt    = new std::vector<float>();
   jet_fjvt   = new std::vector<float>();
+  jet_btag_weight    = new std::vector<float>();
   jet_TrackWidth   = new std::vector<float>();
   jet_NTracks   = new std::vector<unsigned short>();
   jet_PartonTruthLabelID   = new std::vector<float>();
@@ -208,7 +230,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
-  if(fWeightSystName=="Nominal"){
+  if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){
@@ -258,6 +280,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("jet_phi",   &jet_phi);
   tree->SetBranchAddress("jet_jvt",   &jet_jvt);
   tree->SetBranchAddress("jet_fjvt",   &jet_fjvt);
+  tree->SetBranchAddress("jet_btag_weight",   &jet_btag_weight);
   tree->SetBranchAddress("jet_TrackWidth",   &jet_TrackWidth);
   tree->SetBranchAddress("jet_NTracks",   &jet_NTracks);
   tree->SetBranchAddress("jet_PartonTruthLabelID",   &jet_PartonTruthLabelID);
@@ -550,7 +573,8 @@ void Msl::ReadEvent::Read(const std::string &path)
     //
     // Identify the systematic type
     //
-    if(fTrees.at(i).find(fSystName)==std::string::npos) continue;
+    fIsDDQCD=(fTrees.at(i).find("QCDDD")!=std::string::npos); // QCDDD
+    if(fTrees.at(i).find(fSystName)==std::string::npos && !fIsDDQCD) continue;
 
     log() << "Read - Running systematic: " << fSystName << " on tree: " << fTrees.at(i) <<std::endl;
 
@@ -656,7 +680,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->RepVar(Mva::xeSFTrigWeight__1up,   xeSFTrigWeight__1up);
     event->RepVar(Mva::xeSFTrigWeight__1down, xeSFTrigWeight__1down);
 
-    if(fLoadBaseLep){
+    if(fLoadBaseLep && false){
       // Fill Electrons with the baseline electrons for this looser lepton selection
       for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
 	RecParticle new_ele;
@@ -741,6 +765,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));
+      if(jet_btag_weight && jet_btag_weight->size()>iJet) new_jet.AddVar(Mva::jetBtagWeight,jet_btag_weight->at(iJet));
       if(jet_TrackWidth && jet_TrackWidth->size()>iJet) new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));
       if(jet_NTracks && jet_NTracks->size()>iJet) new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));
       if(jet_PartonTruthLabelID && jet_PartonTruthLabelID->size()>iJet) new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));
@@ -786,6 +811,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // forward jets relative to the leading two jets
     float maxPosEta=0.0, maxNegEta=0.0;
+    unsigned nBjet=0;
     if(event->jets.size()>1){
       maxPosEta=std::max(event->jets.at(0).eta,event->jets.at(1).eta);
       maxNegEta=std::min(event->jets.at(0).eta,event->jets.at(1).eta);
@@ -801,8 +827,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(event->jets.at(iJet).pt>30.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj30;
       if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj40;
       if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj50;
+
+      if(fBTagCut>-5.0 && fabs(event->jets.at(iJet).eta)<2.5 && event->jets.at(iJet).HasVar(Mva::jetBtagWeight) && fBTagCut<event->jets.at(iJet).GetVar(Mva::jetBtagWeight)) ++nBjet;
     }
 
+    if(fBTagCut>-5) event->RepVar(Mva::n_bjet, nBjet); 
     if(fJetVetoPt>0.0)
       event->RepVar(Mva::n_jet, nJet);
     //if(nJet25!=event->GetVar(Mva::n_jet)) std::cout << "error in jet counting" << nJet25 << " "  << event->GetVar(Mva::n_jet) << std::endl;
@@ -839,6 +868,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_mu.pt  = truth_mu_pt->at(iMu)/1.0e3;
 	new_mu.eta = truth_mu_eta->at(iMu);
 	new_mu.phi = truth_mu_phi->at(iMu);
+	new_mu.m   = 0.10566;
 	event->truth_mu.push_back(new_mu);
       }
       //event->RepVar(Mva::n_truth_mu, truth_mu_pt->size());
@@ -903,6 +933,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_ele.pt  = base_pt/1.0e3;
 	new_ele.eta = baseel_eta->at(iEl);
 	new_ele.phi = baseel_phi->at(iEl);
+	new_ele.m   = 0.000511;
         new_ele.AddVar(Mva::charge, baseel_charge->at(iEl));
 
         // Store the ptvarcone{20,30} and the topoetcone.
@@ -928,6 +959,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_muo.pt  = base_pt/1.0e3;
 	new_muo.eta = basemu_eta->at(iMu);
 	new_muo.phi = basemu_phi->at(iMu);
+	new_muo.m   = 0.10566;
         new_muo.AddVar(Mva::charge, basemu_charge->at(iMu));
 
         // Store the ptvarcone{20,30} and the topoetcone.
@@ -1082,16 +1114,43 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if((trigger_met_encodedv2 & 0x4)==0x4) trigger_met_encodedv2_new=2; // HLT_xe90_pufit_L1XE50 2017
     if((trigger_met_encodedv2 & 0x8)==0x8) trigger_met_encodedv2_new=3; // HLT_xe110_pufit_xe70_L1XE50 2018
 
-    // run selected for 2017
+    // run selected for 2017 => value 4 for 2017
     if(!fisMC) fRandomRunNumber = fRunNumber;
-    if(fRandomRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))                                    trigger_met_encodedv2_new=4; //HLT_xe90_pufit_L1XE50; // period B
+    if     (325713<=fRandomRunNumber && fRandomRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))   trigger_met_encodedv2_new=4; //HLT_xe90_pufit_L1XE50;    // period B
     else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
     else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
-    else if(340453>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;
+    else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K  
+
+    // 2018 update trigger for later periods => value 5 for
+    if     (350067>fRandomRunNumber  && fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8)==0x8))     trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
+    else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
+
+    if     (fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
+    if     (fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
 
+    // 2015+2016 encoding
+    int trigger_met_encoded = event->GetVar(Mva::trigger_met_encoded);
+    int runPeriod = 0;
+    //int midRun = 303982; // was 302872
+    int midRun = 302872; // was 302872
+    if(fRandomRunNumber<=284484)                                  runPeriod = 1;
+    else if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun) runPeriod = 2;
+    else if(fRandomRunNumber >midRun)                             runPeriod = 3;      
+    int trigger_met_byrun=0; // for the computation of the met trigger SF
+    if(fRandomRunNumber<=284484 && (trigger_met_encoded & 0x8))                             { trigger_met_byrun=1;  }// 2015
+    if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun && (trigger_met_encoded & 0x4)) { trigger_met_byrun=2;  }// 2016 -D3
+    if(fRandomRunNumber >midRun && (trigger_met_encoded & 0x2))                             { trigger_met_byrun=3;  }// 2016
+    if(trigger_met_byrun==0 && (trigger_met_encoded & 0x10) == 0x10 ){
+      if(fRandomRunNumber<=284484)                                  trigger_met_byrun = 4;
+      else if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun) trigger_met_byrun = 5;
+      else if(fRandomRunNumber >midRun)                             trigger_met_byrun = 6;   
+    }// 2015+2016
+    event->RepVar(Mva::trigger_met_byrun, trigger_met_byrun);
+    event->RepVar(Mva::runPeriod,         runPeriod);    
+    
     // Change the leptons to base leptons - after filling the event
-    //if(fLoadBaseLep) ChangeLep(*event);
+    if(fLoadBaseLep) ChangeLep(*event);
 
     if(i % 10000 == 0 && i > 0) {
       cout << "Processed " << setw(10) << right << i << " events" << endl;
@@ -1099,6 +1158,19 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     ++fCountEvents;
 
+    // Process TMVA
+    if(fTMVAReader){
+      // fill the variables
+      fTMVAVars[0]=event->GetVar(Mva::jj_mass)*1.0e3;
+      fTMVAVars[1]=event->GetVar(Mva::jj_dphi);
+      fTMVAVars[2]=event->GetVar(Mva::jj_deta);
+      fTMVAVars[3]=event->GetVar(Mva::met_tst_et)*1.0e3;
+      fTMVAVars[4]=event->GetVar(Mva::jetPt0)*1.0e3;
+      fTMVAVars[5]=event->GetVar(Mva::jetPt1)*1.0e3;
+      event->AddVar(Mva::tmva, fTMVAReader->EvaluateMVA( fTMVAVars, fMVAName ));
+      //std::cout << "inputs: " << fTMVAVars[0] << " " << fTMVAVars[1] << " " << fTMVAVars[2] << " " << fTMVAVars[3] << " " << fTMVAVars[4] << " " << fTMVAVars[5] << " " << event->GetVar(Mva::tmva) << std::endl;
+    }else { event->AddVar(Mva::tmva, 0.0); }
+    
     //
     // Process sub-algorithms
     //
@@ -1396,35 +1468,64 @@ void Msl::ReadEvent::ChangeLep(Event &event)
   // met_tst_nolep_et,met_tst_nolep_phi, ptll, mll, lepPt0, lepPt1, lepCh0, lepCh1
   //event->baseel;
   //event->basemu; mtautau
-  TVector3 met, met_beforeRemove;
-  met.SetPtEtaPhi(event.met.Pt(), 0.0, event.met.Phi());
-  met_beforeRemove=met;
-
-  unsigned n_el=0;
-  unsigned n_mu=0;
+  //
+  //unsigned n_el=0;
+  //unsigned n_mu=0;
   std::vector<TLorentzVector> my_leps;
-  for(unsigned i=0; i<event.baseel.size(); ++i)
-    if(baseel_ptvarcone20->at(i)/baseel_pt->at(i)<0.2){
-      met+=event.baseel.at(i).GetVec();
-      ++n_el;
-      my_leps.push_back(event.baseel.at(i).GetLVec());
+  for(unsigned i=0; i<event.baseel.size(); ++i){
+    my_leps.push_back(event.baseel.at(i).GetLVec());
+  }
+  if(event.baseel.size()==2 && event.basemu.size()==0){
+    event.RepVar(Mva::lepCh0, event.baseel.at(0).GetVar(Mva::charge));
+    event.RepVar(Mva::lepCh1, event.baseel.at(1).GetVar(Mva::charge));
+
+    unsigned chanFlavor=0;
+    if(event.baseel.size()==2 && (event.baseel.at(0).GetVar(Mva::charge)*event.baseel.at(1).GetVar(Mva::charge))>0) chanFlavor=8;
+    if(event.baseel.size()==2 && (event.baseel.at(0).GetVar(Mva::charge)*event.baseel.at(1).GetVar(Mva::charge))<0) chanFlavor=9;
+    if(chanFlavor>0)
+      event.RepVar(Mva::chanFlavor, chanFlavor);
+  }
+  if(event.baseel.size()==0 && event.basemu.size()==2){
+    event.RepVar(Mva::lepCh0, event.basemu.at(0).GetVar(Mva::charge));
+    event.RepVar(Mva::lepCh1, event.basemu.at(1).GetVar(Mva::charge));
+    
+    unsigned chanFlavor=0;
+    if(event.basemu.size()==2 && (event.basemu.at(0).GetVar(Mva::charge)*event.basemu.at(1).GetVar(Mva::charge))>0) chanFlavor=6;
+    if(event.basemu.size()==2 && (event.basemu.at(0).GetVar(Mva::charge)*event.basemu.at(1).GetVar(Mva::charge))<0) chanFlavor=7;
+    if(chanFlavor>0)
+      event.RepVar(Mva::chanFlavor, chanFlavor);
+  }
+  if(event.baseel.size()==1 && event.basemu.size()==1){
+    if(event.baseel.at(0).pt>event.basemu.at(0).pt ){
+      event.RepVar(Mva::lepCh0, event.baseel.at(0).GetVar(Mva::charge));
+      event.RepVar(Mva::lepCh1, event.basemu.at(0).GetVar(Mva::charge));
+    }else{
+      event.RepVar(Mva::lepCh0, event.basemu.at(0).GetVar(Mva::charge));
+      event.RepVar(Mva::lepCh1, event.baseel.at(0).GetVar(Mva::charge));
     }
+  }
+  //  if(baseel_ptvarcone20->at(i)/baseel_pt->at(i)<0.2){
+  //    met+=event.baseel.at(i).GetVec();
+  //    ++n_el;
+  //    my_leps.push_back(event.baseel.at(i).GetLVec());
+  //  }
   for(unsigned i=0; i<event.basemu.size(); ++i)
-    if(basemu_ptvarcone20->at(i)/basemu_pt->at(i)<0.2){
-      met+=event.basemu.at(i).GetVec();
-      ++n_mu;
-      my_leps.push_back(event.basemu.at(i).GetLVec());
-    }
+    my_leps.push_back(event.basemu.at(i).GetLVec());
+  //  if(basemu_ptvarcone20->at(i)/basemu_pt->at(i)<0.2){
+  //    met+=event.basemu.at(i).GetVec();
+  //    ++n_mu;
+  //    
+  //  }
 
   // removing the leptons
-  event.RepVar(Mva::met_tst_nolep_et,  met.Pt());
-  event.RepVar(Mva::met_tst_nolep_phi, met.Phi());
-  if(event.jets.size()>1){
-    event.RepVar(Mva::met_tst_nolep_j1_dphi, met.DeltaPhi(event.jets.at(0).GetVec()));
-    event.RepVar(Mva::met_tst_nolep_j2_dphi, met.DeltaPhi(event.jets.at(1).GetVec()));
-  }
-  event.RepVar(Mva::n_el, n_el);
-  event.RepVar(Mva::n_mu, n_mu);
+  //event.RepVar(Mva::met_tst_nolep_et,  met.Pt());
+  //event.RepVar(Mva::met_tst_nolep_phi, met.Phi());
+  //if(event.jets.size()>1){
+  //  event.RepVar(Mva::met_tst_nolep_j1_dphi, met.DeltaPhi(event.jets.at(0).GetVec()));
+  //  event.RepVar(Mva::met_tst_nolep_j2_dphi, met.DeltaPhi(event.jets.at(1).GetVec()));
+  //}
+  //event.RepVar(Mva::n_el, n_el);
+  //event.RepVar(Mva::n_mu, n_mu);
   // sort leptons
   std::sort(my_leps.begin(),my_leps.end(),SortPhysicsObject("pt"));
   if(my_leps.size()>0)  event.RepVar(Mva::lepPt0, my_leps.at(0).Pt());
@@ -1441,7 +1542,7 @@ void Msl::ReadEvent::ChangeLep(Event &event)
   double x1=-999., x2=-999.,mtt=-999.;
   if(my_leps.size()>1)
     event.GetX1X2(my_leps.at(0), my_leps.at(1),
-		  make_pair<float,float>(met_beforeRemove.Px(), met_beforeRemove.Py()),  x1, x2);
+		  make_pair<float,float>(event.met.Px(), event.met.Py()),  x1, x2);
   if(x1>0.0 && x2>0.0) mtt=event.GetVar(Mva::mll)/TMath::Sqrt(x1*x2);
   event.RepVar(Mva::Mtt, mtt);
 }

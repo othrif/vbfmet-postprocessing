@@ -1,8 +1,9 @@
 class systematics(object):
     def __init__(self,mode):
+        self.systematicsListDown=["MET_SoftTrk_ResoParaDown", "MET_SoftTrk_ResoPerpDown",'JET_JER_DataVsMC__1down', 'JET_JER_EffectiveNP_1__1down', 'JET_JER_EffectiveNP_2__1down', 'JET_JER_EffectiveNP_3__1down', 'JET_JER_EffectiveNP_4__1down', 'JET_JER_EffectiveNP_5__1down', 'JET_JER_EffectiveNP_6__1down', 'JET_JER_EffectiveNP_7restTerm__1down']
         self.systematicsList=""
         self.load(mode)
-        self.removeList=['TAUS_','PH_','JET_MassRes_','JET_Rtrk_','JET_Comb_','FT_EFF_','eleANTISFEL_EFF_Iso_']
+        self.removeList=['TAUS_','PH_','JET_MassRes_','JET_Rtrk_','JET_Comb_','FT_EFF_','eleANTISFEL_EFF_Iso_']#,'nloEWKWeight__1up','nloEWKWeight__1down','xeSFTrigWeight__1up','xeSFTrigWeight__1down']
     def load(self,mode="All"):
         self.removeList=['TAUS_','PH_','JET_MassRes_','JET_Rtrk_','JET_Comb_','FT_EFF_','eleANTISFEL_EFF_Iso_']
         if mode == "All":
@@ -37,9 +38,14 @@ class systematics(object):
         elif mode == "JER":
             self.systematicsList = ['Nominal', 'JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up']
         elif mode == "OneSided": # this is used to list all systematics that need to by symmeterized in plotting
-            self.systematicsList = ["MET_SoftTrk_ResoPara", "MET_SoftTrk_ResoPerp",'JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up']#,'xeSFTrigWeight__1up']
+            self.systematicsList = ["MET_SoftTrk_ResoPara", "MET_SoftTrk_ResoPerp",'JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up']
+        elif mode == "OneSidedDown": # this is used to list all systematics that need to by symmeterized in plotting
+            self.systematicsList = self.systematicsListDown
+            
     def getsystematicsList(self):
         return self.systematicsList
+    def getsystematicsListWithDown(self):
+        return self.systematicsList+self.systematicsListDown    
 
     def getsystematicsOneSidedMap(self):
         return {'JET_JER_DataVsMC__1down':'JET_JER_DataVsMC__1up',
@@ -53,4 +59,3 @@ class systematics(object):
                 "JET_JER_SINGLE_NP__1down":"JET_JER_SINGLE_NP__1up",
                 "MET_SoftTrk_ResoParaDown":"MET_SoftTrk_ResoPara",
                 "MET_SoftTrk_ResoPerpDown":"MET_SoftTrk_ResoPerp",}
-                    #"xeSFTrigWeight__1down":"xeSFTrigWeight__1up"}

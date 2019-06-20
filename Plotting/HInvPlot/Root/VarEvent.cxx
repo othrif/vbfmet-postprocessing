@@ -23,6 +23,8 @@ std::string Msl::Mva::Convert2Str(Var var)
     case trigger_met:	          return "trigger_met";
     case trigger_met_encoded:	  return "trigger_met_encoded";
     case trigger_met_encodedv2:	  return "trigger_met_encodedv2";
+    case trigger_met_byrun:	  return "trigger_met_byrun";
+    case runPeriod:	          return "runPeriod";            
     case trigger_lep:	          return "trigger_lep";
     case passJetCleanTight:	  return "passJetCleanTight";
     case xeSFTrigWeight:	  return "xeSFTrigWeight";
@@ -127,6 +129,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case met_tst_ph_dphi:	  return "met_tst_ph_dphi";
     case passVjetsFilter:	  return "passVjetsFilter";
     case passVjetsPTV:	          return "passVjetsPTV";
+    case jetBtagWeight:           return "jetBtagWeight";
     case jetTrackWidth:           return "jetTrackWidth";
     case jetTrackWidth0:          return "jetTrackWidth0";
     case jetTrackWidth1:	  return "jetTrackWidth1";
@@ -137,6 +140,9 @@ std::string Msl::Mva::Convert2Str(Var var)
     case jetPartonTruthLabelID0:  return "jetPartonTruthLabelID0";
     case jetPartonTruthLabelID1:  return "jetPartonTruthLabelID1";
     case n_vx:			  return "n_vx";
+    case tmva:                    return "tmva";      
+    case bcid:                    return "bcid";      
+    case bcidPos:                 return "bcidPos";      
 
     case NONE: return "NONE";
     default  : break;
@@ -154,8 +160,10 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "jj_dphi")       return jj_dphi;
   if(var == "jj_mass")       return jj_mass;
   if(var == "trigger_met")   return trigger_met;
-  if(var == "trigger_met_encoded")   return trigger_met_encoded;
+  if(var == "trigger_met_encoded")     return trigger_met_encoded;
   if(var == "trigger_met_encodedv2")   return trigger_met_encodedv2;
+  if(var == "trigger_met_byrun")          return trigger_met_byrun;
+  if(var == "runPeriod")          return runPeriod;  
   if(var == "trigger_lep")   return trigger_lep;
   if(var == "passJetCleanTight")   return passJetCleanTight;
   if(var == "xeSFTrigWeight")   return xeSFTrigWeight;
@@ -259,6 +267,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "met_tst_ph_dphi")	 return met_tst_ph_dphi;
   if(var == "passVjetsFilter")	 return passVjetsFilter;
   if(var == "passVjetsPTV")	 return passVjetsPTV;
+  if(var == "jetBtagWeight")     return jetBtagWeight;
   if(var == "jetTrackWidth")     return jetTrackWidth;
   if(var == "jetTrackWidth0")    return jetTrackWidth0;
   if(var == "jetTrackWidth1")    return jetTrackWidth1;
@@ -269,6 +278,9 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "jetPartonTruthLabelID0") return jetPartonTruthLabelID0;
   if(var == "jetPartonTruthLabelID1") return jetPartonTruthLabelID1;
   if(var == "n_vx")		 return n_vx;
+  if(var == "tmva")                   return tmva;  
+  if(var == "bcid")                   return bcid;  
+  if(var == "bcidPos")                return bcidPos;  
 
   cout << "Msl::Mva::Convert2Var - unknown enum: " << var << endl;
   return NONE;
@@ -373,7 +385,9 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(jj_mass);
     vars.push_back(trigger_met);
     vars.push_back(trigger_met_encoded);    
-    vars.push_back(trigger_met_encodedv2);    
+    vars.push_back(trigger_met_encodedv2);
+    vars.push_back(trigger_met_byrun);
+    vars.push_back(runPeriod);        
     vars.push_back(trigger_lep);
     vars.push_back(passJetCleanTight);
     vars.push_back(xeSFTrigWeight);
@@ -478,6 +492,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(met_tst_ph_dphi);
     vars.push_back(passVjetsFilter);
     vars.push_back(passVjetsPTV);
+    vars.push_back(jetBtagWeight);
     vars.push_back(jetTrackWidth);
     vars.push_back(jetTrackWidth0);
     vars.push_back(jetTrackWidth1);
@@ -488,6 +503,9 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(jetPartonTruthLabelID0);
     vars.push_back(jetPartonTruthLabelID1);
     vars.push_back(n_vx);
+    vars.push_back(tmva);    
+    vars.push_back(bcid);    
+    vars.push_back(bcidPos);    
   }
 
   return vars;

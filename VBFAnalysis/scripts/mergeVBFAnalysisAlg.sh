@@ -1,5 +1,5 @@
 #!/bin/bash                                                                                                                                                                                                       
-OUTDIRM=v26Looseg
+OUTDIRM=v26Loose_BTAGW
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
@@ -28,3 +28,11 @@ hadd $OUTDIRM/VBFHOther.root  VBFHOther*.root
 hadd $OUTDIRM/ggFH125.root  ggFH125*.root
 hadd $OUTDIRM/VH125.root  VH125*.root
 
+
+#hadd $OUTDIRM/Wg_strong.root Wg_strong*root
+#hadd $OUTDIRM/Zg_strong.root Zg_strong*root
+#hadd $OUTDIRM/ttg.root ttg*root
+#hadd $OUTDIRM/SinglePhotonBCL.root SinglePhotonBCL*root
+#rm SinglePhotonBCL*root
+#hadd $OUTDIRM/SinglePhoton.root SinglePhoton*root
+#hadd $OUTDIRM/VqqGam.root VqqGam*root
