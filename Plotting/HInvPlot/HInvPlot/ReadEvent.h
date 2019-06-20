@@ -20,6 +20,7 @@
 #include "TTree.h"
 #include "TChain.h"
 #include "TH1D.h"
+#include "TMVA/Reader.h"
 
 // Local
 #include "Event.h"
@@ -130,6 +131,12 @@ namespace Msl
     std::string                 fMETChoice_phi;
     std::string                 fMETChoice_nolep;    
     std::string                 fMETChoice_nolep_phi;
+
+    // TMVA
+    TMVA::Reader                *fTMVAReader;
+    std::string                 fTMVAWeightPath;
+    std::vector<float>         fTMVAVars;
+    TString                     fMVAName;
     
     std::vector<std::string>    fTrees;
     std::vector<std::string>    fFiles;
@@ -157,6 +164,7 @@ namespace Msl
     // External
     float                       fInputCount;
     float                       fLumi;
+    float                       fBTagCut;
     bool                        fisMC;
     bool                        fLoadBaseLep;
     bool                        fOverlapPh;
@@ -193,6 +201,7 @@ namespace Msl
     std::vector<float> *jet_phi;
     std::vector<float> *jet_jvt;
     std::vector<float> *jet_fjvt;
+    std::vector<float> *jet_btag_weight;
     std::vector<float> *jet_TrackWidth;
     //std::vector<std::vector<unsigned short> > *jet_NTracks;
     std::vector<unsigned short> *jet_NTracks;

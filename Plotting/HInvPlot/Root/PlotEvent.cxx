@@ -75,18 +75,18 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   //
   // Created histograms
   //
-  hTruthMuPt   = GetTH1("truthMuPt",    50,  0.0,   100.0);
-  hTruthMuEta  = GetTH1("truthMuEta",   45,  -4.5,   4.5);  
-  hBaseMuPt    = GetTH1("baseMuPt",    50,  0.0,   100.0);
-  hBaseMuEta   = GetTH1("baseMuEta",   45,  -4.5,   4.5);
-  hTruthElPt   = GetTH1("truthElPt",    50,  0.0,   100.0);
-  hTruthElEta  = GetTH1("truthElEta",   45,  -4.5,   4.5);  
-  hBaseElPt    = GetTH1("baseElPt",    50,  0.0,   100.0);
-  hBaseElEta   = GetTH1("baseElEta",   45,  -4.5,   4.5);
-  hTruthTauPt  = GetTH1("truthTauPt",    50,  0.0,   100.0);
-  hTruthTauDR  = GetTH1("truthTauDR",    100,  0.0,   10.0);
-  hTruthTauEta = GetTH1("truthTauEta",   45,  -4.5,   4.5);
-  hminDRLep = GetTH1("minDRLep",   60,  0.0,   6.0);
+  hTruthMuPt    = GetTH1("truthMuPt",    50,  0.0,   100.0);
+  hTruthMuEta   = GetTH1("truthMuEta",   45,  -4.5,   4.5);  
+  hBaseMuPt     = GetTH1("baseMuPt",    50,  0.0,   100.0);
+  hBaseMuEta    = GetTH1("baseMuEta",   45,  -4.5,   4.5);
+  hTruthElPt    = GetTH1("truthElPt",    50,  0.0,   100.0);
+  hTruthElEta   = GetTH1("truthElEta",   45,  -4.5,   4.5);  
+  hBaseElPt     = GetTH1("baseElPt",    50,  0.0,   100.0);
+  hBaseElEta    = GetTH1("baseElEta",   45,  -4.5,   4.5);
+  hTruthTauPt   = GetTH1("truthTauPt",    50,  0.0,   100.0);
+  hTruthTauDR   = GetTH1("truthTauDR",    100,  0.0,   10.0);
+  hTruthTauEta  = GetTH1("truthTauEta",   45,  -4.5,   4.5);
+  hminDRLep     = GetTH1("minDRLep",   60,  0.0,   6.0);
   hptvarcone20  = GetTH1("ptvarcone20",   12,  -0.2,   1.0);  
   hptvarcone30  = GetTH1("ptvarcone30",   12,  -0.2,   1.0);  
   htopoetcone20 = GetTH1("topoetcone20",  12,  -0.2,   1.0);  

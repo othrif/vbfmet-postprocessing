@@ -45,6 +45,7 @@ p.add_option('--draw-norm',     action='store_true', default=False,   dest='draw
 p.add_option('--do-ratio',      action='store_true', default=False,   dest='do_ratio')
 p.add_option('--force-ratio',   action='store_true', default=False,   dest='force_ratio')
 p.add_option('--stack-signal',  action='store_true', default=False,   dest='stack_signal')
+p.add_option('--ph-ana',  action='store_true', default=False,   dest='ph_ana')
 
 p.add_option('--debug',         action='store_true', default=False,   dest='debug')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
@@ -68,7 +69,7 @@ atlas_style_path = options.atlas_style_path
 import ROOT
 import HInvPlot.JobOptions as config
 import HInvPlot.CutsDef    as hstudy
-import HInvPlot.systematics as syst
+import HInvPlot.systematics as import_syst
 
 #config.setPlotDefaults(ROOT)
 
@@ -76,8 +77,8 @@ if not options.wait:
     ROOT.gROOT.SetBatch(True)
 
 log = config.getLog('drawStack.py', debug=options.debug)
-mysyst = syst.systematics('All')
-mysystOneSided = syst.systematics('OneSided')
+mysyst = import_syst.systematics('All')
+mysystOneSided = import_syst.systematics('OneSidedDown')
 
 # List of plots to symmeterize
 symm_list=[]
@@ -189,19 +190,19 @@ def getHistPars(hist):
         #
         # Kinematics histograms
         #
-        'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5},
+        'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5}, #5
         'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
-        'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':False},
+        'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
         'jetEta1': {'xtitle':'Sub-Leading jet #eta'  ,       'ytitle':'Events', 'rebin':5},
         'jet1Phi': {'xtitle':'Sub-Leading jet #phi'  ,       'ytitle':'Events', 'rebin':2},
-        'jetPt1' : {'xtitle':'p_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':False},
+        'jetPt1' : {'xtitle':'p_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
         'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
-        'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},
-        'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':False},
+        'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
         'j0timing' : {'xtitle':'Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1timing' : {'xtitle':'sub-Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
-        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0.0, 'ymin':0.1, 'logy':False, 'LtoRCut':True, 'xmax':9.0},
+        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0.0, 'ymin':0.1, 'logy':False, 'LtoRCut':1, 'xmax':9.0},
         'n_jet_fwd'   : {'xtitle':'Number of extra Jets |eta|>2.5',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj30'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
@@ -213,7 +214,8 @@ def getHistPars(hist):
         'n_jet_cenj30'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj40'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
-        'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0},
+        'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0,'ymin':0.1, 'logy':True,'LtoRCut':1},
+        'tmva'  : {'xtitle':'BDT Score',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},        
 
         'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
@@ -222,21 +224,20 @@ def getHistPars(hist):
         'lepPhi' : {'xtitle':'Lepton #phi [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'dphill' : {'xtitle':'#Delta #phi_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
         'jj_dphi' : {'xtitle':'#Delta #phi_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
-        'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':1.0, 'logy':True},
-        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':1.0, 'logy':True, 'LtoRCut':False},
+        'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':5,  'ymin':0.1, 'logy':False, 'LtoRCut':1},
+        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':1.0, 'logy':True, 'LtoRCut':0},
         'met_tst_phi'    : {'xtitle':'E_{T}^{miss} #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_phi'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
-        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':False},
-        'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':False},
+        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':0},
+        'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
         'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
     'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},
-    'met_soft_tst_et'     : {'xtitle':'MET Soft [GeV]'   ,         'ytitle':'Events',   'rebin':5,'ymin':0.1},
-    'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -271,7 +272,7 @@ def getHistPars(hist):
     'met_tst_ph_dphi'     : {'xtitle':'#Delta#phi(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'Mtt'     : {'xtitle':'m_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'minDRLep'     : {'xtitle':'min #DeltaR(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'j3Pt'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
+    'j3Pt'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':0},
     'j3Eta'     : {'xtitle':'j3 #eta'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3Jvt'     : {'xtitle':'j3 Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3FJvt'     : {'xtitle':'j3 f-Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -282,12 +283,6 @@ def getHistPars(hist):
     'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
     'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
-        'jetTrackWidth0' : {'xtitle':'Track Width (leading)',          'ytitle':'Events', 'LtoRCut':False},
-        'jetTrackWidth1' : {'xtitle':'Track Width (subleading)',          'ytitle':'Events', 'LtoRCut':False},
-        'jetNTracks0' : {'xtitle':'NTracks (leading)',          'ytitle':'Events','LtoRCut':False},
-        'jetNTracks1' : {'xtitle':'NTracks (subleading)',          'ytitle':'Events', 'LtoRCut':False},
-        'jetPartonTruthLabelID0' : {'xtitle':'PartonTruthLabelID PDG (leading)',          'ytitle':'Events', 'LtoRCut':False},
-        'jetPartonTruthLabelID1' : {'xtitle':'PartonTruthLabelID PDG (subleading)',          'ytitle':'Events', 'LtoRCut':False},
 	'n_vx' : {'xtitle':'n_vx', 'ytitle':'Events','LtoRCut':False},
         }
 
@@ -331,6 +326,10 @@ def getLabelSortKey(sample):
     #elif sample == 'data': return 11
     elif sample == 'bkgs': return 12
     elif sample == 'zewk': return 13
+    elif sample == 'ttg': return 13        
+    elif sample == 'zgam': return 13        
+    elif sample == 'wgam': return 13        
+    elif sample == 'pho': return 13        
     elif sample == 'wqcd': return 14
     elif sample == 'wqcdMad': return 14
     elif sample == 'wewk': return 15
@@ -367,6 +366,10 @@ def getSampleSortKey(sample):
     elif sample == 'hvbf': return 9
     elif sample == 'data': return -10
     elif sample == 'bkgs': return 11
+    elif sample == 'ttg': return 13        
+    elif sample == 'zgam': return 13        
+    elif sample == 'wgam': return 13        
+    elif sample == 'pho': return 13        
 
     log.warning('getLabelSortKey - unknown key: %s' %sample)
     return 100
@@ -393,7 +396,7 @@ def getSampleLabel(sample):
         'wewk': 'W+jets EWK',
         'top1': 'Single Top',
         'top2': 'Top', #'t#bar{t}',
-        'tall': 'Top',
+        'tall': 'Top+VV/VVV',
         'vvv': 'VV/VVV',
         'zldy': 'Z low m.',
         'wzzz': 'ZV',#'WZ/ZZ',
@@ -402,6 +405,9 @@ def getSampleLabel(sample):
         'wgam': 'W#gamma',
         'wgas': 'W#gamma*',
         'zgas': 'Z#gamma*',
+        'zgam': 'Z#gamma',        
+        'ttg': 't#bar{t}#gamma',
+        'pho': '#gamma+j',
         'htau':  '%s H#rightarrow#tau#tau'%options.hmass,
         'hggf':  'ggF Higgs',
         'higgs':  'Higgs',
@@ -454,6 +460,8 @@ def getStyle(sample):
     color_zldy = ROOT.kOrange-3
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
+    color_ttg = ROOT.kBlue   -9
+    color_pho = ROOT.kGreen -3  
     color_wdpi = ROOT.kOrange-5
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
@@ -474,6 +482,10 @@ def getStyle(sample):
         'mqcd':{'color':color_wdpi, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'dqcd':{'color':color_wdpi, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'pho':{'color':color_pho, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'wgam':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
@@ -493,7 +505,7 @@ def getStyle(sample):
         sys.exit(1)
 
 #-------------------------------------------------------------------------
-def updateCanvas(can, name=None, leg=None, option = ''):
+def updateCanvas(can, name=None, leg=None, option = '', data_hist=None, bkg_sum_hist=None):
 
     if not can:
         sys.exit(0)
@@ -554,14 +566,23 @@ def updateCanvas(can, name=None, leg=None, option = ''):
             can.Print('%s.eps' %name, 'eps')
 
         if options.do_pdf:
-	    #can.SaveAs('%s.pdf' %name)
             can.Print('%s.pdf' %name, 'pdf')
 
         if options.do_root:
-	    outfile  = ROOT.TFile("hists_"+name+".root", "RECREATE")
-	    can.Write()
-	    outfile.Close()
-	    print "file "+str(outfile)+" has been created"
+            #outfile  = ROOT.TFile("hists_"+name+".root", "RECREATE")
+            outfile  = ROOT.TFile('%s.root' %name, "RECREATE")
+            can.Write()
+            if data_hist:
+                data_hist.hist.SetDirectory(outfile)
+                data_hist.hist.SetName("data_"+data_hist.hist.GetName())                
+                data_hist.hist.Write()
+            if bkg_sum_hist:
+                bkg_sum_hist.SetDirectory(outfile)
+                bkg_sum_hist.SetName("totbkg_"+bkg_sum_hist.GetName())
+                bkg_sum_hist.Write()                
+            outfile.Close()
+            print "file "+str(outfile)+" has been created"
+
 
 #-------------------------------------------------------------------------
 def rescaleFirstBin(hist, scale):
@@ -717,7 +738,10 @@ class DrawStack:
         self.zcr_stack = None
         if options.blind and self.selkey.count('pass_sr') and self.selkey.count('_nn_Nominal'): #and self.selkey=='pass_sr_allmjj_nn_Nominal':
             replace_sr_name = self.selkey[self.selkey.find('pass_sr_')+len('pass_sr_'): self.selkey.find('_nn_Nominal')]
-            self.zcr_stack = DrawStack(name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_'+replace_sr_name+'_ll_Nominal')
+            zcr_name=copy.copy(name)
+            if zcr_name.count('_tst_et') and not zcr_name.count('_nolep') and not zcr_name.count('soft'):
+                zcr_name = zcr_name.replace('_tst_et','_tst_nolep_et')
+            self.zcr_stack = DrawStack(zcr_name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_'+replace_sr_name+'_ll_Nominal')
         self.sign = self.ReadSample(file, sign)
         if options.hscale!=None:
             self.sign.hist.Scale(float(options.hscale))
@@ -792,8 +816,9 @@ class DrawStack:
         log.debug('ReadSample - integral=%5.1f sample=%s, syst=%s' %(hist.Integral(), sample, syst))
 
         if DO_SYMM:
-            #print 'COMPUTING systematic'
-            hist_central_value = self.file_pointer.Get(path)
+            nom_path = self.GetHistPath(sample, 'Nominal')
+            #print 'COMPUTING systematic',nom_path
+            hist_central_value = self.file_pointer.Get(nom_path)
             self.Symmeterize(hist_central_value, hist)
 
         return HistEntry(hist, sample, self.name, self.nf_map)
@@ -842,7 +867,7 @@ class DrawStack:
             bkg_ent.sample = 'bkgs'
             self.sys_bkgs[syst] = bkg_ent
             #print 'integral: ',bkg_ent.hist.Integral()
-            self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst, DO_SYMM=DO_SYMM)
+            self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst_key, DO_SYMM=DO_SYMM)
 
     #-------------------------
     def GetTotalBkgHist(self):
@@ -1000,7 +1025,7 @@ class DrawStack:
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
 
-        updateCanvas(can, name='%s_%s_%s_sig' %(getSelKeyPath(), self.name, syst))
+        updateCanvas(can, name='%s_%s_%s_sig' %(getSelKeyPath(), self.name, syst, self.data, self.bkg_sum))
 
     #----------------------
     def PlotSystBkg(self, syst, can):
@@ -1066,7 +1091,7 @@ class DrawStack:
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
 
-        updateCanvas(can, name='%s_%s_%s_bkg' %(getSelKeyPath(), self.name, syst))
+        updateCanvas(can, name='%s_%s_%s_bkg' %(getSelKeyPath(), self.name, syst, self.data, self.bkg_sum))
 
     #-------------------
     def PlotManySyst(self, systs, can, isSignal=False, fillData=False, groupStart=-1, groupEnd=-1):
@@ -1104,6 +1129,7 @@ class DrawStack:
         bkg = self.GetTotalBkgHist()
         if isSignal:
             bkg = self.sign.hist.Clone()
+            bkg.SetDirectory(0)
         bkg.SetLineWidth(2)
         bkg.SetLineColor(2)
         bkg.SetFillColor(0)
@@ -1118,7 +1144,9 @@ class DrawStack:
         tmp_color=3
         i=0
         for s in sys:
-
+            if not s:
+                print  'not a valid hist: ',s
+                continue
             log.info('PlotManySyst - %s: %s Mean: %0.2f RMS: %0.2f' %(self.name, systs[i], s.GetMean(), s.GetRMS()))
             s.SetLineColor(getColor(tmp_color))
             s.SetMarkerColor(getColor(tmp_color))
@@ -1131,7 +1159,7 @@ class DrawStack:
                 max_bin = s.GetMaximum()
 
         bkg.GetYaxis().SetRangeUser(0.0, 1.2*max_bin)
-        self.UpdateHist(bkg)
+        self.UpdateHist(bkg, ignore_max=True)
         bkg.Draw('HIST E0')
         if fillData:
             mydata.Draw('SAME')
@@ -1197,7 +1225,7 @@ class DrawStack:
                 if math.fabs(s.GetMinimum()-1.0) < 0.15 and math.fabs(s.GetMaximum()-1.0) < 0.15:
                     s.GetYaxis().SetRangeUser(0.80, 1.20)
                 elif math.fabs(s.GetMinimum()-1.0) < 0.5 and math.fabs(s.GetMaximum()-1.0) < 0.5:
-                    s.GetYaxis().SetRangeUser(0.50, 1.50)
+                    s.GetYaxis().SetRangeUser(0.501, 1.499)
                 elif math.fabs(s.GetMinimum()-1.0) < 1.0 and math.fabs(s.GetMaximum()-1.0) < 1.0:
                     s.GetYaxis().SetRangeUser(0.0, 2.00)
                 else:
@@ -1222,7 +1250,7 @@ class DrawStack:
                 tmp_color+=1
 
                 if tmp_color==4 and not fillData:
-                    self.UpdateHist(s)
+                    self.UpdateHist(s,ignore_max=True)
                     s.GetYaxis().SetRangeUser(0.80, 1.20)
                     s.Draw('HIST')
                 else:
@@ -1525,8 +1553,8 @@ class DrawStack:
         norm_hists_bkg=[]
         for hk,hg in self.bkgs.iteritems(): norm_hists_bkg+=[hg.hist.Clone()]
         syst_hist_bkg=ROOT.TGraphAsymmErrors(self.bkg_sum); self.err_bands+=[syst_hist_bkg]
-        syst_ratio=syst_hist_bkg.Clone();                   self.err_bands+=[syst_ratio]
-        self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
+        syst_ratio=syst_hist_bkg.Clone(); self.err_bands+=[syst_ratio]
+        syst_jes_ratio = self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
 
         # Setting the draw options
         syst_hist_bkg.SetFillStyle(3004)
@@ -1625,57 +1653,136 @@ class DrawStack:
                 self.ratio.Divide(den_tmp)
                 # compute the mu-error
                 if options.blind:
-                    leftToRight=True
+                    leftToRight=1
                     CUTRANGE = range(0,self.signif.GetNbinsX()+1)
                     if 'LtoRCut' in getHistPars(self.name):
                         leftToRight = getHistPars(self.name)['LtoRCut']
                     for ibinA in CUTRANGE:
                         ibin = ibinA
-                        if not leftToRight:
+                        if leftToRight==0:
                             ibin = self.signif.GetNbinsX() - ibinA
                         #print ibin
                         cut_Nsig = self.sign.hist.Integral(0,ibin)
                         cut_Nbkg = self.bkg_sum.Integral(0,ibin)
-                        if not leftToRight:
+                        cut_NsigOpp=0.0
+                        cut_NbkgOpp=0.0
+                        if leftToRight==0:
                             cut_Nsig = self.sign.hist.Integral(ibin,10001)
                             cut_Nbkg = self.bkg_sum.Integral(ibin,10001)
-                        if leftToRight==2: # do this bin-by-bin
+                        elif leftToRight==2: # do this bin-by-bin
                             cut_Nsig = self.sign.hist.Integral(ibin,ibin)
                             cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
-
+                        elif leftToRight==3: # add bins together
+                            cut_NsigOpp = self.sign.hist.Integral(ibin+1,10001)
+                            cut_NbkgOpp = self.bkg_sum.Integral(ibin+1,10001)                            
+                        elif (leftToRight==4 and ibin%2==0): # pair every 2 bins together
+                            cut_Nsig = self.sign.hist.GetBinContent(ibin)
+                            cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
+                            if ibin!=0 and ibin!=2: #0 included in CUTRANGE but not in actual histograms - binning starts at 1
+                                cut_NsigOpp = self.sign.hist.GetBinContent(ibin)
+                                cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin)
+                                cut_Nsig = self.sign.hist.GetBinContent(ibin-1)
+                                cut_Nbkg = self.bkg_sum.GetBinContent(ibin-1)
+                        elif (leftToRight==4 and ibin%2==1): # pair every 2 bins together
+                            if ibin!=1:
+                                cut_NsigOpp = self.sign.hist.GetBinContent(ibin+1)
+                                cut_NbkgOpp = self.bkg_sum.GetBinContent(ibin+1)
+                                cut_Nsig = self.sign.hist.GetBinContent(ibin)
+                                cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
+                        #else:
+                        #    cut_Nsig = self.sign.hist.Integral(ibin,ibin)
+                        #    cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
+                                
                         #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
-                            self.signif.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg)/cut_Nsig)
+                            signifV = 2.0*math.sqrt(cut_Nbkg)/cut_Nsig
+                            if cut_NsigOpp>0.0:
+                                signifVOpp = 2.0*math.sqrt(cut_NbkgOpp)/cut_NsigOpp
+                                if  (leftToRight==3 or leftToRight==4) and signifV>0.0 and signifVOpp>0.0: # add bins together
+                                    signifV = 1./math.sqrt(1./signifV**2+1./signifVOpp**2)
+                            self.signif.SetBinContent(ibin, signifV)
+
                             wBKG=0.0
                             madgraph=''
                             if options.madgraph:
                                 madgraph='Mad'
                             if ('wqcd'+madgraph) in self.bkgs and 'wewk' in self.bkgs:
                                 wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['wewk'].hist.Integral(0,ibin)
-                                if not leftToRight:
+                                wBKGOpp=0.0
+                                if leftToRight==0:
                                     wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['wewk'].hist.Integral(ibin,10001)
-                                if leftToRight==2:
+                                elif leftToRight==2:
                                     wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['wewk'].hist.Integral(ibin,ibin)
+                                elif leftToRight==3: # add bins together
+                                    wBKGOpp = self.bkgs['wqcd'+madgraph].hist.Integral(ibin+1,10001)+self.bkgs['wewk'].hist.Integral(ibin+1,10001)
+                                elif leftToRight==4 and ibin%2==0:# pair every 2 bins together
+                                    wBKG = self.bkgs['wqcd'+madgraph].hist.GetBinContent(ibin-1)+self.bkgs['wewk'].hist.GetBinContent(ibin-1)
+                                    wBKGOpp = self.bkgs['wqcd'+madgraph].hist.GetBinContent(ibin)+self.bkgs['wewk'].hist.GetBinContent(ibin)
+                                    if ibin==0 or ibin==2:#For leading Nominal bin (unpaired)
+                                        wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['wewk'].hist.Integral(ibin,ibin)
+                                elif leftToRight==4 and ibin%2==1:# pair every 2 bins together
+                                    wBKG = self.bkgs['wqcd'+madgraph].hist.GetBinContent(ibin)+self.bkgs['wewk'].hist.GetBinContent(ibin)
+                                    wBKGOpp = self.bkgs['wqcd'+madgraph].hist.GetBinContent(ibin+1)+self.bkgs['wewk'].hist.GetBinContent(ibin+1)
+                                    if ibin==1:#For leading Nominal bin (unpaired)
+                                        wBKG = self.bkgs['wqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['wewk'].hist.Integral(ibin,ibin)
 
                             if ('zqcd'+madgraph) in self.bkgs and 'zewk' in self.bkgs:
                                 zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(0,ibin)+self.bkgs['zewk'].hist.Integral(0,ibin)
-                                if not leftToRight:
+                                zBKGOpp=0.0
+                                if leftToRight==0:
                                     zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,10001)+self.bkgs['zewk'].hist.Integral(ibin,10001)
-                                if leftToRight==2:
+                                elif leftToRight==2:
                                     zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
+                                elif leftToRight==3: # add bins together
+                                    zBKGOpp = self.bkgs['zqcd'+madgraph].hist.Integral(ibin+1,10001)+self.bkgs['zewk'].hist.Integral(ibin+1,10001)
+                                elif leftToRight==4 and ibin%2==0:# pair every 2 bins together
+                                    zBKG = self.bkgs['zqcd'+madgraph].hist.GetBinContent(ibin-1)+self.bkgs['zewk'].hist.GetBinContent(ibin-1)
+                                    zBKGOpp = self.bkgs['zqcd'+madgraph].hist.GetBinContent(ibin)+self.bkgs['zewk'].hist.GetBinContent(ibin)
+                                    if ibin==2:#For leading Nominal bin (unpaired)
+                                        zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
+                                elif leftToRight==4 and ibin%2==1:# pair every 2 bins together
+                                    zBKG = self.bkgs['zqcd'+madgraph].hist.GetBinContent(ibin)+self.bkgs['zewk'].hist.GetBinContent(ibin)
+                                    zBKGOpp = self.bkgs['zqcd'+madgraph].hist.GetBinContent(ibin+1)+self.bkgs['zewk'].hist.GetBinContent(ibin+1)
+                                    if ibin==1:#For leading Nominal bin (unpaired)
+                                        zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
                                 total_zcr=-100.0
+                                total_zcrOpp=-100.0
                                 #print 'self.zcr_stack: ',self.zcr_stack
                                 if self.zcr_stack and not self.zcr_stack.bkg_sum:
                                     self.zcr_stack.bkg_sum = self.zcr_stack.GetTotalBkgHist()
-                                    total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
-                                if not leftToRight and self.zcr_stack:
+                                total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
+                                if leftToRight==0 and self.zcr_stack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,10001)
-                                if (leftToRight==2) and self.zcr_stack:
-                                    total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)                                    
+                                elif (leftToRight==2) and self.zcr_stack:
+                                    total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)
+                                elif leftToRight==3: # add bins together
+                                    total_zcrOpp = self.zcr_stack.bkg_sum.Integral(ibin+1,10001)
+                                elif leftToRight==4 and ibin%2==0:# pair every 2 bins together
+                                    total_zcr = self.zcr_stack.bkg_sum.GetBinContent(ibin-1)
+                                    total_zcrOpp = self.zcr_stack.bkg_sum.GetBinContent(ibin)
+                                    if ibin==2:#For leading Nominal bin (unpaired)
+                                        total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)
+                                elif leftToRight==4 and ibin%2==1:# pair every 2 bins together
+                                    total_zcr = self.zcr_stack.bkg_sum.GetBinContent(ibin)
+                                    total_zcrOpp = self.zcr_stack.bkg_sum.GetBinContent(ibin+1)
+                                    if ibin==1:#For leading Nominal bin (unpaired)
+                                        total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)
                                 if total_zcr>0.0:
                                     total_zcr = 1.0/math.sqrt(total_zcr)
-                                #print total_zcr
-                                self.signifCR.SetBinContent(ibin, 2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig)
+                                if total_zcrOpp>0.0:
+                                    total_zcrOpp = 1.0/math.sqrt(total_zcrOpp)
+                                #print ibin,cut_Nbkg,total_zcr,zBKG,wBKG,cut_Nsig,(2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig)
+                                signifVal = 2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig
+                                if leftToRight==3 or leftToRight==4: # add bins together
+                                    signifValOpp=0.0
+                                    if cut_NsigOpp>0.0:
+                                        signifValOpp = 2.0*math.sqrt(cut_NbkgOpp + (zBKGOpp*total_zcrOpp)**2 +(wBKGOpp*0.015)**2 )/cut_NsigOpp
+                                    if signifValOpp>0.0 and signifVal>0:
+                                        signifVal = 1./math.sqrt(1./signifValOpp**2+1./signifVal**2)
+                                    elif signifValOpp>0.0 and not signifVal>0:
+                                        signifVal=signifValOpp
+                                #print signifVal
+                                self.signifCR.SetBinContent(ibin, signifVal)
 
             # Set Names
             pars = getHistPars(self.name)
@@ -1731,7 +1838,7 @@ class DrawStack:
             bx.SetTitleSize(0.14);
             bx.SetTitleOffset(1.2);
 
-            by.SetRangeUser(0,2);
+            by.SetRangeUser(0.501, 1.499);
             if options.blind:
                 by.SetRangeUser(0,0.799);
             by.SetLabelSize(0.13);
@@ -1752,14 +1859,23 @@ class DrawStack:
             self.error_map['bkg_ratio'].SetMarkerColor(1)
             self.error_map['bkg_ratio'].SetMarkerSize(0)
             self.error_map['bkg_ratio'].SetLineColor(1)
-
-            self.error_map['bkg_ratio'].Draw('SAME E2')
+            self.error_map['bkg_ratio'].Draw('SAME E2')            
+            # JES error ratio
+            if syst_jes_ratio:
+                self.error_map['syst_jes_ratio'] = syst_jes_ratio.Clone()
+                self.error_map['syst_jes_ratio'].SetFillColor(0)
+                self.error_map['syst_jes_ratio'].SetLineColor(3)            
+                self.error_map['syst_jes_ratio'].SetLineWidth(2)
+                self.error_map['syst_jes_ratio'].SetMarkerColor(3)
+                self.error_map['syst_jes_ratio'].SetLineStyle(1)
+                self.error_map['syst_jes_ratio'].Draw('SAME E1') #HIST
 
             # Overlay the ratio plot on top of errors
             if options.blind:
                 self.ratio.Draw('same hist')
                 self.signif.Draw('same hist')
-                self.signifCR.Draw('same hist')
+                self.signifCR.GetYaxis().SetRangeUser(0.0,1.5);
+                self.signifCR.Draw('hist same')
                 self.legr.Clear()
                 self.legr.AddEntry(self.ratio,'S/B')
                 self.legr.AddEntry(self.signif,'#sigma_{#mu} Stat 95% CL')
@@ -1796,6 +1912,12 @@ class DrawStack:
                 new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
                 syst.SetPointEYlow(m-1,new_e)
 
+        if False:
+            mysyst_jes = import_syst.systematics('JES')
+            syst_jesr = syst.Clone()
+            syst_jesr.SetName('syst_jesr')
+        else:
+            syst_jesr=None
         # iterate over the systematics
         for sys, ent in self.sys_bkgs.iteritems():
             if True:
@@ -1813,18 +1935,38 @@ class DrawStack:
                         e2=syst.GetErrorYlow(m-1)
                         new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
                         syst.SetPointEYlow(m-1,new_e)
+                    # adding the jes systematics
+                    if syst_jesr and sys in mysyst_jes.getsystematicsList():
+                        if e1>0:
+                            e2=syst_jesr.GetErrorYhigh(m-1)
+                            new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
+                            syst_jesr.SetPointEYhigh(m-1,new_e)
+                        elif e1<0:
+                            e2=syst_jesr.GetErrorYlow(m-1)
+                            new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
+                            syst_jesr.SetPointEYlow(m-1,new_e)                        
         #
         # Calculate the systematic band for a ratio plot
         #
         x1=ROOT.Double()
         y1=ROOT.Double()
+        syst_jesr_ratio=None
+        if syst_jesr:
+            syst_jesr_ratio = syst_ratio.Clone()        
         for i in range(0,self.bkg_sum.GetNbinsX()):
             syst_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             syst_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+            if syst_jesr_ratio:
+                syst_jesr_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+                syst_jesr_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
+
+
         for j in range(1,tot_bkg.GetNbinsX()+1):
             # Set Y value to 1
             syst_ratio.GetPoint(j-1,x1,y1)
             syst_ratio.SetPoint(j-1,x1,1.0)
+            if syst_jesr_ratio:
+                syst_jesr_ratio.SetPoint(j-1,x1,1.0)
             val=tot_bkg.GetBinContent(j)
             if val==0.0:
                 continue
@@ -1836,9 +1978,15 @@ class DrawStack:
             eyd=syst.GetErrorYlow    (j-1)/val
             syst_ratio.SetPointEYhigh(j-1,eyu)
             syst_ratio.SetPointEYlow (j-1,eyd)
+            # JES
+            if syst_jesr_ratio:
+                eyu=syst_jesr.GetErrorYhigh   (j-1)/val
+                eyd=syst_jesr.GetErrorYlow    (j-1)/val
+                syst_jesr_ratio.SetPointEYhigh(j-1,eyu)
+                syst_jesr_ratio.SetPointEYlow (j-1,eyd)           
             #print 'err up: ',eyu,' down: ',eyd
 
-        return
+        return syst_jesr_ratio
 
     def CreateStack(self):
         self.stack   = ROOT.THStack(self.name, self.name)
@@ -1922,7 +2070,7 @@ class DrawStack:
         elif options.xmax != None:
             self.stack.GetXaxis().SetRangeUser(options.xmin,options.xmax)
     #--------------------
-    def UpdateHist(self,h, sample=None):
+    def UpdateHist(self, h, sample=None, ignore_max=False):
 
         pars = getHistPars(self.name)
         if 'xtitle' in pars and h.GetXaxis() != None:
@@ -1931,7 +2079,9 @@ class DrawStack:
         if 'ytitle' in pars and h.GetYaxis() != None:
             h.GetYaxis().SetTitle(pars['ytitle'])
 
-        ymax = self.GetYaxisMax()
+        ymax=-1.0
+        if not ignore_max:
+            ymax = self.GetYaxisMax()
         if ymax > 0.0:
             if self.IsLogy():
                 h.SetMaximum(15.0*ymax)
@@ -2095,7 +2245,7 @@ def writeSystTex(table_name, stack):
                 systs[i]=systs[j]
                 systs[j]=tmp
 
-    my_order=mysyst.getsystematicsList()
+    my_order=mysyst.getsystematicsListWithDown()
     if True:
         for key in my_order:
             for s in systs:
@@ -2163,8 +2313,8 @@ def main():
     rfile  = ROOT.TFile(rpath, 'READ')
 
     sfiles={}
-    print 'Reading nSyst: ',len(mysyst.getsystematicsList())
-    for ia in mysyst.getsystematicsList():
+    print 'Reading nSyst: ',len(mysyst.getsystematicsListWithDown())
+    for ia in mysyst.getsystematicsListWithDown():
         sfiles[ia]=rfile
 
     #
@@ -2172,10 +2322,12 @@ def main():
     #
     #bkgs = ['zewk', 'zqcd','wewk','wqcd','top1','top2']
     if options.madgraph:
-        bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv']#,'zldy'
+        bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy'
-
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
+        #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
+        if options.ph_ana:
+            bkgs = ['ttg', 'zgam','wgam','pho'] #,'mqcd','zldy','vvv' 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
 
@@ -2228,11 +2380,9 @@ def main():
         else:
             cname='%s_%s_%s' %(getSelKeyPath(), var, options.syst)
 
-        updateCanvas(can, name=cname)
-
+        updateCanvas(can, name=cname, data_hist=stack.data, bkg_sum_hist=stack.bkg_sum)
 
         if options.syst_see == 'allsyst':
-
             grouping=10
             syst_group = len(sfiles.keys())/grouping+1
             for i in range(0, syst_group):

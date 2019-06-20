@@ -46,30 +46,16 @@ def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=No
     #
     # Make alg for all events - this algorithm stores events for MakeInput
     #
-    #plot_var = [] #options.var]
-    #print 'alg_suff',alg_suff
-    #plot_alg = hstudy.preparePlotEvent('plotEvent%s' %alg_suff,
-    #                                   Vars=plot_var,
-    #                                   SelKey=selkey,
-    #                                   Region=region,
-    #                                   PassAlg=alg_pass,
-    #                                   NBinLim=nbin_lim)
-    #
-    #if type(alg_take) == type([]):
-    #    alg_take += [plot_alg]
-
-    #
-    # Make plot algorithm for MC samples
-    #
-    #plot_algs = [plot_alg]
     plot_algs=[]
     if not skip_samples:
 
         for key, samples in hstudy.fillSampleList(options=options).iteritems():
             plot_algs += [hstudy.preparePlotEvent('plotEvent%s_%s%s' %(alg_suff, key, my_cut_key),
                                                   syst_name=syst,
+                                                  DetailLvl=options.DetailLvl,
                                                   Samples=samples,
                                                   PassAlg=alg_pass)]
+                                                
 
     return plot_algs
 
@@ -89,6 +75,21 @@ def prepareSeqSR(basic_cuts, alg_take=None, syst='Nominal'):
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
 #-----------------------------------------------------------------------------------------
+def prepareSeqMETSF(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'metsf'
+
+    if not( basic_cuts.chan in ['nn','e','u']) or not passRegion(region):
+        return ('', [])
+
+    pass_alg = hstudy.preparePassEventForMETSF('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+#-----------------------------------------------------------------------------------------
 def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
 
     selkey = basic_cuts.GetSelKey()
@@ -98,6 +99,36 @@ def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
         return ('', [])
 
     pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+#-----------------------------------------------------------------------------------------
+def prepareSeqGamZCR(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'gamzcr'
+
+    if (basic_cuts.chan not in ['ll','ee','uu']) or not passRegion(region):
+        return ('', [])
+
+    pass_alg = hstudy.preparePassEventForGamZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+#-----------------------------------------------------------------------------------------
+def prepareSeqGamWCR(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'gamwcr'
+
+    if not( basic_cuts.chan in ['l','e','u']) or not passRegion(region):
+        return ('', [])
+
+    pass_alg = hstudy.preparePassEventForGamWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
@@ -176,15 +207,20 @@ def main():
     anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
     if options.analysis!='all':
         anas = [options.analysis]
-    if options.analysis=='allmjjdphijj':
+    if options.analysis.count('RedChan'):
+        anas    = ['allmjj']#,'mjj1000','mjj1500','mjj2000']
+    if options.analysis=='metsf':
+        anas = ['metsf','metsfxe70','metsfxe90','metsfxe110','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400']
+    if options.analysis.count('allmjjdphijj'):
         anas = ['allmjj','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2']
-    if options.analysis=='allmjjdphijjnj':
+    if options.analysis.count('allmjjdphijjnj'):
         anas = ['allmjj','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','njgt2']
     chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']        
     if options.analysis=='qcd':
         anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT']
         chans   = ['nn']
-
+    if options.analysis.count('RedChan'):
+        chans   = ['nn','ee','uu','ll','l','e','u']
     if options.chan != None:
         chans = options.chan.split(',')
 
@@ -224,8 +260,7 @@ def main():
         #-----------------------------------------------------------------------------------------
         # Common algorithms for computing additional event properties and event pre-selection
         #
-        #plot_alg = hstudy.preparePlotEvent('plotEvent'+syst)
-        plot_alg = hstudy.preparePlotEvent('plotEvent',syst_name=syst)
+        plot_alg = hstudy.preparePlotEvent('plotEvent',syst_name=syst,DetailLvl=options.DetailLvl)
         read_alg.AddCommonAlg(plot_alg)
 
         #-----------------------------------------------------------------------------------------
@@ -237,33 +272,44 @@ def main():
             for a in anas:
                 for c in chans:
                     basic_cuts = hstudy.BasicCuts(Analysis=a, Chan=c, SameSign=sign)
-
                     #
-                    # SR Cut based regions and algorithms
+                    # MET trigger SF
                     #
-                    (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_sr,  alg_sr)
-                    #
-                    # SR Cut based regions and algorithms with photon
-                    #
-                    if a=='allmjj':
-                        (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
-                        read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)
-
-                    #
-                    # ZCR Cut based regions and algorithms
-                    #
-                    (name_zcr,  alg_zcr)  = prepareSeqZCR (basic_cuts, a, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_zcr,  alg_zcr)
-
-                    #
-                    # WCR Cut based regions and algorithms
-                    #
-                    (name_wcr,  alg_wcr)  = prepareSeqWCR (basic_cuts, a, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_wcr,  alg_wcr)
-
-                    (name_wcranti, alg_wcranti) = prepareSeqWCRAntiID(basic_cuts, a, alg_take=input_cut, syst=syst)
-                    read_alg.AddNormalAlg(name_wcranti, alg_wcranti)
+                    if a.count('metsf'):
+                        (name_metsf,  alg_metsf)  = prepareSeqMETSF(basic_cuts, alg_take=input_cut, syst=syst)
+                        read_alg.AddNormalAlg(name_metsf,  alg_metsf)
+                    else:
+                        #
+                        # SR Cut based regions and algorithms
+                        #
+                        (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
+                        read_alg.AddNormalAlg(name_sr,  alg_sr)
+                        
+                        #
+                        # SR Cut based regions and algorithms with photon
+                        #
+                        if a=='allmjj':
+                            (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
+                            read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)
+                            (name_zcr_gam,  alg_zcr_gam)  = prepareSeqGamZCR (basic_cuts, alg_take=input_cut, syst=syst)
+                            read_alg.AddNormalAlg(name_zcr_gam,  alg_zcr_gam)
+                            (name_wcr_gam,  alg_wcr_gam)  = prepareSeqGamWCR (basic_cuts, alg_take=input_cut, syst=syst)
+                            read_alg.AddNormalAlg(name_wcr_gam,  alg_wcr_gam)
+                        
+                        #
+                        # ZCR Cut based regions and algorithms
+                        #
+                        (name_zcr,  alg_zcr)  = prepareSeqZCR (basic_cuts, a, alg_take=input_cut, syst=syst)
+                        read_alg.AddNormalAlg(name_zcr,  alg_zcr)
+                        
+                        #
+                        # WCR Cut based regions and algorithms
+                        #
+                        (name_wcr,  alg_wcr)  = prepareSeqWCR (basic_cuts, a, alg_take=input_cut, syst=syst)
+                        read_alg.AddNormalAlg(name_wcr,  alg_wcr)
+                        
+                        (name_wcranti, alg_wcranti) = prepareSeqWCRAntiID(basic_cuts, a, alg_take=input_cut, syst=syst)
+                        read_alg.AddNormalAlg(name_wcranti, alg_wcranti)
 
         read_alg.RunConfForAlgs()
 

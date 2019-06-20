@@ -38,6 +38,8 @@ namespace Msl
       trigger_met,
       trigger_met_encoded,      
       trigger_met_encodedv2,
+      trigger_met_byrun,
+      runPeriod,      
       trigger_lep,
       passJetCleanTight,
       xeSFTrigWeight,
@@ -144,6 +146,7 @@ namespace Msl
       met_tst_ph_dphi,
       passVjetsFilter,
       passVjetsPTV,
+      jetBtagWeight,
       jetTrackWidth,
       jetTrackWidth0,
       jetTrackWidth1,
@@ -154,6 +157,9 @@ namespace Msl
       jetPartonTruthLabelID0,
       jetPartonTruthLabelID1,
       n_vx
+      tmva,
+      bcid,
+      bcidPos
     };
 
     std::string       AsStr(Var var);

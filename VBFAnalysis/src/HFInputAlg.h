@@ -43,17 +43,19 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   ///histSvc()         : ServiceHandle to output ROOT service (writing TObjects)
   ///currentFile()     : TFile* to the currently open input file
   ///retrieveMetadata(...): See twiki.cern.ch/twiki/bin/view/AtlasProtected/AthAnalysisBase#ReadingMetaDataInCpp
-  double weightXETrigSF(const float met_pt, int syst);
+  double weightXETrigSF(const float met_pt,  unsigned metRunNumber, int syst);
   float  GetDPhi(const float phi1, const float phi2);
 
  private: 
   int npevents = 0;
+  int year     = 2016;
   Bool_t isMC = true;
   Bool_t isMadgraph = true;
   Bool_t doLowNom = false; //put nominal yields for "Low" histogram for asymmetric systematics for HistFitter
   Bool_t isHigh = true;
   Bool_t weightSyst=false;
   Bool_t doPlot = false;
+  Bool_t doDuplicateCheck = false;
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
@@ -91,6 +93,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t trigger_met;
   Float_t w;
   Int_t runNumber;
+  Int_t randomRunNumber;
   ULong64_t eventNumber;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
@@ -131,6 +134,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_timing;
   std::vector<Int_t>* jet_passJvt;
   std::vector<Float_t>* jet_fjvt;
+  std::vector<unsigned short> *jet_NTracks;
   
   Float_t met_soft_tst_et=-9999; 
   Float_t met_tight_tst_et=-9999;
@@ -144,6 +148,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* basemu_eta;
   std::vector<Float_t>* basemu_phi;
   std::vector<Float_t>* basemu_ptvarcone20;
+  std::vector<Float_t>* basemu_ptvarcone30;
   std::vector<Float_t>* baseel_pt;
   std::vector<Float_t>* baseel_eta;
   std::vector<Float_t>* baseel_phi;

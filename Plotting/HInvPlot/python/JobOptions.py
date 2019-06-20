@@ -1,3 +1,76 @@
+import math
+
+#-----------------------------------------
+def BinomialErr(n2, n1, err1=0.0):
+    err=0.0
+    if n1==0:
+        return err
+    total_num=n1
+    if err1>0.0:
+        total_num = (n1/err1)**2
+
+            
+    eff = n2/n1
+    if total_num<0.0:
+        return 1;
+    if total_num<1.3 and total_num>0.0 and eff==1.0:
+        return 0.2/math.sqrt(total_num);
+    elif total_num<1500.3 and total_num>0.0 and eff==1.0:
+        return 0.01/math.sqrt(total_num);
+    
+    if eff>1.0:
+        print 'eff too high',eff
+        #print total_num
+        if total_num>0.0:
+            return 0.5/math.sqrt(total_num);
+        else:
+            return 1.0
+    if eff<0.0:
+        print 'eff too low',eff
+        return 0
+    err = math.sqrt(eff*(1.0-eff)/total_num)
+    return err
+
+#-----------------------------------------
+def DivideBin(n1,d1):
+
+    m = n1.Clone()
+    for i in range(0,n1.GetNbinsX()+1):
+
+        r=0.0
+        if n1.GetBinContent(i)>0.0:
+            r = d1.GetBinContent(i)/n1.GetBinContent(i)
+        err = BinomialErr(d1.GetBinContent(i), n1.GetBinContent(i), n1.GetBinError(i))
+        #print err
+        m.SetBinContent(i,r)
+        m.SetBinError(i,err)
+    return m
+#-----------------------------------------
+def ComputeEff(nums, dens, w=1.0):
+
+    if len(nums)!=1:
+        print 'ERROR doing it wrong'
+
+    num = nums[0]
+    den = dens[0]
+
+    ratio = num.Clone()
+    ratio.Divide(den)  
+    ratios=[]
+
+    # Set the binomial errors
+    for i in range(0,num.GetNbinsX()+1):
+        ratio.SetBinError(i, BinomialErr(num.GetBinContent(i), den.GetBinContent(i), den.GetBinError(i)))
+
+    ratios+=[ratio]
+
+    #ratio1 = num.Clone()
+    #ratio1.Divide(den1)
+    ## Set the binomial errors
+    #for i in range(0,num.GetNbinsX()+1):
+    #    ratio1.SetBinError(i, BinomialErr(num.GetBinContent(i), den.GetBinContent(i), den.GetBinError(i)))
+    #ratios+=[ratio1]    
+    return ratios
 
 #---------------------------------------------------------------------
 # Make logger object
@@ -50,7 +123,7 @@ def getParser():
     p.add_option('--debug-alg',    type='string', default='no',          dest='debug_alg',  help='')
     p.add_option('--print-alg',    type='string', default='no',          dest='print_alg',  help='')
 
-    p.add_option('--region',       type='string', default='sr,gamsr,zcr,wcr',          dest='region',     help='')    
+    p.add_option('--region',       type='string', default='sr,gamsr,zcr,wcr,gamzcr,gamwcr,metsf',          dest='region',     help='')    
     p.add_option('--chan',         type='string', default=None,          dest='chan',       help='')
     p.add_option('--njet',         type='string', default=None,          dest='njet',       help='')
     p.add_option('--syst',         type='string', default='Nominal',     dest='syst',       help='')
@@ -60,24 +133,26 @@ def getParser():
     p.add_option('--var',          type='string', default='Mll',         dest='var',        help='MT variable used for limits')
     p.add_option('--lep-sign',     type='string', default='0',           dest='lep_sign',   help='Lepton Sign...0 is opposite sign, 1 is SS')
     p.add_option('--trees',        type='string', default='',      dest='trees',      help='Tree name: QCDunwNominal,VBFH125Nominal,VH125Nominal,VVVNominal,W_strongNominal,Z_strongNominal,Z_strongPTVExtNominal,Z_strong_VBFFiltNominal,ggFH125Nominal,QCDwNominal,VBFHOtherNominal,VVNominal,W_EWKNominal,Z_EWKNominal,Z_strongExtNominal,Z_strong_LowMassNominal,dataNominal,ttbarNominal')
-    p.add_option('--trig-name',    type='string', default='',            dest='trig_name',  help='Trigger name if wanted. TRIG_xe80_tclcw, TRIG_lep, TRIG_2mu8_EFxe40_tclcw') 
+    p.add_option('--trig-name',    type='string', default='',            dest='trig_name',  help='Trigger name if wanted. TRIG_xe80_tclcw, TRIG_lep, TRIG_2mu8_EFxe40_tclcw')
+    p.add_option('--mva-weights-path',    type='string', default='',            dest='mva_weights_path',  help='full path to weights files for tmva')     
     p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
     p.add_option('--mergePTV',  action='store_true', default=False,   dest='mergePTV',          help='Merge the pTV slices')
     p.add_option('--mergeExt',  action='store_true', default=False,   dest='mergeExt',          help='Merge the Sherpa extension slices')
     p.add_option('--r207Ana',  action='store_true', default=False,   dest='r207Ana',          help='Run the release 20.7 analysis')    
     
     # Should try to reduce these number of options
-    p.add_option('--skim',         action='store_true', default=False,   dest='skim',                 help='Skim ntuples to met trigger or 3L')
-
+    p.add_option('--skim',         action='store_true', default=False,   dest='skim',           help='Skim ntuples to met trigger or 3L')
+    p.add_option('--jet-veto-pt',  type='float'       , default=-10,     dest='jet_veto_pt',    help='pT for jet veto')
+    p.add_option('--BTagCut',  type='float'       , default=-10,     dest='BTagCut',    help='BTagCut for tagging: 0.86, 0.66, 0.38, -0.15 for the 60, 70, 77, and 85 OP')
+    p.add_option('--DetailLvl',    type='int'       ,   default=0,       dest='DetailLvl',      help='Integer for detail level of plotting. =1 plots jet variables only')
+    
     p.add_option('--vv-vr',    action='store_true', default=False,   dest='vv_vr',            help='Run the VV VR')
     p.add_option('--pu-weight-one',    action='store_true', default=False,   dest='pu_weight_one',            help='Pileup Weight One')    
 
     p.add_option('--ignore-njet',  action='store_true', default=False,   dest='ignore_njet',          help='Ignore Njet')
-    p.add_option('--ignore-met',  action='store_true', default=False,   dest='ignore_met',          help='Ignore MET')
+    p.add_option('--ignore-met',   action='store_true', default=False,   dest='ignore_met',          help='Ignore MET')
     p.add_option('--LoadBaseLep',  action='store_true', default=False,   dest='LoadBaseLep',          help='Use looser leptons')    
-    p.add_option('--OverlapPh',  action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')
-    p.add_option('--jet-veto-pt',         type='float'       , default=-10,       dest='jet_veto_pt',       help='pT for jet veto')
-    
+    p.add_option('--OverlapPh',    action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')
     p.add_option('--debug',        action='store_true', default=False,   dest='debug',      help='')
     p.add_option('--print',        action='store_true', default=False,   dest='print',      help='')
     p.add_option('--print-run',    action='store_true', default=False,   dest='print_run',  help='')    
