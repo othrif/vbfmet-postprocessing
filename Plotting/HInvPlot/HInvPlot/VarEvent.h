@@ -156,7 +156,6 @@ namespace Msl
       jetPartonTruthLabelID,
       jetPartonTruthLabelID0,
       jetPartonTruthLabelID1,
-      n_vx,
       tmva,
       bcid,
       bcidPos,

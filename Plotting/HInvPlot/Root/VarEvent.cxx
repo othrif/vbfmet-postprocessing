@@ -140,7 +140,6 @@ std::string Msl::Mva::Convert2Str(Var var)
     case jetPartonTruthLabelID:   return "jetPartonTruthLabelID";
     case jetPartonTruthLabelID0:  return "jetPartonTruthLabelID0";
     case jetPartonTruthLabelID1:  return "jetPartonTruthLabelID1";
-    case n_vx:			  return "n_vx";
     case tmva:                    return "tmva";      
     case bcid:                    return "bcid";      
     case bcidPos:                 return "bcidPos";      
@@ -278,7 +277,6 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "jetPartonTruthLabelID") return jetPartonTruthLabelID;
   if(var == "jetPartonTruthLabelID0") return jetPartonTruthLabelID0;
   if(var == "jetPartonTruthLabelID1") return jetPartonTruthLabelID1;
-  if(var == "n_vx")		 return n_vx;
   if(var == "tmva")                   return tmva;  
   if(var == "bcid")                   return bcid;  
   if(var == "bcidPos")                return bcidPos;  
@@ -504,7 +502,6 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(jetPartonTruthLabelID);
     vars.push_back(jetPartonTruthLabelID0);
     vars.push_back(jetPartonTruthLabelID1);
-    vars.push_back(n_vx);
     vars.push_back(tmva);    
     vars.push_back(bcid);    
     vars.push_back(bcidPos);    

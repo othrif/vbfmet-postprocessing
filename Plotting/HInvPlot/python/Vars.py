@@ -59,7 +59,6 @@ myplots = [
               ['jetTrackWidth1', '50', '0.0', '1.0'], 
               ['jetNTracks0', '40', '0.0', '40.0'], 
               ['jetNTracks1', '40', '0.0', '40.0'], 
-              ['n_vx', '40', '0.0', '40.0'], 
               ['jetPartonTruthLabelID0', '28', '-5.0', '22.0'], 
               ['jetPartonTruthLabelID1', '28', '-5.0', '22.0'], 
               ['etaj0TimesEtaj1', '200', '-100.0', '100.0'],              
