@@ -158,7 +158,8 @@ namespace Msl
       jetPartonTruthLabelID1,
       tmva,
       bcid,
-      bcidPos
+      bcidPos,
+      n_vx
     };
 
     std::string       AsStr(Var var);
