@@ -47,6 +47,8 @@ class BasicCuts:
         if Analysis.count('metsf'):
             self.DEtajjLowerCut   = 3.5 # was 3.5
             self.MjjLowerCut   = 1000.0
+            #self.DEtajjLowerCut   = 4.2 # was 3.5
+            #self.MjjLowerCut   = 1500.0
             #self.NjetCut   = 'n_jet == 3'
         if Analysis.count('mjj1000'):
             self.MjjLowerCut   = 1000.0

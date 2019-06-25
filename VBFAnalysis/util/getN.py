@@ -68,6 +68,7 @@ else:
         for p,s in enumerate(samplesplit):
             if s[0]=="v":
                     dsid_string = samplesplit[p+1]
+        #dsid_string='308276'
         print 'dsid: ',dsid_string
         nevent = 0
         for line in contFileList:

@@ -990,7 +990,7 @@ StatusCode VBFAnalysisAlg::execute() {
       }else{ tmp_eleANTISF=1.0; }
     }
 
-    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight);
+    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight);
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight;
   }//end systematic weight loop
@@ -1016,10 +1016,9 @@ StatusCode VBFAnalysisAlg::execute() {
 
 void VBFAnalysisAlg::computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi)
 {
-  e_met_j1_dphi          = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(0)));
-  e_met_j2_dphi          = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(1)));
+  e_met_j1_dphi = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(0)));
+  e_met_j2_dphi = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(1)));
 }
-
 
 StatusCode VBFAnalysisAlg::beginInputFile() {
   //
