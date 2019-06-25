@@ -26,7 +26,7 @@ class BasicCuts:
 
         if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest',
                             'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
-                                'njgt2',
+                                'njgt2','njgt2lt5','njgt3lt5','njgt3','nj2',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400']:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
 
@@ -88,6 +88,12 @@ class BasicCuts:
             self.DPhijjLowerCut   = -1.0
             self.DPhijjUpperCut   = 1.8
             self.NjetCut = 'n_jet > 2 && n_jet < 5'
+        if Analysis.count('njgt3'): # single bin
+            self.MjjLowerCut   = 1000.0
+            self.MjjUpperCut   = -1.0
+            self.DPhijjLowerCut   = -1.0
+            self.DPhijjUpperCut   = 1.8
+            self.NjetCut = 'n_jet > 3 && n_jet < 5'
         if Analysis.count('nj2'): 
             self.NjetCut = 'n_jet == 2'
 
@@ -241,18 +247,22 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts += [CutItem('CutNjetCen',  'n_jet_cenj == 0')]
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
-            cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
-            cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
-
-            cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
-            cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')] # move to 50
+            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5':
+                cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
+                cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
+            if basic_cuts.analysis=='mjj1500TrigTest':
+                cuts += [CutItem('CutJ0Pt',  'jetPt0 > 90.0')]
+                cuts += [CutItem('CutJ1Pt',  'jetPt1 > 70.0')] # move to 50
+            else:
+                cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
+                cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')] # move to 50
             #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
         cuts = [CutItem('CutNjet',  'n_jet == 2')]
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 60.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
-
+        
     return cuts
 
 #-------------------------------------------------------------------------
@@ -272,6 +282,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
     else:
         cuts += basic_cuts.GetDEtajjCut() 
         cuts += basic_cuts.GetMjjCut()
+    #cuts += [CutItem('CutMu40','averageIntPerXing>40.0')]
 
     return cuts
 
@@ -329,7 +340,10 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=120.0)
+        if basic_cuts.analysis=='mjj1500TrigTest':
+            cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
+        else:
+            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=120.0)
 
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=False)

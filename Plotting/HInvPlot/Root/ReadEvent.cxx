@@ -827,11 +827,14 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(event->jets.at(iJet).pt>30.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj30;
       if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj40;
       if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj50;
-
-      if(fBTagCut>-5.0 && fabs(event->jets.at(iJet).eta)<2.5 && event->jets.at(iJet).HasVar(Mva::jetBtagWeight) && fBTagCut<event->jets.at(iJet).GetVar(Mva::jetBtagWeight)) ++nBjet;
     }
-
-    if(fBTagCut>-5) event->RepVar(Mva::n_bjet, nBjet); 
+    // recompute the number of b-tagged jets
+    if(fBTagCut>-5.0){
+      for(unsigned iJet=0; iJet<event->jets.size(); ++iJet){
+	if(fabs(event->jets.at(iJet).eta)<2.5 && event->jets.at(iJet).HasVar(Mva::jetBtagWeight) && fBTagCut<event->jets.at(iJet).GetVar(Mva::jetBtagWeight)) ++nBjet;
+      }
+      event->RepVar(Mva::n_bjet, nBjet); 
+    }
     if(fJetVetoPt>0.0)
       event->RepVar(Mva::n_jet, nJet);
     //if(nJet25!=event->GetVar(Mva::n_jet)) std::cout << "error in jet counting" << nJet25 << " "  << event->GetVar(Mva::n_jet) << std::endl;
@@ -1121,12 +1124,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
     else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K  
 
+    if     (fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
+    if     (fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
     // 2018 update trigger for later periods => value 5 for
     if     (350067>fRandomRunNumber  && fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8)==0x8))     trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
-
-    if     (fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
-    if     (fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
 
     // 2015+2016 encoding

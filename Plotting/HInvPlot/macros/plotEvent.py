@@ -57,6 +57,8 @@ def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=No
                                                   PassAlg=alg_pass)]
                                                 
 
+    if options.no_plot:
+        plot_algs = []
     return plot_algs
 
 #-----------------------------------------------------------------------------------------
@@ -85,7 +87,7 @@ def prepareSeqMETSF(basic_cuts, alg_take=None, syst='Nominal'):
 
     pass_alg = hstudy.preparePassEventForMETSF('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-
+    
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
@@ -100,7 +102,6 @@ def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
 
     pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
@@ -190,6 +191,13 @@ def main():
 
     config.loadLibs(ROOT)
 
+    #-----------------------------------------------------------------------------------------
+    # automatically set the lumi for the 2017 and 2018
+    if options.year==2018 and options.int_lumi==36100.0:
+        options.int_lumi=59937.2
+    if options.year==2017 and options.int_lumi==36100.0:
+        options.int_lumi=44307.4
+        
     #-----------------------------------------------------------------------------------------
     # Prepare run numbers for requested samples and find input files
     #

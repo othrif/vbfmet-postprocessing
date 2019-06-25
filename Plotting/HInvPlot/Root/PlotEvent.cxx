@@ -23,6 +23,12 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hdRj1(0),
 				  hdRj2(0),
 				  hminDR(0),
+				  hJetEtaPt25(0),
+				  hJetEtaPt35(0),
+				  hJetEtaPt55(0),
+				  hJetEMECvsBCIDPosPt25(0),
+				  hJetEMECvsBCIDPosPt35(0),
+				  hJetEMECvsBCIDPosPt55(0),
 				  hmj1(0),
 				  hmj2(0),
 				  hminDRmj2(0),
@@ -97,6 +103,12 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hdRj1             = GetTH1("dRj1",             20,  0.0,   10.0);		  
   hdRj2             = GetTH1("dRj2",             20,  0.0,   10.0);		  
   hminDR            = GetTH1("minDR",            20,  0.0,  10.0);		  
+  hJetEtaPt25       = GetTH1("JetEtaPt25",       90,  -4.5,  4.5);		  
+  hJetEtaPt35       = GetTH1("JetEtaPt35",       90,  -4.5,  4.5);		  
+  hJetEtaPt55       = GetTH1("JetEtaPt55",       90,  -4.5,  4.5);
+  hJetEMECvsBCIDPosPt25 = GetTH2("JetEMECvsBCIDPosPt25",  5,  -0.5,  4.5, 35, 0.0, 70);
+  hJetEMECvsBCIDPosPt35 = GetTH2("JetEMECvsBCIDPosPt35",  5,  -0.5,  4.5, 35, 0.0, 70);
+  hJetEMECvsBCIDPosPt55 = GetTH2("JetEMECvsBCIDPosPt55",  5,  -0.5,  4.5, 35, 0.0, 70);  
   hmj1              = GetTH1("mj1",              50,  0.0,   2000.0);		  
   hmj2              = GetTH1("mj2",              50,  0.0,   2000.0);		  
   hminDRmj2         = GetTH1("minDRmj2",         50,  0.0,   2000.0);    	  
@@ -205,11 +217,18 @@ bool Msl::PlotEvent::DoExec(Event &event)
   if(event.jets.size()>1)
     if(fabs(event.jets.at(1).eta)>max_j_eta) max_j_eta= fabs(event.jets.at(1).eta);
   if(hmax_j_eta)  hmax_j_eta->Fill(max_j_eta, weight);
+  unsigned njet25EMEC=0, njet35EMEC=0, njet55EMEC=0;
+  TLorentzVector tmp;
+  for(unsigned iJet=1; iJet<std::min<unsigned>(2,event.jets.size()); ++iJet){ // start with sub-leading jet
+    tmp=event.jets.at(iJet).GetLVec();
+    if(tmp.Pt()<35.0){ hJetEtaPt25->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet25EMEC; }
+    else if(tmp.Pt()<55.0){ hJetEtaPt35->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet35EMEC; }
+    else{  hJetEtaPt55->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet55EMEC; }
+  }
   if(event.jets.size()>2){
-         
-    TLorentzVector tmp;
     const TLorentzVector j1v = event.jets.at(0).GetLVec();
     const TLorentzVector j2v = event.jets.at(1).GetLVec();
+    
     for(unsigned iJet=2; iJet<event.jets.size(); ++iJet){
       tmp=event.jets.at(iJet).GetLVec();
       hcentrality->Fill(event.GetVar(Mva::maxCentrality), weight);
@@ -219,7 +238,10 @@ bool Msl::PlotEvent::DoExec(Event &event)
       hdRj1->Fill(dRj1, weight);
       hdRj2->Fill(dRj2, weight);
       hminDR->Fill(std::min(dRj1,dRj2), weight);
-      
+      if(tmp.Pt()<35.0){ hJetEtaPt25->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet25EMEC; }
+      else if(tmp.Pt()<55.0){ hJetEtaPt35->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet35EMEC; }
+      else{  hJetEtaPt55->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet55EMEC; }
+            
       float mj1 =  (tmp+j1v).M();
       float mj2 =  (tmp+j2v).M();
       hmj1->Fill(mj1, weight);
@@ -236,6 +258,11 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(hj3Eta) hj3Eta->Fill(event.jets.at(2).eta, weight);
     if(hj3Jvt) hj3Jvt->Fill(event.jets.at(2).GetVar(Mva::jvt), weight);
     if(hj3FJvt) hj3FJvt->Fill(event.jets.at(2).GetVar(Mva::fjvt), weight);
+  }
+  if(event.HasVar(Mva::BCIDDistanceFromFront)){
+    hJetEMECvsBCIDPosPt25->Fill(njet25EMEC,event.GetVar(Mva::BCIDDistanceFromFront));
+    hJetEMECvsBCIDPosPt35->Fill(njet35EMEC,event.GetVar(Mva::BCIDDistanceFromFront));
+    hJetEMECvsBCIDPosPt55->Fill(njet55EMEC,event.GetVar(Mva::BCIDDistanceFromFront));
   }
   // end testing
 
