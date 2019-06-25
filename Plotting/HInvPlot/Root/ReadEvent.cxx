@@ -1123,11 +1123,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
     else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
     else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K  
-
-    if     (fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
-    if     (fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
+    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
+    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
     // 2018 update trigger for later periods => value 5 for
-    if     (350067>fRandomRunNumber  && fRandomRunNumber>348800  && ((trigger_met_encodedv2 & 0x8)==0x8))     trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
+    if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
 
@@ -1137,8 +1136,16 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     //int midRun = 303982; // was 302872
     int midRun = 302872; // was 302872
     if(fRandomRunNumber<=284484)                                  runPeriod = 1;
-    else if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun) runPeriod = 2;
-    else if(fRandomRunNumber >midRun)                             runPeriod = 3;      
+    else if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun) runPeriod = 2; // 2016
+    else if(fRandomRunNumber >midRun && fRandomRunNumber< 325713) runPeriod = 3; // 2016    
+    else if(325713<=fRandomRunNumber && fRandomRunNumber<=328393) runPeriod = 10; // 2017 HLT_xe90_pufit_L1XE50
+    else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470) runPeriod = 11; // 2017 HLT_xe100_pufit_L1XE55
+    else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975) runPeriod = 12; // 2017 HLT_xe110_pufit_L1XE55
+    else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 ) runPeriod = 13; // 2017 HLT_xe110_pufit_L1XE50
+    if(350067>fRandomRunNumber  && fRandomRunNumber>=348197)      runPeriod = 30; // 2018 xe70 trigger ...348197
+    else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292) runPeriod = 31; // 2018 xe65 trigger
+    if(fRandomRunNumber>=355529) runPeriod = 20; // 2018 VBF Topo triggers
+
     int trigger_met_byrun=0; // for the computation of the met trigger SF
     if(fRandomRunNumber<=284484 && (trigger_met_encoded & 0x8))                             { trigger_met_byrun=1;  }// 2015
     if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun && (trigger_met_encoded & 0x4)) { trigger_met_byrun=2;  }// 2016 -D3
