@@ -161,6 +161,10 @@ StatusCode VBFAnalysisAlg::initialize() {
   jet_SumPtTracks = new std::vector<std::vector<float> >(0);
   jet_SumPtTracks_PV = new std::vector<float>(0);
   jet_TrackWidth = new std::vector<float>(0);
+  jet_TracksC1 = new std::vector<float>(0);
+  jet_truthjet_pt = new std::vector<float>(0);
+  jet_truthjet_eta = new std::vector<float>(0);
+  jet_truthjet_nCharged = new std::vector<int>(0);
   jet_HECFrac = new std::vector<float>(0);
   jet_EMFrac = new std::vector<float>(0);
   jet_fch = new std::vector<float>(0);
@@ -296,6 +300,10 @@ StatusCode VBFAnalysisAlg::initialize() {
 	m_tree_out->Branch("jet_NTracks",&jet_NTracks_PV);
 	m_tree_out->Branch("jet_SumPtTracks",&jet_SumPtTracks_PV);
 	m_tree_out->Branch("jet_TrackWidth",&jet_TrackWidth);
+	m_tree_out->Branch("jet_TracksC1",&jet_TracksC1);
+	//m_tree_out->Branch("jet_truthjet_pt",&jet_truthjet_pt);// we don't really need to write these out
+	//m_tree_out->Branch("jet_truthjet_eta",&jet_truthjet_eta);
+	//m_tree_out->Branch("jet_truthjet_nCharged",&jet_truthjet_nCharged);
 	m_tree_out->Branch("jet_HECFrac",&jet_HECFrac);
 	m_tree_out->Branch("jet_EMFrac",&jet_EMFrac);
 	m_tree_out->Branch("jet_fch",&jet_fch);
@@ -722,10 +730,17 @@ StatusCode VBFAnalysisAlg::execute() {
       new_jet->setJetP4(newp4); 
 
       acc_NumTrkPt500PV(*new_jet) = jet_NTracks->at(iJet)[0];
-      new_jet->auxdata<int>("DFCommonJets_QGTagger_truthjet_nCharged") = 10;//jet->getAttribute<int>("truthjet_nCharged");
-      new_jet->auxdata<int>("PartonTruthLabelID") = jet_PartonTruthLabelID->at(iJet); //jet->getAttribute<int>("PartonTruthLabelID");
-      new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_eta") = 0.0; //jet->getAttribute<float>("truthjet_eta");
-      new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_pt") = 50000.0; //jet->getAttribute<float>("truthjet_pt");
+      if(jet_truthjet_pt && jet_truthjet_pt->size()>iJet){
+	new_jet->auxdata<int>("DFCommonJets_QGTagger_truthjet_nCharged") = jet_truthjet_nCharged->at(iJet);//jet->getAttribute<int>("truthjet_nCharged");
+	new_jet->auxdata<int>("PartonTruthLabelID") = jet_PartonTruthLabelID->at(iJet); //jet->getAttribute<int>("PartonTruthLabelID");
+	new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_eta") = jet_truthjet_eta->at(iJet); //jet->getAttribute<float>("truthjet_eta");
+	new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_pt") = jet_truthjet_pt->at(iJet); //jet->getAttribute<float>("truthjet_pt");
+      }else{ // dummy values for backward compatibility
+	new_jet->auxdata<int>("DFCommonJets_QGTagger_truthjet_nCharged") = 10;//jet->getAttribute<int>("truthjet_nCharged");
+	new_jet->auxdata<int>("PartonTruthLabelID") = jet_PartonTruthLabelID->at(iJet); //jet->getAttribute<int>("PartonTruthLabelID");
+	new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_eta") = 0.0; //jet->getAttribute<float>("truthjet_eta");
+	new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_pt") = 50000.0; //jet->getAttribute<float>("truthjet_pt");
+      }
       // Loop over QG systematics
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	ANA_CHECK(m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]));
@@ -1152,6 +1167,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("jet_NTracks",1);
     m_tree->SetBranchStatus("jet_SumPtTracks",1);
     m_tree->SetBranchStatus("jet_TrackWidth",1);
+    m_tree->SetBranchStatus("jet_TracksC1",1);
+    m_tree->SetBranchStatus("jet_truthjet_pt",1);
+    m_tree->SetBranchStatus("jet_truthjet_eta",1);
+    m_tree->SetBranchStatus("jet_truthjet_nCharged",1);
     m_tree->SetBranchStatus("jet_HECFrac",1);
     m_tree->SetBranchStatus("jet_EMFrac",1);
     m_tree->SetBranchStatus("jet_fch",1);
@@ -1332,6 +1351,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("jet_NTracks",&jet_NTracks);
     m_tree->SetBranchAddress("jet_SumPtTracks",&jet_SumPtTracks);
     m_tree->SetBranchAddress("jet_TrackWidth",&jet_TrackWidth);
+    m_tree->SetBranchAddress("jet_TracksC1",&jet_TracksC1);
+    m_tree->SetBranchAddress("jet_truthjet_pt",&jet_truthjet_pt);
+    m_tree->SetBranchAddress("jet_truthjet_eta",&jet_truthjet_eta);
+    m_tree->SetBranchAddress("jet_truthjet_nCharged",&jet_truthjet_nCharged);
     m_tree->SetBranchAddress("jet_HECFrac",&jet_HECFrac);
     m_tree->SetBranchAddress("jet_EMFrac",&jet_EMFrac);
     m_tree->SetBranchAddress("jet_fch",&jet_fch);
