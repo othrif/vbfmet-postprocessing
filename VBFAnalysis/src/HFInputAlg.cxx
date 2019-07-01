@@ -212,6 +212,7 @@ StatusCode HFInputAlg::execute() {
   float jj_detaCut = 4.8; // 4.0
   float jj_massCut = 1000.0e3;
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
+  bool nbjetCut = (n_bjet < 2); 
 
   // decide if this MG or sherpa
   bool passSample=false;
@@ -307,7 +308,7 @@ StatusCode HFInputAlg::execute() {
   }
 
   // MET choice to be implemented...
-  if (!((passJetCleanTight == 1) & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (n_ph==0))) return StatusCode::SUCCESS; 
+  if (!((passJetCleanTight == 1) & nbjetCut & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (n_ph==0))) return StatusCode::SUCCESS; 
 
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0);
@@ -502,6 +503,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
   m_tree->SetBranchStatus("n_jet",1);
+  m_tree->SetBranchStatus("n_bjet",1);
   m_tree->SetBranchStatus("n_ph",1);
   m_tree->SetBranchStatus("n_el",1);
   m_tree->SetBranchStatus("n_mu",1);
@@ -542,6 +544,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
   m_tree->SetBranchAddress("n_jet",&n_jet);
+  m_tree->SetBranchAddress("n_bjet",&n_bjet);
   m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_el",&n_el);
