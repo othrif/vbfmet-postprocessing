@@ -7,7 +7,7 @@
 
 
 VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ),
-										      fjvtSFWeight(1.0){
+										      fjvtSFWeight(1.0), fjvtSFTighterWeight(1.0){
   declareProperty( "currentSample", m_currentSample = "W_strong", "current sample");
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
@@ -21,6 +21,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "mcCampaign", m_mcCampaign = "mc16a", "mcCampaign of the mc sample. only read if isMC is true" );
   declareProperty( "UseExtMC", m_UseExtMC = false, "Use extended MC samples");
   declareProperty( "theoVariation", m_theoVariation = false, "Do theory systematic variations");
+  declareProperty( "oneTrigMuon", m_oneTrigMuon = false, "Trigger muon SF set to 1");
 }
 
 
@@ -928,6 +929,7 @@ StatusCode VBFAnalysisAlg::execute() {
     if(!(n_baseel==0 && n_basemu==0)) eleANTISF=1.0;
   }else{ eleANTISF=1.0; }
 
+  if(m_oneTrigMuon) muSFTrigWeight=1.0;
   w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF*nloEWKWeight;
 
   if(m_theoVariation){
@@ -1005,6 +1007,7 @@ StatusCode VBFAnalysisAlg::execute() {
       }else{ tmp_eleANTISF=1.0; }
     }
 
+    if(m_oneTrigMuon) tmp_muSFTrigWeight=1.0;
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight);
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight;
@@ -1105,6 +1108,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("puWeight", 1);
   m_tree->SetBranchStatus("jvtSFWeight", 1);
   m_tree->SetBranchStatus("fjvtSFWeight", 1);
+  m_tree->SetBranchStatus("fjvtSFTighterWeight", 1);
   m_tree->SetBranchStatus("eleANTISF", 1);
   m_tree->SetBranchStatus("elSFWeight", 1);
   m_tree->SetBranchStatus("muSFWeight", 1);
@@ -1279,6 +1283,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("puWeight", &puWeight);
   m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);
   m_tree->SetBranchAddress("fjvtSFWeight", &fjvtSFWeight);
+  m_tree->SetBranchAddress("fjvtSFTighterWeight", &fjvtSFTighterWeight);
   m_tree->SetBranchAddress("eleANTISF", &eleANTISF);
   m_tree->SetBranchAddress("elSFWeight", &elSFWeight);
   m_tree->SetBranchAddress("muSFWeight", &muSFWeight);

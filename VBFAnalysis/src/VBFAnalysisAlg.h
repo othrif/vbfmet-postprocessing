@@ -106,6 +106,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::string treeTitleOut="nominal";
   std::string m_mcCampaign;
   bool m_theoVariation;
+  bool m_oneTrigMuon;
 
   Float_t crossSection;
   Double_t weight;
@@ -131,6 +132,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t puWeight;
   Float_t jvtSFWeight;
   Float_t fjvtSFWeight;
+  Float_t fjvtSFTighterWeight;
   Float_t eleANTISF;
   Float_t elSFWeight;
   Float_t muSFWeight;
