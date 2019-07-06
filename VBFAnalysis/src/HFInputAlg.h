@@ -99,6 +99,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t passJetCleanTight;
   Int_t trigger_lep;
   Int_t n_jet;
+  Int_t n_bjet;
   Int_t n_ph;
   Int_t n_el;
   Int_t n_mu;

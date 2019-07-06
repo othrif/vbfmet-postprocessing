@@ -268,6 +268,9 @@ def getJetCuts(basic_cuts, options, isPh=False):
         cuts = [CutItem('CutNjet',  'n_jet == 2')]
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 60.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
+
+    # b jet veto
+    cuts += [CutItem('CutBVeto',  'n_bjet < 2')]
         
     return cuts
 
@@ -430,7 +433,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     # cuts
     cuts += [CutItem('CutPh', 'n_ph==0')]
-    #cuts = [CutItem('CutNjet2',  'n_jet == 2')]
+
     cuts += getJetCuts(basic_cuts, options);
     cuts += [CutItem('CutMet',       '%s > 100.0' %(met_choice))]
     # does the vertex matter? does the CST met cut matter? does the fjvt cuts matter?
