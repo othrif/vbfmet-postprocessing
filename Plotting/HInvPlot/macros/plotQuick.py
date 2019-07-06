@@ -152,13 +152,29 @@ def Format(h):
     h.SetLineColor(1)
     h.SetMarkerColor(1)
     h.SetTitle('Projection of 2D Efficiency')
+
+#-----------------------------------------
+def PlotError(h):
+
+    hnew = h.Clone()
+    for i in range(0,h.GetNbinsX()+1):
+        valb = h.GetBinContent(i)
+        errb = h.GetBinError(i)
+
+        newval=0.0
+        if valb!=0.0:
+            newval = errb/abs(valb)
+        
+        hnew.SetBinContent(i,newval)
+        hnew.SetBinError(i,0.0)
+    return hnew
 #-----------------------------------------
 def Style():
     ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasStyle.C')                   
     ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasUtils.C')
     ROOT.SetAtlasStyle()
 
-def Draw(hname,f1,f2,can,h1_norm,h2_norm):
+def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     can.Clear()
    
     
@@ -185,7 +201,15 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm):
 
     if hname.count('ph_pt'):
         h1.GetXaxis().SetTitle('Photon p_{T} [GeV]')
-    h1.GetYaxis().SetTitle('Events')
+    if GetError:
+        h1.GetYaxis().SetTitle('Relative Error')        
+    else:
+        h1.GetYaxis().SetTitle('Events')
+
+
+    if GetError:
+        h1 = PlotError(h1)
+        h2 = PlotError(h2)
     h1.Draw()
     h2.Draw('same')
 
@@ -217,10 +241,25 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm):
     pad2.SetLogx(0)
     if hname=='ph_pt_lead':
         hratio.GetXaxis().SetTitle('Lead Photon p_{T} [GeV]')
-        pad1.SetLogy(1)
-        pad2.SetLogy(1)
-        pad1.SetLogx(1)
-        pad2.SetLogx(1)        
+        if not GetError:
+            pad1.SetLogy(1)
+            #pad2.SetLogy(1)
+            pad1.SetLogx(1)
+            pad2.SetLogx(1)
+    elif hname=='elneg_pt':
+        hratio.GetXaxis().SetTitle('Electron p_{T} [GeV]')
+        if not GetError:
+            pad1.SetLogy(1)
+            #pad2.SetLogy(1)
+            pad1.SetLogx(1)
+            pad2.SetLogx(1)                
+    elif hname=='elpos_pt':
+        hratio.GetXaxis().SetTitle('Electron p_{T} [GeV]')
+        if not GetError:
+            pad1.SetLogy(1)
+            #pad2.SetLogy(1)
+            pad1.SetLogx(1)
+            pad2.SetLogx(1)                
 
     elif  hname=='ph_pt':
         hratio.GetXaxis().SetTitle('Photon p_{T} [GeV]')
@@ -256,7 +295,10 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm):
     hratio.Draw()
     can.Update()
     can.WaitPrimitive()
-    can.SaveAs(hname+'.pdf')
+    if GetError:
+        can.SaveAs(hname+'_err.pdf')
+    else:
+        can.SaveAs(hname+'.pdf')
     
 def Fit(_suffix=''):
 
@@ -269,7 +311,7 @@ def Fit(_suffix=''):
     h1_norm = 1000.0*0.000988772/h3.Integral(0,10001)
     h2_norm = 1000.0*0.000988772/h4.Integral(0,10001)
     
-    hnames=['ph_pt_lead','ph_eta_lead','ph_pt','ph_eta','boson_pt','boson_eta','njet','dr_ph_el','dr_ph_j','dr_ph_boson']
+    hnames=['elneg_pt','elpos_pt','ph_pt_lead','ph_eta_lead','ph_pt','ph_eta','boson_pt','boson_eta','njet','dr_ph_el','dr_ph_j','dr_ph_boson']
     for hname in hnames:
         Draw(hname,f1,f2,can,h1_norm,h2_norm)
             #xs 00 -> 0.000988772

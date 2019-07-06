@@ -8,6 +8,7 @@
 int plotTruth()
 {
   TFile *fout = TFile::Open("365510b_VBFTruth_out.root","RECREATE");
+  //TFile *fout = TFile::Open("365500_VBFTruth_out.root","RECREATE");  
   TH1F *hph_pt = new TH1F("ph_pt","ph_pt",500, 0.0,1000.0);
   hph_pt->Sumw2(1);
   hph_pt->SetDirectory(fout);
@@ -21,11 +22,25 @@ int plotTruth()
   TH2F *hph_pt_vs_w = new TH2F("ph_pt_vs_w","ph_pt_vs_w",100, 0.0,500.0,100,-20.0,20.0);
   hph_pt_vs_w->Sumw2(1);
   hph_pt_vs_w->SetDirectory(fout);
+
+  TH2F *helneg_pt_vs_w = new TH2F("elneg_pt_vs_w","elneg_pt_vs_w",100, 0.0,500.0,100,-20.0,20.0);
+  helneg_pt_vs_w->Sumw2(1);
+  helneg_pt_vs_w->SetDirectory(fout);
+  TH2F *helpos_pt_vs_w = new TH2F("elpos_pt_vs_w","elpos_pt_vs_w",100, 0.0,500.0,100,-20.0,20.0);
+  helpos_pt_vs_w->Sumw2(1);
+  helpos_pt_vs_w->SetDirectory(fout);
   
   TH1F *hph_eta = new TH1F("ph_eta","ph_eta",90, -4.5,4.5);
   hph_eta->Sumw2(1);
   hph_eta->SetDirectory(fout);
 
+  TH1F *helneg_pt = new TH1F("elneg_pt","elneg_pt",500, 0.0,1000.0);
+  helneg_pt->Sumw2(1);
+  helneg_pt->SetDirectory(fout);
+  TH1F *helpos_pt = new TH1F("elpos_pt","elpos_pt",500, 0.0,1000.0);
+  helpos_pt->Sumw2(1);
+  helpos_pt->SetDirectory(fout);  
+  
   TH1F *hboson_eta = new TH1F("boson_eta","boson_eta",90, -4.5,4.5);
   hboson_eta->Sumw2(1);
   hboson_eta->SetDirectory(fout);
@@ -47,6 +62,7 @@ int plotTruth()
   hdr_ph_boson->SetDirectory(fout);  
   
   TFile *fin = TFile::Open("365510b_VBFTruth.root");
+  //TFile *fin = TFile::Open("365500_VBFTruth.root");  
   TTree *truthTree = static_cast<TTree*>(fin->Get("MiniNtuple"));
   truthTree->SetBranchStatus("*",1);
    int                 m_njets;                                                                                                                                                                 
@@ -114,6 +130,7 @@ int plotTruth()
   m_el_phi      = new std::vector<float>();
   m_el_type     = new std::vector<uint>();
   m_el_origin   = new std::vector<uint>();
+  m_el_pdgid   = new std::vector<int>();
 
   m_ph_m        = new std::vector<float>();
   m_ph_pt       = new std::vector<float>();
@@ -160,7 +177,7 @@ int plotTruth()
    truthTree->SetBranchAddress("el_phi", &m_el_phi);
    truthTree->SetBranchAddress("el_type", &m_el_type);
    //truthTree->SetBranchAddress("el_origin", &m_el_origin);
-   ////truthTree->SetBranchAddress("el_pdgid", &m_el_pdgid);
+   truthTree->SetBranchAddress("el_pdgid", &m_el_pdgid);
    //
    //// Photons                                                                                                                                                                                      
    truthTree->SetBranchAddress("nphs",        &m_nphs);
@@ -228,6 +245,19 @@ int plotTruth()
      if(m_boson_eta->size()>0) hboson_eta->Fill(m_boson_eta->at(0),weight);
 
      TVector3 phvec,jvec, evec,bvec;
+
+     for(unsigned ne=0; ne<m_el_pt->size(); ++ne){
+       evec.SetPtEtaPhi(m_el_pt->at(ne)/1.0e3, m_el_eta->at(ne), m_el_phi->at(ne));
+       if(evec.Pt()>10.0 && m_el_pdgid->at(ne)<0){
+	 helneg_pt->Fill(m_el_pt->at(ne)/1.0e3,weight);
+	 helneg_pt_vs_w->Fill(m_el_pt->at(ne)/1.0e3,weight);
+       }
+       if(evec.Pt()>10.0 && m_el_pdgid->at(ne)>0){
+	 helpos_pt->Fill(m_el_pt->at(ne)/1.0e3,weight);
+	 helpos_pt_vs_w->Fill(m_el_pt->at(ne)/1.0e3,weight);
+       }
+     }
+     
      for(unsigned nph=0; nph<m_ph_pt->size(); ++nph){
        phvec.SetPtEtaPhi(m_ph_pt->at(nph)/1.0e3, m_ph_eta->at(nph), m_ph_phi->at(nph));
        hph_pt ->Fill(m_ph_pt->at(nph)/1.0e3,weight);
