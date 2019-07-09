@@ -2,188 +2,130 @@ import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.optimizers import SGD
+from keras import optimizers
+from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
 import pickle
-
-pickle_out = open("dict.pickle","rb")
-inputEvts = pickle.load(pickle_out)
-
-#for a
-#np.array()
-
-# Generate dummy data
+from scipy import stats
 import numpy as np
-vbf_len = (len(inputEvts['vbf'])/2)
-z_len = (len(inputEvts['z_strong'])/2)
-print vbf_len,z_len
-Qdata = np.random.random((1000, 4))
-Qdata=[]
-Qdata_test = np.random.random((10, 4))
-labels_train = np.random.randint(2, size=(1000, 1))
-#print 'labels_train:',labels_train
-dataA_train = np.array(inputEvts['vbf'][:vbf_len]+inputEvts['z_strong'][:z_len])
-dataA_test = np.array(inputEvts['vbf'][(vbf_len+1):]+inputEvts['z_strong'][(z_len+1):])
-sample_weights_train=[]
-sample_weights_test=[]
-dataB_train=[]
-dataB_test=[]
-data_test=[]
-check=[]
-bcheck=[]
-ncheck=0
-nbcheck=0
 
-# load data
-it=0
-for i in range(0,500):
-    labels_train[i]=1
-for i in range(500,1000):
-    labels_train[i]=0
-#labels_train = [1 for i in range(0,500)] + [0 for i in range(0,500)]
-for de in range(0,1000):
-    d=inputEvts['z_strong'][de]
-    labels_train[de]=0
-    if de%2==0:
-        d=inputEvts['vbf'][de]
-        labels_train[de]=1
+# read in events from pickle
+pickle_out = open("dict7a.pickle","rb")
+inputEvts = pickle.load(pickle_out)
+vbf = inputEvts['vbf']
+z_strong = inputEvts['z_strong']
 
-    Qdata+=[d[1:]]
-    for u in range(1,5):
-        #Qdata[de][u-1] = d[u]
-        if u==1:
-            Qdata[de][u-1] = d[u]/1.0e4
-        elif u==3:
-            Qdata[de][u-1] = d[u]/1.0e3
-        else:
-            Qdata[de][u-1] = d[u]/10.0
-#for d in dataA_train:
-#    for u in range(1,5):
-#        if u==1:
-#            Qdata[it][u-1] = d[u]/1.0e3
-#        elif u==3:
-#            Qdata[it][u-1] = d[u]/1.0e2
-#    it+=1
-#    if it>499:
-#        break
-#for d in inputEvts['z_strong'][:z_len]:
-#    for u in range(1,5):
-#        if u==1:
-#            Qdata[it][u-1] = d[u]/1.0e3
-#        elif u==3:
-#            Qdata[it][u-1] = d[u]/1.0e2
-#    it+=1
-#    if it>=999:
-#        break
-#end new loading
+# organize input events
+events = vbf + z_strong # make event list
+labels = np.ones(len(vbf)).tolist() + np.zeros(len(z_strong)).tolist() # make label list
+labelled_events = [tuple(event) for event in np.c_[events, labels]] # label events
+data = np.array(labelled_events, dtype=[('WEIGHT', float), ('JJ_MASS', float), ('JJ_DETA', float), ('MET_TST_ET', float), ('JJ_DPHI', float), ('JET_PT0', float), ('JET_PT1', float), ('MET_SOFT_TST_ET', float), ('LABEL', int)]) # convert to recarray
+np.random.shuffle(data) # shuffle data
 
-for d in dataA_train:
-    sample_weights_train+=[d[0]]
-    dataB_train+=[d[1:]]
+# define training/testing data (80-20 ratio)
+COLS = ['WEIGHT', 'JJ_MASS', 'JJ_DETA', 'MET_TST_ET', 'JJ_DPHI', 'JET_PT0', 'JET_PT1', 'MET_SOFT_TST_ET']
+print('cols = {}'.format(COLS))
+X = data[COLS]
+y = data['LABEL']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+X_train = X_train.view((float, len(X_train.dtype.names))) # destructure data
+X_test = X_test.view((float, len(X_test.dtype.names)))# destructure data
 
+# preprocess data
+scaler = preprocessing.StandardScaler().fit(X_train) # scaler to standardize data
+X_train = scaler.transform(X_train)
+X_test = scaler.transform(X_test)
 
-for d in dataA_test:
-    sample_weights_test+=[d[0]]
-    data_test+=[d[1:]]
-    #for u in range(1,5):
-    #    data[it][u-1] = d[u]
-    if ncheck<10:
-        #Qdata_test+=[d[1:]]
-        for u in range(1,5):
-            #Qdata_test[ncheck][u-1] = d[u]
-            if u==1:
-                Qdata_test[ncheck][u-1] = d[u]/1.0e4
-            elif u==3:
-                Qdata_test[ncheck][u-1] = d[u]/1.0e3
-            else:
-                Qdata_test[ncheck][u-1] = d[u]/10.0
-        check+=[d[1:]]
-    ncheck+=1
-
-for d in inputEvts['z_strong'][(z_len+1):]:
-    if nbcheck<10:
-        bcheck+=[d[1:]]
-    nbcheck+=1
-data_train=np.array(dataB_train)
-data_test=np.array(dataB_test)
-#labels_train = [1 for i in range(vbf_len)] + [0 for i in range(z_len)]
-vbf_test_length = len(inputEvts['vbf'])-(vbf_len+1)
-zstrong_test_length = len(inputEvts['z_strong'])-(z_len+1)
-labels_test = [1 for i in range(vbf_test_length)] + [0 for i in range(zstrong_test_length)]
-print 'check:',check
-print 'background:',bcheck
-print 'labels_test:',len(labels_test)
-print 'data_test:',len(data_test)
-print 'sample_weights_test:',len(sample_weights_test)
-print 'sample_weights_train:',len(sample_weights_train)
-print 'labels_train:',len(labels_train)
-print 'data_train:',len(data_train)
-
+# define the classifier model
 model = Sequential()
-# Dense(64) is a fully-connected layer with 64 hidden units.
-# in the first layer, you must specify the expected input data shape:
-# here, 20-dimensional vectors.
-##model.add(Dense(32, activation='relu', input_dim=100))
-##model.add(Dense(1, activation='sigmoid'))
-##model.add(Dense(32, activation='relu', input_dim=len(data_train[0])))
-#model.add(Dense(32, activation='softmax', input_dim=len(data_train[0])))
-##model.add(Dense(1, activation='sigmoid'))
-#model.add(Dense(1, activation='softmax'))
-##model.add(Dropout(0.5))
-##model.add(Dense(64, activation='relu'))
-##model.add(Dropout(0.5))
-##model.add(Dense(10, activation='softmax'))
-##model.add(Dense(1, activation='sigmoid'))
-#
-##sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-##model.compile(loss='categorical_crossentropy',
-##              optimizer=sgd,
-##              metrics=['accuracy'])
-##rms = RMSprop()
-#model.compile(loss='mean_squared_error',
-#              optimizer='sgd',
-#              metrics=['mae', 'acc'])
-#
-##model.compile(loss='binary_crossentropy',
-##              optimizer='rmsprop',
-##              metrics=['accuracy'])
-
-#model.add(Dense(32, activation='relu', input_dim=4))
-##model.add(Dense(10, activation='sigmoid'))
-#model.add(Dense(1, activation='softmax'))
-#model.compile(optimizer='rmsprop',
-#              loss='binary_crossentropy',
-#              metrics=['accuracy'])
-#
-#model = Sequential()
-model.add(Dense(32, activation='relu', input_dim=4))
+model.add(Dense(64, kernel_initializer='normal', activation='relu', input_dim=len(COLS)))
+#model.add(Dropout(0.2))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(optimizer='rmsprop',
               loss='binary_crossentropy',
-              metrics=['accuracy'])
+              metrics=['accuracy']) # best
+#sgd = optimizers.SGD(lr=0.8, momentum=0.0, decay=0.0, nesterov=False)
+#model.compile(optimizer='sgd',
+#              loss='binary_crossentropy',
+#              metrics=['binary_accuracy']) # good
 #model.compile(loss='mean_squared_error',
 #              optimizer='sgd',
-#              metrics=['mae', 'acc'])
-#print Qdata
-#print labels_train
-# Train the model, iterating on the data in batches of 32 samples
-model.fit(np.array(Qdata), labels_train, epochs=20, batch_size=32)#,sample_weight=np.array(sample_weights_train))
-#model.fit(data_train, labels_train, epochs=2)#,sample_weight=np.array(sample_weights_train))
-#score = model.evaluate(data_test, labels_test)#,sample_weight=np.array(sample_weights_test)) #,show_accuracy=True
-#print score
-#print labels_test
-#n=0
-#for d in data_test:
-a=model.predict(Qdata_test)
-print a
-#b=model.predict(np.array(bcheck))
-#print b
-#for i in a:
-#    print i
+#              metrics=['mae', 'acc']) # worst
+
+# train the classifier model
+model.fit(X_train, y_train, epochs=4, batch_size=64)#,sample_weight=np.array(sample_weights_train))
+
+y_pred = model.predict(X_test)
 
 # saving the model
 model.save('my_model.h5')  # creates a HDF5 file 'my_model.h5'
 del model  # deletes the existing model
 
+###############################################################################
+
 # returns a compiled model
-#from keras.models import load_model
+from keras.models import load_model
 # identical to the previous one
-#model = load_model('my_model.h5')
+model = load_model('my_model.h5')
+
+import sklearn.metrics as metrics
+# calculate the fpr and tpr for all thresholds of the classification
+probs = model.predict_proba(X_test)
+preds = probs.ravel()
+fpr, tpr, threshold = metrics.roc_curve(y_test, preds)
+roc_auc = metrics.auc(fpr, tpr)
+
+import matplotlib.pyplot as plt
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
+plt.legend(loc = 'lower right')
+plt.plot([0, 1], [0, 1],'r--')
+plt.xlim([0, 1])
+plt.ylim([0, 1])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show()
+
+#plt.hist(y_train, histtype='step', label='y_train')
+#plt.hist(y_test, histtype='step', label='y_test')
+#plt.legend(loc='upper left')
+#plt.show()
+
+# score predictions
+score_train = model.predict(np.array(X_train))
+score_test = model.predict(np.array(X_test))
+#print(stats.ks_2samp(y_train, y_test))
+print(stats.ks_2samp(np.concatenate(score_train), np.concatenate(score_test)))
+
+# define sig/bkg regions
+sig_train = (y_train == 1)
+sig_test = (y_test == 1)
+bkg_train = (y_train == 0)
+bkg_test = (y_test == 0)
+
+# select sig/bkg for train/test and weights
+signal_train = score_train[sig_train]
+wsignal_train = X_train[sig_train][:,0]
+signal_test = score_test[sig_test]
+wsignal_test = X_test[sig_test][:,0]
+background_train = score_train[bkg_train]
+wbackground_train = X_train[bkg_train][:,0]
+background_test = score_test[bkg_test]
+wbackground_test = X_test[bkg_test][:,0]
+
+# output distribution
+bins = np.linspace(min(0.0,min(background_test)), max(1.0,max(signal_train)), 100)
+plt.hist(signal_train, bins, alpha=0.5, label='Signal Train')
+plt.hist(signal_test, bins, alpha=0.5, label='Signal Test')
+plt.hist(background_test, bins, alpha=0.5, label='Background Test')
+plt.hist(background_train, bins, alpha=0.5, label='Background Train')
+#plt.hist(signal_train, bins, alpha=0.5, label='Signal Train',weights=wsignal_train)
+#plt.hist(signal_test, bins, alpha=0.5, label='Signal Test',weights=wsignal_test)
+#plt.hist(background_test, bins, alpha=0.5, label='Background Test',weights=wbackground_test)
+#plt.hist(background_train, bins, alpha=0.5, label='Background Train',weights=wbackground_train)
+plt.text(60, .025, r'$\mu=100,\ \sigma=15$')
+plt.axis([min(0.0,min(background_test)), max(1.0,max(signal_train)), 0, 300.0])
+plt.grid(True)
+plt.legend(loc='upper right')
+plt.show()
+
