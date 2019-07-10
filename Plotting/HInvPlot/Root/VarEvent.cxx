@@ -70,6 +70,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case n_basemu:	          return "n_basemu";
     case n_baselep:	          return "n_baselep";
     case n_siglep:	          return "n_siglep";
+    case n_vx:	                  return "n_vx";
     case n_ph:	                  return "n_ph";
     case n_truth_tau:	          return "n_truth_tau";
     case met_tst_j1_dphi:	  return "met_tst_j1_dphi";
@@ -147,7 +148,6 @@ std::string Msl::Mva::Convert2Str(Var var)
     case tmva:                    return "tmva";      
     case bcid:                    return "bcid";      
     case bcidPos:                 return "bcidPos";      
-
     case NONE: return "NONE";
     default  : break;
     }
@@ -213,6 +213,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "n_baselep")          return n_baselep;
   if(var == "n_siglep")          return n_siglep;
   if(var == "n_ph")               return n_ph;
+  if(var == "n_vx")               return n_vx;
   if(var == "n_truth_tau")       return n_truth_tau;
   if(var == "met_tst_j1_dphi")   return met_tst_j1_dphi;
   if(var == "met_tst_j2_dphi")   return met_tst_j2_dphi;
@@ -442,6 +443,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(n_baselep);
     vars.push_back(n_siglep);
     vars.push_back(n_ph);
+    vars.push_back(n_vx);
     vars.push_back(n_truth_tau);
     vars.push_back(met_tst_j1_dphi);
     vars.push_back(met_tst_j2_dphi);
