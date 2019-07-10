@@ -12,6 +12,7 @@ p = OptionParser(usage="usage: <path:ROOT file directory>", version="0.1")
 
 p.add_option('-n',             type='int',    default=0,             dest='nevent')
 p.add_option('--hscale',       type='int',    default=None,          dest='hscale')
+p.add_option('--year',         type='int',    default=2016,          dest='year')
 p.add_option('--hmass',        type='string', default='125',         dest='hmass')
 
 p.add_option('--selkey',       type='string', default='pass_sr_hipt_1j_eu', dest='selkey')
@@ -126,7 +127,10 @@ def getSelKeyLabel(selkey):
         elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
         elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<1TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
-        elif selkey.count('njgt2_'):  proc += ',2<N_{jet}>5 SR'            
+        elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5 SR'            
+        elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5 SR'            
+        elif selkey.count('njgt2_'):  proc += ',2<N_{jet} SR'            
+        elif selkey.count('njgt3_'):  proc += ',3<N_{jet} SR'            
         elif selkey.count('sr_'):  proc += ', SR'
         elif selkey.count('wcr'):
             if 'anti' in selkey:
@@ -215,7 +219,18 @@ def getHistPars(hist):
         'n_jet_cenj40'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0,'ymin':0.1, 'logy':True,'LtoRCut':1},
-        'tmva'  : {'xtitle':'BDT Score',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},        
+        'tmva'  : {'xtitle':'BDT Score',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'bcid'  : {'xtitle':'BCID',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'BCIDDistanceFromFront'  : {'xtitle':'Distance from front of Train','ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'lb'  : {'xtitle':'Lumi block','ytitle':'Events', 'rebin':0,'LtoRCut':1}, 
+        'n_vx'  : {'xtitle':'Recontructed Vertices (N_{PV})','ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'JetEtaPt25'  : {'xtitle':'Jet #eta wth 25<p_{T}<35 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},
+        'JetEtaPt35'  : {'xtitle':'Jet #eta wth 35<p_{T}<55 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},                 
+        'JetEtaPt55'  : {'xtitle':'Jet #eta wth 55<p_{T} GeV','ytitle':'Events', 'rebin':5,'LtoRCut':1},                 
+        'JetEMECvsBCIDPosPt25'  : {'xtitle':'Jet Number jets wth 25<p_{T}<35 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'JetEMECvsBCIDPosPt35'  : {'xtitle':'Jet #eta wth 35<p_{T}<55 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
+        'JetEMECvsBCIDPosPt55'  : {'xtitle':'Jet #eta wth 55<p_{T} GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
 
         'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
@@ -2316,7 +2331,14 @@ def main():
     print 'Reading nSyst: ',len(mysyst.getsystematicsListWithDown())
     for ia in mysyst.getsystematicsListWithDown():
         sfiles[ia]=rfile
-
+        
+    #-----------------------------------------------------------------------------------------
+    # automatically set the lumi for the 2017 and 2018
+    if options.year==2018 and options.int_lumi==36100.0:
+        options.int_lumi=59937.2
+    if options.year==2017 and options.int_lumi==36100.0:
+        options.int_lumi=44307.4
+        
     #
     # Select histograms and samples for stacks
     #

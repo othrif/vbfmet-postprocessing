@@ -57,6 +57,8 @@ def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=No
                                                   PassAlg=alg_pass)]
                                                 
 
+    if options.no_plot:
+        plot_algs = []
     return plot_algs
 
 #-----------------------------------------------------------------------------------------
@@ -85,7 +87,7 @@ def prepareSeqMETSF(basic_cuts, alg_take=None, syst='Nominal'):
 
     pass_alg = hstudy.preparePassEventForMETSF('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-
+    
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
@@ -100,7 +102,6 @@ def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
 
     pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
@@ -191,6 +192,13 @@ def main():
     config.loadLibs(ROOT)
 
     #-----------------------------------------------------------------------------------------
+    # automatically set the lumi for the 2017 and 2018
+    if options.year==2018 and options.int_lumi==36100.0:
+        options.int_lumi=59937.2
+    if options.year==2017 and options.int_lumi==36100.0:
+        options.int_lumi=44307.4
+        
+    #-----------------------------------------------------------------------------------------
     # Prepare run numbers for requested samples and find input files
     #
     all_files = hinput.getInputSimlFiles(options.input,options.files)
@@ -210,7 +218,11 @@ def main():
     if options.analysis.count('RedChan'):
         anas    = ['allmjj']#,'mjj1000','mjj1500','mjj2000']
     if options.analysis=='metsf':
-        anas = ['metsf','metsfxe70','metsfxe90','metsfxe110','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400']
+        anas = ['metsf','metsfxe70','metsfxe90','metsfxe110','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
+                'metsfVBFTopo','metsfxe110XE70','metsfxe110XE65',
+                'metsfxe90','metsfxe100','metsfxe110L155','metsfxe100L150',
+                'metsfVBFTopotrigOR','metsfxe110XE70trig','metsfxe110XE65trig',
+                'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]
     if options.analysis.count('allmjjdphijj'):
         anas = ['allmjj','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2']
     if options.analysis.count('allmjjdphijjnj'):

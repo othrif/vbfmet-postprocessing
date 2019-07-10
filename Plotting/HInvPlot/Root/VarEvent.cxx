@@ -95,6 +95,10 @@ std::string Msl::Mva::Convert2Str(Var var)
     case mll:	                  return "mll";
     case ptll:	                  return "ptll";
     case mt:	                  return "mt";
+    case averageIntPerXing:	  return "averageIntPerXing";      
+    case lb:	                  return "lb";      
+    case n_vx:	                  return "n_vx";      
+    case BCIDDistanceFromFront:	  return "BCIDDistanceFromFront";      
     case chanFlavor:	          return "chanFlavor";
     case charge:	          return "charge";
     case ptvarcone20:	          return "ptvarcone20";
@@ -233,6 +237,10 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "mll")               return mll;
   if(var == "ptll")              return ptll;
   if(var == "mt")                return mt;
+  if(var == "averageIntPerXing") return averageIntPerXing;
+  if(var == "lb")                return lb;
+  if(var == "n_vx")              return n_vx;
+  if(var == "BCIDDistanceFromFront") return BCIDDistanceFromFront;
   if(var == "chanFlavor")        return chanFlavor;
   if(var == "charge")            return charge;
   if(var == "ptvarcone20")       return ptvarcone20;
@@ -458,6 +466,10 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(mll);
     vars.push_back(ptll);
     vars.push_back(mt);
+    vars.push_back(averageIntPerXing);
+    vars.push_back(lb);
+    vars.push_back(n_vx);
+    vars.push_back(BCIDDistanceFromFront);
     vars.push_back(chanFlavor);
     vars.push_back(charge);
     vars.push_back(ptvarcone20);

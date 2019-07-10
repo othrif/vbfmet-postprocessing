@@ -107,6 +107,12 @@ namespace Msl
     TH1                        *hdRj1;
     TH1                        *hdRj2;
     TH1                        *hminDR;
+    TH1                        *hJetEtaPt25;
+    TH1                        *hJetEtaPt35;
+    TH1                        *hJetEtaPt55;
+    TH2                        *hJetEMECvsBCIDPosPt25;
+    TH2                        *hJetEMECvsBCIDPosPt35;
+    TH2                        *hJetEMECvsBCIDPosPt55;
     TH1                        *hmj1;
     TH1                        *hmj2;
     TH1                        *hminDRmj2;    

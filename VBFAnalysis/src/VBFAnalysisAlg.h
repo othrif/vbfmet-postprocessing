@@ -106,6 +106,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::string treeTitleOut="nominal";
   std::string m_mcCampaign;
   bool m_theoVariation;
+  bool m_oneTrigMuon;
 
   Float_t crossSection;
   Double_t weight;
@@ -131,6 +132,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t puWeight;
   Float_t jvtSFWeight;
   Float_t fjvtSFWeight;
+  Float_t fjvtSFTighterWeight;
   Float_t eleANTISF;
   Float_t elSFWeight;
   Float_t muSFWeight;
@@ -278,6 +280,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* jet_EMFrac;
   std::vector<Float_t>* jet_fch;
   std::vector<Float_t>* jet_btag_weight;
+  std::vector<Float_t>* jet_TracksC1;
+  std::vector<Float_t>* jet_truthjet_pt;
+  std::vector<Float_t>* jet_truthjet_eta;
+  std::vector<Int_t>*   jet_truthjet_nCharged;
 
   std::vector<Float_t>* truth_jet_pt;
   std::vector<Float_t>* truth_jet_eta;
