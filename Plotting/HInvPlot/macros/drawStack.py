@@ -194,6 +194,11 @@ def getHistPars(hist):
         #
         # Kinematics histograms
         #
+        # Note on option: LtoRCut 0 cuts for values > thr
+        #                         1 cuts for values < thr
+        #                         2 bin-by-bin significance
+        #                         3 tried to combine bins to one value - use with care especially with many bins
+        #                         4 adds every two bins together
         'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5}, #5
         'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
         'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
