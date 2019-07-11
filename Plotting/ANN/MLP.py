@@ -23,9 +23,11 @@ data = np.array(labelled_events, dtype=[('WEIGHT', float), ('JJ_MASS', float), (
 np.random.shuffle(data) # shuffle data
 
 # define training/testing data (80-20 ratio)
-COLS = ['WEIGHT', 'JJ_MASS', 'JJ_DETA', 'MET_TST_ET', 'JJ_DPHI', 'JET_PT0', 'JET_PT1', 'MET_SOFT_TST_ET']
+COLS =  ['JJ_MASS', 'JJ_DETA', 'MET_TST_ET', 'JJ_DPHI', 'JET_PT0', 'JET_PT1', 'MET_SOFT_TST_ET']
+#COLS = [ 'JJ_MASS', 'JJ_DETA', 'MET_TST_ET', 'JJ_DPHI', 'JET_PT0', 'JET_PT1']
 print('cols = {}'.format(COLS))
 X = data[COLS]
+print(X)
 y = data['LABEL']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 #print X_train['WEIGHT']
@@ -38,6 +40,13 @@ X_test = X_test.view((float, len(X_test.dtype.names)))# destructure data
 scaler = preprocessing.StandardScaler().fit(X_train) # scaler to standardize data
 X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
+# Save it
+from sklearn.externals import joblib
+scaler_filename = "my_scaler_7var.save"
+joblib.dump(scaler, scaler_filename) 
+
+# Load it 
+#scaler = joblib.load(scaler_file) 
 
 # define the classifier model
 model = Sequential()
@@ -61,15 +70,16 @@ model.fit(X_train, y_train, epochs=4, batch_size=64)#,sample_weight=np.array(sam
 y_pred = model.predict(X_test)
 
 # saving the model
-model.save('my_model.h5')  # creates a HDF5 file 'my_model.h5'
+model_name='my_model_7var.h5'
+model.save(model_name)  # creates a HDF5 file 'my_model.h5'
 del model  # deletes the existing model
-
+print('Done')
 ###############################################################################
 
 # returns a compiled model
 from keras.models import load_model
 # identical to the previous one
-model = load_model('my_model.h5')
+model = load_model(model_name)
 
 import sklearn.metrics as metrics
 # calculate the fpr and tpr for all thresholds of the classification
