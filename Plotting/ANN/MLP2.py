@@ -56,7 +56,7 @@ def setXYZ(v):
 import numpy as np
 vbf_len = (len(inputEvts['vbf'])/2)
 z_len = (len(inputEvts['z_strong'])/2)
-print vbf_len,z_len
+#print 'variable: ',vbf_len,z_len
 ratio_bkg = vbf_len/float(z_len)
 sample_weights_train=[]
 sample_weights_test=[]
@@ -74,7 +74,7 @@ wbkg_test=[]
 nsignal_train=0
 nsignal_test=0
 nbkg_train=0
-print 'Signal: ',len(inputEvts['vbf'])
+print ('Signal: %s'%len(inputEvts['vbf'])) 
 for i in range(0,len(inputEvts['vbf'])):
     if np.random.uniform()>0.5 and nsignal_train<vbf_len:
         sample_weights_train+=[inputEvts['vbf'][i][0]]
@@ -113,12 +113,12 @@ for i in range(0,len(inputEvts['z_strong'])):
         wbkg_test+=[3600.0/larger_frac*inputEvts['z_strong'][i][0]]
         labels_test+=[[0]]
         
-print 'labels_test:',len(labels_test)
-print 'data_test:',len(dataB_test)
-print 'sample_weights_test:',len(sample_weights_test)
-print 'sample_weights_train:',len(sample_weights_train)
-print 'labels_train:',len(labels_train)
-print 'data_train:',len(dataB_train)
+print('labels_test:%s' %len(labels_test))
+print('data_test:%s' %len(dataB_test))
+print('sample_weights_test:%s' %len(sample_weights_test))
+print('sample_weights_train:%s' %len(sample_weights_train))
+print('labels_train:%s' %len(labels_train))
+print('data_train:%s' %len(dataB_train))
 
 model = Sequential()
 layer1=model.add(Dense(32, activation='relu', input_dim=len(dataB_train[0])))
@@ -140,7 +140,7 @@ model.fit(np.array(dataB_train), np.array(labels_train), epochs=20, batch_size=3
 #print score
 #print 'Qdata_test:',Qdata_test
 a=model.predict(np.array(Qdata_test))
-print a
+print('%s' %a)
 
 a=model.predict(np.array(Qdata_test))
 
@@ -185,8 +185,8 @@ if False:
 
 
 if False:
-    print "wsignal_train: ",len(wsignal_train),len(signal_train)
-    print "wbkg_train: ",len(wbkg_train),len(bkg_train)
+    #print "wsignal_train: ",len(wsignal_train),len(signal_train)
+    #print "wbkg_train: ",len(wbkg_train),len(bkg_train)
     plt.hist(signal_train, bins, alpha=0.5, label='Signal',weights=wsignal_train)
     plt.hist(bkg_train, bins, alpha=0.5, label='Background',weights=wbkg_train)
     plt.legend(loc='upper right')
@@ -204,8 +204,8 @@ if False:
 
     plt.clf()
     
-print "wsignal_train: ",len(wsignal_test),len(signal_test)
-print "wbkg_train: ",len(wbkg_test),len(bkg_test)    
+#print "wsignal_train: ",len(wsignal_test),len(signal_test)
+#print "wbkg_train: ",len(wbkg_test),len(bkg_test)    
 plt.hist(signal_train, bins, alpha=0.5, label='Signal Train',weights=wsignal_train)
 plt.hist(signal_test, bins, alpha=0.5, label='Signal Test',weights=wsignal_test)
 plt.hist(bkg_test, bins, alpha=0.5, label='Background Test',weights=wbkg_test)

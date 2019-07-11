@@ -519,7 +519,7 @@ def prepareBkgRuns(keys,options=None):
         '108343':'schan->e',
         '108344':'schan->mu',
         '108345':'schan->tau',
-        '108346':'Wt',        
+        '108346':'Wt',
         }
     bkg_top2 = {
         '410470':'ttbar(w/oFullHad)',

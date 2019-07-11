@@ -219,7 +219,9 @@ def getHistPars(hist):
         'n_jet_cenj40'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0,'ymin':0.1, 'logy':True,'LtoRCut':1},
-        'tmva'  : {'xtitle':'BDT Score',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'tmva'  : {'xtitle':'BDT Score',          'ytitle':'Events', 'rebin':0,'LtoRCut':0,'xmin':-0.4,'xmax':0.6,'ymin':0.01},
+        #'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':10,'LtoRCut':0,'xmin':0.0},
+        #'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':10,'LtoRCut':2,'xmin':0.0},        
         'bcid'  : {'xtitle':'BCID',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'BCIDDistanceFromFront'  : {'xtitle':'Distance from front of Train','ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
@@ -2079,7 +2081,11 @@ class DrawStack:
         #    ['ymax']=self.stack.GetMaximum()
         if options.do_logy:
             self.stack.SetMinimum(0.1)
-        if 'xmax' in pars:
+        if 'xmax' in pars and 'xmin' in pars:
+            self.stack.GetXaxis().SetRangeUser(pars['xmin'],pars['xmax'])
+        elif 'xmin' in pars:
+            self.stack.GetXaxis().SetRangeUser(pars['xmin'],1.0)              
+        elif 'xmax' in pars:
             self.stack.GetXaxis().SetRangeUser(0.0,pars['xmax'])
         elif options.xmax != None:
             self.stack.GetXaxis().SetRangeUser(options.xmin,options.xmax)
@@ -2125,7 +2131,11 @@ class DrawStack:
             if 'line_style' in style:
                 h.SetLineStyle(style['line_style'])
 
-        if 'xmax' in pars:
+        if 'xmax' in pars and 'xmin' in pars:
+            h.GetXaxis().SetRangeUser(pars['xmin'],pars['xmax'])
+        elif 'xmin' in pars:
+            h.GetXaxis().SetRangeUser(pars['xmin'],1.0)            
+        elif 'xmax' in pars:
             h.GetXaxis().SetRangeUser(0.0,pars['xmax'])
         elif options.xmax != None:
             h.GetXaxis().SetRangeUser(options.xmin,options.xmax)

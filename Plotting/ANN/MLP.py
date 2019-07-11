@@ -28,6 +28,9 @@ print('cols = {}'.format(COLS))
 X = data[COLS]
 y = data['LABEL']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+#print X_train['WEIGHT']
+#print X_train.dtype.names
+#print X_train
 X_train = X_train.view((float, len(X_train.dtype.names))) # destructure data
 X_test = X_test.view((float, len(X_test.dtype.names)))# destructure data
 
