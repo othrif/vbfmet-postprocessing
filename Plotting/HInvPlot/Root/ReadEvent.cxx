@@ -105,13 +105,14 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   if(fTMVAWeightPath!=""){
     fTMVAReader = new TMVA::Reader( "!Color:!Silent" );
     fMVAName =  "BDT method";
-    for(unsigned i=0; i<6; ++i) fTMVAVars.push_back(0.0);
+    for(unsigned i=0; i<7; ++i) fTMVAVars.push_back(0.0);
     fTMVAReader->AddVariable("jj_mass", &fTMVAVars[0]);
     fTMVAReader->AddVariable("jj_dphi", &fTMVAVars[1]);
     fTMVAReader->AddVariable("jj_deta", &fTMVAVars[2]);
     fTMVAReader->AddVariable("met_tst_et", &fTMVAVars[3]);
-    fTMVAReader->AddVariable("jet1_pt", &fTMVAVars[4]);
-    fTMVAReader->AddVariable("jet2_pt", &fTMVAVars[5]);
+    fTMVAReader->AddVariable("met_soft_tst_et", &fTMVAVars[4]);
+    fTMVAReader->AddVariable("jet1_pt", &fTMVAVars[5]);
+    fTMVAReader->AddVariable("jet2_pt", &fTMVAVars[6]);
     fTMVAReader->BookMVA( fMVAName, fTMVAWeightPath);
   }
   
@@ -1174,11 +1175,12 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       fTMVAVars[1]=event->GetVar(Mva::jj_dphi);
       fTMVAVars[2]=event->GetVar(Mva::jj_deta);
       fTMVAVars[3]=event->GetVar(Mva::met_tst_et)*1.0e3;
-      fTMVAVars[4]=event->GetVar(Mva::jetPt0)*1.0e3;
-      fTMVAVars[5]=event->GetVar(Mva::jetPt1)*1.0e3;
-      event->AddVar(Mva::tmva, fTMVAReader->EvaluateMVA( fTMVAVars, fMVAName ));
+      fTMVAVars[4]=event->GetVar(Mva::met_soft_tst_et)*1.0e3;
+      fTMVAVars[5]=event->GetVar(Mva::jetPt0)*1.0e3;
+      fTMVAVars[6]=event->GetVar(Mva::jetPt1)*1.0e3;
+      event->RepVar(Mva::tmva, fTMVAReader->EvaluateMVA( fTMVAVars, fMVAName ));
       //std::cout << "inputs: " << fTMVAVars[0] << " " << fTMVAVars[1] << " " << fTMVAVars[2] << " " << fTMVAVars[3] << " " << fTMVAVars[4] << " " << fTMVAVars[5] << " " << event->GetVar(Mva::tmva) << std::endl;
-    }else { event->AddVar(Mva::tmva, 0.0); }
+    }else if(!event->HasVar(Mva::tmva)) { event->AddVar(Mva::tmva, 0.0); }
     
     //
     // Process sub-algorithms

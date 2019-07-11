@@ -4,38 +4,43 @@ from keras.models import Sequential
 from sklearn import preprocessing
 import pickle
 import ROOT
-import os
+import os,sys
 from array import array
 ann_score = array( 'f', [ 0.0 ] )
 
 # input directory
-idir='/share/t3data2/schae/v26LooseNoExtSystMETTrigSYST/'
-odir='/tmp/'
+#idir='/share/t3data2/schae/v26LooseNoExtSystMETTrigSYST/'
+idir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim/'
+odir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim_7var/'
 dlist = os.listdir(idir)
 
 # returns a compiled model
 from keras.models import load_model
 # identical to the previous one                          
-model = load_model('my_model_6var.h5')
+model = load_model('my_model_7var.h5')
 # load the scaler
 from sklearn.externals import joblib
-scaler = joblib.load('my_scaler_6var.save') 
+scaler = joblib.load('my_scaler_7var.save') 
 
 for d in dlist:
     print(d)
-
+    sys.stdout.flush()
+    #if not d.count('VBF'):
+    #    continue
     fin1 = ROOT.TFile.Open(idir+d)
     file_tree_list = fin1.GetListOfKeys()
     for key in file_tree_list:
         print('%s %s' %(key.GetName(),key.GetClassName()))
-        if key.GetClassName()=='TTree':
+        #if key.GetClassName()=='TTree':
+        if key.GetClassName()=='TTree' and key.GetName().count('Nominal'):
 
             tree_in = fin1.Get(key.GetName())
 
             vbf=[]
             n=0
             for e in tree_in:
-                vbf+=[[e.jj_mass/1.0e3,e.jj_deta,e.met_tst_et/1.0e3,e.jj_dphi,e.jet_pt[0]/1.0e3,e.jet_pt[1]/1.0e3]]
+                #vbf+=[[e.jj_mass/1.0e3,e.jj_deta,e.met_tst_et/1.0e3,e.jj_dphi,e.jet_pt[0]/1.0e3,e.jet_pt[1]/1.0e3]]
+                vbf+=[[e.jj_mass/1.0e3,e.jj_deta,e.met_tst_et/1.0e3,e.jj_dphi,e.jet_pt[0]/1.0e3,e.jet_pt[1]/1.0e3,e.met_soft_tst_et/1.0e3]]
                 n+=1
                 #if n>100:
                 #    break
@@ -70,3 +75,4 @@ for d in dlist:
             tree_out.Write()
             fout.Close()
             fin1.Close()
+print('DONE')
