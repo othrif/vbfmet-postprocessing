@@ -102,6 +102,7 @@ namespace Msl
     TH1                        *hptvarcone30;
     TH1                        *htopoetcone20;
     
+    TH1                        *hjj_mass_variableBin;
     TH1                        *hmj34;
     TH1                        *hmax_j_eta;    
     TH1                        *hdRj1;
