@@ -6,21 +6,30 @@ import pickle
 import ROOT
 import os,sys
 from array import array
+from custom_loss import focal_loss
 ann_score = array( 'f', [ 0.0 ] )
 
 # input directory
+#name_model='_VBFH125_Z_strong'
+name_model='_zstrong'
+#name_model='_zstrong'
+#name_model='_njet'
 #idir='/share/t3data2/schae/v26LooseNoExtSystMETTrigSYST/'
 idir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim/'
-odir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim_7var/'
+odir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim_7var'+name_model+'/'
+if not os.path.exists(odir):
+    os.mkdir(odir)
 dlist = os.listdir(idir)
 
 # returns a compiled model
 from keras.models import load_model
 # identical to the previous one                          
-model = load_model('my_model_7var.h5')
+#model_dir='/home/smau/testarea/HInv/STPostProcessing/Plotting/ANN/'
+model_dir='./'
+model = load_model(model_dir+'model'+name_model+'.hf')
 # load the scaler
 from sklearn.externals import joblib
-scaler = joblib.load('my_scaler_7var.save') 
+scaler = joblib.load(model_dir+'scaler'+name_model+'.save') 
 
 for d in dlist:
     print(d)
@@ -40,7 +49,9 @@ for d in dlist:
             n=0
             for e in tree_in:
                 #vbf+=[[e.jj_mass/1.0e3,e.jj_deta,e.met_tst_et/1.0e3,e.jj_dphi,e.jet_pt[0]/1.0e3,e.jet_pt[1]/1.0e3]]
-                vbf+=[[e.jj_mass/1.0e3,e.jj_deta,e.met_tst_et/1.0e3,e.jj_dphi,e.jet_pt[0]/1.0e3,e.jet_pt[1]/1.0e3,e.met_soft_tst_et/1.0e3]]
+                #'jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]'
+                vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_nolep_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1]]]
+                #vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_nolep_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1],e.n_jet]]
                 n+=1
                 #if n>100:
                 #    break

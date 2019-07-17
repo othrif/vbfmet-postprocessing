@@ -16,6 +16,7 @@ from keras.layers import Dense, Dropout, Activation, LSTM
 #from keras import optimizers
 #from keras import regularizers
 import keras.backend as K
+from custom_loss import *
 
 # Scikit-learn
 import sklearn.metrics as metrics
@@ -23,6 +24,7 @@ import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn import preprocessing
 from sklearn.utils import class_weight
+from sklearn.externals import joblib
 #from keras.wrappers.scikit_learn import KerasClassifier
 #from sklearn.model_selection import GridSearchCV
 
@@ -38,6 +40,14 @@ import matplotlib.pyplot as plt
 ###############################################################################
 
 ###############################################################################
+# Global variabls
+#################
+
+training_name='_zstrong'
+
+###############################################################################
+
+###############################################################################
 # Load data
 ###########
 
@@ -45,6 +55,8 @@ import matplotlib.pyplot as plt
 VBFH125 = np.load('VBFH125.npy')
 label_VBFH125 = np.ones(len(VBFH125))
 VBFH125_labelled = recfn.rec_append_fields(VBFH125, 'label', label_VBFH125)
+import pdb;pdb.set_trace()
+VBFH125_labelled['w']*=10.0 # adding weight to center the distribution
 
 # Z_strong (background)
 Z_strong = np.load('Z_strong.npy')
@@ -72,10 +84,10 @@ W_strong_labelled = recfn.rec_append_fields(W_strong, 'label', label_W_strong)
 # Concatenate and shuffle data
 ##############################
 
-#data = np.concatenate([VBFH125_labelled, Z_strong_labelled])
+data = np.concatenate([VBFH125_labelled, Z_strong_labelled])
 #data = np.concatenate([VBFH125_labelled, Z_strong_labelled, ttbar_labelled])
 #data = np.concatenate([VBFH125_labelled, Z_strong_labelled, ttbar_labelled, W_strong_labelled])
-data = np.concatenate([VBFH125_labelled, Z_strong_labelled, ttbar_labelled, W_strong_labelled, Z_EWK_labelled])
+#data = np.concatenate([VBFH125_labelled, Z_strong_labelled, ttbar_labelled, W_strong_labelled, Z_EWK_labelled])
 np.random.shuffle(data) # shuffle data
 
 ###############################################################################
@@ -100,13 +112,13 @@ COLS += ['n_jet', 'maxCentrality', 'max_mj_over_mjj']
 COLS += ['j3_centrality[0]', 'j3_min_mj_over_mjj', 'jet_pt[2]'] # 'j3_centrality[1]']
 print('cols = {}'.format(COLS))
 
+# select n_jet < 4 due to some variables problems
 data = data[data['n_jet'] < 4]
 
 data['jet_pt[2]'][np.where(data['n_jet'] == 2)]          = 0
 data['j3_centrality[0]'][np.where(data['n_jet'] == 2)]   = 0
 #data['j3_centrality[1]'][np.where(data['n_jet'] == 2)]   = 0
 data['j3_min_mj_over_mjj'][np.where(data['n_jet'] == 2)] = 0
-import pdb;pdb.set_trace()
 
 ###############################################################################
 
@@ -139,8 +151,7 @@ X_train = scaler.transform(X_train) # apply to train data
 X_test = scaler.transform(X_test) # apply to test data
 
 # Save it
-from sklearn.externals import joblib
-scaler_filename = "scaler.save"
+scaler_filename = "scaler"+training_name+".save"
 joblib.dump(scaler, scaler_filename) 
 
 ###############################################################################
@@ -198,6 +209,7 @@ class_weight = class_weight.compute_class_weight('balanced', np.unique(y_train),
 # Define the classifier model
 #############################
 
+# Build the model
 model = Sequential()
 model.add(Dense(32, kernel_initializer='normal', activation='relu', input_dim=len(COLS)))
 #model.add(Dense(16, kernel_initializer='normal', activation='relu'))
@@ -205,8 +217,13 @@ model.add(Dense(32, kernel_initializer='normal', activation='relu', input_dim=le
 #model.add(Dense(2, kernel_initializer='normal', activation='relu'))
 #model.add(Dropout(0.2))
 model.add(Dense(1, activation='sigmoid'))
+
+# Compile the model
 model.compile(optimizer='nadam',
               loss=focal_loss,
+              metrics=['accuracy', sig_eff])
+model.compile(optimizer='rmsprop',
+              loss='binary_crossentropy',
               metrics=['accuracy', sig_eff])
 
 print(model.summary())
@@ -221,7 +238,7 @@ print(model.summary())
 model.fit(X_train, y_train, validation_split=0.1, epochs=5, batch_size=128, class_weight=class_weight, sample_weight=w_train)
 
 # Save the model
-model_filename = 'model.h5'
+model_filename = 'model'+training_name+'.hf'
 model.save(model_filename)
 
 ###############################################################################
@@ -253,7 +270,7 @@ plt.ylim([0, 1])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('Receiver Operating Characteristic (ROC)')
-plt.savefig('ROC.pdf', bbox_inches='tight', rasterized=False)
+plt.savefig('ROC'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
 plt.close()
 
 ## plot PR curve
@@ -269,7 +286,7 @@ plt.close()
 #plt.ylim([0.0, 1.05])
 #plt.xlim([0.0, 1.0])
 #plt.title('2-class Precision-Recall curve: AP={0:0.2f}'.format(average_precision))
-#plt.savefig('PR.pdf', bbox_inches='tight', rasterized=False)
+#plt.savefig('PR'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
 #plt.close()
 
 # score predictions
@@ -328,7 +345,7 @@ plt.legend(ncol=2, loc='upper right')
 plt.xlabel('Keras ANN Score')
 plt.ylabel('Events (Normalized)')
 plt.title('Classifier Overtraining Check')
-plt.savefig('overtrain.pdf', bbox_inches='tight', rasterized=False)
+plt.savefig('overtrain'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
 plt.close()
 
 ###############################################################################
