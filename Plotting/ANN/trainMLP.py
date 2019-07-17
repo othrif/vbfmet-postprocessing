@@ -46,7 +46,7 @@ import matplotlib.pyplot as plt
 VBFH125 = np.load('VBFH125.npy')
 label_VBFH125 = np.ones(len(VBFH125))
 VBFH125_labelled = recfn.rec_append_fields(VBFH125, 'label', label_VBFH125)
-VBFH125_labelled['w']*=20.0 # adding weight to center the distribution
+VBFH125_labelled['w']*=10.0 # adding weight to center the distribution
 
 # Z_strong (background)
 Z_strong = np.load('Z_strong.npy')
