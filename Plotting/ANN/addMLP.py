@@ -11,7 +11,7 @@ ann_score = array( 'f', [ 0.0 ] )
 
 # input directory
 #name_model='_VBFH125_Z_strong'
-name_model='_njet_focal'
+name_model='_zstrong_ttbar'
 #name_model='_njet'
 #idir='/share/t3data2/schae/v26LooseNoExtSystMETTrigSYST/'
 idir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim/'
@@ -25,7 +25,7 @@ from keras.models import load_model
 # identical to the previous one                          
 #model_dir='/home/smau/testarea/HInv/STPostProcessing/Plotting/ANN/'
 model_dir='./'
-model = load_model(model_dir+'model'+name_model+'.h5')
+model = load_model(model_dir+'model'+name_model+'.hf')
 # load the scaler
 from sklearn.externals import joblib
 scaler = joblib.load(model_dir+'scaler'+name_model+'.save') 
@@ -49,8 +49,8 @@ for d in dlist:
             for e in tree_in:
                 #vbf+=[[e.jj_mass/1.0e3,e.jj_deta,e.met_tst_et/1.0e3,e.jj_dphi,e.jet_pt[0]/1.0e3,e.jet_pt[1]/1.0e3]]
                 #'jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]'
-                #vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1]]]
-                vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1],e.n_jet]]
+                vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1]]]
+                #vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1],e.n_jet]]
                 n+=1
                 #if n>100:
                 #    break
