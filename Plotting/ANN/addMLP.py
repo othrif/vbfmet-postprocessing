@@ -11,7 +11,8 @@ ann_score = array( 'f', [ 0.0 ] )
 
 # input directory
 #name_model='_VBFH125_Z_strong'
-name_model='_zstrong_ttbar'
+name_model='_zstrong'
+#name_model='_zstrong'
 #name_model='_njet'
 #idir='/share/t3data2/schae/v26LooseNoExtSystMETTrigSYST/'
 idir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim/'
@@ -49,8 +50,8 @@ for d in dlist:
             for e in tree_in:
                 #vbf+=[[e.jj_mass/1.0e3,e.jj_deta,e.met_tst_et/1.0e3,e.jj_dphi,e.jet_pt[0]/1.0e3,e.jet_pt[1]/1.0e3]]
                 #'jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]'
-                vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1]]]
-                #vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1],e.n_jet]]
+                vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_nolep_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1]]]
+                #vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_nolep_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1],e.n_jet]]
                 n+=1
                 #if n>100:
                 #    break
