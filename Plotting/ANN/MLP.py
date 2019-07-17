@@ -42,7 +42,7 @@ X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
 # Save it
 from sklearn.externals import joblib
-scaler_filename = "my_scaler_7var.save"
+scaler_filename = "my_scaler_7varnjet.save"
 joblib.dump(scaler, scaler_filename) 
 
 # Load it 
@@ -70,7 +70,7 @@ model.fit(X_train, y_train, epochs=4, batch_size=64)#,sample_weight=np.array(sam
 y_pred = model.predict(X_test)
 
 # saving the model
-model_name='my_model_7var.h5'
+model_name='my_model_7varnjet.h5'
 model.save(model_name)  # creates a HDF5 file 'my_model.h5'
 del model  # deletes the existing model
 print('Done')

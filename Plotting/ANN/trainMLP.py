@@ -7,6 +7,7 @@ __author__ = "Sid Mau, Doug Schaefer"
 ###############################################################################
 # Import libraries
 ##################
+training_name='_zstrong'
 
 # Tensorflow and Keras
 import tensorflow as tf
@@ -16,7 +17,7 @@ from keras.layers import Dense, Dropout, Activation, LSTM
 #from keras import optimizers
 #from keras import regularizers
 import keras.backend as K
-
+from custom_loss import *
 # Scikit-learn
 import sklearn.metrics as metrics
 #from sklearn.metrics import classification_report, average_precision_score, precision_recall_curve, confusion_matrix
@@ -45,6 +46,7 @@ import matplotlib.pyplot as plt
 VBFH125 = np.load('VBFH125.npy')
 label_VBFH125 = np.ones(len(VBFH125))
 VBFH125_labelled = recfn.rec_append_fields(VBFH125, 'label', label_VBFH125)
+VBFH125_labelled['w']*=20.0 # adding weight to center the distribution
 
 # Z_strong (background)
 Z_strong = np.load('Z_strong.npy')
@@ -72,8 +74,8 @@ W_strong_labelled = recfn.rec_append_fields(W_strong, 'label', label_W_strong)
 # Concatenate and shuffle data
 ##############################
 
-#data = np.concatenate([VBFH125_labelled, Z_strong_labelled])
-data = np.concatenate([VBFH125_labelled, Z_strong_labelled, ttbar_labelled, W_strong_labelled])
+data = np.concatenate([VBFH125_labelled, Z_strong_labelled])
+#data = np.concatenate([VBFH125_labelled, Z_strong_labelled, ttbar_labelled, W_strong_labelled])
 np.random.shuffle(data) # shuffle data
 
 ###############################################################################
@@ -96,6 +98,9 @@ COLS += ['n_jet', 'maxCentrality', 'max_mj_over_mjj']
 COLS_nj2 = COLS
 COLS_j3 = COLS + ['j3_centrality[0]', 'j3_min_mj_over_mjj', 'jet_pt[2]'] #'j3_centrality[1]', 
 #COLS = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'jet_pt[0]', 'jet_pt[1]']
+#COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]','n_jet']
+COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
+
 print('cols = {}'.format(COLS))
 
 ###############################################################################
@@ -131,32 +136,8 @@ X_test = scaler.transform(X_test) # apply to test data
 
 # Save it
 from sklearn.externals import joblib
-scaler_filename = "scaler.save"
+scaler_filename = "scaler"+training_name+".save"
 joblib.dump(scaler, scaler_filename) 
-
-###############################################################################
-
-###############################################################################
-# Custom loss functions
-#######################
-
-# https://towardsdatascience.com/handling-imbalanced-datasets-in-deep-learning-f48407a0e758
-def focal_loss(y_true, y_pred):
-    gamma = 2.0
-    alpha = 0.25
-    pt_1 = tf.where(tf.equal(y_true, 1), y_pred, tf.ones_like(y_pred))
-    pt_0 = tf.where(tf.equal(y_true, 0), y_pred, tf.zeros_like(y_pred))
-    return(-K.sum(alpha * K.pow(1. - pt_1, gamma) * K.log(pt_1))-K.sum((1-alpha) * K.pow( pt_0, gamma) * K.log(1. - pt_0)))
-
-# signal efficiency
-def sig_loss(y_true, y_pred):
-    #for (signal):
-    #    loss +=  (s / sqrt(7*b)) )**2;
-    #loss = math.sqrt(1/loss);
-    pt_1 = tf.where(tf.equal(y_true, 1), y_pred, tf.ones_like(y_pred))
-    pt_0 = tf.where(tf.equal(y_true, 0), y_pred, tf.zeros_like(y_pred))
-    loss = K.pow((K.sum(pt_1 / K.pow(7*pt_0, 0.5))**2), 0.5)
-    return(loss)
 
 ###############################################################################
 
@@ -180,10 +161,12 @@ model.add(Dense(32, kernel_initializer='normal', activation='relu', input_dim=le
 #model.add(Dense(2, kernel_initializer='normal', activation='relu'))
 #model.add(Dropout(0.2))
 model.add(Dense(1, activation='sigmoid'))
-model.compile(optimizer='nadam',
-              loss=focal_loss,
-              metrics=['accuracy'])
-
+#model.compile(optimizer='nadam',
+#              loss=focal_loss,
+#              metrics=['accuracy'])
+model.compile(optimizer='rmsprop',
+              loss='binary_crossentropy',
+              metrics=['accuracy']) # best
 print(model.summary())
 
 ###############################################################################
@@ -196,7 +179,7 @@ print(model.summary())
 model.fit(X_train, y_train, validation_split=0.1, epochs=10, batch_size=32, class_weight=class_weight, sample_weight=w_train)
 
 # Save the model
-model_filename = 'model.hf'
+model_filename = 'model'+training_name+'.hf'
 model.save(model_filename)
 
 ###############################################################################
@@ -228,7 +211,7 @@ plt.ylim([0, 1])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('Receiver Operating Characteristic (ROC)')
-plt.savefig('ROC.pdf', bbox_inches='tight', rasterized=False)
+plt.savefig('ROC'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
 plt.close()
 
 ## plot PR curve
@@ -244,7 +227,7 @@ plt.close()
 #plt.ylim([0.0, 1.05])
 #plt.xlim([0.0, 1.0])
 #plt.title('2-class Precision-Recall curve: AP={0:0.2f}'.format(average_precision))
-#plt.savefig('PR.pdf', bbox_inches='tight', rasterized=False)
+#plt.savefig('PR'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
 #plt.close()
 
 # score predictions
@@ -303,7 +286,7 @@ plt.legend(ncol=2, loc='upper right')
 plt.xlabel('Keras ANN Score')
 plt.ylabel('Events (Normalized)')
 plt.title('Classifier Overtraining Check')
-plt.savefig('overtrain.pdf', bbox_inches='tight', rasterized=False)
+plt.savefig('overtrain'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
 plt.close()
 
 ###############################################################################
