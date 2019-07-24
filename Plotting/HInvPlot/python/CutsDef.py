@@ -33,7 +33,7 @@ class BasicCuts:
                             'metsfVBFTopotrigOR','metsfxe110XE70trig','metsfxe110XE65trig',
                             'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
-
+        
         self.analysis = Analysis
         self.chan     = Chan
         self.SameSign = SameSign
@@ -44,9 +44,11 @@ class BasicCuts:
         self.DEtajjLowerCut   = 3.8
         self.DEtajjUpperCut   = -1.0
         self.NjetCut   = 'n_jet > 1 && n_jet < 5'
+        self.JetEta = ''
         if Analysis.count('metsf'):
             self.DEtajjLowerCut   = 3.5 # was 3.5
             self.MjjLowerCut   = 1000.0
+            #self.JetEta = 'jetEta0 < 3.2 && jetEta0 > -3.2'
             #self.DEtajjLowerCut   = 4.2 # was 3.5
             #self.MjjLowerCut   = 1500.0
             #self.NjetCut   = 'n_jet == 3'
@@ -159,6 +161,13 @@ class BasicCuts:
         cutNjet = CutItem('CutNjet', self.NjetCut)
         return [cutNjet]
 
+    def GetLeadJetEtaCut(self):
+        if self.JetEta!='':
+            cutJetEta0 = CutItem('CutJetEta0', self.JetEta)
+            return [cutJetEta0]
+        else:
+            return []
+
 #-------------------------------------------------------------------------
 def getLepChannelCuts(basic_cuts):
 
@@ -253,6 +262,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts += [CutItem('CutNjetCen',  'n_jet_cenj == 0')]
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
+            cuts += basic_cuts.GetLeadJetEtaCut()
             if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5':
                 cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
                 cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
