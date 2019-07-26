@@ -2,7 +2,6 @@
 #include "HFInputAlg.h"
 #include "SUSYTools/SUSYCrossSection.h"
 #include "PathResolver/PathResolver.h"
-//#include "xAODEventInfo/EventInfo.h"
 #include "TLorentzVector.h"
 #include <math.h>
 
