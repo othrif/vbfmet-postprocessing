@@ -60,6 +60,7 @@ class sample(object):
             else:
                 self.isMC = True
         if (self.isMC):
+            print "runNumebr::: ",self.runNumber
             if ((self.runNumber >= 308096 and self.runNumber <= 308098) or (self.runNumber == 363489)):
                 self.sampleType = "W_EWK"
             elif (self.runNumber >= 364500 and self.runNumber <= 364519):
@@ -82,7 +83,7 @@ class sample(object):
                 self.sampleType = "Z_EWK"
             elif (self.runNumber >= 345099 and self.runNumber <= 345102):
                 self.sampleType = "Z_strong_VBFFilt"
-            elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515) or (self.runNumber>=366010 and self.runNumber<=366035):
+            elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515) or (self.runNumber>=366010 and self.runNumber<=366035) or (self.runNumber>=311429 and self.runNumber<=311444):
                 self.sampleType = "Z_strong"
             elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)) or (self.runNumber>=410642 and self.runNumber<=410649) or self.runNumber==410642 or self.runNumber==410643:
                 self.sampleType = "ttbar"
@@ -102,7 +103,7 @@ class sample(object):
                 self.sampleType = "ttbar" # VV moved to ttbar+other
             elif (self.runNumber >= 364242 and self.runNumber <= 364249 or self.runNumber==364253):
                 self.sampleType = "ttbar" # VVV moved to ttbar+other
-            elif (self.runNumber == 410658 or self.runNumber <= 410659):
+            elif (self.runNumber == 410658 or self.runNumber == 410659):
                 self.sampleType = "ttbar" # tchan top
             elif (self.runNumber >= 364198 and self.runNumber <= 364215):
                 self.sampleType = "Z_strong" # Z_strong_LowMass added to the Z_strong
@@ -129,7 +130,7 @@ class sample(object):
                 self.sampleType = "ERROR"
         else:
             self.sampleType = "data"
-
+        print 'self.sampleType::::',self.sampleType
     def getisMC(self):
         return self.isMC
     def getsampleType(self):

@@ -20,6 +20,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "normFile", m_normFile = "current.root", "path to a file with the number of events processed" );
   declareProperty( "mcCampaign", m_mcCampaign = "mc16a", "mcCampaign of the mc sample. only read if isMC is true" );
   declareProperty( "UseExtMC", m_UseExtMC = false, "Use extended MC samples");
+  declareProperty( "UseExtMGVjet", m_UseExtMGVjet = false, "Use extended LO MG extension");
   declareProperty( "theoVariation", m_theoVariation = false, "Do theory systematic variations");
   declareProperty( "oneTrigMuon", m_oneTrigMuon = false, "Trigger muon SF set to 1");
 }
@@ -441,6 +442,14 @@ StatusCode VBFAnalysisAlg::MapNgen(){
     Ngen[dsid]=N;
     //std::cout << "input: " << dsid << " " << N << std::endl;
    }
+  if(m_UseExtMGVjet){
+    Ngen_filter.clear();
+    TIter next(f->GetListOfKeys());
+    TKey *key;
+    while ((key = (TKey*)next())) {
+      std::cout << "my key: " << key->GetName() << std::endl;
+    }
+  }
 
   return StatusCode::SUCCESS;
 
@@ -562,7 +571,7 @@ StatusCode VBFAnalysisAlg::execute() {
       if (index_f < samplesfilter.size()){
 	if(Ngen[runNumber]>0 && Ngen[samplesinclusive.at(index_f)] > 0){
 	  NgenCorrected = (Ngen[runNumber]/filtereffs.at(index_f)+Ngen[samplesinclusive.at(index_f)])*filtereffs.at(index_f);
-      }
+	}
       } else if (index_i < samplesinclusive.size()){
 	if (passVjetsFilter) {
 	  if(Ngen[runNumber]>0 && Ngen[samplesfilter.at(index_i)] > 0){
@@ -903,8 +912,9 @@ StatusCode VBFAnalysisAlg::execute() {
     if(!(n_baseel==0 && n_basemu==0)) eleANTISF=1.0;
   }else{ eleANTISF=1.0; }
 
-  if(m_oneTrigMuon) muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF*nloEWKWeight;
+  float tmpD_muSFTrigWeight = muSFTrigWeight;
+  if(m_oneTrigMuon) tmpD_muSFTrigWeight=1.0;
+  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight;
 
   if(m_theoVariation){
     std::map<TString,bool> regDecision;
@@ -1099,6 +1109,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("passBatman", 1);
   m_tree->SetBranchStatus("passVjetsFilter", 1);
   m_tree->SetBranchStatus("passVjetsPTV", 1);
+  m_tree->SetBranchStatus("MGVTruthPt", 1);
+  m_tree->SetBranchStatus("SherpaVTruthPt", 1);
+  m_tree->SetBranchStatus("in_vy_overlap", 1);
+  m_tree->SetBranchStatus("in_vy_overlap_iso", 1);
+  m_tree->SetBranchStatus("FlavourFilter", 1);
   m_tree->SetBranchStatus("passGRL", 1);
   m_tree->SetBranchStatus("passPV", 1);
   m_tree->SetBranchStatus("passDetErr", 1);
@@ -1266,6 +1281,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("passBatman", &passBatman);
   m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
   m_tree->SetBranchAddress("passVjetsPTV", &passVjetsPTV);
+  m_tree->SetBranchAddress("MGVTruthPt", &MGVTruthPt);
+  m_tree->SetBranchAddress("SherpaVTruthPt", &SherpaVTruthPt);
+  m_tree->SetBranchAddress("in_vy_overlap", &in_vy_overlap);
+  m_tree->SetBranchAddress("in_vy_overlap_iso", &in_vy_overlap_iso);
+  m_tree->SetBranchAddress("FlavourFilter", &FlavourFilter);
   m_tree->SetBranchAddress("passGRL", &passGRL);
   m_tree->SetBranchAddress("passPV", &passPV);
   m_tree->SetBranchAddress("passDetErr", &passDetErr);

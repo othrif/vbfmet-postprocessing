@@ -5,7 +5,8 @@ import sys
 #l = open('v21Loose.txt','r')
 #l = open('v26bLoose_rui_sort.txt','r')
 #l = open('v26gam.txt','r')
-l = open('v28PlowSystd.txt','r')
+#l = open('v28PlowSystd.txt','r')
+l = open('v31LooseSystZmm.txt','r')
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt
 myMap = {}

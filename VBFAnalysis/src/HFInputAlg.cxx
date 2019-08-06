@@ -409,7 +409,7 @@ StatusCode HFInputAlg::execute() {
   Float_t lumi = 36.1;
   if(year==2017)      lumi = 44.3074;
   else if(year==2018) lumi = 59.9372;
-  if (isMC) w_final = w*1000*lumi;
+  if (isMC) w_final = w*1000.0*lumi;
   int bin = 0;
   if (jj_mass < 1.5e6) bin = 0;
   else if (jj_mass < 2e6) bin = 1;
@@ -426,6 +426,8 @@ StatusCode HFInputAlg::execute() {
   if(m_binning==6 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
   if(m_binning==6 && (n_jet>2))    bin=6; // separate dphijj, mjj binning, njet binning
 
+  if(isnan(w_final)) std::cout << "isnan w_final? " << w_final << std::endl;
+  if(isnan(xeSFTrigWeight)) std::cout << "isnan xeSFTrigWeight? " << xeSFTrigWeight << std::endl;
   if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
   if (CRWep) HistoFill(hCRWep[bin],w_final);
   if (CRWen) HistoFill(hCRWen[bin],w_final);

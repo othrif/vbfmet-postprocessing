@@ -1106,7 +1106,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // decode trigger_lep
     int trigger_lep = event->GetVar(Mva::trigger_lep);
-    int trigger_lep_new = (trigger_lep&0x1) ? 1 : 0;
+    int trigger_lep_new = ((trigger_lep&0x1)>0) ? 1 : 0;
     if(trigger_lep_new==0 && (trigger_lep&0x10)==0x10) trigger_lep_new = 2;
     if(trigger_lep_new==0 && (trigger_lep&0x100)==0x100) trigger_lep_new = 3;
     event->RepVar(Mva::trigger_lep, trigger_lep_new);
@@ -1124,7 +1124,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
     else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
     else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K  
-    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
+    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
     if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
     // 2018 update trigger for later periods => value 5 for
     if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
