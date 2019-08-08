@@ -395,6 +395,9 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
     m_tree_out->Branch("truth_jj_dphi",  &truth_jj_dphi);
     m_tree_out->Branch("truth_j2_pt",  &truth_j2_pt);
+    m_tree_out->Branch("truthloMG_jj_mass",  &truthloMG_jj_mass);
+    m_tree_out->Branch("truthloMG_jj_dphi",  &truthloMG_jj_dphi);
+    m_tree_out->Branch("truthloMG_j2_pt",    &truthloMG_j2_pt);
   }else{
     truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0;
   }
@@ -510,7 +513,13 @@ StatusCode VBFAnalysisAlg::execute() {
   truth_jj_mass =-1.0;
   truth_jj_dphi = -1.0;
   truth_j2_pt = -1.0;
+
+  truthloMG_jj_mass =-1.0;
+  truthloMG_jj_dphi = -1.0;
+  truthloMG_j2_pt = -1.0;
   if(m_isMC && truth_jet_pt && truth_jet_pt->size()>1){
+    TVector3 tvlep;
+    vector<TLorentzVector> lomg_jets;
     TLorentzVector tmp, jjtruth;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
     jjtruth = tmp;
@@ -519,7 +528,30 @@ StatusCode VBFAnalysisAlg::execute() {
     truth_j2_pt = truth_jet_pt->at(1);
     jjtruth += tmp;
     truth_jj_mass =jjtruth.M();
-  }
+    // the LO MG filtering required overlap with electrons and taus. we need to implement this for the merging
+    for(unsigned itjet=0; itjet<truth_jet_pt->size(); ++itjet){
+      bool passOR_truthjet=true;
+      tmp.SetPtEtaPhiM(truth_jet_pt->at(itjet), truth_jet_eta->at(itjet),truth_jet_phi->at(itjet),truth_jet_m->at(itjet));
+      for(unsigned ittau=0; ittau<truth_tau_pt->size(); ++ittau){
+	if(fabs(truth_tau_eta->at(ittau))>5 || truth_tau_pt->at(ittau)<20.0e3) continue;
+	tvlep.SetPtEtaPhi(truth_tau_pt->at(ittau), truth_tau_eta->at(ittau),truth_tau_phi->at(ittau));
+	if(tvlep.DeltaR(tmp.Vect())<0.3){ passOR_truthjet=false; break; }
+      }
+      if(passOR_truthjet){
+	for(unsigned itele=0; itele<truth_el_pt->size(); ++itele){
+	  if(fabs(truth_el_eta->at(itele))>5 || truth_el_pt->at(itele)<20.0e3) continue;
+	  tvlep.SetPtEtaPhi(truth_el_pt->at(itele), truth_el_eta->at(itele),truth_el_phi->at(itele));
+	  if(tvlep.DeltaR(tmp.Vect())<0.3){ passOR_truthjet=false; break; }
+	}
+      }// end electron overlap check
+      if(passOR_truthjet) lomg_jets.push_back(tmp);
+    }// end truth jet loop
+    if(lomg_jets.size()>=2){
+      truthloMG_jj_mass = (lomg_jets.at(0)+lomg_jets.at(1)).M();
+      truthloMG_jj_dphi = fabs(lomg_jets.at(0).DeltaPhi(lomg_jets.at(1)));
+      truthloMG_j2_pt = lomg_jets.at(1).Pt();
+    }
+  }// end truth computation
 
   // MET trigger scale factor
   unsigned metRunNumber = randomRunNumber;
@@ -608,7 +640,8 @@ StatusCode VBFAnalysisAlg::execute() {
       NgenCorrected = Ngen[runNumber];
       bool passMGFilter = false;
       //if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && passVjetsFilter) ) { NgenCorrected=0.0; weight=0;  return StatusCode::SUCCESS; } // remove events.
-      if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truth_j2_pt>35.0e3 && truth_jj_dphi<2.5 && truth_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events.
+      //if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truth_j2_pt>35.0e3 && truth_jj_dphi<2.5 && truth_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events.
+      if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events.
       if(mg_filter_lo_np01.find(runNumber)!=mg_filter_lo_np01.end() && (MGVTruthPt<100.0e3) ) { weight=-1; return StatusCode::SUCCESS; } // remove events.
     } else {
       NgenCorrected = Ngen[runNumber];

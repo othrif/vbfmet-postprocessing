@@ -77,7 +77,7 @@ class sample(object):
                 self.sampleType = "VqqGam" 
             elif (self.runNumber >= 364156 and self.runNumber <= 364197):
                 self.sampleType = "W_strong"
-            elif (self.runNumber >= 363600 and self.runNumber <= 363671):
+            elif (self.runNumber >= 363600 and self.runNumber <= 363671) or (self.runNumber >= 311445 and self.runNumber <= 311453):
                 self.sampleType = "W_strong" # madgraph
             elif (self.runNumber >= 308092 and self.runNumber <= 308095):
                 self.sampleType = "Z_EWK"

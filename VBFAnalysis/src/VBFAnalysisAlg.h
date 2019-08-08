@@ -214,6 +214,9 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Double_t truth_jj_mass=-9999;
   Double_t truth_jj_dphi=-9999;
   Double_t truth_j2_pt=-9999;
+  Double_t truthloMG_jj_mass=-9999;
+  Double_t truthloMG_jj_dphi=-9999;
+  Double_t truthloMG_j2_pt=-9999;
 
   // optimization variables
   std::vector<Float_t>* j3_centrality;
