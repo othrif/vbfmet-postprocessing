@@ -1,5 +1,5 @@
 #!/bin/bash                                                                                                                                                                                                       
-OUTDIRM=v28PFlow
+OUTDIRM=v26LooseNoTrigMuSF
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
