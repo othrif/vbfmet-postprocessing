@@ -393,6 +393,8 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("truth_jet_phi",&truth_jet_phi);
     m_tree_out->Branch("truth_jet_m",  &truth_jet_m);
     m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
+    m_tree_out->Branch("truth_jj_dphi",  &truth_jj_dphi);
+    m_tree_out->Branch("truth_j2_pt",  &truth_j2_pt);
   }else{
     truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0;
   }
@@ -443,11 +445,23 @@ StatusCode VBFAnalysisAlg::MapNgen(){
     //std::cout << "input: " << dsid << " " << N << std::endl;
    }
   if(m_UseExtMGVjet){
+
+    std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
+    std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
     Ngen_filter.clear();
     TIter next(f->GetListOfKeys());
     TKey *key;
     while ((key = (TKey*)next())) {
-      std::cout << "my key: " << key->GetName() << std::endl;
+      std::string the_dsid = std::string(key->GetName());
+      if(the_dsid.find("skim_")==std::string::npos) continue;
+      the_dsid.erase(0,5); // remove "skim_"
+      int dsid = std::stoi(the_dsid);
+      std::cout << "Skimming histograms for merging are being loaded for key: " << key->GetName() << std::endl;
+      Ngen_filter[dsid]=static_cast<TH1D*>(f->Get(key->GetName()));
+      // printing info
+      if(mg_filter_lo_np01.find(dsid)!=mg_filter_lo_np01.end() || mg_filter_lo_np234.find(dsid)!=mg_filter_lo_np234.end()){
+	std::cout << "Ngen: " << Ngen[dsid] << " filtered: " << Ngen_filter[dsid]->GetBinContent(21) << " " << Ngen_filter[dsid]->GetBinContent(22) << std::endl;
+      }
     }
   }
 
@@ -494,11 +508,15 @@ StatusCode VBFAnalysisAlg::execute() {
 
   // Fill
   truth_jj_mass =-1.0;
+  truth_jj_dphi = -1.0;
+  truth_j2_pt = -1.0;
   if(m_isMC && truth_jet_pt && truth_jet_pt->size()>1){
     TLorentzVector tmp, jjtruth;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
     jjtruth = tmp;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(1), truth_jet_eta->at(1),truth_jet_phi->at(1),truth_jet_m->at(1));
+    truth_jj_dphi = fabs(jjtruth.DeltaPhi(tmp));
+    truth_j2_pt = truth_jet_pt->at(1);
     jjtruth += tmp;
     truth_jj_mass =jjtruth.M();
   }
@@ -583,6 +601,15 @@ StatusCode VBFAnalysisAlg::execute() {
       } else {
 	NgenCorrected = Ngen[runNumber];
       }
+    } else if(m_UseExtMGVjet){
+
+      std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
+      std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
+      NgenCorrected = Ngen[runNumber];
+      bool passMGFilter = false;
+      //if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && passVjetsFilter) ) { NgenCorrected=0.0; weight=0;  return StatusCode::SUCCESS; } // remove events.
+      if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truth_j2_pt>35.0e3 && truth_jj_dphi<2.5 && truth_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events.
+      if(mg_filter_lo_np01.find(runNumber)!=mg_filter_lo_np01.end() && (MGVTruthPt<100.0e3) ) { weight=-1; return StatusCode::SUCCESS; } // remove events.
     } else {
       NgenCorrected = Ngen[runNumber];
     }
