@@ -298,12 +298,14 @@ StatusCode HFInputAlg::execute() {
     }
   }
   xeSFTrigWeight=1.0;
+  xeSFTrigWeight_nomu=1.0;
   unsigned metRunNumber = randomRunNumber;
   if(!isMC) metRunNumber=runNumber;
   if(isMC){ // the MET trigger SF is turned off in the up variation. so it will be =1.
     xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 0); // met was used in the end instead of jj.Pt() 
-    if(currentVariation=="xeSFTrigWeight__1up")   xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 1);
-    if(currentVariation=="xeSFTrigWeight__1down") xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 2);
+    xeSFTrigWeight_nomu = weightXETrigSF(met_tst_nolep_et, metRunNumber, 0); // met was used in the end instead of jj.Pt() 
+    if(currentVariation=="xeSFTrigWeight__1up")   { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 1); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_et, metRunNumber, 1); }
+    if(currentVariation=="xeSFTrigWeight__1down") { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 2); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_et, metRunNumber, 2); }
   }
 
   // MET choice to be implemented...
@@ -319,10 +321,11 @@ StatusCode HFInputAlg::execute() {
   bool trigger_lep_Zee_bool = trigger_lep_bool;
   bool trigger_lep_Zmm_bool = trigger_lep_bool;
   bool trigger_lep_Wmu_bool = trigger_lep_bool;
+  if(m_extraVars<=5) xeSFTrigWeight_nomu=1.0;
   if(m_extraVars>=5) { trigger_lep_Zmm_bool = (trigger_lep>0);  trigger_lep_Zee_bool = (trigger_lep>0); }
-
   if(m_extraVars==6) { trigger_lep_Zmm_bool=((trigger_met &0x1) == 0x1); trigger_lep_Wmu_bool = ((trigger_met &0x1) == 0x1); }
   if(m_extraVars==7 && ((trigger_met &0x1) == 0x1)){ trigger_lep_Zmm_bool=true; trigger_lep_Wmu_bool=true; }
+  if(m_extraVars==7 && !((trigger_met &0x1) == 0x1)){ xeSFTrigWeight_nomu=1.0; } // remove the MET trigger SF for non-met triggered events
   // compute the mll
   float mll=-999.0;
   TLorentzVector l0, l1;
@@ -399,7 +402,6 @@ StatusCode HFInputAlg::execute() {
   if ((trigger_lep_Zee_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
   if ((trigger_lep_Zmm_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
 
-
   // do duplicate check
   if(doDuplicateCheck){
     if(CRZee || CRZmm) std::cout << "ZCR " << runNumber << " " << eventNumber << std::endl;
@@ -433,10 +435,10 @@ StatusCode HFInputAlg::execute() {
   if (CRWen) HistoFill(hCRWen[bin],w_final);
   if (CRWepLowSig) HistoFill(hCRWepLowSig[bin],w_final);
   if (CRWenLowSig) HistoFill(hCRWenLowSig[bin],w_final);
-  if (CRWmp) HistoFill(hCRWmp[bin],w_final);
-  if (CRWmn) HistoFill(hCRWmn[bin],w_final);
+  if (CRWmp) HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu);
+  if (CRWmn) HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu);
   if (CRZee) HistoFill(hCRZee[bin],w_final);
-  if (CRZmm) HistoFill(hCRZmm[bin],w_final);
+  if (CRZmm) HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu);
 
   setFilterPassed(true); //if got here, assume that means algorithm passed
   return StatusCode::SUCCESS;

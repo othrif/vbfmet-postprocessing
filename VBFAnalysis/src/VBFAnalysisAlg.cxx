@@ -940,7 +940,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }else{ eleANTISF=1.0; }
 
   float tmpD_muSFTrigWeight = muSFTrigWeight;
-  if(m_oneTrigMuon) tmpD_muSFTrigWeight=1.0;
+  if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
   w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight;
 
   if(m_theoVariation){
@@ -1018,7 +1018,7 @@ StatusCode VBFAnalysisAlg::execute() {
       }else{ tmp_eleANTISF=1.0; }
     }
 
-    if(m_oneTrigMuon) tmp_muSFTrigWeight=1.0;
+    if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight);
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight;
