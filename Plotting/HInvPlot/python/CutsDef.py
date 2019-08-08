@@ -254,6 +254,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
             if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5':
+                #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
                 cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
                 cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
             if basic_cuts.analysis=='mjj1500TrigTest':
