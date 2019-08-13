@@ -592,7 +592,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
-  if(m_isMC && met_truth_et>-0.5 && (runNumber==308567 || (runNumber>=308275 && runNumber<=308283))){
+  if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567 || (runNumber>=308275 && runNumber<=308283))){
     nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
 
