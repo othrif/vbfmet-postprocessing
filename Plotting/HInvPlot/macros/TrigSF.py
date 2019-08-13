@@ -248,7 +248,8 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(36.1e3/1.0e3))
+        #a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(36.1e3/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(40e3/1.0e3))        
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -479,11 +480,18 @@ if __name__ == "__main__":
     #v28Loose_metsf_VBFTopo.root
     trig='VBFTopo'
     #trig='VBFTopo'
-    fname ='v28Loose_metsf_VBFMETUniq' #v28Loose_metsf_VBFTopo.root
+    fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
     XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
-    fname ='v28Loose_metsf_VBFTopo' #v28Loose_metsf_VBFTopo.root
+    fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
     VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
-    fname ='v28Loose_metsf_VBFTopoUniq' #v28Loose_metsf_VBFTopo.root
-    VBFTopoUniq_u_tenac = DrawSF(can, trig, lep, mvar, fname)        
+    #fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
+    #VBFTopoUniq_u_tenac = DrawSF(can, trig, lep, mvar, fname)        
 
-    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3],VBFTopoUniq_u_tenac[3]],['#mu XE','#mu XEORVBF','VBF Unique'],'xeComparison_SF', ytitle='Trigger Eff.',trig='xe,VBFOR')
+    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['#mu XE','#mu XEORVBF'],'xeComparison_mu_SF', ytitle='Trigger Eff.',trig='xe,VBFOR')
+
+    lep='e'
+    fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
+    XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
+    VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['e XE','e XEORVBF'],'xeComparison_e_SF', ytitle='Trigger Eff.',trig='xe,VBFOR')    
