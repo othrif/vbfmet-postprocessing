@@ -20,6 +20,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "normFile", m_normFile = "current.root", "path to a file with the number of events processed" );
   declareProperty( "mcCampaign", m_mcCampaign = "mc16a", "mcCampaign of the mc sample. only read if isMC is true" );
   declareProperty( "UseExtMC", m_UseExtMC = false, "Use extended MC samples");
+  declareProperty( "UseExtMGVjet", m_UseExtMGVjet = false, "Use extended LO MG extension");
   declareProperty( "theoVariation", m_theoVariation = false, "Do theory systematic variations");
   declareProperty( "oneTrigMuon", m_oneTrigMuon = false, "Trigger muon SF set to 1");
 }
@@ -179,12 +180,14 @@ StatusCode VBFAnalysisAlg::initialize() {
   truth_tau_pt= new std::vector<float>(0);
   truth_tau_eta= new std::vector<float>(0);
   truth_tau_phi= new std::vector<float>(0);
+  truth_tau_status= new std::vector<int>(0);
   truth_mu_pt= new std::vector<float>(0);
   truth_mu_eta= new std::vector<float>(0);
   truth_mu_phi= new std::vector<float>(0);
   truth_el_pt= new std::vector<float>(0);
   truth_el_eta= new std::vector<float>(0);
   truth_el_phi= new std::vector<float>(0);
+  truth_el_status= new std::vector<int>(0);
 
   outtau_pt = new std::vector<float>(0);
   outtau_phi = new std::vector<float>(0);
@@ -392,6 +395,11 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("truth_jet_phi",&truth_jet_phi);
     m_tree_out->Branch("truth_jet_m",  &truth_jet_m);
     m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
+    m_tree_out->Branch("truth_jj_dphi",  &truth_jj_dphi);
+    m_tree_out->Branch("truth_j2_pt",  &truth_j2_pt);
+    m_tree_out->Branch("truthloMG_jj_mass",  &truthloMG_jj_mass);
+    m_tree_out->Branch("truthloMG_jj_dphi",  &truthloMG_jj_dphi);
+    m_tree_out->Branch("truthloMG_j2_pt",    &truthloMG_j2_pt);
   }else{
     truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0;
   }
@@ -441,6 +449,26 @@ StatusCode VBFAnalysisAlg::MapNgen(){
     Ngen[dsid]=N;
     //std::cout << "input: " << dsid << " " << N << std::endl;
    }
+  if(m_UseExtMGVjet){
+
+    std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
+    std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
+    Ngen_filter.clear();
+    TIter next(f->GetListOfKeys());
+    TKey *key;
+    while ((key = (TKey*)next())) {
+      std::string the_dsid = std::string(key->GetName());
+      if(the_dsid.find("skim_")==std::string::npos) continue;
+      the_dsid.erase(0,5); // remove "skim_"
+      int dsid = std::stoi(the_dsid);
+      std::cout << "Skimming histograms for merging are being loaded for key: " << key->GetName() << std::endl;
+      Ngen_filter[dsid]=static_cast<TH1D*>(f->Get(key->GetName()));
+      // printing info
+      if(mg_filter_lo_np01.find(dsid)!=mg_filter_lo_np01.end() || mg_filter_lo_np234.find(dsid)!=mg_filter_lo_np234.end()){
+	std::cout << "Ngen: " << Ngen[dsid] << " filtered: " << Ngen_filter[dsid]->GetBinContent(21) << " " << Ngen_filter[dsid]->GetBinContent(22) << std::endl;
+      }
+    }
+  }
 
   return StatusCode::SUCCESS;
 
@@ -485,14 +513,66 @@ StatusCode VBFAnalysisAlg::execute() {
 
   // Fill
   truth_jj_mass =-1.0;
+  truth_jj_dphi = -1.0;
+  truth_j2_pt = -1.0;
+
+  truthloMG_jj_mass =-1.0;
+  truthloMG_jj_dphi = -1.0;
+  truthloMG_j2_pt = -1.0;
   if(m_isMC && truth_jet_pt && truth_jet_pt->size()>1){
+    TVector3 tvlep;
+    vector<TLorentzVector> lomg_jets;
     TLorentzVector tmp, jjtruth;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(0), truth_jet_eta->at(0),truth_jet_phi->at(0),truth_jet_m->at(0));
     jjtruth = tmp;
     tmp.SetPtEtaPhiM(truth_jet_pt->at(1), truth_jet_eta->at(1),truth_jet_phi->at(1),truth_jet_m->at(1));
+    truth_jj_dphi = fabs(jjtruth.DeltaPhi(tmp));
+    truth_j2_pt = truth_jet_pt->at(1);
     jjtruth += tmp;
     truth_jj_mass =jjtruth.M();
-  }
+    // the LO MG filtering required overlap with electrons and taus. we need to implement this for the merging
+    for(unsigned itjet=0; itjet<truth_jet_pt->size(); ++itjet){
+      bool passOR_truthjet=true;
+      tmp.SetPtEtaPhiM(truth_jet_pt->at(itjet), truth_jet_eta->at(itjet),truth_jet_phi->at(itjet),truth_jet_m->at(itjet));
+      for(unsigned ittau=0; ittau<truth_tau_pt->size(); ++ittau){
+	if(fabs(truth_tau_eta->at(ittau))>5 || truth_tau_pt->at(ittau)<20.0e3) continue;
+	tvlep.SetPtEtaPhi(truth_tau_pt->at(ittau), truth_tau_eta->at(ittau),truth_tau_phi->at(ittau));
+	if(tvlep.DeltaR(tmp.Vect())<0.3){ passOR_truthjet=false; break; }
+      }
+      if(passOR_truthjet){
+	for(unsigned itele=0; itele<truth_el_pt->size(); ++itele){
+	  if(fabs(truth_el_eta->at(itele))>5 || truth_el_pt->at(itele)<20.0e3) continue;
+	  tvlep.SetPtEtaPhi(truth_el_pt->at(itele), truth_el_eta->at(itele),truth_el_phi->at(itele));
+	  if(tvlep.DeltaR(tmp.Vect())<0.3){ passOR_truthjet=false; break; }
+	}
+      }// end electron overlap check
+      if(passOR_truthjet) lomg_jets.push_back(tmp);
+    }// end truth jet loop
+    if(lomg_jets.size()>=2){
+      truthloMG_jj_mass = (lomg_jets.at(0)+lomg_jets.at(1)).M();
+      truthloMG_jj_dphi = fabs(lomg_jets.at(0).DeltaPhi(lomg_jets.at(1)));
+      truthloMG_j2_pt = lomg_jets.at(1).Pt();
+    }
+    if(false && truthloMG_jj_mass<800.0e3){
+      for(unsigned itjet=0; itjet<truth_jet_pt->size(); ++itjet){
+	std::cout << "  jet " << itjet << " pt: " << truth_jet_pt->at(itjet) << " eta: " << truth_jet_eta->at(itjet) << " phi: " << truth_jet_phi->at(itjet) << std::endl;
+	tmp.SetPtEtaPhiM(truth_jet_pt->at(itjet), truth_jet_eta->at(itjet),truth_jet_phi->at(itjet),truth_jet_m->at(itjet));
+	for(unsigned ittau=0; ittau<truth_tau_pt->size(); ++ittau){
+	  if(fabs(truth_tau_eta->at(ittau))>5 || truth_tau_pt->at(ittau)<20.0e3) continue;
+	  tvlep.SetPtEtaPhi(truth_tau_pt->at(ittau), truth_tau_eta->at(ittau),truth_tau_phi->at(ittau));
+	  std::cout << "     tau " << ittau << " pt: " << truth_tau_pt->at(ittau) <<" eta: " << truth_tau_eta->at(ittau) <<" phi: " << truth_tau_phi->at(ittau) 
+		    << "status: " << truth_tau_status->at(ittau) << " dr: " << tvlep.DeltaR(tmp.Vect()) <<std::endl;
+	}
+	for(unsigned itele=0; itele<truth_el_pt->size(); ++itele){
+          if(fabs(truth_el_eta->at(itele))>5 || truth_el_pt->at(itele)<20.0e3) continue;
+          tvlep.SetPtEtaPhi(truth_el_pt->at(itele), truth_el_eta->at(itele),truth_el_phi->at(itele));
+	  std::cout << "       ele " << itele << " pt: " << truth_el_pt->at(itele) <<" eta: " << truth_el_eta->at(itele) <<" phi: " << truth_el_phi->at(itele) 
+		    << "status: " << truth_el_status->at(itele) << " dr: " << tvlep.DeltaR(tmp.Vect()) <<std::endl;
+	}
+      }
+    } // end check
+    
+  }// end truth computation
 
   // MET trigger scale factor
   unsigned metRunNumber = randomRunNumber;
@@ -562,7 +642,7 @@ StatusCode VBFAnalysisAlg::execute() {
       if (index_f < samplesfilter.size()){
 	if(Ngen[runNumber]>0 && Ngen[samplesinclusive.at(index_f)] > 0){
 	  NgenCorrected = (Ngen[runNumber]/filtereffs.at(index_f)+Ngen[samplesinclusive.at(index_f)])*filtereffs.at(index_f);
-      }
+	}
       } else if (index_i < samplesinclusive.size()){
 	if (passVjetsFilter) {
 	  if(Ngen[runNumber]>0 && Ngen[samplesfilter.at(index_i)] > 0){
@@ -574,6 +654,16 @@ StatusCode VBFAnalysisAlg::execute() {
       } else {
 	NgenCorrected = Ngen[runNumber];
       }
+    } else if(m_UseExtMGVjet){
+
+      std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
+      std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
+      NgenCorrected = Ngen[runNumber];
+      bool passMGFilter = false;
+      //if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && passVjetsFilter) ) { NgenCorrected=0.0; weight=0;  return StatusCode::SUCCESS; } // remove events.
+      //if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truth_j2_pt>35.0e3 && truth_jj_dphi<2.5 && truth_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events.
+      if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events.
+      if(mg_filter_lo_np01.find(runNumber)!=mg_filter_lo_np01.end() && (MGVTruthPt<100.0e3) ) { weight=-1; return StatusCode::SUCCESS; } // remove events.
     } else {
       NgenCorrected = Ngen[runNumber];
     }
@@ -903,8 +993,9 @@ StatusCode VBFAnalysisAlg::execute() {
     if(!(n_baseel==0 && n_basemu==0)) eleANTISF=1.0;
   }else{ eleANTISF=1.0; }
 
-  if(m_oneTrigMuon) muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*muSFTrigWeight*eleANTISF*nloEWKWeight;
+  float tmpD_muSFTrigWeight = muSFTrigWeight;
+  if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
+  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight;
 
   if(m_theoVariation){
     std::map<TString,bool> regDecision;
@@ -981,7 +1072,7 @@ StatusCode VBFAnalysisAlg::execute() {
       }else{ tmp_eleANTISF=1.0; }
     }
 
-    if(m_oneTrigMuon) tmp_muSFTrigWeight=1.0;
+    if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight);
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight;
@@ -1099,6 +1190,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("passBatman", 1);
   m_tree->SetBranchStatus("passVjetsFilter", 1);
   m_tree->SetBranchStatus("passVjetsPTV", 1);
+  m_tree->SetBranchStatus("MGVTruthPt", 1);
+  m_tree->SetBranchStatus("SherpaVTruthPt", 1);
+  m_tree->SetBranchStatus("in_vy_overlap", 1);
+  m_tree->SetBranchStatus("in_vy_overlap_iso", 1);
+  m_tree->SetBranchStatus("FlavourFilter", 1);
   m_tree->SetBranchStatus("passGRL", 1);
   m_tree->SetBranchStatus("passPV", 1);
   m_tree->SetBranchStatus("passDetErr", 1);
@@ -1217,9 +1313,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       m_tree->SetBranchStatus("truth_tau_pt", 1);
       m_tree->SetBranchStatus("truth_tau_eta",1);
       m_tree->SetBranchStatus("truth_tau_phi",1);
+      m_tree->SetBranchStatus("truth_tau_status",1);
       m_tree->SetBranchStatus("truth_el_pt",  1);
       m_tree->SetBranchStatus("truth_el_eta", 1);
       m_tree->SetBranchStatus("truth_el_phi", 1);
+      m_tree->SetBranchStatus("truth_el_status", 1);
       m_tree->SetBranchStatus("truth_mu_pt",  1);
       m_tree->SetBranchStatus("truth_mu_eta", 1);
       m_tree->SetBranchStatus("truth_mu_phi", 1);
@@ -1266,6 +1364,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("passBatman", &passBatman);
   m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
   m_tree->SetBranchAddress("passVjetsPTV", &passVjetsPTV);
+  m_tree->SetBranchAddress("MGVTruthPt", &MGVTruthPt);
+  m_tree->SetBranchAddress("SherpaVTruthPt", &SherpaVTruthPt);
+  m_tree->SetBranchAddress("in_vy_overlap", &in_vy_overlap);
+  m_tree->SetBranchAddress("in_vy_overlap_iso", &in_vy_overlap_iso);
+  m_tree->SetBranchAddress("FlavourFilter", &FlavourFilter);
   m_tree->SetBranchAddress("passGRL", &passGRL);
   m_tree->SetBranchAddress("passPV", &passPV);
   m_tree->SetBranchAddress("passDetErr", &passDetErr);
@@ -1401,9 +1504,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       m_tree->SetBranchAddress("truth_tau_pt", &truth_tau_pt);
       m_tree->SetBranchAddress("truth_tau_eta",&truth_tau_eta);
       m_tree->SetBranchAddress("truth_tau_phi",&truth_tau_phi);
+      m_tree->SetBranchAddress("truth_tau_status",&truth_tau_status);
       m_tree->SetBranchAddress("truth_el_pt", &truth_el_pt);
       m_tree->SetBranchAddress("truth_el_eta",&truth_el_eta);
       m_tree->SetBranchAddress("truth_el_phi",&truth_el_phi);
+      m_tree->SetBranchAddress("truth_el_status",&truth_el_status);
       m_tree->SetBranchAddress("truth_mu_pt", &truth_mu_pt);
       m_tree->SetBranchAddress("truth_mu_eta",&truth_mu_eta);
       m_tree->SetBranchAddress("truth_mu_phi",&truth_mu_phi);

@@ -635,12 +635,12 @@ void Msl::PassEvent::PrintEvents(const Mva::Sample &sample, std::ostream &os) co
     //
     const Event &event = fEvents.at(i);
     
-    //if(sample == event.sample) {
-    //  icount++;
-    //  os << std::setw( 6)   << event.RunNumber   << ", "
-    //	 << std::setw(10)   << event.EventNumber << ", "
-    //	 << endl;
-    //}
+    if(sample == event.sample) {
+      icount++;
+      os << std::setw( 6)   << event.RunNumber   << ", "
+    	 << std::setw(10)   << event.EventNumber << ", "
+    	 << endl;
+    }
   }
   
   os << "PrintEvents - printed " << icount << " event(s)" << endl;

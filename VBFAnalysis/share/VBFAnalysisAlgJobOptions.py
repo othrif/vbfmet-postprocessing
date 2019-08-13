@@ -19,6 +19,7 @@ arg_group.add_argument("--currentVariation", dest='currentVariation', default="N
 arg_group.add_argument("--normFile", dest='normFile', default="current.root", help="file with the total number of event processed")
 arg_group.add_argument("--containerName", dest='containerName', default="", help="container name used to look up the sample ID if not in the file path")
 arg_group.add_argument("--UseExtMC", dest="UseExtMC", action="store_true",default=False,help="Use extended MC samples")
+arg_group.add_argument("--UseExtMGVjet", dest="UseExtMGVjet", action="store_true",default=False,help="Use extended LO MG samples")
 arg_group.add_argument("--METTrigPassThru", dest="METTrigPassThru", action="store_true",default=False,help="Pass through for the met trigger skim")
 arg_group.add_argument("--QGTagger", dest="QGTagger", action="store_true",default=False,help="Run the QGTagger when true")
 arg_group.add_argument("--TightSkim", dest="TightSkim", action="store_true",default=False,help="Run TightSkim when set to true")
@@ -59,6 +60,7 @@ athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                    LooseSkim = (not args.TightSkim),
                                    ExtraVars=True,
                                    UseExtMC=args.UseExtMC,
+                                   UseExtMGVjet=args.UseExtMGVjet,
                                    METTrigPassThru=args.METTrigPassThru,
                                    QGTagger=args.QGTagger,
                                    oneTrigMuon=args.oneTrigMuon,

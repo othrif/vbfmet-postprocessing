@@ -89,6 +89,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t m_metdef = 0;
 
   Double_t xeSFTrigWeight;
+  Double_t xeSFTrigWeight_nomu;
   Float_t met_significance;
   Int_t trigger_met;
   Float_t w;
