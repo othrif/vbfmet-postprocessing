@@ -87,9 +87,9 @@ class sample(object):
                 self.sampleType = "Z_strong"
             elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)) or (self.runNumber>=410642 and self.runNumber<=410649) or self.runNumber==410642 or self.runNumber==410643:
                 self.sampleType = "ttbar"
-            elif ((self.runNumber == 308276) or (self.runNumber == 308567)):
+            elif ((self.runNumber == 308276) or (self.runNumber == 308567)) or self.runNumber==346600:
                 self.sampleType = "VBFH125"
-            elif ((self.runNumber >= 308275) and self.runNumber <= 308283) or self.runNumber==346600: 
+            elif ((self.runNumber >= 308275) and self.runNumber <= 308283):
                 self.sampleType = "VBFHOther"
             elif (self.runNumber == 308284) or self.runNumber==346588:
                 self.sampleType = "ggFH125"
