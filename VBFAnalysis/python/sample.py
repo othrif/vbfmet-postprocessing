@@ -60,6 +60,7 @@ class sample(object):
             else:
                 self.isMC = True
         if (self.isMC):
+            print "runNumebr::: ",self.runNumber
             if ((self.runNumber >= 308096 and self.runNumber <= 308098) or (self.runNumber == 363489)):
                 self.sampleType = "W_EWK"
             elif (self.runNumber >= 364500 and self.runNumber <= 364519):
@@ -76,23 +77,23 @@ class sample(object):
                 self.sampleType = "VqqGam" 
             elif (self.runNumber >= 364156 and self.runNumber <= 364197):
                 self.sampleType = "W_strong"
-            elif (self.runNumber >= 363600 and self.runNumber <= 363671):
+            elif (self.runNumber >= 363600 and self.runNumber <= 363671) or (self.runNumber >= 311445 and self.runNumber <= 311453):
                 self.sampleType = "W_strong" # madgraph
             elif (self.runNumber >= 308092 and self.runNumber <= 308095):
                 self.sampleType = "Z_EWK"
             elif (self.runNumber >= 345099 and self.runNumber <= 345102):
                 self.sampleType = "Z_strong_VBFFilt"
-            elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515) or (self.runNumber>=366010 and self.runNumber<=366035):
+            elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515) or (self.runNumber>=366010 and self.runNumber<=366035) or (self.runNumber>=311429 and self.runNumber<=311444):
                 self.sampleType = "Z_strong"
             elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)) or (self.runNumber>=410642 and self.runNumber<=410649) or self.runNumber==410642 or self.runNumber==410643:
                 self.sampleType = "ttbar"
-            elif ((self.runNumber == 308276) or (self.runNumber == 308567)):
+            elif ((self.runNumber == 308276) or (self.runNumber == 308567)) or self.runNumber==346600:
                 self.sampleType = "VBFH125"
-            elif ((self.runNumber >= 308275) and self.runNumber <= 308283): 
+            elif ((self.runNumber >= 308275) and self.runNumber <= 308283):
                 self.sampleType = "VBFHOther"
-            elif (self.runNumber == 308284):
+            elif (self.runNumber == 308284) or self.runNumber==346588:
                 self.sampleType = "ggFH125"
-            elif ((self.runNumber == 308071) or (self.runNumber == 308072) or (self.runNumber == 308070)):
+            elif ((self.runNumber == 308071) or (self.runNumber == 308072) or (self.runNumber == 308070)) or (self.runNumber>=345038 and self.runNumber<=345040):
                 self.sampleType = "VH125"
             elif (self.runNumber >= 361020 and self.runNumber <= 361032) or self.runNumber==310502 or self.runNumber==304784:
                 self.sampleType = "QCDw"
@@ -102,7 +103,7 @@ class sample(object):
                 self.sampleType = "ttbar" # VV moved to ttbar+other
             elif (self.runNumber >= 364242 and self.runNumber <= 364249 or self.runNumber==364253):
                 self.sampleType = "ttbar" # VVV moved to ttbar+other
-            elif (self.runNumber == 410658 or self.runNumber <= 410659):
+            elif (self.runNumber == 410658 or self.runNumber == 410659):
                 self.sampleType = "ttbar" # tchan top
             elif (self.runNumber >= 364198 and self.runNumber <= 364215):
                 self.sampleType = "Z_strong" # Z_strong_LowMass added to the Z_strong
@@ -129,7 +130,7 @@ class sample(object):
                 self.sampleType = "ERROR"
         else:
             self.sampleType = "data"
-
+        print 'self.sampleType::::',self.sampleType
     def getisMC(self):
         return self.isMC
     def getsampleType(self):

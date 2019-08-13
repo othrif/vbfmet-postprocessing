@@ -194,6 +194,11 @@ def getHistPars(hist):
         #
         # Kinematics histograms
         #
+        # Note on option: LtoRCut 0 cuts for values > thr
+        #                         1 cuts for values < thr
+        #                         2 bin-by-bin significance
+        #                         3 tried to combine bins to one value - use with care especially with many bins
+        #                         4 adds every two bins together
         'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5}, #5
         'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
         'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
@@ -219,7 +224,9 @@ def getHistPars(hist):
         'n_jet_cenj40'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0,'ymin':0.1, 'logy':True,'LtoRCut':1},
-        'tmva'  : {'xtitle':'BDT Score',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        #'tmva'  : {'xtitle':'BDT Score',          'ytitle':'Events', 'rebin':0,'LtoRCut':0,'xmin':-0.4,'xmax':0.6,'ymin':0.01},
+        #'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':10,'LtoRCut':0,'xmin':0.0,'ymin':0.1},
+        'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':5,'LtoRCut':2,'xmin':0.0,'ymin':0.1},        
         'bcid'  : {'xtitle':'BCID',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'BCIDDistanceFromFront'  : {'xtitle':'Distance from front of Train','ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
@@ -246,6 +253,7 @@ def getHistPars(hist):
         'met_tst_nolep_phi'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':0},
+        'jj_mass_variableBin'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},
         'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
@@ -1896,6 +1904,16 @@ class DrawStack:
                 self.legr.AddEntry(self.signif,'#sigma_{#mu} Stat 95% CL')
                 self.legr.AddEntry(self.signifCR,'#sigma_{#mu} w/ZCR 95% CL')
                 self.legr.Draw()
+                optv=0.0
+                for i in range(0,self.signifCR.GetNbinsX()+1):
+                    print 'Bin:',i,self.signifCR.GetBinContent(i)
+                    if abs(self.signifCR.GetNbinsX()+1 - i )<4:
+                        if optv>0.0 and self.signifCR.GetBinContent(i)>0.0:
+                            optv=1./math.sqrt((1./optv**2+(1./self.signifCR.GetBinContent(i))**2))
+                        elif self.signifCR.GetBinContent(i)>0.0:
+                            optv=self.signifCR.GetBinContent(i)
+                print 'combine last 3 bins: ',optv
+                        
             else:
                 self.ratio.Draw('same')
             self.pads[ipad].RedrawAxis()
@@ -2080,7 +2098,11 @@ class DrawStack:
         #    ['ymax']=self.stack.GetMaximum()
         if options.do_logy:
             self.stack.SetMinimum(0.1)
-        if 'xmax' in pars:
+        if 'xmax' in pars and 'xmin' in pars:
+            self.stack.GetXaxis().SetRangeUser(pars['xmin'],pars['xmax'])
+        elif 'xmin' in pars:
+            self.stack.GetXaxis().SetRangeUser(pars['xmin'],1.0)              
+        elif 'xmax' in pars:
             self.stack.GetXaxis().SetRangeUser(0.0,pars['xmax'])
         elif options.xmax != None:
             self.stack.GetXaxis().SetRangeUser(options.xmin,options.xmax)
@@ -2126,7 +2148,11 @@ class DrawStack:
             if 'line_style' in style:
                 h.SetLineStyle(style['line_style'])
 
-        if 'xmax' in pars:
+        if 'xmax' in pars and 'xmin' in pars:
+            h.GetXaxis().SetRangeUser(pars['xmin'],pars['xmax'])
+        elif 'xmin' in pars:
+            h.GetXaxis().SetRangeUser(pars['xmin'],1.0)            
+        elif 'xmax' in pars:
             h.GetXaxis().SetRangeUser(0.0,pars['xmax'])
         elif options.xmax != None:
             h.GetXaxis().SetRangeUser(options.xmin,options.xmax)

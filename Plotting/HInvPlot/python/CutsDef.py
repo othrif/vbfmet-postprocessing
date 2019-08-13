@@ -24,7 +24,7 @@ class BasicCuts:
 
     def __init__(self, Analysis, Chan, SameSign=0):
 
-        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest',
+        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest',
                             'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
                                 'njgt2',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
@@ -33,7 +33,7 @@ class BasicCuts:
                             'metsfVBFTopotrigOR','metsfxe110XE70trig','metsfxe110XE65trig',
                             'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
-
+        
         self.analysis = Analysis
         self.chan     = Chan
         self.SameSign = SameSign
@@ -44,11 +44,14 @@ class BasicCuts:
         self.DEtajjLowerCut   = 3.8
         self.DEtajjUpperCut   = -1.0
         self.NjetCut   = 'n_jet > 1 && n_jet < 5'
+        self.JetEta = ''
         if Analysis.count('metsf'):
             self.DEtajjLowerCut   = 3.5 # was 3.5
             self.MjjLowerCut   = 1000.0
-            #self.DEtajjLowerCut   = 4.2 # was 3.5
-            #self.MjjLowerCut   = 1500.0
+            if Analysis.count('VBFTopo'):
+                self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
+                self.DEtajjLowerCut   = 4.2 # was 3.5
+                self.MjjLowerCut   = 1500.0
             #self.NjetCut   = 'n_jet == 3'
         if Analysis.count('mjj1000'):
             self.MjjLowerCut   = 1000.0
@@ -79,6 +82,14 @@ class BasicCuts:
             self.MjjLowerCut   = 1500.0
             self.MjjUpperCut   = -1
             self.DEtajjLowerCut = 4.2 # remove
+            self.DPhijjUpperCut = 1.8
+            self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
+        if Analysis.count('mjj2000TrigTest'):
+            self.MjjLowerCut   = 2000.0
+            self.MjjUpperCut   = -1
+            self.DEtajjLowerCut = 4.2 # remove
+            self.DPhijjUpperCut = 2.0
+            self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
         if Analysis.count('mjj2000'):
             self.MjjLowerCut   = 2000.0
             self.MjjUpperCut   = -1.0
@@ -158,6 +169,19 @@ class BasicCuts:
     def GetNjetCut(self):
         cutNjet = CutItem('CutNjet', self.NjetCut)
         return [cutNjet]
+
+    def GetLeadJetEtaCut(self):
+        if self.JetEta!='':
+            if self.JetEta=='(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)':
+                cutJetEta0 = CutItem('CutJetEta01')
+                cutJetEta0.AddCut(CutItem('Low',   'jetEta0 < 3.2 && jetEta0 > -3.2'), 'OR')
+                cutJetEta0.AddCut(CutItem('High',  'jetEta1 < 3.2 && jetEta1 > -3.2'), 'OR')
+                return [cutJetEta0]
+            else:
+                cutJetEta0 = CutItem('CutJetEta0', self.JetEta)
+                return [cutJetEta0]
+        else:
+            return []
 
 #-------------------------------------------------------------------------
 def getLepChannelCuts(basic_cuts):
@@ -253,14 +277,16 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts += [CutItem('CutNjetCen',  'n_jet_cenj == 0')]
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
+            cuts += basic_cuts.GetLeadJetEtaCut()
             if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5':
+                #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
                 cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
                 cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
-            if basic_cuts.analysis=='mjj1500TrigTest':
+            if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest':
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 90.0')]
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 70.0')] # move to 50
             else:
-                cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]
+                cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]#80,50
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')] # move to 50
             #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
@@ -296,7 +322,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
     return cuts
 
 #-------------------------------------------------------------------------
-def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0):
+def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0, maxMET=-1):
     met_choice = options.met_choice # the met_choice is filled into this variable
     if isLep:
         met_choice=met_choice.replace('_tst','_tst_nolep')
@@ -317,6 +343,9 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0):
             cuts = [cutMET]
             #cuts += [CutItem('CutMetLow',       '%s > 100.0' %(options.met_choice))]
             cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > %s' %(cstCut))]
+    if maxMET>0.0:
+        cuts +=  [CutItem('CutMetMaxMET', '%s < %s' %(met_choice,maxMET))]
+
     return cuts
 
 #-------------------------------------------------------------------------
@@ -334,10 +363,12 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
         cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4', weight=apply_weight)]
     elif options.year==2018:
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 3', weight=apply_weight)]
-        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5', weight=apply_weight)] # use this one
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5')] 
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11')]
-        #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11 || trigger_met_encodedv2 == 5')]
+        if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest':
+            cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11 || trigger_met_encodedv2 == 5')]
+        else:
+            cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5', weight=apply_weight)] # use this one
     else:
         cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)] 
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
@@ -351,8 +382,8 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        if basic_cuts.analysis=='mjj1500TrigTest':
-            cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
+        if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest':
+            cuts += metCuts(basic_cuts,options,metCut=120.0, cstCut=100.0)#, maxMET=150.0)
         else:
             cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=120.0)
 
@@ -370,6 +401,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
             cuts += [CutItem('CutMETTrigRuns20', 'runPeriod == 20')]
             if basic_cuts.GetSelKey().count('trigOR'):
                 cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 11 || trigger_met_encodedv2 == 5')] 
+                #cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 5')]
             elif basic_cuts.GetSelKey().count('trig'): # this is broken!!!
                 cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 11')] 
         elif basic_cuts.GetSelKey().count('metsfxe110XE70'):
@@ -536,7 +568,10 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        cuts += metCuts(basic_cuts, options, True)
+        if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest':
+            cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=150.0)
+        else:
+            cuts += metCuts(basic_cuts, options, True)
 
     if not options.LoadBaseLep:
         if basic_cuts.chan=='ee':
@@ -566,7 +601,10 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
-        cuts += metCuts(basic_cuts,options, True)
+        if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest':
+            cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=150.0)
+        else:
+            cuts += metCuts(basic_cuts,options, True)
     if do_met_signif:
         cuts += [CutItem('CutMetSignif','met_significance > 4.0')]
     # VBF cuts
