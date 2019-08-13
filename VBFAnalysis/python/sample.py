@@ -89,11 +89,11 @@ class sample(object):
                 self.sampleType = "ttbar"
             elif ((self.runNumber == 308276) or (self.runNumber == 308567)):
                 self.sampleType = "VBFH125"
-            elif ((self.runNumber >= 308275) and self.runNumber <= 308283): 
+            elif ((self.runNumber >= 308275) and self.runNumber <= 308283) or self.runNumber==346600: 
                 self.sampleType = "VBFHOther"
-            elif (self.runNumber == 308284):
+            elif (self.runNumber == 308284) or self.runNumber==346588:
                 self.sampleType = "ggFH125"
-            elif ((self.runNumber == 308071) or (self.runNumber == 308072) or (self.runNumber == 308070)):
+            elif ((self.runNumber == 308071) or (self.runNumber == 308072) or (self.runNumber == 308070)) or (self.runNumber>=345038 and self.runNumber<=345040):
                 self.sampleType = "VH125"
             elif (self.runNumber >= 361020 and self.runNumber <= 361032) or self.runNumber==310502 or self.runNumber==304784:
                 self.sampleType = "QCDw"

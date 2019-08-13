@@ -180,12 +180,14 @@ StatusCode VBFAnalysisAlg::initialize() {
   truth_tau_pt= new std::vector<float>(0);
   truth_tau_eta= new std::vector<float>(0);
   truth_tau_phi= new std::vector<float>(0);
+  truth_tau_status= new std::vector<int>(0);
   truth_mu_pt= new std::vector<float>(0);
   truth_mu_eta= new std::vector<float>(0);
   truth_mu_phi= new std::vector<float>(0);
   truth_el_pt= new std::vector<float>(0);
   truth_el_eta= new std::vector<float>(0);
   truth_el_phi= new std::vector<float>(0);
+  truth_el_status= new std::vector<int>(0);
 
   outtau_pt = new std::vector<float>(0);
   outtau_phi = new std::vector<float>(0);
@@ -551,6 +553,25 @@ StatusCode VBFAnalysisAlg::execute() {
       truthloMG_jj_dphi = fabs(lomg_jets.at(0).DeltaPhi(lomg_jets.at(1)));
       truthloMG_j2_pt = lomg_jets.at(1).Pt();
     }
+    if(false && truthloMG_jj_mass<800.0e3){
+      for(unsigned itjet=0; itjet<truth_jet_pt->size(); ++itjet){
+	std::cout << "  jet " << itjet << " pt: " << truth_jet_pt->at(itjet) << " eta: " << truth_jet_eta->at(itjet) << " phi: " << truth_jet_phi->at(itjet) << std::endl;
+	tmp.SetPtEtaPhiM(truth_jet_pt->at(itjet), truth_jet_eta->at(itjet),truth_jet_phi->at(itjet),truth_jet_m->at(itjet));
+	for(unsigned ittau=0; ittau<truth_tau_pt->size(); ++ittau){
+	  if(fabs(truth_tau_eta->at(ittau))>5 || truth_tau_pt->at(ittau)<20.0e3) continue;
+	  tvlep.SetPtEtaPhi(truth_tau_pt->at(ittau), truth_tau_eta->at(ittau),truth_tau_phi->at(ittau));
+	  std::cout << "     tau " << ittau << " pt: " << truth_tau_pt->at(ittau) <<" eta: " << truth_tau_eta->at(ittau) <<" phi: " << truth_tau_phi->at(ittau) 
+		    << "status: " << truth_tau_status->at(ittau) << " dr: " << tvlep.DeltaR(tmp.Vect()) <<std::endl;
+	}
+	for(unsigned itele=0; itele<truth_el_pt->size(); ++itele){
+          if(fabs(truth_el_eta->at(itele))>5 || truth_el_pt->at(itele)<20.0e3) continue;
+          tvlep.SetPtEtaPhi(truth_el_pt->at(itele), truth_el_eta->at(itele),truth_el_phi->at(itele));
+	  std::cout << "       ele " << itele << " pt: " << truth_el_pt->at(itele) <<" eta: " << truth_el_eta->at(itele) <<" phi: " << truth_el_phi->at(itele) 
+		    << "status: " << truth_el_status->at(itele) << " dr: " << tvlep.DeltaR(tmp.Vect()) <<std::endl;
+	}
+      }
+    } // end check
+    
   }// end truth computation
 
   // MET trigger scale factor
@@ -1292,9 +1313,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       m_tree->SetBranchStatus("truth_tau_pt", 1);
       m_tree->SetBranchStatus("truth_tau_eta",1);
       m_tree->SetBranchStatus("truth_tau_phi",1);
+      m_tree->SetBranchStatus("truth_tau_status",1);
       m_tree->SetBranchStatus("truth_el_pt",  1);
       m_tree->SetBranchStatus("truth_el_eta", 1);
       m_tree->SetBranchStatus("truth_el_phi", 1);
+      m_tree->SetBranchStatus("truth_el_status", 1);
       m_tree->SetBranchStatus("truth_mu_pt",  1);
       m_tree->SetBranchStatus("truth_mu_eta", 1);
       m_tree->SetBranchStatus("truth_mu_phi", 1);
@@ -1481,9 +1504,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       m_tree->SetBranchAddress("truth_tau_pt", &truth_tau_pt);
       m_tree->SetBranchAddress("truth_tau_eta",&truth_tau_eta);
       m_tree->SetBranchAddress("truth_tau_phi",&truth_tau_phi);
+      m_tree->SetBranchAddress("truth_tau_status",&truth_tau_status);
       m_tree->SetBranchAddress("truth_el_pt", &truth_el_pt);
       m_tree->SetBranchAddress("truth_el_eta",&truth_el_eta);
       m_tree->SetBranchAddress("truth_el_phi",&truth_el_phi);
+      m_tree->SetBranchAddress("truth_el_status",&truth_el_status);
       m_tree->SetBranchAddress("truth_mu_pt", &truth_mu_pt);
       m_tree->SetBranchAddress("truth_mu_eta",&truth_mu_eta);
       m_tree->SetBranchAddress("truth_mu_phi",&truth_mu_phi);
