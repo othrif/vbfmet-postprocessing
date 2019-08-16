@@ -6,17 +6,19 @@ import pickle
 import ROOT
 import os,sys
 from array import array
-from custom_loss import focal_loss
+from custom_loss import *
 ann_score = array( 'f', [ 0.0 ] )
 
 # input directory
 #name_model='_VBFH125_Z_strong'
-name_model='_zstrong'
+#name_model='_zstrong'
+name_model = '_zstrong_ttbar_wstrong_zewk'
 #name_model='_zstrong'
 #name_model='_njet'
 #idir='/share/t3data2/schae/v26LooseNoExtSystMETTrigSYST/'
 idir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim/'
-odir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim_7var'+name_model+'/'
+#odir='/share/t3data2/schae/v26Loose_BTAGW_TightSkim_7var'+name_model+'/'
+odir='/home/smau/testarea/v26Loose_BTAGW_TightSkim'+name_model+'_v0/'
 if not os.path.exists(odir):
     os.mkdir(odir)
 dlist = os.listdir(idir)
@@ -26,7 +28,7 @@ from keras.models import load_model
 # identical to the previous one                          
 #model_dir='/home/smau/testarea/HInv/STPostProcessing/Plotting/ANN/'
 model_dir='./'
-model = load_model(model_dir+'model'+name_model+'.hf')
+model = load_model(model_dir+'model'+name_model+'.h5', custom_objects={'focal_loss': focal_loss, 'sig_eff': sig_eff})
 # load the scaler
 from sklearn.externals import joblib
 scaler = joblib.load(model_dir+'scaler'+name_model+'.save') 
@@ -48,9 +50,11 @@ for d in dlist:
             vbf=[]
             n=0
             for e in tree_in:
+                #COLS = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'jet_pt[0]', 'jet_pt[1]', 'met_soft_tst_et', 'jet_phi[0]', 'jet_phi[1]', 'maxCentrality', 'max_mj_over_mjj', 'met_cst_jet', 'met_tight_tst_et', 'met_tenacious_tst_et']
+
                 #vbf+=[[e.jj_mass/1.0e3,e.jj_deta,e.met_tst_et/1.0e3,e.jj_dphi,e.jet_pt[0]/1.0e3,e.jet_pt[1]/1.0e3]]
                 #'jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]'
-                vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_nolep_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1]]]
+                vbf+=[[e.jj_mass, e.jj_deta, e.jj_dphi, e.met_tst_nolep_et, e.jet_pt[0], e.jet_pt[1], e.met_soft_tst_et, e.jet_phi[0], e.jet_phi[1], e.n_jet, e.maxCentrality, e.max_mj_over_mjj, e.met_cst_jet, e.met_tight_tst_et, e.met_tenacious_tst_et]]
                 #vbf+=[[e.jj_mass,e.jj_deta,e.jj_dphi,e.met_tst_nolep_et,e.met_soft_tst_et,e.jet_pt[0],e.jet_pt[1],e.n_jet]]
                 n+=1
                 #if n>100:

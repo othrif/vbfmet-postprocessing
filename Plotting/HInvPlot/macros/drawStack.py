@@ -224,7 +224,7 @@ def getHistPars(hist):
         'n_jet_cenj40'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_cenj50'   : {'xtitle':'Number of Jets inside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0,'ymin':0.1, 'logy':True,'LtoRCut':1},
-        'tmva'  : {'xtitle':'BDT Score',          'ytitle':'Events', 'rebin':0,'LtoRCut':0,'xmin':-0.4,'xmax':0.6,'ymin':0.01},
+        'tmva'  : {'xtitle':'BDT Score',          'ytitle':'Events', 'rebin':0,'LtoRCut':0,'xmin':0.0,'xmax':1.0,'ymin':0.01},
         #'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':10,'LtoRCut':0,'xmin':0.0},
         #'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':10,'LtoRCut':2,'xmin':0.0},        
         'bcid'  : {'xtitle':'BCID',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},

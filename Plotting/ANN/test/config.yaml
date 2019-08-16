@@ -1,0 +1,14 @@
+outdir: 'zstrong_ttbar_wstrong_zewk_qg_v5'
+
+training_name: '_zstrong_ttbar_wstrong_zewk_qg_v5'
+cols: ['jj_mass', 'jj_dphi', 'jj_deta', 'met_tst_et', 'jet_pt[0]', 'jet_pt[1]', 'met_tenacious_tst_et', 'met_soft_tst_et', 'met_cst_jet', 'n_jet', 'maxCentrality', 'jet_NTracks[0]', 'jet_NTracks[1]']
+
+signal: 'VBFH125.npy'
+backgrounds: ['ttbar.npy', 'W_strong.npy', 'Z_EWK.npy', 'Z_strong.npy']
+data: 'data_zstrong_ttbar_wstrong_zewk_qg_v5.npz'
+
+hyperparameters:
+    epochs: 10
+    batch_size: 16
+
+model: 'model_zstrong_ttbar_wstrong_zewk_qg_v5.hdf5'
