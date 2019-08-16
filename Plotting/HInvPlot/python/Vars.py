@@ -105,7 +105,7 @@ myplots = [
               ['met_tst_ph_dphi', '12', '0.0', '3.15'],
               ['met_tst_j3_dphi', '32', '0.0', '3.2'],
               ['max_j3_dr', '20', '0.0', '10.0'],
-              #['tmva', '100', '-1.0', '1.0'],
+              ['tmva', '50', '0.0', '1.0'],
     ]
     
 # drawn with the detail plotting option
