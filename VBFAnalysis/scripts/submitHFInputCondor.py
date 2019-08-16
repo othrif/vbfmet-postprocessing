@@ -19,6 +19,7 @@ parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", defau
 parser.add_argument("--extraVars", dest='extraVars', default="0", help="extraVars, 1=cut on the new variables for leptons veto, 2=loosen cuts, 3=no soft met cut default: 0")
 parser.add_argument("--Binning", dest='Binning', default="0", help="Binning, 0=default Mjj binning, 1=low MET bin, 2=njet>2 binning")
 parser.add_argument( "--isMadgraph", dest = "isMadgraph", action="store_true", default = False, help = "Use the madgraph samples" )
+parser.add_argument( "--doTMVA", dest = "doTMVA", action="store_true", default = False, help = "Use the variable filled as tmva for the fitting" )
 parser.add_argument( "--doPlot", dest = "doPlot", action="store_true", default = False, help = "Generate additional histograms for postfit plots")
 args, unknown = parser.parse_known_args()
 
@@ -69,6 +70,8 @@ if args.extraVars:
     extraCommand=' --extraVars '+args.extraVars
 if args.isMadgraph:
     extraCommand+=' --isMadgraph '
+if args.doTMVA:
+    extraCommand+=' --doTMVA '
 if args.doPlot:
     extraCommand+=' --doPlot '
 if int(args.Binning)!=0:

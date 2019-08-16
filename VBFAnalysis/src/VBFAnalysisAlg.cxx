@@ -59,37 +59,39 @@ StatusCode VBFAnalysisAlg::initialize() {
     // qg tagging
     m_qgVars.clear();
     m_systSet.clear();
-    m_qgVars.push_back("JET_QG_Nominal");
-
-    asg::AnaToolHandle<CP::IJetQGTagger> my_handleNom;
-    my_handleNom.setTypeAndName("CP::JetQGTagger/JetQGTagger_VBF");
-    ANA_CHECK(my_handleNom.setProperty("NTrackCut", 5));
-    ANA_CHECK(my_handleNom.setProperty("UseJetVars", 1));
-    ANA_CHECK(my_handleNom.setProperty("cuttype", "threshold"));
-    ANA_CHECK(my_handleNom.retrieve());
-    m_jetQGTool[m_qgVars.at(0)]=my_handleNom;
-    m_systSet["JET_QG_Nominal"] = CP::SystematicSet("");
-    if(m_currentVariation=="Nominal"){
-      // loading the systematics
-      const CP::SystematicRegistry& registry = CP::SystematicRegistry::getInstance();
-      const CP::SystematicSet& recommendedSystematics = registry.recommendedSystematics();
-      // add all recommended systematics
-      for (const auto& systSet : CP::make_systematics_vector(recommendedSystematics)) {
-	TString nameRunThisSyst="";
-	for (const auto& sys : systSet) {
-	  std::cout << "syst: " << sys.name() << " base: " << sys.basename() << std::endl;
-	  // select only QG tagging
-	  if(sys.basename().find("JET_QG_")!=std::string::npos){
-	    std::cout << "QG syst Loaded: " << sys.name() << std::endl;
-	    nameRunThisSyst=sys.name();
+    if(m_QGTagger){
+      m_qgVars.push_back("JET_QG_Nominal");
+      
+      asg::AnaToolHandle<CP::IJetQGTagger> my_handleNom;
+      my_handleNom.setTypeAndName("CP::JetQGTagger/JetQGTagger_VBF");
+      ANA_CHECK(my_handleNom.setProperty("NTrackCut", 5));
+      ANA_CHECK(my_handleNom.setProperty("UseJetVars", 1));
+      ANA_CHECK(my_handleNom.setProperty("cuttype", "threshold"));
+      ANA_CHECK(my_handleNom.retrieve());
+      m_jetQGTool[m_qgVars.at(0)]=my_handleNom;
+      m_systSet["JET_QG_Nominal"] = CP::SystematicSet("");
+      if(m_currentVariation=="Nominal"){
+	// loading the systematics
+	const CP::SystematicRegistry& registry = CP::SystematicRegistry::getInstance();
+	const CP::SystematicSet& recommendedSystematics = registry.recommendedSystematics();
+	// add all recommended systematics
+	for (const auto& systSet : CP::make_systematics_vector(recommendedSystematics)) {
+	  TString nameRunThisSyst="";
+	  for (const auto& sys : systSet) {
+	    std::cout << "syst: " << sys.name() << " base: " << sys.basename() << std::endl;
+	    // select only QG tagging
+	    if(sys.basename().find("JET_QG_")!=std::string::npos){
+	      std::cout << "QG syst Loaded: " << sys.name() << std::endl;
+	      nameRunThisSyst=sys.name();
+	    }
+	  }
+	  if(nameRunThisSyst!=""){
+	    m_qgVars.push_back(nameRunThisSyst);
+	    m_systSet[nameRunThisSyst] = CP::SystematicSet(std::string(nameRunThisSyst.Data()));
 	  }
 	}
-	if(nameRunThisSyst!=""){
-	  m_qgVars.push_back(nameRunThisSyst);
-	  m_systSet[nameRunThisSyst] = CP::SystematicSet(std::string(nameRunThisSyst.Data()));
-	}
-      }
-    }// end qg systematics setup
+      }// end qg systematics setup
+    }// end qg setup
   }// end nominal check
 
   xeSFTrigWeight=1.0;
@@ -225,6 +227,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("passBatman", &passBatman );
   m_tree_out->Branch("passVjetsFilter", &passVjetsFilter );
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
+  m_tree_out->Branch("MGVTruthPt", &MGVTruthPt);
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
   m_tree_out->Branch("averageIntPerXing", &averageIntPerXing);
@@ -451,6 +454,10 @@ StatusCode VBFAnalysisAlg::MapNgen(){
    }
   if(m_UseExtMGVjet){
 
+    std::set<int> mg_w_filter = {311445,311446,311447,311448,311449,311450}; // W b-veto and c-veto
+    std::set<int> mg_w_incl_lf = {363606, 363609, 363630, 363633, 363654, 363657}; // w samples to overlap remove in
+    std::map<int,int> mg_w_LF_map = {{311445,363606},{311446,363630},{311447,363609},{311448,363633},{311449,363654},{311450,363657}};
+    std::set<int> mg_w_filter_highHT = {311451, 311452, 311453}; // W ---> need to implement the year dependence
     std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
     std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
     Ngen_filter.clear();
@@ -466,7 +473,7 @@ StatusCode VBFAnalysisAlg::MapNgen(){
       // printing info
       if(mg_filter_lo_np01.find(dsid)!=mg_filter_lo_np01.end() || mg_filter_lo_np234.find(dsid)!=mg_filter_lo_np234.end()){
 	std::cout << "Ngen: " << Ngen[dsid] << " filtered: " << Ngen_filter[dsid]->GetBinContent(21) << " " << Ngen_filter[dsid]->GetBinContent(22) << std::endl;
-      }
+      }      
     }
   }
 
@@ -592,7 +599,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
-  if(m_isMC && met_truth_et>-0.5 && (runNumber==308567 || (runNumber>=308275 && runNumber<=308283))){
+  if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567 || (runNumber>=308275 && runNumber<=308283))){
     nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
 
@@ -655,15 +662,32 @@ StatusCode VBFAnalysisAlg::execute() {
 	NgenCorrected = Ngen[runNumber];
       }
     } else if(m_UseExtMGVjet){
+      std::set<int> mg_w_filter = {311445,311446,311447,311448,311449,311450}; // W b-veto and c-veto
+      std::set<int> mg_w_incl_lf = {363606, 363609, 363630, 363633, 363654, 363657}; // w samples to overlap remove in
+      std::set<int> mg_w_filter_highHT = {311451, 311452, 311453}; // W ---> need to implement the year dependence
+      //std::set<int> mg_w_incl_highHT = {363615,363616,};
+      std::map<int,int> mg_w_LF_map = {{311445,363606},{311446,363630},{311447,363609},{311448,363633},{311449,363654},{311450,363657}};
+      std::map<int,int> mg_w_LF_map_rev;
+      for(std::map<int,int>::iterator it = mg_w_LF_map.begin(); it!=mg_w_LF_map.end(); ++it) { mg_w_LF_map_rev[it->second] = it->first; }
+
+      // Look up weights in order to match
+      if(mg_w_LF_map.find(runNumber)!=mg_w_LF_map.end()){  int aRun = runNumber; int bRun = mg_w_LF_map[runNumber];
+	MGMergeWeightFilt=Ngen_filter[aRun]->GetBinContent(24)/(Ngen_filter[aRun]->GetBinContent(24)+Ngen_filter[bRun]->GetBinContent(24)); 
+      }
+      if(mg_w_LF_map_rev.find(runNumber)!=mg_w_LF_map_rev.end()){  int aRun = runNumber; int bRun = mg_w_LF_map_rev[runNumber];
+	MGMergeWeightIncl=Ngen_filter[aRun]->GetBinContent(24)/(Ngen_filter[aRun]->GetBinContent(24)+Ngen_filter[bRun]->GetBinContent(24)); 
+      }
 
       std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
       std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
       NgenCorrected = Ngen[runNumber];
-      bool passMGFilter = false;
-      //if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && passVjetsFilter) ) { NgenCorrected=0.0; weight=0;  return StatusCode::SUCCESS; } // remove events.
-      //if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truth_j2_pt>35.0e3 && truth_jj_dphi<2.5 && truth_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events.
-      if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events.
-      if(mg_filter_lo_np01.find(runNumber)!=mg_filter_lo_np01.end() && (MGVTruthPt<100.0e3) ) { weight=-1; return StatusCode::SUCCESS; } // remove events.
+      if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
+      if(runNumber>=361510 && runNumber<=361519 && (MGVTruthPt>100.0e3 && (truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
+      if(mg_w_incl_lf.find(runNumber)!=mg_w_incl_lf.end() && (MGVTruthPt>100.0e3) && passVjetsFilter) {  NgenCorrected/=MGMergeWeightIncl;  } // apply the filter efficiency.
+      if(mg_w_filter.find(runNumber)!=mg_w_filter.end()) {  NgenCorrected/=MGMergeWeightFilt;  } // apply the filter efficiency also to the filtered sample to merge
+      //if(mg_w_filter_highHT.find(runNumber)!=mg_w_filter_highHT.end() ) { weight=-1; return StatusCode::SUCCESS; } // remove events. implemented to replace
+      if(((runNumber>=363615 && runNumber<=363623) || (runNumber>=363639 && runNumber<=363647) || (runNumber>=363660 && runNumber<=363671)) && MGVTruthPt>100.0e3 && passVjetsFilter) { weight=-1; return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
+      if(mg_filter_lo_np01.find(runNumber)!=mg_filter_lo_np01.end() && (MGVTruthPt<99.0e3) ) { weight=-1; return StatusCode::SUCCESS; } // remove events.
     } else {
       NgenCorrected = Ngen[runNumber];
     }
