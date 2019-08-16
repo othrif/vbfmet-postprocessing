@@ -18,6 +18,7 @@ arg_group.add_argument("--extraVars", dest='extraVars', default='0', help="extra
 arg_group.add_argument("--Binning", dest='Binning', default='0', help="Binning, set binning of analysis, default: 0,")
 arg_group.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 arg_group.add_argument("--isMadgraph", action="store_true", dest='isMadgraph', default=False, help="isMadgraph, default: False")
+arg_group.add_argument("--doTMVA", action="store_true", dest='doTMVA', default=False, help="doTMVA, default: False")
 arg_group.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
 arg_group.add_argument("--isLow", action="store_true", dest='isLow', default=False, help="isLow, default: False")
 arg_group.add_argument("--weightSyst", action="store_true", dest='weightSyst', default=False, help="is a weight systematic, default: False")
@@ -85,6 +86,7 @@ if True:
                                        doLowNom = args.doLowNom,
                                        isHigh = not args.isLow,
                                        isMadgraph = args.isMadgraph,
+                                       doTMVA = args.doTMVA,
                                        year = args.year,
                                        weightSyst = args.weightSyst,
                                        doPlot = args.doPlot);
@@ -101,6 +103,7 @@ if True:
                                                doLowNom = args.doLowNom,
                                                isHigh = not args.isLow,
                                                isMadgraph = args.isMadgraph,
+                                               doTMVA = args.doTMVA,
                                                year = args.year,
                                                weightSyst = args.weightSyst,
                                                doPlot = args.doPlot);

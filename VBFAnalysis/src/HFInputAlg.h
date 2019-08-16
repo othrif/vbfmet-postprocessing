@@ -51,6 +51,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   int year     = 2016;
   Bool_t isMC = true;
   Bool_t isMadgraph = true;
+  Bool_t doTMVA = false;
   Bool_t doLowNom = false; //put nominal yields for "Low" histogram for asymmetric systematics for HistFitter
   Bool_t isHigh = true;
   Bool_t weightSyst=false;
@@ -106,6 +107,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t n_mu;
   Int_t n_baseel;
   Int_t n_basemu;
+  Float_t tmva;
   Double_t jj_mass;
   Double_t jj_deta;
   Double_t jj_dphi;
