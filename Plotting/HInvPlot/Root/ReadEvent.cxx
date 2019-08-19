@@ -107,12 +107,16 @@ void Msl::ReadEvent::Conf(const Registry &reg)
     fMVAName =  "BDT method";
     for(unsigned i=0; i<7; ++i) fTMVAVars.push_back(0.0);
     fTMVAReader->AddVariable("jj_mass", &fTMVAVars[0]);
-    fTMVAReader->AddVariable("jj_dphi", &fTMVAVars[1]);
-    fTMVAReader->AddVariable("jj_deta", &fTMVAVars[2]);
-    fTMVAReader->AddVariable("met_tst_et", &fTMVAVars[3]);
-    fTMVAReader->AddVariable("met_soft_tst_et", &fTMVAVars[4]);
-    fTMVAReader->AddVariable("jet1_pt", &fTMVAVars[5]);
-    fTMVAReader->AddVariable("jet2_pt", &fTMVAVars[6]);
+    fTMVAReader->AddVariable("n_jet", &fTMVAVars[1]);
+    fTMVAReader->AddVariable("jet_NTracks[0]", &fTMVAVars[2]);
+    fTMVAReader->AddVariable("jet_eta[0]", &fTMVAVars[3]);
+    fTMVAReader->AddVariable("jet_eta[1]", &fTMVAVars[4]);
+    //fTMVAReader->AddVariable("jj_dphi", &fTMVAVars[1]);
+    //fTMVAReader->AddVariable("jj_deta", &fTMVAVars[2]);
+    //fTMVAReader->AddVariable("met_tst_et", &fTMVAVars[3]);
+    //fTMVAReader->AddVariable("met_soft_tst_et", &fTMVAVars[4]);
+    fTMVAReader->AddVariable("jet_pt[0]", &fTMVAVars[5]);
+    fTMVAReader->AddVariable("jet_pt[1]", &fTMVAVars[6]);
     fTMVAReader->BookMVA( fMVAName, fTMVAWeightPath);
   }
   
@@ -1062,6 +1066,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     //
     int truthFilter=0;
     double truth_deta_jj=-10.0, truth_jj_mass=-10.0, filterMet=-10.0, truthJet1=-10.0;
+    float truthJet2Pt = -10.0;
+    float truthJet2Eta = -10.0;
     if(event->truth_jets.size()>1){
       float tmet_px=0.0, tmet_py=0.0;
       TVector3 tmet;
@@ -1080,6 +1086,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	truth_deta_jj = fabs(event->truth_jets.at(0).eta - event->truth_jets.at(1).eta);
 	truth_jj_mass=truth_jj.M();
       }
+
       //filterMet = sqrt(tmet_px*tmet_px+tmet_py*tmet_py);//tmet.Pt();
       filterMet = sqrt(tmet.Px()*tmet.Px()+tmet.Py()*tmet.Py()); // needed for speed issues
       //if(event->sample==Mva::kZqcd) std::cout << "met after: " << tmet.Pt() << std::endl;
@@ -1089,11 +1096,17 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       //<< " mjj: " << truth_jj.M() << " truthJetPt: " << event->truth_jets.at(1).pt
       //	<< std::endl;
     }
+    if(event->truth_jets.size()>2){
+      truthJet2Pt = event->truth_jets.at(2).pt;
+      truthJet2Eta = event->truth_jets.at(2).eta;
+    }
     event->RepVar(Mva::truth_jj_mass, truth_jj_mass);
     event->RepVar(Mva::truth_jj_deta, truth_deta_jj);
     event->AddVar(Mva::FilterMet,     filterMet);
     event->AddVar(Mva::TruthFilter,   truthFilter);
     event->AddVar(Mva::truthJet1Pt,   truthJet1);
+    event->AddVar(Mva::truthJet2Pt, truthJet2Pt);
+    event->AddVar(Mva::truthJet2Eta, truthJet2Eta);
 
     // update for photon
     if(fOverlapPh) AddPhoton(*event);
@@ -1117,6 +1130,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if((trigger_met_encodedv2 & 0x2)==0x2) trigger_met_encodedv2_new=1; // HLT_xe110_pufit_L1XE55 2017
     if((trigger_met_encodedv2 & 0x4)==0x4) trigger_met_encodedv2_new=2; // HLT_xe90_pufit_L1XE50 2017
     if((trigger_met_encodedv2 & 0x8)==0x8) trigger_met_encodedv2_new=3; // HLT_xe110_pufit_xe70_L1XE50 2018
+    if((trigger_met_encodedv2 & 0x8000)==0x8000) trigger_met_encodedv2_new=6; //VBF trigger
 
     // run selected for 2017 => value 4 for 2017
     if(!fisMC) fRandomRunNumber = fRunNumber;
