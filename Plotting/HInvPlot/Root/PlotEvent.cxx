@@ -137,7 +137,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  6,  binsjjmass); 
 
   // tmva limits
-  float binstmva [8] = {0.  , 0.5 , 0.6 , 0.68, 0.75, 0.82, 0.88, 1.  };
+  float binstmva [8] = {0.057322, 0.42191193, 0.5504329, 0.6630951, 0.751824, 0.8335967, 0.9040917, 0.98163855};
   htmva_variableBin = GetTH1("tmva_variableBin",  7,  binstmva); 
   
   // creating histograms
