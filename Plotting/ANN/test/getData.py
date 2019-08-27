@@ -46,11 +46,11 @@ from root_numpy import root2array, tree2array
 #      '/share/t3data2/schae/v26LooseQGVars/ttbar.root']
 
 # v26 + v28
-fs = ['/share/t3data2/schae/v26LooseQGVars/VBFH125.root',
-      '/share/t3data2/schae/v26LooseQGVars/Z_strong.root',
-      '/share/t3data2/schae/v26LooseQGVars/W_strong.root',
-      '/share/t3data2/schae/v26LooseQGVars/Z_EWK.root',
-      '/share/t3data2/schae/v26LooseQGVars/ttbar.root',
+fs = ['/share/t3data2/schae/v26TightQGVars/VBFH125.root',
+      '/share/t3data2/schae/v26TightQGVars/Z_strong.root',
+      '/share/t3data2/schae/v26TightQGVars/W_strong.root',
+      '/share/t3data2/schae/v26TightQGVars/Z_EWK.root',
+      '/share/t3data2/schae/v26TightQGVars/ttbar.root',
       '/share/t3data2/schae/v28LooseNominalFixXS/VBFH125.root',
       '/share/t3data2/schae/v28LooseNominalFixXS/Z_strong.root',
       '/share/t3data2/schae/v28LooseNominalFixXS/W_strong.root',
@@ -64,6 +64,7 @@ branches += ['jet_pt[2]', 'j3_centrality[0]', 'j3_centrality[1]', 'j3_min_mj_ove
 branches += ['maxCentrality', 'max_mj_over_mjj']
 branches += ['met_tenacious_tst_et', 'met_tight_tst_et', 'met_cst_jet']
 #branches += ['jet_TrackWidth[0]', 'jet_TrackWidth[1]', 'jet_NTracks[0]', 'jet_NTracks[1]']
+branches += ['met_tst_phi[0]',  'met_tst_phi[1]']
 
 selection = 'n_jet >= 2 && n_jet <= 4 && met_tst_et > 150.0e3 && (n_basemu == 0 && n_baseel == 0 && n_ph == 0) && abs(met_tst_j1_dphi) > 1.0 && abs(met_tst_j2_dphi) > 1.0 && jj_mass > 500e3'
 
