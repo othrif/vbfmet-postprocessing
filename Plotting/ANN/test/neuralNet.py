@@ -195,7 +195,7 @@ class MLP:
         
         # Build the model
         model = Sequential()
-        model.add(Dense(4*len(self.cols), kernel_initializer='normal', activation='selu', input_dim=len(self.cols)))
+        model.add(Dense(2*len(self.cols), kernel_initializer='normal', activation='selu', input_dim=len(self.cols)))
         model.add(Dropout(0.2))
         model.add(Dense(2*len(self.cols), kernel_initializer='normal', activation='selu'))
         model.add(Dropout(0.2))

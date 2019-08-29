@@ -9,3 +9,4 @@ with open(sys.argv[1]) as ymlfile:
 mlp.preprocess_data()
 mlp.train_model()
 mlp.make_plots()
+mlp.feature_importance()
