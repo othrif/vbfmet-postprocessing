@@ -137,6 +137,8 @@ namespace Msl
       FilterMet,
       truth_jj_deta,
       truthJet1Pt,
+      truthJet2Pt,
+      truthJet2Eta,
       nTruthJetMatch,
       jetPt3,
       maxCentrality,

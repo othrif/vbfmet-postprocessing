@@ -119,6 +119,8 @@ std::string Msl::Mva::Convert2Str(Var var)
     case FilterMet:	          return "FilterMet";
     case truth_jj_deta:	          return "truth_jj_deta";
     case truthJet1Pt:	          return "truthJet1Pt";
+    case truthJet2Pt:	          return "truthJet2Pt";
+    case truthJet2Eta:	          return "truthJet2Eta";
     case nTruthJetMatch:	  return "nTruthJetMatch";
     case jetPt3:	          return "jetPt3";
     case maxCentrality:	          return "maxCentrality";
@@ -260,6 +262,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "FilterMet")         return FilterMet;
   if(var == "truth_jj_deta")     return truth_jj_deta;
   if(var == "truthJet1Pt")       return truthJet1Pt;
+  if(var == "truthJet2Pt")       return truthJet2Pt;
+  if(var == "truthJet2Eta")       return truthJet2Eta;
   if(var == "nTruthJetMatch")    return nTruthJetMatch;
   if(var == "jetPt3")	         return jetPt3;
   if(var == "maxCentrality")	 return maxCentrality;
@@ -488,6 +492,8 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(FilterMet);
     vars.push_back(truth_jj_deta);
     vars.push_back(truthJet1Pt);
+    vars.push_back(truthJet2Pt);
+    vars.push_back(truthJet2Eta);
     vars.push_back(nTruthJetMatch);
     vars.push_back(jetPt3);
     vars.push_back(maxCentrality);

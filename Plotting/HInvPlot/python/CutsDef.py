@@ -373,7 +373,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     cuts+=getVBFCuts(options, basic_cuts, isLep=False)
     cutsTJV=CutItem("CutTJV")
     cutsTJV.AddCut(CutItem('CutfTJV', 'n_jet > 2 && truthJet2Pt < 35e3 && truthJet2Eta < -2.4 && truthJet2Eta > 2.4'), 'OR')
-    cutsTJV.AddCut(CutItem('CutcTJV', 'n_jet > 2 && truthJet2Eta > -2.4 && truthJet2Eta < 2.4 && truthJet2Pt < 25e3'), 'OR')
+    cutsTJV.AddCut(CutItem('CutcTJV', 'n_jet > 2 && truthJet2Eta > -2.4 && truthJet2Eta < 2.4 && truthJet2Pt < 20e3'), 'OR')
     cutsTJV.AddCut(CutItem('CutnJetTJV', 'n_jet <= 2'), 'OR');
 
     cuts+=[cutsTJV]
