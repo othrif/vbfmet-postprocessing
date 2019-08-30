@@ -521,7 +521,8 @@ def prepareBkgRuns(keys,options=None):
                     '364153':'TBD',
                     '364154':'TBD',
                     '364155':'Znunu_MAXHTPTV1000',
-                    # mc16e samples
+                    }
+    bkg_zqcd_znn_mc16e = {                # mc16e samples
                     '366010':'pt70bfilter',
                     '366011':'pt100',
                     '366012':'pt100',
@@ -553,7 +554,10 @@ def prepareBkgRuns(keys,options=None):
     bkg_zqcd.update(bkg_zqcd_zmm)
     bkg_zqcd.update(bkg_zqcd_zee)
     bkg_zqcd.update(bkg_zqcd_ztt)
-    bkg_zqcd.update(bkg_zqcd_znn)
+    if options.year==2018:
+        bkg_zqcd.update(bkg_zqcd_znn_mc16e)        
+    else:
+        bkg_zqcd.update(bkg_zqcd_znn)
     bkg_top1 = {
         '117360':'tchan->e', 
         '117361':'tchan->mu', 
