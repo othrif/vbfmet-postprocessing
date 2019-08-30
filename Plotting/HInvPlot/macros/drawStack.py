@@ -127,11 +127,11 @@ def getSelKeyLabel(selkey):
         elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
         elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<1TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
-        elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5 SR'            
-        elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5 SR'            
-        elif selkey.count('njgt2_'):  proc += ',2<N_{jet} SR'            
-        elif selkey.count('njgt3_'):  proc += ',3<N_{jet} SR'            
-        elif selkey.count('sr_'):  proc += ', SR'
+        elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'            
+        elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'            
+        elif selkey.count('njgt2_'):  proc += ',2<N_{jet}'            
+        elif selkey.count('njgt3_'):  proc += ',3<N_{jet}'            
+        if selkey.count('sr_'):  proc += ', SR'
         elif selkey.count('wcr'):
             if 'anti' in selkey:
                 proc += ', Anti-ID'
@@ -226,10 +226,10 @@ def getHistPars(hist):
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0,'ymin':0.1, 'logy':True,'LtoRCut':1},
         #'tmva'  : {'xtitle':'BDT Score',          'ytitle':'Events', 'rebin':0,'LtoRCut':0,'xmin':-0.4,'xmax':0.6,'ymin':0.01},
         #'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':10,'LtoRCut':0,'xmin':0.0,'ymin':0.1},
-        'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':5,'LtoRCut':2,'xmin':0.0,'ymin':0.1},        
+        'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':0,'LtoRCut':2,'xmin':0.0,'ymin':0.1},        
         'bcid'  : {'xtitle':'BCID',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'BCIDDistanceFromFront'  : {'xtitle':'Distance from front of Train','ytitle':'Events', 'rebin':0,'LtoRCut':1},
-        'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':2,'LtoRCut':1},
         'lb'  : {'xtitle':'Lumi block','ytitle':'Events', 'rebin':0,'LtoRCut':1}, 
         'n_vx'  : {'xtitle':'Recontructed Vertices (N_{PV})','ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'JetEtaPt25'  : {'xtitle':'Jet #eta wth 25<p_{T}<35 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},
@@ -254,6 +254,7 @@ def getHistPars(hist):
         'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':0},
         'jj_mass_variableBin'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},
+        'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},

@@ -31,6 +31,7 @@ namespace Msl
       kData,
       kHggf,
       kHvbf,
+      kVbfg,
       kHvh,
       kWewk,
       kWqcd,

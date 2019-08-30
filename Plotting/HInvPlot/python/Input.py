@@ -361,6 +361,7 @@ def prepareBkgRuns(keys,options=None):
                       '308567':'VBF125 - all',                                                                                        
                       '346600':'VBF125 - met>75',                                                                                        
                           }
+    sig_vbfgam = {'312243':'', }
     alt_VBF = {'308275':'VBF125 - H75',
                       '308277':'VBF125 - H200',
                       '308278':'VBF125 - H300', 
@@ -374,6 +375,42 @@ def prepareBkgRuns(keys,options=None):
                     '308097':'WmunuEWK',
                     '308098':'WtaunuEWK',                    
                         }
+
+    bkg_new = {#'312243':'',
+                   '343982':'',
+                   '343983':'',
+                   '343984':'',
+                   '343985':'',
+                   '343986':'',                   
+                   }
+    bkg_zqcd_LO_Filt = {    '311429':'Znunu_TightVBF_Np01',
+                            '311430':'Znunu_TightVBF_Np2',
+                            '311431':'Znunu_TightVBF_Np3',
+                            '311432':'Znunu_TightVBF_Np4',
+                            '311433':'Zee_TightVBF_Np01',
+                            '311434':'Zee_TightVBF_Np2',
+                            '311435':'Zee_TightVBF_Np3',
+                            '311436':'Zee_TightVBF_Np4',
+                            '311437':'Zmumu_TightVBF_Np01',
+                            '311438':'Zmumu_TightVBF_Np2',
+                            '311439':'Zmumu_TightVBF_Np3',
+                            '311440':'Zmumu_TightVBF_Np4',
+                            '311441':'Ztautau_TightVBF_Np01',
+                            '311442':'Ztautau_TightVBF_Np2',
+                            '311443':'Ztautau_TightVBF_Np3',
+                            '311444':'Ztautau_TightVBF_Np4',
+                            }
+        
+    bkg_wqcd_LO_Filt = {'311445':'Wenu_Ht140_280_13TeV_BVCVVBF',
+                       '311446':'Wmunu_Ht140_280_13TeV_BVCVVBF',
+                       '311447':'Wenu_Ht280_500_13TeV_BVCVVBF',
+                       '311448':'Wmunu_Ht280_500_13TeV_BVCVVBF',
+                       '311449':'Wtaunu_Ht140_280_13TeV_BVCVVBF',
+                       '311450':'Wtaunu_Ht280_500_13TeV_BVCVVB',
+                       '311451':'Wenu_Ht700_13TeV_VBF',
+                       '311452':'Wmunu_Ht700_13TeV_VBF',
+                       '311453':'Wtaunu_Ht500_13TeV_VBF',
+                           }
         
     bkg_wqcd_mnu =     {'364156':'Wmunu_MAXHTPTV0_70_CVetoBVeto',
                     '364157':'Wmunu_MAXHTPTV0_70_CFilterBVeto',
@@ -947,6 +984,7 @@ def prepareBkgRuns(keys,options=None):
     bkg_keys = {
                 'hvh':sig_VH125,
                 #'whww':sig_VH125v2,
+                'vbfg':sig_vbfgam,                
                 'whww':alt_VBF,
                 'hggf':sig_ggF125,
                 'hvbf':sig_VBF125,
@@ -993,6 +1031,9 @@ def prepareBkgRuns(keys,options=None):
                 if not yi.count('Znunu'): bkg_keys['wdpi'][ki]=yi
     if not options.mergeExt:
         bkg_keys['wdpi'].update(bkg_vbfExt)
+        bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
+        bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)        
+        bkg_keys['wdpi'].update(bkg_new)
     if False:
         bkg_keys['zqcdPow']=bkg_z_strong_powheg
         bkg_keys['vbfz']=bkg_vbfFiltZ        

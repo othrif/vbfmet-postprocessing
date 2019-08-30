@@ -56,6 +56,7 @@ ROOT.gROOT.ProcessLine(
    Float_t   met_tst_nolep_j1_dphi;\
    Float_t   met_tst_nolep_j2_dphi;\
    Float_t   metsig_tst;\
+   Float_t   averageIntPerXing;\
    ULong64_t     eventNumber;\
 };" );
 
@@ -97,6 +98,7 @@ tree_out.Branch( 'max_mj_over_mjj', ROOT.AddressOf( mystruct, 'max_mj_over_mjj' 
 tree_out.Branch( 'maxCentrality', ROOT.AddressOf( mystruct, 'maxCentrality' ), 'maxCentrality/F' )
 tree_out.Branch( 'n_vx', ROOT.AddressOf( mystruct, 'n_vx' ), 'n_vx/I' )
 tree_out.Branch( 'n_tau', ROOT.AddressOf( mystruct, 'n_tau' ), 'n_tau/I' )
+#tree_out.Branch( 'n_pv', ROOT.AddressOf( mystruct, 'n_pv' ), 'n_pv/I' )
 tree_out.Branch( 'n_el', ROOT.AddressOf( mystruct, 'n_el' ), 'n_el/I' )
 tree_out.Branch( 'n_ph', ROOT.AddressOf( mystruct, 'n_ph' ), 'n_ph/I' )
 tree_out.Branch( 'n_mu', ROOT.AddressOf( mystruct, 'n_mu' ), 'n_mu/I' )
@@ -107,6 +109,7 @@ tree_out.Branch( 'n_bjet', ROOT.AddressOf( mystruct, 'n_bjet' ), 'n_bjet/I' )
 tree_out.Branch( 'trigger_met', ROOT.AddressOf( mystruct, 'trigger_met' ), 'trigger_met/I' )
 tree_out.Branch( 'trigger_lep', ROOT.AddressOf( mystruct, 'trigger_lep' ), 'trigger_lep/I' )
 tree_out.Branch( 'runNumber', ROOT.AddressOf( mystruct, 'runNumber' ), 'runNumber/I' )
+tree_out.Branch( 'averageIntPerXing', ROOT.AddressOf( mystruct, 'averageIntPerXing' ), 'averageIntPerXing/F' )
 tree_out.Branch( 'eventNumber', ROOT.AddressOf( mystruct, 'eventNumber' ), 'eventNumber/l' )
 for v in flts:
     tree_out.Branch( v, ROOT.AddressOf( mystruct, v ), v+'/F' )
@@ -140,8 +143,9 @@ tree_out.Branch( 'jet_NTracks', mystruct.jet_NTracks)
  
 #f = ROOT.TFile.Open('/eos/atlas/atlascerngroupdisk/penn-ww/out_QCD_Tenacious.root')
 #f = ROOT.TFile.Open('out_QCD_Tenacious.root')
-f = ROOT.TFile.Open('out_QCD_Loose.root')
-IsLoose=True
+#f = ROOT.TFile.Open('out_QCD_Loose.root')
+f = ROOT.TFile.Open('mj2018.root')
+IsLoose=False
 
 GeV=1.0e3
 tree = f.Get('PredictionTree')
@@ -249,7 +253,7 @@ for e in tree:
     mystruct.met_tenacious_tst_j2_dphi = j2_met_dphi
     mystruct.met_tenacious_tst_et = e.MET*GeV
     mystruct.met_tenacious_tst_phi = e.METphi
-    mystruct.met_cst_jet = e.MHT*GeV
+    mystruct.met_cst_jet = e.MHTDefReb*GeV # MHT includes the soft term. 
     mystruct.met_soft_tst_et = e.METsoft*GeV
     mystruct.met_significance=e.METsig
     mystruct.max_mj_over_mjj=-9999.0
@@ -294,8 +298,10 @@ for e in tree:
     #if(maxmj3_over_mjj<tmp_maxmj3_over_mjj) maxmj3_over_mjj = tmp_maxmj3_over_mjj;
     mystruct.runNumber=e.Run
     mystruct.eventNumber=e.Event    
+    mystruct.averageIntPerXing=e.avIntPerXing
+    #mystruct.n_pv=e.NVtx
     mystruct.n_tau=0
-    mystruct.n_ph=0
+    mystruct.n_ph=e.NPhotons
     mystruct.n_el=0
     mystruct.n_mu=0
     mystruct.n_basemu=0
@@ -313,7 +319,7 @@ for e in tree:
     if not (e.MET>150.0):
         continue
     h1.Fill(3, weight)
-    if not (e.MHT>120.0):
+    if not (e.MHTDefReb>120.0): #e.MHTDefReb*GeV # MHT includes the soft term. 
         continue
     h1.Fill(4, weight)
     if mystruct.n_jet!=2:

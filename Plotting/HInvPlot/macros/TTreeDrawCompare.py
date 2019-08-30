@@ -59,7 +59,7 @@ def DrawSF(can,trig,lep, mvar, fname,year=2018):
     can.Update()
     can.WaitPrimitive()
     #raw_input('waiting...')
-    can.SaveAs(den_path+'.pdf')
+    can.SaveAs(den_path+'_Znn.pdf')
 
     SFW = deff[0].Clone()
     SFZ = deff[0].Clone()
@@ -179,7 +179,7 @@ def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110',input_er
     for t in texts:
         t.Draw()
     can.Update()
-    can.SaveAs(plt_name+'.pdf')
+    can.SaveAs(plt_name+'_Znn.pdf')
 
 ###########################################################################
 # Main function for command line execuation
@@ -189,24 +189,39 @@ if __name__ == "__main__":
     Style()
     fout = ROOT.TFile.Open('myplt.root','RECREATE')
     can = ROOT.TCanvas('stack', 'stack', 800, 500)
-    fIncl = ROOT.TFile.Open('/tmp/Z_strongNominal363InclNoMerge.root')
-    fVBFFilt = ROOT.TFile.Open('/tmp/Z_strongNominal311VBFFilt.root')
-    fInclForMerge = ROOT.TFile.Open('/tmp/Z_strongNominal363Incl.root')
+    #fIncl = ROOT.TFile.Open('/tmp/Z_strongNominal363InclNoMerge.root')
+    #fVBFFilt = ROOT.TFile.Open('/tmp/Z_strongNominal311VBFFilt.root')
+    #fInclForMerge = ROOT.TFile.Open('/tmp/Z_strongNominal363Incl.root')
+    #fIncl = ROOT.TFile.Open('/tmp/incl/Z_strongZnnIncl.root')
+    #fVBFFilt = ROOT.TFile.Open('/tmp/mergeZllW/Z_strongZnnFilt.root')
+    #fInclForMerge = ROOT.TFile.Open('/tmp/mergeZllW/Z_strongZnnIncl.root')
+    fIncl = ROOT.TFile.Open('/tmp/incl/W_strongIncl.root')
+    fVBFFilt = ROOT.TFile.Open('/tmp/mergeZllW/W_strongFilt.root')
+    fInclForMerge = ROOT.TFile.Open('/tmp/mergeZllW/W_strongIncl.root')        
 
+
+    treeName ='W_strongNominal'
     plt=None
     vbfplt=None
     implt=None
-    cuts = '*(jj_mass>1.0e6 && jj_dphi<1.8 && jj_deta>3.8 && met_cst_jet>120.0e3 && met_tst_nolep_et>150.0e3 && jet_pt[0]>80.0e3 && jet_pt[1]>50e3 && n_jet<5 && met_tst_et<20.0e3)'
-    #cuts = '*(jj_mass>-1.0e6 )'
+    #cuts = '*(jj_mass>1.0e6 && jj_dphi<1.8 && jj_deta>3.8 && met_cst_jet>120.0e3 && met_tst_nolep_et>150.0e3 && jet_pt[0]>80.0e3 && jet_pt[1]>50e3 && n_jet<5 && met_tst_et<20.0e3)'
+    #cuts = '*(jj_mass>1.0e6 && jj_dphi<1.8 && jj_deta>3.8 && met_cst_jet>120.0e3 && met_tst_et>150.0e3 && jet_pt[0]>80.0e3 && jet_pt[1]>50e3 && n_jet<5 )'    
+    cuts = '*(jj_mass>-1.0e6 )'
     pvar='truth_jj_mass'
     xaxis='Truth m_{jj} [GeV]'
+    pvar='truth_jj_dphi'
+    xaxis='Truth #Delta#phi'
+    pvar='met_truth_et'
+    xaxis='Truth MET [GeV]'    
     #pvar='sqrt((truth_mu_pt[0]*sin(truth_mu_phi[0])+truth_mu_pt[1]*sin(truth_mu_phi[1]))*(truth_mu_pt[0]*sin(truth_mu_phi[0])+truth_mu_pt[1]*sin(truth_mu_phi[1])) + (truth_mu_pt[0]*cos(truth_mu_phi[0])+truth_mu_pt[1]*cos(truth_mu_phi[1]))*(truth_mu_pt[0]*cos(truth_mu_phi[0])+truth_mu_pt[1]*cos(truth_mu_phi[1])) )' 
     #pvar='truth_jet_phi[0]-truth_jet_phi[1]'   
     #xaxis='Truth Z p_{T} [GeV]'
-    tIncl = fIncl.Get('Z_strongNominal')
+    tIncl = fIncl.Get(treeName)
     n1 = 'Iptruth_jj_mass'
-    if pvar.count('jj_mass'):    
+    if pvar.count('jj_mass'):
         plt = ROOT.TH1F(n1,n1,100,0.0,5000.0)
+    elif pvar.count('jj_dphi'):
+        plt = ROOT.TH1F(n1,n1,50,-7.0,7.0) 
     elif pvar=='truth_jet_phi[0]-truth_jet_phi[1]':
         plt = ROOT.TH1F(n1,n1,50,-7.0,7.0)           
     else:
@@ -218,7 +233,7 @@ if __name__ == "__main__":
     plt.SetMarkerSize(0.6)
     plt.Write()
 
-    tVBFFilt = fVBFFilt.Get('Z_strongNominal')
+    tVBFFilt = fVBFFilt.Get(treeName)
     n2='vbfptruth_jj_mass'
     if pvar.count('jj_mass'): 
         vbfplt = ROOT.TH1F(n2,n2,100,0.0,5000.0)
@@ -235,7 +250,7 @@ if __name__ == "__main__":
     vbfplt.SetDirectory(fout)
     vbfplt.Write()
 
-    imMERGETree = fInclForMerge.Get('Z_strongNominal')
+    imMERGETree = fInclForMerge.Get(treeName)
     n3='inclmergedtruth_jj_mass'
     if pvar.count('jj_mass'): 
         implt = ROOT.TH1F(n3,n3,100,0.0,5000.0)
@@ -262,7 +277,7 @@ if __name__ == "__main__":
     pad1.cd();               # pad1 becomes the current pad
     
     plt.Draw()
-    vbfplt.Scale(1.22)
+    vbfplt.Scale(1.10)
     vbfplt.Draw('same')
     implt.Draw('same')
 
