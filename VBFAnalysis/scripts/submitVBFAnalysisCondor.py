@@ -20,10 +20,12 @@ parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default 
 parser.add_argument( "-p", "--proxyName", type = str, dest = "proxyName", default = "/home/schae/testarea/HInv/run/x509up_u20186", help = "proxy file for grid")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
 parser.add_argument("-e", "--UseExtMC", dest = "UseExtMC", action="store_true", default = False, help = "Use extended MC samples" )
+parser.add_argument("--UseExtMGVjet", dest = "UseExtMGVjet", action="store_true", default = False, help = "Use MG extended MC samples" )
 parser.add_argument( "--METTrigPassThru", dest = "METTrigPassThru", action="store_true", default = False, help = "Use met trigger pass through" )
 parser.add_argument( "--TightSkim", dest = "TightSkim", action="store_true", default = False, help = "Use tight skimming" )
 parser.add_argument( "--QGTagger", dest = "QGTagger", action="store_true", default = False, help = "Use qgtagger. available in releases newer than 21.2.76" )
 parser.add_argument( "--oneTrigMuon", dest = "oneTrigMuon", action="store_true", default = False, help = "Set muon trigger SF to 1 ")
+parser.add_argument( "--theoVariation", dest = "theoVariation", action="store_true", default = False, help = "Run Theory uncertainties ")
 args, unknown = parser.parse_known_args()
 
 
@@ -113,12 +115,16 @@ fMC.close()
 UseExtMC =""
 if args.UseExtMC:
     UseExtMC = " --UseExtMC"
+if args.UseExtMGVjet:
+    UseExtMC += " --UseExtMGVjet"
 if args.METTrigPassThru:
     UseExtMC += " --METTrigPassThru"
 if args.QGTagger:
     UseExtMC += " --QGTagger"
 if args.oneTrigMuon:
     UseExtMC += " --oneTrigMuon"
+if args.theoVariation:
+    UseExtMC += " --theoVariation"
 if args.TightSkim:
     UseExtMC += " --TightSkim"
 

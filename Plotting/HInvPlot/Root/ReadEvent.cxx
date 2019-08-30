@@ -621,7 +621,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
   // vars to skip loading in QCD
   std::set<Mva::Var> fSkipVarsQCD;
-  //fSkipVarsQCD.insert(Mva::met_soft_tst_phi);
+  fSkipVarsQCD.insert(Mva::met_tenacious_tst_nolep_et);
+  fSkipVarsQCD.insert(Mva::met_tenacious_tst_nolep_phi);
+  fSkipVarsQCD.insert(Mva::bcid);
+  fSkipVarsQCD.insert(Mva::BCIDDistanceFromFront);
+  fSkipVarsQCD.insert(Mva::lb);
   
   for(int i = 0; i < nevent; i++) {
     //
@@ -662,7 +666,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(!fMCEventCount) event->SetWeight((fWeight*fLumi));
       else  event->SetWeight(1.0);
       if(fIsDDQCD) event->SetWeight(fWeight);
-      if(fCurrRunNumber!=fRunNumber){
+      if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
 	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
 	  event->sample = Mva::kNone;
@@ -1124,8 +1128,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
     else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
     else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K  
-    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
-    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
+    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF 
+    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF 
     // 2018 update trigger for later periods => value 5 for
     if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50

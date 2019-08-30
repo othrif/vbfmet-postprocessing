@@ -1,5 +1,6 @@
 #!/bin/bash                                                                                                                                                                                                       
-OUTDIRM=v26LooseNoTrigMuSF
+#OUTDIRM=v31TightEM2018
+OUTDIRM=v26TightQG
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
@@ -7,11 +8,13 @@ hadd $OUTDIRM/data.root data*root
 hadd $OUTDIRM/Z_strong_VBFFilt.root Z_strong_VBFFilt*root
 hadd $OUTDIRM/Z_strongPTVExt.root Z_strongPTVExt*root
 hadd $OUTDIRM/Z_strongExt.root Z_strongExt*root
+hadd $OUTDIRM/Z_strongmVBFFilt.root Z_strongmVBFFilt*root
 #hadd $OUTDIRM/Z_strong_LowMass.root Z_strong_LowMass*root
 rm Z_strong_VBFFilt*root
 rm Z_strongPTVExt*root
 rm Z_strong_LowMass*root
 rm Z_strongExt*root
+rm Z_strongmVBFFilt*root
 
 # now hadd the standard samples
 #hadd $OUTDIRM/VV.root VV*root
@@ -24,6 +27,7 @@ hadd $OUTDIRM/QCDw.root QCDw*root
 #hadd $OUTDIRM/QCDunw.root QCDunw*root
 #hadd signal.root *H125*root
 hadd $OUTDIRM/VBFH125.root  VBFH125*.root
+hadd $OUTDIRM/VBFHgam125.root  VBFHgam125*.root
 hadd $OUTDIRM/VBFHOther.root  VBFHOther*.root
 hadd $OUTDIRM/ggFH125.root  ggFH125*.root
 hadd $OUTDIRM/VH125.root  VH125*.root

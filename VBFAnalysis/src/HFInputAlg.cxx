@@ -16,6 +16,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("METDef", m_metdef = 0, "0=loose. 1=tenacious" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
+  declareProperty("doTMVA", doTMVA = false, "doTMVA flag, true means use the MVA");
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
   declareProperty("doPlot", doPlot =false, "doPlot flag, true means the output contains variable distributions");
   declareProperty("doDuplicateCheck", doDuplicateCheck =false, "doDuplicateCheck flag, true means the run and event numbers are printed");
@@ -143,6 +144,7 @@ vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR) 
   vector <TH1F*> h;
   h.push_back(new TH1F((name+"_cuts").c_str(), (name+"_cuts;;").c_str(), 1, 0.5, 1.5));
   if (doPlot) {
+    if(doTMVA) h.push_back(new TH1F((name+"_tmva").c_str(), (name+"_tmva;;").c_str(), 10, 0, 5000));
     h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
     h.push_back(new TH1F((name+"_met_et").c_str(), (name+"_met_et;;").c_str(), 10, 0, 800));
     h.push_back(new TH1F((name+"_lepmet_et").c_str(), (name+"_lepmet_et;;").c_str(), 10, 0, 800));
@@ -154,6 +156,7 @@ StatusCode HFInputAlg::CheckHists(vector <std::pair<vector <TH1F*>, std::string>
   for (auto hname : hnames) {
     CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_cuts", std::get<0>(hname)[0]));
     if (doPlot) {
+      if(doTMVA) CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_tmva", std::get<0>(hname)[1]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_jj_mass", std::get<0>(hname)[1]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_met_et", std::get<0>(hname)[2]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_lepmet_et", std::get<0>(hname)[3]));
@@ -413,20 +416,26 @@ StatusCode HFInputAlg::execute() {
   else if(year==2018) lumi = 59.9372;
   if (isMC) w_final = w*1000.0*lumi;
   int bin = 0;
-  if (jj_mass < 1.5e6) bin = 0;
-  else if (jj_mass < 2e6) bin = 1;
-  else bin = 2;
+  if(doTMVA){
+    float tmvaBinBoundaries[8] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0};
+    // find the right bin
+    for(unsigned i=0; i<7; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]) bin=i; break; } 
+  }else{
+    if (jj_mass < 1.5e6) bin = 0;
+    else if (jj_mass < 2e6) bin = 1;
+    else bin = 2;
 
-  // alternative binning approaches
-  if(m_binning==-1 && JetQGTagger) bin+=3;
-  if(m_binning==1 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin=3; // separate low MET bin
-  if(m_binning==2 && (n_jet>2))  bin=3; // separate extra jets
-  if(m_binning==3 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin+=3; // separate low MET bin, mjj binning
-  if(m_binning==4 && (n_jet>2))    bin+=3; // separate extra jets, mjj binning
-  if(m_binning==5 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
-  // combo
-  if(m_binning==6 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
-  if(m_binning==6 && (n_jet>2))    bin=6; // separate dphijj, mjj binning, njet binning
+    // alternative binning approaches
+    if(m_binning==-1 && JetQGTagger) bin+=3;
+    if(m_binning==1 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin=3; // separate low MET bin
+    if(m_binning==2 && (n_jet>2))  bin=3; // separate extra jets
+    if(m_binning==3 && ((met_tst_et<180.0e3 && SR) || (met_tst_nolep_et<180.0e3 && !SR)))  bin+=3; // separate low MET bin, mjj binning
+    if(m_binning==4 && (n_jet>2))    bin+=3; // separate extra jets, mjj binning
+    if(m_binning==5 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
+    // combo
+    if(m_binning==6 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
+    if(m_binning==6 && (n_jet>2))    bin=6; // separate dphijj, mjj binning, njet binning
+  }
 
   if(isnan(w_final)) std::cout << "isnan w_final? " << w_final << std::endl;
   if(isnan(xeSFTrigWeight)) std::cout << "isnan xeSFTrigWeight? " << xeSFTrigWeight << std::endl;
@@ -447,6 +456,7 @@ StatusCode HFInputAlg::execute() {
 void HFInputAlg::HistoFill(vector<TH1F*> hs, double w){
   hs[0]->Fill(1,w);
   if (doPlot) {
+    if(doTMVA) hs[1]->Fill(tmva,w);
     hs[1]->Fill(jj_mass/(1e3),w);
     hs[2]->Fill(met_tst_et/(1e3),w);
     hs[3]->Fill(met_tst_nolep_et/(1e3),w);
@@ -512,6 +522,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("n_mu",1);
   m_tree->SetBranchStatus("n_baseel",1);
   m_tree->SetBranchStatus("n_basemu",1);
+  if(doTMVA) m_tree->SetBranchStatus("tmva",1);
   m_tree->SetBranchStatus("jj_mass",1);
   m_tree->SetBranchStatus("jj_deta",1);
   m_tree->SetBranchStatus("jj_dphi",1);
@@ -554,6 +565,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_mu",&n_mu);
   m_tree->SetBranchAddress("n_baseel",&n_baseel);
   m_tree->SetBranchAddress("n_basemu",&n_basemu);
+  if(doTMVA) m_tree->SetBranchAddress("tmva",&tmva);
   m_tree->SetBranchAddress("jj_mass",&jj_mass);
   m_tree->SetBranchAddress("jj_deta",&jj_deta);
   m_tree->SetBranchAddress("jj_dphi",&jj_dphi);

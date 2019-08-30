@@ -63,11 +63,11 @@ class sample(object):
             print "runNumebr::: ",self.runNumber
             if ((self.runNumber >= 308096 and self.runNumber <= 308098) or (self.runNumber == 363489)):
                 self.sampleType = "W_EWK"
-            elif (self.runNumber >= 364500 and self.runNumber <= 364519):
+            elif (self.runNumber >= 364500 and self.runNumber <= 364519) or (self.runNumber>=345775 and self.runNumber<=345784) or (self.runNumber>=364550 and self.runNumber<=364584):
                 self.sampleType = "Zg_strong"
             elif (self.runNumber >= 364520 and self.runNumber <= 364535):
                 self.sampleType = "Wg_strong"
-            elif (self.runNumber >= 410082 and self.runNumber <= 410084):
+            elif (self.runNumber >= 410082 and self.runNumber <= 410084) or self.runNumber==410087:
                 self.sampleType = "ttg"
             elif (self.runNumber >= 364541 and self.runNumber <= 364547):
                 self.sampleType = "SinglePhoton" 
@@ -85,15 +85,19 @@ class sample(object):
                 self.sampleType = "Z_strong_VBFFilt"
             elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515) or (self.runNumber>=366010 and self.runNumber<=366035) or (self.runNumber>=311429 and self.runNumber<=311444):
                 self.sampleType = "Z_strong"
+            elif self.runNumber>=343982 and self.runNumber<=343986:
+                self.sampleType = "Z_strongmVBFFilt"
             elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)) or (self.runNumber>=410642 and self.runNumber<=410649) or self.runNumber==410642 or self.runNumber==410643:
                 self.sampleType = "ttbar"
             elif ((self.runNumber == 308276) or (self.runNumber == 308567)) or self.runNumber==346600:
                 self.sampleType = "VBFH125"
+            elif self.runNumber==312243:
+                self.sampleType = "VBFHgam125"
             elif ((self.runNumber >= 308275) and self.runNumber <= 308283):
                 self.sampleType = "VBFHOther"
             elif (self.runNumber == 308284) or self.runNumber==346588:
                 self.sampleType = "ggFH125"
-            elif ((self.runNumber == 308071) or (self.runNumber == 308072) or (self.runNumber == 308070)) or (self.runNumber>=345038 and self.runNumber<=345040):
+            elif ((self.runNumber == 308071) or (self.runNumber == 308072) or (self.runNumber == 308070)) or (self.runNumber>=345038 and self.runNumber<=345040) or self.runNumber==345596:
                 self.sampleType = "VH125"
             elif (self.runNumber >= 361020 and self.runNumber <= 361032) or self.runNumber==310502 or self.runNumber==304784:
                 self.sampleType = "QCDw"

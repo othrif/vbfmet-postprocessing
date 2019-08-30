@@ -126,10 +126,13 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Bool_t passVjetsPTV;
   Float_t MGVTruthPt;
   Float_t SherpaVTruthPt;
+  Float_t MGMergeWeightIncl;
+  Float_t MGMergeWeightFilt;
   Bool_t in_vy_overlap;
   Bool_t in_vy_overlap_iso;
   Int_t FlavourFilter;
 
+  Int_t nParton;
   Int_t runNumber;
   Int_t randomRunNumber;
   ULong64_t eventNumber;

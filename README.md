@@ -69,6 +69,7 @@ mergeVBFAnalysisAlg.sh
 
 ## Run HF Input Maker ##
 This generates histograms for HistFitter to read from. It reads from the microtuples produced by VBFAnalysisAlg.
+     --doTMVA creates fitting plots from the variable tmva
 ```bash
 cd run
 # run locally over 10 events for nominal
