@@ -25,6 +25,7 @@ parser.add_argument( "--METTrigPassThru", dest = "METTrigPassThru", action="stor
 parser.add_argument( "--TightSkim", dest = "TightSkim", action="store_true", default = False, help = "Use tight skimming" )
 parser.add_argument( "--QGTagger", dest = "QGTagger", action="store_true", default = False, help = "Use qgtagger. available in releases newer than 21.2.76" )
 parser.add_argument( "--oneTrigMuon", dest = "oneTrigMuon", action="store_true", default = False, help = "Set muon trigger SF to 1 ")
+parser.add_argument( "--theoVariation", dest = "theoVariation", action="store_true", default = False, help = "Run Theory uncertainties ")
 args, unknown = parser.parse_known_args()
 
 
@@ -122,6 +123,8 @@ if args.QGTagger:
     UseExtMC += " --QGTagger"
 if args.oneTrigMuon:
     UseExtMC += " --oneTrigMuon"
+if args.theoVariation:
+    UseExtMC += " --theoVariation"
 if args.TightSkim:
     UseExtMC += " --TightSkim"
 

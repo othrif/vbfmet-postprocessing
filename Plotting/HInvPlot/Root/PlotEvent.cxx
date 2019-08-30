@@ -19,6 +19,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hTruthTauPt(0), hTruthTauEta(0),
 				  hminDRLep(0),
 				  hjj_mass_variableBin(0),
+				  htmva_variableBin(0),
 				  hmj34(0),
 				  hmax_j_eta(0),
 				  hdRj1(0),
@@ -135,6 +136,10 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   float binsjjmass [7] = { 0.0, 200.0, 500.0, 1000.0, 1500.0, 2000.0, 3000.0 }; 
   hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  6,  binsjjmass); 
   
+  // TMVA variable binned
+  float binstmva[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
+  htmva_variableBin =  GetTH1("tmva_variableBin",  7,  binstmva);
+
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
     fHistVec[fVarVec[a]] =  GetTH1(Mva::Convert2Str(fVarVec[a]),unsigned(fNBinVec[a]), float(fLoVec[a]), float(fHiVec[a]));
@@ -182,6 +187,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hWMadMCIDQCD->Fill(event.RunNumber, weight);  
   hZPowMCIDQCD->Fill(event.RunNumber, weight);
   FillHist(hjj_mass_variableBin,   Mva::jj_mass, event, weight);
+  FillHist(htmva_variableBin,   Mva::tmva, event, weight);
   
   if(event.truth_mu.size()>0){
     hTruthMuPt ->Fill(event.truth_mu.at(0).pt, weight);

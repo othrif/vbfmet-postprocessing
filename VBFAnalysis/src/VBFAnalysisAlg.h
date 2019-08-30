@@ -132,6 +132,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Bool_t in_vy_overlap_iso;
   Int_t FlavourFilter;
 
+  Int_t nParton;
   Int_t runNumber;
   Int_t randomRunNumber;
   ULong64_t eventNumber;

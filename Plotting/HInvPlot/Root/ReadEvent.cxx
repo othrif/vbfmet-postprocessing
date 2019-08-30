@@ -621,7 +621,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
   // vars to skip loading in QCD
   std::set<Mva::Var> fSkipVarsQCD;
-  //fSkipVarsQCD.insert(Mva::met_soft_tst_phi);
+  fSkipVarsQCD.insert(Mva::met_tenacious_tst_nolep_et);
+  fSkipVarsQCD.insert(Mva::met_tenacious_tst_nolep_phi);
+  fSkipVarsQCD.insert(Mva::bcid);
+  fSkipVarsQCD.insert(Mva::BCIDDistanceFromFront);
+  fSkipVarsQCD.insert(Mva::lb);
   
   for(int i = 0; i < nevent; i++) {
     //
@@ -662,7 +666,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(!fMCEventCount) event->SetWeight((fWeight*fLumi));
       else  event->SetWeight(1.0);
       if(fIsDDQCD) event->SetWeight(fWeight);
-      if(fCurrRunNumber!=fRunNumber){
+      if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
 	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
 	  event->sample = Mva::kNone;

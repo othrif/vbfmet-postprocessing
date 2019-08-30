@@ -6,7 +6,7 @@
 #include <math.h>       /* exp */
 
 
-VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ),
+VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ), nParton(-1),
 										      fjvtSFWeight(1.0), fjvtSFTighterWeight(1.0){
   declareProperty( "currentSample", m_currentSample = "W_strong", "current sample");
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
@@ -686,7 +686,7 @@ StatusCode VBFAnalysisAlg::execute() {
       if(mg_w_incl_lf.find(runNumber)!=mg_w_incl_lf.end() && (MGVTruthPt>100.0e3) && passVjetsFilter) {  NgenCorrected/=MGMergeWeightIncl;  } // apply the filter efficiency.
       if(mg_w_filter.find(runNumber)!=mg_w_filter.end()) {  NgenCorrected/=MGMergeWeightFilt;  } // apply the filter efficiency also to the filtered sample to merge
       //if(mg_w_filter_highHT.find(runNumber)!=mg_w_filter_highHT.end() ) { weight=-1; return StatusCode::SUCCESS; } // remove events. implemented to replace
-      if(((runNumber>=363615 && runNumber<=363623) || (runNumber>=363639 && runNumber<=363647) || (runNumber>=363660 && runNumber<=363671)) && MGVTruthPt>100.0e3 && passVjetsFilter) { weight=-1; return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
+      if(((runNumber>=363615 && runNumber<=363623) || (runNumber>=363639 && runNumber<=363647) || (runNumber>=363660 && runNumber<=363671)) && MGVTruthPt>100.0e3 && passVjetsFilter && nParton!=4) { weight=-1; return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples. only up to 3 partons are included in the filtered samples
       if(mg_filter_lo_np01.find(runNumber)!=mg_filter_lo_np01.end() && (MGVTruthPt<99.0e3) ) { weight=-1; return StatusCode::SUCCESS; } // remove events.
     } else {
       NgenCorrected = Ngen[runNumber];
@@ -814,10 +814,13 @@ StatusCode VBFAnalysisAlg::execute() {
 	new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_pt") = 50000.0; //jet->getAttribute<float>("truthjet_pt");
       }
       // Loop over QG systematics
-      for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
-	ANA_CHECK(m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]));
-	m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, nullptr); // add qg taging
-	tMapFloat[m_qgVars.at(iQG)] *= acc_qgTaggerWeight(*new_jet);
+      if (m_isMC){
+	for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
+	  ANA_CHECK(m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]));
+	  m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, nullptr); // add qg taging
+	  if(acc_qgTaggerWeight.isAvailable(*new_jet))
+	    tMapFloat[m_qgVars.at(iQG)] *= acc_qgTaggerWeight(*new_jet);
+	}
       }
     }
   }
@@ -1168,29 +1171,32 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     }
   }
   // add nloEWK
-  if(m_currentVariation=="Nominal"){
-    if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
-      tMapFloat["nloEWKWeight__1up"]=1.0;
-      tMapFloatW["nloEWKWeight__1up"]=1.0;
-      m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
-    }
-    if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
-      tMapFloat["nloEWKWeight__1down"]=1.0;
-      tMapFloatW["nloEWKWeight__1down"]=1.0;
-      m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
-    }
-    for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
-      if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){ 
-	tMapFloat[m_qgVars.at(iQG)]=1.0; 
-	tMapFloatW[m_qgVars.at(iQG)]=1.0;
-	m_tree_out->Branch("w"+m_qgVars.at(iQG),&(tMapFloatW[m_qgVars.at(iQG)])); 
+  if(m_isMC){
+    if(m_currentVariation=="Nominal"){
+      if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
+	tMapFloat["nloEWKWeight__1up"]=1.0;
+	tMapFloatW["nloEWKWeight__1up"]=1.0;
+	m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
       }
-    }// end qg variables
+      if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
+	tMapFloat["nloEWKWeight__1down"]=1.0;
+	tMapFloatW["nloEWKWeight__1down"]=1.0;
+	m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
+      }
+      for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
+	if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){ 
+	  tMapFloat[m_qgVars.at(iQG)]=1.0; 
+	  tMapFloatW[m_qgVars.at(iQG)]=1.0;
+	  m_tree_out->Branch("w"+m_qgVars.at(iQG),&(tMapFloatW[m_qgVars.at(iQG)])); 
+	}
+      }// end qg variables
+    }
   }
 
   m_tree->SetBranchStatus("runNumber", 1);
   m_tree->SetBranchStatus("randomRunNumber", 1);
   m_tree->SetBranchStatus("eventNumber", 1);
+  m_tree->SetBranchStatus("nParton", 1);
   m_tree->SetBranchStatus("averageIntPerXing", 1);
   m_tree->SetBranchStatus("mcEventWeight", 1);
   m_tree->SetBranchStatus("mcEventWeights", 1);
@@ -1364,6 +1370,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("runNumber", &runNumber);
   m_tree->SetBranchAddress("randomRunNumber", &randomRunNumber);
   m_tree->SetBranchAddress("eventNumber", &eventNumber);
+  m_tree->SetBranchAddress("nParton", &nParton);
   m_tree->SetBranchAddress("averageIntPerXing", &averageIntPerXing);
   m_tree->SetBranchAddress("mcEventWeight", &mcEventWeight);
   m_tree->SetBranchAddress("mcEventWeights", &mcEventWeights);
