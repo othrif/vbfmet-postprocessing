@@ -10,6 +10,7 @@
 #include "TTree.h"
 #include "TH1D.h"
 #include <vector>
+#include <map>
 #include <iostream>
 
 using namespace std;
@@ -70,7 +71,11 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
    //Example histogram, see initialize method for registration to output histSvc
    //TH1D* m_myHist = 0;
    //TTree* m_myTree = 0;
-
+  Bool_t m_doSigOverlapTree = false;
+  std::map<unsigned, TFile *> m_signalOverlapFileMap;
+  std::map<unsigned, TTree *> m_signalOverlapTreeMap;
+  unsigned long long m_sigOverlapEvent;
+  vector<int> m_sigOverlapCategory;
   //output tree                                                                                                                                                                                                   
   std::string currentVariation = "Nominal";
   std::string currentSample = "Z_strong";//"W_strong";

@@ -3,6 +3,7 @@
 #include "SUSYTools/SUSYCrossSection.h"
 #include "PathResolver/PathResolver.h"
 #include "TLorentzVector.h"
+#include "TFile.h"
 #include <math.h>
 
 HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ){
@@ -169,6 +170,13 @@ StatusCode HFInputAlg::CheckHists(vector <std::pair<vector <TH1F*>, std::string>
 StatusCode HFInputAlg::finalize() {
   ATH_MSG_INFO ("Finalizing " << name() << "...");
 
+  // write out the overlap trees
+  for(std::map<unsigned, TTree *>::iterator treeIter = m_signalOverlapTreeMap.begin(); treeIter != m_signalOverlapTreeMap.end(); ++treeIter){
+    m_signalOverlapFileMap[treeIter->first]->cd();
+    treeIter->second->Write();
+    m_signalOverlapFileMap[treeIter->first]->Close();
+  }
+
   return StatusCode::SUCCESS;
 }
 
@@ -190,6 +198,20 @@ StatusCode HFInputAlg::execute() {
   bool CRZmm = false;
 
   m_tree->GetEntry(m_tree->GetReadEntry());
+
+  // check if we need to output the physics tree for signal overlap
+  if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634)){
+    m_doSigOverlapTree=true;
+    if(m_signalOverlapFileMap.find(runNumber)==m_signalOverlapFileMap.end()){
+      stringstream soName;
+      soName << "signal_overlap" << runNumber << ".root";
+      m_signalOverlapFileMap[runNumber] = new TFile(soName.str().c_str(),"RECREATE");
+      m_signalOverlapTreeMap[runNumber] = new TTree("physics","signal overlap tree");
+      m_signalOverlapTreeMap[runNumber]->SetDirectory(m_signalOverlapFileMap[runNumber]);
+      m_signalOverlapTreeMap[runNumber]->Branch("event", &m_sigOverlapEvent, "event/l");
+      m_signalOverlapTreeMap[runNumber]->Branch("category",&m_sigOverlapCategory);
+    }
+  }else{  m_doSigOverlapTree=false; }
 
   // Compute jet centrality
   float max_centrality=0.0, maxmj3_over_mjj=0.0;
@@ -449,6 +471,17 @@ StatusCode HFInputAlg::execute() {
   if (CRZee) HistoFill(hCRZee[bin],w_final);
   if (CRZmm) HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu);
 
+  //  add events to the signal overlap tree
+  if(m_doSigOverlapTree && (SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm)){
+    m_sigOverlapEvent = eventNumber;
+    m_sigOverlapCategory.clear();
+    m_sigOverlapCategory.push_back(n_ph==0 ? 0 : 5); // 0 = VBF analysis, 5 = photon analysis
+    m_sigOverlapCategory.push_back(SR ? 0 : (CRZee || CRZmm) ? 2 : 1);
+    m_sigOverlapCategory.push_back(SR ? 0 : 1);
+    m_sigOverlapCategory.push_back(bin); // add the bin number. analysis specific
+    m_signalOverlapTreeMap[runNumber]->Fill();
+  }
+
   setFilterPassed(true); //if got here, assume that means algorithm passed
   return StatusCode::SUCCESS;
 }
@@ -559,7 +592,6 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
   m_tree->SetBranchAddress("n_jet",&n_jet);
   m_tree->SetBranchAddress("n_bjet",&n_bjet);
-  m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_el",&n_el);
   m_tree->SetBranchAddress("n_mu",&n_mu);
