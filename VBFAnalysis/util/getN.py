@@ -43,7 +43,7 @@ if args.pickle==None:
         else:
             p = subprocess.Popen("ls "+fdir.replace("root","*/*"), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             
-        nevent = 0
+        nevent = ROOT.Double(0.0)
         for line in p.stdout.readlines():
             filepath = line.strip()
             print filepath
@@ -78,7 +78,7 @@ else:
                     dsid_string = samplesplit[p+1]
         #dsid_string='308276'
         print 'dsid: ',dsid_string
-        nevent = 0
+        nevent = ROOT.Double(0.0)
         for line in contFileList:
             filepath = line.strip()
             print filepath
