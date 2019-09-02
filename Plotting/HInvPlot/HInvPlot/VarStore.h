@@ -57,6 +57,7 @@ namespace Msl
 
     UInt_t       RunNumber;
     UInt_t       EventNumber;
+    Float_t     AverageIntPerXing;
 
   private:
     

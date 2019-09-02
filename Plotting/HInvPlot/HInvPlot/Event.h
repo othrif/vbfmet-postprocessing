@@ -110,6 +110,7 @@ namespace Msl
     unsigned long int    RunNumber;
     unsigned long int    RandomRunNumber;    
     unsigned long int    EventNumber;
+    float		 AverageIntPerXing;
 
     double               totalWeight;
 
