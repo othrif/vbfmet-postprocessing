@@ -483,15 +483,16 @@ if __name__ == "__main__":
     fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
     XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
     fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
+    fname ='v28Loose_metsf_withORVBFTopo_9070_tenac_xe90VBFVersion' #v28Loose_metsf_VBFTopo.root    
     VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
     #fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
     #VBFTopoUniq_u_tenac = DrawSF(can, trig, lep, mvar, fname)        
 
-    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['#mu XE','#mu XEORVBF'],'xeComparison_mu_SF', ytitle='Trigger Eff.',trig='xe,VBFOR')
+    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['#mu XE','#mu XEORVBFxe90'],'xeComparison_mu_SF_xe90', ytitle='Trigger Eff.',trig='xe,VBFOR')
 
     lep='e'
     fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
     XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
     fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
     VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
-    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['e XE','e XEORVBF'],'xeComparison_e_SF', ytitle='Trigger Eff.',trig='xe,VBFOR')    
+    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['e XE','e XEORVBFxe90'],'xeComparison_e_SF_xe90', ytitle='Trigger Eff.',trig='xe,VBFOR')    
