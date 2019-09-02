@@ -475,10 +475,13 @@ StatusCode HFInputAlg::execute() {
   if(m_doSigOverlapTree && (SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm)){
     m_sigOverlapEvent = eventNumber;
     m_sigOverlapCategory.clear();
-    m_sigOverlapCategory.push_back(n_ph==0 ? 0 : 5); // 0 = VBF analysis, 5 = photon analysis
-    m_sigOverlapCategory.push_back(SR ? 0 : (CRZee || CRZmm) ? 2 : 1);
-    m_sigOverlapCategory.push_back(SR ? 0 : 1);
-    m_sigOverlapCategory.push_back(bin); // add the bin number. analysis specific
+    stringstream evtCategory;
+    evtCategory << 9;
+    evtCategory << (n_ph==0 ? "0" : "5"); // 0 = VBF analysis, 5 = photon analysis 
+    evtCategory << (SR ? "0" : (CRZee || CRZmm) ? "2" : "1");
+    evtCategory << (SR ? "0" : "1");
+    evtCategory << bin; // add the bin number. analysis specific   
+    m_sigOverlapCategory.push_back(std::stoi(evtCategory.str()));
     m_signalOverlapTreeMap[runNumber]->Fill();
   }
 
