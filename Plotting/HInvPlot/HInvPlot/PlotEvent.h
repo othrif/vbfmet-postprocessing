@@ -136,6 +136,9 @@ namespace Msl
     TH1                        *hWMadMCIDQCD;
     TH1                        *hZPowMCIDQCD;    
     std::map<Mva::Var,TH1*>    fHistVec;
+
+    TH2				*hMetvsMu;
+    TH2				*hMetvsNvx;
   };
 }
 

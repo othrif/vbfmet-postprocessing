@@ -40,7 +40,8 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
-				  hZPowMCIDQCD(0)
+				  hZPowMCIDQCD(0),
+				  hMetvsMu(0), hMetvsNvx(0)
 {
 }
 
@@ -131,6 +132,9 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 100, 363122.5,363222.5);  
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
+
+  hMetvsMu = GetTH2("MetvsMu",100,0.0,500.0,60,0.0,60.0);
+  hMetvsNvx = GetTH2("MetvsNvx",100,0.0,500.0,40,0.0,40.0);
 
   // jj_mass limits
   float binsjjmass [7] = { 0.0, 200.0, 500.0, 1000.0, 1500.0, 2000.0, 3000.0 }; 
@@ -276,6 +280,10 @@ bool Msl::PlotEvent::DoExec(Event &event)
     hJetEMECvsBCIDPosPt35->Fill(njet35EMEC,event.GetVar(Mva::BCIDDistanceFromFront));
     hJetEMECvsBCIDPosPt55->Fill(njet55EMEC,event.GetVar(Mva::BCIDDistanceFromFront));
   }
+
+  if(hMetvsMu)hMetvsMu->Fill(event.GetVar(Mva::met_tst_et),event.GetVar(Mva::averageIntPerXing),weight);
+  if(hMetvsNvx)hMetvsNvx->Fill(event.GetVar(Mva::met_tst_et),event.GetVar(Mva::n_vx),weight);
+
   // end testing
 
   // jet DR

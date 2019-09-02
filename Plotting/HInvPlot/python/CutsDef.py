@@ -31,7 +31,8 @@ class BasicCuts:
                             'metsfVBFTopo','metsfxe110XE70','metsfxe110XE65',
                             'metsfxe90','metsfxe100','metsfxe110L155','metsfxe100L150',
                             'metsfVBFTopotrigOR','metsfxe110XE70trig','metsfxe110XE65trig',
-                            'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]:
+                            'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',
+			    'hspu','hshs','hspumjj2','hshsmjj2']:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
         
         self.analysis = Analysis
@@ -96,7 +97,7 @@ class BasicCuts:
             self.DEtajjLowerCut = 4.2 # remove
             self.DPhijjUpperCut = 2.0
             self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
-        if Analysis.count('mjj2000'):
+        if Analysis.count('mjj2000') or Analysis.count('hspumjj2') or Analysis.count('hshsmjj2'):
             self.MjjLowerCut   = 2000.0
             self.MjjUpperCut   = -1.0
         if Analysis.count('dphijj1'):
@@ -296,6 +297,10 @@ def getJetCuts(basic_cuts, options, isPh=False):
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')] # move to 50
             #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
+	    if basic_cuts.analysis=='hspu' or basic_cuts.analysis=='hspumjj2':
+		cuts += [CutItem('CutHSPU', 'nTruthJetMatch==1')]
+	    elif basic_cuts.analysis=='hshs' or basic_cuts.analysis=='hshsmjj2':
+		cuts += [CutItem('CutHSHS', 'nTruthJetMatch>1')]
     else:
         cuts = [CutItem('CutNjet',  'n_jet == 2')]
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 60.0')]
