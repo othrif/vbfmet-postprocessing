@@ -127,8 +127,6 @@ def getSelKeyLabel(selkey):
         elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
         elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<1TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
-        elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5 SR'            
-        elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5 SR'            
         elif selkey.count('njgt2_'):  proc += ',2<N_{jet} SR'            
         elif selkey.count('njgt3_'):  proc += ',3<N_{jet} SR'            
         elif selkey.count('sr_'):  proc += ', SR'
@@ -138,6 +136,10 @@ def getSelKeyLabel(selkey):
             else:
                 proc += ', WCR'
         elif selkey.count('zcr'): proc += ', ZCR'
+        elif selkey.count('muLow'): proc += ', #mu<40'
+        elif selkey.count('muHigh'): proc += ', #mu>=40'
+        elif selkey.count('vxLow'): proc += ', n_vx<40'
+        elif selkey.count('vxHigh'): proc += ', n_vx>=40'
         if selkey.count('FJVT_'):  proc += ',f-jvt'                    
     return proc
 
@@ -306,6 +308,10 @@ def getHistPars(hist):
     'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
     'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
+    'muLow'	:{'xtitle':'j3 #eta, #mu<40',	'ytitle':'Events',	'ymin':0.1},
+    'muHigh'	:{'xtitle':'j3 #eta, #mu>=40',	'ytitle':'Events',	'ymin':0.1},
+    'runLow'	:{'xtitle':'j3 #eta, before Run 355258',	'ytitle':'Events',	'ymin':0.1},
+    'runHigh'	:{'xtitle':'j3 #eta, after Run 355258',	'ytitle':'Events',	'ymin':0.1},
         }
 
     try:

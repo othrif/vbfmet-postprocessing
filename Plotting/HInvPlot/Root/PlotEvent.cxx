@@ -36,6 +36,8 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hmin_mj3(0),
 				  hmin_mj3_over_mjj(0),
 				  hcentrality(0),
+				  hmuLow(0), hmuHigh(0),
+				  hrunLow(0), hrunHigh(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
@@ -120,6 +122,10 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hj3Eta            = GetTH1("j3Eta",            22,  -4.5,  4.5);
   hj3Jvt            = GetTH1("j3Jvt",            12,  -0.2,  1.0);
   hj3FJvt           = GetTH1("j3FJvt",           22,  -0.2,  2.0);
+  hmuLow            = GetTH1("muLow",            22,  -4.5,  4.5);
+  hmuHigh           = GetTH1("muHigh",            22,  -4.5,  4.5);
+  hrunLow           = GetTH1("runLow",            22,  -4.5,  4.5);
+  hrunHigh          = GetTH1("runHigh",            22,  -4.5,  4.5);
 
   hmuDR           = GetTH1("muDR",           25,  0.0,  5.0);
   hmuEta          = GetTH1("muEta",          30,  0.0,  3.0);    
@@ -264,6 +270,10 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(hj3Eta) hj3Eta->Fill(event.jets.at(2).eta, weight);
     if(hj3Jvt) hj3Jvt->Fill(event.jets.at(2).GetVar(Mva::jvt), weight);
     if(hj3FJvt) hj3FJvt->Fill(event.jets.at(2).GetVar(Mva::fjvt), weight);
+    if(hmuLow && event.AverageIntPerXing<40) hmuLow->Fill(event.jets.at(2).eta, weight);
+    if(hmuHigh && event.AverageIntPerXing>=40) hmuHigh->Fill(event.jets.at(2).eta, weight);
+    if(hrunLow && event.RunNumber<355250) hrunLow->Fill(event.jets.at(2).eta, weight);
+    if(hrunHigh && event.RunNumber>355250) hrunHigh->Fill(event.jets.at(2).eta, weight);
   }
   if(event.HasVar(Mva::BCIDDistanceFromFront)){
     hJetEMECvsBCIDPosPt25->Fill(njet25EMEC,event.GetVar(Mva::BCIDDistanceFromFront));

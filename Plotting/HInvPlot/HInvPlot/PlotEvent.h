@@ -126,6 +126,11 @@ namespace Msl
     TH1                        *hj3FJvt;      
     TH1                        *hmuDR;      
     TH1                        *hmuEta;
+
+    TH1			       *hmuLow;
+    TH1			       *hmuHigh;
+    TH1			       *hrunLow;
+    TH1			       *hrunHigh;
     
     TH1                        *hZMCIDQCD;
     TH1                        *hWMCIDQCD;

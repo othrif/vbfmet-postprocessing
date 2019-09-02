@@ -31,7 +31,8 @@ class BasicCuts:
                             'metsfVBFTopo','metsfxe110XE70','metsfxe110XE65',
                             'metsfxe90','metsfxe100','metsfxe110L155','metsfxe100L150',
                             'metsfVBFTopotrigOR','metsfxe110XE70trig','metsfxe110XE65trig',
-                            'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]:
+                            'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',
+			    'muLow','muHigh','vxLow','vxHigh',]:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
         
         self.analysis = Analysis
@@ -278,7 +279,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
             cuts += basic_cuts.GetLeadJetEtaCut()
-            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5':
+            if basic_cuts.analysis!='njgt2':
                 #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
                 cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
                 cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
@@ -318,6 +319,17 @@ def getVBFCuts(options, basic_cuts, isLep=False):
         cuts += basic_cuts.GetDEtajjCut() 
         cuts += basic_cuts.GetMjjCut()
     #cuts += [CutItem('CutMu40','averageIntPerXing>40.0')]
+
+    if basic_cuts.analysis=='muLow':
+	cuts += [CutItem('CutLowMu', 'averageIntPerXing<40')]
+    elif basic_cuts.analysis=='muHigh':
+	cuts += [CutItem('CutHighMu', 'averageIntPerXing>=40')]
+    if basic_cuts.analysis=='vxLow':
+	#cuts += [CutItem('CutLowVx', 'n_vx<40')]
+	cuts += [CutItem('CutLowVx', 'n_vx<25')]
+    elif basic_cuts.analysis=='vxHigh':
+	#cuts += [CutItem('CutHighVx', 'n_vx>=40')]
+	cuts += [CutItem('CutHighVx', 'n_vx>=25')]
 
     return cuts
 
