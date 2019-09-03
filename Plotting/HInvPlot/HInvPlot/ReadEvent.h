@@ -139,6 +139,7 @@ namespace Msl
     TString                     fMVAName;
     
     std::vector<std::string>    fTrees;
+    std::set<std::string>       fTreesMap;
     std::vector<std::string>    fFiles;
     std::map<int,std::string>   fSampleMap; // mcid to plotting type
 
