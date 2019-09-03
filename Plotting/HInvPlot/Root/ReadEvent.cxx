@@ -556,7 +556,13 @@ void Msl::ReadEvent::Read(const std::string &path)
   // setting up auto discovery of trees
   bool autoDiscovery=false;
   if(fTrees.size()==0){
-    for(const auto &key: *dir->GetListOfKeys())  fTrees.push_back(std::string(key->GetName()));
+    for(const auto &key: *dir->GetListOfKeys()){
+      if(fTreesMap.find(std::string(key->GetName()))==fTreesMap.end()){ // remove duplicate trees if they appear
+	fTrees.push_back(std::string(key->GetName()));
+	fTreesMap.insert(std::string(key->GetName()));
+	std::cout << "Tree Name: " << key->GetName() << std::endl;
+      }
+    }
     autoDiscovery=true;
   }
 
@@ -593,7 +599,7 @@ void Msl::ReadEvent::Read(const std::string &path)
   //
   // remove the trees afterward to search the next file
   //
-  if(autoDiscovery) fTrees.clear();
+  if(autoDiscovery){  fTrees.clear(); fTreesMap.clear(); }
   log() << "Read - processing time: " << Msl::PrintResetStopWatch(timer) << endl;
 }
 

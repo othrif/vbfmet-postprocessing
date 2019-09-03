@@ -439,9 +439,10 @@ StatusCode HFInputAlg::execute() {
   if (isMC) w_final = w*1000.0*lumi;
   int bin = 0;
   if(doTMVA){
-    float tmvaBinBoundaries[8] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0};
+    float tmvaBinBoundaries[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
     // find the right bin
-    for(unsigned i=0; i<7; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]) bin=i; break; } 
+    for(unsigned i=0; i<7; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } } 
+    //std::cout << "tmva: " << tmva << " bin: " << bin << std::endl;
   }else{
     if (jj_mass < 1.5e6) bin = 0;
     else if (jj_mass < 2e6) bin = 1;

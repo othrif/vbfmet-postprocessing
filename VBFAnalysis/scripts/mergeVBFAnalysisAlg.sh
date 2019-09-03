@@ -1,6 +1,6 @@
 #!/bin/bash                                                                                                                                                                                                       
 #OUTDIRM=v31TightEM2018
-OUTDIRM=v26TightQG
+OUTDIRM=v31LoosePF
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
