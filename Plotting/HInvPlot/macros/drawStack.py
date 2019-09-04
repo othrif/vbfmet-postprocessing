@@ -267,6 +267,7 @@ def getHistPars(hist):
     'truth_jj_mass'     : {'xtitle':'Truth m_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_deta'     : {'xtitle':'Truth #Delta#eta_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
     'truthJet1Pt'     : {'xtitle':'Truth sub-lead Jet p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+        'truthJet2Pt'     : {'xtitle':'Truth third Jet p_{T} [GeV]'   ,         'ytitle':'Events','xmax':50 ,  'ymin':0.1},
     'nTruthJetMatch'     : {'xtitle':'Number of Truth Matched Jets'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_baseel'     : {'xtitle':'Number of Base Electrons'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_tau'     : {'xtitle':'Number of Taus'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -758,12 +759,15 @@ class DrawStack:
         self.nf_map = nf_map
         self.file_pointer = file
         self.zcr_stack = None
+        self.wcr_stack = None
         if options.blind and self.selkey.count('pass_sr') and self.selkey.count('_nn_Nominal'): #and self.selkey=='pass_sr_allmjj_nn_Nominal':
             replace_sr_name = self.selkey[self.selkey.find('pass_sr_')+len('pass_sr_'): self.selkey.find('_nn_Nominal')]
             zcr_name=copy.copy(name)
+            wcr_name=copy.copy(name)
             if zcr_name.count('_tst_et') and not zcr_name.count('_nolep') and not zcr_name.count('soft'):
                 zcr_name = zcr_name.replace('_tst_et','_tst_nolep_et')
             self.zcr_stack = DrawStack(zcr_name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_'+replace_sr_name+'_ll_Nominal')
+            self.wcr_stack = DrawStack(wcr_name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_wcr_'+replace_sr_name+'_l_Nominal')
         self.sign = self.ReadSample(file, sign)
         if options.hscale!=None:
             self.sign.hist.Scale(float(options.hscale))
@@ -1793,12 +1797,40 @@ class DrawStack:
                                     total_zcr = 1.0/math.sqrt(total_zcr)
                                 if total_zcrOpp>0.0:
                                     total_zcrOpp = 1.0/math.sqrt(total_zcrOpp)
+
+                                total_wcr = -100.0
+                                total_wcrOpp = -100.0
+                                if self.wcr_stack and not self.wcr_stack.bkg_sum:
+                                    self.wcr_stack.bkg_sum = self.wcr_stack.GetTotalBkgHist()
+                                total_wcr = self.wcr_stack.bkg_sum.Integral(0,ibin)
+                                if leftToRight==0 and self.wcr_stack:
+                                    total_wcr = self.wcr_stack.bkg_sum.Integral(ibin,10001)
+                                elif (leftToRight==2) and self.wcr_stack:
+                                    total_wcr = self.wcr_stack.bkg_sum.Integral(ibin,ibin)
+                                elif leftToRight==3: # add bins together                                                                            
+                                    total_wcrOpp = self.wcr_stack.bkg_sum.Integral(ibin+1,10001)
+                                elif leftToRight==4 and ibin%2==0:# pair every 2 bins together                                                      
+                                    total_wcr = self.wcr_stack.bkg_sum.GetBinContent(ibin-1)
+                                    total_wcrOpp = self.wcr_stack.bkg_sum.GetBinContent(ibin)
+                                    if ibin==2:#For leading Nominal bin (unpaired)                                                                  
+                                        total_wcr = self.wcr_stack.bkg_sum.Integral(ibin,ibin)
+                                elif leftToRight==4 and ibin%2==1:# pair every 2 bins together                                                      
+                                    total_wcr = self.wcr_stack.bkg_sum.GetBinContent(ibin)
+                                    total_wcrOpp = self.wcr_stack.bkg_sum.GetBinContent(ibin+1)
+                                    if ibin==1:#For leading Nominal bin (unpaired)                                                                  
+                                        total_wcr = self.wcr_stack.bkg_sum.Integral(ibin,ibin)
+                                if total_wcr>0.0:
+                                    total_wcr = 1.0/math.sqrt(total_wcr)
+                                if total_wcrOpp>0.0:
+                                    total_wcrOpp = 1.0/math.sqrt(total_wcrOpp)
                                 #print ibin,cut_Nbkg,total_zcr,zBKG,wBKG,cut_Nsig,(2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig)
                                 signifVal = 2.0*math.sqrt(cut_Nbkg + (zBKG*total_zcr)**2 +(wBKG*0.015)**2 )/cut_Nsig
+                                #signifVal = 2.0*math.sqrt(cut_Nbkg + (zBKG*total_wcr)**2 +(wBKG*0.015)**2 )/cut_Nsig
                                 if leftToRight==3 or leftToRight==4: # add bins together
                                     signifValOpp=0.0
                                     if cut_NsigOpp>0.0:
                                         signifValOpp = 2.0*math.sqrt(cut_NbkgOpp + (zBKGOpp*total_zcrOpp)**2 +(wBKGOpp*0.015)**2 )/cut_NsigOpp
+                                        #signifValOpp = 2.0*math.sqrt(cut_NbkgOpp + (zBKGOpp*total_zcrOpp)**2 +(wBKGOpp*0.015)**2 )/cut_NsigOpp
                                     if signifValOpp>0.0 and signifVal>0:
                                         signifVal = 1./math.sqrt(1./signifValOpp**2+1./signifVal**2)
                                     elif signifValOpp>0.0 and not signifVal>0:

@@ -372,8 +372,8 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=False)
     cutsTJV=CutItem("CutTJV")
-    cutsTJV.AddCut(CutItem('CutfTJV', 'n_jet > 2 && truthJet2Pt < 35e3 && truthJet2Eta < -2.4 && truthJet2Eta > 2.4'), 'OR')
-    cutsTJV.AddCut(CutItem('CutcTJV', 'n_jet > 2 && truthJet2Eta > -2.4 && truthJet2Eta < 2.4 && truthJet2Pt < 20e3'), 'OR')
+    cutsTJV.AddCut(CutItem('CutfTJV', 'n_jet > 2 && truthJet2Pt < 35 && truthJet2Eta < -2.4 && truthJet2Eta > 2.4'), 'OR')
+    cutsTJV.AddCut(CutItem('CutcTJV', 'n_jet > 2 && truthJet2Eta > -2.4 && truthJet2Eta < 2.4 && truthJet2Pt < 15'), 'OR')
     cutsTJV.AddCut(CutItem('CutnJetTJV', 'n_jet <= 2'), 'OR');
 
     cuts+=[cutsTJV]
@@ -566,9 +566,11 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=True)
     cutsTJV=CutItem("CutTJV")
-    cutsTJV.AddCut(CutItem('CutfTJV', 'n_jet > 2 && truthJet2Pt < 35e3 && truthJet2Eta < -2.4 && truthJet2Eta > 2.4'), 'OR')
-    cutsTJV.AddCut(CutItem('CutcTJV', 'n_jet > 2 && truthJet2Eta > -2.4 && truthJet2Eta < 2.4 && truthJet2Pt < 25e3'), 'OR')
+    cutsTJV.AddCut(CutItem('CutfTJV', 'n_jet > 2 && truthJet2Pt < 35 && truthJet2Eta < -2.4 && truthJet2Eta > 2.4'), 'OR')
+    cutsTJV.AddCut(CutItem('CutcTJV', 'n_jet > 2 && truthJet2Eta > -2.4 && truthJet2Eta < 2.4 && truthJet2Pt < 15'), 'OR')
     cutsTJV.AddCut(CutItem('CutnJetTJV', 'n_jet <= 2'), 'OR');
+
+    cuts+=[cutsTJV]
 
     return GetCuts(cuts)
 
@@ -595,9 +597,12 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=True)
     cutsTJV=CutItem("CutTJV")
-    cutsTJV.AddCut(CutItem('CutfTJV', 'n_jet > 2 && truthJet2Pt < 35e3 && truthJet2Eta < -2.4 && truthJet2Eta > 2.4'), 'OR')
-    cutsTJV.AddCut(CutItem('CutcTJV', 'n_jet > 2 && truthJet2Eta > -2.4 && truthJet2Eta < 2.4 && truthJet2Pt < 25e3'), 'OR')
+    cutsTJV.AddCut(CutItem('CutfTJV', 'n_jet > 2 && truthJet2Pt < 35 && truthJet2Eta < -2.4 && truthJet2Eta > 2.4'), 'OR')
+    cutsTJV.AddCut(CutItem('CutcTJV', 'n_jet > 2 && truthJet2Eta > -2.4 && truthJet2Eta < 2.4 && truthJet2Pt < 15'), 'OR')
     cutsTJV.AddCut(CutItem('CutnJetTJV', 'n_jet <= 2'), 'OR');
+
+    cuts+=[cutsTJV]
+
     return GetCuts(cuts)
 
 def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):

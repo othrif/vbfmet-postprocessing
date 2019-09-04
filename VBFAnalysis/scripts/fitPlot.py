@@ -14,8 +14,8 @@ import pickle
 import VBFAnalysis.ATLAS as ATLAS
 import VBFAnalysis.Style as Style
 from optparse import OptionParser
-#import VBFAnalysis.systematics as vbf_syst
-import HInvPlot.systematics as vbf_syst
+import VBFAnalysis.systematics as vbf_syst
+#import HInvPlot.systematics as vbf_syst
 
 import numpy as np
 
