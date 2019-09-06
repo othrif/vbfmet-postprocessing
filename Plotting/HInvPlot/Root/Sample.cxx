@@ -23,6 +23,7 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kZqcd:  return "zqcd";      
     case kWhww:  return "whww";
     case kTthw:  return "tthw";
+    case kTth:   return "tth";
     case kHtau:  return "htau";
     case kHwww:  return "hwww";
     case kHzww:  return "hzww";
@@ -97,6 +98,7 @@ std::string Msl::Mva::Convert2Std(Sample s)
     case kZqcd:  return "zqcd";
     case kWhww: return "HWW_wh";
     case kTthw: return "HWW_tth";
+    case kTth:  return "HWW_tth";
     case kHtau: return "H_tautau";
     case kHwww: return "HWW_hww";
     case kHzww: return "HWW_hwz";
@@ -169,6 +171,7 @@ std::string Msl::Mva::Convert2Tex(const SampleSet &s)
   if(s.GetName() == "zqcd")  return "Z QCD";    
   if(s.GetName() == "whww")  return "HWW wh";
   if(s.GetName() == "tthw")  return "HWW tth";
+  if(s.GetName() == "tth")   return "HWW tth";
   if(s.GetName() == "zjet")  return "Z$+$jets";
   if(s.GetName() == "zjee")  return "Z$+$jets ee";
   if(s.GetName() == "zjuu")  return "Z$+$jets $\\mu\\mu$";
@@ -215,6 +218,7 @@ Msl::Mva::Sample Msl::Mva::Convert2Sample(const std::string &s)
   if(s == "zqcd") return kZqcd;  
   if(s == "whww") return kWhww;
   if(s == "tthw") return kTthw;
+  if(s == "tth")  return kTth;
   if(s == "htau") return kHtau;
   if(s == "hwww") return kHwww;
   if(s == "hzww") return kHzww;
@@ -293,6 +297,7 @@ const std::vector<Msl::Mva::Sample>& Msl::Mva::GetAllSamples()
     vars.push_back(kWhww);
     vars.push_back(kHtau);
     vars.push_back(kTthw);
+    vars.push_back(kTth);
     vars.push_back(kHwww);
     vars.push_back(kHzww);
     vars.push_back(kZjet);

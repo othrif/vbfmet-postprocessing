@@ -148,6 +148,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t muSFWeight;
   Float_t elSFTrigWeight;
   Float_t muSFTrigWeight;
+  Float_t phSFWeight;
   Float_t xeSFTrigWeight;
   Float_t xeSFTrigWeight__1up;
   Float_t xeSFTrigWeight__1down;
@@ -160,6 +161,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t trigger_HLT_xe70_mht;
   Int_t trigger_HLT_noalg_L1J400;
   Int_t trigger_lep;
+  Int_t lep_trig_match;
   Int_t passGRL;
   Int_t passPV;
   Int_t passDetErr;
@@ -167,6 +169,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t n_bjet;
   Int_t n_el;
   Int_t n_mu;
+  Int_t n_el_w;
+  Int_t n_mu_w;
   Int_t n_ph;
   Int_t n_tau;
   Double_t jj_mass;
@@ -189,6 +193,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   // extra vars
   Int_t   n_baseel=0;
   Int_t   n_basemu=0;
+  Int_t   n_baseel_noOR=0;
+  Int_t   n_basemu_noOR=0;
+  Int_t   n_baseel_iso=0;
+  Int_t   n_basemu_iso=0;
   Float_t met_soft_tst_et=-9999;
   Float_t met_soft_tst_phi=-9999;
   Float_t met_soft_tst_sumet=-9999;

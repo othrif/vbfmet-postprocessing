@@ -723,11 +723,12 @@ def GetCuts(cuts):
 def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
 
     sigs = {}
-    sigs['higgs'] = ['hggf','hvh','hvbf']
+    sigs['higgs'] = ['hggf','hvh','hvbf','tth']
     sigs['hggf']  = ['hggf']
     #sigs['whww']  = ['whww']
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
+    sigs['tth']  = ['tth']
 
     bkgs = {}
 

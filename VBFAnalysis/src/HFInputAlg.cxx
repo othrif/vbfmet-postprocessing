@@ -68,6 +68,7 @@ StatusCode HFInputAlg::initialize() {
   basemu_phi= new std::vector<float>(0);
   basemu_ptvarcone20= new std::vector<float>(0); 
   basemu_ptvarcone30= new std::vector<float>(0); 
+  lep_trig_match=1; // init to 1 for older ntuples
   
   cout<<"NAME of input tree in intialize ======="<<currentVariation<<endl;
   if (currentSample == "data") isMC = false;
@@ -361,12 +362,12 @@ StatusCode HFInputAlg::execute() {
     met_significance = 0;
   }
 
-  bool trigger_lep_bool = (trigger_lep & 0x1)==0x1;
+  bool trigger_lep_bool = ((trigger_lep & 0x1)==0x1) && lep_trig_match>0; // note that lep_trig_match is only computed for signal lepton triggers. We assume it is perfect for dilepton triggers.
   bool trigger_lep_Zee_bool = trigger_lep_bool;
   bool trigger_lep_Zmm_bool = trigger_lep_bool;
   bool trigger_lep_Wmu_bool = trigger_lep_bool;
   if(m_extraVars<=5) xeSFTrigWeight_nomu=1.0;
-  if(m_extraVars>=5) { trigger_lep_Zmm_bool = (trigger_lep>0);  trigger_lep_Zee_bool = (trigger_lep>0); }
+  if(m_extraVars>=5) { trigger_lep_Zmm_bool = (trigger_lep_bool || (trigger_lep & 0x20)==0x20);  trigger_lep_Zee_bool = (trigger_lep_bool || (trigger_lep & 0x400)==0x400); }
   if(m_extraVars==6) { trigger_lep_Zmm_bool=passMETTrig; trigger_lep_Wmu_bool = passMETTrig; }
   if(m_extraVars==7 && passMETTrig){ trigger_lep_Zmm_bool=true; trigger_lep_Wmu_bool=true; }
   if(m_extraVars==7 && !passMETTrig){ xeSFTrigWeight_nomu=1.0; } // remove the MET trigger SF for non-met triggered events
@@ -411,16 +412,10 @@ StatusCode HFInputAlg::execute() {
   if(m_extraVars==4 || m_extraVars==5 || m_extraVars==6 || m_extraVars==7){
     ZelPtCut = n_baseel>0 ? (baseel_pt->at(0)>30.0e3): false;
     ZmuPtCut = n_basemu>0 ? (basemu_pt->at(0)>30.0e3): false;
-    //elSubPtCut = n_baseel>1 ? (baseel_pt->at(1)>7.0e3 && (baseel_ptvarcone20->at(1)/baseel_pt->at(1))<0.3): false;
-    //muSubPtCut = n_basemu>1 ? (basemu_pt->at(1)>7.0e3 && (basemu_ptvarcone30->at(1)/basemu_pt->at(1))<0.3): false;    
     elSubPtCut = n_baseel>1 ? (baseel_pt->at(1)>7.0e3): false;
     muSubPtCut = n_basemu>1 ? (basemu_pt->at(1)>7.0e3): false;    
-    //We_lepVeto  = ((n_baseel == 1) && (n_basemu == 0));
-    //Wm_lepVeto  = ((n_baseel == 0) && (n_basemu == 1));
     Zee_lepVeto = ((n_baseel == 2) && (n_basemu == 0));
     Zmm_lepVeto = ((n_baseel == 0) && (n_basemu == 2)); 
-    //elChPos = n_baseel>0 ? (baseel_charge->at(0) > 0) : false;
-    //muChPos = n_basemu>0 ? (basemu_charge->at(0) > 0) : false;
     OppSignElCut = n_baseel>1 ? (baseel_charge->at(0)*baseel_charge->at(1) < 0) : false;
     OppSignMuCut = n_basemu>1 ? (basemu_charge->at(0)*basemu_charge->at(1) < 0) : false;
 
@@ -601,13 +596,20 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("passJetCleanTight", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
+  m_tree->SetBranchStatus("lep_trig_match", 1);
   m_tree->SetBranchStatus("n_jet",1);
   m_tree->SetBranchStatus("n_bjet",1);
   m_tree->SetBranchStatus("n_ph",1);
   m_tree->SetBranchStatus("n_el",1);
   m_tree->SetBranchStatus("n_mu",1);
+  m_tree->SetBranchStatus("n_el_w",1);
+  m_tree->SetBranchStatus("n_mu_w",1);
   m_tree->SetBranchStatus("n_baseel",1);
   m_tree->SetBranchStatus("n_basemu",1);
+  m_tree->SetBranchStatus("n_baseel_noOR",1);
+  m_tree->SetBranchStatus("n_basemu_noOR",1);
+  m_tree->SetBranchStatus("n_baseel_iso",1);
+  m_tree->SetBranchStatus("n_basemu_iso",1);
   if(doTMVA) m_tree->SetBranchStatus("tmva",1);
   m_tree->SetBranchStatus("jj_mass",1);
   m_tree->SetBranchStatus("jj_deta",1);
@@ -643,14 +645,21 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("trigger_met", &trigger_met);
   m_tree->SetBranchAddress("trigger_met_encodedv2", &trigger_met_encodedv2);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
+  m_tree->SetBranchAddress("lep_trig_match", &lep_trig_match);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
   m_tree->SetBranchAddress("n_jet",&n_jet);
   m_tree->SetBranchAddress("n_bjet",&n_bjet);
   m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_el",&n_el);
   m_tree->SetBranchAddress("n_mu",&n_mu);
+  m_tree->SetBranchAddress("n_el_w",&n_el_w);
+  m_tree->SetBranchAddress("n_mu_w",&n_mu_w);
   m_tree->SetBranchAddress("n_baseel",&n_baseel);
   m_tree->SetBranchAddress("n_basemu",&n_basemu);
+  m_tree->SetBranchAddress("n_baseel_noOR",&n_baseel_noOR);
+  m_tree->SetBranchAddress("n_basemu_noOR",&n_basemu_noOR);
+  m_tree->SetBranchAddress("n_baseel_iso",&n_baseel_iso);
+  m_tree->SetBranchAddress("n_basemu_iso",&n_basemu_iso);
   if(doTMVA) m_tree->SetBranchAddress("tmva",&tmva);
   m_tree->SetBranchAddress("jj_mass",&jj_mass);
   m_tree->SetBranchAddress("jj_deta",&jj_deta);
