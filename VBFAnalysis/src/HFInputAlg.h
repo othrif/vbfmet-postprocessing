@@ -98,6 +98,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Double_t xeSFTrigWeight_nomu;
   Float_t met_significance;
   Int_t trigger_met;
+  Int_t trigger_met_encodedv2;
   Float_t w;
   Int_t runNumber;
   Int_t randomRunNumber;

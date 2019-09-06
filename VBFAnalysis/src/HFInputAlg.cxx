@@ -105,6 +105,9 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==4)  bins=7; // mjj binning
   else if(m_binning==5)  bins=7; // mjj binning
   else if(m_binning==6)  bins=8; // mjj binning + njet bin
+  else if(m_binning==7)  bins=10; // mjj binning + njet bin + dphijj by 2 mjj>800
+  else if(m_binning==8)  bins=10; // mjj binning + mjj>800 + njet bin
+  else if(m_binning==9)  bins=9; // mjj binning + mjj>800 + No njet bin
 
   for (int c=1;c<bins;c++) {
     hSR.push_back(HistoAppend(HistoNameMaker(currentSample,string("SR"+to_string(c)),to_string(c), syst, isMC), string("SR"+to_string(c))));
@@ -145,10 +148,10 @@ vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR) 
   vector <TH1F*> h;
   h.push_back(new TH1F((name+"_cuts").c_str(), (name+"_cuts;;").c_str(), 1, 0.5, 1.5));
   if (doPlot) {
-    if(doTMVA) h.push_back(new TH1F((name+"_tmva").c_str(), (name+"_tmva;;").c_str(), 10, 0, 5000));
     h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
     h.push_back(new TH1F((name+"_met_et").c_str(), (name+"_met_et;;").c_str(), 10, 0, 800));
     h.push_back(new TH1F((name+"_lepmet_et").c_str(), (name+"_lepmet_et;;").c_str(), 10, 0, 800));
+    if(doTMVA) h.push_back(new TH1F((name+"_tmva").c_str(), (name+"_tmva;;").c_str(), 2000, 0, 1.0));
   }
   return h;
 }
@@ -157,10 +160,10 @@ StatusCode HFInputAlg::CheckHists(vector <std::pair<vector <TH1F*>, std::string>
   for (auto hname : hnames) {
     CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_cuts", std::get<0>(hname)[0]));
     if (doPlot) {
-      if(doTMVA) CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_tmva", std::get<0>(hname)[1]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_jj_mass", std::get<0>(hname)[1]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_met_et", std::get<0>(hname)[2]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_lepmet_et", std::get<0>(hname)[3]));
+      if(doTMVA) CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_tmva", std::get<0>(hname)[4]));
     }
   }
   return StatusCode::SUCCESS;
@@ -234,7 +237,8 @@ StatusCode HFInputAlg::execute() {
   float METCut=180.0e3; // 150.0e3
   float METCSTJetCut = 150.0e3; // 120.0e3
   float jj_detaCut = 4.8; // 4.0
-  float jj_massCut = 1000.0e3;
+  float jj_massCut = 1000.0e3; // 1000.0e3
+  if(m_binning>=7 && m_binning<=9) jj_massCut = 800.0e3; // 1000.0e3 
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
   bool nbjetCut = (n_bjet < 2); 
 
@@ -296,6 +300,7 @@ StatusCode HFInputAlg::execute() {
     //leptonVeto = (n_baseel>0 || n_basemu>0) && !(((n_el+n_mu)==1 && (n_baseel+n_basemu)==1) || ((n_el+n_mu)==2 && (n_baseel+n_basemu)==2));
     metSoftVeto = met_soft_tst_et>20.0e3;
     if(m_extraVars==3) metSoftVeto=false;
+    //metSoftVeto=false;
     if(jet_fjvt->size()>1)
       fJVTVeto = fabs(jet_fjvt->at(0))>0.5 || fabs(jet_fjvt->at(1))>0.5;
     else fJVTVeto=true;
@@ -332,7 +337,21 @@ StatusCode HFInputAlg::execute() {
     if(currentVariation=="xeSFTrigWeight__1up")   { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 1); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_et, metRunNumber, 1); }
     if(currentVariation=="xeSFTrigWeight__1down") { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 2); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_et, metRunNumber, 2); }
   }
-
+  // Choose the met trigger
+  bool passMETTrig = ((trigger_met &0x1) == 0x1);
+  if(year==2017){
+    passMETTrig=0;
+    if     (325713<=metRunNumber && metRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))   passMETTrig=1; //HLT_xe90_pufit_L1XE50;    // period B
+    else if(329385<=metRunNumber && metRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) passMETTrig=1; //HLT_xe100_pufit_L1XE55;   // period C
+    else if(330857<=metRunNumber && metRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   passMETTrig=1; //HLT_xe110_pufit_L1XE55;   // period D1-D5
+    else if(341649>=metRunNumber && metRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  passMETTrig=1; //HLT_xe110_pufit_L1XE50;   // period D6-K  
+  }else if(year==2018){
+    passMETTrig=0;
+    if     (350067> metRunNumber && metRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    passMETTrig=1; // HLT_xe110_pufit_xe70_L1XE50
+    else if(350067<=metRunNumber && metRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) passMETTrig=1; // HLT_xe110_pufit_xe65_L1XE50
+    //if     (metRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
+    //if     (metRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
+  }
   // MET choice to be implemented...
   if (!((passJetCleanTight == 1) & nbjetCut & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 1.8) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (n_ph==0))) return StatusCode::SUCCESS; 
 
@@ -348,9 +367,9 @@ StatusCode HFInputAlg::execute() {
   bool trigger_lep_Wmu_bool = trigger_lep_bool;
   if(m_extraVars<=5) xeSFTrigWeight_nomu=1.0;
   if(m_extraVars>=5) { trigger_lep_Zmm_bool = (trigger_lep>0);  trigger_lep_Zee_bool = (trigger_lep>0); }
-  if(m_extraVars==6) { trigger_lep_Zmm_bool=((trigger_met &0x1) == 0x1); trigger_lep_Wmu_bool = ((trigger_met &0x1) == 0x1); }
-  if(m_extraVars==7 && ((trigger_met &0x1) == 0x1)){ trigger_lep_Zmm_bool=true; trigger_lep_Wmu_bool=true; }
-  if(m_extraVars==7 && !((trigger_met &0x1) == 0x1)){ xeSFTrigWeight_nomu=1.0; } // remove the MET trigger SF for non-met triggered events
+  if(m_extraVars==6) { trigger_lep_Zmm_bool=passMETTrig; trigger_lep_Wmu_bool = passMETTrig; }
+  if(m_extraVars==7 && passMETTrig){ trigger_lep_Zmm_bool=true; trigger_lep_Wmu_bool=true; }
+  if(m_extraVars==7 && !passMETTrig){ xeSFTrigWeight_nomu=1.0; } // remove the MET trigger SF for non-met triggered events
   // compute the mll
   float mll=-999.0;
   TLorentzVector l0, l1;
@@ -417,7 +436,7 @@ StatusCode HFInputAlg::execute() {
       mll = (l0+l1).M();
     }
   }
-  if (((trigger_met &0x1) == 0x1) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (SR_lepVeto)) SR = true;
+  if ((passMETTrig) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & (met_tst_j1_dphi>1.0) & (met_tst_j2_dphi>1.0) & (SR_lepVeto)) SR = true;
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (met_significance > 4.0)) CRWep = true;}
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance > 4.0)) CRWen = true;}
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0) && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (met_significance <= 4.0)) CRWepLowSig = true;}
@@ -433,20 +452,46 @@ StatusCode HFInputAlg::execute() {
     if(SR) std::cout << "SR " << runNumber << " " << eventNumber << std::endl;
   }
   Float_t w_final = 1;
-  Float_t lumi = 36.1;
+  Float_t lumi = 36.208;//36207.66
   if(year==2017)      lumi = 44.3074;
-  else if(year==2018) lumi = 59.9372;
+  else if(year==2018) lumi = 58.4501; //59.9372;
   if (isMC) w_final = w*1000.0*lumi;
   int bin = 0;
   if(doTMVA){
-    float tmvaBinBoundaries[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
+    //float tmvaBinBoundaries[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
+    //float tmvaBinBoundaries[8] = {0.0, 0.75300000, 0.8300000, 0.8800000, 0.9100000, 0.9400000, 0.9600000, 1.0};//var 11 run best    
+    //float tmvaBinBoundaries[8] = { 0.0000000, 0.69000000, 0.76500000, 0.80300000, 0.83300000, 0.86100000, 0.88780000,1.0 };//var5
+    //float tmvaBinBoundaries[8] = { 0.0000000, 0.71000000, 0.78400000, 0.82300000, 0.85300000, 0.88000000, 0.9078, 1.0 }; //var7
+    //float tmvaBinBoundaries[8] = { 0.0000000, 0.74000000, 0.80200000, 0.84000000, 0.86700000, 0.89000000, 0.91300000,1.0 };//var9
+    //float tmvaBinBoundaries[8] = { 0.0000000, 0.7300000, 0.83000000, 0.87700000, 0.90900000, 0.93400000, 0.9559,1.0 }; //var11
+    float tmvaBinBoundaries[8] = { 0.0000000, 0.61600000, 0.72400000, 0.79000000, 0.83800000, 0.87700000, 0.91100000,1.0 };//var 11 -mjj500
+    //float tmvaBinBoundaries[8] = { 0.0000000, 0.70050000, 0.77450000, 0.81800000, 0.85200000, 0.88100000, 0.91050000,1.0 }; //var8
+    //float tmvaBinBoundaries[8] = { 0.0000000, 0.73100000, 0.80450000, 0.84200000, 0.87050000, 0.89400000, 0.91800000,1.0 }; //var6
     // find the right bin
     for(unsigned i=0; i<7; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } } 
+    //if(n_jet>2) bin=1; // test
     //std::cout << "tmva: " << tmva << " bin: " << bin << std::endl;
   }else{
-    if (jj_mass < 1.5e6) bin = 0;
-    else if (jj_mass < 2e6) bin = 1;
-    else bin = 2;
+    bool AddBelow1TeV=(m_binning>=7);
+    if(!AddBelow1TeV){
+      if (jj_mass < 1.5e6) bin = 0;
+      else if (jj_mass < 2e6) bin = 1;
+      else bin = 2;
+    }else if(m_binning==7){
+      if      (jj_mass < 1.0e6) bin = 0;
+      else if (jj_mass < 1.5e6) bin = 1;
+      else if (jj_mass < 2e6)   bin = 2;
+      else bin = 3;
+    }else if(m_binning==8 || m_binning==9){
+      if      (jj_mass < 1.00e6) bin = 0;
+      else if (jj_mass < 1.25e6) bin = 1;
+      else if (jj_mass < 1.50e6) bin = 2;
+      else if (jj_mass < 1.75e6) bin = 3;
+      else if (jj_mass < 2.00e6) bin = 4;
+      else if (jj_mass < 2.25e6) bin = 5;
+      else if (jj_mass < 2.50e6) bin = 6;
+      else bin = 7;
+    }
 
     // alternative binning approaches
     if(m_binning==-1 && JetQGTagger) bin+=3;
@@ -456,8 +501,12 @@ StatusCode HFInputAlg::execute() {
     if(m_binning==4 && (n_jet>2))    bin+=3; // separate extra jets, mjj binning
     if(m_binning==5 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
     // combo
+    
     if(m_binning==6 && (jj_dphi>1))  bin+=3; // separate dphijj, mjj binning
     if(m_binning==6 && (n_jet>2))    bin=6; // separate dphijj, mjj binning, njet binning
+    if(m_binning==7 && (jj_dphi>1))  bin+=4; // separate dphijj, mjj binning
+    if(m_binning==7 && (n_jet>2))    bin=8; // separate dphijj, mjj binning, njet binning
+    if(m_binning==8 && (n_jet>2))    bin=8; // separate dphijj, mjj binning, njet binning
   }
 
   if(isnan(w_final)) std::cout << "isnan w_final? " << w_final << std::endl;
@@ -493,10 +542,10 @@ StatusCode HFInputAlg::execute() {
 void HFInputAlg::HistoFill(vector<TH1F*> hs, double w){
   hs[0]->Fill(1,w);
   if (doPlot) {
-    if(doTMVA) hs[1]->Fill(tmva,w);
     hs[1]->Fill(jj_mass/(1e3),w);
     hs[2]->Fill(met_tst_et/(1e3),w);
     hs[3]->Fill(met_tst_nolep_et/(1e3),w);
+    if(doTMVA) hs[4]->Fill(tmva,w);
   }
   return ;
 }
@@ -592,6 +641,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("randomRunNumber",&randomRunNumber);
   m_tree->SetBranchAddress("eventNumber",&eventNumber);
   m_tree->SetBranchAddress("trigger_met", &trigger_met);
+  m_tree->SetBranchAddress("trigger_met_encodedv2", &trigger_met_encodedv2);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
   m_tree->SetBranchAddress("n_jet",&n_jet);
