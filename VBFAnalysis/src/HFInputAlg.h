@@ -93,7 +93,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t m_extraVars = 0;
   Int_t m_binning = 0;
   Int_t m_metdef = 0;
-  Bool_t m_v26Ntuples=false;
+  Bool_t v26Ntuples=false;
 
   Double_t xeSFTrigWeight;
   Double_t xeSFTrigWeight_nomu;

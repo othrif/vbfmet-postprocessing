@@ -73,6 +73,8 @@ if args.isMadgraph:
     extraCommand+=' --isMadgraph '
 if args.doTMVA:
     extraCommand+=' --doTMVA '
+if args.v26Ntuples:
+    extraCommand+=' --v26Ntuples '
 if args.doPlot:
     extraCommand+=' --doPlot '
 if int(args.Binning)!=0:

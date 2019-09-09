@@ -75,7 +75,7 @@ class BasicCuts:
             self.MjjLowerCut   = 200.0
         if Analysis.count('mjjLow200'):
             self.MjjLowerCut   = 200.0
-            self.MjjUpperCut   = 1000.0
+            self.MjjUpperCut   = 800.0
         if Analysis.count('mjj1500'):
             self.MjjLowerCut   = 1500.0
             self.MjjUpperCut   = 2000.0

@@ -20,7 +20,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("doTMVA", doTMVA = false, "doTMVA flag, true means use the MVA");
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
   declareProperty("doPlot", doPlot =false, "doPlot flag, true means the output contains variable distributions");
-  declareProperty("v26Ntuples", m_v26Ntuples = false, "v26Ntuples flag, true means the setting for backward compatibility with v26 ntuples");
+  declareProperty("v26Ntuples", v26Ntuples = false, "v26Ntuples flag, true means the setting for backward compatibility with v26 ntuples");
   declareProperty("doDuplicateCheck", doDuplicateCheck =false, "doDuplicateCheck flag, true means the run and event numbers are printed");
   //declareProperty( "Property", m_nProperty = 0, "My Example Integer Property" ); //example property declaration
 }
@@ -191,7 +191,6 @@ StatusCode HFInputAlg::execute() {
 
   npevents++;
   if( (npevents%10000) ==0) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
-
   bool SR = false;
   bool CRWep = false;
   bool CRWen = false;
@@ -359,13 +358,18 @@ StatusCode HFInputAlg::execute() {
 
   if(n_el== 1) { met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0); } else {  met_significance = 0; }
 
-  if(m_v26Ntuples) lep_trig_match=1;
+  if(v26Ntuples) lep_trig_match=1;
   bool trigger_lep_bool = ((trigger_lep & 0x1)==0x1) && lep_trig_match>0; // note that lep_trig_match is only computed for signal lepton triggers. We assume it is perfect for dilepton triggers.
   bool trigger_lep_Zee_bool = trigger_lep_bool;
   bool trigger_lep_Zmm_bool = trigger_lep_bool;
   bool trigger_lep_Wmu_bool = trigger_lep_bool;
   if(m_extraVars<=5) xeSFTrigWeight_nomu=1.0;
-  if(m_extraVars>=5) { trigger_lep_Zmm_bool = (trigger_lep_bool || (trigger_lep & 0x20)==0x20);  trigger_lep_Zee_bool = (trigger_lep_bool || (trigger_lep & 0x400)==0x400); }
+  if(!v26Ntuples){
+    if(m_extraVars>=5) { trigger_lep_Zmm_bool = (trigger_lep_bool || (trigger_lep & 0x20)==0x20);  trigger_lep_Zee_bool = (trigger_lep_bool || (trigger_lep & 0x400)==0x400); }
+  }else{
+    if(m_extraVars>=5) { trigger_lep_Zmm_bool = (trigger_lep>0);  trigger_lep_Zee_bool = (trigger_lep>0); }
+  }
+
   if(m_extraVars==6) { trigger_lep_Zmm_bool=passMETTrig; trigger_lep_Wmu_bool = passMETTrig; }
   if(m_extraVars==7 && passMETTrig){ trigger_lep_Zmm_bool=true; trigger_lep_Wmu_bool=true; }
   if(m_extraVars==7 && !passMETTrig){ xeSFTrigWeight_nomu=1.0; } // remove the MET trigger SF for non-met triggered events
@@ -390,7 +394,7 @@ StatusCode HFInputAlg::execute() {
   bool Zee_lepVeto = ((n_el == 2) && (n_mu == 0));
   bool Zmm_lepVeto = ((n_el == 0) && (n_mu == 2));
 
-  if(!m_v26Ntuples){
+  if(!v26Ntuples){
     SR_lepVeto  = ((n_baseel == 0) && (n_basemu == 0));
     We_lepVeto  = ((n_baseel == 1) && (n_basemu == 0) && (n_el_w == 1));
     Wm_lepVeto  = ((n_baseel == 0) && (n_basemu == 1) && (n_mu_w == 1));
@@ -420,7 +424,7 @@ StatusCode HFInputAlg::execute() {
   bool muChPos = n_mu>0 ? (mu_charge->at(0) > 0) : false;
   bool OppSignElCut = n_el>1 ? (el_charge->at(0)*el_charge->at(1) < 0) : false;
   bool OppSignMuCut = n_mu>1 ? (mu_charge->at(0)*mu_charge->at(1) < 0) : false;
-  if(m_v26Ntuples){
+  if(v26Ntuples){
     if(m_extraVars==4 || m_extraVars==5 || m_extraVars==6 || m_extraVars==7){
       ZelPtCut = n_baseel>0 ? (baseel_pt->at(0)>30.0e3): false;
       ZmuPtCut = n_basemu>0 ? (basemu_pt->at(0)>30.0e3): false;
