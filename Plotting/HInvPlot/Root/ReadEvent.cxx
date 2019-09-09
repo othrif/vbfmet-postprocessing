@@ -685,6 +685,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       }else{
 	event->sample = fCurrSample;
       }
+      if(fIsDDQCD) event->sample=Mva::kQCD;
     }
     // Load XS trigger SF
     event->RepVar(Mva::xeSFTrigWeight,        xeSFTrigWeight);
