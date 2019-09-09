@@ -1,6 +1,6 @@
 #!/bin/bash                                                                                                                                                                                                       
 #OUTDIRM=v31TightEM2018
-OUTDIRM=v26LoosenoQG
+OUTDIRM=v31Loosemc16a
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
@@ -26,10 +26,16 @@ hadd $OUTDIRM/ttbar.root ttbar*root
 hadd $OUTDIRM/QCDw.root QCDw*root
 #hadd $OUTDIRM/QCDunw.root QCDunw*root
 #hadd signal.root *H125*root
+hadd $OUTDIRM/VBFH125Old.root  VBFH125Old*.root
+rm VBFH125Old*.root
 hadd $OUTDIRM/VBFH125.root  VBFH125*.root
 hadd $OUTDIRM/VBFHgam125.root  VBFHgam125*.root
 hadd $OUTDIRM/VBFHOther.root  VBFHOther*.root
+hadd $OUTDIRM/ggFH125Old.root  ggFH125Old*.root
+rm ggFH125Old*.root
 hadd $OUTDIRM/ggFH125.root  ggFH125*.root
+hadd $OUTDIRM/VH125Old.root  VH125Old*.root
+rm  VH125Old*.root
 hadd $OUTDIRM/VH125.root  VH125*.root
 
 

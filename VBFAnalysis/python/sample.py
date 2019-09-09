@@ -7,8 +7,8 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst,Ext)
-        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
-                               "VBFH125","ggFH125","VH125","TTH125","VBFHOther","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',"data"] # do not change order
+        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
+                               "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',"data"] # do not change order
 
         self.sampleMap = {'data':['data'],
                           'W_EWK':['W_EWK'],
@@ -18,6 +18,7 @@ class sample(object):
                           'Z_strong_VBFFilt':['Z_strong_VBFFilt'],
                           'Z_strongExt':['Z_strongExt'],
                           'Z_strongPTVExt':['Z_strongPTVExt'],
+                          'Z_strongmVBFFilt':['Z_strongmVBFFilt'],
                           'VV_VVV':['VV','VVV'],
                           'Zg_strong':['Zg_strong'],
                           'Wg_strong':['Wg_strong'],
@@ -25,7 +26,7 @@ class sample(object):
                           'SinglePhoton':['SinglePhoton'],
                           'SinglePhotonBCL':['SinglePhotonBCL'],
                           'VqqGam':['VqqGam'],
-                          'signal':['VBFH125','ggFH125','VH125','TTH125'],
+                          'signal':['VBFH125','ggFH125','VH125','TTH125','VBFHgam125'],
                           'signalOld':['VBFH125Old','ggFH125Old','VH125Old'],
                           'VBFHOther':['VBFHOther'],
                           'QCD':['QCDw','QCDunw'],
