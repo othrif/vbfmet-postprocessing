@@ -259,7 +259,7 @@ def getHistPars(hist):
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
-        'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
+        'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':20,  'ymin':0.01,'logy':False},
     'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
@@ -489,6 +489,8 @@ def getStyle(sample):
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
     color_higgs = ROOT.kViolet-9 #ROOT.kRed    +0
+    color_hvbf = ROOT.kRed+1 #ROOT.kRed    +0
+    color_hggf = ROOT.kRed+1 #ROOT.kRed    +0
     color_higgsall = ROOT.kRed+1 #ROOT.kRed    +0
     color_bkgs = ROOT.kBlue   +1
     color_data = ROOT.kBlack
@@ -512,8 +514,8 @@ def getStyle(sample):
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
-        #'hggf':{'color':color_hggf, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        #'hvbf':{'color':color_hvbf, 'fill_style':0,    'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'hggf':{'color':color_hggf, 'fill_style':0, 'marker_style': 0, 'line_width':5, 'leg_opt':'f'},
+        'hvbf':{'color':color_hvbf, 'fill_style':0,    'marker_style': 0, 'line_width':5, 'leg_opt':'f'},
         'data':{'color':color_data, 'fill_style':0,    'marker_style':20, 'line_width':0, 'leg_opt':'ple'},
         'bkgs':{'color':color_bkgs, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         }
