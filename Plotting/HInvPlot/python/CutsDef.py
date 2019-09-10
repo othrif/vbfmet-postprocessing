@@ -678,9 +678,8 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
             r207_base_cut = CutItem("CutBaseLep", "n_baselep > 0")
             new_cuts.append(r207_base_cut)
 
-        # We need to *remove* this cut if not running the r20.7 analysis as it
-        # requires there be signal leptons.
-        elif cutobj.GetCutName() == "CutSignalLep" and not options.r207Ana:
+        # We need to *remove* this cut (we don't want to require signal leptons).
+        elif cutobj.GetCutName() == "CutSignalLep":
             pass
 
         # Otherwise-- just add the cut.
