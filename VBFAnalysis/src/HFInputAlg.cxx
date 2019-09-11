@@ -208,7 +208,7 @@ StatusCode HFInputAlg::execute() {
     m_doSigOverlapTree=true;
     if(m_signalOverlapFileMap.find(runNumber)==m_signalOverlapFileMap.end()){
       stringstream soName;
-      soName << "signal_overlap" << runNumber << ".root";
+      soName << "Overlap_vbfhinv_" << runNumber << ".root";
       m_signalOverlapFileMap[runNumber] = new TFile(soName.str().c_str(),"RECREATE");
       m_signalOverlapTreeMap[runNumber] = new TTree("physics","signal overlap tree");
       m_signalOverlapTreeMap[runNumber]->SetDirectory(m_signalOverlapFileMap[runNumber]);
