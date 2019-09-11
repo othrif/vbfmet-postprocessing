@@ -39,6 +39,7 @@ namespace Msl
       kZqcd,
       kWhww,
       kTthw,
+      kTth,
       kHtau,
       kHwww,
       kHzww,

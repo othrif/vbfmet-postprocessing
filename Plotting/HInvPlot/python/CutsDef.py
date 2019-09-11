@@ -38,6 +38,7 @@ class BasicCuts:
         self.chan     = Chan
         self.SameSign = SameSign
         self.MjjLowerCut   = 1000.0
+        #self.MjjLowerCut   = 800.0
         self.MjjUpperCut   = -1.0
         self.DPhijjLowerCut   = -1.0
         self.DPhijjUpperCut   = 1.8
@@ -74,7 +75,7 @@ class BasicCuts:
             self.MjjLowerCut   = 200.0
         if Analysis.count('mjjLow200'):
             self.MjjLowerCut   = 200.0
-            self.MjjUpperCut   = 1000.0
+            self.MjjUpperCut   = 800.0
         if Analysis.count('mjj1500'):
             self.MjjLowerCut   = 1500.0
             self.MjjUpperCut   = 2000.0
@@ -392,9 +393,11 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
             cuts += metCuts(basic_cuts,options,metCut=120.0, cstCut=100.0)#, maxMET=150.0)
         else:
             cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=120.0)
+            #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
 
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=False)
+    #cuts += [CutItem('CutOneHSJet',  'nTruthJetMatch == 1')]
 
     return GetCuts(cuts)
 
@@ -720,11 +723,12 @@ def GetCuts(cuts):
 def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
 
     sigs = {}
-    sigs['higgs'] = ['hggf','hvh','hvbf']
+    sigs['higgs'] = ['hggf','hvh','hvbf','tth']
     sigs['hggf']  = ['hggf']
     #sigs['whww']  = ['whww']
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
+    sigs['tth']  = ['tth']
 
     bkgs = {}
 

@@ -210,6 +210,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w);
   //m_tree_out->Branch("nloEWKWeight",&nloEWKWeight);
+  m_tree_out->Branch("puSyst2018Weight",&puSyst2018Weight);
   m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight);
   if(m_currentVariation=="Nominal"){ // only write for the nominal
     m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
@@ -229,12 +230,15 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("MGVTruthPt", &MGVTruthPt);
   m_tree_out->Branch("trigger_lep", &trigger_lep);
+  m_tree_out->Branch("lep_trig_match", &lep_trig_match);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
   m_tree_out->Branch("averageIntPerXing", &averageIntPerXing);
   m_tree_out->Branch("n_vx", &n_vx);
   m_tree_out->Branch("n_jet",&n_jet);
   m_tree_out->Branch("n_el",&n_el);
   m_tree_out->Branch("n_mu",&n_mu);
+  m_tree_out->Branch("n_el_w",&n_el_w);
+  m_tree_out->Branch("n_mu_w",&n_mu_w);
   m_tree_out->Branch("n_ph",&n_ph);
   m_tree_out->Branch("n_tau",&n_tau);
   m_tree_out->Branch("jj_mass",&jj_mass);
@@ -269,6 +273,11 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("maxCentrality",&maxCentrality);
   m_tree_out->Branch("n_baseel",&n_baseel);
   m_tree_out->Branch("n_basemu",&n_basemu);
+  m_tree_out->Branch("n_el_baseline_noOR",&n_baseel_noOR);
+  m_tree_out->Branch("n_mu_baseline_noOR",&n_basemu_noOR);
+  m_tree_out->Branch("n_el_baseline_iso",&n_baseel_iso);
+  m_tree_out->Branch("n_mu_baseline_iso",&n_basemu_iso);
+
   m_tree_out->Branch("n_bjet",&n_bjet);
 
   if(m_contLep){
@@ -614,6 +623,19 @@ StatusCode VBFAnalysisAlg::execute() {
     tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
     tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
   }
+  // applying a pileup weight for 2018 data
+  puSyst2018Weight=1.0;
+  if(m_isMC && metRunNumber>=348197){ // select for 2018
+    puSyst2018Weight=1.2;
+    if(averageIntPerXing>39.0 && averageIntPerXing<52.1){
+      if(n_jet>2) puSyst2018Weight*=1.2;
+      if(n_jet>2 && fabs(jet_eta->at(2))>3.0) puSyst2018Weight*=1.3;
+      if(n_jet==2) puSyst2018Weight*=1.07;
+      tMapFloat["puSyst2018Weight__1down"]=1.0+(puSyst2018Weight-1.0)/2.0;
+      tMapFloat["puSyst2018Weight__1up"]  =puSyst2018Weight+(puSyst2018Weight-1.0)/2.0;
+    }
+  } // end pileup weight systematic
+
   if (m_isMC){
     // hack for when the cross-section code messed up
     if(runNumber==309668) crossSection =  592.36*0.9728*0.001043;
@@ -908,8 +930,8 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if(m_LooseSkim && m_currentVariation=="Nominal"){
     METCut = 100.0e3;
-    LeadJetPtCut = 60.0e3; // 60.0e3
-    subLeadJetPtCut = 40.0e3; // 40.0e3
+    LeadJetPtCut = 80.0e3; // 60.0e3
+    subLeadJetPtCut = 50.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
     DEtajjCut =3.5; // 3.5
   }
@@ -1022,7 +1044,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*puWeight*fjvtSFWeight*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight;
+  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
 
   if(m_theoVariation){
     std::map<TString,bool> regDecision;
@@ -1059,36 +1081,44 @@ StatusCode VBFAnalysisAlg::execute() {
   //
   float tmp_puWeight = puWeight;
   float tmp_jvtSFWeight = jvtSFWeight;
-  float tmp_fjvtSFWeight = fjvtSFWeight;
+  float tmp_fjvtSFWeight = (met_tenacious_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
   float tmp_elSFWeight = elSFWeight;
   float tmp_muSFWeight = muSFWeight;
   float tmp_elSFTrigWeight = elSFTrigWeight;
   float tmp_muSFTrigWeight = muSFTrigWeight;
+  float tmp_phSFWeight = phSFWeight;
   float tmp_eleANTISF = eleANTISF;
   float tmp_nloEWKWeight = nloEWKWeight;
+  float tmp_puSyst2018Weight = puSyst2018Weight;
   float tmp_qgTagWeight = 1.0; // assuming the default weight is 1.0 for qg tagging
 
   for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
     tmp_puWeight = puWeight;
     tmp_jvtSFWeight = jvtSFWeight;
-    tmp_fjvtSFWeight = fjvtSFWeight;
+    tmp_fjvtSFWeight = (met_tenacious_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
     tmp_elSFWeight = elSFWeight;
     tmp_muSFWeight = muSFWeight;
     tmp_elSFTrigWeight = elSFTrigWeight;
     tmp_muSFTrigWeight = muSFTrigWeight;
+    tmp_phSFWeight = phSFWeight;
     tmp_eleANTISF = eleANTISF;
     tmp_nloEWKWeight = nloEWKWeight;
+    tmp_puSyst2018Weight = puSyst2018Weight;
     tmp_qgTagWeight = 1.0; // default value is 1
 
     if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
-    else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    //else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("puWeight"))       tmp_puWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFWeight"))     tmp_elSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFTrigWeight")) tmp_elSFTrigWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFTrigWeight")) tmp_muSFTrigWeight=tMapFloat[it->first];
+    else if(it->first.Contains("phSFWeight")) tmp_phSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("nloEWKWeight"))   tmp_nloEWKWeight=tMapFloat[it->first];
+    else if(it->first.Contains("puSyst2018Weight"))   tmp_puSyst2018Weight=tMapFloat[it->first];
     else if(it->first.Contains("JET_QG_"))        tmp_qgTagWeight=tMapFloat[it->first];
     else if(it->first.Contains("eleANTISF")){
       tmp_eleANTISF=tMapFloat[it->first];
@@ -1100,12 +1130,12 @@ StatusCode VBFAnalysisAlg::execute() {
     }
 
     if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
-    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight);
+    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight);
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight;
   }//end systematic weight loop
 
-  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight);
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR)) return StatusCode::SUCCESS;
   double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
@@ -1183,6 +1213,17 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	tMapFloatW["nloEWKWeight__1down"]=1.0;
 	m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
       }
+      if(tMapFloat.find("puSyst2018Weight__1up")==tMapFloat.end()){
+	tMapFloat ["puSyst2018Weight__1up"]=1.0;
+	tMapFloatW["puSyst2018Weight__1up"]=1.0;
+	m_tree_out->Branch("wpuSyst2018Weight__1up",&(tMapFloatW["puSyst2018Weight__1up"]));
+      }
+      if(tMapFloat.find("puSyst2018Weight__1down")==tMapFloat.end()){
+	tMapFloat ["puSyst2018Weight__1down"]=1.0;
+	tMapFloatW["puSyst2018Weight__1down"]=1.0;
+	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
+      }
+
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){ 
 	  tMapFloat[m_qgVars.at(iQG)]=1.0; 
@@ -1209,12 +1250,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("muSFWeight", 1);
   m_tree->SetBranchStatus("elSFTrigWeight", 1);
   m_tree->SetBranchStatus("muSFTrigWeight", 1);
+  m_tree->SetBranchStatus("phSFWeight", 1);
   m_tree->SetBranchStatus("trigger_HLT_xe100_mht_L1XE50", 1);
   m_tree->SetBranchStatus("trigger_HLT_xe110_mht_L1XE50", 1);
   m_tree->SetBranchStatus("trigger_HLT_xe90_mht_L1XE50", 1);
   m_tree->SetBranchStatus("trigger_HLT_xe70_mht", 1);
   m_tree->SetBranchStatus("trigger_HLT_noalg_L1J400", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
+  m_tree->SetBranchStatus("lep_trig_match", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("l1_met_trig_encoded", 1);
   m_tree->SetBranchStatus("passBatman", 1);
@@ -1234,10 +1277,16 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("n_jet",1);
   m_tree->SetBranchStatus("n_el",1);
   m_tree->SetBranchStatus("n_mu",1);
+  m_tree->SetBranchStatus("n_el_w",1);
+  m_tree->SetBranchStatus("n_mu_w",1);
   m_tree->SetBranchStatus("n_ph",1);
   m_tree->SetBranchStatus("n_bjet",1);
   m_tree->SetBranchStatus("n_el_baseline",1);
   m_tree->SetBranchStatus("n_mu_baseline",1);
+  m_tree->SetBranchStatus("n_el_baseline_noOR",1);
+  m_tree->SetBranchStatus("n_mu_baseline_noOR",1);
+  m_tree->SetBranchStatus("n_el_baseline_iso",1);
+  m_tree->SetBranchStatus("n_mu_baseline_iso",1);
   m_tree->SetBranchStatus("jj_mass",1);
   m_tree->SetBranchStatus("jj_deta",1);
   m_tree->SetBranchStatus("jj_dphi",1);
@@ -1383,12 +1432,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("muSFWeight", &muSFWeight);
   m_tree->SetBranchAddress("elSFTrigWeight", &elSFTrigWeight);
   m_tree->SetBranchAddress("muSFTrigWeight", &muSFTrigWeight);
+  m_tree->SetBranchAddress("phSFWeight", &phSFWeight);
   m_tree->SetBranchAddress("trigger_HLT_xe100_mht_L1XE50", &trigger_HLT_xe100_mht_L1XE50);
   m_tree->SetBranchAddress("trigger_HLT_xe110_mht_L1XE50", &trigger_HLT_xe110_mht_L1XE50);
   m_tree->SetBranchAddress("trigger_HLT_xe90_mht_L1XE50", &trigger_HLT_xe90_mht_L1XE50);
   m_tree->SetBranchAddress("trigger_HLT_xe70_mht", &trigger_HLT_xe70_mht);
   m_tree->SetBranchAddress("trigger_HLT_noalg_L1J400", &trigger_HLT_noalg_L1J400);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
+  m_tree->SetBranchAddress("lep_trig_match", &lep_trig_match);
   //m_tree->SetBranchAddress("trigger_met", &trigger_met); // just testing being copying directly
   m_tree->SetBranchAddress("trigger_met", &trigger_met_encodedv2);
   m_tree->SetBranchAddress("l1_met_trig_encoded", &l1_met_trig_encoded);
@@ -1409,10 +1460,16 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_jet",&n_jet);
   m_tree->SetBranchAddress("n_el",&n_el);
   m_tree->SetBranchAddress("n_mu",&n_mu);
+  m_tree->SetBranchAddress("n_el_w",&n_el_w);
+  m_tree->SetBranchAddress("n_mu_w",&n_mu_w);
 
   // variables that are now filled
   m_tree->SetBranchAddress("n_el_baseline",&n_baseel);
   m_tree->SetBranchAddress("n_mu_baseline",&n_basemu);
+  m_tree->SetBranchAddress("n_el_baseline_noOR",&n_baseel_noOR);
+  m_tree->SetBranchAddress("n_mu_baseline_noOR",&n_basemu_noOR);
+  m_tree->SetBranchAddress("n_el_baseline_iso",&n_baseel_iso);
+  m_tree->SetBranchAddress("n_mu_baseline_iso",&n_basemu_iso);
   m_tree->SetBranchAddress("n_ph",&n_ph);
   m_tree->SetBranchAddress("n_bjet",            &n_bjet);
   m_tree->SetBranchAddress("lumiBlock",&lumiBlock);
