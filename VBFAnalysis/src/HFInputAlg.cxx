@@ -250,8 +250,11 @@ StatusCode HFInputAlg::execute() {
     else if(currentSample=="Z_strong") passSample=(runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519);
     else passSample=true;
   }else{
-    if(currentSample=="W_strong") passSample=!(runNumber >= 363600 && runNumber <= 363671) && !(runNumber >= 311429 && runNumber <= 311453) && !(runNumber >= 366010 && runNumber <= 366035) && !(runNumber >= 364216 && runNumber <= 364229);
-    else if(currentSample=="Z_strong") passSample=!((runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519)) && !(runNumber >= 311429 && runNumber <= 311453) && !(runNumber >= 366010 && runNumber <= 366035) && !(runNumber >= 364216 && runNumber <= 364229);
+    if(currentSample=="W_strong") passSample=!(runNumber >= 363600 && runNumber <= 363671) && !(runNumber >= 311429 && runNumber <= 311453) && !(runNumber >= 364216 && runNumber <= 364229);
+    else if(currentSample=="Z_strong"){
+      passSample=!((runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519)) && !(runNumber >= 311429 && runNumber <= 311453) && !(runNumber >= 366010 && runNumber <= 366035) && !(runNumber >= 364216 && runNumber <= 364229);
+      if(year==2018)       passSample=!((runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519)) && !(runNumber >= 311429 && runNumber <= 311453) && !(runNumber >= 364216 && runNumber <= 364229);
+    }
     else passSample=true;
   }
   if(!passSample)  return StatusCode::SUCCESS;
@@ -468,6 +471,14 @@ StatusCode HFInputAlg::execute() {
   if(year==2017)      lumi = 44.3074;
   else if(year==2018) lumi = 58.4501; //59.9372;
   if (isMC) w_final = w*1000.0*lumi;
+  // reweight
+  //if(isMC && year==2018){
+  //  if(averageIntPerXing>39.0 && averageIntPerXing<52.1){
+  //    if(n_jet>2) w_final*=1.2;
+  //    if(n_jet>2 && fabs(jet_eta->at(2))>3.0) w_final*=1.3;
+  //    if(n_jet==2) w_final*=1.07;
+  //  }
+  //}
   int bin = 0;
   if(doTMVA){
     //float tmvaBinBoundaries[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
@@ -477,8 +488,8 @@ StatusCode HFInputAlg::execute() {
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.74000000, 0.80200000, 0.84000000, 0.86700000, 0.89000000, 0.91300000,1.0 };//var9
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.7300000, 0.83000000, 0.87700000, 0.90900000, 0.93400000, 0.9559,1.0 }; //var11
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.61600000, 0.72400000, 0.79000000, 0.83800000, 0.87700000, 0.91100000,1.0 };//var 11 -mjj500
-    //float tmvaBinBoundaries[8] = { 0.0000000, 0.69700000, 0.76800000, 0.81100000, 0.84500000, 0.87600000, 0.90950000,1.0 };// var8 - new tenacious cut
-    float tmvaBinBoundaries[8] = { 0.0000000, 0.71250000, 0.80000000, 0.84850000, 0.88300000, 0.91150000, 0.93800000,1.0 };// var 9 - new tenacious cut
+    float tmvaBinBoundaries[8] = { 0.0000000, 0.69700000, 0.76800000, 0.81100000, 0.84500000, 0.87600000, 0.90950000,1.0 };// var8 - new tenacious cut
+    //float tmvaBinBoundaries[8] = { 0.0000000, 0.71250000, 0.80000000, 0.84850000, 0.88300000, 0.91150000, 0.93800000,1.0 };// var 9 - new tenacious cut
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.74300000, 0.80700000, 0.84550000, 0.87400000, 0.89850000, 0.92500000,1.0 };// var 11 - new tenacious cut
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.70050000, 0.77450000, 0.81800000, 0.85200000, 0.88100000, 0.91050000,1.0 }; //var8
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.73100000, 0.80450000, 0.84200000, 0.87050000, 0.89400000, 0.91800000,1.0 }; //var6
@@ -614,7 +625,9 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("randomRunNumber", 1);
   m_tree->SetBranchStatus("eventNumber", 1);
   m_tree->SetBranchStatus("passJetCleanTight", 1);
+  m_tree->SetBranchStatus("averageIntPerXing", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
+  m_tree->SetBranchStatus("trigger_met_encodedv2", 1);
   m_tree->SetBranchStatus("trigger_lep", 1);
   m_tree->SetBranchStatus("lep_trig_match", 1);
   m_tree->SetBranchStatus("n_jet",1);
@@ -662,6 +675,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("runNumber",&runNumber);
   m_tree->SetBranchAddress("randomRunNumber",&randomRunNumber);
   m_tree->SetBranchAddress("eventNumber",&eventNumber);
+  m_tree->SetBranchAddress("averageIntPerXing", &averageIntPerXing);
   m_tree->SetBranchAddress("trigger_met", &trigger_met);
   m_tree->SetBranchAddress("trigger_met_encodedv2", &trigger_met_encodedv2);
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);

@@ -22,6 +22,8 @@ parser.add_argument( "--isMadgraph", dest = "isMadgraph", action="store_true", d
 parser.add_argument( "--doTMVA", dest = "doTMVA", action="store_true", default = False, help = "Use the variable filled as tmva for the fitting" )
 parser.add_argument( "--doPlot", dest = "doPlot", action="store_true", default = False, help = "Generate additional histograms for postfit plots")
 parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
+parser.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
+parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
 
 writeMultiJet(int(args.Binning))
@@ -71,6 +73,10 @@ if args.extraVars:
     extraCommand=' --extraVars '+args.extraVars
 if args.isMadgraph:
     extraCommand+=' --isMadgraph '
+if args.METDef!="0":
+    extraCommand+=' --METDef '+args.METDef+' '
+if args.year!=2016:
+    extraCommand+=' --year %s ' %(args.year)
 if args.doTMVA:
     extraCommand+=' --doTMVA '
 if args.v26Ntuples:
