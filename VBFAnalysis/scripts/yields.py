@@ -98,7 +98,9 @@ samplesPrint =['Samples','VBFH125',
 #f=ROOT.TFile.Open('SumHF_tmva_11var_mjj800SoftDPhi2.root')
 #f=ROOT.TFile.Open('SumHF_tmva_11var_mjj900.root')
 #f=ROOT.TFile.Open('SumHF_tmva_11vartest4.root')
-f=ROOT.TFile.Open('SumHF_v31_CBv2.root')
+#f=ROOT.TFile.Open('SumHF_v31_CBv2.root')
+#f=ROOT.TFile.Open('SumHF_v31_CB_mu_noOR.root')
+f=ROOT.TFile.Open('SumHF_v31_CB_newBaseline.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400.root')#
@@ -128,7 +130,7 @@ for s in samples:
     SumErrList+=[0.0]
 print line
 
-bins=[1,2,3,4,5,6,7,8,9]
+bins=[1,2,3,4,5,6,7,8,9,10]
 nRegion=0
 sTot=0
 for bin_num in bins:
@@ -231,6 +233,7 @@ print ''
 print '\\resizebox{\\textwidth}{!}{ '
 print '\\begin{tabular}{l|ccccccccc}'
 cline=''
+#print region_cf
 for b in range(0,len(region_cf[0])+1):
     cline=samplesPrint[b]+'\t& '
     for r in range(0,len(region_cf)):
