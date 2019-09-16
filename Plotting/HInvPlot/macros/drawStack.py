@@ -29,7 +29,7 @@ p.add_option('--do-nf',        type='string', default=None,          dest='do_nf
 p.add_option('--extract-sig',  type='string', default=None,          dest='extract_sig')
 p.add_option('--syst-table',   type='string', default=None,          dest='syst_table')
 
-p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi') # 2017: 44307.4, 2018: 59937.2
+p.add_option('--int-lumi',     type='float',  default=36200.0,       dest='int_lumi') # 2017: 44307.4, 2018: 59937.2
 p.add_option('--ymin',         type='float',  default=None,          dest='ymin')
 p.add_option('--ymax',         type='float',  default=None,          dest='ymax')
 p.add_option('--xmax',         type='float',  default=None,          dest='xmax')
@@ -125,7 +125,7 @@ def getSelKeyLabel(selkey):
         elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'        
         elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'        
         elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
-        elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<1TeV'
+        elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<0.8TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
         elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'            
         elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'            
@@ -2362,9 +2362,9 @@ def main():
         
     #-----------------------------------------------------------------------------------------
     # automatically set the lumi for the 2017 and 2018
-    if options.year==2018 and options.int_lumi==36100.0:
-        options.int_lumi=59937.2
-    if options.year==2017 and options.int_lumi==36100.0:
+    if options.year==2018 and options.int_lumi==36200.0:
+        options.int_lumi=58450.1
+    if options.year==2017 and options.int_lumi==36200.0:
         options.int_lumi=44307.4
         
     #

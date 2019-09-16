@@ -112,7 +112,7 @@ def getParser():
     p.add_option('-n','--nevent',  type='int',    dest='nevent',         default=0,         help='number of events')
     p.add_option('--year',         type='int',    dest='year',           default=2012,      help='analysis year')
     
-    p.add_option('--int-lumi',     type='float',  default=36100.0,       dest='int_lumi',    help='int luminosity 2017: 44307.4, 2018: 59937.2')
+    p.add_option('--int-lumi',     type='float',  default=36200.0,       dest='int_lumi',    help='int luminosity 2017: 44307.4, 2018: 59937.2')
     p.add_option('-r','--rfile',   type='string', default='out.root',    dest='rfile',      help='output ROOT file')
     p.add_option('-c','--cfile',   type='string', default=None,          dest='cfile',      help='cutflow tables')
     p.add_option('-t','--tfile',   type='string', default=None,          dest='tfile',      help='tree files')

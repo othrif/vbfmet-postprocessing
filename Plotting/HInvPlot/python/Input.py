@@ -361,7 +361,7 @@ def prepareBkgRuns(keys,options=None):
                       '308567':'VBF125 - all',                                                                                        
                       '346600':'VBF125 - met>75',                                                                                        
                           }
-    sig_vbfgam = {'312243':'', }
+    sig_vbfgam = {'312243':'vbf gamma', }
     alt_VBF = {'308275':'VBF125 - H75',
                       '308277':'VBF125 - H200',
                       '308278':'VBF125 - H300', 

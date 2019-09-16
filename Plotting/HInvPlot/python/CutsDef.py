@@ -487,10 +487,17 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
 
     cuts = FilterCuts(options)
 
-    cuts += [CutItem('CutTrig',      'trigger_met == 1')]
+    apply_weight='xeSFTrigWeight'
+    if options.year==2017:
+        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4', weight=apply_weight)]
+    elif options.year==2018:
+        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5', weight=apply_weight)] # use this one
+    else:
+        cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)] 
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     if Region=='SR':
-        cuts += getLepChannelCuts(basic_cuts)
+    #    cuts += getLepChannelCuts(basic_cuts)
+        print ''
     elif Region=='ZCR':
         if basic_cuts.chan=='ee':
             cuts += [CutItem('CutEl','n_el == 2')]
@@ -735,6 +742,8 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['tall'] = ['top2','vvv']
     bkgs['dqcd'] = ['dqcd']
     if options.OverlapPh:
+        sigs['vbfg'] = ['vbfg']
+        sigs['higgs'] += ['vbfg']
         bkgs['ttg']  = ['ttg']
         bkgs['pho']  = ['pho']
         bkgs['phoAlt']  = ['phoAlt']
