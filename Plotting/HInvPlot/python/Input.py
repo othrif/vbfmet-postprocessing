@@ -382,6 +382,16 @@ def prepareBkgRuns(keys,options=None):
                     '308098':'WtaunuEWK',                    
                         }
 
+    bkg_zgewk =     {'363266':'ZnnEWK',
+                    '363267':'ZeeEWK',
+                    '363268':'ZmmEWK',                    
+                    '363269':'ZttEWK',                    
+                        }
+
+    bkg_wgewk =     {'363270':'WenEWK',
+                     '363271':'WmnEWK',
+                     '363272':'WtnEWK',  }                  
+        
     bkg_new = {#'312243':'',
                    '343982':'',
                    '343983':'',
@@ -1021,6 +1031,8 @@ def prepareBkgRuns(keys,options=None):
                 'wdpi':bkg_top_other,
                 'wgam':bkg_sherpa_wg,
                 'zgam':bkg_sherpa_zg,
+                'wgamewk':bkg_wgewk,
+                'zgamewk':bkg_zgewk,
                 'ttg':bkg_ttg,
                 'pho':bkg_pho,
                 'phoAlt':bkg_pho_v2,

@@ -70,6 +70,8 @@ namespace Msl
       kQCD_MC,
       kZjhf,
       kZgam,
+      kZgamEWK,
+      kWgamEWK,
       kZgas,
       kWjhf,
       kZvbf,

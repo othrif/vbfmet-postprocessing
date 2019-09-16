@@ -2377,7 +2377,7 @@ def main():
         bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
-            bkgs = ['ttg', 'zgam','wgam','pho'] #,'mqcd','zldy','vvv' 
+            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk'] #,'mqcd','zldy','vvv' 
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
 

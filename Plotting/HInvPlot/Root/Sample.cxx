@@ -37,6 +37,8 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kZltt:  return "zltt";
     case kZjhf:  return "zjhf";
     case kZgam:  return "zgam";
+    case kZgamEWK:  return "zgamewk";
+    case kWgamEWK:  return "wgamewk";      
     case kZgas:  return "zgas";
     case kZvbf:  return "zvbf";
     case kZvbe:  return "zvbe";
@@ -112,7 +114,9 @@ std::string Msl::Mva::Convert2Std(Sample s)
     case kZltt: return "Zj_ttLM";
     case kZjhf: return "ZjetsHF";
     case kZgam: return "Zjets_gamma";
-    case kZgas: return "Zjets_gamma*";
+    case kZgamEWK: return "Zjets_gammaEWK";
+    case kWgamEWK: return "Wjets_gammaEWK";
+    case kZgas: return "Zjets_gamma*";      
     case kZvbf: return "ZjetsVBF_Filter";
     case kZvbe: return "Zj_eeVBF_Filter";
     case kZvbm: return "Zj_mmVBF_Filter";
@@ -232,6 +236,8 @@ Msl::Mva::Sample Msl::Mva::Convert2Sample(const std::string &s)
   if(s == "zltt") return kZltt;
   if(s == "zjhf") return kZjhf;
   if(s == "zgam") return kZgam;
+  if(s == "zgamewk") return kZgamEWK;
+  if(s == "wgamewk") return kWgamEWK;
   if(s == "zgas") return kZgas;
   if(s == "zvbf") return kZvbf;
   if(s == "zvbe") return kZvbe;
@@ -310,6 +316,8 @@ const std::vector<Msl::Mva::Sample>& Msl::Mva::GetAllSamples()
     vars.push_back(kZltt);
     vars.push_back(kZjhf);
     vars.push_back(kZgam);
+    vars.push_back(kZgamEWK);
+    vars.push_back(kWgamEWK);    
     vars.push_back(kZgas);
     vars.push_back(kZvbf);
     vars.push_back(kZvbe);
