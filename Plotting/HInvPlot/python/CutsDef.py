@@ -489,7 +489,8 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
 def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR'):
 
     cuts = FilterCuts(options)
-
+    if options.OverlapPh:
+        cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
     apply_weight='xeSFTrigWeight'
     if options.year==2017:
         cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4', weight=apply_weight)]

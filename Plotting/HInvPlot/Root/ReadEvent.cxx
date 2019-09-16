@@ -1169,6 +1169,20 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }// 2015+2016
     event->RepVar(Mva::trigger_met_byrun, trigger_met_byrun);
     event->RepVar(Mva::runPeriod,         runPeriod);    
+
+    // apply the overlap
+    if(fOverlapPh && fisMC){
+      bool in_vy_overlap = event->GetVar(Mva::in_vy_overlap);
+      bool isVjets =(event->sample==Mva::kWqcdMad) || (event->sample==Mva::kWqcd) || (event->sample==Mva::kZqcd) || (event->sample==Mva::kZqcdMad) || (event->sample==Mva::kZewk) || (event->sample==Mva::kWewk) || (event->sample==Mva::kZqcdPow);
+      bool isTop = (event->sample==Mva::ktop2);
+      bool isVgjets = (event->sample==Mva::kttg) || (event->sample==Mva::kZgam) || (event->sample==Mva::kWgam) || (event->sample==Mva::kZgamEWK) || (event->sample==Mva::kWgamEWK);
+      event->RepVar(Mva::in_vy_overlapCut,1.0);
+      if(isVjets && in_vy_overlap)   event->RepVar(Mva::in_vy_overlapCut,0.0);
+      if(isTop   && in_vy_overlap)   event->RepVar(Mva::in_vy_overlapCut,0.0);
+      if(isVgjets && !in_vy_overlap) event->RepVar(Mva::in_vy_overlapCut,0.0);
+    }else{
+      event->RepVar(Mva::in_vy_overlapCut,1.0);
+    }
     
     // Change the leptons to base leptons - after filling the event
     if(fLoadBaseLep) ChangeLep(*event);
