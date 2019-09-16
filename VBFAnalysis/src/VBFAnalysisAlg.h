@@ -321,6 +321,9 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* truth_mu_pt;
   std::vector<Float_t>* truth_mu_eta;
   std::vector<Float_t>* truth_mu_phi;
+  std::vector<Float_t>* truth_ph_pt;
+  std::vector<Float_t>* truth_ph_eta;
+  std::vector<Float_t>* truth_ph_phi;
   std::vector<Float_t>* truth_el_pt;
   std::vector<Float_t>* truth_el_eta;
   std::vector<Float_t>* truth_el_phi;
