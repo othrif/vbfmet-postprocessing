@@ -2,3 +2,10 @@
 */RootCore/lib
 */RootCore/root_config_generic
 */RootCore/obj
+
+# Plotting file: inputs and outputs.
+Plotting/*.txt
+Plotting/*.root
+Plotting/*.eps
+Plotting/*.png
+Plotting/*.pdf
