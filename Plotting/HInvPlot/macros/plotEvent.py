@@ -193,9 +193,9 @@ def main():
 
     #-----------------------------------------------------------------------------------------
     # automatically set the lumi for the 2017 and 2018
-    if options.year==2018 and options.int_lumi==36100.0:
-        options.int_lumi=59937.2
-    if options.year==2017 and options.int_lumi==36100.0:
+    if options.year==2018 and options.int_lumi==36207.66:
+        options.int_lumi=58450.1
+    if options.year==2017 and options.int_lumi==36207.66:
         options.int_lumi=44307.4
         
     #-----------------------------------------------------------------------------------------

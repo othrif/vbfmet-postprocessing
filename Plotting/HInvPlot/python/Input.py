@@ -344,13 +344,19 @@ def prepareBkgRuns(keys,options=None):
         #
         #
         #
-        
+    sig_tth125    = {'346632':'1l',
+                     '346633':'0l',
+                     '346634':'2l',}
     sig_VH125     = {'308072':'ZH125',
                      '308071':'WpH125',
                      '308070':'WmH125',
                      '345038':'ZH125 - new incl',
                      '345039':'WpH125 - new incl',
-                     '345040':'WmH125 - new incl',}
+                     '345040':'WmH125 - new incl',
+                     '346605':'WpinclHinv_MET75',
+                     '346606':'WminclHinv_MET75',
+                     '346607':'ZinclHinv_MET75',
+    }
                          
     sig_ggF125 = {'308284':'ggF125',
                   '346588':'ggF125 reshower',}
@@ -992,6 +998,7 @@ def prepareBkgRuns(keys,options=None):
                 'vbfg':sig_vbfgam,                
                 'whww':alt_VBF,
                 'hggf':sig_ggF125,
+                'tth':sig_tth125,
                 'hvbf':sig_VBF125,
                 'wewk':bkg_wewk,
                 'wqcd':bkg_wqcd,

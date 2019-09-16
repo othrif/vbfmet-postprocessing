@@ -93,11 +93,14 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t m_extraVars = 0;
   Int_t m_binning = 0;
   Int_t m_metdef = 0;
+  Bool_t v26Ntuples=false;
 
   Double_t xeSFTrigWeight;
   Double_t xeSFTrigWeight_nomu;
   Float_t met_significance;
+  Float_t averageIntPerXing;
   Int_t trigger_met;
+  Int_t trigger_met_encodedv2;
   Float_t w;
   Int_t runNumber;
   Int_t randomRunNumber;
@@ -105,13 +108,20 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_lep;
+  Int_t lep_trig_match;
   Int_t n_jet;
   Int_t n_bjet;
   Int_t n_ph;
   Int_t n_el;
   Int_t n_mu;
+  Int_t n_el_w;
+  Int_t n_mu_w;
   Int_t n_baseel;
   Int_t n_basemu;
+  Int_t n_baseel_noOR;
+  Int_t n_basemu_noOR;
+  Int_t n_baseel_iso;
+  Int_t n_basemu_iso;
   Float_t tmva;
   Double_t jj_mass;
   Double_t jj_deta;

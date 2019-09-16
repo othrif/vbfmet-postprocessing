@@ -7,7 +7,8 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst,Ext)
-        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125","ggFH125","VH125","VBFHOther","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',"data"] # do not change order
+        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
+                               "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',"data"] # do not change order
 
         self.sampleMap = {'data':['data'],
                           'W_EWK':['W_EWK'],
@@ -17,6 +18,7 @@ class sample(object):
                           'Z_strong_VBFFilt':['Z_strong_VBFFilt'],
                           'Z_strongExt':['Z_strongExt'],
                           'Z_strongPTVExt':['Z_strongPTVExt'],
+                          'Z_strongmVBFFilt':['Z_strongmVBFFilt'],
                           'VV_VVV':['VV','VVV'],
                           'Zg_strong':['Zg_strong'],
                           'Wg_strong':['Wg_strong'],
@@ -24,7 +26,8 @@ class sample(object):
                           'SinglePhoton':['SinglePhoton'],
                           'SinglePhotonBCL':['SinglePhotonBCL'],
                           'VqqGam':['VqqGam'],
-                          'signal':['VBFH125','ggFH125','VH125'],
+                          'signal':['VBFH125','ggFH125','VH125','TTH125','VBFHgam125'],
+                          'signalOld':['VBFH125Old','ggFH125Old','VH125Old'],
                           'VBFHOther':['VBFHOther'],
                           'QCD':['QCDw','QCDunw'],
                           }
@@ -89,16 +92,24 @@ class sample(object):
                 self.sampleType = "Z_strongmVBFFilt"
             elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)) or (self.runNumber>=410642 and self.runNumber<=410649) or self.runNumber==410642 or self.runNumber==410643:
                 self.sampleType = "ttbar"
-            elif ((self.runNumber == 308276) or (self.runNumber == 308567)) or self.runNumber==346600:
+            elif self.runNumber==346600:
                 self.sampleType = "VBFH125"
+            elif ((self.runNumber == 308276) or (self.runNumber == 308567)): 
+                self.sampleType = "VBFH125Old"
+            elif ((self.runNumber >= 346632) and (self.runNumber <= 346634)):
+                self.sampleType = "TTH125"
             elif self.runNumber==312243:
                 self.sampleType = "VBFHgam125"
             elif ((self.runNumber >= 308275) and self.runNumber <= 308283):
                 self.sampleType = "VBFHOther"
-            elif (self.runNumber == 308284) or self.runNumber==346588:
+            elif self.runNumber==346588:
                 self.sampleType = "ggFH125"
-            elif ((self.runNumber == 308071) or (self.runNumber == 308072) or (self.runNumber == 308070)) or (self.runNumber>=345038 and self.runNumber<=345040) or self.runNumber==345596:
+            elif (self.runNumber == 308284):
+                self.sampleType = "ggFH125Old"
+            elif self.runNumber>=346605 and self.runNumber<=346607:
                 self.sampleType = "VH125"
+            elif ((self.runNumber == 308071) or (self.runNumber == 308072) or (self.runNumber == 308070)) or (self.runNumber>=345038 and self.runNumber<=345040) or self.runNumber==345596:
+                self.sampleType = "VH125Old"
             elif (self.runNumber >= 361020 and self.runNumber <= 361032) or self.runNumber==310502 or self.runNumber==304784:
                 self.sampleType = "QCDw"
             elif (self.runNumber >= 426001 and self.runNumber <= 426009):

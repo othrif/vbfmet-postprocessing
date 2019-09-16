@@ -22,6 +22,7 @@ arg_group.add_argument("--doTMVA", action="store_true", dest='doTMVA', default=F
 arg_group.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
 arg_group.add_argument("--isLow", action="store_true", dest='isLow', default=False, help="isLow, default: False")
 arg_group.add_argument("--weightSyst", action="store_true", dest='weightSyst', default=False, help="is a weight systematic, default: False")
+arg_group.add_argument("--v26Ntuples", action="store_true", dest='v26Ntuples', default=False, help="run v26 style ntuples, default: False")
 arg_group.add_argument("--oldInput", action="store_true", dest='oldInput', default=False, help="if oldInput, switch to HFInputOldInput")
 arg_group.add_argument("--doPlot", action="store_true", dest='doPlot', default=False, help="doPlot, to turn on additional histograms used for postfit plots, default: False")
 # parse the commandline options
@@ -89,7 +90,8 @@ if True:
                                        doTMVA = args.doTMVA,
                                        year = args.year,
                                        weightSyst = args.weightSyst,
-                                       doPlot = args.doPlot);
+                                       doPlot = args.doPlot,
+                                       v26Ntuples = args.v26Ntuples);
     else:
         if args.currentSample == "physics_micro":
             isMC = False
@@ -106,7 +108,8 @@ if True:
                                                doTMVA = args.doTMVA,
                                                year = args.year,
                                                weightSyst = args.weightSyst,
-                                               doPlot = args.doPlot);
+                                               doPlot = args.doPlot,
+                                               v26Ntuples = args.v26Ntuples);
     
     
     include("AthAnalysisBaseComps/SuppressLogging.py")              #Optional include to suppress as much athena output as possible. Keep at bottom of joboptions so that it doesn't suppress the logging of the things you have configured above

@@ -31,6 +31,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hJetEMECvsBCIDPosPt25(0),
 				  hJetEMECvsBCIDPosPt35(0),
 				  hJetEMECvsBCIDPosPt55(0),
+                                  hMetvsMu(0),
 				  hmj1(0),
 				  hmj2(0),
 				  hminDRmj2(0),
@@ -111,6 +112,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hJetEMECvsBCIDPosPt25 = GetTH2("JetEMECvsBCIDPosPt25",  5,  -0.5,  4.5, 35, 0.0, 70);
   hJetEMECvsBCIDPosPt35 = GetTH2("JetEMECvsBCIDPosPt35",  5,  -0.5,  4.5, 35, 0.0, 70);
   hJetEMECvsBCIDPosPt55 = GetTH2("JetEMECvsBCIDPosPt55",  5,  -0.5,  4.5, 35, 0.0, 70);  
+  hMetvsMu = GetTH2("MetvsMu",  50, 0.0, 500.0, 10,  0.0,  100);  
   hmj1              = GetTH1("mj1",              50,  0.0,   2000.0);		  
   hmj2              = GetTH1("mj2",              50,  0.0,   2000.0);		  
   hminDRmj2         = GetTH1("minDRmj2",         50,  0.0,   2000.0);    	  
@@ -187,8 +189,8 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hWMadMCIDQCD->Fill(event.RunNumber, weight);  
   hZPowMCIDQCD->Fill(event.RunNumber, weight);
   FillHist(hjj_mass_variableBin,   Mva::jj_mass, event, weight);
-  FillHist(htmva_variableBin,   Mva::tmva, event, weight);
-  
+  FillHist(htmva_variableBin,      Mva::tmva,    event, weight);
+  if(hMetvsMu && event.HasVar(Mva::averageIntPerXing)) hMetvsMu->Fill(event.GetVar(Mva::met_tst_nolep_et), event.GetVar(Mva::averageIntPerXing), weight);
   if(event.truth_mu.size()>0){
     hTruthMuPt ->Fill(event.truth_mu.at(0).pt, weight);
     hTruthMuEta->Fill(event.truth_mu.at(0).eta, weight);

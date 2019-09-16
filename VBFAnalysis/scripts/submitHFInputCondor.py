@@ -16,11 +16,14 @@ parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", d
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
-parser.add_argument("--extraVars", dest='extraVars', default="0", help="extraVars, 1=cut on the new variables for leptons veto, 2=loosen cuts, 3=no soft met cut default: 0")
-parser.add_argument("--Binning", dest='Binning', default="0", help="Binning, 0=default Mjj binning, 1=low MET bin, 2=njet>2 binning")
+parser.add_argument("--extraVars", dest='extraVars', default="0", help="extraVars, 1=cut on the new variables for leptons veto, 2=loosen cuts, 3=no soft met cut default: 0, 5=met OR lep trig CR, 6=met trig CR, 7=corrected SF for v31")
+parser.add_argument("--Binning", dest='Binning', default="0", help="Binning, 0=default Mjj binning, 1=low MET bin, 2=njet>2 binning, 3=met binning, 4=3bins for nj>2, 5=3dphibin, 6= dphi by mjj+nj>2, 7=800mjj withdphi, 8=mjj 8bins")
 parser.add_argument( "--isMadgraph", dest = "isMadgraph", action="store_true", default = False, help = "Use the madgraph samples" )
 parser.add_argument( "--doTMVA", dest = "doTMVA", action="store_true", default = False, help = "Use the variable filled as tmva for the fitting" )
 parser.add_argument( "--doPlot", dest = "doPlot", action="store_true", default = False, help = "Generate additional histograms for postfit plots")
+parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
+parser.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
+parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
 
 writeMultiJet(int(args.Binning))
@@ -70,8 +73,14 @@ if args.extraVars:
     extraCommand=' --extraVars '+args.extraVars
 if args.isMadgraph:
     extraCommand+=' --isMadgraph '
+if args.METDef!="0":
+    extraCommand+=' --METDef '+args.METDef+' '
+if args.year!=2016:
+    extraCommand+=' --year %s ' %(args.year)
 if args.doTMVA:
     extraCommand+=' --doTMVA '
+if args.v26Ntuples:
+    extraCommand+=' --v26Ntuples '
 if args.doPlot:
     extraCommand+=' --doPlot '
 if int(args.Binning)!=0:
