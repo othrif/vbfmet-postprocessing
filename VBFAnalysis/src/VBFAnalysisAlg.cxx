@@ -7,7 +7,7 @@
 
 
 VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ), nParton(-1),
-										      fjvtSFWeight(1.0), fjvtSFTighterWeight(1.0){
+										      fjvtSFWeight(1.0), fjvtSFTighterWeight(1.0), phSFWeight(1.0){
   declareProperty( "currentSample", m_currentSample = "W_strong", "current sample");
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
@@ -186,6 +186,9 @@ StatusCode VBFAnalysisAlg::initialize() {
   truth_mu_pt= new std::vector<float>(0);
   truth_mu_eta= new std::vector<float>(0);
   truth_mu_phi= new std::vector<float>(0);
+  truth_ph_pt= new std::vector<float>(0);
+  truth_ph_eta= new std::vector<float>(0);
+  truth_ph_phi= new std::vector<float>(0);
   truth_el_pt= new std::vector<float>(0);
   truth_el_eta= new std::vector<float>(0);
   truth_el_phi= new std::vector<float>(0);
@@ -390,10 +393,14 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("truth_mu_pt", &truth_mu_pt);
       m_tree_out->Branch("truth_mu_eta",&truth_mu_eta);
       m_tree_out->Branch("truth_mu_phi",&truth_mu_phi);
+      m_tree_out->Branch("truth_ph_pt", &truth_ph_pt);
+      m_tree_out->Branch("truth_ph_eta",&truth_ph_eta);
+      m_tree_out->Branch("truth_ph_phi",&truth_ph_phi);
     }else{
       truth_tau_pt=0; truth_tau_eta=0; truth_tau_phi=0;
       truth_el_pt=0;  truth_el_eta=0;  truth_el_phi=0;
       truth_mu_pt=0;  truth_mu_eta=0;  truth_mu_phi=0;
+      truth_ph_pt=0;  truth_ph_eta=0;  truth_ph_phi=0;
     }
   }
 
@@ -930,7 +937,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if(m_LooseSkim && m_currentVariation=="Nominal"){
     METCut = 100.0e3;
-    LeadJetPtCut = 80.0e3; // 60.0e3
+    LeadJetPtCut = 60.0e3; // 60.0e3
     subLeadJetPtCut = 50.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
     DEtajjCut =3.5; // 3.5
@@ -1265,7 +1272,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("passVjetsPTV", 1);
   m_tree->SetBranchStatus("MGVTruthPt", 1);
   m_tree->SetBranchStatus("SherpaVTruthPt", 1);
-  m_tree->SetBranchStatus("in_vy_overlap", 1);
+  m_tree->SetBranchStatus("in_vy_overlap", 1);// prefer this one. the iso shouldnt be required
   m_tree->SetBranchStatus("in_vy_overlap_iso", 1);
   m_tree->SetBranchStatus("FlavourFilter", 1);
   m_tree->SetBranchStatus("passGRL", 1);
@@ -1400,6 +1407,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       m_tree->SetBranchStatus("truth_mu_pt",  1);
       m_tree->SetBranchStatus("truth_mu_eta", 1);
       m_tree->SetBranchStatus("truth_mu_phi", 1);
+      m_tree->SetBranchStatus("truth_ph_pt",  1);
+      m_tree->SetBranchStatus("truth_ph_eta", 1);
+      m_tree->SetBranchStatus("truth_ph_phi", 1);
     }
   }
 
@@ -1600,6 +1610,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       m_tree->SetBranchAddress("truth_mu_pt", &truth_mu_pt);
       m_tree->SetBranchAddress("truth_mu_eta",&truth_mu_eta);
       m_tree->SetBranchAddress("truth_mu_phi",&truth_mu_phi);
+      m_tree->SetBranchAddress("truth_ph_pt", &truth_ph_pt);
+      m_tree->SetBranchAddress("truth_ph_eta",&truth_ph_eta);
+      m_tree->SetBranchAddress("truth_ph_phi",&truth_ph_phi);
     }
   }
 

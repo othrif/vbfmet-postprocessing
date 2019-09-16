@@ -57,6 +57,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Bool_t isHigh = true;
   Bool_t weightSyst=false;
   Bool_t doPlot = false;
+  Bool_t doVBFMETGam = false;
   Bool_t doDuplicateCheck = false;
   bool is2015;
   bool is2016;
@@ -105,6 +106,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t runNumber;
   Int_t randomRunNumber;
   ULong64_t eventNumber;
+  Bool_t in_vy_overlap;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_lep;
@@ -145,6 +147,9 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* el_pt;
   std::vector<Float_t>* el_phi;
   std::vector<Float_t>* el_eta;
+  std::vector<Float_t>* ph_pt;
+  std::vector<Float_t>* ph_phi;
+  std::vector<Float_t>* ph_eta;
   std::vector<Float_t>* jet_pt;
   std::vector<Float_t>* jet_phi;
   std::vector<Float_t>* jet_eta;

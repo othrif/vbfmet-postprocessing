@@ -20,6 +20,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("doTMVA", doTMVA = false, "doTMVA flag, true means use the MVA");
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
   declareProperty("doPlot", doPlot =false, "doPlot flag, true means the output contains variable distributions");
+  declareProperty("doVBFMETGam", doVBFMETGam =false, "doVBFMETGam flag, true means run the VBF+MET+photon analysis");
   declareProperty("v26Ntuples", v26Ntuples = false, "v26Ntuples flag, true means the setting for backward compatibility with v26 ntuples");
   declareProperty("doDuplicateCheck", doDuplicateCheck =false, "doDuplicateCheck flag, true means the run and event numbers are printed");
   //declareProperty( "Property", m_nProperty = 0, "My Example Integer Property" ); //example property declaration
@@ -52,6 +53,9 @@ StatusCode HFInputAlg::initialize() {
   el_pt= new std::vector<float>(0);
   el_phi= new std::vector<float>(0);
   el_eta= new std::vector<float>(0);
+  ph_pt= new std::vector<float>(0);
+  ph_phi= new std::vector<float>(0);
+  ph_eta= new std::vector<float>(0);
   jet_pt= new std::vector<float>(0);
   jet_phi= new std::vector<float>(0);
   jet_eta= new std::vector<float>(0);
@@ -258,6 +262,10 @@ StatusCode HFInputAlg::execute() {
     else passSample=true;
   }
   if(!passSample)  return StatusCode::SUCCESS;
+  /// register the vjets samples
+  bool isVjets =(currentSample=="W_strong") || (currentSample=="Z_strong") || (currentSample=="Z_EWK") || (currentSample=="W_EWK") || (currentSample=="Z_strongPTVExt") || (currentSample=="Z_strongExt") || (currentSample=="Z_strong_VBFFilt");
+  bool isTop = (currentSample=="ttbar");
+  bool isVgjets = (currentSample=="ttg") || (currentSample=="Zg_strong") || (currentSample=="Wg_strong") || (currentSample=="Zg_EWK") || (currentSample=="Wg_EWK");
 
   // removed extra top samples:
   //std::cout << "runNumber:"<<runNumber << std::endl;
@@ -279,6 +287,7 @@ StatusCode HFInputAlg::execute() {
   // modify the MET definition
   if(m_metdef==1 && n_jet>1){ // changing to tenacious
     met_tst_et = met_tenacious_tst_et;
+    met_tst_phi = met_tenacious_tst_phi;
     met_tst_nolep_et = met_tenacious_tst_nolep_et;
     met_tst_j1_dphi = fabs(GetDPhi(met_tenacious_tst_phi, jet_phi->at(0)));
     met_tst_j2_dphi = fabs(GetDPhi(met_tenacious_tst_phi, jet_phi->at(1)));
@@ -356,10 +365,31 @@ StatusCode HFInputAlg::execute() {
     //if     (metRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
     //if     (metRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
   }
-  // MET choice to be implemented...
-  if (!((passJetCleanTight == 1) & nbjetCut & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 2.0) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (n_ph==0))) return StatusCode::SUCCESS; 
 
-  if(n_el== 1) { met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0); } else {  met_significance = 0; }
+  // setup the photon + MET+ VBF analysis
+  bool phSelectionCut = (n_ph==0);
+  float phcentrality = 1.0;
+  float phcentralityCut=0.4; // set to pass
+  float met_tst_ph_dphi = 10.0;
+  float met_tst_ph_dphiCut = 1.8;
+  bool in_vy_overlapCut=true;
+  if(doVBFMETGam){
+    jj_detaCut=3.0;
+    jj_massCut=250.0e3;
+    phSelectionCut=(n_ph==1);
+    if(n_ph>0) phcentrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(ph_eta->at(0) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
+    met_tst_ph_dphi = fabs(GetDPhi(met_tst_phi, ph_phi->at(0)));
+    // if this is a vjets sample and it has a photon overlap, then remove it
+    if(isVjets && in_vy_overlap) in_vy_overlapCut=false;
+    if(isTop   && in_vy_overlap) in_vy_overlapCut=false;
+    if(isVgjets && !in_vy_overlap) in_vy_overlapCut=false;
+    // need to remove the signal, apply this to the Vgamma samples
+  }
+
+  // basic selection.
+  if (!((passJetCleanTight == 1) & nbjetCut & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 2.0) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (phSelectionCut) & (phcentrality>phcentralityCut) & (met_tst_ph_dphi>met_tst_ph_dphiCut) & (in_vy_overlapCut))) return StatusCode::SUCCESS; 
+
+  if(n_el==1) { met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0); } else {  met_significance = 0; }
 
   if(v26Ntuples) lep_trig_match=1;
   bool trigger_lep_bool = ((trigger_lep & 0x1)==0x1) && lep_trig_match>0; // note that lep_trig_match is only computed for signal lepton triggers. We assume it is perfect for dilepton triggers.
@@ -623,6 +653,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("randomRunNumber", 1);
   m_tree->SetBranchStatus("eventNumber", 1);
   m_tree->SetBranchStatus("passJetCleanTight", 1);
+  m_tree->SetBranchStatus("in_vy_overlap", 1);
   m_tree->SetBranchStatus("averageIntPerXing", 1);
   m_tree->SetBranchStatus("trigger_met", 1);
   m_tree->SetBranchStatus("trigger_met_encodedv2", 1);
@@ -664,6 +695,9 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("el_pt",1);
   m_tree->SetBranchStatus("el_phi",1);
   m_tree->SetBranchStatus("el_eta",1);
+  m_tree->SetBranchStatus("ph_pt",1);
+  m_tree->SetBranchStatus("ph_phi",1);
+  m_tree->SetBranchStatus("ph_eta",1);
   m_tree->SetBranchStatus("jet_pt",1);
   m_tree->SetBranchStatus("jet_phi",1);
   m_tree->SetBranchStatus("jet_eta",1);
@@ -679,6 +713,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("trigger_lep", &trigger_lep);
   m_tree->SetBranchAddress("lep_trig_match", &lep_trig_match);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
+  m_tree->SetBranchAddress("in_vy_overlap", &in_vy_overlap);
   m_tree->SetBranchAddress("n_jet",&n_jet);
   m_tree->SetBranchAddress("n_bjet",&n_bjet);
   m_tree->SetBranchAddress("n_ph",&n_ph);
@@ -711,12 +746,15 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("el_charge",&el_charge);
   m_tree->SetBranchAddress("baseel_charge",&baseel_charge);
   m_tree->SetBranchAddress("el_pt",&el_pt);
+  m_tree->SetBranchAddress("ph_pt",&ph_pt);
   m_tree->SetBranchAddress("jet_pt",&jet_pt);
   m_tree->SetBranchAddress("jet_timing",&jet_timing);
   m_tree->SetBranchAddress("mu_phi",&mu_phi);
   m_tree->SetBranchAddress("el_phi",&el_phi);
+  m_tree->SetBranchAddress("ph_phi",&ph_phi);
   m_tree->SetBranchAddress("mu_eta",&mu_eta);
   m_tree->SetBranchAddress("el_eta",&el_eta);
+  m_tree->SetBranchAddress("ph_eta",&ph_eta);
   m_tree->SetBranchAddress("jet_phi",&jet_phi);
   m_tree->SetBranchAddress("jet_eta",&jet_eta);
   m_tree->SetBranchAddress("jet_m",&jet_m);
