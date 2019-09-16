@@ -7,7 +7,7 @@
 
 
 VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ), nParton(-1),
-										      fjvtSFWeight(1.0), fjvtSFTighterWeight(1.0){
+										      fjvtSFWeight(1.0), fjvtSFTighterWeight(1.0), phSFWeight(1.0){
   declareProperty( "currentSample", m_currentSample = "W_strong", "current sample");
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
@@ -1272,7 +1272,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("passVjetsPTV", 1);
   m_tree->SetBranchStatus("MGVTruthPt", 1);
   m_tree->SetBranchStatus("SherpaVTruthPt", 1);
-  m_tree->SetBranchStatus("in_vy_overlap", 1);
+  m_tree->SetBranchStatus("in_vy_overlap", 1);// prefer this one. the iso shouldnt be required
   m_tree->SetBranchStatus("in_vy_overlap_iso", 1);
   m_tree->SetBranchStatus("FlavourFilter", 1);
   m_tree->SetBranchStatus("passGRL", 1);

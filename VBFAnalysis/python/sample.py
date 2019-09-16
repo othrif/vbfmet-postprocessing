@@ -70,6 +70,10 @@ class sample(object):
                 self.sampleType = "Zg_strong"
             elif (self.runNumber >= 364520 and self.runNumber <= 364535):
                 self.sampleType = "Wg_strong"
+            elif (self.runNumber >= 363270 and self.runNumber <= 363272):
+                self.sampleType = "Wg_EWK"
+            elif (self.runNumber >= 363266 and self.runNumber <= 363269):
+                self.sampleType = "Zg_EWK"
             elif (self.runNumber >= 410082 and self.runNumber <= 410084) or self.runNumber==410087:
                 self.sampleType = "ttg"
             elif (self.runNumber >= 364541 and self.runNumber <= 364547):
