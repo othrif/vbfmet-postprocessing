@@ -27,7 +27,9 @@ def compute_ratio(args, tfile, region):
     histname = os.path.join(region, "plotEvent_data", args.var)
 
     # TODO XXX: should we make this configurable?
-    valid_mcs = ["wewk", "wqcd", "zewk", "zqcd", "top2", "vvv"]
+    # Note: vvv seems no longer available by default in output ROOT file.
+    # (it was a small contribution anyway...)
+    valid_mcs = ["wewk", "wqcd", "zewk", "zqcd", "tall"]
 
     data_hist = tfile.Get(histname)
     print("Reading histogram: " + histname)
