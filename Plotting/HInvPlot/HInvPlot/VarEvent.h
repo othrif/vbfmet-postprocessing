@@ -162,7 +162,9 @@ namespace Msl
       jetPartonTruthLabelID1,
       tmva,
       bcid,
-      bcidPos
+      bcidPos,
+      in_vy_overlap,
+      in_vy_overlapCut
     };
 
     std::string       AsStr(Var var);
