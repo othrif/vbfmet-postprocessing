@@ -125,7 +125,7 @@ def getSelKeyLabel(selkey):
         elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'        
         elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'        
         elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
-        elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<1TeV'
+        elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<0.8TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
         elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'            
         elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'            
