@@ -123,6 +123,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t BCIDDistanceFromFront;
   Bool_t passBatman;
   Bool_t passVjetsFilter;
+  Bool_t passVjetsFilterTauEl;
   Bool_t passVjetsPTV;
   Float_t MGVTruthPt;
   Float_t SherpaVTruthPt;

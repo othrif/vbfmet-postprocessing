@@ -230,6 +230,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   if(m_extraVars) m_tree_out->Branch("trigger_met_encoded", &trigger_met_encoded);
   m_tree_out->Branch("passBatman", &passBatman );
   m_tree_out->Branch("passVjetsFilter", &passVjetsFilter );
+  m_tree_out->Branch("passVjetsFilterTauEl", &passVjetsFilterTauEl );
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("MGVTruthPt", &MGVTruthPt);
   m_tree_out->Branch("in_vy_overlap", &in_vy_overlap);
@@ -321,8 +322,8 @@ StatusCode VBFAnalysisAlg::initialize() {
 	m_tree_out->Branch("jet_EMFrac",&jet_EMFrac);
 	m_tree_out->Branch("jet_fch",&jet_fch);
       }
-      if(m_isMC) m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
-      if(m_isMC) m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
+      if(m_isMC && m_currentVariation=="Nominal") m_tree_out->Branch("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
+      if(m_isMC && m_currentVariation=="Nominal") m_tree_out->Branch("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
     }else{
       if(m_QGTagger){
       	m_tree_out->Branch("jet_NTracks",&jet_NTracks_PV);
@@ -356,15 +357,17 @@ StatusCode VBFAnalysisAlg::initialize() {
       if(m_isMC) m_tree_out->Branch("baseel_truthOrigin",  &baseel_truthOrigin);
       if(m_isMC) m_tree_out->Branch("baseel_truthType",    &baseel_truthType);
     }
+    m_tree_out->Branch("ph_pt", &ph_pt);
+    m_tree_out->Branch("ph_phi",&ph_phi);
+    m_tree_out->Branch("ph_eta",&ph_eta);
     if(m_currentVariation=="Nominal"){
-      m_tree_out->Branch("ph_pt", &ph_pt);
-      m_tree_out->Branch("ph_phi",&ph_phi);
-      m_tree_out->Branch("ph_eta",&ph_eta);
       m_tree_out->Branch("tau_pt",&outtau_pt);
       m_tree_out->Branch("tau_phi",&outtau_phi);
       m_tree_out->Branch("tau_eta",&outtau_eta);
       m_tree_out->Branch("met_soft_tst_phi",       &met_soft_tst_phi);
       m_tree_out->Branch("met_soft_tst_sumet",     &met_soft_tst_sumet);
+    }else{
+      tau_pt=0; tau_phi=0; tau_eta=0; 
     }
     // Tenacious MET
     m_tree_out->Branch("met_tenacious_tst_et",   &met_tenacious_tst_et);
@@ -597,7 +600,6 @@ StatusCode VBFAnalysisAlg::execute() {
     } // end check
     
   }// end truth computation
-
   // MET trigger scale factor
   unsigned metRunNumber = randomRunNumber;
   if(!m_isMC) metRunNumber=runNumber;
@@ -711,8 +713,11 @@ StatusCode VBFAnalysisAlg::execute() {
       std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
       std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
       NgenCorrected = Ngen[runNumber];
-      if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
-      if(runNumber>=361510 && runNumber<=361519 && (MGVTruthPt>100.0e3 && (truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
+      if((truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3) && !passVjetsFilterTauEl) std::cout << "local truth, but passVjetsFilterTauEl is false" << std::endl;
+      //if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
+      //if(runNumber>=361510 && runNumber<=361519 && (MGVTruthPt>100.0e3 && (truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
+      if(runNumber>=363123 && runNumber<=363170 && (MGVTruthPt>100.0e3 && (passVjetsFilterTauEl)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
+      if(runNumber>=361510 && runNumber<=361519 && (MGVTruthPt>100.0e3 && (passVjetsFilterTauEl)) ) {  weight=-1;  return StatusCode::SUCCESS; } // remove events as these are replaced by filtered samples
       if(mg_w_incl_lf.find(runNumber)!=mg_w_incl_lf.end() && (MGVTruthPt>100.0e3) && passVjetsFilter) {  NgenCorrected/=MGMergeWeightIncl;  } // apply the filter efficiency.
       if(mg_w_filter.find(runNumber)!=mg_w_filter.end()) {  NgenCorrected/=MGMergeWeightFilt;  } // apply the filter efficiency also to the filtered sample to merge
       //if(mg_w_filter_highHT.find(runNumber)!=mg_w_filter_highHT.end() ) { weight=-1; return StatusCode::SUCCESS; } // remove events. implemented to replace
@@ -854,7 +859,6 @@ StatusCode VBFAnalysisAlg::execute() {
       }
     }
   }
-
   // refill the base leptons
   if(n_baseel>int(baseel_pt->size())){
     for(unsigned a=0; a<el_pt->size(); ++a){
@@ -947,7 +951,6 @@ StatusCode VBFAnalysisAlg::execute() {
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
 
   bool GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>250.0e3);
-  //if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) )) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (n_jet < 2) return StatusCode::SUCCESS;
   if (!(n_jet < 5) && !m_LooseSkim) return StatusCode::SUCCESS;
@@ -991,11 +994,11 @@ StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG ("Assign trigger_met value");
   if(n_el== 1) {
     met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
-  }else if(n_baseel == 1 && baseel_pt->size()==1){
+  }else if(baseel_pt && n_baseel == 1 && baseel_pt->size()==1){
     met_significance = met_tst_et/1000/sqrt((baseel_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
   }else if(n_mu == 1){
     met_significance = met_tst_et/1000/sqrt((mu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
-  }else if(n_basemu == 1){
+  }else if(basemu_pt && n_basemu == 1 && basemu_pt->size()>0){
     met_significance = met_tst_et/1000/sqrt((basemu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
   }else {
     met_significance = 0;
@@ -1270,6 +1273,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("l1_met_trig_encoded", 1);
   m_tree->SetBranchStatus("passBatman", 1);
   m_tree->SetBranchStatus("passVjetsFilter", 1);
+  m_tree->SetBranchStatus("passVjetsFilterTauEl", 1);
   m_tree->SetBranchStatus("passVjetsPTV", 1);
   m_tree->SetBranchStatus("MGVTruthPt", 1);
   m_tree->SetBranchStatus("SherpaVTruthPt", 1);
@@ -1456,6 +1460,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("l1_met_trig_encoded", &l1_met_trig_encoded);
   m_tree->SetBranchAddress("passBatman", &passBatman);
   m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
+  m_tree->SetBranchAddress("passVjetsFilterTauEl", &passVjetsFilterTauEl);
   m_tree->SetBranchAddress("passVjetsPTV", &passVjetsPTV);
   m_tree->SetBranchAddress("MGVTruthPt", &MGVTruthPt);
   m_tree->SetBranchAddress("SherpaVTruthPt", &SherpaVTruthPt);
@@ -1582,9 +1587,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("ph_pt",           &ph_pt);
     m_tree->SetBranchAddress("ph_phi",          &ph_phi);
     m_tree->SetBranchAddress("ph_eta",          &ph_eta);
-    m_tree->SetBranchAddress("tau_pt",           &tau_pt);
-    m_tree->SetBranchAddress("tau_phi",          &tau_phi);
-    m_tree->SetBranchAddress("tau_eta",          &tau_eta);
+    if(m_currentVariation=="Nominal" && m_isMC){
+      m_tree->SetBranchAddress("tau_pt",           &tau_pt);
+      m_tree->SetBranchAddress("tau_phi",          &tau_phi);
+      m_tree->SetBranchAddress("tau_eta",          &tau_eta);
+    }else{ tau_pt=0; tau_phi=0; tau_eta=0; }
 
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
     m_tree->SetBranchAddress("met_soft_tst_phi",       &met_soft_tst_phi);
