@@ -232,6 +232,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("passVjetsFilter", &passVjetsFilter );
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("MGVTruthPt", &MGVTruthPt);
+  m_tree_out->Branch("in_vy_overlap", &in_vy_overlap);
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("lep_trig_match", &lep_trig_match);
   m_tree_out->Branch("passJetCleanTight", &passJetCleanTight);
