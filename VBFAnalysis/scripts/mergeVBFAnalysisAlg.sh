@@ -37,7 +37,9 @@ hadd $OUTDIRM/ggFH125.root  ggFH125*.root
 hadd $OUTDIRM/VH125Old.root  VH125Old*.root
 rm  VH125Old*.root
 hadd $OUTDIRM/VH125.root  VH125*.root
-
+hadd $OUTDIRM/Zg_EWKNominal.root  Zg_EWKNominal*.root
+hadd $OUTDIRM/Wg_EWKNominal.root  Wg_EWKNominal*.root
+hadd $OUTDIRM/TTH125Nominal.root  TTH125Nominal*.root
 
 #hadd $OUTDIRM/Wg_strong.root Wg_strong*root
 #hadd $OUTDIRM/Zg_strong.root Zg_strong*root
