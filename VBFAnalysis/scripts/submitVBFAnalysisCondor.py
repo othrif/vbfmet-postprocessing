@@ -40,10 +40,11 @@ else:
     systlistA = sys.getsystematicsList()
     # remove the weight systematics to avoid empty ntuples. weight systematics are saved as weights
     for s in systlistA:
-        if s not in sysW.getsystematicsList():
+        if (s not in sysW.getsystematicsList()) and (s not in sysW.getsystematicsOneSidedMap()):
             systlist+=[s]
 
 print systlist
+print 'Will process this many variations: ',len(systlist)
 list_file=None
 isFileMap=False
 if args.listSample.count('.p'):

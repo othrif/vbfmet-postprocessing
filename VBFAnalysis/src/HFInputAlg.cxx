@@ -67,12 +67,9 @@ StatusCode HFInputAlg::initialize() {
   baseel_pt= new std::vector<float>(0);
   baseel_eta= new std::vector<float>(0);
   baseel_phi= new std::vector<float>(0);
-  baseel_ptvarcone20= new std::vector<float>(0);
   basemu_pt= new std::vector<float>(0);
   basemu_eta= new std::vector<float>(0);
   basemu_phi= new std::vector<float>(0);
-  basemu_ptvarcone20= new std::vector<float>(0); 
-  basemu_ptvarcone30= new std::vector<float>(0); 
   lep_trig_match=1; // init to 1 for older ntuples
   
   cout<<"NAME of input tree in intialize ======="<<currentVariation<<endl;
@@ -772,12 +769,9 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchStatus("baseel_pt",1);
     m_tree->SetBranchStatus("baseel_eta",1);
     m_tree->SetBranchStatus("baseel_phi",1);
-    m_tree->SetBranchStatus("baseel_ptvarcone20",1);
     m_tree->SetBranchStatus("basemu_pt",1);
     m_tree->SetBranchStatus("basemu_eta",1);
     m_tree->SetBranchStatus("basemu_phi",1);
-    m_tree->SetBranchStatus("basemu_ptvarcone20",1);
-    m_tree->SetBranchStatus("basemu_ptvarcone30",1);
 
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
     m_tree->SetBranchAddress("met_tenacious_tst_et",   &met_tenacious_tst_et);
@@ -788,15 +782,12 @@ StatusCode HFInputAlg::beginInputFile() {
     //m_tree->SetBranchAddress("met_tighter_tst_et",     &met_tighter_tst_et);    
     m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
     m_tree->SetBranchAddress("jet_NTracks",         &jet_NTracks);
-    m_tree->SetBranchAddress("baseel_ptvarcone20",  &baseel_ptvarcone20);
     m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
     m_tree->SetBranchAddress("baseel_eta",           &baseel_eta);
     m_tree->SetBranchAddress("baseel_phi",           &baseel_phi);
     m_tree->SetBranchAddress("basemu_pt",           &basemu_pt);
     m_tree->SetBranchAddress("basemu_eta",           &basemu_eta);
     m_tree->SetBranchAddress("basemu_phi",           &basemu_phi);
-    m_tree->SetBranchAddress("basemu_ptvarcone20",  &basemu_ptvarcone20);
-    m_tree->SetBranchAddress("basemu_ptvarcone30",  &basemu_ptvarcone30);
   }
   return StatusCode::SUCCESS;
 }
