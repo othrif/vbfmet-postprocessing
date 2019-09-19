@@ -11,6 +11,7 @@ using namespace std;
 Msl::VarStore::VarStore():
   RunNumber  (0),
   EventNumber(0),
+  AverageIntPerXing(0),
   fWeight    (0.0),
   fBits      (0),
   fSample    (Mva::kNone)
@@ -21,6 +22,7 @@ Msl::VarStore::VarStore():
 Msl::VarStore::VarStore(const Event &event, const std::vector<Mva::Var> &vars):
   RunNumber  (event.RunNumber),
   EventNumber(event.EventNumber),
+  AverageIntPerXing(event.AverageIntPerXing),
   fWeight    (0.0),
   fBits      (0),
   fSample    (Mva::kNone)
@@ -35,6 +37,7 @@ void Msl::VarStore::Clear()
 
   RunNumber   = 0;
   EventNumber = 0;
+  AverageIntPerXing = 0;
   fWeight     = 0.0;
   fBits       = 0;
   fSample     = Mva::kNone;
@@ -48,6 +51,7 @@ void Msl::VarStore::FillStore(const Event &event, const std::vector<Mva::Var> &v
   //
   RunNumber   = event.RunNumber;
   EventNumber = event.EventNumber;
+  AverageIntPerXing = event.AverageIntPerXing;
   fWeight     = event.GetWeight();
   fSample     = event.sample;
 

@@ -105,13 +105,14 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   if(fTMVAWeightPath!=""){
     fTMVAReader = new TMVA::Reader( "!Color:!Silent" );
     fMVAName =  "BDT method";
-    for(unsigned i=0; i<6; ++i) fTMVAVars.push_back(0.0);
+    for(unsigned i=0; i<7; ++i) fTMVAVars.push_back(0.0);
     fTMVAReader->AddVariable("jj_mass", &fTMVAVars[0]);
     fTMVAReader->AddVariable("jj_dphi", &fTMVAVars[1]);
     fTMVAReader->AddVariable("jj_deta", &fTMVAVars[2]);
     fTMVAReader->AddVariable("met_tst_et", &fTMVAVars[3]);
-    fTMVAReader->AddVariable("jet1_pt", &fTMVAVars[4]);
-    fTMVAReader->AddVariable("jet2_pt", &fTMVAVars[5]);
+    fTMVAReader->AddVariable("met_soft_tst_et", &fTMVAVars[4]);
+    fTMVAReader->AddVariable("jet1_pt", &fTMVAVars[5]);
+    fTMVAReader->AddVariable("jet2_pt", &fTMVAVars[6]);
     fTMVAReader->BookMVA( fMVAName, fTMVAWeightPath);
   }
   
@@ -1105,7 +1106,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // decode trigger_lep
     int trigger_lep = event->GetVar(Mva::trigger_lep);
-    int trigger_lep_new = (trigger_lep&0x1) ? 1 : 0;
+    int trigger_lep_new = ((trigger_lep&0x1)>0) ? 1 : 0;
     if(trigger_lep_new==0 && (trigger_lep&0x10)==0x10) trigger_lep_new = 2;
     if(trigger_lep_new==0 && (trigger_lep&0x100)==0x100) trigger_lep_new = 3;
     event->RepVar(Mva::trigger_lep, trigger_lep_new);
@@ -1123,7 +1124,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
     else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
     else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K  
-    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
+    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
     if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
     // 2018 update trigger for later periods => value 5 for
     if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
@@ -1174,11 +1175,12 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       fTMVAVars[1]=event->GetVar(Mva::jj_dphi);
       fTMVAVars[2]=event->GetVar(Mva::jj_deta);
       fTMVAVars[3]=event->GetVar(Mva::met_tst_et)*1.0e3;
-      fTMVAVars[4]=event->GetVar(Mva::jetPt0)*1.0e3;
-      fTMVAVars[5]=event->GetVar(Mva::jetPt1)*1.0e3;
-      event->AddVar(Mva::tmva, fTMVAReader->EvaluateMVA( fTMVAVars, fMVAName ));
+      fTMVAVars[4]=event->GetVar(Mva::met_soft_tst_et)*1.0e3;
+      fTMVAVars[5]=event->GetVar(Mva::jetPt0)*1.0e3;
+      fTMVAVars[6]=event->GetVar(Mva::jetPt1)*1.0e3;
+      event->RepVar(Mva::tmva, fTMVAReader->EvaluateMVA( fTMVAVars, fMVAName ));
       //std::cout << "inputs: " << fTMVAVars[0] << " " << fTMVAVars[1] << " " << fTMVAVars[2] << " " << fTMVAVars[3] << " " << fTMVAVars[4] << " " << fTMVAVars[5] << " " << event->GetVar(Mva::tmva) << std::endl;
-    }else { event->AddVar(Mva::tmva, 0.0); }
+    }else if(!event->HasVar(Mva::tmva)) { event->AddVar(Mva::tmva, 0.0); }
     
     //
     // Process sub-algorithms

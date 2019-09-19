@@ -248,7 +248,8 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(36.1e3/1.0e3))
+        #a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(36.1e3/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(40e3/1.0e3))        
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -458,14 +459,39 @@ if __name__ == "__main__":
     #trig='xe110XE65'
     mvar = 'met_tst_et'
     #fname='/tmp/v28Loose_metsf_VBFTopo'
-    fname='/tmp/v28Loose_metsf'
-    xe1108_u_tenac = DrawSF(can, trig, lep, mvar, fname)
-    
-    fname='/tmp/v27Loose_metsf'
-    trig='metsfxe100L150'
-    xe1107_u_tenac = DrawSF(can, trig, lep, mvar, fname, year=2017)
+    #fname='/tmp/v28Loose_metsf'
+    #xe1108_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    #
+    #fname='/tmp/v27Loose_metsf'
+    #trig='metsfxe100L150'
+    #xe1107_u_tenac = DrawSF(can, trig, lep, mvar, fname, year=2017)
+    #
+    #fname='/tmp/v26Loose_metsf'
+    #trig='xe110'
+    #xe1106_u_tenac = DrawSF(can, trig, lep, mvar, fname, year=2016)
 
-    fname='/tmp/v26Loose_metsf'
-    trig='xe110'
-    xe1106_u_tenac = DrawSF(can, trig, lep, mvar, fname, year=2016)
-    
+    #trig='xe110'
+    #trig='xe110L155'
+    trig='VBFTopo'
+    #trig='VBFTopo'
+    fname ='v28Loose_metsf_reg' #v28Loose_metsf_VBFTopo.root
+    #Generic_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    #v28Loose_metsf_VBFMETUniq.root
+    #v28Loose_metsf_VBFTopo.root
+    trig='VBFTopo'
+    #trig='VBFTopo'
+    fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
+    XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
+    VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    #fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
+    #VBFTopoUniq_u_tenac = DrawSF(can, trig, lep, mvar, fname)        
+
+    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['#mu XE','#mu XEORVBF'],'xeComparison_mu_SF', ytitle='Trigger Eff.',trig='xe,VBFOR')
+
+    lep='e'
+    fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
+    XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
+    VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['e XE','e XEORVBF'],'xeComparison_e_SF', ytitle='Trigger Eff.',trig='xe,VBFOR')    

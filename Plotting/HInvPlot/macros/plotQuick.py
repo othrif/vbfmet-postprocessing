@@ -201,6 +201,11 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
 
     if hname.count('ph_pt'):
         h1.GetXaxis().SetTitle('Photon p_{T} [GeV]')
+    if hname=='ph_pt_lead':
+        h1.Rebin(5)
+        h2.Rebin(5)
+        h1.GetXaxis().SetRangeUser(5.0,1000.0)
+        h2.GetXaxis().SetRangeUser(5.0,1000.0)
     if GetError:
         h1.GetYaxis().SetTitle('Relative Error')        
     else:
@@ -241,6 +246,9 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     pad2.SetLogx(0)
     if hname=='ph_pt_lead':
         hratio.GetXaxis().SetTitle('Lead Photon p_{T} [GeV]')
+        h1.GetXaxis().SetRangeUser(11.0,1000.0)
+        h2.GetXaxis().SetRangeUser(11.0,1000.0)
+        hratio.GetXaxis().SetRangeUser(11.0,1000.0) 
         if not GetError:
             pad1.SetLogy(1)
             #pad2.SetLogy(1)
@@ -280,7 +288,7 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     elif  hname=='dr_ph_boson':
         hratio.GetXaxis().SetTitle('#DeltaR(#gamma,boson)')        
     hratio.GetYaxis().SetTitle('224 / 227Enh')
-    hratio.GetYaxis().SetRangeUser(0.5,1.5)
+    hratio.GetYaxis().SetRangeUser(0.5,1.5)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -295,6 +303,7 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     hratio.Draw()
     can.Update()
     can.WaitPrimitive()
+    #raw_input()
     if GetError:
         can.SaveAs(hname+'_err.pdf')
     else:
@@ -304,8 +313,10 @@ def Fit(_suffix=''):
 
     can=ROOT.TCanvas('can',"can",600,600)
     Style();
-    f1 = ROOT.TFile.Open('365500_VBFTruth_out.root')
-    f2 = ROOT.TFile.Open('365510b_VBFTruth_out.root')    
+    #f1 = ROOT.TFile.Open('365500_VBFTruth_out.root')
+    #f2 = ROOT.TFile.Open('365510b_VBFTruth_out.root')
+    f1 = ROOT.TFile.Open('mc.365520_ptgam15_out.root')
+    f2 = ROOT.TFile.Open('mc.366000_ptgam15_out.root')        
     h3 = f1.Get('njet')
     h4 = f2.Get('njet')
     h1_norm = 1000.0*0.000988772/h3.Integral(0,10001)
@@ -313,7 +324,7 @@ def Fit(_suffix=''):
     
     hnames=['elneg_pt','elpos_pt','ph_pt_lead','ph_eta_lead','ph_pt','ph_eta','boson_pt','boson_eta','njet','dr_ph_el','dr_ph_j','dr_ph_boson']
     for hname in hnames:
-        Draw(hname,f1,f2,can,h1_norm,h2_norm)
+        Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=False)
             #xs 00 -> 0.000988772
             #xs 06 -> 0.00211978
             #xs 00 -> 0.000988772

@@ -7,7 +7,10 @@
 
 int plotTruth()
 {
-  TFile *fout = TFile::Open("365510b_VBFTruth_out.root","RECREATE");
+  //TFile *fout = TFile::Open("365510b_VBFTruth_out.root","RECREATE");
+  //TFile *fout = TFile::Open("enhanced_ptgam_out.root","RECREATE");
+  TFile *fout = TFile::Open("mc.365520_ptgam15_out.root","RECREATE");
+  //TFile *fout = TFile::Open("mc.366000_ptgam15_out.root","RECREATE");    
   //TFile *fout = TFile::Open("365500_VBFTruth_out.root","RECREATE");  
   TH1F *hph_pt = new TH1F("ph_pt","ph_pt",500, 0.0,1000.0);
   hph_pt->Sumw2(1);
@@ -61,7 +64,10 @@ int plotTruth()
   hdr_ph_boson->Sumw2(1);
   hdr_ph_boson->SetDirectory(fout);  
   
-  TFile *fin = TFile::Open("365510b_VBFTruth.root");
+  //TFile *fin = TFile::Open("365510b_VBFTruth.root");
+  //TFile *fin = TFile::Open("enhanced_ptgam.root");
+  TFile *fin = TFile::Open("mc.365520_ptgam15.root");
+  //TFile *fin = TFile::Open("mc.366000_ptgam15.root");  
   //TFile *fin = TFile::Open("365500_VBFTruth.root");  
   TTree *truthTree = static_cast<TTree*>(fin->Get("MiniNtuple"));
   truthTree->SetBranchStatus("*",1);
@@ -286,8 +292,8 @@ int plotTruth()
        }
        if(phor) continue;
        if(m_jet_pt->at(nj)>20.0e3) ++tnj;
-       hnjet->Fill(tnj,weight);
      }
+     hnjet->Fill(tnj,weight);
    }
 
    fout->Write();

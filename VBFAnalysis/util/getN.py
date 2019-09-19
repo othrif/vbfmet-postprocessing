@@ -19,6 +19,7 @@ sys.stdout.flush()
 
 fout = ROOT.TFile(args.output,"RECREATE")
 h_total = ROOT.TH1D("h_total","",1,0,1)
+hmap={}
 if args.pickle==None:
     print 'not a pickle'
     fdir_list = open(args.filelist,'r')
@@ -55,6 +56,13 @@ if args.pickle==None:
                 continue
             h = f.Get("NumberEvents")
             nevent += h.GetBinContent(args.event_count)
+            if dsid_string in hmap:
+                hmap[dsid_string].Add(h)
+            else:
+                hnew = h.Clone()          
+                hnew.SetDirectory(fout)
+                hnew.SetName('skim_%s' %(dsid_string))
+                hmap[dsid_string]=hnew
         h_total.Fill(dsid_string,nevent)
 else:
     # run pickle file list
@@ -87,9 +95,19 @@ else:
 		continue
 	    nevent += h.GetBinContent(args.event_count)
             print 'total events: ',nevent
+            if dsid_string in hmap:
+                hmap[dsid_string].Add(h)
+            else:
+                hnew = h.Clone()          
+                hnew.SetDirectory(fout)
+                hnew.SetName('skim_%s' %(dsid_string))
+                hmap[dsid_string]=hnew
             f.Close()
         h_total.Fill(dsid_string,nevent)
         
     
+fout.cd()
+for dsid_string,hnew in hmap.iteritems():
+    hnew.Write()
 h_total.Draw()
 fout.Write()

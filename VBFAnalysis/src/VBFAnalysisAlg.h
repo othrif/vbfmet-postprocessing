@@ -60,6 +60,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   long int nFileEvtTot = 0;
   Bool_t m_isMC = true;
   Bool_t m_UseExtMC = false;
+  Bool_t m_UseExtMGVjet = false;
   bool is2015;
   bool is2016;
   bool m_LooseSkim = true;
@@ -78,6 +79,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
 
   TH1D *h_Gen;
   std::map<int,double> Ngen;
+  std::map<int,TH1D*>  Ngen_filter;
 
   //Maps for types of Tree things
   std::map<TString, int>   tMapInt;
@@ -122,6 +124,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Bool_t passBatman;
   Bool_t passVjetsFilter;
   Bool_t passVjetsPTV;
+  Float_t MGVTruthPt;
+  Float_t SherpaVTruthPt;
+  Bool_t in_vy_overlap;
+  Bool_t in_vy_overlap_iso;
+  Int_t FlavourFilter;
 
   Int_t runNumber;
   Int_t randomRunNumber;
@@ -205,6 +212,11 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_truth_sumet=-9999;
   Float_t GenMET_pt=-9999;
   Double_t truth_jj_mass=-9999;
+  Double_t truth_jj_dphi=-9999;
+  Double_t truth_j2_pt=-9999;
+  Double_t truthloMG_jj_mass=-9999;
+  Double_t truthloMG_jj_dphi=-9999;
+  Double_t truthloMG_j2_pt=-9999;
 
   // optimization variables
   std::vector<Float_t>* j3_centrality;
@@ -293,12 +305,14 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* truth_tau_pt;
   std::vector<Float_t>* truth_tau_eta;
   std::vector<Float_t>* truth_tau_phi;
+  std::vector<Int_t>* truth_tau_status;
   std::vector<Float_t>* truth_mu_pt;
   std::vector<Float_t>* truth_mu_eta;
   std::vector<Float_t>* truth_mu_phi;
   std::vector<Float_t>* truth_el_pt;
   std::vector<Float_t>* truth_el_eta;
   std::vector<Float_t>* truth_el_phi;
+  std::vector<Int_t>* truth_el_status;
 
   std::vector<Float_t>* outtau_pt;
   std::vector<Float_t>* outtau_phi;

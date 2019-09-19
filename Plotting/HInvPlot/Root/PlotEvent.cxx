@@ -18,6 +18,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hBaseElPt(0), hBaseElEta(0),
 				  hTruthTauPt(0), hTruthTauEta(0),
 				  hminDRLep(0),
+				  hjj_mass_variableBin(0),
 				  hmj34(0),
 				  hmax_j_eta(0),
 				  hdRj1(0),
@@ -35,6 +36,8 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hmin_mj3(0),
 				  hmin_mj3_over_mjj(0),
 				  hcentrality(0),
+				  hmuLow(0), hmuHigh(0),
+				  hrunLow(0), hrunHigh(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
@@ -119,6 +122,10 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hj3Eta            = GetTH1("j3Eta",            22,  -4.5,  4.5);
   hj3Jvt            = GetTH1("j3Jvt",            12,  -0.2,  1.0);
   hj3FJvt           = GetTH1("j3FJvt",           22,  -0.2,  2.0);
+  hmuLow            = GetTH1("muLow",            22,  -4.5,  4.5);
+  hmuHigh           = GetTH1("muHigh",            22,  -4.5,  4.5);
+  hrunLow           = GetTH1("runLow",            22,  -4.5,  4.5);
+  hrunHigh          = GetTH1("runHigh",            22,  -4.5,  4.5);
 
   hmuDR           = GetTH1("muDR",           25,  0.0,  5.0);
   hmuEta          = GetTH1("muEta",          30,  0.0,  3.0);    
@@ -130,6 +137,10 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
+  // jj_mass limits
+  float binsjjmass [7] = { 0.0, 200.0, 500.0, 1000.0, 1500.0, 2000.0, 3000.0 }; 
+  hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  6,  binsjjmass); 
+  
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
     fHistVec[fVarVec[a]] =  GetTH1(Mva::Convert2Str(fVarVec[a]),unsigned(fNBinVec[a]), float(fLoVec[a]), float(fHiVec[a]));
@@ -176,6 +187,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hZMad2MCIDQCD->Fill(event.RunNumber, weight);  
   hWMadMCIDQCD->Fill(event.RunNumber, weight);  
   hZPowMCIDQCD->Fill(event.RunNumber, weight);
+  FillHist(hjj_mass_variableBin,   Mva::jj_mass, event, weight);
   
   if(event.truth_mu.size()>0){
     hTruthMuPt ->Fill(event.truth_mu.at(0).pt, weight);
@@ -258,6 +270,10 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(hj3Eta) hj3Eta->Fill(event.jets.at(2).eta, weight);
     if(hj3Jvt) hj3Jvt->Fill(event.jets.at(2).GetVar(Mva::jvt), weight);
     if(hj3FJvt) hj3FJvt->Fill(event.jets.at(2).GetVar(Mva::fjvt), weight);
+    if(hmuLow && event.AverageIntPerXing<40) hmuLow->Fill(event.jets.at(2).eta, weight);
+    if(hmuHigh && event.AverageIntPerXing>=40) hmuHigh->Fill(event.jets.at(2).eta, weight);
+    if(hrunLow && event.RunNumber<355250) hrunLow->Fill(event.jets.at(2).eta, weight);
+    if(hrunHigh && event.RunNumber>355250) hrunHigh->Fill(event.jets.at(2).eta, weight);
   }
   if(event.HasVar(Mva::BCIDDistanceFromFront)){
     hJetEMECvsBCIDPosPt25->Fill(njet25EMEC,event.GetVar(Mva::BCIDDistanceFromFront));
