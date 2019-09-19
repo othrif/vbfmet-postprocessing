@@ -39,7 +39,6 @@ myvars = [    ['jj_deta', '50', '0.0', '10.0'],
               ['BCIDDistanceFromFront', '100', '-0.5', '99.5'],
               ['averageIntPerXing', '100', '-0.5', '99.5'],
               ['lb', '100', '-0.5', '999.5'],
-              ['n_vx', '100', '-0.5', '99.5'],
               ]
 myvars_notplotted = [['trigger_met_encoded', '2', '0.0', '1.0'],
                          ['trigger_met_encodedv2', '2', '0.0', '1.0'],
