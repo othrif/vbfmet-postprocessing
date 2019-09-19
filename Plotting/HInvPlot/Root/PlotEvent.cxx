@@ -133,8 +133,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
-  hMetvsMu = GetTH2("MetvsMu",100,0.0,500.0,60,0.0,60.0);
-  hMetvsNvx = GetTH2("MetvsNvx",100,0.0,500.0,40,0.0,40.0);
+  hMetvsMu = GetTH2("MetvsMu",100,0.0,500.0,100,0.0,100.0);
+  hMetvsNvx = GetTH2("MetvsNvx",100,0.0,500.0,100,0.0,100.0);
 
   // jj_mass limits
   float binsjjmass [7] = { 0.0, 200.0, 500.0, 1000.0, 1500.0, 2000.0, 3000.0 }; 
