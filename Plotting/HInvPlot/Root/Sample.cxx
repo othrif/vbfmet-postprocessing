@@ -172,7 +172,9 @@ std::string Msl::Mva::Convert2Tex(const SampleSet &s)
   if(s.GetName() == "wewk")  return "W EWK";  
   if(s.GetName() == "wqcd")  return "W QCD";
   if(s.GetName() == "zewk")  return "Z EWK";  
-  if(s.GetName() == "zqcd")  return "Z QCD";    
+  if(s.GetName() == "zqcd")  return "Z QCD";  
+  if(s.GetName() == "zgamewk")  return "Z $\\gamma$ EWK";    
+  if(s.GetName() == "wgamewk")  return "W $\\gamma$ EWK";    
   if(s.GetName() == "whww")  return "HWW wh";
   if(s.GetName() == "tthw")  return "HWW tth";
   if(s.GetName() == "tth")   return "HWW tth";
