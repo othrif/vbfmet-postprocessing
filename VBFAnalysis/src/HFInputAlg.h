@@ -171,12 +171,9 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* basemu_pt;
   std::vector<Float_t>* basemu_eta;
   std::vector<Float_t>* basemu_phi;
-  std::vector<Float_t>* basemu_ptvarcone20;
-  std::vector<Float_t>* basemu_ptvarcone30;
   std::vector<Float_t>* baseel_pt;
   std::vector<Float_t>* baseel_eta;
   std::vector<Float_t>* baseel_phi;
-  std::vector<Float_t>* baseel_ptvarcone20;
   
 }; 
 
