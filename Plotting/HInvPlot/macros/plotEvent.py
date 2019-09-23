@@ -224,7 +224,7 @@ def main():
                 'metsfVBFTopotrigOR','metsfxe110XE70trig','metsfxe110XE65trig',
                 'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]
     if options.analysis.count('allmjjdphijj'):
-        anas = ['allmjj','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2']
+        anas = ['allmjj','mjj800dphijj1','mjj800dphijj2','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2']
     if options.analysis.count('allmjjdphijjnj'):
         anas = ['allmjj','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','njgt2']
     chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']        

@@ -24,7 +24,7 @@ class BasicCuts:
 
     def __init__(self, Analysis, Chan, SameSign=0):
 
-        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest',
+        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2',
                             'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
                                 'njgt2','njgt2lt5','njgt3lt5',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
@@ -37,11 +37,10 @@ class BasicCuts:
         self.analysis = Analysis
         self.chan     = Chan
         self.SameSign = SameSign
-        self.MjjLowerCut   = 1000.0
-        #self.MjjLowerCut   = 800.0
+        self.MjjLowerCut   = 800.0
         self.MjjUpperCut   = -1.0
         self.DPhijjLowerCut   = -1.0
-        self.DPhijjUpperCut   = 1.8
+        self.DPhijjUpperCut   = 2.0
         self.DEtajjLowerCut   = 3.8
         self.DEtajjUpperCut   = -1.0
         self.NjetCut   = 'n_jet > 1 && n_jet < 5'
@@ -57,6 +56,9 @@ class BasicCuts:
         if Analysis.count('mjj1000'):
             self.MjjLowerCut   = 1000.0
             self.MjjUpperCut   = 1500.0
+        if Analysis.count('mjj800'):
+            self.MjjLowerCut   = 800.0
+            self.MjjUpperCut   = 1000.0
         if Analysis.count('LowMETQCDVR'):
             self.MjjLowerCut   = 200.0
             self.MjjUpperCut   = -1
@@ -64,7 +66,7 @@ class BasicCuts:
             self.DEtajjUpperCut   = 3.8
             self.NjetCut = 'n_jet == 2'
         if Analysis.count('LowMETQCDSR'):
-            self.MjjLowerCut   = 1000.0
+            self.MjjLowerCut   = 800.0
             self.MjjUpperCut   = -1
             self.DEtajjLowerCut   = 3.8
             self.DEtajjUpperCut   = -1
@@ -83,13 +85,13 @@ class BasicCuts:
             self.MjjLowerCut   = 1000.0
             self.MjjUpperCut   = -1
             self.DEtajjLowerCut = 4.2 # remove
-            self.DPhijjUpperCut = 1.8
+            self.DPhijjUpperCut = 2.0
             self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
         if Analysis.count('mjj1500TrigTest'):
             self.MjjLowerCut   = 1500.0
             self.MjjUpperCut   = -1
             self.DEtajjLowerCut = 4.2 # remove
-            self.DPhijjUpperCut = 1.8
+            self.DPhijjUpperCut = 2.0
             self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
         if Analysis.count('mjj2000TrigTest'):
             self.MjjLowerCut   = 2000.0
@@ -105,18 +107,18 @@ class BasicCuts:
             self.DPhijjUpperCut   = 1.0
         if Analysis.count('dphijj2'):
             self.DPhijjLowerCut   = 1.0
-            self.DPhijjUpperCut   = 1.8
+            self.DPhijjUpperCut   = 2.0
         if Analysis.count('njgt2'): # single bin
-            self.MjjLowerCut   = 1000.0
+            self.MjjLowerCut   = 800.0
             self.MjjUpperCut   = -1.0
             self.DPhijjLowerCut   = -1.0
-            self.DPhijjUpperCut   = 1.8
+            self.DPhijjUpperCut   = 2.0
             self.NjetCut = 'n_jet > 2 && n_jet < 5'
         if Analysis.count('njgt3'): # single bin
-            self.MjjLowerCut   = 1000.0
+            self.MjjLowerCut   = 800.0
             self.MjjUpperCut   = -1.0
             self.DPhijjLowerCut   = -1.0
-            self.DPhijjUpperCut   = 1.8
+            self.DPhijjUpperCut   = 2.0
             self.NjetCut = 'n_jet > 3 && n_jet < 5'
         if Analysis.count('nj2'):
             self.NjetCut = 'n_jet == 2'

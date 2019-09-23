@@ -135,8 +135,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
 
   // jj_mass limits
-  float binsjjmass [7] = { 0.0, 200.0, 500.0, 1000.0, 1500.0, 2000.0, 3000.0 }; 
-  hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  6,  binsjjmass); 
+  float binsjjmass [8] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3000.0 }; 
+  hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  7,  binsjjmass); 
   
   // TMVA variable binned
   float binstmva[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
