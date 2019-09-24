@@ -636,10 +636,9 @@ StatusCode VBFAnalysisAlg::execute() {
   // applying a pileup weight for 2018 data
   puSyst2018Weight=1.0;
   if(m_isMC && metRunNumber>=348197){ // select for 2018
-    puSyst2018Weight=1.2;
     if(averageIntPerXing>39.0 && averageIntPerXing<52.1){
       if(n_jet>2) puSyst2018Weight*=1.2;
-      if(n_jet>2 && fabs(jet_eta->at(2))>3.0) puSyst2018Weight*=1.3;
+      if(n_jet>2 && fabs(jet_eta->at(2))>3.0) puSyst2018Weight*=1.4;
       if(n_jet==2) puSyst2018Weight*=1.07;
       tMapFloat["puSyst2018Weight__1down"]=1.0+(puSyst2018Weight-1.0)/2.0;
       tMapFloat["puSyst2018Weight__1up"]  =puSyst2018Weight+(puSyst2018Weight-1.0)/2.0;

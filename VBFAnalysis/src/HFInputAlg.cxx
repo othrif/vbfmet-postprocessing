@@ -237,10 +237,11 @@ StatusCode HFInputAlg::execute() {
 
   // Cuts
   float METCut=180.0e3; // 150.0e3
+  float jj_DPHICut=1.8;
   float METCSTJetCut = 150.0e3; // 120.0e3
   float jj_detaCut = 4.8; // 4.0
   float jj_massCut = 1000.0e3; // 1000.0e3
-  if(m_binning>=7 && m_binning<=9) jj_massCut = 800.0e3; // 1000.0e3 
+  if(m_binning>=7 && m_binning<=9){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
   bool nbjetCut = (n_bjet < 2); 
 
@@ -384,7 +385,7 @@ StatusCode HFInputAlg::execute() {
   }
 
   // basic selection.
-  if (!((passJetCleanTight == 1) & nbjetCut & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < 2.0) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (phSelectionCut) & (phcentrality>phcentralityCut) & (met_tst_ph_dphi>met_tst_ph_dphiCut) & (in_vy_overlapCut))) return StatusCode::SUCCESS; 
+  if (!((passJetCleanTight == 1) & nbjetCut & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < jj_DPHICut) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (phSelectionCut) & (phcentrality>phcentralityCut) & (met_tst_ph_dphi>met_tst_ph_dphiCut) & (in_vy_overlapCut))) return StatusCode::SUCCESS; 
 
   if(n_el==1) { met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0); } else {  met_significance = 0; }
 
