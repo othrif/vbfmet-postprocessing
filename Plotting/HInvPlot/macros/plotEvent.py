@@ -213,8 +213,10 @@ def main():
     # Prepare selection keys
     #
     anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
-    if options.analysis!='all':
-        anas = [options.analysis]
+    if options.analysis!='all' and options.analysis.count(','):
+        anas = options.analysis.split(',')
+    elif options.analysis!='all':
+        anas = [options.analysis]        
     if options.analysis.count('RedChan'):
         anas    = ['allmjj']#,'mjj1000','mjj1500','mjj2000']
     if options.analysis=='metsf':
