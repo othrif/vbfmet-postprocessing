@@ -1,5 +1,5 @@
 ### General Description ###
-Algorithms included: VBFAnalysisAlg, HFInputAlg.
+Algorithms included: VBFAnalysisAlg, HFInputAlg, VBFTruthAlg.
 
 In order to run the algorithms all the samples should have the name pattern: user.ANYNAME.vTAG.RUNNUMBER. Data samples should in addition has physics_Main in the name.
 
@@ -31,7 +31,7 @@ acmSetup
 python VBFAnalysis/util/writeFileMap.py # for GRID files
 python VBFAnalysis/util/writeFileMapLS.py # copy in a text file with each input file per line. There is an input for text files from the GRID. These can be overwritten preferring local files
 # collect the pickle file to get the total event counts for normalization
-python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/uchicagoFileMap_v15Loose.p -o fout_v15raw.root 
+python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/uchicagoFileMap_v15Loose.p -o fout_v15raw.root
 
 # to check the number of raw. The RAW counts need to be saved. Add the -r 1 option.
 python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/uchicagoFileMap_v15Loose.p -o fout_v15raw.root -r 1
@@ -78,8 +78,8 @@ athena VBFAnalysis/HFInputJobOptions.py --evtMax 10 --filesInput /eos/user/r/rzo
 For running on condor:
 ```bash
 # run on condor over all the contributions and nominal only
-submitHFInputCondor.py -n 
-# run on condor over all the contributions and systematics 
+submitHFInputCondor.py -n
+# run on condor over all the contributions and systematics
 submitHFInputCondor.py
 ```
 You can change the list of systematics in VBFAnalysis/python/systematics.py and list of contributions in VBFAnalysis/python/sample.py.
