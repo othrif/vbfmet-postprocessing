@@ -213,10 +213,11 @@ def main():
     # Prepare selection keys
     #
     anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
+    chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']
     if options.analysis!='all' and options.analysis.count(','):
         anas = options.analysis.split(',')
     elif options.analysis!='all':
-        anas = [options.analysis]        
+        anas = [options.analysis]
     if options.analysis.count('RedChan'):
         anas    = ['allmjj']#,'mjj1000','mjj1500','mjj2000']
     if options.analysis=='metsf':
@@ -229,13 +230,17 @@ def main():
         anas = ['allmjj','mjj800dphijj1','mjj800dphijj2','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2']
     if options.analysis.count('allmjjdphijjnj'):
         anas = ['allmjj','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','njgt2']
-    chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']        
+
     if options.analysis=='qcd':
         anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT']
         chans   = ['nn']
     if options.analysis.count('RedChan'):
         chans   = ['nn','ee','uu','ll','l','e','u']
-    if options.chan != None:
+    if options.chan=='short':
+        chans   = ['nn','ee','uu','ll','l','e','u']
+    elif options.chan=='veryshort':
+        chans   = ['nn','ll','l']        
+    elif options.chan != None:
         chans = options.chan.split(',')
 
     try:
