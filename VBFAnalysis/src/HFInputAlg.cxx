@@ -347,23 +347,25 @@ StatusCode HFInputAlg::execute() {
   if(isMC){ // the MET trigger SF is turned off in the up variation. so it will be =1.
     xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 0); // met was used in the end instead of jj.Pt() 
     xeSFTrigWeight_nomu = weightXETrigSF(met_tst_nolep_et, metRunNumber, 0); // met was used in the end instead of jj.Pt() 
-    if(currentVariation=="xeSFTrigWeight__1up")   { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 1); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_et, metRunNumber, 1); }
-    if(currentVariation=="xeSFTrigWeight__1down") { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 2); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_et, metRunNumber, 2); }
+    if(currentVariation=="xeSFTrigWeight__1up")   { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 1); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_nolep_et, metRunNumber, 1); }
+    if(currentVariation=="xeSFTrigWeight__1down") { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 2); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_nolep_et, metRunNumber, 2); }
   }
   // Choose the met trigger
   bool passMETTrig = ((trigger_met &0x1) == 0x1);
   if(year==2017){
-    passMETTrig=0;
-    if     (325713<=metRunNumber && metRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))   passMETTrig=1; //HLT_xe90_pufit_L1XE50;    // period B
-    else if(329385<=metRunNumber && metRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) passMETTrig=1; //HLT_xe100_pufit_L1XE55;   // period C
-    else if(330857<=metRunNumber && metRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   passMETTrig=1; //HLT_xe110_pufit_L1XE55;   // period D1-D5
-    else if(341649>=metRunNumber && metRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  passMETTrig=1; //HLT_xe110_pufit_L1XE50;   // period D6-K  
+    //passMETTrig=0;
+    //if     (325713<=metRunNumber && metRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))   passMETTrig=1; //HLT_xe90_pufit_L1XE50;    // period B
+    //else if(329385<=metRunNumber && metRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) passMETTrig=1; //HLT_xe100_pufit_L1XE55;   // period C
+    //else if(330857<=metRunNumber && metRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   passMETTrig=1; //HLT_xe110_pufit_L1XE55;   // period D1-D5
+    //else if(341649>=metRunNumber && metRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  passMETTrig=1; //HLT_xe110_pufit_L1XE50;   // period D6-K  
+    passMETTrig=0; if(((trigger_met_encodedv2 & 0x2)==0x2))    passMETTrig=1;
   }else if(year==2018){
-    passMETTrig=0;
-    if     (350067> metRunNumber && metRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    passMETTrig=1; // HLT_xe110_pufit_xe70_L1XE50
-    else if(350067<=metRunNumber && metRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) passMETTrig=1; // HLT_xe110_pufit_xe65_L1XE50
+    //passMETTrig=0;
+    //if     (350067> metRunNumber && metRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    passMETTrig=1; // HLT_xe110_pufit_xe70_L1XE50
+    //else if(350067<=metRunNumber && metRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) passMETTrig=1; // HLT_xe110_pufit_xe65_L1XE50
     //if     (metRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
     //if     (metRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
+    passMETTrig=0; if(((trigger_met_encodedv2 & 0x8)==0x8))    passMETTrig=1;
   }
 
   // setup the photon + MET+ VBF analysis
@@ -828,12 +830,14 @@ double HFInputAlg::weightXETrigSF(const float met_pt, unsigned metRunNumber, int
   if(metRunNumber<=284484)                        { p0 = 110.396; p1 = 19.4147; e1 = 0.06; }  // 2015 xe70
   if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 111.684; p1 = 19.147;  e1 = 0.08; }  // 2016 xe90
   if(metRunNumber>302872)                         { p0 = 68.8679; p1 = 54.0594; e1 = 0.06; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
-  if(325713<=metRunNumber && metRunNumber<=328393) { p0 = 86.6614; p1 = 49.8935; e1 = 0.05; } // 2017 xe90_pufit_L1XE50
-  if(329385<=metRunNumber && metRunNumber<=330470) { p0 = 103.780; p1 = 57.2547; e1 = 0.05; } // 2017 xe100_pufit_L1XE55
-  if(330857<=metRunNumber && metRunNumber<=331975) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
-  if(331975< metRunNumber && metRunNumber<=341649) { p0 = 103.152; p1 = 38.6121; e1 = 0.05; } // 2017 xe110_pufit_L1XE50
-  if(350067> metRunNumber && metRunNumber>=348197) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
-  if(350067<=metRunNumber && metRunNumber<=364292) { p0 = 107.509; p1 = 32.0065; e1 = 0.05; } // 2018 xe110_xe65_L1XE50
+  //if(325713<=metRunNumber && metRunNumber<=328393) { p0 = 86.6614; p1 = 49.8935; e1 = 0.05; } // 2017 xe90_pufit_L1XE50
+  //if(329385<=metRunNumber && metRunNumber<=330470) { p0 = 103.780; p1 = 57.2547; e1 = 0.05; } // 2017 xe100_pufit_L1XE55
+  //if(330857<=metRunNumber && metRunNumber<=331975) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
+  //if(331975< metRunNumber && metRunNumber<=341649) { p0 = 103.152; p1 = 38.6121; e1 = 0.05; } // 2017 xe110_pufit_L1XE50
+  //if(350067> metRunNumber && metRunNumber>=348197) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
+  //if(350067<=metRunNumber && metRunNumber<=364292) { p0 = 107.509; p1 = 32.0065; e1 = 0.05; } // 2018 xe110_xe65_L1XE50
+  if(325713<=metRunNumber && metRunNumber<=341649) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
+  if(364292>= metRunNumber && metRunNumber>=348197) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
 
   double x = met_pt / 1.0e3;
   if (x < 100) { return 0; }

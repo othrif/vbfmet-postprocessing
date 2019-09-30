@@ -101,7 +101,7 @@ samplesPrint =['Samples','VBFH125',
 #f=ROOT.TFile.Open('SumHF_v31_CBv2.root')
 #f=ROOT.TFile.Open('SumHF_v31_CB_mu_noOR.root')
 #f=ROOT.TFile.Open('SumHF_Sep20_v32PFE.root')
-f=ROOT.TFile.Open('SumHF_v31_CB_newBaseline.root')
+f=ROOT.TFile.Open('SumHF_Sep29_METTriggerForMuonCRs_2017.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400.root')#
@@ -131,7 +131,7 @@ for s in samples:
     SumErrList+=[0.0]
 print line
 
-bins=[1,2,3,4,5,6,7,8,9,10]
+bins=[1,2,3,4,5,6,7,8,9,10,11,12,13]
 nRegion=0
 sTot=0
 for bin_num in bins:
