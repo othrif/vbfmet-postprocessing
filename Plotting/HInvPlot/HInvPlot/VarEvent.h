@@ -41,10 +41,14 @@ namespace Msl
       trigger_met_byrun,
       runPeriod,      
       trigger_lep,
+      lep_trig_match,      
       passJetCleanTight,
       xeSFTrigWeight,
       xeSFTrigWeight__1up,
       xeSFTrigWeight__1down,
+      xeSFTrigWeight_nomu,
+      xeSFTrigWeight_nomu__1up,
+      xeSFTrigWeight_nomu__1down,      
       //
       // KInematic variables read directly from standard ntuples
       //   - enum name must match branch name from HWW tree
@@ -86,6 +90,10 @@ namespace Msl
       n_tau,
       n_baseel,
       n_basemu,
+      n_mu_baseline_noOR,
+      n_mu_w,
+      n_el_w,
+      n_lep_w,
       n_baselep,
       n_siglep,
       n_ph,

@@ -26,11 +26,15 @@ std::string Msl::Mva::Convert2Str(Var var)
     case trigger_met_byrun:	  return "trigger_met_byrun";
     case runPeriod:	          return "runPeriod";            
     case trigger_lep:	          return "trigger_lep";
+    case lep_trig_match:	  return "lep_trig_match";
     case passJetCleanTight:	  return "passJetCleanTight";
     case xeSFTrigWeight:	  return "xeSFTrigWeight";
     case xeSFTrigWeight__1up:	  return "xeSFTrigWeight__1up";
     case xeSFTrigWeight__1down:	  return "xeSFTrigWeight__1down";
-
+    case xeSFTrigWeight_nomu:	     return "xeSFTrigWeight_nomu";
+    case xeSFTrigWeight_nomu__1up:   return "xeSFTrigWeight_nomu__1up";
+    case xeSFTrigWeight_nomu__1down: return "xeSFTrigWeight_nomu__1down";
+      
     case met_truth_et:	          return "met_truth_et";
     case met_truth_phi:	          return "met_truth_phi";
     case met_tst_et:	          return "met_tst_et";
@@ -68,6 +72,10 @@ std::string Msl::Mva::Convert2Str(Var var)
     case n_tau:	                  return "n_tau";
     case n_baseel:	          return "n_baseel";
     case n_basemu:	          return "n_basemu";
+    case n_mu_baseline_noOR:	  return "n_mu_baseline_noOR";      
+    case n_mu_w:	          return "n_mu_w";      
+    case n_el_w:	          return "n_el_w";      
+    case n_lep_w:	          return "n_lep_w";      
     case n_baselep:	          return "n_baselep";
     case n_siglep:	          return "n_siglep";
     case n_ph:	                  return "n_ph";
@@ -170,10 +178,14 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "trigger_met_byrun")          return trigger_met_byrun;
   if(var == "runPeriod")          return runPeriod;  
   if(var == "trigger_lep")   return trigger_lep;
+  if(var == "lep_trig_match")   return lep_trig_match;
   if(var == "passJetCleanTight")   return passJetCleanTight;
   if(var == "xeSFTrigWeight")   return xeSFTrigWeight;
   if(var == "xeSFTrigWeight__1up")   return xeSFTrigWeight__1up;
   if(var == "xeSFTrigWeight__1down")   return xeSFTrigWeight__1down;
+  if(var == "xeSFTrigWeight_nomu")   return xeSFTrigWeight_nomu;
+  if(var == "xeSFTrigWeight_nomu__1up")   return xeSFTrigWeight_nomu__1up;
+  if(var == "xeSFTrigWeight_nomu__1down")   return xeSFTrigWeight_nomu__1down;  
   if(var == "met_truth_et")    return met_truth_et;
   if(var == "met_truth_phi")    return met_truth_phi;
   if(var == "met_tst_et")    return met_tst_et;
@@ -211,6 +223,10 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "n_tau")             return n_tau;
   if(var == "n_baseel")          return n_baseel;
   if(var == "n_basemu")          return n_basemu;
+  if(var == "n_mu_baseline_noOR")  return n_mu_baseline_noOR;
+  if(var == "n_mu_w")              return n_mu_w;
+  if(var == "n_el_w")              return n_el_w;
+  if(var == "n_lep_w")              return n_lep_w;
   if(var == "n_baselep")          return n_baselep;
   if(var == "n_siglep")          return n_siglep;
   if(var == "n_ph")               return n_ph;
@@ -399,10 +415,14 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(trigger_met_byrun);
     vars.push_back(runPeriod);        
     vars.push_back(trigger_lep);
+    vars.push_back(lep_trig_match);
     vars.push_back(passJetCleanTight);
     vars.push_back(xeSFTrigWeight);
     vars.push_back(xeSFTrigWeight__1up);
     vars.push_back(xeSFTrigWeight__1down);
+    vars.push_back(xeSFTrigWeight_nomu);
+    vars.push_back(xeSFTrigWeight_nomu__1up);
+    vars.push_back(xeSFTrigWeight_nomu__1down);    
 
     vars.push_back(met_truth_et);
     vars.push_back(met_truth_phi);
@@ -441,6 +461,10 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(n_tau);
     vars.push_back(n_baseel);
     vars.push_back(n_basemu);
+    vars.push_back(n_mu_baseline_noOR);
+    vars.push_back(n_mu_w);
+    vars.push_back(n_el_w);
+    vars.push_back(n_lep_w);
     vars.push_back(n_baselep);
     vars.push_back(n_siglep);
     vars.push_back(n_ph);
