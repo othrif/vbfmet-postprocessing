@@ -97,6 +97,9 @@ StatusCode VBFAnalysisAlg::initialize() {
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
+  xeSFTrigWeight_nomu=1.0;
+  xeSFTrigWeight_nomu__1up=1.0;
+  xeSFTrigWeight_nomu__1down=1.0;
 
   j3_centrality = new std::vector<float>(0);
   j3_dRj1 = new std::vector<float>(0);
@@ -215,9 +218,12 @@ StatusCode VBFAnalysisAlg::initialize() {
   //m_tree_out->Branch("nloEWKWeight",&nloEWKWeight);
   m_tree_out->Branch("puSyst2018Weight",&puSyst2018Weight);
   m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight);
+  m_tree_out->Branch("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
   if(m_currentVariation=="Nominal"){ // only write for the nominal
     m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
     m_tree_out->Branch("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
+    m_tree_out->Branch("xeSFTrigWeight_nomu__1up",&xeSFTrigWeight_nomu__1up);
+    m_tree_out->Branch("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);
     if(m_theoVariation) m_tree_out->Branch("mcEventWeights",&mcEventWeights);
   }
   if(m_currentVariation=="Nominal") m_tree_out->Branch("eleANTISF",&eleANTISF);
@@ -606,6 +612,9 @@ StatusCode VBFAnalysisAlg::execute() {
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
+  xeSFTrigWeight_nomu=1.0;
+  xeSFTrigWeight_nomu__1up=1.0;
+  xeSFTrigWeight_nomu__1down=1.0;
   if(m_isMC && jet_pt && jet_pt->size()>1){
     TLorentzVector tmp, jj;
     tmp.SetPtEtaPhiM(jet_pt->at(0), jet_eta->at(0),jet_phi->at(0),jet_m->at(0));
@@ -615,6 +624,9 @@ StatusCode VBFAnalysisAlg::execute() {
     xeSFTrigWeight        = weightXETrigSF(met_tst_et, metRunNumber, 0); // met was used in the end instead of jj.Pt()
     xeSFTrigWeight__1up   = weightXETrigSF(met_tst_et, metRunNumber, 1);
     xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, metRunNumber, 2);
+    xeSFTrigWeight_nomu        = weightXETrigSF(met_tst_nolep_et, metRunNumber, 0); // met was used in the end instead of jj.Pt()
+    xeSFTrigWeight_nomu__1up   = weightXETrigSF(met_tst_nolep_et, metRunNumber, 1);
+    xeSFTrigWeight_nomu__1down = weightXETrigSF(met_tst_nolep_et, metRunNumber, 2);
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;

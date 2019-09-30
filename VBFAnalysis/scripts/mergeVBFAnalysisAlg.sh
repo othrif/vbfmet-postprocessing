@@ -1,6 +1,6 @@
 #!/bin/bash                                                                                                                                                                                                       
-#OUTDIRM=v31TightEM2018
-OUTDIRM=/share/t3data2/schae/v32ETight
+OUTDIRM=v34TightPF18
+#OUTDIRM=/share/t3data2/schae/v32ETight
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
