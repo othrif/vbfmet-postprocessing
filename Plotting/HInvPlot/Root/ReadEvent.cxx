@@ -1142,7 +1142,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // 2018 update trigger for later periods => value 5 for
     //if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     //else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
-    if(364292=>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50    
+    if(364292>=fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50    
     if(fIsDDQCD){ trigger_met_encodedv2_new=4; if(fRandomRunNumber>=348197) trigger_met_encodedv2_new=5; }
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
 
