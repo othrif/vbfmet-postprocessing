@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 import os
 
 def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="VBFAnalysisCondorSub", proxyName='/home/schae/testarea/HInv/run/x509up_u20186', slc7=False):
@@ -13,10 +13,10 @@ def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="VBFAnalysis
     os.system("echo 'voms-proxy-info'  >> "+subDir+"/"+scriptName+syst+".sh")
     #os.system("echo 'cd "+buildDir+"; acmSetup; cd -;' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
-    if slc7 or True: # until we get an slc7 release
+    #if slc7 or True: # until we get an slc7 release
         #os.system("echo 'lsetup \"root 6.14.04-x86_64-slc6-gcc62-opt\"'  >> "+subDir+"/"+scriptName+syst+".sh")
         #os.system("echo 'export CMTCONFIG=x86_64-slc7-gcc62-opt'  >> "+subDir+"/"+scriptName+syst+".sh")
-        os.system("echo 'export CMTCONFIG=x86_64-slc7-gcc8-opt'  >> "+subDir+"/"+scriptName+syst+".sh")
+    #    os.system("echo 'export CMTCONFIG=x86_64-slc7-gcc8-opt'  >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'source "+buildDir+"/${CMTCONFIG}/setup.sh' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system('''echo ' echo INPUT:$1 $2' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')

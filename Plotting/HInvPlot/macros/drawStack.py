@@ -229,7 +229,7 @@ def getHistPars(hist):
         'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':0,'LtoRCut':2,'xmin':0.0,'ymin':0.1},        
         'bcid'  : {'xtitle':'BCID',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'BCIDDistanceFromFront'  : {'xtitle':'Distance from front of Train','ytitle':'Events', 'rebin':0,'LtoRCut':1},
-        'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':2,'LtoRCut':1},
+        'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
         'lb'  : {'xtitle':'Lumi block','ytitle':'Events', 'rebin':0,'LtoRCut':1}, 
         'n_vx'  : {'xtitle':'Recontructed Vertices (N_{PV})','ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'JetEtaPt25'  : {'xtitle':'Jet #eta wth 25<p_{T}<35 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},
@@ -252,18 +252,19 @@ def getHistPars(hist):
         'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_phi'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
-        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':0.01,'logy':False, 'LtoRCut':0},
+        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
         'jj_mass_variableBin'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
-        'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':20,  'ymin':0.01,'logy':False},
+        'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':False},
     'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
+    'met_tenacious_tst_nolep_et'     : {'xtitle':'Tenacious MET (lepton removed) [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},    
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_mass'     : {'xtitle':'Truth m_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_deta'     : {'xtitle':'Truth #Delta#eta_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -1876,6 +1877,7 @@ class DrawStack:
             by.SetRangeUser(0.501, 1.499);
             if options.blind:
                 by.SetRangeUser(0,0.799);
+                #by.SetRangeUser(0,1.7999);
             by.SetLabelSize(0.13);
             by.SetLabelOffset(0.0125);
             by.SetTitleSize(0.14);
