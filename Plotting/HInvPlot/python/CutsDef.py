@@ -104,10 +104,10 @@ class BasicCuts:
             self.MjjUpperCut   = -1.0
         if Analysis.count('mjj3000'):
             self.MjjLowerCut   = 3000.0
-            self.MjjUpperCut   = -1.0            
+            self.MjjUpperCut   = -1.0
         if Analysis.count('mjj3500'):
             self.MjjLowerCut   = 3500.0
-            self.MjjUpperCut   = -1.0            
+            self.MjjUpperCut   = -1.0
         if Analysis.count('dphijj1'):
             self.DPhijjLowerCut   = -1
             self.DPhijjUpperCut   = 1.0

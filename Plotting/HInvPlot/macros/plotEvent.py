@@ -212,7 +212,7 @@ def main():
     #-----------------------------------------------------------------------------------------
     # Prepare selection keys
     #
-    anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
+    anas    = ['allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3500']
     chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']
     if options.analysis!='all' and options.analysis.count(','):
         anas = options.analysis.split(',')
@@ -227,9 +227,9 @@ def main():
                 'metsfVBFTopotrigOR','metsfxe110XE70trig','metsfxe110XE65trig',
                 'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]
     if options.analysis.count('allmjjdphijj'):
-        anas = ['allmjj','mjj800dphijj1','mjj800dphijj2','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2']
+        anas = ['allmjj','mjj800dphijj1','mjj800dphijj2','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj3500dphijj2','mjj3500dphijj1']
     if options.analysis.count('allmjjdphijjnj'):
-        anas = ['allmjj','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','njgt2']
+        anas = ['allmjj','mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2','njgt2']
 
     if options.analysis=='qcd':
         anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT']
