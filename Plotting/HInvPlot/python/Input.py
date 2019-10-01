@@ -356,6 +356,7 @@ def prepareBkgRuns(keys,options=None):
                      '346605':'WpinclHinv_MET75',
                      '346606':'WminclHinv_MET75',
                      '346607':'ZinclHinv_MET75',
+                     '345596':'ggZinclHinv_MET75',
     }
                          
     sig_ggF125 = {'308284':'ggF125',
@@ -570,8 +571,8 @@ def prepareBkgRuns(keys,options=None):
     bkg_zqcd.update(bkg_zqcd_zmm)
     bkg_zqcd.update(bkg_zqcd_zee)
     bkg_zqcd.update(bkg_zqcd_ztt)
-    #if options.year==2018:
-    bkg_zqcd.update(bkg_zqcd_znn_mc16e)
+    if options.year==2018:
+        bkg_zqcd.update(bkg_zqcd_znn_mc16e)
     bkg_zqcd.update(bkg_zqcd_znn)
     #else:
     #    bkg_zqcd.update(bkg_zqcd_znn)
@@ -1058,6 +1059,9 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
         bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)        
         bkg_keys['wdpi'].update(bkg_new)
+    if options.year!=2018:
+        bkg_keys['wdpi'].update(bkg_zqcd_znn_mc16e)
+
     if False:
         bkg_keys['zqcdPow']=bkg_z_strong_powheg
         bkg_keys['vbfz']=bkg_vbfFiltZ        
