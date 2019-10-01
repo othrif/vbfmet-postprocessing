@@ -655,6 +655,7 @@ StatusCode VBFAnalysisAlg::execute() {
       tMapFloat["puSyst2018Weight__1down"]=1.0+(puSyst2018Weight-1.0)/2.0;
       tMapFloat["puSyst2018Weight__1up"]  =puSyst2018Weight+(puSyst2018Weight-1.0)/2.0;
     }
+    //puSyst2018Weight=1.0;
   } // end pileup weight systematic
 
   if (m_isMC){
