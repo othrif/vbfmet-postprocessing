@@ -76,7 +76,7 @@ if True:
         isMC = False
     else:
         isMC = True
-    
+    print 'isMC: ',isMC
     if not(args.oldInput):
         athAlgSeq += CfgMgr.HFInputAlg("HFInputAlg",
                                        currentVariation = args.currentVariation,

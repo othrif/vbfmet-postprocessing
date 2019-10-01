@@ -7,7 +7,7 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst,Ext)
-        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
+        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
                                "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',"data"] # do not change order
 
         self.sampleMap = {'data':['data'],
@@ -22,6 +22,8 @@ class sample(object):
                           'VV_VVV':['VV','VVV'],
                           'Zg_strong':['Zg_strong'],
                           'Wg_strong':['Wg_strong'],
+                          'Wg_EWK':['Wg_EWK'],
+                          'Zg_EWK':['Zg_EWK'],
                           'ttg':['ttg'],
                           'SinglePhoton':['SinglePhoton'],
                           'SinglePhotonBCL':['SinglePhotonBCL'],
