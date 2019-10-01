@@ -41,7 +41,15 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
-				  hZPowMCIDQCD(0)
+				  hZPowMCIDQCD(0),
+				  hmu_njet2(0),
+				  hmu_njet34(0),
+				  hratio_mu_njet2(0),
+				  hratio_mu_njet34(0),
+				  hj2Eta_40mu52(0),
+				  hj2Eta_not40mu52(0),
+				  hj3Eta_40mu52(0),
+				  hj3Eta_not40mu52(0)
 {
 }
 
@@ -133,6 +141,13 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 100, 363122.5,363222.5);  
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
   hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
+
+  hmu_njet2           = GetTH1("mu_njet2", 100, -0.5, 99.5);
+  hmu_njet34          = GetTH1("mu_njet34", 100, -0.5, 99.5);
+  hj3Eta_40mu52       = GetTH1("j3Eta_40mu52", 22,  -4.5,  4.5);
+  hj3Eta_not40mu52    = GetTH1("j3Eta_not40mu52", 22,  -4.5,  4.5);
+  hratio_mu_njet2     = GetTH2("j3EtaMuNjet2", 100, -0.5, 99.5, 22,  -4.5,  4.5);
+  hratio_mu_njet34    = GetTH2("j3EtaMuNjet34", 100, -0.5, 99.5, 22,  -4.5,  4.5);
 
   // jj_mass limits
   float binsjjmass [8] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3000.0 }; 
@@ -270,8 +285,18 @@ bool Msl::PlotEvent::DoExec(Event &event)
     }
     if(hj3Pt) hj3Pt->Fill(event.jets.at(2).pt, weight);
     if(hj3Eta) hj3Eta->Fill(event.jets.at(2).eta, weight);
+    if(hj3Eta_40mu52 && event.GetVar(Mva::averageIntPerXing)>39 && event.GetVar(Mva::averageIntPerXing<53)) hj3Eta_40mu52->Fill(event.jets.at(2).eta,weight);
+    if(hj3Eta_not40mu52 && (event.GetVar(Mva::averageIntPerXing)<39 || event.GetVar(Mva::averageIntPerXing>53))) hj3Eta_not40mu52->Fill(event.jets.at(2).eta,weight);
     if(hj3Jvt) hj3Jvt->Fill(event.jets.at(2).GetVar(Mva::jvt), weight);
     if(hj3FJvt) hj3FJvt->Fill(event.jets.at(2).GetVar(Mva::fjvt), weight);
+    if(hmu_njet34 && Mva::jj_mass<800000) hmu_njet34->Fill(event.GetVar(Mva::averageIntPerXing),weight);
+    if(hratio_mu_njet34 && Mva::jj_mass<800000) hratio_mu_njet34->Fill(event.GetVar(Mva::averageIntPerXing),event.jets.at(2).eta,weight);
+  }
+  else if(event.jets.size()==2){
+    if(hmu_njet2 && Mva::jj_mass<800000) hmu_njet2->Fill(event.GetVar(Mva::averageIntPerXing),weight);
+    if(hratio_mu_njet2 && Mva::jj_mass<800000) hratio_mu_njet2->Fill(event.GetVar(Mva::averageIntPerXing),event.jets.at(1).eta,weight);
+    if(hj2Eta_40mu52 && event.GetVar(Mva::averageIntPerXing)>39 && event.GetVar(Mva::averageIntPerXing<53)) hj2Eta_40mu52->Fill(event.jets.at(1).eta,weight);
+    if(hj2Eta_not40mu52 && (event.GetVar(Mva::averageIntPerXing)<39 || event.GetVar(Mva::averageIntPerXing>53))) hj2Eta_not40mu52->Fill(event.jets.at(1).eta,weight);
   }
   if(event.HasVar(Mva::BCIDDistanceFromFront)){
     hJetEMECvsBCIDPosPt25->Fill(njet25EMEC,event.GetVar(Mva::BCIDDistanceFromFront));

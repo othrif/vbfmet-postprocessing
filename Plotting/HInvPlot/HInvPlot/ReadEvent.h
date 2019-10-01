@@ -174,6 +174,7 @@ namespace Msl
     bool                        fIsDDQCD;
     // Input vars
     float fWeight;
+    float puweight;
     float xeSFTrigWeight;
     float xeSFTrigWeight__1up;
     float xeSFTrigWeight__1down;

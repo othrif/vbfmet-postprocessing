@@ -233,6 +233,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
   if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
+    tree->SetBranchAddress("puSyst2018Weight",        &puweight);
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){
       tree->SetBranchAddress("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
@@ -666,12 +667,12 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // identify the sample
     if(!fisMC){
       event->sample = Mva::kData;
-      if(!fMCEventCount) event->SetWeight(fWeight);
+      if(!fMCEventCount) event->SetWeight(fWeight/puweight);
       else event->SetWeight(1.0);
     }else{
-      if(!fMCEventCount) event->SetWeight((fWeight*fLumi));
+      if(!fMCEventCount) event->SetWeight((fWeight*fLumi/puweight));
       else  event->SetWeight(1.0);
-      if(fIsDDQCD) event->SetWeight(fWeight);
+      if(fIsDDQCD) event->SetWeight(fWeight/puweight);
       if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
 	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
