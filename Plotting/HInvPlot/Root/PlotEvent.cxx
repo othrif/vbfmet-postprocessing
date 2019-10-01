@@ -144,6 +144,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
 
   hmu_njet2           = GetTH1("mu_njet2", 100, -0.5, 99.5);
   hmu_njet34          = GetTH1("mu_njet34", 100, -0.5, 99.5);
+  hj2Eta_40mu52       = GetTH1("j2Eta_40mu52", 22,  -4.5,  4.5);
+  hj2Eta_not40mu52    = GetTH1("j2Eta_not40mu52", 22,  -4.5,  4.5);
   hj3Eta_40mu52       = GetTH1("j3Eta_40mu52", 22,  -4.5,  4.5);
   hj3Eta_not40mu52    = GetTH1("j3Eta_not40mu52", 22,  -4.5,  4.5);
   hratio_mu_njet2     = GetTH2("j3EtaMuNjet2", 100, -0.5, 99.5, 22,  -4.5,  4.5);
