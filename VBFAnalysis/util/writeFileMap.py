@@ -6,7 +6,7 @@ import sys
 #l = open('v26bLoose_rui_sort.txt','r')
 #l = open('v26gam.txt','r')
 #l = open('v28PlowSystd.txt','r')
-l = open('v32LEAll.txt')
+l = open('v34LMC_mc16a.txt')
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt
 myMap = {}
@@ -51,5 +51,5 @@ for ite in l:
 print myMap
 
 
-pickle.dump( myMap, open( "myMap.p", "wb" ) )
+pickle.dump( myMap, open( "myMap_mc16a.p", "wb" ) )
 print 'done'
