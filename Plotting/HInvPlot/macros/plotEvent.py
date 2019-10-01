@@ -100,7 +100,7 @@ def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
     if basic_cuts.chan !='nn' or not passRegion(region):
         return ('', [])
 
-    pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut,syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
@@ -148,7 +148,7 @@ def prepareSeqWCR(basic_cuts, region, alg_take=None, syst='Nominal'):
     if basic_cuts.chan in ['ee','uu','ll','nn','eu'] or not passRegion(region):
         return ('', [])
 
-    pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif)
+    pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif,syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
@@ -176,7 +176,7 @@ def prepareSeqZCR(basic_cuts, region, alg_take=None, syst='Nominal'):
     if basic_cuts.chan in ['ep','em','um','up','l','e','u','nn'] or not passRegion(region):
         return ('', [])
 
-    pass_alg = hstudy.preparePassEventForZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    pass_alg = hstudy.preparePassEventForZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut,syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting

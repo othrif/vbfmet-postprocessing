@@ -230,13 +230,19 @@ void Msl::ReadEvent::Init(TTree* tree)
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
+  xeSFTrigWeight_nomu=1.0;
+  xeSFTrigWeight_nomu__1up=1.0;
+  xeSFTrigWeight_nomu__1down=1.0;  
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
+  tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);  
   if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){
       tree->SetBranchAddress("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
       tree->SetBranchAddress("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
+      tree->SetBranchAddress("xeSFTrigWeight_nomu__1up",&xeSFTrigWeight_nomu__1up);
+      tree->SetBranchAddress("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);      
     }
   }
   else{
@@ -691,6 +697,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->RepVar(Mva::xeSFTrigWeight,        xeSFTrigWeight);
     event->RepVar(Mva::xeSFTrigWeight__1up,   xeSFTrigWeight__1up);
     event->RepVar(Mva::xeSFTrigWeight__1down, xeSFTrigWeight__1down);
+    event->RepVar(Mva::xeSFTrigWeight_nomu,        xeSFTrigWeight_nomu);
+    event->RepVar(Mva::xeSFTrigWeight_nomu__1up,   xeSFTrigWeight_nomu__1up);
+    event->RepVar(Mva::xeSFTrigWeight_nomu__1down, xeSFTrigWeight_nomu__1down);    
 
     if(fLoadBaseLep && false){
       // Fill Electrons with the baseline electrons for this looser lepton selection
@@ -939,6 +948,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // Fill Base electrons
     unsigned n_baselep=0;
+    unsigned n_wlep=0;    
     unsigned n_siglep=0;
     if(baseel_pt){
       //unsigned n_baseel=0;
@@ -989,11 +999,15 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       //n_baselep+=n_basemu;
     }
     n_baselep+=event->GetVar(Mva::n_baseel);
-    n_baselep+=event->GetVar(Mva::n_basemu);
+    //if(fv26Ntuples) n_baselep+=event->GetVar(Mva::n_basemu);
+    n_baselep+=event->GetVar(Mva::n_mu_baseline_noOR);
     event->RepVar(Mva::n_baselep, n_baselep);
     n_siglep+=event->GetVar(Mva::n_el);
     n_siglep+=event->GetVar(Mva::n_mu);
     event->RepVar(Mva::n_siglep, n_siglep);
+    n_wlep+=event->GetVar(Mva::n_el_w);
+    n_wlep+=event->GetVar(Mva::n_mu_w);
+    event->RepVar(Mva::n_lep_w, n_wlep);
 
     // Fill signal photons
     if(ph_pt){
@@ -1118,8 +1132,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // decode trigger_lep
     int trigger_lep = event->GetVar(Mva::trigger_lep);
     int trigger_lep_new = ((trigger_lep&0x1)>0) ? 1 : 0;
-    if(trigger_lep_new==0 && (trigger_lep&0x10)==0x10) trigger_lep_new = 2;
-    if(trigger_lep_new==0 && (trigger_lep&0x100)==0x100) trigger_lep_new = 3;
+    if( event->GetVar(Mva::lep_trig_match)<0.5) trigger_lep_new=0;
+    if(trigger_lep_new==0 && (trigger_lep&0x20)==0x20) trigger_lep_new = 2;
+    if(trigger_lep_new==0 && (trigger_lep&0x400)==0x400) trigger_lep_new = 3;
     event->RepVar(Mva::trigger_lep, trigger_lep_new);
 
     // decode trigger_met
@@ -1145,7 +1160,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if(364292>=fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50    
     if(fIsDDQCD){ trigger_met_encodedv2_new=4; if(fRandomRunNumber>=348197) trigger_met_encodedv2_new=5; }
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
-
+    if(trigger_met_encodedv2_new==0 || trigger_met_encodedv2_new>6){
+      xeSFTrigWeight_nomu=1.0; xeSFTrigWeight_nomu__1up=1.0; xeSFTrigWeight_nomu__1down=1.0; }
     // 2015+2016 encoding
     int trigger_met_encoded = event->GetVar(Mva::trigger_met_encoded);
     int runPeriod = 0;

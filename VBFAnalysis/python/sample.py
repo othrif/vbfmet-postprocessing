@@ -46,7 +46,7 @@ class sample(object):
             #print "RUN: ",self.runNumber
             if "MiniNtuple.root/user" in samplename:
                 self.subfileN = samplename.split(".")[-3]
-            if "physics_Main" in samplesplit:
+            if "physics_Main" in samplesplit or "debugrec_hlt" in samplesplit:
                 self.isMC = False
             else:
                 self.isMC = True
