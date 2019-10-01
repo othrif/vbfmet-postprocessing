@@ -788,7 +788,7 @@ StatusCode HFInputAlg::beginInputFile() {
     //m_tree->SetBranchStatus("met_tighter_tst_et",1);
     m_tree->SetBranchStatus("met_tight_tst_et",1);
     m_tree->SetBranchStatus("jet_fjvt",1);
-    m_tree->SetBranchStatus("jet_NTracks",1);
+    if(m_binning==-1) m_tree->SetBranchStatus("jet_NTracks",1);
     m_tree->SetBranchStatus("baseel_pt",1);
     m_tree->SetBranchStatus("baseel_eta",1);
     m_tree->SetBranchStatus("baseel_phi",1);
@@ -804,7 +804,7 @@ StatusCode HFInputAlg::beginInputFile() {
     m_tree->SetBranchAddress("met_tight_tst_et",       &met_tight_tst_et);
     //m_tree->SetBranchAddress("met_tighter_tst_et",     &met_tighter_tst_et);    
     m_tree->SetBranchAddress("jet_fjvt",            &jet_fjvt);
-    m_tree->SetBranchAddress("jet_NTracks",         &jet_NTracks);
+    if(m_binning==-1) m_tree->SetBranchAddress("jet_NTracks",         &jet_NTracks);
     m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
     m_tree->SetBranchAddress("baseel_eta",           &baseel_eta);
     m_tree->SetBranchAddress("baseel_phi",           &baseel_phi);

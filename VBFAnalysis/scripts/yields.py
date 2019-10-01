@@ -22,7 +22,7 @@ samples =['hVBFH125_',
           'hW_strong_',
           'hW_EWK_',
           'httbar_',
-          'hQCDw_',
+          #'hQCDw_',
           'heleFakes_',
           'hmultijet_',
           'hdata_',
@@ -36,7 +36,7 @@ samplesPrint =['Samples','VBFH125',
           'W QCD',
           'W EWK',
           'ttbar',
-          'QCD',
+          #'QCD',
           'eleFakes',
           'multijet',
           'data',
@@ -101,7 +101,7 @@ samplesPrint =['Samples','VBFH125',
 #f=ROOT.TFile.Open('SumHF_v31_CBv2.root')
 #f=ROOT.TFile.Open('SumHF_v31_CB_mu_noOR.root')
 #f=ROOT.TFile.Open('SumHF_Sep20_v32PFE.root')
-f=ROOT.TFile.Open('SumHF_Oct1_METTriggerForMuonCRs_oneTrig_2017a.root')
+f=ROOT.TFile.Open('SumHF_Oct1_oneTrig_2018.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400.root')#
@@ -161,7 +161,10 @@ for rmy in regions:
         for s in samples:
             histname=s+r
             if s=='hdata_':
-                histname=s+'NONE_'+r[len('VBFjetSel_3Nom_'):]
+                if bin_num>9:
+                    histname=s+'NONE_'+r[len('VBFjetSel_10Nom_'):]
+                else:
+                    histname=s+'NONE_'+r[len('VBFjetSel_3Nom_'):]
                 #print histname
             h=f.Get(histname)
             integral=0.0
