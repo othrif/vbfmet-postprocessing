@@ -44,12 +44,12 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZPowMCIDQCD(0),
 				  hmu_njet2(0),
 				  hmu_njet34(0),
-				  hratio_mu_njet2(0),
-				  hratio_mu_njet34(0),
 				  hj2Eta_40mu52(0),
 				  hj2Eta_not40mu52(0),
 				  hj3Eta_40mu52(0),
-				  hj3Eta_not40mu52(0)
+				  hj3Eta_not40mu52(0),
+				  hratio_mu_njet2(0),
+				  hratio_mu_njet34(0)
 {
 }
 
