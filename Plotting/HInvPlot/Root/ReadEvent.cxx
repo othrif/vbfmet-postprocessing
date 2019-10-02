@@ -638,6 +638,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::bcid);
   fSkipVarsQCD.insert(Mva::BCIDDistanceFromFront);
   fSkipVarsQCD.insert(Mva::lb);
+  fSkipVarsQCD.insert(Mva::n_mu_w);
+  fSkipVarsQCD.insert(Mva::n_el_w);
+  fSkipVarsQCD.insert(Mva::n_mu_baseline_noOR);
+  fSkipVarsQCD.insert(Mva::lep_trig_match);
   
   for(int i = 0; i < nevent; i++) {
     //
@@ -650,20 +654,19 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     
     if(fRunNumber==-123) fIsDDQCD=true;
-
+    
     // Fill event
     for(unsigned a=0; a<fVarVec.size(); ++a){
       if(fIsDDQCD && fSkipVarsQCD.find(fVarVec.at(a).var)!=fSkipVarsQCD.end()) continue;//skip missing vars in QCD
       event->AddVar(fVarVec.at(a).var, fVarVec.at(a).GetVal());
     }
 
-    //if(fIsDDQCD){
-    //  event->AddVar(Mva::passJetCleanTight, 1);
-    //  event->AddVar(Mva::passVjetsFilter, 1);
-    //  event->AddVar(Mva::passVjetsPTV, 1);
-    //  event->AddVar(Mva::trigger_met_encoded, 1);
-    //  event->AddVar(Mva::trigger_met_encodedv2, 1);
-    //}
+    if(fIsDDQCD){
+      event->RepVar(Mva::n_mu_w, 0);
+      event->RepVar(Mva::n_el_w, 0);
+      event->RepVar(Mva::n_mu_baseline_noOR, 0);
+      event->RepVar(Mva::lep_trig_match, 0);
+    }    
 
     event->RunNumber = fRunNumber;
     event->RandomRunNumber = fRandomRunNumber;    
@@ -1158,7 +1161,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     //if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     //else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
     if(364292>=fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50    
-    if(fIsDDQCD){ trigger_met_encodedv2_new=4; if(fRandomRunNumber>=348197) trigger_met_encodedv2_new=5; }
+    if(fIsDDQCD){ trigger_met_encodedv2_new=4; }
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
     if(trigger_met_encodedv2_new==0 || trigger_met_encodedv2_new>6){
       xeSFTrigWeight_nomu=1.0; xeSFTrigWeight_nomu__1up=1.0; xeSFTrigWeight_nomu__1down=1.0; }
