@@ -259,10 +259,10 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
     elif n_mu>=0 and n_el>=0:
         cuts += [CutItem('CutBaseLep',  'n_baselep == %s' %(n_mu))]
         if not options.LoadBaseLep or isWCR:
-            cuts += [CutItem('CutSignalLep','n_siglep == %s' %(n_mu))]
+            cuts += [CutItem('CutSignalLep','n_lep_w == %s' %(n_mu))]
     elif n_mu>=0 or n_el>=0:
-        cuts += [CutItem('CutBaseMu','n_mu_w == %s' %(n_mu))]
-        cuts += [CutItem('CutBaseEl','n_el_w == %s' %(n_el))]
+        cuts += [CutItem('CutBaseMu','n_mu == %s' %(n_mu))]
+        cuts += [CutItem('CutBaseEl','n_el == %s' %(n_el))]
         if not options.LoadBaseLep:
             cuts += [CutItem('CutSignalMu','n_mu == %s' %(n_mu))]
             cuts += [CutItem('CutSignalEl','n_el == %s' %(n_el))]
@@ -771,6 +771,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['zewk'] = ['zewk']
     bkgs['tall'] = ['top2','vvv']
     bkgs['dqcd'] = ['dqcd']
+    bkgs['mqcd'] = ['mqcd']
     if options.OverlapPh:
         sigs['vbfg'] = ['vbfg']
         sigs['higgs'] += ['vbfg']
@@ -813,9 +814,9 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     #
     if reg != None and key != None:
         if options.OverlapPh:
-            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,ttg,pho,phoAlt,wgam,zgam,zgamEWK,wgamEWK,bkgs,data')
+            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamEWK,wgamEWK,bkgs,data')
         else:
-            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
+            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 
