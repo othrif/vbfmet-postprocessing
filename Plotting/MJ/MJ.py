@@ -29,6 +29,10 @@ ROOT.gROOT.ProcessLine(
    Int_t     n_tau;\
    Int_t     n_el;\
    Int_t     n_ph;\
+   Int_t     n_mu_w;\
+   Int_t     n_el_w;\
+   Int_t     n_mu_baseline_noOR;\
+   Int_t     lep_trig_match;\
    Int_t     n_mu;\
    Int_t     n_baseel;\
    Int_t     n_basemu;\
@@ -103,6 +107,10 @@ tree_out.Branch( 'n_el', ROOT.AddressOf( mystruct, 'n_el' ), 'n_el/I' )
 tree_out.Branch( 'n_ph', ROOT.AddressOf( mystruct, 'n_ph' ), 'n_ph/I' )
 tree_out.Branch( 'n_mu', ROOT.AddressOf( mystruct, 'n_mu' ), 'n_mu/I' )
 tree_out.Branch( 'n_baseel', ROOT.AddressOf( mystruct, 'n_baseel' ), 'n_baseel/I' )
+tree_out.Branch( 'n_mu_w', ROOT.AddressOf( mystruct, 'n_mu_w' ), 'n_mu_w/I' )
+tree_out.Branch( 'n_el_w', ROOT.AddressOf( mystruct, 'n_el_w' ), 'n_el_w/I' )
+tree_out.Branch( 'n_mu_baseline_noOR', ROOT.AddressOf( mystruct, 'n_mu_baseline_noOR' ), 'n_mu_baseline_noOR/I' )
+tree_out.Branch( 'lep_trig_match', ROOT.AddressOf( mystruct, 'lep_trig_match' ), 'lep_trig_match/I' )
 tree_out.Branch( 'n_basemu', ROOT.AddressOf( mystruct, 'n_basemu' ), 'n_basemu/I' )
 tree_out.Branch( 'n_jet', ROOT.AddressOf( mystruct, 'n_jet' ), 'n_jet/I' )
 tree_out.Branch( 'n_bjet', ROOT.AddressOf( mystruct, 'n_bjet' ), 'n_bjet/I' )
@@ -306,6 +314,10 @@ for e in tree:
     mystruct.n_tau=0
     mystruct.n_ph=e.NPhotons
     mystruct.n_el=0
+    mystruct.n_mu_w=0
+    mystruct.n_el_w=0
+    mystruct.n_mu_baseline_noOR=0
+    mystruct.lep_trig_match=0
     mystruct.n_mu=0
     mystruct.n_basemu=0
     mystruct.n_baseel=0

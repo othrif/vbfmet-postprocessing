@@ -230,7 +230,11 @@ void Msl::ReadEvent::Init(TTree* tree)
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
+  xeSFTrigWeight_nomu=1.0;
+  xeSFTrigWeight_nomu__1up=1.0;
+  xeSFTrigWeight_nomu__1down=1.0;  
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
+  tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);  
   if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
     tree->SetBranchAddress("puSyst2018Weight",        &puweight);
@@ -238,6 +242,8 @@ void Msl::ReadEvent::Init(TTree* tree)
     if(fSystName=="Nominal"){
       tree->SetBranchAddress("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
       tree->SetBranchAddress("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
+      tree->SetBranchAddress("xeSFTrigWeight_nomu__1up",&xeSFTrigWeight_nomu__1up);
+      tree->SetBranchAddress("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);      
     }
   }
   else{
@@ -633,6 +639,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::bcid);
   fSkipVarsQCD.insert(Mva::BCIDDistanceFromFront);
   fSkipVarsQCD.insert(Mva::lb);
+  fSkipVarsQCD.insert(Mva::n_mu_w);
+  fSkipVarsQCD.insert(Mva::n_el_w);
+  fSkipVarsQCD.insert(Mva::n_mu_baseline_noOR);
+  fSkipVarsQCD.insert(Mva::lep_trig_match);
   
   for(int i = 0; i < nevent; i++) {
     //
@@ -645,20 +655,19 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     
     if(fRunNumber==-123) fIsDDQCD=true;
-
+    
     // Fill event
     for(unsigned a=0; a<fVarVec.size(); ++a){
       if(fIsDDQCD && fSkipVarsQCD.find(fVarVec.at(a).var)!=fSkipVarsQCD.end()) continue;//skip missing vars in QCD
       event->AddVar(fVarVec.at(a).var, fVarVec.at(a).GetVal());
     }
 
-    //if(fIsDDQCD){
-    //  event->AddVar(Mva::passJetCleanTight, 1);
-    //  event->AddVar(Mva::passVjetsFilter, 1);
-    //  event->AddVar(Mva::passVjetsPTV, 1);
-    //  event->AddVar(Mva::trigger_met_encoded, 1);
-    //  event->AddVar(Mva::trigger_met_encodedv2, 1);
-    //}
+    if(fIsDDQCD){
+      event->RepVar(Mva::n_mu_w, 0);
+      event->RepVar(Mva::n_el_w, 0);
+      event->RepVar(Mva::n_mu_baseline_noOR, 0);
+      event->RepVar(Mva::lep_trig_match, 0);
+    }    
 
     event->RunNumber = fRunNumber;
     event->RandomRunNumber = fRandomRunNumber;    
@@ -692,6 +701,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->RepVar(Mva::xeSFTrigWeight,        xeSFTrigWeight);
     event->RepVar(Mva::xeSFTrigWeight__1up,   xeSFTrigWeight__1up);
     event->RepVar(Mva::xeSFTrigWeight__1down, xeSFTrigWeight__1down);
+    event->RepVar(Mva::xeSFTrigWeight_nomu,        xeSFTrigWeight_nomu);
+    event->RepVar(Mva::xeSFTrigWeight_nomu__1up,   xeSFTrigWeight_nomu__1up);
+    event->RepVar(Mva::xeSFTrigWeight_nomu__1down, xeSFTrigWeight_nomu__1down);    
 
     if(fLoadBaseLep && false){
       // Fill Electrons with the baseline electrons for this looser lepton selection
@@ -940,6 +952,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // Fill Base electrons
     unsigned n_baselep=0;
+    unsigned n_wlep=0;    
     unsigned n_siglep=0;
     if(baseel_pt){
       //unsigned n_baseel=0;
@@ -990,11 +1003,15 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       //n_baselep+=n_basemu;
     }
     n_baselep+=event->GetVar(Mva::n_baseel);
-    n_baselep+=event->GetVar(Mva::n_basemu);
+    //if(fv26Ntuples) n_baselep+=event->GetVar(Mva::n_basemu);
+    n_baselep+=event->GetVar(Mva::n_mu_baseline_noOR);
     event->RepVar(Mva::n_baselep, n_baselep);
     n_siglep+=event->GetVar(Mva::n_el);
     n_siglep+=event->GetVar(Mva::n_mu);
     event->RepVar(Mva::n_siglep, n_siglep);
+    n_wlep+=event->GetVar(Mva::n_el_w);
+    n_wlep+=event->GetVar(Mva::n_mu_w);
+    event->RepVar(Mva::n_lep_w, n_wlep);
 
     // Fill signal photons
     if(ph_pt){
@@ -1119,8 +1136,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // decode trigger_lep
     int trigger_lep = event->GetVar(Mva::trigger_lep);
     int trigger_lep_new = ((trigger_lep&0x1)>0) ? 1 : 0;
-    if(trigger_lep_new==0 && (trigger_lep&0x10)==0x10) trigger_lep_new = 2;
-    if(trigger_lep_new==0 && (trigger_lep&0x100)==0x100) trigger_lep_new = 3;
+    if( event->GetVar(Mva::lep_trig_match)<0.5) trigger_lep_new=0;
+    if(trigger_lep_new==0 && (trigger_lep&0x20)==0x20) trigger_lep_new = 2;
+    if(trigger_lep_new==0 && (trigger_lep&0x400)==0x400) trigger_lep_new = 3;
     event->RepVar(Mva::trigger_lep, trigger_lep_new);
 
     // decode trigger_met
@@ -1132,17 +1150,22 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // run selected for 2017 => value 4 for 2017
     if(!fisMC) fRandomRunNumber = fRunNumber;
-    if     (325713<=fRandomRunNumber && fRandomRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))   trigger_met_encodedv2_new=4; //HLT_xe90_pufit_L1XE50;    // period B
-    else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
-    else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
-    else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K  
+    //if     (325713<=fRandomRunNumber && fRandomRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))   trigger_met_encodedv2_new=4; //HLT_xe90_pufit_L1XE50;    // period B
+    //else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
+    //else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
+    //else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K
+    if(325713<=fRandomRunNumber && fRandomRunNumber<=341649 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // All periods
+    
     if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF 
     if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF 
     // 2018 update trigger for later periods => value 5 for
-    if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
-    else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
+    //if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
+    //else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
+    if(364292>=fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50    
+    if(fIsDDQCD){ trigger_met_encodedv2_new=4; }
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
-
+    if(trigger_met_encodedv2_new==0 || trigger_met_encodedv2_new>6){
+      xeSFTrigWeight_nomu=1.0; xeSFTrigWeight_nomu__1up=1.0; xeSFTrigWeight_nomu__1down=1.0; }
     // 2015+2016 encoding
     int trigger_met_encoded = event->GetVar(Mva::trigger_met_encoded);
     int runPeriod = 0;

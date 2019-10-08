@@ -230,7 +230,7 @@ def getHistPars(hist):
         'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':0,'LtoRCut':2,'xmin':0.0,'ymin':0.1},        
         'bcid'  : {'xtitle':'BCID',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'BCIDDistanceFromFront'  : {'xtitle':'Distance from front of Train','ytitle':'Events', 'rebin':0,'LtoRCut':1},
-        'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':2,'LtoRCut':1},
+        'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
         'lb'  : {'xtitle':'Lumi block','ytitle':'Events', 'rebin':0,'LtoRCut':1}, 
         'n_vx'  : {'xtitle':'Recontructed Vertices (N_{PV})','ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'JetEtaPt25'  : {'xtitle':'Jet #eta wth 25<p_{T}<35 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},

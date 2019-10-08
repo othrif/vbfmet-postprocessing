@@ -100,7 +100,7 @@ def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
     if basic_cuts.chan !='nn' or not passRegion(region):
         return ('', [])
 
-    pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut,syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
@@ -148,7 +148,7 @@ def prepareSeqWCR(basic_cuts, region, alg_take=None, syst='Nominal'):
     if basic_cuts.chan in ['ee','uu','ll','nn','eu'] or not passRegion(region):
         return ('', [])
 
-    pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif)
+    pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif,syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
@@ -176,7 +176,7 @@ def prepareSeqZCR(basic_cuts, region, alg_take=None, syst='Nominal'):
     if basic_cuts.chan in ['ep','em','um','up','l','e','u','nn'] or not passRegion(region):
         return ('', [])
 
-    pass_alg = hstudy.preparePassEventForZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    pass_alg = hstudy.preparePassEventForZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut,syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
@@ -212,7 +212,7 @@ def main():
     #-----------------------------------------------------------------------------------------
     # Prepare selection keys
     #
-    anas    = ['allmjj','mjj1000','mjj1500','mjj2000']
+    anas    = ['allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3500']
     chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']
     if options.analysis!='all' and options.analysis.count(','):
         anas = options.analysis.split(',')
@@ -227,9 +227,9 @@ def main():
                 'metsfVBFTopotrigOR','metsfxe110XE70trig','metsfxe110XE65trig',
                 'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]
     if options.analysis.count('allmjjdphijj'):
-        anas = ['allmjj','mjj800dphijj1','mjj800dphijj2','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2']
+        anas = ['allmjj','mjj800dphijj1','mjj800dphijj2','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj3500dphijj2','mjj3500dphijj1']
     if options.analysis.count('allmjjdphijjnj'):
-        anas = ['allmjj','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','njgt2']
+        anas = ['allmjj','mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2','njgt2']
 
     if options.analysis=='qcd':
         anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT']

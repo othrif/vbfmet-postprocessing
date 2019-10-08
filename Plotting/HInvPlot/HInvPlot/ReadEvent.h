@@ -178,6 +178,9 @@ namespace Msl
     float xeSFTrigWeight;
     float xeSFTrigWeight__1up;
     float xeSFTrigWeight__1down;
+    float xeSFTrigWeight_nomu;
+    float xeSFTrigWeight_nomu__1up;
+    float xeSFTrigWeight_nomu__1down;    
     int   fRunNumber;
     int   fRandomRunNumber;    
     ULong64_t fEventNumber;    

@@ -45,6 +45,7 @@ class BasicCuts:
         self.DEtajjLowerCut   = 3.8
         self.DEtajjUpperCut   = -1.0
         self.NjetCut   = 'n_jet > 1 && n_jet < 5'
+        #self.NjetCut   = 'n_jet == 2'
         self.JetEta = ''
         if Analysis.count('metsf'):
             self.DEtajjLowerCut   = 3.5 # was 3.5
@@ -105,10 +106,10 @@ class BasicCuts:
             self.MjjUpperCut   = -1.0
         if Analysis.count('mjj3000'):
             self.MjjLowerCut   = 3000.0
-            self.MjjUpperCut   = -1.0            
+            self.MjjUpperCut   = -1.0
         if Analysis.count('mjj3500'):
             self.MjjLowerCut   = 3500.0
-            self.MjjUpperCut   = -1.0            
+            self.MjjUpperCut   = -1.0
         if Analysis.count('dphijj1'):
             self.DPhijjLowerCut   = -1
             self.DPhijjUpperCut   = 1.0
@@ -270,10 +271,10 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
     elif n_mu>=0 and n_el>=0:
         cuts += [CutItem('CutBaseLep',  'n_baselep == %s' %(n_mu))]
         if not options.LoadBaseLep or isWCR:
-            cuts += [CutItem('CutSignalLep','n_siglep == %s' %(n_mu))]
+            cuts += [CutItem('CutSignalLep','n_lep_w == %s' %(n_mu))]
     elif n_mu>=0 or n_el>=0:
-        cuts += [CutItem('CutBaseMu','n_basemu == %s' %(n_mu))]
-        cuts += [CutItem('CutBaseEl','n_baseel == %s' %(n_el))]
+        cuts += [CutItem('CutBaseMu','n_mu == %s' %(n_mu))]
+        cuts += [CutItem('CutBaseEl','n_el == %s' %(n_el))]
         if not options.LoadBaseLep:
             cuts += [CutItem('CutSignalMu','n_mu == %s' %(n_mu))]
             cuts += [CutItem('CutSignalEl','n_el == %s' %(n_el))]
@@ -350,6 +351,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
 
 #-------------------------------------------------------------------------
 def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0, maxMET=-1):
+
     met_choice = options.met_choice # the met_choice is filled into this variable
     if isLep:
         met_choice=met_choice.replace('_tst','_tst_nolep')
@@ -376,28 +378,39 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0, maxMET
     return cuts
 
 #-------------------------------------------------------------------------
-def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
-
-    cuts = FilterCuts(options)
-
-    # special setup for the trigger SF in the signal region
-    apply_weight='xeSFTrigWeight'
+def getMETTriggerCut(cut = '', options=None, basic_cuts=None, syst=None, ORTrig=''):
+    cuts=[]
+    apply_weight=None
+    if syst!=None:
+        apply_weight='xeSFTrigWeight'
     if syst=='xeSFTrigWeight__1up':
         apply_weight='xeSFTrigWeight__1up'
     elif syst=='xeSFTrigWeight__1down':
         apply_weight='xeSFTrigWeight__1down'
+    if apply_weight and ORTrig!='':
+        apply_weight=apply_weight.replace('xeSFTrigWeight','xeSFTrigWeight_nomu')
+        
     if options.year==2017:
-        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4', weight=apply_weight)]
+        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4'+ORTrig, weight=apply_weight)]
     elif options.year==2018:
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 3', weight=apply_weight)]
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5')]
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11')]
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
-            cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11 || trigger_met_encodedv2 == 5')]
+            cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11 || trigger_met_encodedv2 == 5'+ORTrig)]
         else:
-            cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5', weight=apply_weight)] # use this one
+            cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5'+ORTrig, weight=apply_weight)] # use this one
     else:
-        cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)]
+        cuts += [CutItem('CutTrig',      'trigger_met == 1'+ORTrig, weight=apply_weight)]
+    return cuts
+
+#-------------------------------------------------------------------------
+def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
+
+    cuts = FilterCuts(options)
+
+    # special setup for the trigger SF in the signal region
+    cuts += getMETTriggerCut(cut, options, basic_cuts, syst)
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
     cuts += [CutItem('CutPh', 'n_ph==0')]
@@ -506,18 +519,12 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
     return GetCuts(cuts)
 
 #-------------------------------------------------------------------------
-def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR'):
+def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR', syst='Nominal'):
 
     cuts = FilterCuts(options)
     if options.OverlapPh:
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
-    apply_weight='xeSFTrigWeight'
-    if options.year==2017:
-        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4', weight=apply_weight)]
-    elif options.year==2018:
-        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5', weight=apply_weight)] # use this one
-    else:
-        cuts += [CutItem('CutTrig',      'trigger_met == 1', weight=apply_weight)] 
+    cuts += getMETTriggerCut(cut, options, basic_cuts, syst)
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     if Region=='SR':
     #    cuts += getLepChannelCuts(basic_cuts)
@@ -564,15 +571,17 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     return GetCuts(cuts)
 
 #-------------------------------------------------------------------------
-def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
+def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='Nominal'):
 
     cuts = FilterCuts(options)
 
     if options.r207Ana:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     else:
-        cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
-    #cuts += [CutItem('CutTrig',      'trigger_lep > 0 || trigger_met>0')]
+        if basic_cuts.chan=='uu':
+            cuts += getMETTriggerCut(cut, options, basic_cuts, None, ORTrig=' || trigger_lep > 0')   
+        else:
+            cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += [CutItem('CutPh', 'n_ph==0')]
     cuts += getLepChannelCuts(basic_cuts)
@@ -622,10 +631,14 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     return GetCuts(cuts)
 
 #-------------------------------------------------------------------------
-def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met_signif=False):
+def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met_signif=False,syst='Nominal'):
 
     cuts = FilterCuts(options)
-    cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
+    if basic_cuts.chan in ['u','um','up']:
+        cuts += getMETTriggerCut(cut, options, basic_cuts, None, ORTrig=' || trigger_lep > 0')
+    else:
+        cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
+
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += [CutItem('CutPh', 'n_ph==0')]
     cuts += getLepChannelCuts(basic_cuts)
@@ -770,6 +783,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['zewk'] = ['zewk']
     bkgs['tall'] = ['top2','vvv']
     bkgs['dqcd'] = ['dqcd']
+    bkgs['mqcd'] = ['mqcd']
     if options.OverlapPh:
         sigs['vbfg'] = ['vbfg']
         sigs['higgs'] += ['vbfg']
@@ -812,9 +826,9 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     #
     if reg != None and key != None:
         if options.OverlapPh:
-            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,ttg,pho,phoAlt,wgam,zgam,zgamEWK,wgamEWK,bkgs,data')
+            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamEWK,wgamEWK,bkgs,data')
         else:
-            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
+            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 
@@ -883,11 +897,11 @@ def preparePassEventForMETSF(alg_name, options, basic_cuts, cut='BASIC'):
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
 
 #-------------------------------------------------------------------------
-def preparePassEventForGamSR(alg_name, options, basic_cuts, cut='BASIC'):
+def preparePassEventForGamSR(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
 
     reg  = ROOT.Msl.Registry()
 
-    cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, Region='SR')
+    cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, Region='SR', syst=syst)
 
     #
     # Fill Registry with cuts and samples for cut-flow
@@ -911,7 +925,7 @@ def preparePassEventForGamZCR(alg_name, options, basic_cuts, cut='BASIC'):
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
 
 #-------------------------------------------------------------------------
-def preparePassEventForGamWCR(alg_name, options, basic_cuts, cut='BASIC'):
+def preparePassEventForGamWCR(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
 
     reg  = ROOT.Msl.Registry()
 
@@ -925,11 +939,11 @@ def preparePassEventForGamWCR(alg_name, options, basic_cuts, cut='BASIC'):
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
 
 #-------------------------------------------------------------------------
-def preparePassEventForZCR(alg_name, options, basic_cuts, cut='BASIC'):
+def preparePassEventForZCR(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
 
     reg  = ROOT.Msl.Registry()
 
-    cuts = getZCRCuts(cut, options, basic_cuts, ignore_met=options.ignore_met)
+    cuts = getZCRCuts(cut, options, basic_cuts, ignore_met=options.ignore_met,syst=syst)
 
     #
     # Fill Registry with cuts and samples for cut-flow
@@ -939,11 +953,11 @@ def preparePassEventForZCR(alg_name, options, basic_cuts, cut='BASIC'):
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
 
 #-------------------------------------------------------------------------
-def preparePassEventForWCR(alg_name, options, basic_cuts, cut='BASIC', do_met_signif=False):
+def preparePassEventForWCR(alg_name, options, basic_cuts, cut='BASIC', do_met_signif=False,syst='Nominal'):
 
     reg  = ROOT.Msl.Registry()
 
-    cuts = getWCRCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, do_met_signif=do_met_signif)
+    cuts = getWCRCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, do_met_signif=do_met_signif,syst=syst)
 
     #
     # Fill Registry with cuts and samples for cut-flow
