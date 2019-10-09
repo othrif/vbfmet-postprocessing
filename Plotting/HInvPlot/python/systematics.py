@@ -100,6 +100,7 @@ class systematics(object):
 'PH_EFF_ID_Uncertainty__1down','PH_EFF_ID_Uncertainty__1up','PH_EFF_ISO_Uncertainty__1down','PH_EFF_ISO_Uncertainty__1up','PH_EFF_TRIGGER_Uncertainty__1down','PH_EFF_TRIGGER_Uncertainty__1up',
 'PRW_DATASF__1down','PRW_DATASF__1up','xeSFTrigWeight__1up','xeSFTrigWeight__1down','nloEWKWeight__1up','nloEWKWeight__1down',
 #'JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff',
+'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up',
                                         'puSyst2018Weight__1up','puSyst2018Weight__1down']
             
         elif mode == "Electrons":
