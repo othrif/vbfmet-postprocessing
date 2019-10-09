@@ -721,7 +721,7 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
             new_cuts.append(cutobj)
 
     # Add a cut to veto signal leptons.
-    new_cuts.append(CutItem("CutNoSigLeps", "n_siglep == 0"))
+    new_cuts.append(CutItem("CutNoSigLeps", "n_lep_w == 0"))
 
     # Add the trigger isolation: ptvarcone30/pt < 0.07 for mu, ptvarcone20/pt<0.1
     # TODO: make this one optional!
