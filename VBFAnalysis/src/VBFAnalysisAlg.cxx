@@ -1132,7 +1132,6 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_qgTagWeight = 1.0; // default value is 1
 
     if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
-    //else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("puWeight"))       tmp_puWeight=tMapFloat[it->first];

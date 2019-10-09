@@ -803,8 +803,8 @@ def prepareBkgRuns(keys,options=None):
                     '426008':'JZ8',
                     '426009':'JZ9',
                     }
+    bkg_datadriveqcd = {'-123':'Loose',}
     bkg_qcdw = {
-                   '-123':'Loose',
                    '310502':'powerlaw',
                    '304784':'powerlaw',                   
                    '361020':'JZ0W',
@@ -1025,7 +1025,8 @@ def prepareBkgRuns(keys,options=None):
                 ##'top2':bkg_zqcd_ztt,
                 ##'top1':bkg_zqcd_znn,
                 'vvv':bkg_vv,
-                'dqcd':bkg_qcdw,
+                'mqcd':bkg_qcdw,
+                'dqcd':bkg_datadriveqcd,
                 #'mqcd':bkg_qcdunw,
                 'zqcdMad':bkg_z_strong_madgraph,
                 'wqcdMad':bkg_w_strong_madgraph,
