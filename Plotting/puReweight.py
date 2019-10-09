@@ -25,14 +25,17 @@ gDirectory.cd("plotEvent_data")
 data2Hist=gDirectory.Get("j3EtaMuNjet2")
 data34Hist=gDirectory.Get("j3EtaMuNjet34")
 
+#data/bkg
 ratio2=data2Hist.Clone()
 ratio2.Divide(bkgd2Hist)
 ratio34=data34Hist.Clone()
 ratio34.Divide(bkgd34Hist)
+#bkg/data
 #ratio2=bkgd2Hist.Clone()
 #ratio2.Divide(data2Hist)
 #ratio34=bkgd34Hist.Clone()
 #ratio34.Divide(data34Hist)
+
 ratio2_zoom = TH2D("ratio2_zoom","ratio2_zoom",13,39.5,52.5,22,-4.5,4.5)
 ratio34_zoom = TH2D("ratio34_zoom","ratio34_zoom",13,39.5,52.5,22,-4.5,4.5)
 
@@ -125,14 +128,16 @@ graph34.Fit("fit34")
 
 if save:
 	can2g = TCanvas("can2g","can2g",600,600)
-	graph2.SetTitle(";jet2Eta;average data/MC over 40<#mu<52")
+	#graph2.SetTitle(";jet2Eta;average data/MC over 40<#mu<52")
+	graph2.SetTitle(";jet2Eta;average MC/data over 40<#mu<52")
 	graph2.Draw("AC*")
 	fit2_zoom.SetLineColor(kBlue)
 	fit2_zoom.Draw("same")
 	fit2.Draw("same")
 
 	can34g = TCanvas("can34g","can34g",600,600)
-	graph34.SetTitle(";jet3Eta;average data/MC over 40<#mu<52")
+	#graph34.SetTitle(";jet3Eta;average data/MC over 40<#mu<52")
+	graph34.SetTitle(";jet3Eta;average MC/data over 40<#mu<52")
 	graph34.Draw("AC*")
 
 	can2g.SaveAs("etaFnFit_njet2.png")

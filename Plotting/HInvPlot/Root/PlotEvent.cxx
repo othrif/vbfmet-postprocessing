@@ -179,7 +179,14 @@ bool Msl::PlotEvent::DoExec(Event &event)
     return true;
   }
 
-  double weight = event.GetWeight();
+  double puWeight = 1.0;
+  //data if weight==1.0
+  if(!(event.GetWeight()==1.0) && 39<event.GetVar(Mva::averageIntPerXing) && event.GetVar(Mva::averageIntPerXing)<52.1){
+    if(event.jets.size()==2) puWeight = -0.0766*event.jets.at(1).eta + 0.6963;
+    else if(event.jets.size()>2) puWeight = 0.0103*event.jets.at(2).eta*event.jets.at(2).eta + 0.0067*event.jets.at(2).eta + 0.7375;
+  }
+
+  double weight = event.GetWeight()*puWeight;
   if(fDebug) std::cout << "PlotEvent: " << weight << " " << GetAlgName() << std::endl;
   if(fPassAlg) {
     if(!(fPassAlg->GetPassStatus())) {
