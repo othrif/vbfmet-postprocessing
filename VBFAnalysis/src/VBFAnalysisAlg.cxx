@@ -1068,7 +1068,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
+  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
 
   if(m_theoVariation){
     std::map<TString,bool> regDecision;
@@ -1105,7 +1105,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //
   float tmp_puWeight = puWeight;
   float tmp_jvtSFWeight = jvtSFWeight;
-  float tmp_fjvtSFWeight = (met_tenacious_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
+  float tmp_fjvtSFWeight = (met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
   float tmp_elSFWeight = elSFWeight;
   float tmp_muSFWeight = muSFWeight;
   float tmp_elSFTrigWeight = elSFTrigWeight;
@@ -1120,7 +1120,7 @@ StatusCode VBFAnalysisAlg::execute() {
     // initialize
     tmp_puWeight = puWeight;
     tmp_jvtSFWeight = jvtSFWeight;
-    tmp_fjvtSFWeight = (met_tenacious_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
+    tmp_fjvtSFWeight = (met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
     tmp_elSFWeight = elSFWeight;
     tmp_muSFWeight = muSFWeight;
     tmp_elSFTrigWeight = elSFTrigWeight;
@@ -1130,10 +1130,9 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_nloEWKWeight = nloEWKWeight;
     tmp_puSyst2018Weight = puSyst2018Weight;
     tmp_qgTagWeight = 1.0; // default value is 1
-
-    if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
-    else if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
-    else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_nolep_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_nolep_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("puWeight"))       tmp_puWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFWeight"))     tmp_elSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];
