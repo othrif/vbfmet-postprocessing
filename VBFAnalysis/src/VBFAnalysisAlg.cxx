@@ -631,15 +631,16 @@ StatusCode VBFAnalysisAlg::execute() {
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
   if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567 || (runNumber>=308275 && runNumber<=308283))){
-    nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;
+    //nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;// tighter mjj>1TeV
+    nloEWKWeight=1.0 - 0.000325*(met_truth_et/1.0e3) - 0.0724;    
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
 
-    // add systematics here
+    // add systematics here - these are from the tighter mjj>1 TeV cuts
     // UP -0.000320 x Pt(Higgs) - 0.0729
     // DOWN -0.000355 x Pt(Higgs) - 0.0692
     // use (UP - DOWN) / 2
-    float up = -0.000320*(met_truth_et/1.0e3) - 0.0729;
-    float down = -0.000355 *(met_truth_et/1.0e3) - 0.0692;
+    float up = -0.000303*(met_truth_et/1.0e3) - 0.0745;
+    float down = -0.000338 *(met_truth_et/1.0e3) - 0.0708;
     float syst = fabs(up-down)/2.0;
 
     tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
