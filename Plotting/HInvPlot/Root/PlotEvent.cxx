@@ -181,9 +181,13 @@ bool Msl::PlotEvent::DoExec(Event &event)
 
   double puWeight = 1.0;
   //data if weight==1.0
+  //if(!(event.GetWeight()==1.0) && 39<event.GetVar(Mva::averageIntPerXing) && event.GetVar(Mva::averageIntPerXing)<52.1){
+  //  if(event.jets.size()==2) puWeight = -0.0766*event.jets.at(1).eta + 0.6963;
+  //  else if(event.jets.size()>2) puWeight = 0.0103*event.jets.at(2).eta*event.jets.at(2).eta + 0.0067*event.jets.at(2).eta + 0.7375;
+  //}
   if(!(event.GetWeight()==1.0) && 39<event.GetVar(Mva::averageIntPerXing) && event.GetVar(Mva::averageIntPerXing)<52.1){
-    if(event.jets.size()==2) puWeight = -0.0766*event.jets.at(1).eta + 0.6963;
-    else if(event.jets.size()>2) puWeight = 0.0103*event.jets.at(2).eta*event.jets.at(2).eta + 0.0067*event.jets.at(2).eta + 0.7375;
+    if(event.jets.size()==2) puWeight = 1.3830;
+    else if(event.jets.size()>2) puWeight = 1.1602;
   }
 
   double weight = event.GetWeight()*puWeight;
