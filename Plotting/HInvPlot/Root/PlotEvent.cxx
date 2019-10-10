@@ -38,6 +38,9 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hmin_mj3(0),
 				  hmin_mj3_over_mjj(0),
 				  hcentrality(0),
+				  hjj_deta_signed(0),
+				  hjj_deta_diff(0),
+				  hjj_deta_abs(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
 				  hWMadMCIDQCD(0),
@@ -113,9 +116,9 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hJetEMECvsBCIDPosPt35 = GetTH2("JetEMECvsBCIDPosPt35",  5,  -0.5,  4.5, 35, 0.0, 70);
   hJetEMECvsBCIDPosPt55 = GetTH2("JetEMECvsBCIDPosPt55",  5,  -0.5,  4.5, 35, 0.0, 70);  
   hMetvsMu = GetTH2("MetvsMu",  50, 0.0, 500.0, 10,  0.0,  100);  
-  hmj1              = GetTH1("mj1",              50,  0.0,   2000.0);		  
-  hmj2              = GetTH1("mj2",              50,  0.0,   2000.0);		  
-  hminDRmj2         = GetTH1("minDRmj2",         50,  0.0,   2000.0);    	  
+  hmj1              = GetTH1("mj1",              50,  0.0,   2000.0);
+  hmj2              = GetTH1("mj2",              50,  0.0,   2000.0);
+  hminDRmj2         = GetTH1("minDRmj2",         50,  0.0,   2000.0);
   hmin_mj3          = GetTH1("min_mj3",          50,  0.0,   2000.0);	  
   hmin_mj3_over_mjj = GetTH1("min_mj3_over_mjj", 25,  0.0,   1.0);
   hcentrality       = GetTH1("centrality",       25,  0.0,   1.0);
@@ -123,6 +126,10 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hj3Eta            = GetTH1("j3Eta",            22,  -4.5,  4.5);
   hj3Jvt            = GetTH1("j3Jvt",            12,  -0.2,  1.0);
   hj3FJvt           = GetTH1("j3FJvt",           22,  -0.2,  2.0);
+
+  hjj_deta_signed   = GetTH1("jj_deta_signed",   50, -10.0, 10.0);
+  hjj_deta_diff     = GetTH1("jj_deta_diff",   50, -10.0, 10.0);
+  hjj_deta_abs      = GetTH1("jj_deta_abs",   50, -3.0, 3.0);    
 
   hmuDR           = GetTH1("muDR",           25,  0.0,  5.0);
   hmuEta          = GetTH1("muEta",          30,  0.0,  3.0);    
@@ -185,9 +192,13 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hZMCIDQCD->Fill(event.RunNumber, weight);
   hWMCIDQCD->Fill(event.RunNumber, weight);
   hZMadMCIDQCD->Fill(event.RunNumber, weight);
-  hZMad2MCIDQCD->Fill(event.RunNumber, weight);  
+  hZMad2MCIDQCD->Fill(event.RunNumber, weight);
   hWMadMCIDQCD->Fill(event.RunNumber, weight);  
   hZPowMCIDQCD->Fill(event.RunNumber, weight);
+  float jj_deta = event.GetVar(Mva::jj_deta);
+  if(hjj_deta_signed) hjj_deta_signed->Fill(( fabs(event.GetVar(Mva::jetEta0)) > fabs(event.GetVar(Mva::jetEta1)) ? -1.0*jj_deta : jj_deta), weight);
+  if(hjj_deta_diff) hjj_deta_diff->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1))), weight);
+  if(hjj_deta_abs) hjj_deta_abs->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1)))/jj_deta, weight);    
   FillHist(hjj_mass_variableBin,   Mva::jj_mass, event, weight);
   FillHist(htmva_variableBin,      Mva::tmva,    event, weight);
   if(hMetvsMu && event.HasVar(Mva::averageIntPerXing)) hMetvsMu->Fill(event.GetVar(Mva::met_tst_nolep_et), event.GetVar(Mva::averageIntPerXing), weight);
