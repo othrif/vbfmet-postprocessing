@@ -154,8 +154,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hratio_mu_njet34    = GetTH2("j3EtaMuNjet34", 100, -0.5, 99.5, 22,  -4.5,  4.5);
 
   // jj_mass limits
-  float binsjjmass [8] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3000.0 }; 
-  hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  7,  binsjjmass); 
+  float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 }; 
+  hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  8,  binsjjmass); 
   
   // TMVA variable binned
   float binstmva[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};

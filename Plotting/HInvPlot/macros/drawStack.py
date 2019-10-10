@@ -212,7 +212,7 @@ def getHistPars(hist):
         'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
         'j0timing' : {'xtitle':'Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1timing' : {'xtitle':'sub-Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
-        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0.0, 'ymin':0.1, 'logy':False, 'LtoRCut':1, 'xmax':9.0},
+        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0, 'ymin':0.1, 'logy':False, 'LtoRCut':1, 'xmax':9.0},
         'n_jet_fwd'   : {'xtitle':'Number of extra Jets |eta|>2.5',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj30'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
@@ -1878,7 +1878,7 @@ class DrawStack:
             by.SetRangeUser(0.501, 1.499);
             if options.blind:
                 by.SetRangeUser(0,0.799);
-                #by.SetRangeUser(0,1.7999);
+                by.SetRangeUser(0,1.7999);
             by.SetLabelSize(0.13);
             by.SetLabelOffset(0.0125);
             by.SetTitleSize(0.14);
@@ -1943,7 +1943,8 @@ class DrawStack:
         # Draw
         nom=None
         nom = self.bkg_sum.Clone()
-        for i in range(0,self.bkg_sum.GetNbinsX()):
+
+        for i in range(0,self.bkg_sum.GetNbinsX()+1):
             syst.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             syst.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             # This REMOVES THE MC STAT uncertainty from the syst band
@@ -1969,6 +1970,7 @@ class DrawStack:
         # iterate over the systematics
         for sys, ent in self.sys_bkgs.iteritems():
             if True:
+                #if ent.hist.Integral()<3500.0:
                 #print 'sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()
                 for m in range(1,nom.GetNbinsX()+1):
                     nom_val=nom.GetBinContent(m)
@@ -2001,7 +2003,7 @@ class DrawStack:
         syst_jesr_ratio=None
         if syst_jesr:
             syst_jesr_ratio = syst_ratio.Clone()        
-        for i in range(0,self.bkg_sum.GetNbinsX()):
+        for i in range(0,self.bkg_sum.GetNbinsX()+1):
             syst_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             syst_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             if syst_jesr_ratio:
@@ -2042,15 +2044,8 @@ class DrawStack:
 
         for bkg in sorted(self.bkgs.keys(), key=getSampleSortKey):
 
-            if self.bkgs[bkg].sample=='smww' or self.bkgs[bkg].sample=='wzzz': ## doug wzzz
-                for bb in range(0,self.bkgs[bkg].hist.GetNbinsX()):
-                    my_err = self.bkgs[bkg].hist.GetBinError(bb)
-                    my_int = self.bkgs[bkg].hist.GetBinContent(bb)
-                    self.bkgs[bkg].hist.SetBinError(bb,math.sqrt(my_err**2+(0.09*my_int)**2))
-
             he = self.bkgs[bkg]
             self.stack.Add(he.hist)
-
 
             if self.bkg_sum == None:
                 self.bkg_sum = he.hist.Clone()
@@ -2387,7 +2382,7 @@ def main():
     if options.madgraph:
         bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall']#,'mqcd'] #,'mqcd','zldy','vvv' 
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
             bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk'] #,'mqcd','zldy','vvv' 

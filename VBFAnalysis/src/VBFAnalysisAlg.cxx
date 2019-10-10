@@ -631,15 +631,16 @@ StatusCode VBFAnalysisAlg::execute() {
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
   if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567 || (runNumber>=308275 && runNumber<=308283))){
-    nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;
+    //nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;// tighter mjj>1TeV
+    nloEWKWeight=1.0 - 0.000325*(met_truth_et/1.0e3) - 0.0724;    
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
 
-    // add systematics here
+    // add systematics here - these are from the tighter mjj>1 TeV cuts
     // UP -0.000320 x Pt(Higgs) - 0.0729
     // DOWN -0.000355 x Pt(Higgs) - 0.0692
     // use (UP - DOWN) / 2
-    float up = -0.000320*(met_truth_et/1.0e3) - 0.0729;
-    float down = -0.000355 *(met_truth_et/1.0e3) - 0.0692;
+    float up = -0.000303*(met_truth_et/1.0e3) - 0.0745;
+    float down = -0.000338 *(met_truth_et/1.0e3) - 0.0708;
     float syst = fabs(up-down)/2.0;
 
     tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
@@ -1067,7 +1068,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
+  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
 
   if(m_theoVariation){
     std::map<TString,bool> regDecision;
@@ -1104,7 +1105,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //
   float tmp_puWeight = puWeight;
   float tmp_jvtSFWeight = jvtSFWeight;
-  float tmp_fjvtSFWeight = (met_tenacious_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
+  float tmp_fjvtSFWeight = (met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
   float tmp_elSFWeight = elSFWeight;
   float tmp_muSFWeight = muSFWeight;
   float tmp_elSFTrigWeight = elSFTrigWeight;
@@ -1119,7 +1120,7 @@ StatusCode VBFAnalysisAlg::execute() {
     // initialize
     tmp_puWeight = puWeight;
     tmp_jvtSFWeight = jvtSFWeight;
-    tmp_fjvtSFWeight = (met_tenacious_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
+    tmp_fjvtSFWeight = (met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
     tmp_elSFWeight = elSFWeight;
     tmp_muSFWeight = muSFWeight;
     tmp_elSFTrigWeight = elSFTrigWeight;
@@ -1129,11 +1130,9 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_nloEWKWeight = nloEWKWeight;
     tmp_puSyst2018Weight = puSyst2018Weight;
     tmp_qgTagWeight = 1.0; // default value is 1
-
-    if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
-    //else if(it->first.Contains("fjvtSFWeight"))   tmp_fjvtSFWeight=tMapFloat[it->first];
-    else if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
-    else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_nolep_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_nolep_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("puWeight"))       tmp_puWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFWeight"))     tmp_elSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("muSFWeight"))     tmp_muSFWeight=tMapFloat[it->first];

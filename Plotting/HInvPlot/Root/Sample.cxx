@@ -16,7 +16,7 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kHggf:  return "hggf";
     case kHvbf:  return "hvbf";
     case kVbfg:  return "vbfg";
-    case kHvh:   return "hvh";            
+    case kHvh:   return "hvh";
     case kWewk:  return "wewk";      
     case kWqcd:  return "wqcd";      
     case kZewk:  return "zewk";      
@@ -55,7 +55,7 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kWjdte: return "wjdte";
     case kQFlip: return "qflip";
     case kQCD:   return "dqcd";
-    case kQCD_MC:   return "mqcd";
+    case kQCD_MC: return "mqcd";
     case kWjhf:  return "wjhf";
     case kWgam:  return "wgam";
     case kWgas:  return "wgas";
