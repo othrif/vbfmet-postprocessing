@@ -44,6 +44,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZPowMCIDQCD(0),
 				  hmu_njet2(0),
 				  hmu_njet34(0),
+				  hj2Eta(0),
 				  hj2Eta_40mu52(0),
 				  hj2Eta_not40mu52(0),
 				  hj3Eta_40mu52(0),
@@ -144,6 +145,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
 
   hmu_njet2           = GetTH1("mu_njet2", 100, -0.5, 99.5);
   hmu_njet34          = GetTH1("mu_njet34", 100, -0.5, 99.5);
+  hj2Eta 	      = GetTH1("j2Eta", 22,  -4.5,  4.5);
   hj2Eta_40mu52       = GetTH1("j2Eta_40mu52", 22,  -4.5,  4.5);
   hj2Eta_not40mu52    = GetTH1("j2Eta_not40mu52", 22,  -4.5,  4.5);
   hj3Eta_40mu52       = GetTH1("j3Eta_40mu52", 22,  -4.5,  4.5);
@@ -185,10 +187,11 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //  if(event.jets.size()==2) puWeight = -0.0766*event.jets.at(1).eta + 0.6963;
   //  else if(event.jets.size()>2) puWeight = 0.0103*event.jets.at(2).eta*event.jets.at(2).eta + 0.0067*event.jets.at(2).eta + 0.7375;
   //}
-  if(!(event.GetWeight()==1.0) && 39<event.GetVar(Mva::averageIntPerXing) && event.GetVar(Mva::averageIntPerXing)<52.1){
-    if(event.jets.size()==2) puWeight = 1.3830;
-    else if(event.jets.size()>2) puWeight = 1.1602;
-  }
+  //
+  //if(!(event.GetWeight()==1.0) && 39<event.GetVar(Mva::averageIntPerXing) && event.GetVar(Mva::averageIntPerXing)<52.1){
+  //  if(event.jets.size()==2) puWeight = 1.3830;
+  //  else if(event.jets.size()>2) puWeight = 1.1602;
+  // }
 
   double weight = event.GetWeight()*puWeight;
   if(fDebug) std::cout << "PlotEvent: " << weight << " " << GetAlgName() << std::endl;
@@ -308,6 +311,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   else if(event.jets.size()==2){
     if(hmu_njet2 && Mva::jj_mass<800000) hmu_njet2->Fill(event.GetVar(Mva::averageIntPerXing),weight);
     if(hratio_mu_njet2 && Mva::jj_mass<800000) hratio_mu_njet2->Fill(event.GetVar(Mva::averageIntPerXing),event.jets.at(1).eta,weight);
+    if(hj2Eta && Mva::jj_mass<800000) hj2Eta->Fill(event.jets.at(1).eta,weight);
     if(event.GetVar(Mva::averageIntPerXing)>39 && event.GetVar(Mva::averageIntPerXing<53)) hj2Eta_40mu52->Fill(event.jets.at(1).eta,weight);
     else hj2Eta_not40mu52->Fill(event.jets.at(1).eta,weight);
   }

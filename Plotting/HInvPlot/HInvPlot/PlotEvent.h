@@ -139,6 +139,7 @@ namespace Msl
 
     TH1			       *hmu_njet2;
     TH1			       *hmu_njet34;
+    TH1			       *hj2Eta;
     TH1			       *hj2Eta_40mu52;
     TH1			       *hj2Eta_not40mu52;
     TH1			       *hj3Eta_40mu52;
