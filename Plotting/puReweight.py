@@ -93,9 +93,6 @@ def functionalWeights(bkgd2Hist, bkgd34Hist, data2Hist, data34Hist):
 		can2a.SetLogz()
 		ratio2.Draw("COLZ")
 
-		can2a.SaveAs("muVsJ3eta_njet2_"+ana+"_full.png")
-		can34a.SaveAs("muVsJ3eta_njet34_"+ana+"_full.png")
-
 		can34a = TCanvas("can34a","can34a",600,600)
 		ratio34.SetStats(0)
 		ratio34.SetTitle("WCR, M_{jj}<0.8 TeV, Njet==3,4;#mu; #eta(j_{3})")
@@ -104,6 +101,7 @@ def functionalWeights(bkgd2Hist, bkgd34Hist, data2Hist, data34Hist):
 
 		can2a.SaveAs("muVsJ3eta_njet2_"+ana+"_full.png")
 		can34a.SaveAs("muVsJ3eta_njet34_"+ana+"_full.png")
+
 		can2g = TCanvas("can2g","can2g",600,600)
 		#graph2.SetTitle(";jet2Eta;average data/MC over 40<#mu<52")
 		graph2.SetTitle(";jet2Eta;average MC/data over 40<#mu<52")
@@ -221,12 +219,13 @@ method = interpretInput.BooleanInput(methodInput)
 
 
 if method:
-	inFile.cd("pass_wcr_"+ana+"_l_Nominal")
+	reg="u"
+	inFile.cd("pass_wcr_"+ana+"_"+reg+"_Nominal")
 	gDirectory.cd("plotEvent_bkgs")
 	b2muHist=gDirectory.Get("mu_njet2")
 	b34muHist=gDirectory.Get("mu_njet34")
 	inFile.cd()
-	inFile.cd("pass_wcr_"+ana+"_l_Nominal")
+	inFile.cd("pass_wcr_"+ana+"_"+reg+"_Nominal")
 	gDirectory.cd("plotEvent_data")
 	d2muHist=gDirectory.Get("mu_njet2")
 	d34muHist=gDirectory.Get("mu_njet34")
