@@ -19,7 +19,7 @@ args, unknown = parser.parse_known_args()
 
 ### Load systematics list from HInvPlot/python/systematics.py ###
 if args.nominal:
-    sys = VBFAnalysis.systematics.systematics("Nominal")
+    sys = HInvPlot.systematics.systematics("Nominal")
     asys_systlist = []
     wsys_systlist = []
 else:
