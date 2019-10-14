@@ -1977,7 +1977,7 @@ class DrawStack:
                 for m in range(1,nom.GetNbinsX()+1):
                     nom_val=nom.GetBinContent(m)
                     e1=(ent.hist.GetBinContent(m)-nom_val)
-                    #print 'e1: ',e1,' nom_val: ',nom_val,' variation: ',ent.hist.GetBinContent(m)
+                    #print 'bin: ',m,' e1: ',e1,' nom_val: ',nom_val,' variation: ',ent.hist.GetBinContent(m),' ehig: ',syst.GetErrorYhigh(m-1),' elow: ',syst.GetErrorYlow(m-1)
                     #print 'stat error: ',nom.GetBinError(m),' asym: ',syst.GetErrorYhigh(m-1)
                     if e1>0:
                         e2=syst.GetErrorYhigh(m-1)
@@ -2384,7 +2384,7 @@ def main():
     if options.madgraph:
         bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv' 
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
             bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk'] #,'mqcd','zldy','vvv' 

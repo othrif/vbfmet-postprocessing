@@ -235,8 +235,9 @@ bool Msl::PlotEvent::DoExec(Event &event)
     for(unsigned iJet=0; iJet<event.jets.size(); ++iJet)
       hTruthTauDR ->Fill(event.truth_taus.at(0).GetVec().DeltaR(event.jets.at(iJet).GetVec()), weight);
     hTruthTauEta->Fill(event.truth_taus.at(0).eta, weight);
-  }  
-
+  }
+  //if(event.GetVar(Mva::n_el)==2)
+  //std::cout << "eventNum: " << event.EventNumber << " weight: " << weight << std::endl;
   // testing
   float max_j_eta=fabs(event.jets.at(0).eta);
   if(event.jets.size()>1)

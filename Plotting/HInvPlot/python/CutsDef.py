@@ -366,18 +366,18 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0, maxMET
     return cuts
 
 #-------------------------------------------------------------------------
-def getMETTriggerCut(cut = '', options=None, basic_cuts=None, syst=None, ORTrig=''):
+def getMETTriggerCut(cut = '', options=None, basic_cuts=None, Localsyst=None, ORTrig=''):
     cuts=[]
     apply_weight=None
-    if syst!=None:
+    if Localsyst!=None and Localsyst!='NOXESF':
         apply_weight='xeSFTrigWeight'
-    if syst=='xeSFTrigWeight__1up':
+    if Localsyst=='xeSFTrigWeight__1up':
         apply_weight='xeSFTrigWeight__1up'
-    elif syst=='xeSFTrigWeight__1down':
+    elif Localsyst=='xeSFTrigWeight__1down':
         apply_weight='xeSFTrigWeight__1down'
-    if apply_weight and ORTrig!='':
+    if apply_weight!=None and ORTrig!='':
         apply_weight=apply_weight.replace('xeSFTrigWeight','xeSFTrigWeight_nomu')
-        
+
     if options.year==2017:
         cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4'+ORTrig, weight=apply_weight)]
     elif options.year==2018:
@@ -512,7 +512,15 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     cuts = FilterCuts(options)
     if options.OverlapPh:
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
-    cuts += getMETTriggerCut(cut, options, basic_cuts, syst)
+
+    if basic_cuts.chan in ['nn']:
+        cuts += getMETTriggerCut(cut, options, basic_cuts, syst)
+    elif basic_cuts.chan in ['uu','u','up','um']:
+        cuts += getMETTriggerCut(cut, options, basic_cuts, None, ORTrig=' || trigger_lep > 0')
+    elif basic_cuts.chan in ['ee','ll','eu']:
+        cuts += [CutItem('CutTrig',      'trigger_lep > 0')]        
+    else:
+        cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     if Region=='SR':
     #    cuts += getLepChannelCuts(basic_cuts)
@@ -567,7 +575,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     else:
         if basic_cuts.chan=='uu':
-            cuts += getMETTriggerCut(cut, options, basic_cuts, None, ORTrig=' || trigger_lep > 0')   
+            cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')   
         else:
             cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
@@ -623,7 +631,7 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
 
     cuts = FilterCuts(options)
     if basic_cuts.chan in ['u','um','up']:
-        cuts += getMETTriggerCut(cut, options, basic_cuts, None, ORTrig=' || trigger_lep > 0')
+        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
     else:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
 
