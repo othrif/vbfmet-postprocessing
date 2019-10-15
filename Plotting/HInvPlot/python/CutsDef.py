@@ -256,17 +256,17 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
     #return cuts
     if isEMu:
         cuts += [CutItem('CutBaseLep','n_baselep == 2')]
-    elif n_mu>=0 and n_el>=0:
+    elif n_mu==0 and n_el==0: # for the SR
+        cuts += [CutItem('CutBaseLep','n_baselep == 0')]
+    elif n_mu>0 and n_el>0: # for the WCR
         cuts += [CutItem('CutBaseLep',  'n_baselep == %s' %(n_mu))]
         if not options.LoadBaseLep or isWCR:
-            cuts += [CutItem('CutSignalLep','n_lep_w == %s' %(n_mu))]
-    elif n_mu>=0 or n_el>=0:
-        cuts += [CutItem('CutBaseMu','n_mu == %s' %(n_mu))]
-        cuts += [CutItem('CutBaseEl','n_el == %s' %(n_el))]
-        if not options.LoadBaseLep:
-            cuts += [CutItem('CutSignalMu','n_mu == %s' %(n_mu))]
-            cuts += [CutItem('CutSignalEl','n_el == %s' %(n_el))]
-    else:
+            cuts += [CutItem('CutSignalWLep','n_lep_w == %s' %(n_mu))]
+    elif n_mu>=0 or n_el>=0: # for Z CR
+        cuts += [CutItem('CutBaseLep','n_baselep == %s' %(n_mu+n_el))]
+        cuts += [CutItem('CutSignalMu','n_mu == %s' %(n_mu))]
+        cuts += [CutItem('CutSignalEl','n_el == %s' %(n_el))]
+    else: #other
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
 
     # Cut is under discussion
@@ -530,13 +530,13 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutEl','n_el == 2')]
         if basic_cuts.chan=='uu':
             cuts += [CutItem('CutMu','n_mu == 2')]
-        cuts += [CutItem('CutSignalLep','n_siglep == 2')]
+        cuts += [CutItem('CutSignalZLep','n_siglep == 2')]
     elif Region=='WCR':
         if basic_cuts.chan=='e':
             cuts += [CutItem('CutEl','n_el == 1')]
         if basic_cuts.chan=='u':
             cuts += [CutItem('CutMu','n_mu == 1')]
-        cuts += [CutItem('CutSignalLep','n_siglep == 1')]
+        cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
 
     cuts += [CutItem('CutPh',       'n_ph==1')]
     cuts += getJetCuts(basic_cuts, options, isPh=True);
@@ -600,7 +600,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
     n_el=2;
     isEMu=False
     if basic_cuts.chan=='ee':
-        n_mu=2; n_el=0; #note that the muon is used
+        n_mu=0; n_el=2; 
     if basic_cuts.chan=='uu':
         n_mu=2; n_el=0;
     if basic_cuts.chan=='eu':
@@ -709,7 +709,7 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
             new_cuts.append(r207_base_cut)
 
         # We need to *remove* this cut (we don't want to require signal leptons).
-        elif cutobj.GetCutName() == "CutSignalLep":
+        elif cutobj.GetCutName() == "CutSignalWLep":
             pass
 
         # Otherwise-- just add the cut.
