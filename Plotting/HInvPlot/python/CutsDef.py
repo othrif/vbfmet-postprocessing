@@ -260,8 +260,10 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     elif n_mu>0 and n_el>0: # for the WCR
         cuts += [CutItem('CutBaseLep',  'n_baselep == %s' %(n_mu))]
-        if not options.LoadBaseLep or isWCR:
+        if isWCR:
             cuts += [CutItem('CutSignalWLep','n_lep_w == %s' %(n_mu))]
+        else:
+            cuts += [CutItem('CutSignalZLep','n_siglep == %s' %(n_mu))]
     elif n_mu>=0 or n_el>=0: # for Z CR
         cuts += [CutItem('CutBaseLep','n_baselep == %s' %(n_mu+n_el))]
         cuts += [CutItem('CutSignalMu','n_mu == %s' %(n_mu))]

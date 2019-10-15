@@ -1973,7 +1973,7 @@ class DrawStack:
         for sys, ent in self.sys_bkgs.iteritems():
             if True:
                 #if ent.hist.Integral()<3500.0:
-                #print 'sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()
+                #print ent.hist.Integral(),' sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()
                 for m in range(1,nom.GetNbinsX()+1):
                     nom_val=nom.GetBinContent(m)
                     e1=(ent.hist.GetBinContent(m)-nom_val)
