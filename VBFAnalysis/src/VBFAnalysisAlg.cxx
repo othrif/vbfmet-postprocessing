@@ -649,6 +649,10 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   // applying a pileup weight for 2018 data
   puSyst2018Weight=1.0;
+  if(m_currentVariation=="Nominal"){// initialize
+    tMapFloat["puSyst2018Weight__1down"]=1.0;
+    tMapFloat["puSyst2018Weight__1up"]=1.0;
+  }
   if(m_isMC && metRunNumber>=348197){ // select for 2018
     if(averageIntPerXing>39.0 && averageIntPerXing<52.1){
       if(n_jet>2) puSyst2018Weight*=1.2;
@@ -657,6 +661,7 @@ StatusCode VBFAnalysisAlg::execute() {
       if(m_currentVariation=="Nominal"){
 	tMapFloat["puSyst2018Weight__1down"]=1.0+(puSyst2018Weight-1.0)/2.0;
 	tMapFloat["puSyst2018Weight__1up"]  =puSyst2018Weight+(puSyst2018Weight-1.0)/2.0;
+	//std::cout << "puSyst2018Wei: " << puSyst2018Weight << " up: " << tMapFloat["puSyst2018Weight__1up"]  << " down: " << tMapFloat["puSyst2018Weight__1down"] << std::endl; 
       }
     }
     //puSyst2018Weight=1.0;
@@ -1161,6 +1166,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight;
+    //std::cout << "sys: " << it->first << " pu: " << tmp_puSyst2018Weight << " " << tMapFloatW[it->first] << std::endl; 
   }//end systematic weight loop
 
   ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight);
