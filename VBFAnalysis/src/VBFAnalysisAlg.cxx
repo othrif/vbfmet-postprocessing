@@ -642,9 +642,10 @@ StatusCode VBFAnalysisAlg::execute() {
     float up = -0.000303*(met_truth_et/1.0e3) - 0.0745;
     float down = -0.000338 *(met_truth_et/1.0e3) - 0.0708;
     float syst = fabs(up-down)/2.0;
-
-    tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
-    tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
+    if(m_currentVariation=="Nominal"){
+      tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
+      tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
+    }
   }
   // applying a pileup weight for 2018 data
   puSyst2018Weight=1.0;
@@ -653,8 +654,10 @@ StatusCode VBFAnalysisAlg::execute() {
       if(n_jet>2) puSyst2018Weight*=1.2;
       if(n_jet>2 && fabs(jet_eta->at(2))>3.0) puSyst2018Weight*=1.4;
       if(n_jet==2) puSyst2018Weight*=1.07;
-      tMapFloat["puSyst2018Weight__1down"]=1.0+(puSyst2018Weight-1.0)/2.0;
-      tMapFloat["puSyst2018Weight__1up"]  =puSyst2018Weight+(puSyst2018Weight-1.0)/2.0;
+      if(m_currentVariation=="Nominal"){
+	tMapFloat["puSyst2018Weight__1down"]=1.0+(puSyst2018Weight-1.0)/2.0;
+	tMapFloat["puSyst2018Weight__1up"]  =puSyst2018Weight+(puSyst2018Weight-1.0)/2.0;
+      }
     }
     //puSyst2018Weight=1.0;
   } // end pileup weight systematic
@@ -836,8 +839,10 @@ StatusCode VBFAnalysisAlg::execute() {
     static SG::AuxElement::ConstAccessor<float> acc_qgTaggerDec("qgTagger");
     static SG::AuxElement::ConstAccessor<float> acc_qgTaggerWeight("qgTaggerWeight");
 
-    for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
-      tMapFloat [m_qgVars.at(iQG)]=1.0;
+    if(m_currentVariation=="Nominal"){
+      for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
+	tMapFloat [m_qgVars.at(iQG)]=1.0;
+      }
     }
 
     for(unsigned iJet=0; iJet<jet_NTracks->size(); ++iJet){
@@ -862,7 +867,7 @@ StatusCode VBFAnalysisAlg::execute() {
 	new_jet->auxdata<float>("DFCommonJets_QGTagger_truthjet_pt") = 50000.0; //jet->getAttribute<float>("truthjet_pt");
       }
       // Loop over QG systematics
-      if (m_isMC){
+      if (m_isMC && m_currentVariation=="Nominal"){
 	for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	  ANA_CHECK(m_jetQGTool["JET_QG_Nominal"]->sysApplySystematicVariation(m_systSet[m_qgVars.at(iQG)]));
 	  m_jetQGTool["JET_QG_Nominal"]->tag(*new_jet, nullptr); // add qg taging
@@ -1154,10 +1159,12 @@ StatusCode VBFAnalysisAlg::execute() {
     if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight);
 
+
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight;
   }//end systematic weight loop
 
   ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight);
+
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR)) return StatusCode::SUCCESS;
   double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
@@ -1209,17 +1216,19 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   // add the systematics weights to the nominal
   TObjArray *var_list = m_tree->GetListOfBranches();
 
-  for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) {
-    TString var_name = var_list->At(a)->GetName();
-    if(var_name.Contains("__1up") || var_name.Contains("__1down")){
-      m_tree->SetBranchStatus(var_name, 1);
-      if(tMapFloat.find(var_name)==tMapFloat.end()){
-	tMapFloat[var_name]=-999.0;
-	tMapFloatW[var_name]=-999.0;
-	m_tree_out->Branch("w"+var_name,&(tMapFloatW[var_name]));
+  if(m_currentVariation=="Nominal"){
+    for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) {
+      TString var_name = var_list->At(a)->GetName();
+      if(var_name.Contains("__1up") || var_name.Contains("__1down")){
+	m_tree->SetBranchStatus(var_name, 1);
+	if(tMapFloat.find(var_name)==tMapFloat.end()){
+	  tMapFloat[var_name]=-999.0;
+	  tMapFloatW[var_name]=-999.0;
+	  m_tree_out->Branch("w"+var_name,&(tMapFloatW[var_name]));
+	}
+	m_tree->SetBranchStatus(var_name, 1);
+	m_tree->SetBranchAddress(var_name, &(tMapFloat[var_name]));
       }
-      m_tree->SetBranchStatus(var_name, 1);
-      m_tree->SetBranchAddress(var_name, &(tMapFloat[var_name]));
     }
   }
   // add nloEWK

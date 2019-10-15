@@ -6,7 +6,7 @@ def writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="PlotEventCo
     os.system("echo 'export HOME=$(pwd)' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet' >> "+subDir+"/"+scriptName+syst+".sh")
-    os.system("echo 'asetup AthAnalysis,21.2.56,here' >> "+subDir+"/"+scriptName+syst+".sh")
+    os.system("echo 'asetup AthAnalysis,21.2.83,here' >> "+subDir+"/"+scriptName+syst+".sh")
     #os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
     #os.system("echo 'source "+buildDir+"/${CMTCONFIG}/setup.sh' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'source "+buildDir+"/Plotting/RootCore/scripts/setup.sh' >> "+subDir+"/"+scriptName+syst+".sh")
