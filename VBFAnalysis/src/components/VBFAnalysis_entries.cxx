@@ -4,6 +4,7 @@
 #include "../VBFAnalysisAlg.h"
 #include "../HFInputAlg.h"
 #include "../VBFTruthAlg.h"
+#include "../SignalSystHelper.h"
 
 DECLARE_ALGORITHM_FACTORY( VBFAnalysisAlg )
 DECLARE_ALGORITHM_FACTORY( HFInputAlg )
