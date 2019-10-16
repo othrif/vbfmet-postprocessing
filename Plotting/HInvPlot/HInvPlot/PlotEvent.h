@@ -121,7 +121,10 @@ namespace Msl
     TH1                        *hminDRmj2;    
     TH1                        *hmin_mj3;
     TH1                        *hmin_mj3_over_mjj;
-    TH1                        *hcentrality;      
+    TH1                        *hcentrality;
+    TH1                        *hjj_deta_signed;
+    TH1                        *hjj_deta_diff;
+    TH1                        *hjj_deta_abs;
     TH1                        *hj3Pt;      
     TH1                        *hj3Eta;      
     TH1                        *hj3Jvt;      

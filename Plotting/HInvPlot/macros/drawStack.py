@@ -257,6 +257,9 @@ def getHistPars(hist):
         'jj_mass_variableBin'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
+        'jj_deta_signed' : {'xtitle':'Signed #Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
+        'jj_deta_diff' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
+        'jj_deta_abs' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|/#Delta#eta_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
@@ -1973,11 +1976,11 @@ class DrawStack:
         for sys, ent in self.sys_bkgs.iteritems():
             if True:
                 #if ent.hist.Integral()<3500.0:
-                #print 'sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()
+                #print ent.hist.Integral(),' sys: ',sys,ent.hist.Integral(),' nom: ',nom.Integral()
                 for m in range(1,nom.GetNbinsX()+1):
                     nom_val=nom.GetBinContent(m)
                     e1=(ent.hist.GetBinContent(m)-nom_val)
-                    #print 'e1: ',e1,' nom_val: ',nom_val,' variation: ',ent.hist.GetBinContent(m)
+                    #print 'bin: ',m,' e1: ',e1,' nom_val: ',nom_val,' variation: ',ent.hist.GetBinContent(m),' ehig: ',syst.GetErrorYhigh(m-1),' elow: ',syst.GetErrorYlow(m-1)
                     #print 'stat error: ',nom.GetBinError(m),' asym: ',syst.GetErrorYhigh(m-1)
                     if e1>0:
                         e2=syst.GetErrorYhigh(m-1)
@@ -2384,7 +2387,7 @@ def main():
     if options.madgraph:
         bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall']#,'mqcd'] #,'mqcd','zldy','vvv' 
+        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
             bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk'] #,'mqcd','zldy','vvv' 
