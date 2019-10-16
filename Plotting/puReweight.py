@@ -127,8 +127,9 @@ def scalarWeights(b2muHist, b34muHist, d2muHist, d34muHist):
 	ratio34=d34muHist.Clone()
 	ratio34.Divide(b34muHist)
 
-	ratio2_zoom = TH1D("ratio2_zoom","ratio2_zoom",13,39.5,52.5)
-	ratio34_zoom = TH1D("ratio34_zoom","ratio34_zoom",13,39.5,52.5)
+	#for mu reweight
+	#ratio2_zoom = TH1D("ratio2_zoom","ratio2_zoom",13,39.5,52.5)
+	#ratio34_zoom = TH1D("ratio34_zoom","ratio34_zoom",13,39.5,52.5)
 
 	ave2=0.0
 	tot2=0.
@@ -143,6 +144,8 @@ def scalarWeights(b2muHist, b34muHist, d2muHist, d34muHist):
 			ratio2.SetBinContent(x+1,0)
 		if oldbin34>50:#fill zoomed plot with bins without outlier high weights
 			ratio34.SetBinContent(x+1,0)
+		#for mu reweight
+		"""
 		if 39<center<54:
 			x_zoom+=1
 			oldbin=ratio2.GetBinContent(x+1)
@@ -155,9 +158,18 @@ def scalarWeights(b2muHist, b34muHist, d2muHist, d34muHist):
 				ratio34_zoom.SetBinContent(x_zoom,oldbin34)
 				ave34+=oldbin34
 				tot34+=1.
+		"""
 
-	ave2/=tot2
-	ave34/=tot34
+	#for mu reweight
+	#ave2/=tot2
+	#ave34/=tot34
+
+	for x in range(ratio2.GetNbinsX()):
+		ave2+=ratio2.GetBinContent(x+1)
+		ave34+=ratio34.GetBinContent(x+1)
+	ave2/=ratio2.GetNbinsX()
+	ave34/=ratio34.GetNbinsX()
+
 
 	print ave2
 	print ave34
@@ -165,6 +177,8 @@ def scalarWeights(b2muHist, b34muHist, d2muHist, d34muHist):
 	saveInput = raw_input("Save plots? (T/F) ")
 	save = interpretInput.BooleanInput(saveInput)
 	if save:
+		"""
+		#for mu reweight
 		can2 = TCanvas("can2","can2",600,600)
 		ratio2_zoom.SetStats(0)
 		ratio2_zoom.SetTitle("WCR, M_{jj}<0.8 TeV, Njet==2;#mu; #eta(j_{2})")
@@ -178,26 +192,31 @@ def scalarWeights(b2muHist, b34muHist, d2muHist, d34muHist):
 		#ratio34_zoom.SetMinimum(0)
 		#can34.SetLogz()
 		ratio34_zoom.Draw("COLZ")
+		"""
 
 		can2a = TCanvas("can2a","can2a",600,600)
 		ratio2.SetStats(0)
-		ratio2.SetTitle("WCR, M_{jj}<0.8 TeV, Njet==2;#mu; #eta(j_{2})")
-		#ratio2.SetMinimum(0)
+		#ratio2.SetTitle("WCR, M_{jj}<0.8 TeV, Njet==2;#mu;")
+		ratio2.SetTitle("WCR, M_{jj}<0.8 TeV, Njet==2; #eta(j_{2})")
 		can2a.SetLogz()
 		ratio2.Draw("COLZ")
 
 		can34a = TCanvas("can34a","can34a",600,600)
 		ratio34.SetStats(0)
-		ratio34.SetTitle("WCR, M_{jj}<0.8 TeV, Njet==3,4;#mu; #eta(j_{3})")
-		#ratio34.SetMinimum(0)
+		#ratio34.SetTitle("WCR, M_{jj}<0.8 TeV, Njet==3,4;#mu;")
+		ratio34.SetTitle("WCR, M_{jj}<0.8 TeV, Njet==3,4;#eta(j_{3});")
 		ratio34.Draw("COLZ")
 
+		"""
+		#mu reweight
 		can2.SaveAs("mu_njet2_"+ana+".png")
 		can34.SaveAs("mu_njet34_"+ana+".png")
 		can2a.SaveAs("mu_njet2_"+ana+"_full.png")
 		can34a.SaveAs("mu_njet34_"+ana+"_full.png")
+		"""
 		
-		
+		can2a.SaveAs("j2eta_njet2_"+ana+"_full.png")
+		can34a.SaveAs("j3eta_njet34_"+ana+"_full.png")
 
 
 ######################################################################################
@@ -222,13 +241,21 @@ if method:
 	reg="u"
 	inFile.cd("pass_wcr_"+ana+"_"+reg+"_Nominal")
 	gDirectory.cd("plotEvent_bkgs")
-	b2muHist=gDirectory.Get("mu_njet2")
-	b34muHist=gDirectory.Get("mu_njet34")
+	#eta reweight
+	b2muHist=gDirectory.Get("j2Eta_40mu52")
+	b34muHist=gDirectory.Get("j3Eta_40mu52")
+	#mu reweight
+	#b2muHist=gDirectory.Get("mu_njet2")
+	#b34muHist=gDirectory.Get("mu_njet34")
 	inFile.cd()
 	inFile.cd("pass_wcr_"+ana+"_"+reg+"_Nominal")
 	gDirectory.cd("plotEvent_data")
-	d2muHist=gDirectory.Get("mu_njet2")
-	d34muHist=gDirectory.Get("mu_njet34")
+	#eta reweight
+	d2muHist=gDirectory.Get("j2Eta_40mu52")
+	d34muHist=gDirectory.Get("j3Eta_40mu52")
+	#mu reweight
+	#d2muHist=gDirectory.Get("mu_njet2")
+	#d34muHist=gDirectory.Get("mu_njet34")
 	scalarWeights(b2muHist,b34muHist,d2muHist,d34muHist)
 else:
 	inFile.cd("pass_wcr_"+ana+"_l_Nominal")
