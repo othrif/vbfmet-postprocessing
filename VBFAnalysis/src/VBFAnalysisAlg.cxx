@@ -1,5 +1,6 @@
 // VBFAnalysis includes
 #include "VBFAnalysisAlg.h"
+#include "SignalSystHelper.h"
 #include "SUSYTools/SUSYCrossSection.h"
 #include "PathResolver/PathResolver.h"
 #include "TLorentzVector.h"
@@ -110,7 +111,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   j3_min_mj_over_mjj = new std::vector<float>(0);
   mj34=-9999.0;
   max_j_eta=-9999.0;
-// add container leptons
+  // add container leptons
   contmu_pt= new std::vector<float>(0);
   contmu_eta= new std::vector<float>(0);
   contmu_phi= new std::vector<float>(0);
@@ -1278,6 +1279,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("averageIntPerXing", 1);
   m_tree->SetBranchStatus("mcEventWeight", 1);
   m_tree->SetBranchStatus("mcEventWeights", 1);
+  if(m_currentVariation=="Nominal" && m_isMC){
+    m_tree->SetBranchStatus("HTXS_prodMode", 1);
+    m_tree->SetBranchStatus("HTXS_errorCode", 1);
+    m_tree->SetBranchStatus("HTXS_Stage1_1_Fine_Category_pTjet25", 1);
+  }
   m_tree->SetBranchStatus("puWeight", 1);
   m_tree->SetBranchStatus("jvtSFWeight", 1);
   m_tree->SetBranchStatus("fjvtSFWeight", 1);
@@ -1464,6 +1470,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("averageIntPerXing", &averageIntPerXing);
   m_tree->SetBranchAddress("mcEventWeight", &mcEventWeight);
   m_tree->SetBranchAddress("mcEventWeights", &mcEventWeights);
+  if(m_currentVariation=="Nominal" && m_isMC){
+    m_tree->SetBranchAddress("HTXS_prodMode", &HTXS_prodMode);
+    m_tree->SetBranchAddress("HTXS_errorCode", &HTXS_errorCode);
+    m_tree->SetBranchAddress("HTXS_Stage1_1_Fine_Category_pTjet25", &HTXS_Stage1_1_Fine_Category_pTjet25);
+  }
   m_tree->SetBranchAddress("puWeight", &puWeight);
   m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);
   m_tree->SetBranchAddress("fjvtSFWeight", &fjvtSFWeight);
