@@ -648,6 +648,11 @@ StatusCode VBFAnalysisAlg::execute() {
       tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
     }
   }
+  if(m_isMC && m_currentVariation=="Nominal"){// initialize
+    // set the VBF variables systematics
+    if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25);
+  }
+  
   // applying a pileup weight for 2018 data
   puSyst2018Weight=1.0;
   if(m_currentVariation=="Nominal"){// initialize
@@ -1126,6 +1131,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_nloEWKWeight = nloEWKWeight;
   float tmp_puSyst2018Weight = puSyst2018Weight;
   float tmp_qgTagWeight = 1.0; // assuming the default weight is 1.0 for qg tagging
+  float tmp_signalTruthSyst=1.0; // signal truth systematics
 
   for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     // initialize
@@ -1141,6 +1147,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_nloEWKWeight = nloEWKWeight;
     tmp_puSyst2018Weight = puSyst2018Weight;
     tmp_qgTagWeight = 1.0; // default value is 1
+    tmp_signalTruthSyst=1.0; // default value is 1
     if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_nolep_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_nolep_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
@@ -1152,6 +1159,8 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("phSFWeight")) tmp_phSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("nloEWKWeight"))   tmp_nloEWKWeight=tMapFloat[it->first];
     else if(it->first.Contains("puSyst2018Weight"))   tmp_puSyst2018Weight=tMapFloat[it->first];
+    else if(it->first.Contains("VBF_qqH_"))   tmp_signalTruthSyst=tMapFloat[it->first]; // scale + S-T VBF
+    else if(it->first.Contains("ATLAS_PDF4LHC_NLO_30_"))   tmp_signalTruthSyst=tMapFloat[it->first]; //PDF
     else if(it->first.Contains("JET_QG_"))        tmp_qgTagWeight=tMapFloat[it->first];
     else if(it->first.Contains("eleANTISF")){
       tmp_eleANTISF=tMapFloat[it->first];
@@ -1163,10 +1172,10 @@ StatusCode VBFAnalysisAlg::execute() {
     }
 
     if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
-    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight);
+    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth syst: " << tmp_signalTruthSyst);
 
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
     //std::cout << "sys: " << it->first << " pu: " << tmp_puSyst2018Weight << " " << tMapFloatW[it->first] << std::endl; 
   }//end systematic weight loop
 
@@ -1241,6 +1250,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   // add nloEWK
   if(m_isMC){
     if(m_currentVariation=="Nominal"){
+      
+      // initialize the VBF variables
+      if(runNumber==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
+      
       if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
 	tMapFloat["nloEWKWeight__1up"]=1.0;
 	tMapFloatW["nloEWKWeight__1up"]=1.0;
