@@ -24,8 +24,8 @@ class BasicCuts:
 
     def __init__(self, Analysis, Chan, SameSign=0):
 
-        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','mjjLowNjet2','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
-			    'mjjLowNjet',
+        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
+			    'mjjLowNjet','mjjLowNjet2','mjjLowNjetFJVT','njgt',
                             'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
                                 'njgt2','njgt2lt5','njgt3lt5',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
@@ -128,7 +128,7 @@ class BasicCuts:
             self.DPhijjLowerCut   = -1.0
             self.DPhijjUpperCut   = 2.0
             self.NjetCut = 'n_jet > 2 && n_jet < 5'
-        if Analysis.count('mjjLowNjet'): # single bin
+        if Analysis.count('mjjLowNjet') or Analysis.count('mjjLowNjetFJVT'): # single bin
             self.MjjLowerCut   = 200.0
             self.MjjUpperCut   = 800.0
             self.DPhijjLowerCut   = -1.0
@@ -250,7 +250,7 @@ def FilterCuts(options):
     return cuts
 
 #-------------------------------------------------------------------------
-def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
+def ExtraCuts(basic_cuts, options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
     cuts = []
 
     if options.r207Ana:
@@ -286,7 +286,8 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
     # Cut is under discussion
     if not isEMu:
         cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
-    cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
+    if basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt':
+        cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
     return cuts
@@ -308,7 +309,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
             cuts += basic_cuts.GetLeadJetEtaCut()
-            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and basic_cuts.analysis!='mjjLowNjet':
+            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and basic_cuts.analysis!='mjjLowNjet' and basic_cuts.analysis!='njgt':
                 #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
                 cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
                 cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
@@ -419,7 +420,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
     cuts += getJetCuts(basic_cuts, options);
 
     # add the extra cuts
-    cuts += ExtraCuts(options)
+    cuts += ExtraCuts(basic_cuts,options)
 
     if cut == 'BeforeMET':
         return GetCuts(cuts)
@@ -619,7 +620,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
         n_mu=2; n_el=0;
     if basic_cuts.chan=='eu':
         n_mu=1; n_el=1; isEMu=True;
-    cuts += ExtraCuts(options, n_mu,n_el,isEMu)
+    cuts += ExtraCuts(basic_cuts,options, n_mu,n_el,isEMu)
 
     if cut == 'BeforeMET':
         return GetCuts(cuts)
@@ -656,7 +657,7 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
     cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
 
     # add the extra cuts
-    cuts += ExtraCuts(options, 1,1, isWCR=True)
+    cuts += ExtraCuts(basic_cuts,options, 1,1, isWCR=True)
 
     if cut == 'BeforeMET':
         return GetCuts(cuts)

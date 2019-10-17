@@ -200,11 +200,11 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //  if(event.jets.size()==2) puWeight = 1.2636;
   //  else if(event.jets.size()>2) puWeight = 0.9826;
   // }
-  //values from wcr_u to correct mu
-  if(!(event.GetWeight()==1.0) && 39<event.GetVar(Mva::averageIntPerXing) && event.GetVar(Mva::averageIntPerXing)<52.1){
-    if(event.jets.size()==2) puWeight = 1.2282;
-    else if(event.jets.size()>2) puWeight = 0.9554;
-   }
+  //values from wcr_u eta to correct mu
+  //if(!(event.GetWeight()==1.0) && 39<event.GetVar(Mva::averageIntPerXing) && event.GetVar(Mva::averageIntPerXing)<52.1){
+  //  if(event.jets.size()==2) puWeight = 1.2282;
+  //  else if(event.jets.size()>2) puWeight = 0.9554;
+  // }
 
   double weight = event.GetWeight()*puWeight;
   if(fDebug) std::cout << "PlotEvent: " << weight << " " << GetAlgName() << std::endl;
