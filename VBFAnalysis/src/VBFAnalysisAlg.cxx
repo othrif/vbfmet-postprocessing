@@ -651,6 +651,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
     if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights);
+    if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights);    
   }
   
   // applying a pileup weight for 2018 data
@@ -1251,8 +1252,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   if(m_isMC){
     if(m_currentVariation=="Nominal"){
       
-      // initialize the VBF variables
+      // initialize the VBF & ggF variables
       if(runNumber==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
+      if(runNumber==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);      
       
       if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
 	tMapFloat["nloEWKWeight__1up"]=1.0;

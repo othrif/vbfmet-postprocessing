@@ -122,6 +122,44 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
   tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=mcEventWeights->at(DefaultVal+32)/mcEventWeights->at(DefaultVal);
 }
 
+// set ggF vars
+void SignalSystHelper::setggFVars(std::map<TString, Float_t> &tMapFloat, std::vector<Float_t>* mcEventWeights){
+
+  if(!mcEventWeights && mcEventWeights->size()<200)
+    std::cout << "SignalSystHelper::setVBFVars - Unknown event weights! " << std::endl;
+  // value is 0
+  unsigned DefaultVal=111;
+  if(mcEventWeights->at(DefaultVal)!=0.0) return;
+  
+  // PDF variations for 90401 nloPDF with 30 variations
+  for(unsigned i=1; i<31; ++i){
+    tMapFloat["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=mcEventWeights->at(DefaultVal+i)/mcEventWeights->at(DefaultVal);
+  }
+  // ATLAS_PDF4LHC_NLO_30_alphaS up 31 and down 32
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]=mcEventWeights->at(DefaultVal+31)/mcEventWeights->at(DefaultVal);
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=mcEventWeights->at(DefaultVal+32)/mcEventWeights->at(DefaultVal);
+  
+}
+
+// create variations
+void SignalSystHelper::initggFVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree){
+  std::string var_name = "";
+  // add the ggF PDF variations
+  for(unsigned i=1; i<31; ++i){    
+    tMapFloat["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=1.0;
+    tMapFloatW["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=1.0;
+    var_name="wATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up";
+    tree->Branch(var_name.c_str(),&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]));
+  }
+  // ATLAS_PDF4LHC_NLO_30_alphaS up 31 and down 32
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]=1.0;
+  tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]=1.0;
+  tree->Branch("wATLAS_PDF4LHC_NLO_30_alphaS__1up",&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]));
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=1.0;
+  tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=1.0;
+  tree->Branch("wATLAS_PDF4LHC_NLO_30_alphaS__1down",&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]));
+}
+
 // create variations
 void SignalSystHelper::initVBFVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree){
   std::string var_name = "";
