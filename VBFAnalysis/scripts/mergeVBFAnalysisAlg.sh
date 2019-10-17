@@ -1,5 +1,5 @@
 #!/bin/bash                                                                                                                                                                                                       
-OUTDIRM=v34TightPF18
+OUTDIRM=v34TightPF17
 #OUTDIRM=/share/t3data2/schae/v32ETight
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root

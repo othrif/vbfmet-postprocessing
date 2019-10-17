@@ -17,6 +17,7 @@
 #include "PATInterfaces/SystematicsUtil.h"
 #include "PATInterfaces/SystematicRegistry.h"
 
+#include "SignalSystHelper.h"
 #include "TTree.h"
 #include "TH1D.h"
 #include <vector>
@@ -70,6 +71,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool m_METTrigPassThru = false;
   TTree *m_tree = 0;
   TTree *m_tree_out = 0;
+  SignalSystHelper     my_signalSystHelper;
+
   SUSY::CrossSectionDB *my_XsecDB;
   std::map<TString,asg::AnaToolHandle<CP::IJetQGTagger> >      m_jetQGTool;                     //! 
   std::map<TString,CP::SystematicSet>        m_systSet;                     //! 
@@ -139,6 +142,9 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   ULong64_t eventNumber;
   Float_t averageIntPerXing;
   Float_t mcEventWeight;
+  Int_t HTXS_prodMode;
+  Int_t HTXS_errorCode;
+  Int_t HTXS_Stage1_1_Fine_Category_pTjet25;
   Float_t nloEWKWeight;
   Float_t puSyst2018Weight;
   Float_t puWeight;
