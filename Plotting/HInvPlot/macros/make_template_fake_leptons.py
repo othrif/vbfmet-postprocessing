@@ -29,11 +29,11 @@ import collections
 region_labels = {"wcranti_mjj2000_e": "M_{jj} #geq 2000 GeV",
                  "wcranti_mjj1500_e": "1500 #leq M_{jj} #leq 2000 GeV",
                  "wcranti_mjj1000_e": "1000 #leq M_{jj} #leq 1500 GeV",
-                 "wcranti_allmjj_e": "M_{jj} #geq 1000 GeV",
+                 "wcranti_allmjj_e": "M_{jj} #geq 800 GeV",
                  "wcranti_mjj2000_u": "M_{jj} #geq 2000 GeV",
                  "wcranti_mjj1500_u": "1500 #leq M_{jj} #leq 2000 GeV",
                  "wcranti_mjj1000_u": "1000 #leq M_{jj} #leq 1500 GeV",
-                 "wcranti_allmjj_u": "M_{jj} #geq 1000 GeV"}
+                 "wcranti_allmjj_u": "M_{jj} #geq 800 GeV"}
 
 # Hardcoded labels for electron and muon regions.
 process_labels = {"e": "W #rightarrow e#nu",
@@ -204,9 +204,15 @@ def main():
 
     parser.add_argument('--xlabel', dest="xlabel", default="MET Significance [GeV^{1/2}]", help="Label for x axis.")
     parser.add_argument('--ylabel', dest="ylabel", default="Events", help="Label for y axis.")
+    parser.add_argument('-y', '--year', dest="year", default=2016, type=int, help="The year, will set lumi automatically.")
 
     # Load arguments.
     args = parser.parse_args()
+
+    if args.year == 2017:
+        args.lumi = '44.3'
+    elif args.year == 2018:
+        args.lumi = '58.5'
 
     # Read the file we passed to the script.
     filename = os.path.abspath(args.filename)
