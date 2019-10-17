@@ -144,7 +144,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t mcEventWeight;
   Int_t HTXS_prodMode;
   Int_t HTXS_errorCode;
-  Int_t HTXS_Stage1_1_Category_pTjet25;
+  Int_t HTXS_Stage1_1_Fine_Category_pTjet25;
   Float_t nloEWKWeight;
   Float_t puSyst2018Weight;
   Float_t puWeight;

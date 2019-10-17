@@ -650,7 +650,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
-    if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25);
+    if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights);
   }
   
   // applying a pileup weight for 2018 data

@@ -1,10 +1,11 @@
 #include <iostream>
-#include <stringstream>
+#include <sstream>
 #include <map>
 #include <iostream>
 #include <iomanip>
 #include <numeric>
 #include <cmath>
+#include "SignalSystHelper.h"
 
 SignalSystHelper::SignalSystHelper() {}
 
@@ -109,30 +110,31 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
   if(!mcEventWeights && mcEventWeights->size()<169)
     std::cout << "SignalSystHelper::setVBFVars - Unknown event weights! " << std::endl;
   // value is 0
-  if(mcEventWeights->(DefaultVal)!=0.0) return;
+  unsigned DefaultVal=109;
+  if(mcEventWeights->at(DefaultVal)!=0.0) return;
   
   // PDF variations for 90401 nloPDF with 30 variations
-  unsigned DefaultVal=109;
   for(unsigned i=1; i<31; ++i){
-    tMapFloat["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=mcEventWeights->(DefaultVal+i)/mcEventWeights->(DefaultVal);
+    tMapFloat["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=mcEventWeights->at(DefaultVal+i)/mcEventWeights->at(DefaultVal);
   }
   // ATLAS_PDF4LHC_NLO_30_alphaS up 31 and down 32
-  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]=mcEventWeights->(DefaultVal+31)/mcEventWeights->(DefaultVal);
-  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=mcEventWeights->(DefaultVal+32)/mcEventWeights->(DefaultVal);
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]=mcEventWeights->at(DefaultVal+31)/mcEventWeights->at(DefaultVal);
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=mcEventWeights->at(DefaultVal+32)/mcEventWeights->at(DefaultVal);
 }
 
 // create variations
 void SignalSystHelper::initVBFVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree){
-  
+  std::string var_name = "";
   // add the VBF scale variations
   for(unsigned i=0; i<10; ++i){
     tMapFloat[getVBFVarName(i)+"__1up"]=1.0;
     tMapFloatW[getVBFVarName(i)+"__1up"]=1.0;
-    tree->Branch("w"+getVBFVarName(i)+"__1up",&(tMapFloatW[getVBFVarName(i)+"__1up"]));
+    var_name = "w"+getVBFVarName(i)+"__1up";
+    tree->Branch(var_name.c_str(),&(tMapFloatW[getVBFVarName(i)+"__1up"]));
   }
   // S-T jet veto nj=2
   tMapFloat["VBF_qqH_STJetVeto__1up"]=1.0;
-  tMapFloatW["VBF_qqH_STJetVeto__1up"]=1.0;
+  tMapFloatW["VBF_qqH_STJetVeto__1up"]=1.0;  
   tree->Branch("wVBF_qqH_STJetVeto__1up",&(tMapFloatW["wVBF_qqH_STJetVeto__1up"]));
   // S-T jet veto nj=3,4
   tMapFloat["VBF_qqH_STJetVeto34__1up"]=1.0;
@@ -140,10 +142,11 @@ void SignalSystHelper::initVBFVars(std::map<TString, Float_t> &tMapFloat, std::m
   tree->Branch("wVBF_qqH_STJetVeto34__1up",&(tMapFloatW["wVBF_qqH_STJetVeto34__1up"]));
 
   // add the VBF PDF variations
-  for(unsigned i=1; i<31; ++i){
+  for(unsigned i=1; i<31; ++i){    
     tMapFloat["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=1.0;
     tMapFloatW["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=1.0;
-    tree->Branch("wATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up",&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]));
+    var_name="wATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up";
+    tree->Branch(var_name.c_str(),&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]));
   }
   // ATLAS_PDF4LHC_NLO_30_alphaS up 31 and down 32
   tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]=1.0;
@@ -156,7 +159,7 @@ void SignalSystHelper::initVBFVars(std::map<TString, Float_t> &tMapFloat, std::m
 }
 
 // Propagation function
-double SignalSystHelper::vbf_uncert_stage_1_1(int source, int event_STXS, double Nsigma=1.0){
+double SignalSystHelper::vbf_uncert_stage_1_1(int source, int event_STXS, double Nsigma){
   // return a single weight for a given souce
   if(source < 10){
     double delta_var = m_stxs_acc[event_STXS][source] * m_uncert_deltas[source];
