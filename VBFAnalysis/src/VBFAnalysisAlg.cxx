@@ -57,6 +57,9 @@ StatusCode VBFAnalysisAlg::initialize() {
     std::cout << "Cross section using local file: " << xSecFilePath << std::endl;
     my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath, false, false, true);
 
+    // signal systematics
+    my_signalSystHelper.initialize();
+
     // qg tagging
     m_qgVars.clear();
     m_systSet.clear();
@@ -650,8 +653,14 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
-    //if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights);
-    //if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights);    
+    if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights);
+    if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights);    
+
+    // This is a bug fix in the MC production. The wrong PDF weight was used for the default. 
+    // This changes to the => systematics will be fixed when the new signal samples are processed. This is tranparent with the fix
+    if((!mcEventWeights || mcEventWeights->size()<120) && (runNumber==346600 || runNumber==346588)) std::cout << "ERROR the mcEvent Weights are missing!!!" << std::endl;
+    if(runNumber==346588) mcEventWeight = mcEventWeights->at(111); // ggF
+    if(runNumber==346600) mcEventWeight = mcEventWeights->at(109); // VBF
   }
   
   // applying a pileup weight for 2018 data
@@ -1253,8 +1262,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     if(m_currentVariation=="Nominal"){
       
       // initialize the VBF & ggF variables
-      //if(runNumber==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
-      //if(runNumber==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);      
+      if(runNumber==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
+      if(runNumber==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);      
       
       if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
 	tMapFloat["nloEWKWeight__1up"]=1.0;
