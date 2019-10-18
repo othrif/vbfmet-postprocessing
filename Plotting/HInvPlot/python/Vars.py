@@ -1,15 +1,13 @@
+# Detail levels
+
+DETAIL_LEVEL_JETS = 1
+DETAIL_LEVEL_MET = 2
+
 # these are variables to be read in. Note that vectors are read in through ReadEvent
 myvars = [    ['jj_deta', '50', '0.0', '10.0'],
               ['jj_dphi', '32', '0.0', '3.2'],
               ['jj_mass', '50', '0.0', '5000.0'],
-              ['trigger_met', '2', '-0.5', '1.5'],              
               ['trigger_lep', '2', '-0.5', '1.5'],
-              ['met_tst_et', '100', '0.0', '500.0'],
-              ['met_tst_phi', '32', '-3.2', '3.2'],
-              ['met_tst_nolep_et', '100', '0.0', '500.0'],
-              ['met_tst_nolep_phi', '32', '-3.2', '3.2'],
-              ['met_significance', '200', '0.0', '20.0'],
-              ['metsig_tst', '200', '0.0', '20.0'],              
               ['n_jet', '10', '-0.5', '9.5'],
               ['n_bjet', '10', '-0.5', '9.5'],              
               ['n_el', '4', '-0.5', '3.5'],
@@ -52,6 +50,18 @@ myvars_notplotted = [['trigger_met_encoded', '2', '0.0', '1.0'],
                          ['passJetCleanTight', '2', '-0.5', '1.5'],              
         ]
     
+# These MET variables are plotted too, but if DETAIL_LEVEL_MET
+# is set on the command line, *only* the met vars are plotted.
+metplots = [
+              ['trigger_met', '2', '-0.5', '1.5'],              
+              ['met_tst_et', '100', '0.0', '500.0'],
+              ['met_tst_phi', '32', '-3.2', '3.2'],
+              ['met_tst_nolep_et', '100', '0.0', '500.0'],
+              ['met_tst_nolep_phi', '32', '-3.2', '3.2'],
+              ['met_significance', '200', '0.0', '20.0'],
+              ['metsig_tst', '200', '0.0', '20.0']
+           ]
+
 # these are variables not stored, but that we want to plot
 myplots = [
               ['jetPt0', '500', '0.0', '500.0'], 
@@ -162,7 +172,7 @@ mev_vars = ['jj_mass',
     
 def GetVarStr(entry=0, syst_name='Nominal'):
     varstr = []
-    all_vars = myvars+myvars_notplotted
+    all_vars = myvars+metplots+myvars_notplotted
     for i in all_vars:
         skip=False
         if syst_name!='Nominal':
@@ -179,9 +189,15 @@ def GetPltStr(entry=0, syst_name='Nominal', DetailLvl=0):
     varstr = []
     allvars = []
     allvars += myplots
+    allvars += metplots
     allvars += myvars
-    if DetailLvl==1:
-        allvars=jetplots
+
+    # Different plotting detail levels.
+    if DetailLvl == DETAIL_LEVEL_JETS:
+        allvars = jetplots
+    if DetailLvl == DETAIL_LEVEL_MET:
+        allvars = metplots
+
     for i in allvars:
         skip=False
         if syst_name!='Nominal':
