@@ -23,6 +23,22 @@ import argparse
 
 import collections
 
+# Hardcoded bin/region labels.
+# these can be overridden by passing -t [text] to set text on the legend.
+# (Labels for the other binning scheme(s) should be added here!)
+region_labels = {"wcranti_mjj2000_e": "M_{jj} #geq 2000 GeV",
+                 "wcranti_mjj1500_e": "1500 #leq M_{jj} #leq 2000 GeV",
+                 "wcranti_mjj1000_e": "1000 #leq M_{jj} #leq 1500 GeV",
+                 "wcranti_allmjj_e": "M_{jj} #geq 800 GeV",
+                 "wcranti_mjj2000_u": "M_{jj} #geq 2000 GeV",
+                 "wcranti_mjj1500_u": "1500 #leq M_{jj} #leq 2000 GeV",
+                 "wcranti_mjj1000_u": "1000 #leq M_{jj} #leq 1500 GeV",
+                 "wcranti_allmjj_u": "M_{jj} #geq 800 GeV"}
+
+# Hardcoded labels for electron and muon regions.
+process_labels = {"e": "W #rightarrow e#nu",
+                  "u": "W #rightarrow #mu#nu"}
+
 def compute_ratio(args, tfile, region):
     histname = os.path.join(region, "plotEvent_data", args.var)
 
@@ -116,21 +132,46 @@ def compute_ratio(args, tfile, region):
     data_hist.Draw()
     canvas.Update()
 
-    data_hist.GetXaxis().SetTitle("MET Significance [GeV^{1/2}]")
-    data_hist.GetYaxis().SetTitle("Events")
+    data_hist.GetXaxis().SetTitle(args.xlabel)
+    data_hist.GetYaxis().SetTitle(args.ylabel)
 
-    ROOT.ATLASLabel(0.65, 0.85, "Internal")
+    label = ROOT.ATLASLabel(0.66, 0.87, "Internal")
 
-    legend = ROOT.TLegend(0.55, 0.7, 0.92, 0.85)
+    # Get the text to use to describe this region/bin.
+    # It could be hardcoded in the global dictionary region_labels (above).
+    # Or it could be passed in on the CLI.
+    region_text = args.text
+    if region_text == "" and args.region in region_labels.keys():
+        region_text = region_labels[args.region]
 
-    legend_header = "AntiID Template Shape"
-    #legend.SetHeader(legend_header, "C")
-    legend.AddEntry(0, legend_header, "")
-    if not args.text == "":
-        legend.AddEntry(0, args.text, "")
-    legend.AddEntry(0, "Ratio: %0.2f +/- %0.2f" % (ratio, ratio_bin_error), "")
+    # Also look up the process (this could be the W to mu nu CR!) and get
+    # a human-readable description.
+    # This is fragile.
+    process_char = args.region[-1]
+    try:
+        process = process_labels[process_char]
+    except KeyError:
+        process = process_labels['e']
+
+    # Dynamically relocate the legend depending on whether or not we have
+    # text describing the selection region.
+    lower_bound = 0.70
+    if not region_text == "":
+        lower_bound -= 0.04
+    legend = ROOT.TLegend(0.66, lower_bound, 0.95, 0.85)
+
+    # TODO: make energy, configurable...
+    legend.AddEntry(0, "#sqrt{s} = " + args.energy + " TeV, " + args.lumi + " fb^{-1}", "")
+    legend.AddEntry(0, process + ", Anti-ID", "")
+    if not region_text == "":
+        legend.AddEntry(0, region_text, "")
+    legend.AddEntry(0, "Ratio: %0.2f #pm %0.2f" % (ratio, ratio_bin_error), "")
     legend.SetBorderSize(0)
     legend.SetFillColor(0)
+    legend.SetMargin(0)
+    legend.SetFillStyle(0)
+    legend.SetTextSize(0.035)
+    legend.SetTextFont(42)
     legend.Draw()
 
     output_name = "anti_id_template_" + region + ".eps"
@@ -144,7 +185,11 @@ def compute_ratio(args, tfile, region):
 
 def main():
     parser = argparse.ArgumentParser(description="A script to make template plots for lepton fake estimation.")
+
+    # Main argument.
     parser.add_argument('filename', default="output.root", help="Output file from HInvPlot to run over.")
+
+    # Various CLI options.
     parser.add_argument('-w', '--wait', action="store_true", dest="wait", help="Wait after drawing plot.")
     parser.add_argument('-n', '--name', dest="name", default="", help="The name of the plot to create.")
     parser.add_argument('-t', '--text', dest="text", default="", help="Text to put on the legend.")
@@ -154,10 +199,23 @@ def main():
     parser.add_argument('-b', '--rebin', dest="rebin", default=10, help="Number to rebin by when drawing the template shape plot.")
     parser.add_argument('-a', '--all', dest="all", action="store_true", help="Run estimate for all regions. Ignore -r.")
     parser.add_argument('-p', '--plusminus', dest="plusminus", action="store_true", help="Run estimate for ep and em regions too.")
+    parser.add_argument('-l', '--lumi', dest="lumi", default="36.2", help="Integrated lumi (fb^-1) for datasets, defaults to 2015+16 lumi.")
+    parser.add_argument('-e', '--energy', dest="energy", default="13", help="Energy (TeV) for datasets, defaults to 13 TeV.")
+
+    parser.add_argument('--xlabel', dest="xlabel", default="MET Significance [GeV^{1/2}]", help="Label for x axis.")
+    parser.add_argument('--ylabel', dest="ylabel", default="Events", help="Label for y axis.")
+    parser.add_argument('-y', '--year', dest="year", default=2016, type=int, help="The year, will set lumi automatically.")
+
+    # Load arguments.
     args = parser.parse_args()
 
-    filename = os.path.abspath(args.filename)
+    if args.year == 2017:
+        args.lumi = '44.3'
+    elif args.year == 2018:
+        args.lumi = '58.5'
 
+    # Read the file we passed to the script.
+    filename = os.path.abspath(args.filename)
     tfile = ROOT.TFile(filename)
     keys = tfile.GetListOfKeys()
 
