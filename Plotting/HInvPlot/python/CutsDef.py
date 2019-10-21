@@ -373,6 +373,8 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0, maxMET
         else:
             cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
 	    if basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt' and basic_cuts.analysis!='njgt4':
+                cutMET.AddCut(CutItem('LowMET', '%s > %s' %(met_choice, metCut)), 'OR')
+	    else:
                 cutMET.AddCut(CutItem('LowMET', '%s > %s && j0fjvt < 0.2 && j1fjvt < 0.2' %(met_choice, metCut)), 'OR')
             cuts = [cutMET]
             #cuts += [CutItem('CutMetLow',       '%s > 100.0' %(options.met_choice))]
