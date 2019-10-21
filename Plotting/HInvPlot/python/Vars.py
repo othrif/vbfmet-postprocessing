@@ -6,7 +6,7 @@ DETAIL_LEVEL_MET = 2
 # these are variables to be read in. Note that vectors are read in through ReadEvent
 myvars = [    ['jj_deta', '50', '0.0', '10.0'],
               ['jj_dphi', '32', '0.0', '3.2'],
-              ['jj_mass', '50', '0.0', '5000.0'],
+              ['jj_mass', '70', '0.0', '7000.0'],
               ['trigger_lep', '2', '-0.5', '1.5'],
               ['n_jet', '10', '-0.5', '9.5'],
               ['n_bjet', '10', '-0.5', '9.5'],              
@@ -101,7 +101,7 @@ myplots = [
               ['j0timing', '100', '-50.0', '50.0'], 
               ['j1timing', '100', '-50.0', '50.0'],
               ['n_truth_tau', '4', '-0.5', '3.5'],
-              ['truth_jj_mass', '50', '0.0', '2000.0'],              
+              ['truth_jj_mass', '70', '0.0', '7000.0'],              
               ['FilterMet', '50', '0.0', '500.0'],              
               ['met_truth_phi', '6', '0.0', '6.2'],              
               ['truth_jj_deta', '10', '0.0', '10.0'],              
