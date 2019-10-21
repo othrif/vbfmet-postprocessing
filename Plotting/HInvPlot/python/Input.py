@@ -627,7 +627,7 @@ def prepareBkgRuns(keys,options=None):
                          '312494':'Znunu_PTV280_500_MJJ500_1000_KtMerging',
                          '312495':'Znunu_PTV280_500_MJJ1000__E_CMS_KtMerging',
                      }
-    bkg_zqcd_sh_ktExt = {
+    bkg_wqcd_sh_ktExt = {
                          '312496':'Wenu_PTV100_140_MJJ0_500_KtMerging',
                          '312497':'Wenu_PTV100_140_MJJ500_1000_KtMerging',
                          '312498':'Wenu_PTV100_140_MJJ1000__E_CMS_KtMerging',
