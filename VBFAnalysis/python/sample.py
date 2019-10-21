@@ -7,12 +7,12 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst,Ext)
-        self.sampleTypeList = ["W_EWK","W_strong","Z_EWK", "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
+        self.sampleTypeList = ["W_EWKPow","W_EWK","W_strong","Z_EWKPow","Z_EWK", "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strong228", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
                                "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',"data"] # do not change order
 
         self.sampleMap = {'data':['data'],
-                          'W_EWK':['W_EWK'],
-                          'Z_EWK':['Z_EWK'],
+                          'W_EWK':['W_EWK',"W_EWKPow"],
+                          'Z_EWK':['Z_EWK',"Z_EWKPow"],
                           'W_strong':['W_strong'],
                           'Z_strong':['Z_strong','Z_strong_VBFFilt','Z_strong_LowMass'],
                           'Z_strong_VBFFilt':['Z_strong_VBFFilt'],
@@ -96,6 +96,12 @@ class sample(object):
                 self.sampleType = "Z_strong"
             elif self.runNumber>=343982 and self.runNumber<=343986:
                 self.sampleType = "Z_strongmVBFFilt"
+            elif self.runNumber==421301:
+                self.sampleType = "Z_strong228"
+            elif self.runNumber>=363233 and self.runNumber<=363236:
+                self.sampleType = "Z_EWKPow"
+            elif self.runNumber>=363237 and self.runNumber<=363239:
+                self.sampleType = "W_EWKPow"
             elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)) or (self.runNumber>=410642 and self.runNumber<=410649) or self.runNumber==410642 or self.runNumber==410643:
                 self.sampleType = "ttbar"
             elif self.runNumber==346600:
@@ -141,6 +147,8 @@ class sample(object):
                 else:
                     self.sampleType = "Z_strongExt"
             elif (self.runNumber >=309662  and self.runNumber <= 309664):
+                self.sampleType = "Z_strongExt"
+            elif (self.runNumber >=312448  and self.runNumber <= 312531):
                 self.sampleType = "Z_strongExt"
             elif (self.runNumber >=364216  and self.runNumber <= 364229):
                 self.sampleType = "Z_strongPTVExt" #other?

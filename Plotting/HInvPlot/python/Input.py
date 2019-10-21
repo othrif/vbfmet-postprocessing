@@ -382,13 +382,17 @@ def prepareBkgRuns(keys,options=None):
                     '308097':'WmunuEWK',
                     '308098':'WtaunuEWK',                    
                         }
+    bkg_wewkpow =     {'363237':'WenuEWK',
+                       '363238':'WmunuEWK',
+                       '363239':'WtaunuEWK',                    
+                        }
 
     bkg_zgewk =     {'363266':'ZnnEWK',
                     '363267':'ZeeEWK',
                     '363268':'ZmmEWK',                    
                     '363269':'ZttEWK',                    
                         }
-
+    
     bkg_wgewk =     {'363270':'WenEWK',
                      '363271':'WmnEWK',
                      '363272':'WtnEWK',  }                  
@@ -400,6 +404,7 @@ def prepareBkgRuns(keys,options=None):
                    '343985':'',
                    '343986':'',                   
                    }
+    bkg_zee_228 = {'421301':'zee_ptvEnh'}
     bkg_zqcd_LO_Filt = {    '311429':'Znunu_TightVBF_Np01',
                             '311430':'Znunu_TightVBF_Np2',
                             '311431':'Znunu_TightVBF_Np3',
@@ -481,6 +486,12 @@ def prepareBkgRuns(keys,options=None):
                     '308094':'ZttEWK',
                     '308095':'ZnnEWK',                     
                         }
+
+    bkg_zewkpow =     {'363234':'ZeeEWK',
+                       '363235':'ZmmEWK',                        
+                       '363236':'ZttEWK',
+                       '363233':'ZnnEWK',                     
+                   }
     
     bkg_zqcd_zmm = {'364100':'Zmumu_MAXHTPTV0_70_CVetoBVeto',
                     '364101':'TBD',
@@ -567,6 +578,94 @@ def prepareBkgRuns(keys,options=None):
                     '366034':'pt140',
                     '366035':'pt280',
                     }
+    bkg_zqcd_sh_ktExt = {'312448':'Zee_PTV100_140_MJJ0_500_KtMerging',
+                         '312449':'Zee_PTV100_140_MJJ500_1000_KtMerging',
+                         '312450':'Zee_PTV100_140_MJJ1000__E_CMS_KtMerging',
+                         '312451':'Zee_PTV140_220_MJJ0_500_KtMerging',
+                         '312452':'Zee_PTV140_220_MJJ500_1000_KtMerging',
+                         '312453':'Zee_PTV140_220_MJJ1000__E_CMS_KtMerging',
+                         '312454':'Zee_PTV220_280_MJJ0_500_KtMerging',
+                         '312455':'Zee_PTV220_280_MJJ500_1000_KtMerging',
+                         '312456':'Zee_PTV220_280_MJJ1000__E_CMS_KtMerging',
+                         '312457':'Zee_PTV280_500_MJJ0_500_KtMerging',
+                         '312458':'Zee_PTV280_500_MJJ500_1000_KtMerging',
+                         '312459':'Zee_PTV280_500_MJJ1000__E_CMS_KtMerging',
+                         '312460':'Zmm_PTV100_140_MJJ0_500_KtMerging',
+                         '312461':'Zmm_PTV100_140_MJJ500_1000_KtMerging',
+                         '312462':'Zmm_PTV100_140_MJJ1000__E_CMS_KtMerging',
+                         '312463':'Zmm_PTV140_220_MJJ0_500_KtMerging',
+                         '312464':'Zmm_PTV140_220_MJJ500_1000_KtMerging',
+                         '312465':'Zmm_PTV140_220_MJJ1000__E_CMS_KtMerging',
+                         '312466':'Zmm_PTV220_280_MJJ0_500_KtMerging',
+                         '312467':'Zmm_PTV220_280_MJJ500_1000_KtMerging',
+                         '312468':'Zmm_PTV220_280_MJJ1000__E_CMS_KtMerging',
+                         '312469':'Zmm_PTV280_500_MJJ0_500_KtMerging',
+                         '312470':'Zmm_PTV280_500_MJJ500_1000_KtMerging',
+                         '312471':'Zmm_PTV280_500_MJJ1000__E_CMS_KtMerging',
+                         '312472':'Ztt_PTV100_140_MJJ0_500_KtMerging',
+                         '312473':'Ztt_PTV100_140_MJJ500_1000_KtMerging',
+                         '312474':'Ztt_PTV100_140_MJJ1000__E_CMS_KtMerging',
+                         '312475':'Ztt_PTV140_220_MJJ0_500_KtMerging',
+                         '312476':'Ztt_PTV140_220_MJJ500_1000_KtMerging',
+                         '312477':'Ztt_PTV140_220_MJJ1000__E_CMS_KtMerging',
+                         '312478':'Ztt_PTV220_280_MJJ0_500_KtMerging',
+                         '312479':'Ztt_PTV220_280_MJJ500_1000_KtMerging',
+                         '312480':'Ztt_PTV220_280_MJJ1000__E_CMS_KtMerging',
+                         '312481':'Ztt_PTV280_500_MJJ0_500_KtMerging',
+                         '312482':'Ztt_PTV280_500_MJJ500_1000_KtMerging',
+                         '312483':'Ztt_PTV280_500_MJJ1000__E_CMS_KtMerging',
+                         '312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',
+                         '312485':'Znunu_PTV100_140_MJJ500_1000_KtMerging',
+                         '312486':'Znunu_PTV100_140_MJJ1000__E_CMS_KtMerging',
+                         '312487':'Znunu_PTV140_220_MJJ0_500_KtMerging',
+                         '312488':'Znunu_PTV140_220_MJJ500_1000_KtMerging',
+                         '312489':'Znunu_PTV140_220_MJJ1000__E_CMS_KtMerging',
+                         '312490':'Znunu_PTV220_280_MJJ0_500_KtMerging',
+                         '312491':'Znunu_PTV220_280_MJJ500_1000_KtMerging',
+                         '312492':'Znunu_PTV220_280_MJJ1000__E_CMS_KtMerging',
+                         '312493':'Znunu_PTV280_500_MJJ0_500_KtMerging',
+                         '312494':'Znunu_PTV280_500_MJJ500_1000_KtMerging',
+                         '312495':'Znunu_PTV280_500_MJJ1000__E_CMS_KtMerging',
+                     }
+    bkg_zqcd_sh_ktExt = {
+                         '312496':'Wenu_PTV100_140_MJJ0_500_KtMerging',
+                         '312497':'Wenu_PTV100_140_MJJ500_1000_KtMerging',
+                         '312498':'Wenu_PTV100_140_MJJ1000__E_CMS_KtMerging',
+                         '312499':'Wenu_PTV140_220_MJJ0_500_KtMerging',
+                         '312500':'Wenu_PTV140_220_MJJ500_1000_KtMerging',
+                         '312501':'Wenu_PTV140_220_MJJ1000__E_CMS_KtMerging',
+                         '312502':'Wenu_PTV220_280_MJJ0_500_KtMerging',
+                         '312503':'Wenu_PTV220_280_MJJ500_1000_KtMerging',
+                         '312504':'Wenu_PTV220_280_MJJ1000__E_CMS_KtMerging',
+                         '312505':'Wenu_PTV280_500_MJJ0_500_KtMerging',
+                         '312506':'Wenu_PTV280_500_MJJ500_1000_KtMerging',
+                         '312507':'Wenu_PTV280_500_MJJ1000__E_CMS_KtMerging',
+                         '312508':'Wmunu_PTV100_140_MJJ0_500_KtMerging',
+                         '312509':'Wmunu_PTV100_140_MJJ500_1000_KtMerging',
+                         '312510':'Wmunu_PTV100_140_MJJ1000__E_CMS_KtMerging',
+                         '312511':'Wmunu_PTV140_220_MJJ0_500_KtMerging',
+                         '312512':'Wmunu_PTV140_220_MJJ500_1000_KtMerging',
+                         '312513':'Wmunu_PTV140_220_MJJ1000__E_CMS_KtMerging',
+                         '312514':'Wmunu_PTV220_280_MJJ0_500_KtMerging',
+                         '312515':'Wmunu_PTV220_280_MJJ500_1000_KtMerging',
+                         '312516':'Wmunu_PTV220_280_MJJ1000__E_CMS_KtMerging',
+                         '312517':'Wmunu_PTV280_500_MJJ0_500_KtMerging',
+                         '312518':'Wmunu_PTV280_500_MJJ500_1000_KtMerging',
+                         '312519':'Wmunu_PTV280_500_MJJ1000__E_CMS_KtMerging',
+                         '312520':'Wtaunu_PTV100_140_MJJ0_500_KtMerging',
+                         '312521':'Wtaunu_PTV100_140_MJJ500_1000_KtMerging',
+                         '312522':'Wtaunu_PTV100_140_MJJ1000__E_CMS_KtMerging',
+                         '312523':'Wtaunu_PTV140_220_MJJ0_500_KtMerging',
+                         '312524':'Wtaunu_PTV140_220_MJJ500_1000_KtMerging',
+                         '312525':'Wtaunu_PTV140_220_MJJ1000__E_CMS_KtMerging',
+                         '312526':'Wtaunu_PTV220_280_MJJ0_500_KtMerging',
+                         '312527':'Wtaunu_PTV220_280_MJJ500_1000_KtMerging',
+                         '312528':'Wtaunu_PTV220_280_MJJ1000__E_CMS_KtMerging',
+                         '312529':'Wtaunu_PTV280_500_MJJ0_500_KtMerging',
+                         '312530':'Wtaunu_PTV280_500_MJJ500_1000_KtMerging',
+                         '312531':'Wtaunu_PTV280_500_MJJ1000__E_CMS_KtMerging',
+    }
+
     bkg_zqcd={}
     bkg_zqcd.update(bkg_zqcd_zmm)
     bkg_zqcd.update(bkg_zqcd_zee)
@@ -1012,8 +1111,10 @@ def prepareBkgRuns(keys,options=None):
                 'tth':sig_tth125,
                 'hvbf':sig_VBF125,
                 'wewk':bkg_wewk,
+                #'wewk':bkg_wewkpow,
                 'wqcd':bkg_wqcd,
                 'zewk':bkg_zewk,
+                #'zewk':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
                 'top2':bkg_top2, # all top 
                 #'top1':bkg_top1,
@@ -1062,6 +1163,13 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['wdpi'].update(bkg_new)
     if options.year!=2018:
         bkg_keys['wdpi'].update(bkg_zqcd_znn_mc16e)
+
+    # extra samples here for now
+    bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
+    bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
+    bkg_keys['wdpi'].update(bkg_wewkpow)
+    bkg_keys['wdpi'].update(bkg_zewkpow)
+    bkg_keys['wdpi'].update(bkg_zee_228)
 
     if False:
         bkg_keys['zqcdPow']=bkg_z_strong_powheg
