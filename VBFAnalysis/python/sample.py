@@ -66,7 +66,7 @@ class sample(object):
                 self.isMC = True
         if (self.isMC):
             print "runNumebr::: ",self.runNumber
-            if ((self.runNumber >= 308096 and self.runNumber <= 308098) or (self.runNumber == 363489)):
+            if (self.runNumber >= 308096 and self.runNumber <= 308098):
                 self.sampleType = "W_EWK"
             elif (self.runNumber >= 364500 and self.runNumber <= 364519) or (self.runNumber>=345775 and self.runNumber<=345784) or (self.runNumber>=364550 and self.runNumber<=364584):
                 self.sampleType = "Zg_strong"
@@ -128,7 +128,7 @@ class sample(object):
                 self.sampleType = "QCDunw"
             elif (self.runNumber >= 364250 and self.runNumber <= 364255) or (self.runNumber >= 363355 and self.runNumber <= 363360) or self.runNumber==363489 or self.runNumber==363494:
                 self.sampleType = "ttbar" # VV moved to ttbar+other
-            elif (self.runNumber >= 364242 and self.runNumber <= 364249 or self.runNumber==364253):
+            elif ((self.runNumber >= 364242 and self.runNumber <= 364249) or self.runNumber==364253):
                 self.sampleType = "ttbar" # VVV moved to ttbar+other
             elif (self.runNumber == 410658 or self.runNumber == 410659):
                 self.sampleType = "ttbar" # tchan top
