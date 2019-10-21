@@ -128,14 +128,14 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
 }
 
 // set ggF vars
-void SignalSystHelper::setggFVars(std::map<TString, Float_t> &tMapFloat, std::vector<Float_t>* mcEventWeights){
+void SignalSystHelper::setggFVars(std::map<TString, Float_t> &tMapFloat, std::vector<Float_t>* mcEventWeights, unsigned defaultPDFVal = 111){
 
   // Check the weights are loaded
-  if(!mcEventWeights && !mcEventWeights && mcEventWeights->size()<200)
+  if(!mcEventWeights && !mcEventWeights && mcEventWeights->size()<146)
     std::cout << "SignalSystHelper::setVBFVars - Unknown event weights! " << mcEventWeights << std::endl;
 
   // value is 0
-  unsigned DefaultVal=111;
+  unsigned DefaultVal=defaultPDFVal;
   if(mcEventWeights->at(DefaultVal)==0.0){ std::cout << "WANRING - PDF weight is 0" << std::endl; return; } 
   
   // PDF variations for 90401 nloPDF with 30 variations

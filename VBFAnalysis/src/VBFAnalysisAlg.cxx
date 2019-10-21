@@ -20,7 +20,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "current sytematics of the tree" );
   declareProperty( "normFile", m_normFile = "current.root", "path to a file with the number of events processed" );
   declareProperty( "mcCampaign", m_mcCampaign = "mc16a", "mcCampaign of the mc sample. only read if isMC is true" );
-  declareProperty( "UseExtMC", m_UseExtMC = false, "Use extended MC samples");
+  declareProperty( "UseExtMC", m_UseExtMC = false, "Use extended MC samples mc16a");
   declareProperty( "UseExtMGVjet", m_UseExtMGVjet = false, "Use extended LO MG extension");
   declareProperty( "theoVariation", m_theoVariation = false, "Do theory systematic variations");
   declareProperty( "oneTrigMuon", m_oneTrigMuon = false, "Trigger muon SF set to 1");
@@ -654,7 +654,8 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
     if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights);
-    if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights);    
+    if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 111);
+    if(runNumber>=312448 && runNumber<=312531) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 115); // filtered sherpa uses nnpdf
 
     // This is a bug fix in the MC production. The wrong PDF weight was used for the default. 
     // This changes to the => systematics will be fixed when the new signal samples are processed. This is tranparent with the fix
@@ -955,16 +956,30 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   //364112-364113,364126-364127,364140-364141,364154-364155
   //364168-364169,364182-364183,364196-364197
+  // This section merges events with pTV>500 GeV. The MAXHTPTV samples have to be added together
   if((runNumber>=364216 && runNumber<=364229)){ // QCD NLO sherpa extension samples for pTV
-  }else if((runNumber>=364112 && runNumber<=364113) || // Zmm 500, 1000
-	   (runNumber>=364126 && runNumber<=364127) || // Zee 500, 1000
-	   (runNumber>=364140 && runNumber<=364141) || // Ztt 500, 1000
-	   (runNumber>=364154 && runNumber<=364155) || // Znn 500, 1000
-	   (runNumber>=364168 && runNumber<=364169) || // Wmunu 500, 1000
-	   (runNumber>=364182 && runNumber<=364183) || // Wenu 500, 1000
-	   (runNumber>=364196 && runNumber<=364197)){  // Wtaunu 500, 1000
+  }else if((runNumber>=364112 && runNumber<=364113) || // Zmm 500, 1000 MAXPTHT
+	   (runNumber>=364126 && runNumber<=364127) || // Zee 500, 1000 MAXPTHT
+	   (runNumber>=364140 && runNumber<=364141) || // Ztt 500, 1000 MAXPTHT
+	   (runNumber>=364154 && runNumber<=364155) || // Znn 500, 1000 MAXPTHT
+	   (runNumber>=364168 && runNumber<=364169) || // Wmunu 500, 1000 MAXPTHT
+	   (runNumber>=364182 && runNumber<=364183) || // Wenu 500, 1000 MAXPTHT
+	   (runNumber>=364196 && runNumber<=364197)){  // Wtaunu 500, 1000 MAXPTHT
     passVjetsPTV=(!passVjetsPTV); // flip these
   }else passVjetsPTV=true;// others must pass
+  // Now we have the KT merged 100-500 GeV in PTV samples. We want to merge these as well.
+  if((runNumber>=312448 && runNumber<=312531)) passVjetsPTV=true; // these are the KT merged samples 100-500 GeV
+  if((runNumber>=364100 && runNumber<=364113) || // Zmm MAXPTHT
+     (runNumber>=364114 && runNumber<=364127) || // Zee MAXPTHT
+     (runNumber>=364128 && runNumber<=364141) || // Ztt MAXPTHT
+     (runNumber>=364142 && runNumber<=364155) || // Znn MAXPTHT
+     (runNumber>=366010 && runNumber<=366035) || // Znn ptvmjj
+     (runNumber>=364156 && runNumber<=364169) || // Wmunu MAXPTHT
+     (runNumber>=364170 && runNumber<=364183) || // Wenu MAXPTHT
+     (runNumber>=364184 && runNumber<=364197)){  // Wtaunu MAXPTHT  
+    if(SherpaVTruthPt<100.0e3) passVjetsPTV=false; // remove if pTV>100
+    if(SherpaVTruthPt>500.0e3) passVjetsPTV=false; // remove if pTV>100
+  }
 
   // Fixing a bug in the variables
   if(jet_phi->size()>1){
@@ -1144,6 +1159,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_signalTruthSyst=1.0; // signal truth systematics
 
   for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
+    //std::cout << "syst: " << it->first <<std::endl;
     // initialize
     tmp_puWeight = puWeight;
     tmp_jvtSFWeight = jvtSFWeight;
@@ -1262,9 +1278,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     if(m_currentVariation=="Nominal"){
       
       // initialize the VBF & ggF variables
-      if(runNumber==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
-      if(runNumber==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);      
-      
+      if(m_runNumberInput==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
+      if(m_runNumberInput==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);
+      if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);// filtered Sherpa samples use nnPDF
+
       if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
 	tMapFloat["nloEWKWeight__1up"]=1.0;
 	tMapFloatW["nloEWKWeight__1up"]=1.0;
