@@ -21,7 +21,7 @@ class SignalSystHelper{
   void initVBFVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree);
   void initggFVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree);  
   void setVBFVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights);
-  void setggFVars(std::map<TString, Float_t> &tMapFloat, std::vector<Float_t>* mcEventWeights);  
+  void setggFVars(std::map<TString, Float_t> &tMapFloat, std::vector<Float_t>* mcEventWeights, unsigned defaultPDFVal);  
   
  private:
   std::vector<double> m_uncert_deltas;
