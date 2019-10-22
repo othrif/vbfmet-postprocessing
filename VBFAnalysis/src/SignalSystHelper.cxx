@@ -99,7 +99,7 @@ std::string SignalSystHelper::getVBFVarName(int selection){
 }
 
 // set VBF vars
-void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights){
+void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights, Int_t n_jet_truth, Double_t truth_jj_mass){
 
   // add the VBF scale variations
   for(unsigned i=0; i<10; ++i){
@@ -116,6 +116,10 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
   // add truth_jj_mass, truth_jj_dphi, n_jet_truth
   tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.02;
   tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.98;
+  if(n_jet_truth==2 && truth_jj_mass>3.5e6){
+    tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.04;
+    tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.96;
+  }
 
   // Check the weights are loaded
   if(mcEventWeights && !mcEventWeights && mcEventWeights->size()<169)

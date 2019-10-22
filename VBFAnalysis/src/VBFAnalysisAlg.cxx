@@ -430,6 +430,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
     m_tree_out->Branch("truth_jj_dphi",  &truth_jj_dphi);
     m_tree_out->Branch("truth_j2_pt",  &truth_j2_pt);
+    m_tree_out->Branch("n_jet_truth",  &n_jet_truth);
     m_tree_out->Branch("truthloMG_jj_mass",  &truthloMG_jj_mass);
     m_tree_out->Branch("truthloMG_jj_dphi",  &truthloMG_jj_dphi);
     m_tree_out->Branch("truthloMG_j2_pt",    &truthloMG_j2_pt);
@@ -653,7 +654,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
-    if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights);
+    if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights,n_jet_truth,truth_jj_mass);
     if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 111);
     if(runNumber>=312448 && runNumber<=312531) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 115); // filtered sherpa uses nnpdf
 
@@ -1475,6 +1476,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     }
 
     if(m_currentVariation=="Nominal" && m_isMC){
+      m_tree->SetBranchStatus("n_jet_truth", 1);
       m_tree->SetBranchStatus("truth_tau_pt", 1);
       m_tree->SetBranchStatus("truth_tau_eta",1);
       m_tree->SetBranchStatus("truth_tau_phi",1);
