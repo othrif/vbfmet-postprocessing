@@ -14,7 +14,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("isMadgraph", isMadgraph = false, "isMadgraph flag, true means the sample is Madgraph");
   declareProperty("ExtraVars", m_extraVars = 7, "0=20.7 analysis, 1=lepton veto, object def, 2=loose cuts, 3=no met soft cut, 4=no xe SF for muons, 5=lepTrigOnly for muCR, 6=met trig only for muCR, 7=metORLep for muCR (default)" );
   declareProperty("Binning", m_binning = 11, "0=rel20p7 binning. Other options with >0, 11 is default" );
-  declareProperty("METDef", m_metdef = 1, "0=loose. 1=tenacious" );
+  declareProperty("METDef", m_metdef = 0, "0=loose. 1=tenacious" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   declareProperty("doTMVA", doTMVA = false, "doTMVA flag, true means use the MVA");
