@@ -545,8 +545,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
     // Nominal
-    if(m_doVjetRW)
-      vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(0));
+    vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(0));
     // Variations
     for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){ // exclude nominal
       tMapFloat[m_vjVariations.at(iVj)]=my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(iVj));
@@ -1139,8 +1138,8 @@ StatusCode VBFAnalysisAlg::execute() {
 
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight*vjWeight;
-
+  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
+  if(m_doVjetRW) w *= vjWeight;
   if(m_theoVariation){
     std::map<TString,bool> regDecision;
     regDecision["Incl"]=true;
@@ -1234,7 +1233,8 @@ StatusCode VBFAnalysisAlg::execute() {
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight);
 
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst*tmp_vjWeight;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
+    if(m_doVjetRW) tMapFloatW[it->first] *= tmp_vjWeight;
     //std::cout << "sys: " << it->first << " pu: " << tmp_puSyst2018Weight << " " << tMapFloatW[it->first] << std::endl;
   }//end systematic weight loop
 
