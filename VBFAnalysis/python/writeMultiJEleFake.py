@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 
-def writeMultiJet(Binning=0):
+def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
     #multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
@@ -32,20 +32,66 @@ def writeMultiJet(Binning=0):
         multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
         multijets += [5.0]
     if Binning==11:
-        multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
-        multijets += [5.0]
+        multijets = [19.5, 32.0, 15.5, 11.0, 3.5, 9.0, 22.0, 10.0, 4.0, 2.0, 13.0] # MET>150
+        if METCut>150:
+            tmpmj = [19.5, 32.0, 15.5, 11.0, 3.5, 9.0, 22.0, 10.0, 4.0, 2.0, 13.0]; multijets=[]  # MET>150
+            if METCut==160: 
+                for i in tmpmj: multijets+=[(0.84085024)*i] # MET>160... from scaling to low mjj
+            if METCut==165: 
+                for i in tmpmj: multijets+=[(0.76158444)*i] # MET>165... from scaling to low mjj
+            if METCut==170: 
+                for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
+            if METCut==180: 
+                for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
+    # MJ for other years
+    if year==2017:
+        if Binning==11:
+            multijets=[]; tmpmj = [191.3, 409.8, 102.7, 23.6, 8.5, 47.3, 101.2, 25.4, 5.8, 2.1, 55.5]
+            for i in tmpmj: multijets+=[(0.046/0.035)*i] # MET>150... from scaling to low mjj
+            if METCut==160: 
+                for i in tmpmj: multijets+=[(0.84085024)*(0.046/0.035)*i] # MET>160... from scaling to low mjj                
+            if METCut==165: 
+                for i in tmpmj: multijets+=[(0.76158444)*(0.046/0.035)*i] # MET>165... from scaling to low mjj                
+            if METCut==170: 
+                for i in tmpmj: multijets+=[(0.70803802)*(0.046/0.035)*i] # MET>170... from scaling to low mjj                
+            if METCut==180: 
+                for i in tmpmj: multijets+=[(0.53423362)*(0.046/0.035)*i] # MET>180... from scaling to low mjj                
+        else:
+            print 'MJ is not defined for binning: ',Binning
+    elif year==2018:
+        if Binning==11:
+            multijets = [191.3, 409.8, 102.7, 23.6, 8.5, 47.3, 101.2, 25.4, 5.8, 2.1, 55.5] # MET>150... from scaling to low mjj
+            if METCut>150:
+                tmpmj = [191.3, 409.8, 102.7, 23.6, 8.5, 47.3, 101.2, 25.4, 5.8, 2.1, 55.5]; multijets=[] # MET>150... from scaling to low mjj
+                if METCut==160: 
+                    for i in tmpmj: multijets+=[(0.84085024)*i] # MET>160... from scaling to low mjj
+                if METCut==165: 
+                    for i in tmpmj: multijets+=[(0.76158444)*i] # MET>165... from scaling to low mjj
+                if METCut==170: 
+                    for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
+                if METCut==180: 
+                    for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
+        else:
+            print 'MJ is not defined for binning: ',Binning
+
+    if doDoubleRatio:
+        multijets+=[300.0]
     a = 1
 
     f_multijet = ROOT.TFile("multijet.root", "recreate")
     for multijet in multijets:
-        hist = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        hist=None
+        if doDoubleRatio and a==(len(multijets)-1):
+            hist = ROOT.TH1F("hmultijet_antiVBFSel_1Nom_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1Nom_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+        else:
+            hist = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         hist.SetBinContent(1,multijet)
         hist.Write()
         a += 1
     f_multijet.Write()
     f_multijet.Close()
  
-def writeFakeEle(Binning=0):
+def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
 
     f_fakeele = ROOT.TFile("fakeele.root", "recreate")
     fakeelesp = [10.7, 11.6, 5.0]
@@ -75,20 +121,48 @@ def writeFakeEle(Binning=0):
         fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
         fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
     if Binning==11:
-        fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
-        fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
+        fakeelesp = [7.4, 7.0, 4.1, 3.4, 1.8, 7.4, 7.0, 4.1, 3.4, 1.8, 5.8]
+        fakeelesm = [7.4, 7.0, 4.1, 3.4, 1.8, 7.4, 7.0, 4.1, 3.4, 1.8, 5.8]
 
+    # later years
+    if year==2017:
+        if Binning==11:
+            fakeelesp = [9.2, 8.3, 15.0, 8.9, 3.7, 9.2, 8.3, 15.0, 8.9, 3.7, 2.0]
+            fakeelesm = [9.2, 8.3, 15.0, 8.9, 3.7, 9.2, 8.3, 15.0, 8.9, 3.7, 5.3]
+        else:
+            print 'MJ is not defined for binning: ',Binning
+    elif year==2018:
+        if Binning==11:
+            fakeelesp = [12.5, 14.6, 15.8, 15.8, 3.8, 12.5, 14.6, 15.8, 15.8, 3.8, 5.3]
+            fakeelesm = [12.5, 14.6, 15.8, 15.8, 3.8, 12.5, 14.6, 15.8, 15.8, 3.8, 5.3]
+        else:
+            print 'MJ is not defined for binning: ',Binning
+    if doDoubleRatio:
+        fakeelesp+=[12.5]
+        fakeelesm+=[12.5]
     a = 1
     for fakeelep in fakeelesp:
         fakeelem = fakeelesm[a-1]
-        histpLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histmLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histpLowSig=None
+        histmLowSig=None
+        if doDoubleRatio and a==(len(fakeelesp)-1):
+            histpLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
+            histmLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
+        else:
+            histpLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histmLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histpLowSig.SetBinContent(1,fakeelep)
         histmLowSig.SetBinContent(1,fakeelem)
         histpLowSig.Write()
         histmLowSig.Write()
-        histp = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histm = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histm=None
+        histp=None
+        if doDoubleRatio and a==(len(fakeelesp)-1):
+            histp = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts;;", 1, 0.5, 1.5)
+            histm = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts;;", 1, 0.5, 1.5)
+        else:
+            histp = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histm = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) 
         histp.SetBinContent(1,1)
         histm.SetBinContent(1,1)
         histp.Write()
@@ -96,5 +170,5 @@ def writeFakeEle(Binning=0):
         a += 1
     f_fakeele.Write()
     f_fakeele.Close()
-#writeMultiJet(7)
-#writeFakeEle(7)
+#writeMultiJet(11, 2018, 180)
+#writeFakeEle(11,  2018)

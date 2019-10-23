@@ -20,7 +20,7 @@ class SignalSystHelper{
   std::string getVBFVarName(int selection);
   void initVBFVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree);
   void initggFVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree);  
-  void setVBFVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights);
+  void setVBFVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights, Int_t n_jet_truth, Double_t truth_jj_mass);
   void setggFVars(std::map<TString, Float_t> &tMapFloat, std::vector<Float_t>* mcEventWeights, unsigned defaultPDFVal);  
   
  private:

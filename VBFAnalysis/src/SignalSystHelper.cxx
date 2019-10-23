@@ -99,7 +99,7 @@ std::string SignalSystHelper::getVBFVarName(int selection){
 }
 
 // set VBF vars
-void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights){
+void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights, Int_t n_jet_truth, Double_t truth_jj_mass){
 
   // add the VBF scale variations
   for(unsigned i=0; i<10; ++i){
@@ -109,6 +109,17 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
   // S-T jet veto
   tMapFloat["VBF_qqH_STJetVeto__1up"]=1.03;  
   tMapFloat["VBF_qqH_STJetVeto34__1up"]=1.05;
+  tMapFloat["VBF_qqH_STJetVeto__1down"]=0.97;  
+  tMapFloat["VBF_qqH_STJetVeto34__1down"]=0.95;
+
+  // PS modelling systematics
+  // add truth_jj_mass, truth_jj_dphi, n_jet_truth
+  tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.02;
+  tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.98;
+  if(n_jet_truth==2 && truth_jj_mass>3.5e6){
+    tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.04;
+    tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.96;
+  }
 
   // Check the weights are loaded
   if(mcEventWeights && !mcEventWeights && mcEventWeights->size()<169)
@@ -129,6 +140,10 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
 
 // set ggF vars
 void SignalSystHelper::setggFVars(std::map<TString, Float_t> &tMapFloat, std::vector<Float_t>* mcEventWeights, unsigned defaultPDFVal = 111){
+
+  // Parton shower modelling uncertainties
+  tMapFloat["ggF_gg2H_PSVarWeights__1up"]  =1.2;
+  tMapFloat["ggF_gg2H_PSVarWeights__1down"]=0.8;
 
   // Check the weights are loaded
   if(!mcEventWeights && !mcEventWeights && mcEventWeights->size()<146)
@@ -168,6 +183,14 @@ void SignalSystHelper::initggFVars(std::map<TString, Float_t> &tMapFloat, std::m
   tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=1.0;
   tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=1.0;
   tree->Branch("wATLAS_PDF4LHC_NLO_30_alphaS__1down",&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]));
+
+  // Used the parton shower weights
+  tMapFloat["ggF_gg2H_PSVarWeights__1up"]=1.0;
+  tMapFloatW["ggF_gg2H_PSVarWeights__1up"]=1.0;
+  tree->Branch("wggF_gg2H_PSVarWeights__1up",&(tMapFloatW["ggF_gg2H_PSVarWeights__1up"]));
+  tMapFloat["ggF_PSVarWeights__1down"]=1.0;
+  tMapFloatW["ggF_gg2H_PSVarWeights__1down"]=1.0;
+  tree->Branch("wggF_gg2H_PSVarWeights__1down",&(tMapFloatW["ggF_gg2H_PSVarWeights__1down"]));
 }
 
 // create variations
@@ -184,11 +207,25 @@ void SignalSystHelper::initVBFVars(std::map<TString, Float_t> &tMapFloat, std::m
   // S-T jet veto nj=2
   tMapFloat["VBF_qqH_STJetVeto__1up"]=1.0;
   tMapFloatW["VBF_qqH_STJetVeto__1up"]=1.0;  
-  tree->Branch("wVBF_qqH_STJetVeto__1up",&(tMapFloatW["wVBF_qqH_STJetVeto__1up"]));
+  tree->Branch("wVBF_qqH_STJetVeto__1up",&(tMapFloatW["VBF_qqH_STJetVeto__1up"]));
+  tMapFloat["VBF_qqH_STJetVeto__1down"]=1.0;
+  tMapFloatW["VBF_qqH_STJetVeto__1down"]=1.0;
+  tree->Branch("wVBF_qqH_STJetVeto__1down",&(tMapFloatW["VBF_qqH_STJetVeto__1down"]));
   // S-T jet veto nj=3,4
   tMapFloat["VBF_qqH_STJetVeto34__1up"]=1.0;
   tMapFloatW["VBF_qqH_STJetVeto34__1up"]=1.0;
-  tree->Branch("wVBF_qqH_STJetVeto34__1up",&(tMapFloatW["wVBF_qqH_STJetVeto34__1up"]));
+  tree->Branch("wVBF_qqH_STJetVeto34__1up",&(tMapFloatW["VBF_qqH_STJetVeto34__1up"]));
+  tMapFloat["VBF_qqH_STJetVeto34__1down"]=1.0;
+  tMapFloatW["VBF_qqH_STJetVeto34__1down"]=1.0;
+  tree->Branch("wVBF_qqH_STJetVeto34__1down",&(tMapFloatW["VBF_qqH_STJetVeto34__1down"]));
+
+  // Used the parton shower weights
+  tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.0;
+  tMapFloatW["VBF_qqH_PSVarWeights__1up"]=1.0;
+  tree->Branch("wVBF_qqH_PSVarWeights__1up",&(tMapFloatW["VBF_qqH_PSVarWeights__1up"]));
+  tMapFloat["VBF_qqH_PSVarWeights__1down"]=1.0;
+  tMapFloatW["VBF_qqH_PSVarWeights__1down"]=1.0;
+  tree->Branch("wVBF_qqH_PSVarWeights__1down",&(tMapFloatW["VBF_qqH_PSVarWeights__1down"]));
 
   // add the VBF PDF variations
   for(unsigned i=1; i<31; ++i){    

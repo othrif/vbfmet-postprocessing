@@ -13,6 +13,7 @@ from VBFAnalysis.writeMultiJEleFake import *
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
+parser.add_argument( "--metOptSyst", dest = "metOptSyst", action="store_true", default = False, help = "Do only the met optimization systematics" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
@@ -20,6 +21,7 @@ parser.add_argument("--extraVars", dest='extraVars', default="0", help="extraVar
 parser.add_argument("--Binning", dest='Binning', default="0", help="Binning, 0=default Mjj binning, 1=low MET bin, 2=njet>2 binning, 3=met binning, 4=3bins for nj>2, 5=3dphibin, 6= dphi by mjj+nj>2, 7=800mjj withdphi, 8=mjj 8bins")
 parser.add_argument( "--isMadgraph", dest = "isMadgraph", action="store_true", default = False, help = "Use the madgraph samples" )
 parser.add_argument( "--doTMVA", dest = "doTMVA", action="store_true", default = False, help = "Use the variable filled as tmva for the fitting" )
+parser.add_argument( "--doDoubleRatio", dest = "doDoubleRatio", action="store_true", default = False, help = "Use this variable to run the double ratio inputs")
 parser.add_argument( "--doPlot", dest = "doPlot", action="store_true", default = False, help = "Generate additional histograms for postfit plots")
 parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
 parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis")
@@ -27,14 +29,20 @@ parser.add_argument("--year", type=int, dest='year', default=2016, help="year, d
 parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
 
-writeMultiJet(int(args.Binning))
-writeFakeEle(int(args.Binning))
+writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio)
+writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio)
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:
     sys = VBFAnalysis.systematics.systematics("Nominal")
     asys_systlist = []
     wsys_systlist = []
+elif args.metOptSyst:
+    sys = VBFAnalysis.systematics.systematics("METSystOpt")
+    asys = VBFAnalysis.systematics.systematics("OneSided")
+    wsys = VBFAnalysis.systematics.systematics("WeightSyst")
+    asys_systlist = asys.getsystematicsList()
+    wsys_systlist = wsys.getsystematicsList()
 else:
     sys = VBFAnalysis.systematics.systematics("All")
     asys = VBFAnalysis.systematics.systematics("OneSided")
@@ -80,6 +88,8 @@ if args.year!=2016:
     extraCommand+=' --year %s ' %(args.year)
 if args.doTMVA:
     extraCommand+=' --doTMVA '
+if args.doDoubleRatio:
+    extraCommand+=' --doDoubleRatio '
 if args.v26Ntuples:
     extraCommand+=' --v26Ntuples '
 if args.doVBFMETGam:
@@ -94,6 +104,9 @@ for syst in systlist:
         isLow = " --isLow"
     if syst in wsys_systlist:
         isLow+=' --weightSyst'
+    if syst in sys.getsystematicsOneSidedMap().keys():
+        print 'Skipping one sided systematic: ',syst
+        continue
     runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+isLow+extraCommand
     print runCommand
     writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
