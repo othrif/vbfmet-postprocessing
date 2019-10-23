@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 
-def writeMultiJet(Binning=0, year=2016):
+def writeMultiJet(Binning=0, year=2016, METCut=150):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
     #multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
@@ -32,20 +32,33 @@ def writeMultiJet(Binning=0, year=2016):
         multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
         multijets += [5.0]
     if Binning==11:
-        multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
-        multijets += [5.0]
-
+        multijets = [19.5, 32.0, 15.5, 11.0, 3.5, 9.0, 22.0, 10.0, 4.0, 2.0, 13.0] # MET>150
+        if METCut>150:
+            tmpmj = [19.5, 32.0, 15.5, 11.0, 3.5, 9.0, 22.0, 10.0, 4.0, 2.0, 13.0]; multijets=[]  # MET>150
+            if METCut>160: for i in tmpmj: multijets+=[(0.84085024)*i] # MET>160... from scaling to low mjj
+            if METCut>165: for i in tmpmj: multijets+=[(0.76158444)*i] # MET>165... from scaling to low mjj
+            if METCut>170: for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
+            if METCut>180: for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
     # MJ for other years
     if year==2017:
         if Binning==11:
-            multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
-            multijets += [5.0]
+            multijets=[]; tmpmj = [191.3, 409.8, 102.7, 23.6, 8.5, 47.3, 101.2, 25.4, 5.8, 2.1, 55.5]
+            for i in tmpmj: multijets+=[(0.046/0.035)*i] # MET>150... from scaling to low mjj
+            if METCut>160: for i in tmpmj: multijets+=[(0.84085024)*(0.046/0.035)*i] # MET>160... from scaling to low mjj                
+            if METCut>165: for i in tmpmj: multijets+=[(0.76158444)*(0.046/0.035)*i] # MET>165... from scaling to low mjj                
+            if METCut>170: for i in tmpmj: multijets+=[(0.70803802)*(0.046/0.035)*i] # MET>170... from scaling to low mjj                
+            if METCut>180: for i in tmpmj: multijets+=[(0.53423362)*(0.046/0.035)*i] # MET>180... from scaling to low mjj                
         else:
             print 'MJ is not defined for binning: ',Binning
     elif year==2018:
         if Binning==11:
-            multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
-            multijets += [5.0]
+            multijets = [191.3, 409.8, 102.7, 23.6, 8.5, 47.3, 101.2, 25.4, 5.8, 2.1, 55.5] # MET>150... from scaling to low mjj
+            if METCut>150:
+                tmpmj = [191.3, 409.8, 102.7, 23.6, 8.5, 47.3, 101.2, 25.4, 5.8, 2.1, 55.5]; multijets=[] # MET>150... from scaling to low mjj
+                if METCut>160: for i in tmpmj: multijets+=[(0.84085024)*i] # MET>160... from scaling to low mjj
+                if METCut>165: for i in tmpmj: multijets+=[(0.76158444)*i] # MET>165... from scaling to low mjj
+                if METCut>170: for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
+                if METCut>180: for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
         else:
             print 'MJ is not defined for binning: ',Binning
     a = 1
@@ -89,20 +102,20 @@ def writeFakeEle(Binning=0, year=2016):
         fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
         fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
     if Binning==11:
-        fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
-        fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
+        fakeelesp = [7.4, 7.0, 4.1, 3.4, 1.8, 7.4, 7.0, 4.1, 3.4, 1.8, 5.8]
+        fakeelesm = [7.4, 7.0, 4.1, 3.4, 1.8, 7.4, 7.0, 4.1, 3.4, 1.8, 5.8]
 
     # later years
     if year==2017:
         if Binning==11:
-            fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
-            fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
+            fakeelesp = [9.2, 8.3, 15.0, 8.9, 3.7, 9.2, 8.3, 15.0, 8.9, 3.7, 2.0]
+            fakeelesm = [9.2, 8.3, 15.0, 8.9, 3.7, 9.2, 8.3, 15.0, 8.9, 3.7, 5.3]
         else:
             print 'MJ is not defined for binning: ',Binning
     elif year==2018:
         if Binning==11:
-            fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
-            fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
+            fakeelesp = [12.5, 14.6, 15.8, 15.8, 3.8, 12.5, 14.6, 15.8, 15.8, 3.8, 5.3]
+            fakeelesm = [12.5, 14.6, 15.8, 15.8, 3.8, 12.5, 14.6, 15.8, 15.8, 3.8, 5.3]
         else:
             print 'MJ is not defined for binning: ',Binning
     a = 1
