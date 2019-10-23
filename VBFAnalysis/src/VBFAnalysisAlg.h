@@ -116,6 +116,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::string m_mcCampaign;
   bool m_theoVariation;
   bool m_oneTrigMuon;
+  bool m_doVjetRW ;
 
   Float_t crossSection;
   Double_t weight;

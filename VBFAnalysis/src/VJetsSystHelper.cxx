@@ -352,8 +352,6 @@ double VJetsSystHelper::getCorrection(int mcChannelNumber, double pTV, TString v
 
    if (process == "") return 1.;
 
-   std::cout << "Process: " << process << std::endl;
-
    TH1 *hCorr;
 
    Double_t correction = 0;
@@ -381,7 +379,7 @@ double VJetsSystHelper::getCorrection(int mcChannelNumber, double pTV, TString v
 
        if (!tmp_var.Contains("dK_PDF")) continue;
 
-       Bool_t tmp__1up = tmp_var.Contains("up");
+       Bool_t tmp_High = tmp_var.Contains("up");
        if (High != tmp_High) continue;
 
        std::map<TString, TH1*>::iterator itr = m_histoMap.find(process + "_" + tmp_var);

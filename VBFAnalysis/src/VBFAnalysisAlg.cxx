@@ -25,6 +25,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "UseExtMGVjet", m_UseExtMGVjet = false, "Use extended LO MG extension");
   declareProperty( "theoVariation", m_theoVariation = false, "Do theory systematic variations");
   declareProperty( "oneTrigMuon", m_oneTrigMuon = false, "Trigger muon SF set to 1");
+  declareProperty( "doVjetRW", m_doVjetRW = false, "Add V+jets re-weighting variables");
 }
 
 
@@ -62,7 +63,8 @@ StatusCode VBFAnalysisAlg::initialize() {
     my_signalSystHelper.initialize();
 
     // Vjets weight + systematics
-    if(m_isMC && m_currentVariation=="Nominal"){
+    if(m_isMC && m_currentVariation=="Nominal")
+      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
       std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
       my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
       my_vjSystHelper.applyEWCorrection(true);
@@ -540,15 +542,14 @@ StatusCode VBFAnalysisAlg::execute() {
 
   //Vjets weight and systematics
   vjWeight = 1.0;
-  if (m_currentSample.Contains("Zee") || m_currentSample.Contains("Zmumu") || m_currentSample.Contains("Ztautau") || m_currentSample.Contains("Znunu")  ||
-    m_currentSample.Contains("Wenu") || m_currentSample.Contains("Wmunu")   || m_currentSample.Contains("Wtaunu") ) {
+
+  if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
     // Nominal
-    vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., "Nominal");
-    std::cout << "Vjets Weights Nominal: " << vjWeight << std::endl;
+    if(m_doVjetRW)
+      vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(0));
     // Variations
     for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){ // exclude nominal
       tMapFloat[m_vjVariations.at(iVj)]=my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(iVj));
-      std::cout << "Vjets Weights " << m_vjVariations.at(iVj) << ": " << tMapFloat[m_vjVariations.at(iVj)] << std::endl;
     }
   }
 
@@ -1350,7 +1351,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       }// end qg variables
 
     // Vjets weight + systematics
-    for(unsigned iVj=0; iVj<m_vjVariations.size(); ++iVj){
+    for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){
       if(tMapFloat.find(m_vjVariations.at(iVj))==tMapFloat.end()){
         tMapFloat[m_vjVariations.at(iVj)]=1.0;
         tMapFloatW[m_vjVariations.at(iVj)]=1.0;
