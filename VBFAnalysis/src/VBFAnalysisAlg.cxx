@@ -61,19 +61,17 @@ StatusCode VBFAnalysisAlg::initialize() {
     // signal systematics
     my_signalSystHelper.initialize();
 
-    // Vjets systematics
-    //my_vjSystHelper = new VJetsSystHelper();
-    std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
-    my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
-    my_vjSystHelper.applyEWCorrection(true);
-    my_vjSystHelper.applyQCDCorrection(true);
-    my_vjSystHelper.mergePDF(true);
-    my_vjSystHelper.smoothQCDCorrection(false);
-    my_vjSystHelper.initialize();
-
-    std::vector<TString> variations = my_vjSystHelper.getAllVariationNames();
-    for (auto var:variations)
-      std::cout << "VJets Variations:" << var << std::endl;
+    // Vjets weight + systematics
+    if(m_isMC && m_currentVariation=="Nominal"){
+      std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
+      my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
+      my_vjSystHelper.applyEWCorrection(true);
+      my_vjSystHelper.applyQCDCorrection(true);
+      my_vjSystHelper.mergePDF(true);
+      my_vjSystHelper.smoothQCDCorrection(false);
+      my_vjSystHelper.initialize();
+      m_vjVariations = my_vjSystHelper.getAllVariationNames();
+    }
 
     // qg tagging
     m_qgVars.clear();
@@ -235,6 +233,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w);
   //m_tree_out->Branch("nloEWKWeight",&nloEWKWeight);
+  m_tree_out->Branch("vjWeight",&vjWeight);
   m_tree_out->Branch("puSyst2018Weight",&puSyst2018Weight);
   m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight);
   m_tree_out->Branch("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
@@ -539,10 +538,19 @@ StatusCode VBFAnalysisAlg::execute() {
   if(!m_tree) ATH_MSG_ERROR("VBFAnaysisAlg::execute: tree invalid: " <<m_tree );
   m_tree->GetEntry(nFileEvt);
 
-  //Vjets
-  std::cout << "Got here:" << runNumber << ", " << truth_V_dressed_pt << std::endl;
-  Float_t vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., "Nominal");
-  std::cout << "weight=" << vjWeight << std::endl;
+  //Vjets weight and systematics
+  vjWeight = 1.0;
+  if (m_currentSample.Contains("Zee") || m_currentSample.Contains("Zmumu") || m_currentSample.Contains("Ztautau") || m_currentSample.Contains("Znunu")  ||
+    m_currentSample.Contains("Wenu") || m_currentSample.Contains("Wmunu")   || m_currentSample.Contains("Wtaunu") ) {
+    // Nominal
+    vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., "Nominal");
+    std::cout << "Vjets Weights Nominal: " << vjWeight << std::endl;
+    // Variations
+    for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){ // exclude nominal
+      tMapFloat[m_vjVariations.at(iVj)]=my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(iVj));
+      std::cout << "Vjets Weights " << m_vjVariations.at(iVj) << ": " << tMapFloat[m_vjVariations.at(iVj)] << std::endl;
+    }
+  }
 
   // iterate event count
   ++nFileEvt;
@@ -1130,7 +1138,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
+  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight*vjWeight;
 
   if(m_theoVariation){
     std::map<TString,bool> regDecision;
@@ -1178,6 +1186,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_puSyst2018Weight = puSyst2018Weight;
   float tmp_qgTagWeight = 1.0; // assuming the default weight is 1.0 for qg tagging
   float tmp_signalTruthSyst=1.0; // signal truth systematics
+  float tmp_vjWeight = vjWeight;
 
   for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     //std::cout << "syst: " << it->first <<std::endl;
@@ -1195,6 +1204,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_puSyst2018Weight = puSyst2018Weight;
     tmp_qgTagWeight = 1.0; // default value is 1
     tmp_signalTruthSyst=1.0; // default value is 1
+    tmp_vjWeight = vjWeight;
     if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_nolep_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_nolep_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
@@ -1209,6 +1219,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("VBF_qqH_"))   tmp_signalTruthSyst=tMapFloat[it->first]; // scale + S-T VBF
     else if(it->first.Contains("ATLAS_PDF4LHC_NLO_30_"))   tmp_signalTruthSyst=tMapFloat[it->first]; //PDF
     else if(it->first.Contains("JET_QG_"))        tmp_qgTagWeight=tMapFloat[it->first];
+    else if(it->first.Contains("vjets_"))        tmp_vjWeight=tMapFloat[it->first];
     else if(it->first.Contains("eleANTISF")){
       tmp_eleANTISF=tMapFloat[it->first];
       tmp_eleANTISF=std::min<float>(tmp_eleANTISF,1.5);
@@ -1219,14 +1230,14 @@ StatusCode VBFAnalysisAlg::execute() {
     }
 
     if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
-    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth syst: " << tmp_signalTruthSyst);
+    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight);
 
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst*tmp_vjWeight;
     //std::cout << "sys: " << it->first << " pu: " << tmp_puSyst2018Weight << " " << tMapFloatW[it->first] << std::endl;
   }//end systematic weight loop
 
-  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " Vjets syst: " << tmp_vjWeight);
 
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR)) return StatusCode::SUCCESS;
@@ -1304,9 +1315,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);// filtered Sherpa samples use nnPDF
 
       if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
-	tMapFloat["nloEWKWeight__1up"]=1.0;
-	tMapFloatW["nloEWKWeight__1up"]=1.0;
-	m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
+        tMapFloat["nloEWKWeight__1up"]=1.0;
+        tMapFloatW["nloEWKWeight__1up"]=1.0;
+        m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
       }
       if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
 	tMapFloat["nloEWKWeight__1down"]=1.0;
@@ -1323,6 +1334,12 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	tMapFloatW["puSyst2018Weight__1down"]=1.0;
 	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
       }
+      if(tMapFloat.find("puSyst2018Weight__1down")==tMapFloat.end()){
+  tMapFloat ["puSyst2018Weight__1down"]=1.0;
+  tMapFloatW["puSyst2018Weight__1down"]=1.0;
+  m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
+      }
+
 
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){
@@ -1331,6 +1348,16 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	  m_tree_out->Branch("w"+m_qgVars.at(iQG),&(tMapFloatW[m_qgVars.at(iQG)]));
 	}
       }// end qg variables
+
+    // Vjets weight + systematics
+    for(unsigned iVj=0; iVj<m_vjVariations.size(); ++iVj){
+      if(tMapFloat.find(m_vjVariations.at(iVj))==tMapFloat.end()){
+        tMapFloat[m_vjVariations.at(iVj)]=1.0;
+        tMapFloatW[m_vjVariations.at(iVj)]=1.0;
+        m_tree_out->Branch("w"+m_vjVariations.at(iVj),&(tMapFloatW[m_vjVariations.at(iVj)]));
+      }
+      }// end Vjets variations
+
     }
   }
 

@@ -75,6 +75,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   SignalSystHelper     my_signalSystHelper;
   VJetsSystHelper      my_vjSystHelper;
 
+
   SUSY::CrossSectionDB *my_XsecDB;
   std::map<TString,asg::AnaToolHandle<CP::IJetQGTagger> >      m_jetQGTool;                     //!
   std::map<TString,CP::SystematicSet>        m_systSet;                     //!
@@ -91,6 +92,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::map<TString, Float_t> tMapFloat;
   std::map<TString, Float_t> tMapFloatW;
   vector<TString> m_qgVars;
+  std::vector<TString> m_vjVariations;
 
   // jet container
   xAOD::JetContainer* m_newJets;
@@ -118,6 +120,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t crossSection;
   Double_t weight;
   Float_t w;
+  Double_t vjWeight;
   Float_t met_significance;
   Int_t trigger_met;
   Int_t trigger_met_encoded;

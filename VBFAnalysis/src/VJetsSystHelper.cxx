@@ -82,23 +82,23 @@ int VJetsSystHelper::initialize()
 {
 
    std::vector<TString> variations = { "Nominal",
-                                       "vjets_d1kappa_EW_High", "vjets_d1kappa_EW_Low",
-                                       "vjets_d2kappa_EW_High", "vjets_d2kappa_EW_Low",
-                                       "vjets_d3kappa_EW_High", "vjets_d3kappa_EW_Low",
-                                       "vjets_d1K_NNLO_High", "vjets_d1K_NNLO_Low",
-                                       "vjets_d2K_NNLO_High", "vjets_d2K_NNLO_Low",
-                                       "vjets_d3K_NNLO_High", "vjets_d3K_NNLO_Low",
-                                       "vjets_dK_NNLO_mix_High", "vjets_dK_NNLO_mix_Low",
+                                       "vjets_d1kappa_EW__1up", "vjets_d1kappa_EW__1down",
+                                       "vjets_d2kappa_EW__1up", "vjets_d2kappa_EW__1down",
+                                       "vjets_d3kappa_EW__1up", "vjets_d3kappa_EW__1down",
+                                       "vjets_d1K_NNLO__1up", "vjets_d1K_NNLO__1down",
+                                       "vjets_d2K_NNLO__1up", "vjets_d2K_NNLO__1down",
+                                       "vjets_d3K_NNLO__1up", "vjets_d3K_NNLO__1down",
+                                       "vjets_dK_NNLO_mix__1up", "vjets_dK_NNLO_mix__1down",
                                      };
    if (m_smoothQCDCorrection) {
-     variations.push_back("vjets_QCDSmoothing_High");
-     variations.push_back("vjets_QCDSmoothing_Low");
+     variations.push_back("vjets_QCDSmoothing__1up");
+     variations.push_back("vjets_QCDSmoothing__1down");
    }
 
    m_nPDF = 107;
    for (Int_t p = 0; p < m_nPDF; p++) {
-     variations.push_back("vjets_" + TString::Format("dK_PDF_%d_High", p + 1));
-     variations.push_back("vjets_" + TString::Format("dK_PDF_%d_Low", p + 1));
+     variations.push_back("vjets_" + TString::Format("dK_PDF_%d__1up", p + 1));
+     variations.push_back("vjets_" + TString::Format("dK_PDF_%d__1down", p + 1));
    }
    m_variations = variations;
 
@@ -213,31 +213,31 @@ int VJetsSystHelper::initialize()
          TString variation = m_variations[iVar];
          TH1 *hMC_used = hMC;
 
-         if (variation == "vjets_QCDSmoothing_High") hMC_used = hMC_SmoothUp;
-         if (variation == "vjets_QCDSmoothing_Low") hMC_used = hMC_SmoothDn;
+         if (variation == "vjets_QCDSmoothing__1up") hMC_used = hMC_SmoothUp;
+         if (variation == "vjets_QCDSmoothing__1down") hMC_used = hMC_SmoothDn;
 
          const Int_t n_var = m_nPDF + 8;
          double e[n_var];
 	 for (Int_t p = 0; p < 8+m_nPDF; p++)  {
 	   e[p] = 0;
 	 }
-         if (variation == "vjets_d1kappa_EW_High") e[0] = 1;
-         if (variation == "vjets_d1kappa_EW_Low") e[0] = -1;
-         if (variation == "vjets_d2kappa_EW_High") e[1] = 1;
-         if (variation == "vjets_d2kappa_EW_Low") e[1] = -1;
-         if (variation == "vjets_d3kappa_EW_High") e[2] = 1;
-         if (variation == "vjets_d3kappa_EW_Low") e[2] = -1;
-         if (variation == "vjets_d1K_NNLO_High") e[3] = 1;
-         if (variation == "vjets_d1K_NNLO_Low") e[3] = -1;
-         if (variation == "vjets_d2K_NNLO_High") e[4] = 1;
-         if (variation == "vjets_d2K_NNLO_Low") e[4] = -1;
-         if (variation == "vjets_d3K_NNLO_High") e[5] = 1;
-         if (variation == "vjets_d3K_NNLO_Low") e[5] = -1;
-         if (variation == "vjets_dK_NNLO_mix_High") e[6] = 1;
-         if (variation == "vjets_dK_NNLO_mix_Low") e[6] = -1;
+         if (variation == "vjets_d1kappa_EW__1up") e[0] = 1;
+         if (variation == "vjets_d1kappa_EW__1down") e[0] = -1;
+         if (variation == "vjets_d2kappa_EW__1up") e[1] = 1;
+         if (variation == "vjets_d2kappa_EW__1down") e[1] = -1;
+         if (variation == "vjets_d3kappa_EW__1up") e[2] = 1;
+         if (variation == "vjets_d3kappa_EW__1down") e[2] = -1;
+         if (variation == "vjets_d1K_NNLO__1up") e[3] = 1;
+         if (variation == "vjets_d1K_NNLO__1down") e[3] = -1;
+         if (variation == "vjets_d2K_NNLO__1up") e[4] = 1;
+         if (variation == "vjets_d2K_NNLO__1down") e[4] = -1;
+         if (variation == "vjets_d3K_NNLO__1up") e[5] = 1;
+         if (variation == "vjets_d3K_NNLO__1down") e[5] = -1;
+         if (variation == "vjets_dK_NNLO_mix__1up") e[6] = 1;
+         if (variation == "vjets_dK_NNLO_mix__1down") e[6] = -1;
          for (Int_t p = 0; p < m_nPDF; p++) {
-            if (variation == "vjets_" + TString::Format("dK_PDF_%d_High", p + 1)) e[p + 8] = 1;
-            if (variation == "vjets_" + TString::Format("dK_PDF_%d_Low", p + 1)) e[p + 8] = -1;
+            if (variation == "vjets_" + TString::Format("dK_PDF_%d__1up", p + 1)) e[p + 8] = 1;
+            if (variation == "vjets_" + TString::Format("dK_PDF_%d__1down", p + 1)) e[p + 8] = -1;
          }
 
          TH1 *hVar = (TH1*)hMC_used->Clone(process + "_" + variation);
@@ -315,8 +315,8 @@ const std::vector<TString> &VJetsSystHelper::getAllVariationNames()
     all_variation_names.push_back(variation);
   }
   if (m_mergePDF) {
-    all_variation_names.push_back("vjets_dK_PDF_High");
-    all_variation_names.push_back("vjets_dK_PDF_Low");
+    all_variation_names.push_back("vjets_dK_PDF__1up");
+    all_variation_names.push_back("vjets_dK_PDF__1down");
   }
 
   if (!m_initialized) {
@@ -367,7 +367,7 @@ double VJetsSystHelper::getCorrection(int mcChannelNumber, double pTV, TString v
    // sum in quadrature PDF uncertainties
    if (variation.Contains("dK_PDF") &&  m_mergePDF) {
 
-     Bool_t High = variation.Contains("High");
+     Bool_t High = variation.Contains("up");
 
      std::map<TString, TH1*>::iterator itr_nom = m_histoMap.find(process + "_Nominal");
      TH1* hNom = itr_nom->second;
@@ -381,7 +381,7 @@ double VJetsSystHelper::getCorrection(int mcChannelNumber, double pTV, TString v
 
        if (!tmp_var.Contains("dK_PDF")) continue;
 
-       Bool_t tmp_High = tmp_var.Contains("High");
+       Bool_t tmp__1up = tmp_var.Contains("up");
        if (High != tmp_High) continue;
 
        std::map<TString, TH1*>::iterator itr = m_histoMap.find(process + "_" + tmp_var);
