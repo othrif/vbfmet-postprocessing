@@ -35,19 +35,27 @@ def writeMultiJet(Binning=0, year=2016, METCut=150):
         multijets = [19.5, 32.0, 15.5, 11.0, 3.5, 9.0, 22.0, 10.0, 4.0, 2.0, 13.0] # MET>150
         if METCut>150:
             tmpmj = [19.5, 32.0, 15.5, 11.0, 3.5, 9.0, 22.0, 10.0, 4.0, 2.0, 13.0]; multijets=[]  # MET>150
-            if METCut>160: for i in tmpmj: multijets+=[(0.84085024)*i] # MET>160... from scaling to low mjj
-            if METCut>165: for i in tmpmj: multijets+=[(0.76158444)*i] # MET>165... from scaling to low mjj
-            if METCut>170: for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
-            if METCut>180: for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
+            if METCut==160: 
+                for i in tmpmj: multijets+=[(0.84085024)*i] # MET>160... from scaling to low mjj
+            if METCut==165: 
+                for i in tmpmj: multijets+=[(0.76158444)*i] # MET>165... from scaling to low mjj
+            if METCut==170: 
+                for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
+            if METCut==180: 
+                for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
     # MJ for other years
     if year==2017:
         if Binning==11:
             multijets=[]; tmpmj = [191.3, 409.8, 102.7, 23.6, 8.5, 47.3, 101.2, 25.4, 5.8, 2.1, 55.5]
             for i in tmpmj: multijets+=[(0.046/0.035)*i] # MET>150... from scaling to low mjj
-            if METCut>160: for i in tmpmj: multijets+=[(0.84085024)*(0.046/0.035)*i] # MET>160... from scaling to low mjj                
-            if METCut>165: for i in tmpmj: multijets+=[(0.76158444)*(0.046/0.035)*i] # MET>165... from scaling to low mjj                
-            if METCut>170: for i in tmpmj: multijets+=[(0.70803802)*(0.046/0.035)*i] # MET>170... from scaling to low mjj                
-            if METCut>180: for i in tmpmj: multijets+=[(0.53423362)*(0.046/0.035)*i] # MET>180... from scaling to low mjj                
+            if METCut==160: 
+                for i in tmpmj: multijets+=[(0.84085024)*(0.046/0.035)*i] # MET>160... from scaling to low mjj                
+            if METCut==165: 
+                for i in tmpmj: multijets+=[(0.76158444)*(0.046/0.035)*i] # MET>165... from scaling to low mjj                
+            if METCut==170: 
+                for i in tmpmj: multijets+=[(0.70803802)*(0.046/0.035)*i] # MET>170... from scaling to low mjj                
+            if METCut==180: 
+                for i in tmpmj: multijets+=[(0.53423362)*(0.046/0.035)*i] # MET>180... from scaling to low mjj                
         else:
             print 'MJ is not defined for binning: ',Binning
     elif year==2018:
@@ -55,10 +63,14 @@ def writeMultiJet(Binning=0, year=2016, METCut=150):
             multijets = [191.3, 409.8, 102.7, 23.6, 8.5, 47.3, 101.2, 25.4, 5.8, 2.1, 55.5] # MET>150... from scaling to low mjj
             if METCut>150:
                 tmpmj = [191.3, 409.8, 102.7, 23.6, 8.5, 47.3, 101.2, 25.4, 5.8, 2.1, 55.5]; multijets=[] # MET>150... from scaling to low mjj
-                if METCut>160: for i in tmpmj: multijets+=[(0.84085024)*i] # MET>160... from scaling to low mjj
-                if METCut>165: for i in tmpmj: multijets+=[(0.76158444)*i] # MET>165... from scaling to low mjj
-                if METCut>170: for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
-                if METCut>180: for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
+                if METCut==160: 
+                    for i in tmpmj: multijets+=[(0.84085024)*i] # MET>160... from scaling to low mjj
+                if METCut==165: 
+                    for i in tmpmj: multijets+=[(0.76158444)*i] # MET>165... from scaling to low mjj
+                if METCut==170: 
+                    for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
+                if METCut==180: 
+                    for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
         else:
             print 'MJ is not defined for binning: ',Binning
     a = 1
@@ -136,5 +148,5 @@ def writeFakeEle(Binning=0, year=2016):
         a += 1
     f_fakeele.Write()
     f_fakeele.Close()
-#writeMultiJet(7)
-#writeFakeEle(7)
+#writeMultiJet(11, 2018, 180)
+#writeFakeEle(11,  2018)
