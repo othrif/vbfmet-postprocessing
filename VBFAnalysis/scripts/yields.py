@@ -101,7 +101,8 @@ samplesPrint =['Samples','VBFH125',
 #f=ROOT.TFile.Open('SumHF_v31_CBv2.root')
 #f=ROOT.TFile.Open('SumHF_v31_CB_mu_noOR.root')
 #f=ROOT.TFile.Open('SumHF_Sep20_v32PFE.root')
-f=ROOT.TFile.Open('SumHF_Oct1_oneTrig_All.root')
+#f=ROOT.TFile.Open('SumHF_Oct1_oneTrig_All.root')
+f=ROOT.TFile.Open('/share/t3data2/schae/METScan/MET150/v34E/SumHF_2018_MET150.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400.root')#
@@ -270,7 +271,9 @@ for sample in samples:
         vname=i.GetName()
         #print vname
         #if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
-        if vname.count('VBFjetSel') and vname.count('_oneEleNegLowSigCR3_') and vname.count(sample):
+        #if vname.count('VBFjetSel') and vname.count('_oneEleNegLowSigCR3_') and vname.count(sample):
+        if vname.count('VBFjetSel') and vname.count('_SR5') and vname.count(sample):
+        #if vname.count('VBFjetSel') and vname.count('_twoMuCR4') and vname.count(sample):
             h=f.Get(vname)
             intBkg=h.IntegralAndError(0,1001,mye)
             #print '%0.2f ' %(intBkg)+vname 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 
-def writeMultiJet(Binning=0):
+def writeMultiJet(Binning=0, year=2016):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
     #multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
@@ -34,6 +34,20 @@ def writeMultiJet(Binning=0):
     if Binning==11:
         multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
         multijets += [5.0]
+
+    # MJ for other years
+    if year==2017:
+        if Binning==11:
+            multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
+            multijets += [5.0]
+        else:
+            print 'MJ is not defined for binning: ',Binning
+    elif year==2018:
+        if Binning==11:
+            multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
+            multijets += [5.0]
+        else:
+            print 'MJ is not defined for binning: ',Binning
     a = 1
 
     f_multijet = ROOT.TFile("multijet.root", "recreate")
@@ -45,7 +59,7 @@ def writeMultiJet(Binning=0):
     f_multijet.Write()
     f_multijet.Close()
  
-def writeFakeEle(Binning=0):
+def writeFakeEle(Binning=0, year=2016):
 
     f_fakeele = ROOT.TFile("fakeele.root", "recreate")
     fakeelesp = [10.7, 11.6, 5.0]
@@ -78,6 +92,19 @@ def writeFakeEle(Binning=0):
         fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
         fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
 
+    # later years
+    if year==2017:
+        if Binning==11:
+            fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
+            fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
+        else:
+            print 'MJ is not defined for binning: ',Binning
+    elif year==2018:
+        if Binning==11:
+            fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
+            fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
+        else:
+            print 'MJ is not defined for binning: ',Binning
     a = 1
     for fakeelep in fakeelesp:
         fakeelem = fakeelesm[a-1]

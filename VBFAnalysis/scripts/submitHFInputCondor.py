@@ -13,6 +13,7 @@ from VBFAnalysis.writeMultiJEleFake import *
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
+parser.add_argument( "--metOptSyst", dest = "metOptSyst", action="store_true", default = False, help = "Do only the met optimization systematics" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
@@ -27,14 +28,20 @@ parser.add_argument("--year", type=int, dest='year', default=2016, help="year, d
 parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
 
-writeMultiJet(int(args.Binning))
-writeFakeEle(int(args.Binning))
+writeMultiJet(int(args.Binning), args.year)
+writeFakeEle(int(args.Binning), args.year)
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:
     sys = VBFAnalysis.systematics.systematics("Nominal")
     asys_systlist = []
     wsys_systlist = []
+elif args.metOptSyst:
+    sys = VBFAnalysis.systematics.systematics("METSystOpt")
+    asys = VBFAnalysis.systematics.systematics("OneSided")
+    wsys = VBFAnalysis.systematics.systematics("WeightSyst")
+    asys_systlist = asys.getsystematicsList()
+    wsys_systlist = wsys.getsystematicsList()
 else:
     sys = VBFAnalysis.systematics.systematics("All")
     asys = VBFAnalysis.systematics.systematics("OneSided")
@@ -94,6 +101,9 @@ for syst in systlist:
         isLow = " --isLow"
     if syst in wsys_systlist:
         isLow+=' --weightSyst'
+    if syst in sys.getsystematicsOneSidedMap().keys():
+        print 'Skipping one sided systematic: ',syst
+        continue
     runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+isLow+extraCommand
     print runCommand
     writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub")
