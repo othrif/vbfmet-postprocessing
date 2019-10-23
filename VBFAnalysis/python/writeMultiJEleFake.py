@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 
-def writeMultiJet(Binning=0, year=2016, METCut=150):
+def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
     #multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
@@ -73,18 +73,25 @@ def writeMultiJet(Binning=0, year=2016, METCut=150):
                     for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
         else:
             print 'MJ is not defined for binning: ',Binning
+
+    if doDoubleRatio:
+        multijets+=[300.0]
     a = 1
 
     f_multijet = ROOT.TFile("multijet.root", "recreate")
     for multijet in multijets:
-        hist = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        hist=None
+        if doDoubleRatio and a==(len(multijets)-1):
+            hist = ROOT.TH1F("hmultijet_antiVBFSel_1Nom_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1Nom_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+        else:
+            hist = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         hist.SetBinContent(1,multijet)
         hist.Write()
         a += 1
     f_multijet.Write()
     f_multijet.Close()
  
-def writeFakeEle(Binning=0, year=2016):
+def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
 
     f_fakeele = ROOT.TFile("fakeele.root", "recreate")
     fakeelesp = [10.7, 11.6, 5.0]
@@ -130,17 +137,32 @@ def writeFakeEle(Binning=0, year=2016):
             fakeelesm = [12.5, 14.6, 15.8, 15.8, 3.8, 12.5, 14.6, 15.8, 15.8, 3.8, 5.3]
         else:
             print 'MJ is not defined for binning: ',Binning
+    if doDoubleRatio:
+        fakeelesp+=[12.5]
+        fakeelesm+=[12.5]
     a = 1
     for fakeelep in fakeelesp:
         fakeelem = fakeelesm[a-1]
-        histpLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histmLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histpLowSig=None
+        histmLowSig=None
+        if doDoubleRatio and a==(len(fakeelesp)-1):
+            histpLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
+            histmLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
+        else:
+            histpLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histmLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histpLowSig.SetBinContent(1,fakeelep)
         histmLowSig.SetBinContent(1,fakeelem)
         histpLowSig.Write()
         histmLowSig.Write()
-        histp = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histm = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histm=None
+        histp=None
+        if doDoubleRatio and a==(len(fakeelesp)-1):
+            histp = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts;;", 1, 0.5, 1.5)
+            histm = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts;;", 1, 0.5, 1.5)
+        else:
+            histp = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histm = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) 
         histp.SetBinContent(1,1)
         histm.SetBinContent(1,1)
         histp.Write()
