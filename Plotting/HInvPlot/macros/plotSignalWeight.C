@@ -6,54 +6,76 @@
 #include <string>
 
   //TFile *_file0 = TFile::Open("/tmp/miniT.root");
-  TFile *_file0 = TFile::Open("/tmp/miniG.root");
+  //TFile *_file0 = TFile::Open("miniAllggH.root");
+  TFile *_file0 = TFile::Open("miniAllVBF.root");
   //TTree *VBFH125Nominal = static_cast<TTree *>(_file0->Get("VBFH125Nominal"));
   TTree *VBFH125Nominal = static_cast<TTree *>(_file0->Get("MiniNtuple"));  
-  std::vector<TH1F *> myplots,myplotsdphi;
+  std::vector<TH1F *> myplots,myplotsdphi,myplotsweight;
   // TH1F *hmjj145 = new TH1F("hmjj145","hmjj145",50, 0.0,5000.0);
   float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 }; 
   //hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  8,  binsjjmass); 
   //hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  8,  binsjjmass); 
   unsigned offset=0; //0,8,16
   unsigned start = 145;
-  bool doggF=true;
+  unsigned maxBin=24; // 24 max
+  bool doggF=false;
+  // nj==2
+  std::string totalCutDef="(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 &&  n_jet_truth==2  && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
+  // nj==3,4
+  //exp(-4.0/std::pow(truthF_jj_deta,2) * std::pow(jet_truthjet_eta[2] - (jet_truthjet_eta[0]+jet_truthjet_eta[1])/2.0,2))<0.6
+  //std::string totalCutDef="(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 && (n_jet_truth==3 || n_jet_truth==3) && (exp(-4.0/std::pow(truthF_jj_deta,2) * std::pow(jet_truthjet_eta[2] - (jet_truthjet_eta[0]+jet_truthjet_eta[1])/2.0,2))<0.6)  && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
   if(doggF){
     start=180;
   }
   string hist_name="";
-  string var_name="";  
-  string cut_name="";  
+  string var_name="";
+  string cut_name="";
   hist_name="hmjjNom";
   TH1F *hnom = new TH1F(hist_name.c_str(),hist_name.c_str(),8,  binsjjmass);
   //TH1F *hnom = new TH1F(hist_name.c_str(),hist_name.c_str(),50, 0.0,5000.0);
   myplots.push_back(hnom);
   var_name="truthF_jj_mass/1.0e3>>hmjjNom";// VBF109, ggf 111
-  if(doggF) cut_name="mcEventWeights[111]*(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 &&  n_jet_truth==2  && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
-  else cut_name="mcEventWeights[109]*(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 &&  n_jet_truth==2  && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
+  if(doggF) cut_name="mcEventWeights[111]*"+totalCutDef;
+  else cut_name="mcEventWeights[109]*"+totalCutDef;
   VBFH125Nominal->Draw(var_name.c_str(),cut_name.c_str());
 
   TH1F *hdphijjNom = new TH1F("hdphijjNom","hdphijjNom",8, 0.0,2.0);
   var_name="truthF_jj_dphi>>hdphijjNom";// VBF109, ggf 111
-  if(doggF) cut_name="mcEventWeights[111]*(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 &&  n_jet_truth==2  && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
-  else cut_name="mcEventWeights[109]*(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 &&  n_jet_truth==2  && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
+  if(doggF) cut_name="mcEventWeights[111]*"+totalCutDef;
+  else cut_name="mcEventWeights[109]*"+totalCutDef;
   VBFH125Nominal->Draw(var_name.c_str(),cut_name.c_str());
   myplotsdphi.push_back(hdphijjNom);
 
+  TH1F *hWNom = new TH1F("hWNom","hWNom",200, -5.0,5.0);
+  var_name="((mcEventWeights[111]-mcEventWeights[109])/mcEventWeights[111])>>hWNom";// VBF109, ggf 111
+  if(doggF) cut_name="mcEventWeights[111]*"+totalCutDef;
+  else cut_name="mcEventWeights[109]*"+totalCutDef;
+  VBFH125Nominal->Draw(var_name.c_str(),cut_name.c_str());
+  myplotsweight.push_back(hWNom);
+
   //for(unsigned i=start; i<169; ++i){
   //for(unsigned i=(start+offset); i<(154+offset); ++i){
-  for(unsigned i=(start+offset); i<(start+8+offset); ++i){
+  for(unsigned i=(start+offset); i<(start+maxBin+offset); ++i){
     hist_name="hmjj"+std::to_string(i);
     TH1F *hh = new TH1F(hist_name.c_str(),hist_name.c_str(), 8,  binsjjmass);
     myplots.push_back(hh);
     var_name="truthF_jj_mass/1.0e3>>hmjj"+std::to_string(i);
-    cut_name="mcEventWeights["+std::to_string(i)+"]*(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 && n_jet_truth==2 && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
+    cut_name="mcEventWeights["+std::to_string(i)+"]*"+totalCutDef;
     VBFH125Nominal->Draw(var_name.c_str(),cut_name.c_str()) ;
 
     hist_name="hdphi"+std::to_string(i);
     TH1F *hhd = new TH1F(hist_name.c_str(),hist_name.c_str(),8, 0.0,2.0);
     myplotsdphi.push_back(hhd);
     var_name="truthF_jj_dphi>>hdphi"+std::to_string(i);
-    cut_name="mcEventWeights["+std::to_string(i)+"]*(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 && n_jet_truth==2 && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
+    cut_name="mcEventWeights["+std::to_string(i)+"]*"+totalCutDef;
+    VBFH125Nominal->Draw(var_name.c_str(),cut_name.c_str());
+
+    hist_name="hW"+std::to_string(i);
+    TH1F *hhw = new TH1F(hist_name.c_str(),hist_name.c_str(),200, -5.0,5.0);
+    myplotsweight.push_back(hhw);
+    if(doggF) var_name="((mcEventWeights[111]-mcEventWeights["+std::to_string(i)+"])/mcEventWeights[111])>>hW"+std::to_string(i);
+    else var_name="((mcEventWeights[109]-mcEventWeights["+std::to_string(i)+"])/mcEventWeights[109])>>hW"+std::to_string(i);
+    cut_name="mcEventWeights["+std::to_string(i)+"]*"+totalCutDef;
     VBFH125Nominal->Draw(var_name.c_str(),cut_name.c_str());
   }
 
@@ -75,13 +97,15 @@
     ++color;
     if(i==0){ myplots.at(0)->Draw(); leg->AddEntry(myplots.at(0),lab[0].c_str()); }
     else { myplots.at(i)->Draw("same"); leg->AddEntry(myplots.at(i),lab[i+offset].c_str()); }
-    
+    std::cout << "Var " << i << " " << lab[i+offset] << " with Integral: " << myplots.at(i)->Integral(0,1000) << " ratio: " << (myplots.at(i)->Integral(0,1000)/myplots.at(0)->Integral()) << std::endl;     
   }
   leg->Draw();
   can->Update();
   //can->WaitPrimitive();
-  can->SaveAs("plt3.root");
-  can->SaveAs("plt3.pdf");
+  std::string n="plt"+std::to_string(offset)+".root";
+  can->SaveAs(n.c_str());
+  n="plt"+std::to_string(offset)+".pdf";
+  can->SaveAs(n.c_str());
 
   for(unsigned i=1; i<myplots.size(); ++i){  
 
@@ -90,12 +114,15 @@
     r->Divide(myplots.at(0));
     if(i==1) r->Draw();
     else r->Draw("same");
+
   }
   leg->Draw();
   can->Update();
   //can->WaitPrimitive();
-  can->SaveAs("pltratio3.root");
-  can->SaveAs("pltratio3.pdf");
+  n="pltratio"+std::to_string(offset)+".root";
+  can->SaveAs(n.c_str());
+  n="pltratio"+std::to_string(offset)+".pdf";
+  can->SaveAs(n.c_str());
   
   color=1;
   for(unsigned i=0; i<myplotsdphi.size(); ++i){
@@ -110,8 +137,10 @@
   leg->Draw();
   can->Update();
   //can->WaitPrimitive();
-  can->SaveAs("pltdphi3.root");
-  can->SaveAs("pltdphi3.pdf");
+  n="pltdphi"+std::to_string(offset)+".root";
+  can->SaveAs(n.c_str());
+  n="pltdphi"+std::to_string(offset)+".pdf";
+  can->SaveAs(n.c_str());
 
   for(unsigned i=1; i<myplotsdphi.size(); ++i){  
     TH1F *r = static_cast<TH1F *>(myplotsdphi.at(i)->Clone());
@@ -123,9 +152,30 @@
   leg->Draw();
   can->Update();
   //can->WaitPrimitive();
-  can->SaveAs("pltdphiratio3.root");
-  can->SaveAs("pltdphiratio3.pdf");
+  n="pltdphiratio"+std::to_string(offset)+".root";
+  can->SaveAs(n.c_str());
+  n="pltdphiratio"+std::to_string(offset)+".pdf";
+  can->SaveAs(n.c_str());
 
+  color=2;
+  for(unsigned i=1; i<myplotsweight.size(); ++i){
+    myplotsweight.at(i)->GetXaxis()->SetTitle("[NomW - varW]/NomW");
+    myplotsweight.at(i)->GetYaxis()->SetTitle("Events [arb units]");
+    myplotsweight.at(i)->SetLineColor(color);
+    ++color;
+    if(i==1) myplotsweight.at(1)->Draw();
+    else myplotsweight.at(i)->Draw("same");
+    //leg->AddEntry(myplotsdphi.at(i),lab[i].c_str());
+    std::cout << "Delta Var " << i << " " << lab[i+offset] << " with mean: " << myplotsweight.at(i)->GetMean() << " RMS: " << myplotsweight.at(i)->GetRMS() << " meanerror: "
+	      << myplotsweight.at(i)->GetMeanError() << std::endl;
+  }
+  leg->Draw();
+  can->Update();
+  //can->WaitPrimitive();
+  n="weight"+std::to_string(offset)+".root";
+  can->SaveAs(n.c_str());
+  n="weight"+std::to_string(offset)+".pdf";
+  can->SaveAs(n.c_str());
 
 }/// move to this one: INFO CutBookkeeper CutBookkeepers StreamAOD LHE3Weight_PDFset=90400 Cyc=5 N=500 weight^2=7685.83
 // from INFO CutBookkeeper CutBookkeepers StreamAOD LHE3Weight_nominal Cyc=5 N=500 weight^2=7063.31
@@ -146,3 +196,14 @@
 //    "isr:muRfac=1.0_fsr:muRfac=1.5", "isr:muRfac=1.0_fsr:muRfac=0.75"162,165
 //    "isr:muRfac=1.0_fsr:muRfac=1.25", "isr:muRfac=1.0_fsr:muRfac=0.875" 163,166
 //up to 166, 168 for hardRa
+
+//#ggH
+//xrdcp root://fax.mwt2.org:1094//pnfs/uchicago.edu/atlaslocalgroupdisk/rucio/user/schae/fe/d8/user.schae.19126275._000001.MiniNtuple.root /tmp/miniAggH.root
+//xrdcp root://fax.mwt2.org:1094//pnfs/uchicago.edu/atlaslocalgroupdisk/rucio/user/schae/ec/40/user.schae.19192039._000001.MiniNtuple.root /tmp/miniDggH.root
+//xrdcp root://fax.mwt2.org:1094//pnfs/uchicago.edu/atlaslocalgroupdisk/rucio/user/schae/ae/98/user.schae.19276124._000002.MiniNtuple.root /tmp/miniEggH.root
+// hadd miniAllggH.root /tmp/mini*ggH.root &>m1 &
+//#VBF
+//xrdcp root://fax.mwt2.org:1094//pnfs/uchicago.edu/atlaslocalgroupdisk/rucio/user/schae/b8/e8/user.schae.19224877._000001.MiniNtuple.root /tmp/miniAVBF.root
+//xrdcp root://fax.mwt2.org:1094//pnfs/uchicago.edu/atlaslocalgroupdisk/rucio/user/schae/0f/0d/user.schae.19192040._000001.MiniNtuple.root /tmp/miniDVBF.root
+//xrdcp root://fax.mwt2.org:1094//pnfs/uchicago.edu/atlaslocalgroupdisk/rucio/user/schae/87/93/user.schae.19126269._000001.MiniNtuple.root /tmp/miniEVBF.root
+//hadd miniAllVBF.root /tmp/mini*VBF.root &>test.log &
