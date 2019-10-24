@@ -79,11 +79,11 @@ class sample(object):
             elif (self.runNumber >= 410082 and self.runNumber <= 410084) or self.runNumber==410087:
                 self.sampleType = "ttg"
             elif (self.runNumber >= 364541 and self.runNumber <= 364547):
-                self.sampleType = "SinglePhoton" 
+                self.sampleType = "SinglePhoton"
             elif (self.runNumber >= 361040 and self.runNumber <= 361062):
-                self.sampleType = "SinglePhotonBCL" 
+                self.sampleType = "SinglePhotonBCL"
             elif (self.runNumber >= 305435 and self.runNumber <= 305444):
-                self.sampleType = "VqqGam" 
+                self.sampleType = "VqqGam"
             elif (self.runNumber >= 364156 and self.runNumber <= 364197):
                 self.sampleType = "W_strong"
             elif (self.runNumber >= 363600 and self.runNumber <= 363671) or (self.runNumber >= 311445 and self.runNumber <= 311453):
@@ -106,7 +106,7 @@ class sample(object):
                 self.sampleType = "ttbar"
             elif self.runNumber==346600:
                 self.sampleType = "VBFH125"
-            elif ((self.runNumber == 308276) or (self.runNumber == 308567)): 
+            elif ((self.runNumber == 308276) or (self.runNumber == 308567)):
                 self.sampleType = "VBFH125Old"
             elif ((self.runNumber >= 346632) and (self.runNumber <= 346634)):
                 self.sampleType = "TTH125"
@@ -139,7 +139,7 @@ class sample(object):
             elif (self.runNumber >=309665  and self.runNumber <= 309673):
                 if Ext:
                     self.sampleType = "Z_strong" #extension
-                else: 
+                else:
                     self.sampleType = "Z_strongExt"
             elif (self.runNumber >=309674  and self.runNumber <= 309679):
                 if Ext:
@@ -175,16 +175,16 @@ class sample(object):
 
 
   # we assume the samplename has the format user.**.v**.runNumber.
-  #                                                                                                                                                                                                               
-  # Signal:  VBF: 308276,308567, ggF: 308284, VH: 308071,308072                                                                                                                                                   
-  # Diboson: W: 363359-363360, 363489, Z: 363355-363358                                                                                                                                                           
-  # Wenu:    strong 364170-364183, EWK 308096                                                                                                                                                                     
-  # Wmunu:   strong 364156-364169, EWK 308097                                                                                                                                                                     
-  # Wtaunu:  strong 364184-364197, EWK 308098                                                                                                                                                                     
-  # Zee:     strong 364114-364127, EWK 308092                                                                                                                                                                     
-  # Zmumu:   strong 364100-364113, EWK 308093                                                                                                                                                                     
-  # Ztautau: strong 364128-364141, EWK 308094                                                                                                                                                                     
-  # Znunu:   strong 364142-364155, EWK 308095                                                                                                                                                                     
+  #
+  # Signal:  VBF: 308276,308567, ggF: 308284, VH: 308071,308072
+  # Diboson: W: 363359-363360, 363489, Z: 363355-363358
+  # Wenu:    strong 364170-364183, EWK 308096
+  # Wmunu:   strong 364156-364169, EWK 308097
+  # Wtaunu:  strong 364184-364197, EWK 308098
+  # Zee:     strong 364114-364127, EWK 308092
+  # Zmumu:   strong 364100-364113, EWK 308093
+  # Ztautau: strong 364128-364141, EWK 308094
+  # Znunu:   strong 364142-364155, EWK 308095
   # SingleTop: 410011-410014,410025,410026,ttbar:410470,410471,410472
-  # Other higgs: 308275-308283                                                                                                                                                                                    
-  #                                                                         
+  # Other higgs: 308275-308283
+  #

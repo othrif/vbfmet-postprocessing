@@ -25,6 +25,7 @@ arg_group.add_argument("--QGTagger", dest="QGTagger", action="store_true",defaul
 arg_group.add_argument("--TightSkim", dest="TightSkim", action="store_true",default=False,help="Run TightSkim when set to true")
 arg_group.add_argument("--theoVariation", dest='theoVariation', action="store_true", default=False, help="do theory systematic variations, default: False")
 arg_group.add_argument("--oneTrigMuon", dest='oneTrigMuon', action="store_true", default=False, help="set muon trigger SF to 1, default: False")
+arg_group.add_argument("--doVjetRW", dest='doVjetRW', action="store_true", default=False, help="apply V+jets theory reweighing ")
 
 # parse the commandline options
 args = config.parse_args()
@@ -64,6 +65,7 @@ athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                    METTrigPassThru=args.METTrigPassThru,
                                    QGTagger=args.QGTagger,
                                    oneTrigMuon=args.oneTrigMuon,
+                                   doVjetRW=args.doVjetRW,
                                    runNumberInput = runNumber,
                                    theoVariation = args.theoVariation and isSherpaVjets
                                    );
