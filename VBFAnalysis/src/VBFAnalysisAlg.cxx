@@ -450,7 +450,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("truthloMG_jj_mass",  &truthloMG_jj_mass);
     m_tree_out->Branch("truthloMG_jj_dphi",  &truthloMG_jj_dphi);
     m_tree_out->Branch("truthloMG_j2_pt",    &truthloMG_j2_pt);
-    m_tree_out->Branch("b_truth_V_dressed_pt",  &b_truth_V_dressed_pt);
+    m_tree_out->Branch("truth_V_dressed_pt",  &truth_V_dressed_pt);
   }else{
     truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0;
   }
