@@ -21,6 +21,7 @@
   bool doggF=false;
   // nj==2
   std::string totalCutDef="(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 &&  n_jet_truth==2  && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
+  //std::string totalCutDef="(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 &&  n_jet_truth==2  && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>2000e3)";
   // nj==3,4
   //exp(-4.0/std::pow(truthF_jj_deta,2) * std::pow(jet_truthjet_eta[2] - (jet_truthjet_eta[0]+jet_truthjet_eta[1])/2.0,2))<0.6
   //std::string totalCutDef="(met_truth_et>150.0e3 && jet_truthjet_pt[0]>80.0e3 && jet_truthjet_pt[1]>50.0e3 && (n_jet_truth==3 || n_jet_truth==3) && (exp(-4.0/std::pow(truthF_jj_deta,2) * std::pow(jet_truthjet_eta[2] - (jet_truthjet_eta[0]+jet_truthjet_eta[1])/2.0,2))<0.6)  && truthF_jj_deta>3.8 && truthF_jj_dphi<2 && truthF_jj_mass>800e3)";
@@ -71,12 +72,19 @@
     VBFH125Nominal->Draw(var_name.c_str(),cut_name.c_str());
 
     hist_name="hW"+std::to_string(i);
-    TH1F *hhw = new TH1F(hist_name.c_str(),hist_name.c_str(),200, -5.0,5.0);
+    TH1F *hhw = new TH1F(hist_name.c_str(),hist_name.c_str(),200, -1.0,1.0);
     myplotsweight.push_back(hhw);
     if(doggF) var_name="((mcEventWeights[111]-mcEventWeights["+std::to_string(i)+"])/mcEventWeights[111])>>hW"+std::to_string(i);
     else var_name="((mcEventWeights[109]-mcEventWeights["+std::to_string(i)+"])/mcEventWeights[109])>>hW"+std::to_string(i);
-    cut_name="mcEventWeights["+std::to_string(i)+"]*"+totalCutDef;
+    cut_name=totalCutDef;
+    std::cout << "var: " << var_name << std::endl;
     VBFH125Nominal->Draw(var_name.c_str(),cut_name.c_str());
+
+    hist_name="hWW"+std::to_string(i);
+    TH1F *hhww = new TH1F(hist_name.c_str(),hist_name.c_str(),1000, -50.0,300.0);
+    var_name="mcEventWeights["+std::to_string(i)+"]>>hWW"+std::to_string(i);
+    VBFH125Nominal->Draw(var_name.c_str(),cut_name.c_str());
+    std::cout << "var: " << i << " mean: " << hhww->GetMean() << " " << hhww->GetMeanError() << " " << hhww->GetRMS() << std::endl;
   }
 
   TLegend *leg = new TLegend(0.2,0.2,0.4,0.4);
