@@ -16,8 +16,9 @@ arg_group.add_argument("--currentSample", dest='currentSample', default="", help
 arg_group.add_argument("--doLowNom", action="store_true", dest='doLowNom', default=False, help="doLowNom, to symmetrize asymmetric syst, default: False")
 arg_group.add_argument("--extraVars", dest='extraVars', default='7', help="extraVars, cut on the new variables for leptons veto etc, default: 0, 1=lepton vars, 2= includes kinematics, 3=no met soft cut, 4=no xe SF for muons, 5=lepTrigOnly for muCR, 6=met trig only for muCR, 7=metORLep for muCR (default)")
 arg_group.add_argument("--Binning", dest='Binning', default='11', help="Binning, set binning of analysis, rel 20p7: 0, default 11 bins: 11")
-arg_group.add_argument("--METDef", dest='METDef', default='1', help="met definition, default: 0=loose, 1=tenacious")
+arg_group.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 arg_group.add_argument("--isMadgraph", action="store_true", dest='isMadgraph', default=False, help="isMadgraph, default: False")
+arg_group.add_argument("--doDoubleRatio", action="store_true", dest='doDoubleRatio', default=False, help="doDoubleRatio, default: False")
 arg_group.add_argument("--doTMVA", action="store_true", dest='doTMVA', default=False, help="doTMVA, default: False")
 arg_group.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
 arg_group.add_argument("--isLow", action="store_true", dest='isLow', default=False, help="isLow, default: False")
@@ -89,6 +90,7 @@ if True:
                                        isHigh = not args.isLow,
                                        isMadgraph = args.isMadgraph,
                                        doTMVA = args.doTMVA,
+                                       doDoubleRatio = args.doDoubleRatio,
                                        year = args.year,
                                        weightSyst = args.weightSyst,
                                        doPlot = args.doPlot,
@@ -108,6 +110,7 @@ if True:
                                                isHigh = not args.isLow,
                                                isMadgraph = args.isMadgraph,
                                                doTMVA = args.doTMVA,
+                                               doDoubleRatio = args.doDoubleRatio,
                                                year = args.year,
                                                weightSyst = args.weightSyst,
                                                doPlot = args.doPlot,

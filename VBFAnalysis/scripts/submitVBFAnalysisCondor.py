@@ -12,6 +12,7 @@ from VBFAnalysis.buildCondorScript import *
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
+parser.add_argument( "--metOptSyst", dest = "metOptSyst", action="store_true", default = False, help = "Do only the met optimization systematics" )
 parser.add_argument( "--slc7", dest = "slc7", action="store_true", default = False, help = "Do slc7" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", default = "/eos/user/r/rzou/v04/list", help = "list of ntuples to run over" )
@@ -26,6 +27,7 @@ parser.add_argument( "--TightSkim", dest = "TightSkim", action="store_true", def
 parser.add_argument( "--QGTagger", dest = "QGTagger", action="store_true", default = False, help = "Use qgtagger. available in releases newer than 21.2.76" )
 parser.add_argument( "--useTrigMuonSF", dest = "useTrigMuonSF", action="store_false", default = True, help = "Uses muon trigger SF instead of 1 when called ")
 parser.add_argument( "--theoVariation", dest = "theoVariation", action="store_true", default = False, help = "Run Theory uncertainties ")
+parser.add_argument("--doVjetRW", dest = "doVjetRW", action="store_true", default = False, help = "apply V+jets theory reweighing" )
 args, unknown = parser.parse_known_args()
 
 
@@ -34,6 +36,14 @@ systlist  = []
 if args.nominal:
     sys = VBFAnalysis.systematics.systematics("Nominal")
     systlist = sys.getsystematicsList()
+elif args.metOptSyst:
+    sys = VBFAnalysis.systematics.systematics("METSystOpt")
+    sysW = VBFAnalysis.systematics.systematics("WeightSyst")
+    systlistA = sys.getsystematicsList()
+    # remove the weight systematics to avoid empty ntuples. weight systematics are saved as weights
+    for s in systlistA:
+        if (s not in sysW.getsystematicsList()) and (s not in sysW.getsystematicsOneSidedMap()):
+            systlist+=[s]
 else:
     sys = VBFAnalysis.systematics.systematics("All")
     sysW = VBFAnalysis.systematics.systematics("WeightSyst")
@@ -60,7 +70,7 @@ buildPaths = os.getenv('CMAKE_PREFIX_PATH')
 buildPathsVec = buildPaths.split(':')
 buildDir =  buildPathsVec[0][:buildPathsVec[0].find(CMTCONFIG)].rstrip('/')
 os.system("rm -rf "+workDir)
-os.system("mkdir "+workDir)                
+os.system("mkdir "+workDir)
 
 listofrunN = workDir+"/filelist"
 listofrunNMC = workDir+"/filelistMC"
@@ -128,6 +138,8 @@ if args.theoVariation:
     UseExtMC += " --theoVariation"
 if args.TightSkim:
     UseExtMC += " --TightSkim"
+if args.doVjetRW:
+    UseExtMC += " --doVjetRW"
 
 for syst in systlist:
     print listofrunN

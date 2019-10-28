@@ -14,10 +14,11 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("isMadgraph", isMadgraph = false, "isMadgraph flag, true means the sample is Madgraph");
   declareProperty("ExtraVars", m_extraVars = 7, "0=20.7 analysis, 1=lepton veto, object def, 2=loose cuts, 3=no met soft cut, 4=no xe SF for muons, 5=lepTrigOnly for muCR, 6=met trig only for muCR, 7=metORLep for muCR (default)" );
   declareProperty("Binning", m_binning = 11, "0=rel20p7 binning. Other options with >0, 11 is default" );
-  declareProperty("METDef", m_metdef = 1, "0=loose. 1=tenacious" );
+  declareProperty("METDef", m_metdef = 0, "0=loose. 1=tenacious" );
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   declareProperty("doTMVA", doTMVA = false, "doTMVA flag, true means use the MVA");
+  declareProperty("doDoubleRatio", doDoubleRatio = false, "doDoubleRatio flag, true means use the doDoubleRatio method");
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
   declareProperty("doPlot", doPlot =false, "doPlot flag, true means the output contains variable distributions");
   declareProperty("doVBFMETGam", doVBFMETGam =false, "doVBFMETGam flag, true means run the VBF+MET+photon analysis");
@@ -136,12 +137,38 @@ StatusCode HFInputAlg::initialize() {
     hnames.push_back(std::make_pair(hCRZmm.back(), HistoNameMaker(currentSample,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC)));
     CheckHists(hnames);
   }
+  // Adding the ACR for double ratio for 500-800/1000GeV
+  if(doDoubleRatio){
+    std::string binNameDR="DoubleRatio";
+    hSR.push_back(HistoAppend(HistoNameMaker(currentSample,string("AVBFCR1"),binNameDR, syst, isMC), string("AVBFCR")));
+    hCRWep.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneElePosACR1"),binNameDR, syst, isMC), string("oneElePosACR")));
+    hCRWen.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneEleNegACR1"),binNameDR, syst, isMC), string("oneEleNegACR")));
+    hCRWepLowSig.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneElePosLowSigACR1"),binNameDR, syst, isMC), string("oneElePosLowSigACR")));
+    hCRWenLowSig.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneEleNegLowSigACR1"),binNameDR, syst, isMC), string("oneEleNegLowSigACR")));
+    hCRWmp.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneMuPosACR1"),binNameDR, syst, isMC), string("oneMuPosACR")));
+    hCRWmn.push_back(HistoAppend(HistoNameMaker(currentSample,string("oneMuNegACR1"),binNameDR, syst, isMC), string("oneMuNegACR")));
+    hCRZee.push_back(HistoAppend(HistoNameMaker(currentSample,string("twoEleACR1"),binNameDR, syst, isMC), string("twoEleACR")));
+    hCRZmm.push_back(HistoAppend(HistoNameMaker(currentSample,string("twoMuACR1"),binNameDR, syst, isMC), string("twoMuACR")));
+    vector <std::pair<vector <TH1F*>, std::string>> hnames;
+    hnames.push_back(std::make_pair(hSR.back(),HistoNameMaker(currentSample,string("AVBFCR1"),binNameDR, syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWep.back(), HistoNameMaker(currentSample,string("oneElePosACR1"),binNameDR, syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWen.back(), HistoNameMaker(currentSample,string("oneEleNegACR1"),binNameDR, syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWepLowSig.back(), HistoNameMaker(currentSample,string("oneElePosLowSigACR1"),binNameDR, syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWenLowSig.back(), HistoNameMaker(currentSample,string("oneEleNegLowSigACR1"),binNameDR, syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWmp.back(), HistoNameMaker(currentSample,string("oneMuPosACR1"),binNameDR, syst, isMC)));
+    hnames.push_back(std::make_pair(hCRWmn.back(), HistoNameMaker(currentSample,string("oneMuNegACR1"),binNameDR, syst, isMC)));
+    hnames.push_back(std::make_pair(hCRZee.back(), HistoNameMaker(currentSample,string("twoEleACR1"),binNameDR, syst, isMC)));
+    hnames.push_back(std::make_pair(hCRZmm.back(), HistoNameMaker(currentSample,string("twoMuACR1"),binNameDR, syst, isMC)));
+    CheckHists(hnames);
+  }
+
   return StatusCode::SUCCESS;
 }
 
 std::string HFInputAlg::HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst, Bool_t isMC) {
   if (isMC) {
     if (bin == "") return "h"+currentSample+ "_"+syst+"_"+currentCR + "_obs";
+    else if (bin == "DoubleRatio") return "h"+currentSample+ "_antiVBFSel_1"+syst+"_"+currentCR + "_obs";
     else if (currentSample.find("signal") != std::string::npos) return "h"+currentSample+syst+"_"+currentCR + "_obs";
     else return "h"+currentSample+ "_VBFjetSel_"+bin+syst+"_"+currentCR + "_obs";
   } else {
@@ -244,6 +271,7 @@ StatusCode HFInputAlg::execute() {
   float jj_detaCut = 4.8; // 4.0
   float jj_massCut = 1000.0e3; // 1000.0e3
   if(m_binning>=7 && m_binning<=11){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
+  if(doDoubleRatio) jj_massCut=500.0e3;
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
   bool nbjetCut = (n_bjet < 2); 
 
@@ -581,10 +609,17 @@ StatusCode HFInputAlg::execute() {
     if(m_binning==10 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
     if(m_binning==11 && (jj_dphi>1))  bin+=5; // separate dphijj, mjj binning
     if(m_binning==11 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
+
+    if(doDoubleRatio){
+      if(m_binning==11 && (jj_mass < 800.0e3)){ bin=11; } 
+      if(m_binning==0  && (jj_mass < 1000.0e3)){ bin=4; } 
+      if(m_binning==6  && (jj_mass < 1000.0e3)){ bin=7; } 
+    }
   }
 
   if(isnan(w_final)) std::cout << "isnan w_final? " << w_final << std::endl;
   if(isnan(xeSFTrigWeight)) std::cout << "isnan xeSFTrigWeight? " << xeSFTrigWeight << std::endl;
+
   if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
   if (CRWep) HistoFill(hCRWep[bin],w_final);
   if (CRWen) HistoFill(hCRWen[bin],w_final);
