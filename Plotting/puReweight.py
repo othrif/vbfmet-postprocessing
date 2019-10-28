@@ -118,14 +118,39 @@ def functionalWeights(bkgd2Hist, bkgd34Hist, data2Hist, data34Hist):
 		can2g.SaveAs("etaFnFit_njet2.png")
 		can34g.SaveAs("etaFnFit_njet34.png")
 
+def err(tot,qcd,qcd2):
+	#function returns sqrt(sum of w2)
+	error=math.sqrt(tot**2-qcd**2+qcd2**2)
+	return error
 
-def scalarWeights(b2muHist, b34muHist, d2muHist, d34muHist):
+def scalarWeights(b2muHist, b34muHist, d2muHist, d34muHist, qcd2Hist, qcd34Hist):
+
+
+	#scale dqcd - SF = 0.035
+	sf=0.035
+	qcd2Clone=qcd2Hist.Clone()
+	qcd2Clone2=qcd2Hist.Clone()
+	qcd2Clone.Scale(1.0-sf)
+	qcd2Clone2.Scale(sf)
+	qcd34Clone=qcd34Hist.Clone()
+	qcd34Clone2=qcd34Hist.Clone()
+	qcd34Clone.Scale(1.0-sf)
+	qcd34Clone2.Scale(sf)
+	b2muHist.Add(qcd2Clone,-1)#subtract
+	b34muHist.Add(qcd34Clone,-1)#subtract
+
+	#rescale errors
+	for i in range(b2muHist.GetNbinsX()):
+		b2muHist.SetBinError(i+1,err(b2muHist.GetBinError(i+1),qcd2Hist.GetBinError(i+1),qcd2Clone2.GetBinError(i+1)))
+		b34muHist.SetBinError(i+1,err(b34muHist.GetBinError(i+1),qcd34Hist.GetBinError(i+1),qcd34Clone2.GetBinError(i+1)))
 
 	#data/bkg
 	ratio2=d2muHist.Clone()
 	ratio2.Divide(b2muHist)
 	ratio34=d34muHist.Clone()
 	ratio34.Divide(b34muHist)
+
+
 
 	#for mu reweight
 	#ratio2_zoom = TH1D("ratio2_zoom","ratio2_zoom",13,39.5,52.5)
@@ -135,9 +160,9 @@ def scalarWeights(b2muHist, b34muHist, d2muHist, d34muHist):
 	tot2=0.
 	ave34=0.0
 	tot34=0.
-	x_zoom=-1
+	#x_zoom=-1
 	for x in range(ratio2.GetNbinsX()):
-		center=ratio2.GetXaxis().GetBinCenter(ratio2.GetXaxis().FindBin(x+1))
+		#center=ratio2.GetXaxis().GetBinCenter(ratio2.GetXaxis().FindBin(x+1))
 		oldbin=ratio2.GetBinContent(x+1)
 		oldbin34=ratio34.GetBinContent(x+1)
 		if oldbin>50:#fill zoomed plot with bins without outlier high weights
@@ -170,9 +195,21 @@ def scalarWeights(b2muHist, b34muHist, d2muHist, d34muHist):
 	ave2/=ratio2.GetNbinsX()
 	ave34/=ratio34.GetNbinsX()
 
-
-	print ave2
-	print ave34
+	err2b=ROOT.Double(0)
+	err2d=ROOT.Double(0)
+	err3b=ROOT.Double(0)
+	err3d=ROOT.Double(0)
+	
+	print "NJET==2"
+	print "Data: "+str(d2muHist.IntegralAndError(0,100,err2d))+" +\- "+str(err2d)
+	print "Bkgd: "+str(b2muHist.IntegralAndError(0,100,err2b))+" +\- "+str(err2b)
+	print "Yield ratio: "+str(d2muHist.Integral()/b2muHist.Integral())
+	print "Ave bin ratios: "+str(ave2)
+	print "NJET==3||4"
+	print "Data: "+str(d34muHist.IntegralAndError(0,100,err3d))+" +\- "+str(err3d)
+	print "Bkgd: "+str(b34muHist.IntegralAndError(0,100,err3b))+" +\- "+str(err3b)
+	print "Yield ratio: "+str(d34muHist.Integral()/b34muHist.Integral())
+	print "Ave bin ratios: "+str(ave34)
 
 	saveInput = raw_input("Save plots? (T/F) ")
 	save = interpretInput.BooleanInput(saveInput)
@@ -238,8 +275,7 @@ method = interpretInput.BooleanInput(methodInput)
 
 
 if method:
-	reg="u"
-	inFile.cd("pass_wcr_"+ana+"_"+reg+"_Nominal")
+	inFile.cd("pass_"+ana+"_Nominal")
 	gDirectory.cd("plotEvent_bkgs")
 	#eta reweight
 	b2muHist=gDirectory.Get("j2Eta_40mu52")
@@ -248,7 +284,7 @@ if method:
 	#b2muHist=gDirectory.Get("mu_njet2")
 	#b34muHist=gDirectory.Get("mu_njet34")
 	inFile.cd()
-	inFile.cd("pass_wcr_"+ana+"_"+reg+"_Nominal")
+	inFile.cd("pass_"+ana+"_Nominal")
 	gDirectory.cd("plotEvent_data")
 	#eta reweight
 	d2muHist=gDirectory.Get("j2Eta_40mu52")
@@ -256,14 +292,20 @@ if method:
 	#mu reweight
 	#d2muHist=gDirectory.Get("mu_njet2")
 	#d34muHist=gDirectory.Get("mu_njet34")
-	scalarWeights(b2muHist,b34muHist,d2muHist,d34muHist)
+	#rescaledqcd
+	inFile.cd()
+	inFile.cd("pass_"+ana+"_Nominal")
+	gDirectory.cd("plotEvent_dqcd")
+	qcd2Hist=gDirectory.Get("j2Eta_40mu52")
+	qcd34Hist=gDirectory.Get("j3Eta_40mu52")
+	scalarWeights(b2muHist,b34muHist,d2muHist,d34muHist,qcd2Hist,qcd34Hist)
 else:
-	inFile.cd("pass_wcr_"+ana+"_l_Nominal")
+	inFile.cd("pass_"+ana+"_Nominal")
 	gDirectory.cd("plotEvent_bkgs")
 	bkgd2Hist=gDirectory.Get("j3EtaMuNjet2")
 	bkgd34Hist=gDirectory.Get("j3EtaMuNjet34")
 	inFile.cd()
-	inFile.cd("pass_wcr_"+ana+"_l_Nominal")
+	inFile.cd("pass_"+ana+"_Nominal")
 	gDirectory.cd("plotEvent_data")
 	data2Hist=gDirectory.Get("j3EtaMuNjet2")
 	data34Hist=gDirectory.Get("j3EtaMuNjet34")
