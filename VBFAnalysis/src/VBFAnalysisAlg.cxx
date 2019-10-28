@@ -1688,6 +1688,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("metsig_tst",             &metsig_tst);
 
     if(m_currentVariation=="Nominal" && m_isMC){
+      m_tree->SetBranchAddress("n_jet_truth",  &n_jet_truth);
       m_tree->SetBranchAddress("truth_tau_pt", &truth_tau_pt);
       m_tree->SetBranchAddress("truth_tau_eta",&truth_tau_eta);
       m_tree->SetBranchAddress("truth_tau_phi",&truth_tau_phi);
