@@ -319,6 +319,24 @@ def getHistPars(hist):
     'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},     
         'mu_njet2'  : {'xtitle':'Njet==2, Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
         'mu_njet34'  : {'xtitle':'Njet>2, Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
+
+        'j0fjvt_40mu52' : {'xtitle':'Leading jet f-JVT (40<=#mu<=52)',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j0fjvt_not40mu52' : {'xtitle':'Leading jet f-JVT !(40<=#mu<=52)',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j1fjvt_40mu52' : {'xtitle':'Sub-leading jet f-JVT (40<=#mu<=52)',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j1fjvt_not40mu52' : {'xtitle':'Sub-leading jet f-JVT !(40<=#mu<=52)',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j2fjvt_40mu52' : {'xtitle':'Sub-leading jet f-JVT (40<=#mu<=52),njet==2',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j2fjvt_not40mu52' : {'xtitle':'Sub-leading jet f-JVT !(40<=#mu<=52),njet==2',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j3fjvt_40mu52' : {'xtitle':'Third jet f-JVT (40<=#mu<=52),njet>2',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j3fjvt_not40mu52' : {'xtitle':'Third jet f-JVT !(40<=#mu<=52),njet>2',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j0fjvt_40mu52_eta28' : {'xtitle':'Leading jet f-JVT (40<=#mu<=52),|#eta|<2.8',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j0fjvt_not40mu52_eta28' : {'xtitle':'Leading jet f-JVT !(40<=#mu<=52),|#eta|<2.8',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j1fjvt_40mu52_eta28' : {'xtitle':'Sub-leading jet f-JVT (40<=#mu<=52),|#eta|<2.8',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j1fjvt_not40mu52_eta28' : {'xtitle':'Sub-leading jet f-JVT !(40<=#mu<=52),|#eta|<2.8',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j2fjvt_40mu52_eta28' : {'xtitle':'Sub-leading jet f-JVT (40<=#mu<=52),njet==2,|#eta|<2.8',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j2fjvt_not40mu52_eta28' : {'xtitle':'Sub-leading jet f-JVT !(40<=#mu<=52),njet==2,|#eta|<2.8',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j3fjvt_40mu52_eta28' : {'xtitle':'Third jet f-JVT (40<=#mu<=52),njet>2,|#eta|<2.8',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+        'j3fjvt_not40mu52_eta28' : {'xtitle':'Third jet f-JVT !(40<=#mu<=52),njet>2,|#eta|<2.8',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
+
         }
 
     try:
