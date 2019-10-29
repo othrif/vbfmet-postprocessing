@@ -15,6 +15,9 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kData:  return "data";
     case kHggf:  return "hggf";
     case kHvbf:  return "hvbf";
+    case kHvbf500:  return "hvbf500";
+    case kHvbf1k:  return "hvbf1k";
+    case kHvbf3k:  return "hvbf3k";
     case kVbfg:  return "vbfg";
     case kHvh:   return "hvh";
     case kWewk:  return "wewk";      
@@ -92,6 +95,9 @@ std::string Msl::Mva::Convert2Std(Sample s)
     case kData: return "Data";
     case kHggf:  return "hggf";
     case kHvbf:  return "hvbf";
+    case kHvbf500:  return "hvbf500";
+    case kHvbf1k:  return "hvbf1k";
+    case kHvbf3k:  return "hvbf3k";
     case kVbfg:  return "vbfg";
     case kHvh:   return "hvh";            
     case kWewk:  return "wewk";      
@@ -167,6 +173,9 @@ std::string Msl::Mva::Convert2Tex(const SampleSet &s)
   if(s.GetName() == "data")  return "Data";
   if(s.GetName() == "hggf")  return "HInv ggF";  
   if(s.GetName() == "hvbf")  return "HInv VBF";
+  if(s.GetName() == "hvbf500")  return "HInv VBF";  
+  if(s.GetName() == "hvbf1k")  return "HInv VBF";  
+  if(s.GetName() == "hvbf3k")  return "HInv VBF";  
   if(s.GetName() == "vbfg")  return "HInv VBFgamma";
   if(s.GetName() == "hvh")   return "HInv VH";  
   if(s.GetName() == "wewk")  return "W EWK";  
@@ -216,6 +225,9 @@ Msl::Mva::Sample Msl::Mva::Convert2Sample(const std::string &s)
   if(s == "data") return kData;
   if(s == "hggf") return kHggf;
   if(s == "hvbf") return kHvbf;
+  if(s == "hvbf500") return kHvbf500;  
+  if(s == "hvbf1k") return kHvbf1k;
+  if(s == "hvbf3k") return kHvbf3k;    
   if(s == "vbfg") return kVbfg;
   if(s == "hvh")  return kHvh;
   if(s == "wewk") return kWewk;  
@@ -296,6 +308,9 @@ const std::vector<Msl::Mva::Sample>& Msl::Mva::GetAllSamples()
     vars.push_back(kData);
     vars.push_back(kHggf);
     vars.push_back(kHvbf);
+    vars.push_back(kHvbf500);
+    vars.push_back(kHvbf1k);
+    vars.push_back(kHvbf3k);
     vars.push_back(kVbfg);    
     vars.push_back(kHvh);
     vars.push_back(kWewk);

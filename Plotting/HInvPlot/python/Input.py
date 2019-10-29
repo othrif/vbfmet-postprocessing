@@ -370,13 +370,14 @@ def prepareBkgRuns(keys,options=None):
                           }
     sig_vbfgam = {'312243':'vbf gamma', }
     alt_VBF = {'308275':'VBF125 - H75',
-                      '308277':'VBF125 - H200',
-                      '308278':'VBF125 - H300', 
-                      '308279':'VBF125 - H500', 
-                      '308280':'VBF125 - H750', 
-                      '308281':'VBF125 - H1000',
-                      '308282':'VBF125 - H2000',
-                      '308283':'VBF125 - H3000',}
+               '308277':'VBF125 - H200',
+               '308278':'VBF125 - H300',
+               #'308279':'VBF125 - H500', 
+               '308280':'VBF125 - H750', 
+               #'308281':'VBF125 - H1000',
+               '308282':'VBF125 - H2000',
+               #'308283':'VBF125 - H3000',
+                   }
 
     bkg_wewk =     {'308096':'WenuEWK',
                     '308097':'WmunuEWK',
@@ -1106,8 +1107,11 @@ def prepareBkgRuns(keys,options=None):
     bkg_keys = {
                 'hvh':sig_VH125,
                 #'whww':sig_VH125v2,
-                'vbfg':sig_vbfgam,                
+                'vbfg':sig_vbfgam,
                 'whww':alt_VBF,
+                'hvbf500':{'308279':'VBF125 - H500',},                
+                'hvbf1k':{'308281':'VBF125 - H1000',},                
+                'hvbf3k':{'308283':'VBF125 - H3000',},                
                 'hggf':sig_ggF125,
                 'tth':sig_tth125,
                 'hvbf':sig_VBF125,

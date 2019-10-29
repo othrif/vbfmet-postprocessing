@@ -772,6 +772,9 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
     sigs['tth']  = ['tth']
+    sigs['hvbf500']  = ['hvbf500']    
+    sigs['hvbf1k']  = ['hvbf1k']    
+    sigs['hvbf3k']  = ['hvbf3k']    
 
     bkgs = {}
 
