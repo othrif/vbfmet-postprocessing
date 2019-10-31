@@ -114,26 +114,26 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
     tMapFloat["VBF_qqH_STJetVeto34__1up"]=1.031;
     tMapFloat["VBF_qqH_STJetVeto34__1down"]=0.993;
   }
-  // PS modelling systematics
+  // PS modelling systematics -> removed 1% because these PS weights are supposed to be used to interpret between the HTXS bins
   // add truth_jj_mass, truth_jj_dphi, n_jet_truth
-  tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.02;
-  tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.98;
+  tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.01;
+  tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.99;
   if(n_jet_truth==2 ){
     if( truth_jj_mass>3.5e6){
-      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.05;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.998;
+      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.04;
+      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.9988;
     } else if( truth_jj_mass>2.0e6){
-      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.028;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.997;
+      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.018;
+      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.998;
     }else if( truth_jj_mass>1.5e6){
-      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.0112;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.996;
+      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.0012;
+      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.997;
     }else if( truth_jj_mass>1.0e6){
-      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.006;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.99;
+      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.002;
+      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.995;
     }else if( truth_jj_mass>0.8e6){
       tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.002;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.975;
+      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.985;
     }
   }
   else if(n_jet_truth>2){
