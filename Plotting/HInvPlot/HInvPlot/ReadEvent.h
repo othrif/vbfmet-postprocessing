@@ -7,9 +7,9 @@
  * @Author : Doug Schaefer
  *
  * @Brief  :
- * 
+ *
  *  Base class for C++ and python algorithms for reading basic events
- * 
+ *
  **********************************************************************************/
 
 // C/C++
@@ -33,7 +33,7 @@ class TFile;
 namespace Msl
 {
 
-  class ReadEvent 
+  class ReadEvent
   {
   public:
 
@@ -41,7 +41,7 @@ namespace Msl
     virtual ~ReadEvent();
 
     enum CleaningCuts{ ALL=0, PassGRL, PassTTCVeto, IncompleteEvents, PassLarErr, PassTileErr, PassTileTrip, PassHotSpot, PassBadJet,
-		       PassCaloJet, PassBCHTight, PassBCHMedium, PassGoodVtx, PassBadMuon, PassCosmic, PassHFOR, PassMCOverlap, 
+		       PassCaloJet, PassBCHTight, PassBCHMedium, PassGoodVtx, PassBadMuon, PassCosmic, PassHFOR, PassMCOverlap,
 		       PassGT2BaseLep, PassEQ2BaseLep, PassTrig, PassEQ2SRLep, PassNSigTau, PassEQ2SRLepNoTrig, CleaningCuts_N };
 
     // Init is called when TTree (or TChain) is attached
@@ -60,7 +60,7 @@ namespace Msl
     void AddPreSelAlg(const std::string &key, IExecAlg *alg);
 
     void PrintAlgs(std::ostream &os = std::cout) const;
-    
+
     void RunConfForAlgs();
 
     void Read(const std::string &path);
@@ -75,14 +75,14 @@ namespace Msl
     std::ostream& log() const;
 
   public:
-    
+
     typedef std::vector<IExecAlg *> AlgVec;
     typedef std::vector<VarData>    VarVec;
 
     struct AlgData
     {
       explicit AlgData(const std::string &key);
-      
+
       std::string  alg_key;
       AlgVec       alg_vec;
       IExecAlg    *pre_sel;
@@ -92,23 +92,23 @@ namespace Msl
     };
 
     void SetSystName(std::string systName) { fSystName = systName; }
-    void SetWeightSystName(std::string wsystName) { fWeightSystName = wsystName; }    
+    void SetWeightSystName(std::string wsystName) { fWeightSystName = wsystName; }
     void ClearAlgs() {
       fAlgAll.clear();
       fAlgCommon.clear();
       fAlgPreSel.clear();
       fAlgNormal.clear();
     }
-    
+
     typedef std::vector<AlgData>                 AlgList;
   private:
 
     void ReadTree(TTree *rtree);
 
     void FillEvent(Event &event);
-    
+
     void ProcessAlgs(Event &top_event, Event &alg_event);
-    
+
     void AddVars(const std::string &key, const Registry &reg);
 
     bool MatchAlg(IExecAlg *alg) const;
@@ -116,7 +116,7 @@ namespace Msl
     void ChangeLep(Event &event);
     void ComputeLepVars(Event &event);
     void AddPhoton(Event &event);
-    
+
   private:
     std::set<unsigned>          evt_map;
     // Properties:
@@ -129,7 +129,7 @@ namespace Msl
     std::string                 fAnalysisName;
     std::string                 fMETChoice;
     std::string                 fMETChoice_phi;
-    std::string                 fMETChoice_nolep;    
+    std::string                 fMETChoice_nolep;
     std::string                 fMETChoice_nolep_phi;
 
     // TMVA
@@ -137,7 +137,7 @@ namespace Msl
     std::string                 fTMVAWeightPath;
     std::vector<float>         fTMVAVars;
     TString                     fMVAName;
-    
+
     std::vector<std::string>    fTrees;
     std::set<std::string>       fTreesMap;
     std::vector<std::string>    fFiles;
@@ -147,14 +147,14 @@ namespace Msl
     std::vector<unsigned>       fEventIdVec;
 
     bool                        fDebug;
-    bool                        fPrint;    
-    bool                        fPrintEvent;    
-    bool                        fMCEventCount;    
+    bool                        fPrint;
+    bool                        fPrintEvent;
+    bool                        fMCEventCount;
     int                         fMaxNEvent;
 
     std::vector<Msl::Mva::Var>  fVarMeV;       //! - do not make CINT dictionary
     VarVec                      fVarVec;       //! - do not make CINT dictionary
-    
+
     // Algorithms:
     AlgVec                      fAlgAll;       //! - all unique algorithms
     AlgVec                      fAlgCommon;    //! - common algs - run on global event first
@@ -174,16 +174,17 @@ namespace Msl
     bool                        fIsDDQCD;
     // Input vars
     float fWeight;
+    float vjWeight;
     float xeSFTrigWeight;
     float xeSFTrigWeight__1up;
     float xeSFTrigWeight__1down;
     float xeSFTrigWeight_nomu;
     float xeSFTrigWeight_nomu__1up;
-    float xeSFTrigWeight_nomu__1down;    
+    float xeSFTrigWeight_nomu__1down;
     int   fRunNumber;
-    int   fRandomRunNumber;    
-    ULong64_t fEventNumber;    
-    int   fCurrRunNumber;    
+    int   fRandomRunNumber;
+    ULong64_t fEventNumber;
+    int   fCurrRunNumber;
     Mva::Sample fCurrSample;
 
     std::vector<float> *el_charge;
@@ -197,10 +198,10 @@ namespace Msl
     std::vector<float> *tau_charge;
     std::vector<float> *tau_pt;
     std::vector<float> *tau_eta;
-    std::vector<float> *tau_phi;    
+    std::vector<float> *tau_phi;
     std::vector<float> *jet_timing;
     std::vector<float> *jet_pt;
-    std::vector<float> *jet_m;    
+    std::vector<float> *jet_m;
     std::vector<float> *jet_eta;
     std::vector<float> *jet_phi;
     std::vector<float> *jet_jvt;
@@ -222,16 +223,16 @@ namespace Msl
     std::vector<float> *truth_tau_phi;
     std::vector<float> *truth_jet_pt;
     std::vector<float> *truth_jet_eta;
-    std::vector<float> *truth_jet_phi;    
+    std::vector<float> *truth_jet_phi;
     std::vector<float> *baseel_pt;
-    std::vector<int>   *baseel_charge;    
+    std::vector<int>   *baseel_charge;
     std::vector<float> *baseel_eta;
-    std::vector<float> *baseel_phi;    
+    std::vector<float> *baseel_phi;
     std::vector<float> *baseel_ptvarcone20;
-    std::vector<float> *baseel_ptvarcone30;        
-    std::vector<float> *baseel_topoetcone20;        
+    std::vector<float> *baseel_ptvarcone30;
+    std::vector<float> *baseel_topoetcone20;
     std::vector<float> *basemu_pt;
-    std::vector<int>   *basemu_charge;    
+    std::vector<int>   *basemu_charge;
     std::vector<float> *basemu_eta;
     std::vector<float> *basemu_phi;
     std::vector<float> *basemu_ptvarcone20;
@@ -239,8 +240,8 @@ namespace Msl
     std::vector<float> *basemu_topoetcone20;
     std::vector<float> *ph_pt;
     std::vector<float> *ph_eta;
-    std::vector<float> *ph_phi;    
-    
+    std::vector<float> *ph_phi;
+
     // For event counting
     float                       fSumw;
     float                       fNraw;
