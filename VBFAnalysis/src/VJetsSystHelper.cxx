@@ -338,11 +338,10 @@ double VJetsSystHelper::getCorrection(int mcChannelNumber, double pTV, TString v
 
    TString process = "";
    // Sherpa 2.2.1
-   if ((364142 <= mcChannelNumber && mcChannelNumber <= 364155)||mcChannelNumber==364222||mcChannelNumber==364223 ||
-	    (366010 <= mcChannelNumber && mcChannelNumber <= 366017)||
-	    (366019 <= mcChannelNumber && mcChannelNumber <= 366026)||
+   if ((364142 <= mcChannelNumber && mcChannelNumber <= 364155) || mcChannelNumber==364222 || mcChannelNumber==364223 ||
+	    (366010 <= mcChannelNumber && mcChannelNumber <= 366017)  ||
+	    (366019 <= mcChannelNumber && mcChannelNumber <= 366026)  ||
 	    (366028 <= mcChannelNumber && mcChannelNumber <= 366035)) process = "vvj"; // Zvv
-   //   else if ((364142 <= mcChannelNumber && mcChannelNumber <= 364155)||mcChannelNumber==364222||mcChannelNumber==364223) process = "vvj"; // Zvv
    else if ((364184 <= mcChannelNumber && mcChannelNumber <= 364197)||mcChannelNumber==364228||mcChannelNumber==364229) process = "evj"; // Wtv
    else if ((364156 <= mcChannelNumber && mcChannelNumber <= 364169)||mcChannelNumber==364224||mcChannelNumber==364225) process = "evj"; // Wuv
    else if ((364170 <= mcChannelNumber && mcChannelNumber <= 364183)||mcChannelNumber==364226||mcChannelNumber==364227) process = "evj"; // Wev
