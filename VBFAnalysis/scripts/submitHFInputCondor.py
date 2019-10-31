@@ -21,6 +21,7 @@ parser.add_argument("--extraVars", dest='extraVars', default="0", help="extraVar
 parser.add_argument("--Binning", dest='Binning', default="0", help="Binning, 0=default Mjj binning, 1=low MET bin, 2=njet>2 binning, 3=met binning, 4=3bins for nj>2, 5=3dphibin, 6= dphi by mjj+nj>2, 7=800mjj withdphi, 8=mjj 8bins")
 parser.add_argument( "--isMadgraph", dest = "isMadgraph", action="store_true", default = False, help = "Use the madgraph samples" )
 parser.add_argument( "--doTMVA", dest = "doTMVA", action="store_true", default = False, help = "Use the variable filled as tmva for the fitting" )
+parser.add_argument( "--doDoubleRatio", dest = "doDoubleRatio", action="store_true", default = False, help = "Use this variable to run the double ratio inputs")
 parser.add_argument( "--doPlot", dest = "doPlot", action="store_true", default = False, help = "Generate additional histograms for postfit plots")
 parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
 parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis")
@@ -28,8 +29,8 @@ parser.add_argument("--year", type=int, dest='year', default=2016, help="year, d
 parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
 
-writeMultiJet(int(args.Binning), args.year)
-writeFakeEle(int(args.Binning), args.year)
+writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio)
+writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio)
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:
@@ -87,6 +88,8 @@ if args.year!=2016:
     extraCommand+=' --year %s ' %(args.year)
 if args.doTMVA:
     extraCommand+=' --doTMVA '
+if args.doDoubleRatio:
+    extraCommand+=' --doDoubleRatio '
 if args.v26Ntuples:
     extraCommand+=' --v26Ntuples '
 if args.doVBFMETGam:
