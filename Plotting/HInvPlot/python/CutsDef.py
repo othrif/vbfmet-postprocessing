@@ -415,7 +415,9 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
             cuts += metCuts(basic_cuts,options,metCut=120.0, cstCut=100.0)#, maxMET=150.0)
         else:
+            #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
             cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=120.0)
+            #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
 
     # VBF cuts
