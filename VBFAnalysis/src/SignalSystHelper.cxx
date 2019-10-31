@@ -108,8 +108,8 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
 
   // S-T jet veto
   if(n_jet_truth==2 ){
-    tMapFloat["VBF_qqH_STJetVeto__1up"]=1.031;
-    tMapFloat["VBF_qqH_STJetVeto__1down"]=0.99;  
+    //tMapFloat["VBF_qqH_STJetVeto__1up"]=1.031;
+    //tMapFloat["VBF_qqH_STJetVeto__1down"]=0.99;  
   }else{
     tMapFloat["VBF_qqH_STJetVeto34__1up"]=1.031;
     tMapFloat["VBF_qqH_STJetVeto34__1down"]=0.993;
@@ -225,12 +225,12 @@ void SignalSystHelper::initVBFVars(std::map<TString, Float_t> &tMapFloat, std::m
     tree->Branch(var_name.c_str(),&(tMapFloatW[getVBFVarName(i)+"__1up"]));
   }
   // S-T jet veto nj=2
-  tMapFloat["VBF_qqH_STJetVeto__1up"]=1.0;
-  tMapFloatW["VBF_qqH_STJetVeto__1up"]=1.0;  
-  tree->Branch("wVBF_qqH_STJetVeto__1up",&(tMapFloatW["VBF_qqH_STJetVeto__1up"]));
-  tMapFloat["VBF_qqH_STJetVeto__1down"]=1.0;
-  tMapFloatW["VBF_qqH_STJetVeto__1down"]=1.0;
-  tree->Branch("wVBF_qqH_STJetVeto__1down",&(tMapFloatW["VBF_qqH_STJetVeto__1down"]));
+  //tMapFloat["VBF_qqH_STJetVeto__1up"]=1.0;
+  //tMapFloatW["VBF_qqH_STJetVeto__1up"]=1.0;  
+  //tree->Branch("wVBF_qqH_STJetVeto__1up",&(tMapFloatW["VBF_qqH_STJetVeto__1up"]));
+  //tMapFloat["VBF_qqH_STJetVeto__1down"]=1.0;
+  //tMapFloatW["VBF_qqH_STJetVeto__1down"]=1.0;
+  //tree->Branch("wVBF_qqH_STJetVeto__1down",&(tMapFloatW["VBF_qqH_STJetVeto__1down"]));
   // S-T jet veto nj=3,4
   tMapFloat["VBF_qqH_STJetVeto34__1up"]=1.0;
   tMapFloatW["VBF_qqH_STJetVeto34__1up"]=1.0;
