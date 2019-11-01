@@ -1,6 +1,7 @@
 // VBFAnalysis includes
 #include "VBFAnalysisAlg.h"
 #include "SignalSystHelper.h"
+#include "VJetsSystHelper.h"
 #include "SUSYTools/SUSYCrossSection.h"
 #include "PathResolver/PathResolver.h"
 #include "TLorentzVector.h"
@@ -24,6 +25,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "UseExtMGVjet", m_UseExtMGVjet = false, "Use extended LO MG extension");
   declareProperty( "theoVariation", m_theoVariation = false, "Do theory systematic variations");
   declareProperty( "oneTrigMuon", m_oneTrigMuon = false, "Trigger muon SF set to 1");
+  declareProperty( "doVjetRW", m_doVjetRW = false, "Add V+jets re-weighting variables");
 }
 
 
@@ -46,10 +48,10 @@ StatusCode VBFAnalysisAlg::initialize() {
   // initialize jet container
   m_newJets = new xAOD::JetContainer();
   m_newJetsAux = new xAOD::AuxContainerBase();
-  m_newJets->setStore( m_newJetsAux ); //< Connect the two  
+  m_newJets->setStore( m_newJetsAux ); //< Connect the two
   xAOD::Jet* new_jet = new xAOD::Jet();
   m_newJets->push_back(new_jet);
-  
+
   if(m_isMC){
     std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
     xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
@@ -60,12 +62,25 @@ StatusCode VBFAnalysisAlg::initialize() {
     // signal systematics
     my_signalSystHelper.initialize();
 
+    // Vjets weight + systematics
+    if(m_isMC && m_currentVariation=="Nominal")
+      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
+      std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
+      my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
+      my_vjSystHelper.applyEWCorrection(true);
+      my_vjSystHelper.applyQCDCorrection(true);
+      my_vjSystHelper.mergePDF(true);
+      my_vjSystHelper.smoothQCDCorrection(false);
+      my_vjSystHelper.initialize();
+      m_vjVariations = my_vjSystHelper.getAllVariationNames();
+    }
+
     // qg tagging
     m_qgVars.clear();
     m_systSet.clear();
     if(m_QGTagger){
       m_qgVars.push_back("JET_QG_Nominal");
-      
+
       asg::AnaToolHandle<CP::IJetQGTagger> my_handleNom;
       my_handleNom.setTypeAndName("CP::JetQGTagger/JetQGTagger_VBF");
       ANA_CHECK(my_handleNom.setProperty("NTrackCut", 5));
@@ -220,6 +235,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w);
   //m_tree_out->Branch("nloEWKWeight",&nloEWKWeight);
+  m_tree_out->Branch("vjWeight",&vjWeight);
   m_tree_out->Branch("puSyst2018Weight",&puSyst2018Weight);
   m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight);
   m_tree_out->Branch("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
@@ -377,7 +393,7 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("met_soft_tst_phi",       &met_soft_tst_phi);
       m_tree_out->Branch("met_soft_tst_sumet",     &met_soft_tst_sumet);
     }else{
-      tau_pt=0; tau_phi=0; tau_eta=0; 
+      tau_pt=0; tau_phi=0; tau_eta=0;
     }
     // Tenacious MET
     m_tree_out->Branch("met_tenacious_tst_et",   &met_tenacious_tst_et);
@@ -434,6 +450,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("truthloMG_jj_mass",  &truthloMG_jj_mass);
     m_tree_out->Branch("truthloMG_jj_dphi",  &truthloMG_jj_dphi);
     m_tree_out->Branch("truthloMG_j2_pt",    &truthloMG_j2_pt);
+    m_tree_out->Branch("truth_V_dressed_pt",  &truth_V_dressed_pt);
   }else{
     truth_jet_pt=0; truth_jet_phi=0; truth_jet_eta=0; truth_jet_m=0;
   }
@@ -489,7 +506,7 @@ StatusCode VBFAnalysisAlg::MapNgen(){
     std::set<int> mg_w_incl_lf = {363606, 363609, 363630, 363633, 363654, 363657}; // w samples to overlap remove in
     std::map<int,int> mg_w_LF_map = {{311445,363606},{311446,363630},{311447,363609},{311448,363633},{311449,363654},{311450,363657}};
     std::set<int> mg_w_filter_highHT = {311451, 311452, 311453}; // W ---> need to implement the year dependence
-    std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
+    std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21
     std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
     Ngen_filter.clear();
     TIter next(f->GetListOfKeys());
@@ -504,7 +521,7 @@ StatusCode VBFAnalysisAlg::MapNgen(){
       // printing info
       if(mg_filter_lo_np01.find(dsid)!=mg_filter_lo_np01.end() || mg_filter_lo_np234.find(dsid)!=mg_filter_lo_np234.end()){
 	std::cout << "Ngen: " << Ngen[dsid] << " filtered: " << Ngen_filter[dsid]->GetBinContent(21) << " " << Ngen_filter[dsid]->GetBinContent(22) << std::endl;
-      }      
+      }
     }
   }
 
@@ -523,6 +540,18 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if(!m_tree) ATH_MSG_ERROR("VBFAnaysisAlg::execute: tree invalid: " <<m_tree );
   m_tree->GetEntry(nFileEvt);
+
+  //Vjets weight and systematics
+  vjWeight = 1.0;
+
+  if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
+    // Nominal
+    vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(0));
+    // Variations
+    for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){ // exclude nominal
+      tMapFloat[m_vjVariations.at(iVj)]=my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(iVj));
+    }
+  }
 
   // iterate event count
   ++nFileEvt;
@@ -598,18 +627,18 @@ StatusCode VBFAnalysisAlg::execute() {
 	for(unsigned ittau=0; ittau<truth_tau_pt->size(); ++ittau){
 	  if(fabs(truth_tau_eta->at(ittau))>5 || truth_tau_pt->at(ittau)<20.0e3) continue;
 	  tvlep.SetPtEtaPhi(truth_tau_pt->at(ittau), truth_tau_eta->at(ittau),truth_tau_phi->at(ittau));
-	  std::cout << "     tau " << ittau << " pt: " << truth_tau_pt->at(ittau) <<" eta: " << truth_tau_eta->at(ittau) <<" phi: " << truth_tau_phi->at(ittau) 
+	  std::cout << "     tau " << ittau << " pt: " << truth_tau_pt->at(ittau) <<" eta: " << truth_tau_eta->at(ittau) <<" phi: " << truth_tau_phi->at(ittau)
 		    << "status: " << truth_tau_status->at(ittau) << " dr: " << tvlep.DeltaR(tmp.Vect()) <<std::endl;
 	}
 	for(unsigned itele=0; itele<truth_el_pt->size(); ++itele){
           if(fabs(truth_el_eta->at(itele))>5 || truth_el_pt->at(itele)<20.0e3) continue;
           tvlep.SetPtEtaPhi(truth_el_pt->at(itele), truth_el_eta->at(itele),truth_el_phi->at(itele));
-	  std::cout << "       ele " << itele << " pt: " << truth_el_pt->at(itele) <<" eta: " << truth_el_eta->at(itele) <<" phi: " << truth_el_phi->at(itele) 
+	  std::cout << "       ele " << itele << " pt: " << truth_el_pt->at(itele) <<" eta: " << truth_el_eta->at(itele) <<" phi: " << truth_el_phi->at(itele)
 		    << "status: " << truth_el_status->at(itele) << " dr: " << tvlep.DeltaR(tmp.Vect()) <<std::endl;
 	}
       }
     } // end check
-    
+
   }// end truth computation
   // MET trigger scale factor
   unsigned metRunNumber = randomRunNumber;
@@ -637,7 +666,7 @@ StatusCode VBFAnalysisAlg::execute() {
   nloEWKWeight=1.0;
   if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
     //nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;// tighter mjj>1TeV
-    nloEWKWeight=1.0 - 0.000350*(met_truth_et/1.0e3) - 0.0430;    
+    nloEWKWeight=1.0 - 0.000350*(met_truth_et/1.0e3) - 0.0430;
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
 
     // add systematics here - these are from the tighter mjj>1 TeV cuts
@@ -652,19 +681,20 @@ StatusCode VBFAnalysisAlg::execute() {
       tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
     }
   }
+
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
     if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights,n_jet_truth,truth_jj_mass);
     if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 111);
     if(runNumber>=312448 && runNumber<=312531) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 115); // filtered sherpa uses nnpdf
 
-    // This is a bug fix in the MC production. The wrong PDF weight was used for the default. 
+    // This is a bug fix in the MC production. The wrong PDF weight was used for the default.
     // This changes to the => systematics will be fixed when the new signal samples are processed. This is tranparent with the fix
     if((!mcEventWeights || mcEventWeights->size()<120) && (runNumber==346600 || runNumber==346588)) std::cout << "ERROR the mcEvent Weights are missing!!!" << std::endl;
     if(runNumber==346588) mcEventWeight = mcEventWeights->at(111); // ggF
     if(runNumber==346600) mcEventWeight = mcEventWeights->at(109); // VBF
   }
-  
+
   // applying a pileup weight for 2018 data
   puSyst2018Weight=1.0;
   if(m_currentVariation=="Nominal"){// initialize
@@ -679,7 +709,7 @@ StatusCode VBFAnalysisAlg::execute() {
       if(m_currentVariation=="Nominal"){
 	tMapFloat["puSyst2018Weight__1down"]=1.0+(puSyst2018Weight-1.0)/2.0;
 	tMapFloat["puSyst2018Weight__1up"]  =puSyst2018Weight+(puSyst2018Weight-1.0)/2.0;
-	//std::cout << "puSyst2018Wei: " << puSyst2018Weight << " up: " << tMapFloat["puSyst2018Weight__1up"]  << " down: " << tMapFloat["puSyst2018Weight__1down"] << std::endl; 
+	//std::cout << "puSyst2018Wei: " << puSyst2018Weight << " up: " << tMapFloat["puSyst2018Weight__1up"]  << " down: " << tMapFloat["puSyst2018Weight__1down"] << std::endl;
       }
     }
     //puSyst2018Weight=1.0;
@@ -743,13 +773,13 @@ StatusCode VBFAnalysisAlg::execute() {
 
       // Look up weights in order to match
       if(mg_w_LF_map.find(runNumber)!=mg_w_LF_map.end()){  int aRun = runNumber; int bRun = mg_w_LF_map[runNumber];
-	MGMergeWeightFilt=Ngen_filter[aRun]->GetBinContent(24)/(Ngen_filter[aRun]->GetBinContent(24)+Ngen_filter[bRun]->GetBinContent(24)); 
+	MGMergeWeightFilt=Ngen_filter[aRun]->GetBinContent(24)/(Ngen_filter[aRun]->GetBinContent(24)+Ngen_filter[bRun]->GetBinContent(24));
       }
       if(mg_w_LF_map_rev.find(runNumber)!=mg_w_LF_map_rev.end()){  int aRun = runNumber; int bRun = mg_w_LF_map_rev[runNumber];
-	MGMergeWeightIncl=Ngen_filter[aRun]->GetBinContent(24)/(Ngen_filter[aRun]->GetBinContent(24)+Ngen_filter[bRun]->GetBinContent(24)); 
+	MGMergeWeightIncl=Ngen_filter[aRun]->GetBinContent(24)/(Ngen_filter[aRun]->GetBinContent(24)+Ngen_filter[bRun]->GetBinContent(24));
       }
 
-      std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
+      std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21
       std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
       NgenCorrected = Ngen[runNumber];
       if((truthloMG_j2_pt>35.0e3 && truthloMG_jj_dphi<2.5 && truthloMG_jj_mass>800.0e3) && !passVjetsFilterTauEl) std::cout << "local truth, but passVjetsFilterTauEl is false" << std::endl;
@@ -875,7 +905,7 @@ StatusCode VBFAnalysisAlg::execute() {
       // loading the qg tagger for systematics
       xAOD::Jet* new_jet = m_newJets->at(0);
       const xAOD::JetFourMom_t newp4(jet_pt->at(iJet), jet_eta->at(iJet), jet_phi->at(iJet), jet_m->at(iJet));
-      new_jet->setJetP4(newp4); 
+      new_jet->setJetP4(newp4);
 
       acc_NumTrkPt500PV(*new_jet) = jet_NTracks->at(iJet)[0];
       if(jet_truthjet_pt && jet_truthjet_pt->size()>iJet){ // check that the variables exist to give backward compatibility
@@ -977,7 +1007,7 @@ StatusCode VBFAnalysisAlg::execute() {
      (runNumber>=366010 && runNumber<=366035) || // Znn ptvmjj
      (runNumber>=364156 && runNumber<=364169) || // Wmunu MAXPTHT
      (runNumber>=364170 && runNumber<=364183) || // Wenu MAXPTHT
-     (runNumber>=364184 && runNumber<=364197)){  // Wtaunu MAXPTHT  
+     (runNumber>=364184 && runNumber<=364197)){  // Wtaunu MAXPTHT
     if(SherpaVTruthPt<100.0e3) passVjetsPTV=false; // remove if pTV>100
     if(SherpaVTruthPt>500.0e3) passVjetsPTV=false; // remove if pTV>100
   }
@@ -1035,7 +1065,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if     (325713<=metRunNumber && metRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))   trigger_met=1; //HLT_xe90_pufit_L1XE50;    // period B
   else if(329385<=metRunNumber && metRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met=1; //HLT_xe100_pufit_L1XE55;   // period C
   else if(330857<=metRunNumber && metRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met=1; //HLT_xe110_pufit_L1XE55;   // period D1-D5
-  else if(341649>=metRunNumber && metRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met=1; //HLT_xe110_pufit_L1XE50;   // period D6-K  
+  else if(341649>=metRunNumber && metRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met=1; //HLT_xe110_pufit_L1XE50;   // period D6-K
   // 2018 update trigger for later periods => value 5 for
   if(metRunNumber>=348197) trigger_met=0; // zero it out for 2018
   if     (350067 >metRunNumber && metRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met=1; // HLT_xe110_pufit_xe70_L1XE50
@@ -1111,7 +1141,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
   w = weight*mcEventWeight*puWeight*(met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
-
+  if(m_doVjetRW) w *= vjWeight;
   if(m_theoVariation){
     std::map<TString,bool> regDecision;
     regDecision["Incl"]=true;
@@ -1158,6 +1188,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_puSyst2018Weight = puSyst2018Weight;
   float tmp_qgTagWeight = 1.0; // assuming the default weight is 1.0 for qg tagging
   float tmp_signalTruthSyst=1.0; // signal truth systematics
+  float tmp_vjWeight = vjWeight;
 
   for(std::map<TString,Float_t>::iterator it=tMapFloat.begin(); it!=tMapFloat.end(); ++it){
     //std::cout << "syst: " << it->first <<std::endl;
@@ -1175,6 +1206,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_puSyst2018Weight = puSyst2018Weight;
     tmp_qgTagWeight = 1.0; // default value is 1
     tmp_signalTruthSyst=1.0; // default value is 1
+    tmp_vjWeight = vjWeight;
     if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_nolep_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_nolep_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
@@ -1190,6 +1222,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("ggF_gg2H_"))   tmp_signalTruthSyst=tMapFloat[it->first]; // PS modelling
     else if(it->first.Contains("ATLAS_PDF4LHC_NLO_30_"))   tmp_signalTruthSyst=tMapFloat[it->first]; //PDF
     else if(it->first.Contains("JET_QG_"))        tmp_qgTagWeight=tMapFloat[it->first];
+    else if(it->first.Contains("vjets_"))        tmp_vjWeight=tMapFloat[it->first];
     else if(it->first.Contains("eleANTISF")){
       tmp_eleANTISF=tMapFloat[it->first];
       tmp_eleANTISF=std::min<float>(tmp_eleANTISF,1.5);
@@ -1200,14 +1233,15 @@ StatusCode VBFAnalysisAlg::execute() {
     }
 
     if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
-    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth syst: " << tmp_signalTruthSyst);
+    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight);
 
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
-    //std::cout << "sys: " << it->first << " pu: " << tmp_puSyst2018Weight << " " << tMapFloatW[it->first] << std::endl; 
+    if(m_doVjetRW) tMapFloatW[it->first] *= tmp_vjWeight;
+    //std::cout << "sys: " << it->first << " pu: " << tmp_puSyst2018Weight << " " << tMapFloatW[it->first] << std::endl;
   }//end systematic weight loop
 
-  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " Vjets syst: " << tmp_vjWeight);
 
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR)) return StatusCode::SUCCESS;
@@ -1278,16 +1312,16 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   // add nloEWK
   if(m_isMC){
     if(m_currentVariation=="Nominal"){
-      
+
       // initialize the VBF & ggF variables
       if(m_runNumberInput==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
       if(m_runNumberInput==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);
       if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);// filtered Sherpa samples use nnPDF
 
       if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
-	tMapFloat["nloEWKWeight__1up"]=1.0;
-	tMapFloatW["nloEWKWeight__1up"]=1.0;
-	m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
+        tMapFloat["nloEWKWeight__1up"]=1.0;
+        tMapFloatW["nloEWKWeight__1up"]=1.0;
+        m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
       }
       if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
 	tMapFloat["nloEWKWeight__1down"]=1.0;
@@ -1304,14 +1338,30 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	tMapFloatW["puSyst2018Weight__1down"]=1.0;
 	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
       }
+      if(tMapFloat.find("puSyst2018Weight__1down")==tMapFloat.end()){
+  tMapFloat ["puSyst2018Weight__1down"]=1.0;
+  tMapFloatW["puSyst2018Weight__1down"]=1.0;
+  m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
+      }
+
 
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
-	if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){ 
-	  tMapFloat[m_qgVars.at(iQG)]=1.0; 
+	if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){
+	  tMapFloat[m_qgVars.at(iQG)]=1.0;
 	  tMapFloatW[m_qgVars.at(iQG)]=1.0;
-	  m_tree_out->Branch("w"+m_qgVars.at(iQG),&(tMapFloatW[m_qgVars.at(iQG)])); 
+	  m_tree_out->Branch("w"+m_qgVars.at(iQG),&(tMapFloatW[m_qgVars.at(iQG)]));
 	}
       }// end qg variables
+
+    // Vjets weight + systematics
+    for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){
+      if(tMapFloat.find(m_vjVariations.at(iVj))==tMapFloat.end()){
+        tMapFloat[m_vjVariations.at(iVj)]=1.0;
+        tMapFloatW[m_vjVariations.at(iVj)]=1.0;
+        m_tree_out->Branch("w"+m_vjVariations.at(iVj),&(tMapFloatW[m_vjVariations.at(iVj)]));
+      }
+      }// end Vjets variations
+
     }
   }
 
@@ -1491,6 +1541,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       m_tree->SetBranchStatus("truth_ph_pt",  1);
       m_tree->SetBranchStatus("truth_ph_eta", 1);
       m_tree->SetBranchStatus("truth_ph_phi", 1);
+      m_tree->SetBranchStatus("truth_V_dressed_pt", 1);
     }
   }
 
@@ -1628,6 +1679,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("truth_jet_eta",&truth_jet_eta);
     m_tree->SetBranchAddress("truth_jet_m",  &truth_jet_m);
     if(foundGenMET) m_tree->SetBranchAddress("GenMET_pt",  &GenMET_pt);
+    m_tree->SetBranchAddress("truth_V_dressed_pt",&truth_V_dressed_pt);
   }
 
     if(m_currentVariation=="Nominal" && m_contLep){
