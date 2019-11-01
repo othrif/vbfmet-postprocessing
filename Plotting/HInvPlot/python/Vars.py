@@ -42,13 +42,13 @@ myvars = [    ['jj_deta', '50', '0.0', '10.0'],
               #['lb', '100', '-0.5', '999.5'],
               ['n_vx', '100', '-0.5', '99.5'],
               #['tmva', '100', '-1.0', '1.0'],
+#              ['vjWeight', '100', '0', '1.0'],
               ]
 myvars_notplotted = [['trigger_met_encoded', '2', '0.0', '1.0'],
                          ['trigger_met_encodedv2', '2', '0.0', '1.0'],
               ['passVjetsFilter', '2', '0.0', '1.0'],
               ['passVjetsPTV', '2', '0.0', '1.0'],
                          ['passJetCleanTight', '2', '-0.5', '1.5'],
-              ['vjWeight', '2', '-0.5', '1.5'],
         ]
 
 # These MET variables are plotted too, but if DETAIL_LEVEL_MET

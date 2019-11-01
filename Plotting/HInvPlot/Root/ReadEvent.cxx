@@ -227,7 +227,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   // Init
   for(unsigned i=0; i<fVarVec.size(); ++i)
     fVarVec.at(i).SetVarBranch(tree);
-  vjWeight=-99.0;
+  vjWeight=1.0;
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
@@ -676,13 +676,15 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->EventNumber = fEventNumber;
     event->isMC = fisMC;
     // identify the sample
-    std::cout << fWeight << " " << vjWeight << std::endl;
     if(!fisMC){
       event->sample = Mva::kData;
       if(!fMCEventCount) event->SetWeight(fWeight);
       else event->SetWeight(1.0);
     }else{
-      if(!fMCEventCount) {/*std::cout << "Weight with:" << fWeight*fLumi << ", wihtout:" << fWeight*fLumi/vjWeight << ", vjweight=" << vjWeight << std::endl;*/ event->SetWeight((fWeight*fLumi/vjWeight)); }
+      if(!fMCEventCount) {
+        if(fnoVjWeight) event->SetWeight((fWeight*fLumi/vjWeight)); // assume vjweight is already applied to the nominal weight
+        else event->SetWeight(fWeight*fLumi);
+      }
       else  event->SetWeight(1.0);
       if(fIsDDQCD) event->SetWeight(fWeight);
       if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){
@@ -701,7 +703,6 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(fIsDDQCD) event->sample=Mva::kQCD;
     }
     // Load XS trigger SF
-    event->RepVar(Mva::vjWeight,        vjWeight);
     event->RepVar(Mva::xeSFTrigWeight,        xeSFTrigWeight);
     event->RepVar(Mva::xeSFTrigWeight__1up,   xeSFTrigWeight__1up);
     event->RepVar(Mva::xeSFTrigWeight__1down, xeSFTrigWeight__1down);
