@@ -1,6 +1,27 @@
 class systematics(object):
     def __init__(self,mode):
-        self.systematicsListDown=["MET_SoftTrk_ResoParaDown", "MET_SoftTrk_ResoPerpDown",'JET_JER_DataVsMC__1down', 'JET_JER_EffectiveNP_1__1down', 'JET_JER_EffectiveNP_2__1down', 'JET_JER_EffectiveNP_3__1down', 'JET_JER_EffectiveNP_4__1down', 'JET_JER_EffectiveNP_5__1down', 'JET_JER_EffectiveNP_6__1down', 'JET_JER_EffectiveNP_7restTerm__1down']
+        self.systematicsListDown=["MET_SoftTrk_ResoParaDown", "MET_SoftTrk_ResoPerpDown", 'JET_JER_EffectiveNP_1__1down', 'JET_JER_EffectiveNP_2__1down', 'JET_JER_EffectiveNP_3__1down', 'JET_JER_EffectiveNP_4__1down', 'JET_JER_EffectiveNP_5__1down', 'JET_JER_EffectiveNP_6__1down', 'JET_JER_EffectiveNP_7restTerm__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV30__1down','ATLAS_PDF4LHC_NLO_30_EV29__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV28__1down','ATLAS_PDF4LHC_NLO_30_EV27__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV26__1down','ATLAS_PDF4LHC_NLO_30_EV25__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV24__1down','ATLAS_PDF4LHC_NLO_30_EV23__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV22__1down','ATLAS_PDF4LHC_NLO_30_EV21__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV20__1down','ATLAS_PDF4LHC_NLO_30_EV19__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV18__1down','ATLAS_PDF4LHC_NLO_30_EV17__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV16__1down','ATLAS_PDF4LHC_NLO_30_EV15__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV14__1down','ATLAS_PDF4LHC_NLO_30_EV13__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV12__1down','ATLAS_PDF4LHC_NLO_30_EV11__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV10__1down','ATLAS_PDF4LHC_NLO_30_EV9__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV8__1down','ATLAS_PDF4LHC_NLO_30_EV7__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV6__1down','ATLAS_PDF4LHC_NLO_30_EV5__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV4__1down','ATLAS_PDF4LHC_NLO_30_EV3__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV2__1down','ATLAS_PDF4LHC_NLO_30_EV1__1down',
+                                    'VBF_qqH_25__1down','VBF_qqH_2jet__1down',
+                                    'VBF_qqH_Mjj1500__1down','VBF_qqH_Mjj1000__1down',
+                                    'VBF_qqH_Mjj700__1down','VBF_qqH_Mjj350__1down',
+                                    'VBF_qqH_Mjj120__1down','VBF_qqH_Mjj60__1down',
+                                    'VBF_qqH_200__1down','VBF_qqH_tot__1down'
+                                      ]
         self.systematicsList=""
         self.load(mode)
         self.removeList=['TAUS_','PH_','JET_MassRes_','JET_Rtrk_','JET_Comb_','FT_EFF_','eleANTISFEL_EFF_Iso_']#,'nloEWKWeight__1up','nloEWKWeight__1down','xeSFTrigWeight__1up','xeSFTrigWeight__1down']
@@ -79,7 +100,7 @@ class systematics(object):
                                        'PRW_DATASF__1down','PRW_DATASF__1up',
                                        'xeSFTrigWeight__1up','xeSFTrigWeight__1down','nloEWKWeight__1up','nloEWKWeight__1down','puSyst2018Weight__1up','puSyst2018Weight__1down',
                                         'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up',
-                                        'JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff'
+                                        #'JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff'
                                         ]
             # add the theory systematics
             self.systematicsList += ['ATLAS_PDF4LHC_NLO_30_alphaS__1up','ATLAS_PDF4LHC_NLO_30_alphaS__1down',
@@ -98,7 +119,7 @@ class systematics(object):
                                      'ATLAS_PDF4LHC_NLO_30_EV6__1up','ATLAS_PDF4LHC_NLO_30_EV5__1up',
                                      'ATLAS_PDF4LHC_NLO_30_EV4__1up','ATLAS_PDF4LHC_NLO_30_EV3__1up',
                                      'ATLAS_PDF4LHC_NLO_30_EV2__1up','ATLAS_PDF4LHC_NLO_30_EV1__1up',
-                                    'VBF_qqH_STJetVeto34__1up','VBF_qqH_STJetVeto34__1down','VBF_qqH_STJetVeto__1up','VBF_qqH_STJetVeto__1down',
+                                    'VBF_qqH_STJetVeto34__1up','VBF_qqH_STJetVeto34__1down',
                                     'VBF_qqH_25__1up','VBF_qqH_2jet__1up',
                                     'VBF_qqH_Mjj1500__1up','VBF_qqH_Mjj1000__1up',
                                     'VBF_qqH_Mjj700__1up','VBF_qqH_Mjj350__1up',
@@ -143,7 +164,7 @@ class systematics(object):
                                      'ATLAS_PDF4LHC_NLO_30_EV6__1up','ATLAS_PDF4LHC_NLO_30_EV5__1up',
                                      'ATLAS_PDF4LHC_NLO_30_EV4__1up','ATLAS_PDF4LHC_NLO_30_EV3__1up',
                                      'ATLAS_PDF4LHC_NLO_30_EV2__1up','ATLAS_PDF4LHC_NLO_30_EV1__1up',
-                                    'VBF_qqH_STJetVeto34__1up','VBF_qqH_STJetVeto34__1down','VBF_qqH_STJetVeto__1up','VBF_qqH_STJetVeto__1down',
+                                    'VBF_qqH_STJetVeto34__1up','VBF_qqH_STJetVeto34__1down',
                                     'VBF_qqH_25__1up','VBF_qqH_2jet__1up',
                                     'VBF_qqH_Mjj1500__1up','VBF_qqH_Mjj1000__1up',
                                     'VBF_qqH_Mjj700__1up','VBF_qqH_Mjj350__1up',
@@ -172,6 +193,28 @@ class systematics(object):
                                     'JET_JER_EffectiveNP_1__1up','JET_JER_EffectiveNP_1__1down',
                                     'JET_JER_DataVsMC_MC16__1up', 'JET_JER_DataVsMC_MC16__1down',
                                 ]
+        elif mode == "SigTheory":
+            self.systematicsList= ['ATLAS_PDF4LHC_NLO_30_EV30__1up','ATLAS_PDF4LHC_NLO_30_EV29__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV28__1up','ATLAS_PDF4LHC_NLO_30_EV27__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV26__1up','ATLAS_PDF4LHC_NLO_30_EV25__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV24__1up','ATLAS_PDF4LHC_NLO_30_EV23__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV22__1up','ATLAS_PDF4LHC_NLO_30_EV21__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV20__1up','ATLAS_PDF4LHC_NLO_30_EV19__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV18__1up','ATLAS_PDF4LHC_NLO_30_EV17__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV16__1up','ATLAS_PDF4LHC_NLO_30_EV15__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV14__1up','ATLAS_PDF4LHC_NLO_30_EV13__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV12__1up','ATLAS_PDF4LHC_NLO_30_EV11__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV10__1up','ATLAS_PDF4LHC_NLO_30_EV9__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV8__1up','ATLAS_PDF4LHC_NLO_30_EV7__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV6__1up','ATLAS_PDF4LHC_NLO_30_EV5__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV4__1up','ATLAS_PDF4LHC_NLO_30_EV3__1up',
+                                    'ATLAS_PDF4LHC_NLO_30_EV2__1up','ATLAS_PDF4LHC_NLO_30_EV1__1up',
+                                    'VBF_qqH_25__1up','VBF_qqH_2jet__1up',
+                                    'VBF_qqH_Mjj1500__1up','VBF_qqH_Mjj1000__1up',
+                                    'VBF_qqH_Mjj700__1up','VBF_qqH_Mjj350__1up',
+                                    'VBF_qqH_Mjj120__1up','VBF_qqH_Mjj60__1up',
+                                    'VBF_qqH_200__1up','VBF_qqH_tot__1up'
+                                       ]
         elif mode == "OneSided": # this is used to list all systematics that need to by symmeterized in plotting
             self.systematicsList = ["MET_SoftTrk_ResoPara", "MET_SoftTrk_ResoPerp",'JET_JER_DataVsMC_MC16__1up','JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up','JET_JER_DataVsMC_MC16__1up','JET_QG_trackFakes','JET_QG_trackeff']
             # add theory systematics
@@ -204,7 +247,7 @@ class systematics(object):
         return self.systematicsList+self.systematicsListDown    
 
     def getsystematicsOneSidedMap(self):
-        return {'JET_JER_DataVsMC__1down':'JET_JER_DataVsMC__1up', # these are old!
+        return {#'JET_JER_DataVsMC__1down':'JET_JER_DataVsMC__1up', # these are old!
                 #'JET_JER_DataVsMC_MC16__1down':'JET_JER_DataVsMC_MC16__1up', # this is two sided
                 'JET_JER_EffectiveNP_1__1down':'JET_JER_EffectiveNP_1__1up',
                 'JET_JER_EffectiveNP_2__1down':'JET_JER_EffectiveNP_2__1up',
@@ -254,8 +297,8 @@ class systematics(object):
                 'VBF_qqH_200__1down':'VBF_qqH_200__1up',
                 'VBF_qqH_tot__1down':'VBF_qqH_tot__1up',
                 "JET_JER_SINGLE_NP__1down":"JET_JER_SINGLE_NP__1up",
-                "JET_QG_trackFakes__1down":"JET_QG_trackFakes",
-                "JET_QG_trackeff__1down"  :"JET_QG_trackeff",
+                #"JET_QG_trackFakes__1down":"JET_QG_trackFakes",
+                #"JET_QG_trackeff__1down"  :"JET_QG_trackeff",
                 "MET_SoftTrk_ResoParaDown":"MET_SoftTrk_ResoPara",
                 "MET_SoftTrk_ResoPerpDown":"MET_SoftTrk_ResoPerp",}
                 

@@ -96,8 +96,8 @@ if args.doVBFMETGam:
     extraCommand+=' --doVBFMETGam '
 if args.doPlot:
     extraCommand+=' --doPlot '
-if int(args.Binning)!=0:
-    extraCommand+=' --Binning '+args.Binning
+extraCommand+=' --Binning '+args.Binning
+    
 for syst in systlist:
     isLow = ""    
     if "__1down" in syst or "Down" in syst:

@@ -49,7 +49,8 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::TMVAWeightPath',options.mva_weights_path)
         self.read_reg.SetVal('ReadEvent::TrigString',    options.trig_name)  # specify a trigger from the command line
         self.read_reg.SetVal('ReadEvent::mergePTV',      options.mergePTV)  
-        self.read_reg.SetVal('ReadEvent::mergeExt',      options.mergeExt)  
+        self.read_reg.SetVal('ReadEvent::mergeExt',      options.mergeExt)
+        self.read_reg.SetVal('ReadEvent::Year',          options.year)          
             
         self.read_reg.SetVal('ReadEvent::Print',      'yes')
         self.read_reg.SetVal('ReadEvent::Trees',      ' '.join(self.trees))
@@ -370,13 +371,14 @@ def prepareBkgRuns(keys,options=None):
                           }
     sig_vbfgam = {'312243':'vbf gamma', }
     alt_VBF = {'308275':'VBF125 - H75',
-                      '308277':'VBF125 - H200',
-                      '308278':'VBF125 - H300', 
-                      '308279':'VBF125 - H500', 
-                      '308280':'VBF125 - H750', 
-                      '308281':'VBF125 - H1000',
-                      '308282':'VBF125 - H2000',
-                      '308283':'VBF125 - H3000',}
+               '308277':'VBF125 - H200',
+               '308278':'VBF125 - H300',
+               #'308279':'VBF125 - H500', 
+               '308280':'VBF125 - H750', 
+               #'308281':'VBF125 - H1000',
+               '308282':'VBF125 - H2000',
+               #'308283':'VBF125 - H3000',
+                   }
 
     bkg_wewk =     {'308096':'WenuEWK',
                     '308097':'WmunuEWK',
@@ -1102,11 +1104,15 @@ def prepareBkgRuns(keys,options=None):
 
     # add low mass
     bkg_zqcd.update(bkg_lowMassZ)
+    #bkg_zqcd.update(bkg_zee_228)
     bkg_keys = {
                 'hvh':sig_VH125,
                 #'whww':sig_VH125v2,
-                'vbfg':sig_vbfgam,                
+                'vbfg':sig_vbfgam,
                 'whww':alt_VBF,
+                'hvbf500':{'308279':'VBF125 - H500',},                
+                'hvbf1k':{'308281':'VBF125 - H1000',},                
+                'hvbf3k':{'308283':'VBF125 - H3000',},                
                 'hggf':sig_ggF125,
                 'tth':sig_tth125,
                 'hvbf':sig_VBF125,
