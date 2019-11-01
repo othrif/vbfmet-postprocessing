@@ -94,6 +94,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::mergeExt",      fMergeExt);
   reg.Get("ReadEvent::mergePTV",      fMergePTV);
   reg.Get("ReadEvent::BTagCut",       fBTagCut);
+  reg.Get("ReadEvent::noVjWeight",      fnoVjWeight);
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);

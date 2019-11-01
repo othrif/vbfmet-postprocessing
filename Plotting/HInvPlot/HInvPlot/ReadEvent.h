@@ -170,6 +170,7 @@ namespace Msl
     bool                        fLoadBaseLep;
     bool                        fOverlapPh;
     bool                        fMergeExt;
+    bool                        fnoVjWeight;
     bool                        fMergePTV;
     bool                        fIsDDQCD;
     // Input vars
