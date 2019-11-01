@@ -183,7 +183,8 @@ namespace Msl
     int   fRunNumber;
     int   fRandomRunNumber;    
     ULong64_t fEventNumber;    
-    int   fCurrRunNumber;    
+    int   fCurrRunNumber;
+    int   fYear;        
     Mva::Sample fCurrSample;
 
     std::vector<float> *el_charge;
