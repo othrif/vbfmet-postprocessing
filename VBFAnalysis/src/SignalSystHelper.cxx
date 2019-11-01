@@ -137,8 +137,8 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
     }
   }
   else if(n_jet_truth>2){
-    tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.025;
-    tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.945;
+    tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.015;
+    tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.96;
   }
 
   // Check the weights are loaded
