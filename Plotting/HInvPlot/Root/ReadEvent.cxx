@@ -227,13 +227,14 @@ void Msl::ReadEvent::Init(TTree* tree)
   // Init
   for(unsigned i=0; i<fVarVec.size(); ++i)
     fVarVec.at(i).SetVarBranch(tree);
-  vjWeight=-999.0;
+  vjWeight=-99.0;
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
   xeSFTrigWeight_nomu=1.0;
   xeSFTrigWeight_nomu__1up=1.0;
   xeSFTrigWeight_nomu__1down=1.0;
+  tree->SetBranchStatus("vjWeight", 1);
   tree->SetBranchAddress("vjWeight", &vjWeight);
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
   tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
