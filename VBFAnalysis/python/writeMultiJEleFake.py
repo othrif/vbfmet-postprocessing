@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import ROOT
-
+import os
 def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
@@ -71,6 +71,10 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
                     for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
                 if METCut==180: 
                     for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
+        elif Binning==0:
+            multijets = [400, 200, 200]
+        elif Binning==6:
+            multijets = [300.0, 135, 120.0, 70.0, 120.0, 120.0, 50.0]
         else:
             print 'MJ is not defined for binning: ',Binning
 
@@ -81,12 +85,23 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
     f_multijet = ROOT.TFile("multijet.root", "recreate")
     for multijet in multijets:
         hist=None
-        if doDoubleRatio and a==(len(multijets)-1):
-            hist = ROOT.TH1F("hmultijet_antiVBFSel_1Nom_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1Nom_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+        if doDoubleRatio and a==(len(multijets)):
+            hist   = ROOT.TH1F("hmultijet_antiVBFSel_1Nom_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1Nom_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+            histUp = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncHigh_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncHigh_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+            histDw = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncLow_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncLow_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
         else:
-            hist = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            hist   = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         hist.SetBinContent(1,multijet)
+        hist.SetBinError(1,multijet*0.2)
+        histUp.SetBinContent(1,multijet*1.6)
+        histUp.SetBinError(1,0.0)
+        histDw.SetBinContent(1,multijet/1.6)
+        histDw.SetBinError(1,0.0)
         hist.Write()
+        histUp.Write()
+        histDw.Write()
         a += 1
     f_multijet.Write()
     f_multijet.Close()
@@ -145,7 +160,7 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
         fakeelem = fakeelesm[a-1]
         histpLowSig=None
         histmLowSig=None
-        if doDoubleRatio and a==(len(fakeelesp)-1):
+        if doDoubleRatio and a==(len(fakeelesp)):
             histpLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
             histmLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
         else:
@@ -157,7 +172,7 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
         histmLowSig.Write()
         histm=None
         histp=None
-        if doDoubleRatio and a==(len(fakeelesp)-1):
+        if doDoubleRatio and a==(len(fakeelesp)):
             histp = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts;;", 1, 0.5, 1.5)
             histm = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts;;", 1, 0.5, 1.5)
         else:
@@ -170,5 +185,9 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
         a += 1
     f_fakeele.Write()
     f_fakeele.Close()
-#writeMultiJet(11, 2018, 180)
+#writeMultiJet(11, 2016, 150)
+#os.chdir('../v34D')
+#writeMultiJet(11, 2017, 150)
+#os.chdir('../v34E')
+#writeMultiJet(11, 2018, 150)
 #writeFakeEle(11,  2018)

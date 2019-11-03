@@ -79,14 +79,17 @@ if not options.wait:
 
 log = config.getLog('drawStack.py', debug=options.debug)
 mysyst = import_syst.systematics('All')
+#mysyst = import_syst.systematics('SigTheory')
 mysystOneSided = import_syst.systematics('OneSidedDown')
 
+# or options.syst=='SigTheory'
 # List of plots to symmeterize
 symm_list=[]
 
 #add asymetric uncertainties
 for key,v in mysystOneSided.getsystematicsOneSidedMap().iteritems():
-    symm_list+=[key]
+    if (v in mysyst.getsystematicsList()):
+        symm_list+=[key]
 
 #-----------------------------------------
 def Style():
@@ -1045,8 +1048,10 @@ class DrawStack:
         log.info('   draw ratio')
         sys.Divide(sig)
 
-        if math.fabs(sys.GetMinimum()-1.0) < 0.15 and math.fabs(sys.GetMaximum()-1.0) < 0.15:
-            sys.GetYaxis().SetRangeUser(0.80, 1.20)
+        if math.fabs(sys.GetMinimum()-1.0) < 0.05 and math.fabs(sys.GetMaximum()-1.0) < 0.05:
+            sys.GetYaxis().SetRangeUser(0.95, 1.05)
+        elif math.fabs(sys.GetMinimum()-1.0) < 0.15 and math.fabs(sys.GetMaximum()-1.0) < 0.15:
+            sys.GetYaxis().SetRangeUser(0.80, 1.20)            
         elif math.fabs(sys.GetMinimum()-1.0) < 0.7 and math.fabs(sys.GetMaximum()-1.0) < 0.7:
             sys.GetYaxis().SetRangeUser(0.20, 1.80)
         else:
@@ -1110,13 +1115,15 @@ class DrawStack:
         sys.Divide(bkg)
         log.info('   draw bkg ratio: min/max = %.2f/%.2f' %(sys.GetMinimum(), sys.GetMaximum()))
 
-        if math.fabs(sys.GetMinimum()-1.0) < 0.15 and math.fabs(sys.GetMaximum()-1.0) < 0.15:
+        if math.fabs(sys.GetMinimum()-1.0) < 0.05 and math.fabs(sys.GetMaximum()-1.0) < 0.05:
+            sys.GetYaxis().SetRangeUser(0.95, 1.05)
+        elif math.fabs(sys.GetMinimum()-1.0) < 0.15 and math.fabs(sys.GetMaximum()-1.0) < 0.15:
             sys.GetYaxis().SetRangeUser(0.80, 1.20)
         elif math.fabs(sys.GetMinimum()-1.0) < 0.7 and math.fabs(sys.GetMaximum()-1.0) < 0.7:
             sys.GetYaxis().SetRangeUser(0.0, 1.80)
         else:
             sys.GetYaxis().SetRangeUser(0.0, 3.0)
-        sys.GetYaxis().SetRangeUser(0.7, 1.3)
+        #sys.GetYaxis().SetRangeUser(0.7, 1.3)
 
         sys.GetYaxis().SetTitle('%s/Nominal' %syst)
         sys.GetYaxis().CenterTitle()
@@ -1273,7 +1280,9 @@ class DrawStack:
                     s.Divide(bkg)
 
                 # SetRange
-                if math.fabs(s.GetMinimum()-1.0) < 0.15 and math.fabs(s.GetMaximum()-1.0) < 0.15:
+                if math.fabs(s.GetMinimum()-1.0) < 0.05 and math.fabs(s.GetMaximum()-1.0) < 0.05:
+                    s.GetYaxis().SetRangeUser(0.95, 1.05)
+                elif math.fabs(s.GetMinimum()-1.0) < 0.15 and math.fabs(s.GetMaximum()-1.0) < 0.15:
                     s.GetYaxis().SetRangeUser(0.80, 1.20)
                 elif math.fabs(s.GetMinimum()-1.0) < 0.5 and math.fabs(s.GetMaximum()-1.0) < 0.5:
                     s.GetYaxis().SetRangeUser(0.501, 1.499)
@@ -1293,7 +1302,7 @@ class DrawStack:
                     if tmp_color==3:
                         self.UpdateHist(bkg_ratio)
                         bkg_ratio.GetYaxis().SetTitle('%s / Data' %'Syst')
-                        bkg_ratio.GetYaxis().SetRangeUser(0.80, 1.20)
+                        #bkg_ratio.GetYaxis().SetRangeUser(0.80, 1.20)
                         bkg_ratio.Draw('HIST')
                 else:
                     s.GetYaxis().SetTitle('%s / Nominal' %'Syst')
@@ -1302,7 +1311,7 @@ class DrawStack:
 
                 if tmp_color==4 and not fillData:
                     self.UpdateHist(s,ignore_max=True)
-                    s.GetYaxis().SetRangeUser(0.80, 1.20)
+                    s.GetYaxis().SetRangeUser(0.95, 1.05)
                     s.Draw('HIST')
                 else:
                     s.Draw('HIST SAME')
@@ -1360,7 +1369,7 @@ class DrawStack:
 
         self.sig_table.SetStats(False)
         #self.sig_table.GetYaxis().SetRangeUser(0.82, 1.18)
-        self.sig_table.GetYaxis().SetRangeUser(0.82, 1.18)
+        self.sig_table.GetYaxis().SetRangeUser(0.95, 1.05)
 
         self.sig_table.GetYaxis().SetTitle('Systematics/Nominal')
         self.sig_table.GetYaxis().CenterTitle()
