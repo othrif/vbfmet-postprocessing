@@ -146,6 +146,10 @@ namespace Msl
     TH1                        *hj2fjvt; 
     TH1			       *hj2metsig;     
     TH1			       *hj3metsig;     
+    TH1                        *hj2fjvt_eta28; 
+    TH1                        *hj3fjvt_eta28; 
+    TH1			       *hj2metsig_eta28;     
+    TH1			       *hj3metsig_eta28;     
     TH2			       *hratio_mu_njet2;
     TH2			       *hratio_mu_njet34;
 

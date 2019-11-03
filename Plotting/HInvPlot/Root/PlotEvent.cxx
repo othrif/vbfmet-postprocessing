@@ -51,6 +51,10 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hj2fjvt(0),
 				  hj2metsig(0),
 				  hj3metsig(0),
+				  hj2fjvt_eta28(0),
+				  hj3fjvt_eta28(0),
+				  hj2metsig_eta28(0),
+				  hj3metsig_eta28(0),
 				  hratio_mu_njet2(0),
 				  hratio_mu_njet34(0)
 {
@@ -152,9 +156,13 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hmu_njet2           = GetTH1("mu_njet2", 100, -0.5, 99.5);
   hmu_njet34          = GetTH1("mu_njet34", 100, -0.5, 99.5);
   hj2Eta 	      = GetTH1("j2Eta", 22,  -4.5,  4.5);
-  hj2fjvt           = GetTH1("j2fjvt",           22,  -0.2,  2.0);
+  hj2fjvt             = GetTH1("j2fjvt",           22,  -0.2,  2.0);
   hj2metsig	      = GetTH1("j2metsig", 200, 0.0, 20.0);
+  hj2fjvt_eta28       = GetTH1("j2fjvt_eta28",           22,  -0.2,  2.0);
+  hj2metsig_eta28     = GetTH1("j2metsig_eta28", 200, 0.0, 20.0);
   hj3metsig	      = GetTH1("j3metsig", 200, 0.0, 20.0);
+  hj3fjvt_eta28       = GetTH1("j3fjvt_eta28",           22,  -0.2,  2.0);
+  hj3metsig_eta28     = GetTH1("j3metsig_eta28", 200, 0.0, 20.0);
   hratio_mu_njet2     = GetTH2("j3EtaMuNjet2", 100, -0.5, 99.5, 22,  -4.5,  4.5);
   hratio_mu_njet34    = GetTH2("j3EtaMuNjet34", 100, -0.5, 99.5, 22,  -4.5,  4.5);
 
@@ -322,6 +330,10 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(hj3metsig) hj3metsig->Fill(event.GetVar(Mva::met_significance), weight);
     if(hmu_njet34) hmu_njet34->Fill(event.GetVar(Mva::averageIntPerXing),weight);
     if(hratio_mu_njet34) hratio_mu_njet34->Fill(event.GetVar(Mva::averageIntPerXing),event.jets.at(2).eta,weight);
+    if(event.jets.at(2).eta>2.8||event.jets.at(2).eta<-2.8){
+      if(hj3fjvt_eta28) hj3fjvt_eta28->Fill(event.jets.at(2).GetVar(Mva::fjvt), weight);
+      if(hj3metsig_eta28) hj3metsig_eta28->Fill(event.GetVar(Mva::met_significance), weight);
+    }
   }
   else if(event.jets.size()==2){
     if(hmu_njet2) hmu_njet2->Fill(event.GetVar(Mva::averageIntPerXing),weight);
@@ -329,6 +341,10 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(hj2Eta) hj2Eta->Fill(event.jets.at(1).eta,weight);
     if(hj2fjvt) hj2fjvt->Fill(event.jets.at(1).GetVar(Mva::fjvt), weight);
     if(hj2metsig) hj2metsig->Fill(event.GetVar(Mva::met_significance), weight);
+    if(event.jets.at(1).eta>2.8||event.jets.at(1).eta<-2.8){
+      if(hj2fjvt_eta28) hj2fjvt_eta28->Fill(event.jets.at(1).GetVar(Mva::fjvt), weight);
+      if(hj2metsig_eta28) hj2metsig_eta28->Fill(event.GetVar(Mva::met_significance), weight);
+    }
   }
   if(event.HasVar(Mva::BCIDDistanceFromFront)){
     hJetEMECvsBCIDPosPt25->Fill(njet25EMEC,event.GetVar(Mva::BCIDDistanceFromFront));
