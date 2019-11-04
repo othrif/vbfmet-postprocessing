@@ -23,7 +23,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
     if True:
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(36000/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(59000/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.04)
@@ -187,19 +187,37 @@ def Draw(hname1,f1,f2,can,h1_norm,h2_norm,GetError=True, hpath=''):
     can.Clear()
    
     hname=hpath+hname1
+    hnamev2=hname
+    hnamev3=hname
+    hnamev4=hname
+    if True:
+        hnamev2=hpath.replace('_hvbf','_hvbf500')+hname1
+        hnamev3=hpath.replace('_hvbf','_hvbf1k')+hname1
+        hnamev4=hpath.replace('_hvbf','_hvbf3k')+hname1
+    print hname
+    print hnamev2
     h1 = f1.Get(hname)
-    h2 = f2.Get(hname)
+    h2 = f2.Get(hnamev2)
+    h3 = f2.Get(hnamev3)
+    h4 = f2.Get(hnamev4)
     h1.Scale(h1_norm)
     h2.Scale(h2_norm)
     h1.SetStats(0)
     h2.SetStats(0)
+    h3.SetStats(0)
+    h4.SetStats(0)
     h1.SetLineColor(1)
     h1.SetMarkerColor(1)
     h2.SetLineColor(2)
     h2.SetMarkerColor(2)
     h1.SetMarkerSize(0.5)
     h2.SetMarkerSize(0.5)
-
+    h3.SetLineColor(3)
+    h3.SetMarkerColor(3)
+    h4.SetLineColor(4)
+    h4.SetMarkerColor(4)    
+    h3.SetMarkerSize(0.5)
+    h4.SetMarkerSize(0.5)    
 
     # pads
     pad1 = ROOT.TPad("pad1", "pad1", 0, 0.3, 1, 1.0);
@@ -207,7 +225,7 @@ def Draw(hname1,f1,f2,can,h1_norm,h2_norm,GetError=True, hpath=''):
     #pad1.SetGridx();         # Vertical grid
     pad1.Draw();             # Draw the upper pad: pad1
     pad1.cd();               # pad1 becomes the current pad
-    extra_text_save='_vbf'
+    extra_text_save='_vbfHighMass'
     extra_text='VBF H125'
     rebin=2
     if hname.count('_hggf'):
@@ -229,15 +247,23 @@ def Draw(hname1,f1,f2,can,h1_norm,h2_norm,GetError=True, hpath=''):
     if hname1=='jj_mass':
         h1.Rebin(rebin)
         h2.Rebin(rebin)
+        h4.Rebin(rebin)
+        h3.Rebin(rebin)
     if hname1=='jj_deta':
         h1.Rebin(rebin)
-        h2.Rebin(rebin)        
+        h2.Rebin(rebin)
+        h3.Rebin(rebin)
+        h4.Rebin(rebin)
     if hname1=='met_tst_et':
         h1.Rebin(rebin)
         h2.Rebin(rebin) 
+        h3.Rebin(rebin) 
+        h4.Rebin(rebin) 
     if hname1=='jj_dphi':
         h1.Rebin(rebin)
         h2.Rebin(rebin) 
+        h3.Rebin(rebin) 
+        h4.Rebin(rebin) 
     if GetError:
         h1.GetYaxis().SetTitle('Relative Error')        
     else:
@@ -249,6 +275,8 @@ def Draw(hname1,f1,f2,can,h1_norm,h2_norm,GetError=True, hpath=''):
         h2 = PlotError(h2)
     h1.Draw()
     h2.Draw('same')
+    h3.Draw('same')
+    h4.Draw('same')
 
     e=ROOT.Double(0.0)
     print 'Integral old: ',h1.IntegralAndError(0,1001,e),'+/-',e
@@ -257,8 +285,10 @@ def Draw(hname1,f1,f2,can,h1_norm,h2_norm,GetError=True, hpath=''):
     leg = ROOT.TLegend(0.4,0.5,0.8,0.8)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
-    leg.AddEntry(h1,'Old Signal')
-    leg.AddEntry(h2,'New Signal')
+    leg.AddEntry(h1,'H125 Signal')
+    leg.AddEntry(h2,'H500 Signal')
+    leg.AddEntry(h3,'H1000 Signal')    
+    leg.AddEntry(h4,'H3000 Signal')    
 
     leg.Draw()
         
@@ -274,8 +304,8 @@ def Draw(hname1,f1,f2,can,h1_norm,h2_norm,GetError=True, hpath=''):
     pad2.Draw();
     pad2.cd();       # pad2 becomes the current pad
 
-    hratio = h1.Clone()
-    hratio.Divide(h2)
+    hratio = h2.Clone()
+    hratio.Divide(h1)
     pad1.SetLogy(0)
     pad2.SetLogy(0)
     pad1.SetLogx(0)
@@ -335,8 +365,8 @@ def Draw(hname1,f1,f2,can,h1_norm,h2_norm,GetError=True, hpath=''):
         hratio.GetXaxis().SetTitle('Truth MET [GeV]')
     elif  hname.count('j3Pt'):
         hratio.GetXaxis().SetTitle('3rd jet p_{T} [GeV]')        
-    hratio.GetYaxis().SetTitle('Old / New')
-    hratio.GetYaxis().SetRangeUser(0.5,1.5)       
+    hratio.GetYaxis().SetTitle('Signal / H125')
+    hratio.GetYaxis().SetRangeUser(0.0,0.5)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -349,6 +379,12 @@ def Draw(hname1,f1,f2,can,h1_norm,h2_norm,GetError=True, hpath=''):
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);    
     hratio.Draw()
+    hratio3 = h3.Clone()
+    hratio4 = h4.Clone()
+    hratio3.Divide(h1)
+    hratio4.Divide(h1)
+    hratio3.Draw('same')
+    hratio4.Draw('same')
     can.Update()
     can.WaitPrimitive()
     #raw_input()
@@ -365,15 +401,18 @@ def Fit(_suffix=''):
     #f2 = ROOT.TFile.Open('365510b_VBFTruth_out.root')
     #f1 = ROOT.TFile.Open('/tmp/v26Loose_BTAGW_sig.root')
     #f2 = ROOT.TFile.Open('../v26LooseNewSig.root')        
-    f1 = ROOT.TFile.Open('/tmp/v26Loose_BTAGW_sig_nj25.root')
-    f2 = ROOT.TFile.Open('/tmp/v26LooseNewSigLoosenNjet.root')        
+    #f1 = ROOT.TFile.Open('/tmp/v26Loose_BTAGW_sig_nj25.root')
+    #f2 = ROOT.TFile.Open('/tmp/v26LooseNewSigLoosenNjet.root')
+
+    f2 = ROOT.TFile.Open('/tmp/v34PFTSother.root')
+    f1 = ROOT.TFile.Open('/tmp/v34PFTSother.root')
 
     h1_norm=1.0 #36.100
     h2_norm=1.0 #36.100 #hggf, hvh, hvbf
-    hnames=['n_jet','j3Pt','met_truth_et','jj_mass','jj_deta','met_tst_et','jj_dphi']#'elneg_pt','elpos_pt','ph_pt_lead','ph_eta_lead','ph_pt','ph_eta','boson_pt','boson_eta','njet','dr_ph_el','dr_ph_j','dr_ph_boson']
+    hnames=['met_tst_et','jj_mass','jj_deta','jj_dphi','n_jet','j3Pt','met_truth_et','jj_mass','jj_deta','met_tst_et','jj_dphi']#'elneg_pt','elpos_pt','ph_pt_lead','ph_eta_lead','ph_pt','ph_eta','boson_pt','boson_eta','njet','dr_ph_el','dr_ph_j','dr_ph_boson']
     for hname in hnames:
-        #Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=False, hpath='pass_sr_allmjj_nn_Nominal/plotEvent_hvbf/')
-        Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=False, hpath='pass_sr_njgt2lt5_nn_Nominal/plotEvent_hvbf/')        
+        Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=False, hpath='pass_sr_allmjj_nn_Nominal/plotEvent_hvbf/')
+        #Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=False, hpath='pass_sr_njgt2lt5_nn_Nominal/plotEvent_hvbf/')        
     #raw_input('a')
 
 setPlotDefaults(ROOT)
