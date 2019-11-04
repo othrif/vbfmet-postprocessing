@@ -103,6 +103,8 @@ class systematics(object):
 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up',
                                         'puSyst2018Weight__1up','puSyst2018Weight__1down',
                                         ]
+            self.systematicsList = ["vjets_d1kappa_EW", "vjets_d2kappa_EW", "vjets_d3kappa_EW", "vjets_d1K_NNLO", "vjets_d2K_NNLO", "vjets_d3K_NNLO", "vjets_dK_NNLO_mix", "vjets_dK_PDF"]
+
 
         elif mode == "Electrons":
             self.systematicsList = ["Nominal", "EG_RESOLUTION_ALL__1down", "EG_RESOLUTION_ALL__1up", "EG_SCALE_ALL__1down", "EG_SCALE_ALL__1up", "EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down",  "EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1up"]
@@ -121,8 +123,6 @@ class systematics(object):
                                         ]
         elif mode == "OneSidedDown": # this is used to list all systematics that need to by symmeterized in plotting
             self.systematicsList = self.systematicsListDown
-        elif mode == "vj":
-            self.systematicsList = ["vjets_d1kappa_EW", "vjets_d2kappa_EW", "vjets_d3kappa_EW", "vjets_d1K_NNLO", "vjets_d2K_NNLO", "vjets_d3K_NNLO", "vjets_dK_NNLO_mix", "vjets_dK_PDF"]
 
     def getsystematicsList(self):
         return self.systematicsList

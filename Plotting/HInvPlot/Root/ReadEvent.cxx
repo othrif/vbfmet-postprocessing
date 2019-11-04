@@ -559,7 +559,6 @@ void Msl::ReadEvent::Read(const std::string &path)
   cout << "------------------------------------------------------------------" << endl;
   log() << "Read - process new file: "                         << endl
 	<< "   path:      " << path                            << endl;
-
   //
   // Read events from tree(s) and call sub-algorithms for processing
   //

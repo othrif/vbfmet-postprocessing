@@ -55,7 +55,7 @@ def prepareListPlot(selkey, alg_take=None, alg_pass=None, alg_suff='', region=No
                                                   DetailLvl=options.DetailLvl,
                                                   Samples=samples,
                                                   PassAlg=alg_pass)]
-                                                
+
 
     if options.no_plot:
         plot_algs = []
@@ -87,7 +87,7 @@ def prepareSeqMETSF(basic_cuts, alg_take=None, syst='Nominal'):
 
     pass_alg = hstudy.preparePassEventForMETSF('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-    
+
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
@@ -197,7 +197,7 @@ def main():
         options.int_lumi=58450.1
     if options.year==2017 and options.int_lumi==36207.66:
         options.int_lumi=44307.4
-        
+
     #-----------------------------------------------------------------------------------------
     # Prepare run numbers for requested samples and find input files
     #
@@ -239,7 +239,7 @@ def main():
     if options.chan=='short':
         chans   = ['nn','ee','uu','ll','l','e','u']
     elif options.chan=='veryshort':
-        chans   = ['nn','ll','l']        
+        chans   = ['nn','ll','l']
     elif options.chan != None:
         chans = options.chan.split(',')
 
@@ -303,7 +303,7 @@ def main():
                         #
                         (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
                         read_alg.AddNormalAlg(name_sr,  alg_sr)
-                        
+
                         #
                         # SR Cut based regions and algorithms with photon
                         #
@@ -314,19 +314,19 @@ def main():
                             read_alg.AddNormalAlg(name_zcr_gam,  alg_zcr_gam)
                             (name_wcr_gam,  alg_wcr_gam)  = prepareSeqGamWCR (basic_cuts, alg_take=input_cut, syst=syst)
                             read_alg.AddNormalAlg(name_wcr_gam,  alg_wcr_gam)
-                        
+
                         #
                         # ZCR Cut based regions and algorithms
                         #
                         (name_zcr,  alg_zcr)  = prepareSeqZCR (basic_cuts, a, alg_take=input_cut, syst=syst)
                         read_alg.AddNormalAlg(name_zcr,  alg_zcr)
-                        
+
                         #
                         # WCR Cut based regions and algorithms
                         #
                         (name_wcr,  alg_wcr)  = prepareSeqWCR (basic_cuts, a, alg_take=input_cut, syst=syst)
                         read_alg.AddNormalAlg(name_wcr,  alg_wcr)
-                        
+
                         (name_wcranti, alg_wcranti) = prepareSeqWCRAntiID(basic_cuts, a, alg_take=input_cut, syst=syst)
                         read_alg.AddNormalAlg(name_wcranti, alg_wcranti)
 
