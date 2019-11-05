@@ -64,7 +64,7 @@ StatusCode VBFAnalysisAlg::initialize() {
 
     // Vjets weight + systematics
     if(m_isMC && m_currentVariation=="Nominal")
-      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
+      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") != std::string::npos  || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
       std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
       my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
       my_vjSystHelper.applyEWCorrection(true);
