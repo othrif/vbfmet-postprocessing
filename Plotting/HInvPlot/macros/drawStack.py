@@ -78,7 +78,8 @@ if not options.wait:
     ROOT.gROOT.SetBatch(True)
 
 log = config.getLog('drawStack.py', debug=options.debug)
-mysyst = import_syst.systematics('All')
+#mysyst = import_syst.systematics("All")
+mysyst = import_syst.systematics(options.syst)
 #mysyst = import_syst.systematics('SigTheory')
 mysystOneSided = import_syst.systematics('OneSidedDown')
 
@@ -124,16 +125,16 @@ def getSelKeyLabel(selkey):
             elif selkey.count('_e'): proc = 'W#rightarrow e#nu'
             elif selkey.count('_u'): proc = 'W#rightarrow#mu#nu'
 
-        if selkey.count('LowMETQCD_'):  proc += ', Low MET QCD'        
-        elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'        
-        elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'        
+        if selkey.count('LowMETQCD_'):  proc += ', Low MET QCD'
+        elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'
+        elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'
         elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
         elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<0.8TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
-        elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'            
-        elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'            
-        elif selkey.count('njgt2_'):  proc += ',2<N_{jet}'            
-        elif selkey.count('njgt3_'):  proc += ',3<N_{jet}'            
+        elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'
+        elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'
+        elif selkey.count('njgt2_'):  proc += ',2<N_{jet}'
+        elif selkey.count('njgt3_'):  proc += ',3<N_{jet}'
         if selkey.count('sr_'):  proc += ', SR'
         elif selkey.count('wcr'):
             if 'anti' in selkey:
@@ -141,7 +142,7 @@ def getSelKeyLabel(selkey):
             else:
                 proc += ', WCR'
         elif selkey.count('zcr'): proc += ', ZCR'
-        if selkey.count('FJVT_'):  proc += ',f-jvt'                    
+        if selkey.count('FJVT_'):  proc += ',f-jvt'
     return proc
 
 #-------------------------------------------------------------------------
@@ -229,18 +230,18 @@ def getHistPars(hist):
         'n_bjet'  : {'xtitle':'Number of B Jets',             'ytitle':'Events', 'rebin':0,'ymin':0.1, 'logy':True,'LtoRCut':1},
         #'tmva'  : {'xtitle':'BDT Score',          'ytitle':'Events', 'rebin':0,'LtoRCut':0,'xmin':-0.4,'xmax':0.6,'ymin':0.01},
         #'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':10,'LtoRCut':0,'xmin':0.0,'ymin':0.1},
-        'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':0,'LtoRCut':2,'xmin':0.0,'ymin':0.1},        
+        'tmva'  : {'xtitle':'Keras ANN Score',    'ytitle':'Events', 'rebin':0,'LtoRCut':2,'xmin':0.0,'ymin':0.1},
         'bcid'  : {'xtitle':'BCID',             'ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'BCIDDistanceFromFront'  : {'xtitle':'Distance from front of Train','ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
-        'lb'  : {'xtitle':'Lumi block','ytitle':'Events', 'rebin':0,'LtoRCut':1}, 
+        'lb'  : {'xtitle':'Lumi block','ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'n_vx'  : {'xtitle':'Recontructed Vertices (N_{PV})','ytitle':'Events', 'rebin':0,'LtoRCut':1},
         'JetEtaPt25'  : {'xtitle':'Jet #eta wth 25<p_{T}<35 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},
-        'JetEtaPt35'  : {'xtitle':'Jet #eta wth 35<p_{T}<55 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},                 
-        'JetEtaPt55'  : {'xtitle':'Jet #eta wth 55<p_{T} GeV','ytitle':'Events', 'rebin':5,'LtoRCut':1},                 
+        'JetEtaPt35'  : {'xtitle':'Jet #eta wth 35<p_{T}<55 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},
+        'JetEtaPt55'  : {'xtitle':'Jet #eta wth 55<p_{T} GeV','ytitle':'Events', 'rebin':5,'LtoRCut':1},
         'JetEMECvsBCIDPosPt25'  : {'xtitle':'Jet Number jets wth 25<p_{T}<35 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},
-        'JetEMECvsBCIDPosPt35'  : {'xtitle':'Jet #eta wth 35<p_{T}<55 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
-        'JetEMECvsBCIDPosPt55'  : {'xtitle':'Jet #eta wth 55<p_{T} GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
+        'JetEMECvsBCIDPosPt35'  : {'xtitle':'Jet #eta wth 35<p_{T}<55 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'JetEMECvsBCIDPosPt55'  : {'xtitle':'Jet #eta wth 55<p_{T} GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},
 
         'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
@@ -257,11 +258,11 @@ def getHistPars(hist):
         'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
         'jj_mass_variableBin'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},
-        'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
+        'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},
         'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'jj_deta_signed' : {'xtitle':'Signed #Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
-        'jj_deta_diff' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
-        'jj_deta_abs' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|/#Delta#eta_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
+        'jj_deta_diff' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
+        'jj_deta_abs' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|/#Delta#eta_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
@@ -270,7 +271,7 @@ def getHistPars(hist):
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
-    'met_tenacious_tst_nolep_et'     : {'xtitle':'Tenacious MET (lepton removed) [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},    
+    'met_tenacious_tst_nolep_et'     : {'xtitle':'Tenacious MET (lepton removed) [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_mass'     : {'xtitle':'Truth m_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_deta'     : {'xtitle':'Truth #Delta#eta_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -313,7 +314,7 @@ def getHistPars(hist):
     'avgmj3_over_mjj'     : {'xtitle':'Average min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
-    'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},     
+    'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
         }
 
     try:
@@ -356,12 +357,12 @@ def getLabelSortKey(sample):
     #elif sample == 'data': return 11
     elif sample == 'bkgs': return 12
     elif sample == 'zewk': return 13
-    elif sample == 'ttg': return 13        
-    elif sample == 'zgamewk': return 15        
+    elif sample == 'ttg': return 13
+    elif sample == 'zgamewk': return 15
     elif sample == 'wgamewk': return 15
-    elif sample == 'zgam': return 13        
-    elif sample == 'wgam': return 13        
-    elif sample == 'pho': return 13        
+    elif sample == 'zgam': return 13
+    elif sample == 'wgam': return 13
+    elif sample == 'pho': return 13
     elif sample == 'wqcd': return 14
     elif sample == 'wqcdMad': return 14
     elif sample == 'wewk': return 15
@@ -398,12 +399,12 @@ def getSampleSortKey(sample):
     elif sample == 'hvbf': return 9
     elif sample == 'data': return -10
     elif sample == 'bkgs': return 11
-    elif sample == 'ttg': return 13        
-    elif sample == 'zgam': return 13        
+    elif sample == 'ttg': return 13
+    elif sample == 'zgam': return 13
     elif sample == 'wgam': return 13
     elif sample == 'zgamewk': return 15
     elif sample == 'wgamewk': return 15
-    elif sample == 'pho': return 13        
+    elif sample == 'pho': return 13
 
     log.warning('getLabelSortKey - unknown key: %s' %sample)
     return 100
@@ -439,9 +440,9 @@ def getSampleLabel(sample):
         'wgam': 'W#gamma',
         'wgas': 'W#gamma*',
         'zgas': 'Z#gamma*',
-        'zgam': 'Z#gamma',        
-        'zgamewk': 'Z#gamma EWK',        
-        'wgamewk': 'W#gamma EWK',        
+        'zgam': 'Z#gamma',
+        'zgamewk': 'Z#gamma EWK',
+        'wgamewk': 'W#gamma EWK',
         'ttg': 't#bar{t}#gamma',
         'pho': '#gamma+j',
         'htau':  '%s H#rightarrow#tau#tau'%options.hmass,
@@ -497,9 +498,9 @@ def getStyle(sample):
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
     color_wgamewk = ROOT.kOrange-5
-    color_zgamewk = ROOT.kOrange-6    
+    color_zgamewk = ROOT.kOrange-6
     color_ttg = ROOT.kBlue   -9
-    color_pho = ROOT.kGreen -3  
+    color_pho = ROOT.kGreen -3
     color_wdpi = ROOT.kOrange-5
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
@@ -522,11 +523,11 @@ def getStyle(sample):
         'mqcd':{'color':color_wdpi, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'dqcd':{'color':color_wdpi, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'pho':{'color':color_pho, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
-        'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
-        'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'pho':{'color':color_pho, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'wgam':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'zgamewk':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'zgamewk':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'wgamewk':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
@@ -616,12 +617,12 @@ def updateCanvas(can, name=None, leg=None, option = '', data_hist=None, bkg_sum_
             can.Write()
             if data_hist:
                 data_hist.hist.SetDirectory(outfile)
-                data_hist.hist.SetName("data_"+data_hist.hist.GetName())                
+                data_hist.hist.SetName("data_"+data_hist.hist.GetName())
                 data_hist.hist.Write()
             if bkg_sum_hist:
                 bkg_sum_hist.SetDirectory(outfile)
                 bkg_sum_hist.SetName("totbkg_"+bkg_sum_hist.GetName())
-                bkg_sum_hist.Write()                
+                bkg_sum_hist.Write()
             outfile.Close()
             print "file "+str(outfile)+" has been created"
 
@@ -1039,7 +1040,7 @@ class DrawStack:
         if math.fabs(sys.GetMinimum()-1.0) < 0.05 and math.fabs(sys.GetMaximum()-1.0) < 0.05:
             sys.GetYaxis().SetRangeUser(0.95, 1.05)
         elif math.fabs(sys.GetMinimum()-1.0) < 0.15 and math.fabs(sys.GetMaximum()-1.0) < 0.15:
-            sys.GetYaxis().SetRangeUser(0.80, 1.20)            
+            sys.GetYaxis().SetRangeUser(0.80, 1.20)
         elif math.fabs(sys.GetMinimum()-1.0) < 0.7 and math.fabs(sys.GetMaximum()-1.0) < 0.7:
             sys.GetYaxis().SetRangeUser(0.20, 1.80)
         else:
@@ -1722,7 +1723,7 @@ class DrawStack:
                             cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
                         elif leftToRight==3: # add bins together
                             cut_NsigOpp = self.sign.hist.Integral(ibin+1,10001)
-                            cut_NbkgOpp = self.bkg_sum.Integral(ibin+1,10001)                            
+                            cut_NbkgOpp = self.bkg_sum.Integral(ibin+1,10001)
                         elif (leftToRight==4 and ibin%2==0): # pair every 2 bins together
                             cut_Nsig = self.sign.hist.GetBinContent(ibin)
                             cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
@@ -1740,7 +1741,7 @@ class DrawStack:
                         #else:
                         #    cut_Nsig = self.sign.hist.Integral(ibin,ibin)
                         #    cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
-                                
+
                         #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
                             signifV = 2.0*math.sqrt(cut_Nbkg)/cut_Nsig
@@ -1908,12 +1909,12 @@ class DrawStack:
             self.error_map['bkg_ratio'].SetMarkerColor(1)
             self.error_map['bkg_ratio'].SetMarkerSize(0)
             self.error_map['bkg_ratio'].SetLineColor(1)
-            self.error_map['bkg_ratio'].Draw('SAME E2')            
+            self.error_map['bkg_ratio'].Draw('SAME E2')
             # JES error ratio
             if syst_jes_ratio:
                 self.error_map['syst_jes_ratio'] = syst_jes_ratio.Clone()
                 self.error_map['syst_jes_ratio'].SetFillColor(0)
-                self.error_map['syst_jes_ratio'].SetLineColor(3)            
+                self.error_map['syst_jes_ratio'].SetLineColor(3)
                 self.error_map['syst_jes_ratio'].SetLineWidth(2)
                 self.error_map['syst_jes_ratio'].SetMarkerColor(3)
                 self.error_map['syst_jes_ratio'].SetLineStyle(1)
@@ -1939,7 +1940,7 @@ class DrawStack:
                         elif self.signifCR.GetBinContent(i)>0.0:
                             optv=self.signifCR.GetBinContent(i)
                 print 'combine last 3 bins: ',optv
-                        
+
             else:
                 self.ratio.Draw('same')
             self.pads[ipad].RedrawAxis()
@@ -2005,7 +2006,7 @@ class DrawStack:
                         elif e1<0:
                             e2=syst_jesr.GetErrorYlow(m-1)
                             new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
-                            syst_jesr.SetPointEYlow(m-1,new_e)                        
+                            syst_jesr.SetPointEYlow(m-1,new_e)
         #
         # Calculate the systematic band for a ratio plot
         #
@@ -2013,7 +2014,7 @@ class DrawStack:
         y1=ROOT.Double()
         syst_jesr_ratio=None
         if syst_jesr:
-            syst_jesr_ratio = syst_ratio.Clone()        
+            syst_jesr_ratio = syst_ratio.Clone()
         for i in range(0,self.bkg_sum.GetNbinsX()+1):
             syst_ratio.SetPointEXhigh(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
             syst_ratio.SetPointEXlow(i-1,self.bkg_sum.GetXaxis().GetBinWidth(i)/2.0)
@@ -2044,7 +2045,7 @@ class DrawStack:
                 eyu=syst_jesr.GetErrorYhigh   (j-1)/val
                 eyd=syst_jesr.GetErrorYlow    (j-1)/val
                 syst_jesr_ratio.SetPointEYhigh(j-1,eyu)
-                syst_jesr_ratio.SetPointEYlow (j-1,eyd)           
+                syst_jesr_ratio.SetPointEYlow (j-1,eyd)
             #print 'err up: ',eyu,' down: ',eyd
 
         return syst_jesr_ratio
@@ -2122,7 +2123,7 @@ class DrawStack:
         if 'xmax' in pars and 'xmin' in pars:
             self.stack.GetXaxis().SetRangeUser(pars['xmin'],pars['xmax'])
         elif 'xmin' in pars:
-            self.stack.GetXaxis().SetRangeUser(pars['xmin'],1.0)              
+            self.stack.GetXaxis().SetRangeUser(pars['xmin'],1.0)
         elif 'xmax' in pars:
             self.stack.GetXaxis().SetRangeUser(0.0,pars['xmax'])
         elif options.xmax != None:
@@ -2172,7 +2173,7 @@ class DrawStack:
         if 'xmax' in pars and 'xmin' in pars:
             h.GetXaxis().SetRangeUser(pars['xmin'],pars['xmax'])
         elif 'xmin' in pars:
-            h.GetXaxis().SetRangeUser(pars['xmin'],1.0)            
+            h.GetXaxis().SetRangeUser(pars['xmin'],1.0)
         elif 'xmax' in pars:
             h.GetXaxis().SetRangeUser(0.0,pars['xmax'])
         elif options.xmax != None:
@@ -2376,16 +2377,17 @@ def main():
 
     sfiles={}
     print 'Reading nSyst: ',len(mysyst.getsystematicsListWithDown())
-    for ia in mysyst.getsystematicsListWithDown():
+    #for ia in mysyst.getsystematicsListWithDown():
+    for ia in mysyst.getsystematicsList():
         sfiles[ia]=rfile
-        
+
     #-----------------------------------------------------------------------------------------
     # automatically set the lumi for the 2017 and 2018
     if options.year==2018 and options.int_lumi==36207.66:
         options.int_lumi=58450.1
     if options.year==2017 and options.int_lumi==36207.66:
         options.int_lumi=44307.4
-        
+
     #
     # Select histograms and samples for stacks
     #
@@ -2396,7 +2398,7 @@ def main():
         bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
-            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk'] #,'mqcd','zldy','vvv' 
+            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk'] #,'mqcd','zldy','vvv'
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
 

@@ -169,7 +169,15 @@ class systematics(object):
                                     'VBF_qqH_Mjj1500__1up','VBF_qqH_Mjj1000__1up',
                                     'VBF_qqH_Mjj700__1up','VBF_qqH_Mjj350__1up',
                                     'VBF_qqH_Mjj120__1up','VBF_qqH_Mjj60__1up',
-                                    'VBF_qqH_200__1up','VBF_qqH_tot__1up']
+                                    'VBF_qqH_200__1up','VBF_qqH_tot__1up',
+                                    'vjets_d1kappa_EW__1up', 'vjets_d1kappa_EW__1down',
+                                    'vjets_d2kappa_EW__1up', 'vjets_d2kappa_EW__1down',
+                                    'vjets_d3kappa_EW__1up', 'vjets_d3kappa_EW__1down',
+                                    'vjets_d1K_NNLO__1up', 'vjets_d1K_NNLO__1down',
+                                    'vjets_d2K_NNLO__1up', 'vjets_d2K_NNLO__1down',
+                                    'vjets_d3K_NNLO__1up', 'vjets_d3K_NNLO__1down',
+                                    'vjets_dK_NNLO_mix__1up', 'vjets_dK_NNLO_mix__1down'
+                                    ]
         elif mode == "Electrons":
             self.systematicsList = ["Nominal", "EG_RESOLUTION_ALL__1down", "EG_RESOLUTION_ALL__1up", "EG_SCALE_ALL__1down", "EG_SCALE_ALL__1up", "EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down",  "EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1up"]
         elif mode == "Muons":
@@ -240,6 +248,16 @@ class systematics(object):
                                     'VBF_qqH_200__1up','VBF_qqH_tot__1up']
         elif mode == "OneSidedDown": # this is used to list all systematics that need to by symmeterized in plotting
             self.systematicsList = self.systematicsListDown
+        elif mode == "vjTheory":
+            self.systematicsList= [
+                                     'vjets_d1kappa_EW__1up', 'vjets_d1kappa_EW__1down',
+                                     'vjets_d2kappa_EW__1up', 'vjets_d2kappa_EW__1down',
+                                     'vjets_d3kappa_EW__1up', 'vjets_d3kappa_EW__1down',
+                                     'vjets_d1K_NNLO__1up', 'vjets_d1K_NNLO__1down',
+                                     'vjets_d2K_NNLO__1up', 'vjets_d2K_NNLO__1down',
+                                     'vjets_d3K_NNLO__1up', 'vjets_d3K_NNLO__1down',
+                                     'vjets_dK_NNLO_mix__1up', 'vjets_dK_NNLO_mix__1down'
+                                       ]
 
     def getsystematicsList(self):
         return self.systematicsList
@@ -256,34 +274,34 @@ class systematics(object):
                 'JET_JER_EffectiveNP_5__1down':'JET_JER_EffectiveNP_5__1up',
                 'JET_JER_EffectiveNP_6__1down':'JET_JER_EffectiveNP_6__1up',
                 'JET_JER_EffectiveNP_7restTerm__1down':'JET_JER_EffectiveNP_7restTerm__1up',
-                'ATLAS_PDF4LHC_NLO_30_EV30__1down':'ATLAS_PDF4LHC_NLO_30_EV30__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV29__1down':'ATLAS_PDF4LHC_NLO_30_EV29__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV28__1down':'ATLAS_PDF4LHC_NLO_30_EV28__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV27__1down':'ATLAS_PDF4LHC_NLO_30_EV27__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV26__1down':'ATLAS_PDF4LHC_NLO_30_EV26__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV25__1down':'ATLAS_PDF4LHC_NLO_30_EV25__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV24__1down':'ATLAS_PDF4LHC_NLO_30_EV24__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV23__1down':'ATLAS_PDF4LHC_NLO_30_EV23__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV22__1down':'ATLAS_PDF4LHC_NLO_30_EV22__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV21__1down':'ATLAS_PDF4LHC_NLO_30_EV21__1up',                
+                'ATLAS_PDF4LHC_NLO_30_EV30__1down':'ATLAS_PDF4LHC_NLO_30_EV30__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV29__1down':'ATLAS_PDF4LHC_NLO_30_EV29__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV28__1down':'ATLAS_PDF4LHC_NLO_30_EV28__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV27__1down':'ATLAS_PDF4LHC_NLO_30_EV27__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV26__1down':'ATLAS_PDF4LHC_NLO_30_EV26__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV25__1down':'ATLAS_PDF4LHC_NLO_30_EV25__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV24__1down':'ATLAS_PDF4LHC_NLO_30_EV24__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV23__1down':'ATLAS_PDF4LHC_NLO_30_EV23__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV22__1down':'ATLAS_PDF4LHC_NLO_30_EV22__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV21__1down':'ATLAS_PDF4LHC_NLO_30_EV21__1up',
                 'ATLAS_PDF4LHC_NLO_30_EV20__1down':'ATLAS_PDF4LHC_NLO_30_EV20__1up',
-                'ATLAS_PDF4LHC_NLO_30_EV19__1down':'ATLAS_PDF4LHC_NLO_30_EV19__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV18__1down':'ATLAS_PDF4LHC_NLO_30_EV18__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV17__1down':'ATLAS_PDF4LHC_NLO_30_EV17__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV16__1down':'ATLAS_PDF4LHC_NLO_30_EV16__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV15__1down':'ATLAS_PDF4LHC_NLO_30_EV15__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV14__1down':'ATLAS_PDF4LHC_NLO_30_EV14__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV13__1down':'ATLAS_PDF4LHC_NLO_30_EV13__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV12__1down':'ATLAS_PDF4LHC_NLO_30_EV12__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV11__1down':'ATLAS_PDF4LHC_NLO_30_EV11__1up',                
+                'ATLAS_PDF4LHC_NLO_30_EV19__1down':'ATLAS_PDF4LHC_NLO_30_EV19__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV18__1down':'ATLAS_PDF4LHC_NLO_30_EV18__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV17__1down':'ATLAS_PDF4LHC_NLO_30_EV17__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV16__1down':'ATLAS_PDF4LHC_NLO_30_EV16__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV15__1down':'ATLAS_PDF4LHC_NLO_30_EV15__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV14__1down':'ATLAS_PDF4LHC_NLO_30_EV14__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV13__1down':'ATLAS_PDF4LHC_NLO_30_EV13__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV12__1down':'ATLAS_PDF4LHC_NLO_30_EV12__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV11__1down':'ATLAS_PDF4LHC_NLO_30_EV11__1up',
                 'ATLAS_PDF4LHC_NLO_30_EV10__1down':'ATLAS_PDF4LHC_NLO_30_EV10__1up',
                 'ATLAS_PDF4LHC_NLO_30_EV9__1down':'ATLAS_PDF4LHC_NLO_30_EV9__1up',
-                'ATLAS_PDF4LHC_NLO_30_EV8__1down':'ATLAS_PDF4LHC_NLO_30_EV8__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV7__1down':'ATLAS_PDF4LHC_NLO_30_EV7__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV6__1down':'ATLAS_PDF4LHC_NLO_30_EV6__1up',                
+                'ATLAS_PDF4LHC_NLO_30_EV8__1down':'ATLAS_PDF4LHC_NLO_30_EV8__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV7__1down':'ATLAS_PDF4LHC_NLO_30_EV7__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV6__1down':'ATLAS_PDF4LHC_NLO_30_EV6__1up',
                 'ATLAS_PDF4LHC_NLO_30_EV5__1down':'ATLAS_PDF4LHC_NLO_30_EV5__1up',
-                'ATLAS_PDF4LHC_NLO_30_EV4__1down':'ATLAS_PDF4LHC_NLO_30_EV4__1up',                
-                'ATLAS_PDF4LHC_NLO_30_EV3__1down':'ATLAS_PDF4LHC_NLO_30_EV3__1up',                
+                'ATLAS_PDF4LHC_NLO_30_EV4__1down':'ATLAS_PDF4LHC_NLO_30_EV4__1up',
+                'ATLAS_PDF4LHC_NLO_30_EV3__1down':'ATLAS_PDF4LHC_NLO_30_EV3__1up',
                 'ATLAS_PDF4LHC_NLO_30_EV2__1down':'ATLAS_PDF4LHC_NLO_30_EV2__1up',
                 'ATLAS_PDF4LHC_NLO_30_EV1__1down':'ATLAS_PDF4LHC_NLO_30_EV1__1up',
                 'VBF_qqH_25__1down':'VBF_qqH_25__1up',
@@ -301,4 +319,4 @@ class systematics(object):
                 #"JET_QG_trackeff__1down"  :"JET_QG_trackeff",
                 "MET_SoftTrk_ResoParaDown":"MET_SoftTrk_ResoPara",
                 "MET_SoftTrk_ResoPerpDown":"MET_SoftTrk_ResoPerp",}
-                
+

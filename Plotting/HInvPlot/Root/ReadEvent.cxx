@@ -96,7 +96,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::mergePTV",      fMergePTV);
   reg.Get("ReadEvent::BTagCut",       fBTagCut);
   reg.Get("ReadEvent::noVjWeight",      fnoVjWeight);
-  reg.Get("ReadEvent::Year",          fYear);  
+  reg.Get("ReadEvent::Year",          fYear);
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -1168,10 +1168,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // 2018 update trigger for later periods => value 5 for
     //if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     //else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
-    if(364292>=fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50    
+    if(364292>=fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     if(fIsDDQCD){
       if(fYear==2017) trigger_met_encodedv2_new=4;
-      else if(fYear==2018) trigger_met_encodedv2_new=5;      
+      else if(fYear==2018) trigger_met_encodedv2_new=5;
       else trigger_met_encodedv2_new=1;       // 2015+2016
     }
     event->RepVar(Mva::trigger_met_encodedv2, trigger_met_encodedv2_new);
