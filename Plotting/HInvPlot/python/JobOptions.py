@@ -137,6 +137,7 @@ def getParser():
     p.add_option('--mva-weights-path',    type='string', default='',            dest='mva_weights_path',  help='full path to weights files for tmva')     
     p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
     p.add_option('--mergePTV',  action='store_true', default=False,   dest='mergePTV',          help='Merge the pTV slices')
+    p.add_option('--mergeMGExt',  action='store_true', default=False,   dest='mergeMGExt',          help='Merge the MG extensions')
     p.add_option('--mergeExt',  action='store_true', default=False,   dest='mergeExt',          help='Merge the Sherpa extension slices')
     p.add_option('--r207Ana',  action='store_true', default=False,   dest='r207Ana',          help='Run the release 20.7 analysis')    
     
