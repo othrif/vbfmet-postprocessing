@@ -7,7 +7,7 @@ import sys
 #l = open('v26gam.txt','r')
 #l = open('v28PlowSystd.txt','r')
 #l = open('v34LMC_mc16a.txt')
-l = open('sig.txt')
+l = open('filteredSherpa.txt')
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt
 myMap = {}
