@@ -984,10 +984,9 @@ def prepareBkgRuns(keys,options=None):
                       }
 
     bkg_vbfFiltZ = {'345099':'TBD',
-                        '345100':'TBD',
-                        '345101':'TBD',
-                        '345102':'TBD',
-                        }
+                    '345100':'TBD',
+                    '345101':'TBD',
+                    '345102':'TBD',}
     bkg_lowMassZ = {'364198':'TBD',
                         '364199':'TBD',
                         '364200':'TBD',
@@ -1124,6 +1123,8 @@ def prepareBkgRuns(keys,options=None):
                 #'zewk':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
                 'top2':bkg_top2, # all top
+                #'top2':bkg_zewkpow,
+                #'top2':{'312487':'Znunu_PTV100_140_MJJ0_500_KtMerging','312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',}, # all top
                 #'top1':bkg_top1,
                 ##'hvbf':bkg_wqcd_mnu,
                 ##'wewk':bkg_wqcd_tnu,
@@ -1158,22 +1159,36 @@ def prepareBkgRuns(keys,options=None):
                 }
 
     if not options.mergePTV:
+        bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
+        bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
         if  not options.year==2018:
             bkg_keys['wdpi'].update(bkg_vbfPTVExt)
         else:
             for ki,yi in bkg_vbfPTVExt.iteritems():
                 if not yi.count('Znunu'): bkg_keys['wdpi'][ki]=yi
+    else:
+        bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
+        bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)        
     if not options.mergeExt:
         bkg_keys['wdpi'].update(bkg_vbfExt)
         bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
         bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)
         bkg_keys['wdpi'].update(bkg_new)
+
+    if not options.mergeMGExt:
+        bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
+        bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)
+    else:
+        #bkg_keys['zqcdMad']=bkg_zqcd_LO_Filt
+        bkg_keys['zqcdMad'].update(bkg_zqcd_LO_Filt)
+        bkg_keys['wqcdMad'].update(bkg_wqcd_LO_Filt)
+        #bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
+        #bkg_keys['wdpi'].update(bkg_z_strong_madgraph)        
+        #bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)        
     if options.year!=2018:
         bkg_keys['wdpi'].update(bkg_zqcd_znn_mc16e)
 
     # extra samples here for now
-    bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
-    bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
     bkg_keys['wdpi'].update(bkg_wewkpow)
     bkg_keys['wdpi'].update(bkg_zewkpow)
     bkg_keys['wdpi'].update(bkg_zee_228)
