@@ -65,6 +65,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool is2015;
   bool is2016;
   bool m_LooseSkim = true;
+  bool m_AltSkim = false;
   bool m_extraVars = true;
   bool m_contLep   = false;
   bool m_QGTagger   = true;

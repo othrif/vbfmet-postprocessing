@@ -13,6 +13,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
   declareProperty( "LooseSkim", m_LooseSkim = true, "true if loose skimming is requested" );
+  declareProperty( "AltSkim", m_AltSkim = false, "true if alternate skimming is requested" );
   declareProperty( "ExtraVars", m_extraVars = true, "true if extra variables should be output" );
   declareProperty( "QGTagger", m_QGTagger = false, "true if extra variables should be output for QGTagger" );
   declareProperty( "METTrigPassThru", m_METTrigPassThru = false, "true if require no met triggers" );
@@ -485,9 +486,10 @@ StatusCode VBFAnalysisAlg::MapNgen(){
    }
   if(m_UseExtMGVjet){
 
-    std::set<int> mg_w_filter = {311445,311446,311447,311448,311449,311450}; // W b-veto and c-veto
-    std::set<int> mg_w_incl_lf = {363606, 363609, 363630, 363633, 363654, 363657}; // w samples to overlap remove in
-    std::map<int,int> mg_w_LF_map = {{311445,363606},{311446,363630},{311447,363609},{311448,363633},{311449,363654},{311450,363657}};
+    //std::set<int> mg_w_filter = {311445,311446,311447,311448,311449,311450}; // W b-veto and c-veto
+    //std::set<int> mg_w_incl_lf = {363606, 363609, 363630, 363633, 363654, 363657}; // w samples to overlap remove in
+    //    std::map<int,int> mg_w_LF_map = {{311445,363606},{311446,363630},{311447,363609},{311448,363633},{311449,363654},{311450,363657}};
+    std::map<int,int> mg_w_LF_map = {{311445,363606},{311448,363633},{311449,363654},{311450,363657}};
     std::set<int> mg_w_filter_highHT = {311451, 311452, 311453}; // W ---> need to implement the year dependence
     std::set<int> mg_filter_lo_np01  =  {311429, 311433, 311437, 311441}; //entry 21 
     std::set<int> mg_filter_lo_np234 =  {311430, 311431, 311432, 311434, 311435, 311436, 311438, 311439, 311440, 311442, 311443, 311444}; //entry 22
@@ -733,11 +735,15 @@ StatusCode VBFAnalysisAlg::execute() {
 	NgenCorrected = Ngen[runNumber];
       }
     } else if(m_UseExtMGVjet){
-      std::set<int> mg_w_filter = {311445,311446,311447,311448,311449,311450}; // W b-veto and c-veto
-      std::set<int> mg_w_incl_lf = {363606, 363609, 363630, 363633, 363654, 363657}; // w samples to overlap remove in
+      //std::set<int> mg_w_filter = {311445,311446,311447,311448,311449,311450}; // W b-veto and c-veto
+      //std::set<int> mg_w_incl_lf = {363606, 363609, 363630, 363633, 363654, 363657}; // w samples to overlap remove in
+      std::set<int> mg_w_filter = {311445,311448,311449,311450}; // W b-veto and c-veto
+      std::set<int> mg_w_incl_lf = {363606, 363633, 363654, 363657}; // w samples to overlap remove in
       std::set<int> mg_w_filter_highHT = {311451, 311452, 311453}; // W ---> need to implement the year dependence
       //std::set<int> mg_w_incl_highHT = {363615,363616,};
-      std::map<int,int> mg_w_LF_map = {{311445,363606},{311446,363630},{311447,363609},{311448,363633},{311449,363654},{311450,363657}};
+      //std::map<int,int> mg_w_LF_map = {{311445,363606},{311446,363630},{311447,363609},{311448,363633},{311449,363654},{311450,363657}};
+      std::map<int,int> mg_w_LF_map = {{311445,363606},{311448,363633},{311449,363654},{311450,363657}};
+      if(runNumber==311446 || runNumber==311447) {  weight=-1;  return StatusCode::SUCCESS; } 
       std::map<int,int> mg_w_LF_map_rev;
       for(std::map<int,int>::iterator it = mg_w_LF_map.begin(); it!=mg_w_LF_map.end(); ++it) { mg_w_LF_map_rev[it->second] = it->first; }
 
@@ -937,28 +943,29 @@ StatusCode VBFAnalysisAlg::execute() {
       passVjetsFilter=false;
     }else passVjetsFilter=true;
   } else {
-    if((runNumber>=309662 && runNumber<=309679)){ // QCD NLO sherpa extension samples with Mjj filter
-      // use the filter as calculated
-    }else if((runNumber>=364173 && runNumber<=364175) || // Wenu 70-140 all three
-	     (runNumber>=364159 && runNumber<=364161) || // Wmunu 70-140 all three
-	     (runNumber>=364187 && runNumber<=364189) || // Wtaunu 70-140 all three
-	     (runNumber>=364162 && runNumber<=364163) || // Wmunu 140-280 CVBV+cFilter
-	     (runNumber>=364176 && runNumber<=364177) || // Wenu 140-280 CVBV+cFilter
-	     (runNumber>=364190 && runNumber<=364191) || // Wtaunu 140-280 CVBV+cFilter
-	     (runNumber>=364103 && runNumber<=364103) || // Zmm 70-140 CVBV
-	     (runNumber>=364132 && runNumber<=364132) || // Ztautau_MAXHTPTV70_140_CFBV
-	     (runNumber>=364145 && runNumber<=364146) || // Znn 70-140 CVBV, c Filter
-	     (runNumber>=364148 && runNumber<=364148) || // znn 140-280 CVBV
-	     (runNumber>=364134 && runNumber<=364134) || // Ztt 140-280 CVBV
-	     (runNumber>=364120 && runNumber<=364120) || // Zee 140-280 CVBV
-	     (runNumber>=364106 && runNumber<=364107)){  // Zmm 140-280 CVBV+cfilter
-      passVjetsFilter=(!passVjetsFilter);
-    }else passVjetsFilter=true;
+    // comment out for testing
+    //if((runNumber>=309662 && runNumber<=309679)){ // QCD NLO sherpa extension samples with Mjj filter
+    //  // use the filter as calculated
+    //}else if((runNumber>=364173 && runNumber<=364175) || // Wenu 70-140 all three
+    //	     (runNumber>=364159 && runNumber<=364161) || // Wmunu 70-140 all three
+    //	     (runNumber>=364187 && runNumber<=364189) || // Wtaunu 70-140 all three
+    //	     (runNumber>=364162 && runNumber<=364163) || // Wmunu 140-280 CVBV+cFilter
+    //	     (runNumber>=364176 && runNumber<=364177) || // Wenu 140-280 CVBV+cFilter
+    //	     (runNumber>=364190 && runNumber<=364191) || // Wtaunu 140-280 CVBV+cFilter
+    //	     (runNumber>=364103 && runNumber<=364103) || // Zmm 70-140 CVBV
+    //	     (runNumber>=364132 && runNumber<=364132) || // Ztautau_MAXHTPTV70_140_CFBV
+    //	     (runNumber>=364145 && runNumber<=364146) || // Znn 70-140 CVBV, c Filter
+    //	     (runNumber>=364148 && runNumber<=364148) || // znn 140-280 CVBV
+    //	     (runNumber>=364134 && runNumber<=364134) || // Ztt 140-280 CVBV
+    //	     (runNumber>=364120 && runNumber<=364120) || // Zee 140-280 CVBV
+    //	     (runNumber>=364106 && runNumber<=364107)){  // Zmm 140-280 CVBV+cfilter
+    //  passVjetsFilter=(!passVjetsFilter);
+    //}else passVjetsFilter=true;
   }
   //364112-364113,364126-364127,364140-364141,364154-364155
   //364168-364169,364182-364183,364196-364197
   // This section merges events with pTV>500 GeV. The MAXHTPTV samples have to be added together
-  if((runNumber>=364216 && runNumber<=364229)){ // QCD NLO sherpa extension samples for pTV
+  if((runNumber>=364216 && runNumber<=364229)){ // QCD NLO sherpa extension samples for pTV, so they should pass
   }else if((runNumber>=364112 && runNumber<=364113) || // Zmm 500, 1000 MAXPTHT
 	   (runNumber>=364126 && runNumber<=364127) || // Zee 500, 1000 MAXPTHT
 	   (runNumber>=364140 && runNumber<=364141) || // Ztt 500, 1000 MAXPTHT
@@ -966,11 +973,14 @@ StatusCode VBFAnalysisAlg::execute() {
 	   (runNumber>=364168 && runNumber<=364169) || // Wmunu 500, 1000 MAXPTHT
 	   (runNumber>=364182 && runNumber<=364183) || // Wenu 500, 1000 MAXPTHT
 	   (runNumber>=364196 && runNumber<=364197)){  // Wtaunu 500, 1000 MAXPTHT
-    passVjetsPTV=(!passVjetsPTV); // flip these
+    passVjetsPTV=(!passVjetsPTV); // flip these. We can turn these off unless pTV<100 GeV as done below
   }else passVjetsPTV=true;// others must pass
   // Now we have the KT merged 100-500 GeV in PTV samples. We want to merge these as well.
-  if((runNumber>=312448 && runNumber<=312531)) passVjetsPTV=true; // these are the KT merged samples 100-500 GeV
-  if((runNumber>=364100 && runNumber<=364113) || // Zmm MAXPTHT
+  if((runNumber>=312448 && runNumber<=312531)){
+    passVjetsPTV=true; // these are the KT merged samples 100-500 GeV
+    // use passVjetsFilter as it was calculated
+  }
+  else if((runNumber>=364100 && runNumber<=364113) || // Zmm MAXPTHT
      (runNumber>=364114 && runNumber<=364127) || // Zee MAXPTHT
      (runNumber>=364128 && runNumber<=364141) || // Ztt MAXPTHT
      (runNumber>=364142 && runNumber<=364155) || // Znn MAXPTHT
@@ -978,9 +988,14 @@ StatusCode VBFAnalysisAlg::execute() {
      (runNumber>=364156 && runNumber<=364169) || // Wmunu MAXPTHT
      (runNumber>=364170 && runNumber<=364183) || // Wenu MAXPTHT
      (runNumber>=364184 && runNumber<=364197)){  // Wtaunu MAXPTHT  
-    if(SherpaVTruthPt<100.0e3) passVjetsPTV=false; // remove if pTV>100
-    if(SherpaVTruthPt>500.0e3) passVjetsPTV=false; // remove if pTV>100
-  }
+    if(SherpaVTruthPt<100.0e3) passVjetsPTV=true; // keep if pTV>100
+    //else if(SherpaVTruthPt>500.0e3) passVjetsPTV=true; // remove if pTV>500 // these should come from the PTV samples
+    else passVjetsPTV = false;
+
+    // merging using the truth info
+    if(SherpaVTruthPt>100.0e3 && SherpaVTruthPt<500.0e3) passVjetsFilter=(!passVjetsFilter); //flip to use those that fail
+    else passVjetsFilter=true;
+  }else{ passVjetsFilter=true; }
 
   // Fixing a bug in the variables
   if(jet_phi->size()>1){
@@ -994,6 +1009,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float subLeadJetPtCut = 50.0e3;
   float MjjCut =8e5;
   float DEtajjCut =3.5;
+  float DPhijjCut =2.0;
 
   if(m_LooseSkim && m_currentVariation=="Nominal"){
     METCut = 100.0e3;
@@ -1002,17 +1018,25 @@ StatusCode VBFAnalysisAlg::execute() {
     MjjCut =2e5; // 2e5
     DEtajjCut =3.5; // 3.5
   }
+  if(m_AltSkim){
+    METCut = 200.0e3;
+    LeadJetPtCut = 80.0e3; // 60.0e3
+    subLeadJetPtCut = 50.0e3; // 40.0e3
+    MjjCut =2e5; // 2e5
+    DEtajjCut =2.5; // 3.5
+    DPhijjCut=4.0; // 2.0
+  }
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
 
   bool GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>250.0e3);
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (n_jet < 2) return StatusCode::SUCCESS;
-  if (!(n_jet < 5) && !m_LooseSkim) return StatusCode::SUCCESS;
+  if (!(n_jet < 5) && !(m_LooseSkim || m_AltSkim)) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("n_jet = 2!");
   if (!(unsigned(n_jet) == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
   if (!(unsigned(n_jet) == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
-  if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < 2.0) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+  if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < DPhijjCut) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
   ATH_MSG_DEBUG ("Pass VBF cuts!");
   // encoding met triggers
   trigger_met_encoded=0;
@@ -1110,7 +1134,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*puWeight*(met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
+  w = weight*mcEventWeight*puWeight*(met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
 
   if(m_theoVariation){
     std::map<TString,bool> regDecision;
@@ -1147,7 +1171,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //
   float tmp_puWeight = puWeight;
   float tmp_jvtSFWeight = jvtSFWeight;
-  float tmp_fjvtSFWeight = (met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
+  float tmp_fjvtSFWeight = (met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
   float tmp_elSFWeight = elSFWeight;
   float tmp_muSFWeight = muSFWeight;
   float tmp_elSFTrigWeight = elSFTrigWeight;
@@ -1164,7 +1188,7 @@ StatusCode VBFAnalysisAlg::execute() {
     // initialize
     tmp_puWeight = puWeight;
     tmp_jvtSFWeight = jvtSFWeight;
-    tmp_fjvtSFWeight = (met_tenacious_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
+    tmp_fjvtSFWeight = (met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
     tmp_elSFWeight = elSFWeight;
     tmp_muSFWeight = muSFWeight;
     tmp_elSFTrigWeight = elSFTrigWeight;
@@ -1175,8 +1199,8 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_puSyst2018Weight = puSyst2018Weight;
     tmp_qgTagWeight = 1.0; // default value is 1
     tmp_signalTruthSyst=1.0; // default value is 1
-    if(it->first.Contains("fjvtSFWeight")        && (met_tenacious_tst_nolep_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
-    else if(it->first.Contains("fjvtSFTighterWeight") && (met_tenacious_tst_nolep_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    if(it->first.Contains("fjvtSFWeight")        && (met_tst_nolep_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("fjvtSFTighterWeight") && (met_tst_nolep_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("puWeight"))       tmp_puWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFWeight"))     tmp_elSFWeight=tMapFloat[it->first];

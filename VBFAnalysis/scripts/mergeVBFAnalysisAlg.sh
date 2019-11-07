@@ -1,5 +1,5 @@
 #!/bin/bash                                                                                                                                                                                                       
-OUTDIRM=v34TightPF17
+OUTDIRM=v34AltSkimPF18
 #OUTDIRM=/share/t3data2/schae/v32ETight
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
@@ -9,12 +9,14 @@ hadd $OUTDIRM/Z_strong_VBFFilt.root Z_strong_VBFFilt*root
 hadd $OUTDIRM/Z_strongPTVExt.root Z_strongPTVExt*root
 hadd $OUTDIRM/Z_strongExt.root Z_strongExt*root
 hadd $OUTDIRM/Z_strongmVBFFilt.root Z_strongmVBFFilt*root
+hadd $OUTDIRM/W_strongExt.root W_strongExt*root
 #hadd $OUTDIRM/Z_strong_LowMass.root Z_strong_LowMass*root
 rm Z_strong_VBFFilt*root
 rm Z_strongPTVExt*root
 rm Z_strong_LowMass*root
 rm Z_strongExt*root
 rm Z_strongmVBFFilt*root
+rm W_strongExt*root
 
 # now hadd the standard samples
 #hadd $OUTDIRM/VV.root VV*root
