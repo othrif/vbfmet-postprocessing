@@ -112,7 +112,7 @@ else:
         foundV = False
         for p,s in enumerate(sampledir.split(".")):
             if s[0]=="v":
-                samplePattern+="."+s
+                samplePattern+="."+s+"."
                 foundV = True
         if not(foundV):
             print "ERROR: samples have different names than assumed!"
@@ -120,7 +120,7 @@ else:
         if (samplePatternGlobal != samplePattern) and (samplePatternGlobal != ""):
             print "ERROR: samples have different patterns!"
             break
-        samplePatternGlobal = samplePattern+'.'
+        samplePatternGlobal = samplePattern
 f.close()
 fMC.close()
 

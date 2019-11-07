@@ -546,7 +546,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //Vjets weight and systematics
   vjWeight = 1.0;
 
-  if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
+  if ( m_isMC  && (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos )) {
     // Nominal
     vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(0));
     // Variations
