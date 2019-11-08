@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser( description = "Looping over sys and samples fo
 
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
 parser.add_argument( "--metOptSyst", dest = "metOptSyst", action="store_true", default = False, help = "Do only the met optimization systematics" )
-parser.add_argument( "--slc7", dest = "slc7", action="store_true", default = False, help = "Do slc7" )
+parser.add_argument( "--slc7", dest = "slc7", action="store_true", default = False, help = "Do slc7 for chicago tier3" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", default = "/eos/user/r/rzou/v04/list", help = "list of ntuples to run over" )
 #parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "/home/rzou/STPostProcessing/run/f_out_total_v05.root", help = "file with the total number of event processed" )
