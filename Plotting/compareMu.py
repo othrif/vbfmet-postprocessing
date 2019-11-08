@@ -22,6 +22,8 @@ inDir=sys.argv[1]
 if inDir[-1]!='/':
         inDir+='/'
 
+outName=sys.argv[2]
+
 dataHistsRatio=[]
 bkgdHistsRatio=[]
 names=[]
@@ -52,23 +54,54 @@ for i in range(len(dataHistsRatio)):
 
 labels=[]
 for infile in names:
-	if infile.find("allmjj")>0:
-		labels.append("WCR_"+infile[infile.find("allmjj")+7])
-	elif infile.find("mjjLow200")>0 and infile[infile.find("mjjLow200")+10]!="n":#1lvr
-		labels.append("1LVR_"+infile[infile.find("mjjLow200")+10])
-	elif infile.find("mjjLow200")>0 and infile[infile.find("mjjLow200")+10]=="n":#0lvr
-		labels.append("0LVR")
+	if infile.find("nomj")>0:
+		if infile.find("allmjj")>0 and infile[infile.find("allmjj")+7]=="n":
+			labels.append("SR-MJ")
+		elif infile.find("mjjLow200")>0 and infile[infile.find("mjjLow200")+10]=="n":#0lvr
+			labels.append("0LVR-MJ")
+		elif infile.find("njgt")>0 and infile[infile.find("njgt")+5]=="n":
+			labels.append("SR-MJ")
+		elif infile.find("mjjLowNjetFJVT")>0 and infile[infile.find("mjjLowNjetFJVT")+15]=="n":#0lvr
+			labels.append("0LVR-MJ")
+		
+	else:
+		if infile.find("allmjj")>0 and infile[infile.find("allmjj")+7]!="n":
+			labels.append("WCR_"+infile[infile.find("allmjj")+7])
+		elif infile.find("allmjj")>0 and infile[infile.find("allmjj")+7]=="n":
+			labels.append("SR")
+		elif infile.find("mjjLow200")>0 and infile[infile.find("mjjLow200")+10]!="n":#1lvr
+			labels.append("1LVR_"+infile[infile.find("mjjLow200")+10])
+		elif infile.find("mjjLow200")>0 and infile[infile.find("mjjLow200")+10]=="n":#0lvr
+			labels.append("0LVR")
+		elif infile.find("njgt")>0 and infile[infile.find("njgt")+5]!="n":
+			labels.append("WCR_"+infile[infile.find("njgt")+5])
+		elif infile.find("njgt")>0 and infile[infile.find("njgt")+5]=="n":
+			labels.append("SR")
+		elif infile.find("mjjLowNjetFJVT")>0 and infile[infile.find("mjjLowNjetFJVT")+15]!="n":#1lvr
+			labels.append("1LVR_"+infile[infile.find("mjjLowNjetFJVT")+15])
+		elif infile.find("mjjLowNjetFJVT")>0 and infile[infile.find("mjjLowNjetFJVT")+15]=="n":#0lvr
+			labels.append("0LVR")
 
 
 dataCanvas=TCanvas("dataCanvas","dataCanvas",600,600)
 legend=TLegend(0.7,0.7,0.9,0.9)
+if "SR-MJ" in labels:
+	sr=labels.index("SR-MJ")
+else:
+	sr=len(dataHists)+1#is never reached
+if "SR" in labels:
+	sr2=labels.index("SR")
+else:
+	sr2=len(dataHists)+1#is never reached
+
 for i in range(len(dataHists)):
-	dataHists[i].Draw("same HIST")
-	dataHists[i].SetStats(0)
-	dataHists[i].SetLineColor(i+1)
-	dataHists[i].SetMarkerSize(0.5)
-	dataHists[i].SetMarkerColor(i+1)
-	legend.AddEntry(dataHists[i],labels[i],'l')
+	if i!=sr and i!=sr2:# and names[i].find("nomj")<=0:
+		dataHists[i].Draw("SAME HIST E1")
+		dataHists[i].SetStats(0)
+		dataHists[i].SetLineColor(i+1)
+		dataHists[i].SetMarkerSize(0.5)
+		dataHists[i].SetMarkerColor(i+1)
+		legend.AddEntry(dataHists[i],labels[i],'l')
 myText(0.65, 0.6, 1, "#sqrt{s}= 13 TeV")
 myText(0.65, 0.55, 1, "59.9/fb")
 myText(0.65, 0.5, 1, "VBF Hinv")
@@ -76,30 +109,32 @@ ATLASLabel(0.65, 0.65, "Internal")
 dataHists[0].SetMaximum(ymax(dataHists))
 dataHists[0].SetTitle("2018 Data;averageIntPerXing;Entries")
 legend.Draw()
-dataCanvas.SaveAs("compareMu_data.png")
+dataCanvas.SaveAs("compareMu_data_"+outName+".png")
 
+legend2=TLegend(0.7,0.7,0.9,0.9)
 bkgdCanvas=TCanvas("bkgdCanvas","bkgdCanvas",600,600)
 for i in range(len(dataHists)):
-	bkgdHists[i].Draw("same HIST")
+	bkgdHists[i].Draw("SAME HIST E1")
 	bkgdHists[i].SetStats(0)
 	bkgdHists[i].SetLineColor(i+1)
 	bkgdHists[i].SetMarkerSize(0.5)
 	bkgdHists[i].SetMarkerColor(i+1)
+	legend2.AddEntry(bkgdHists[i],labels[i],'l')
 myText(0.65, 0.6, 1, "#sqrt{s}= 13 TeV")
 myText(0.65, 0.55, 1, "59.9/fb")
 myText(0.65, 0.5, 1, "VBF Hinv")
 ATLASLabel(0.65, 0.65, "Internal")
 bkgdHists[0].SetMaximum(ymax(bkgdHists))
 bkgdHists[0].SetTitle("Sum of Backgrounds (+QCD);averageIntPerXing;Entries")
-legend.Draw()
-bkgdCanvas.SaveAs("compareMu_bkgd.png")
+legend2.Draw()
+bkgdCanvas.SaveAs("compareMu_bkgd_"+outName+".png")
 
 
 
 
-
+print "Computing ratios with respect to 0LVR-MJ"
 #area normalize ratio wrt 0lvr
-nolep=labels.index("0LVR")
+nolep=labels.index("0LVR-MJ")
 dataHistsRatio[nolep].Scale(1/dataHistsRatio[nolep].Integral())
 bkgdHistsRatio[nolep].Scale(1/bkgdHistsRatio[nolep].Integral())
 for i in range(len(dataHistsNorm)):
@@ -118,9 +153,11 @@ dataCanvasNorm=TCanvas("dataCanvasNorm","dataCanvasNorm",600,800)
 dataCanvasNorm.Divide(1,2,0,0)
 dataCanvasNorm.cd(1)
 for i in range(len(dataHistsNorm)):
-	dataHistsNorm[i].Draw("same HIST")
-	dataHistsNorm[i].SetStats(0)
-	dataHistsNorm[i].SetLineColor(i+1)
+	if i!=sr and i!=sr2:# and names[i].find("nomj")<=0:
+		dataHistsNorm[i].Draw("SAME HIST E1")
+		dataHistsNorm[i].SetStats(0)
+		dataHistsNorm[i].SetLineColor(i+1)
+		dataHistsNorm[i].SetMarkerSize(0)
 myText(0.65, 0.6, 1, "#sqrt{s}= 13 TeV")
 myText(0.65, 0.55, 1, "59.9/fb")
 myText(0.65, 0.5, 1, "VBF Hinv")
@@ -130,32 +167,38 @@ dataHistsNorm[0].SetTitle("Area Normalized Data; ; Normalized Entries")
 legend.Draw()
 dataCanvasNorm.cd(2)
 for j in range(len(dataHistsRatio)):
-	dataHistsRatio[j].Draw("same HIST C")
-	dataHistsRatio[j].SetStats(0)
-	dataHistsRatio[j].SetLineColor(j+1)
+	if j!=sr and j!=sr2:# and names[j].find("nomj")<=0:
+		dataHistsRatio[j].Draw("SAME HIST")
+		dataHistsRatio[j].SetStats(0)
+		dataHistsRatio[j].SetLineColor(j+1)
+		dataHistsRatio[j].SetMarkerSize(0)
 dataHistsRatio[0].SetTitle(" ; averageIntPerXing (#mu); Ratio (region / 0LVR)")
-dataCanvasNorm.SaveAs("compareMu_dataNorm.png")
+dataHistsRatio[0].GetYaxis().SetRangeUser(0,2)
+dataCanvasNorm.SaveAs("compareMu_dataNorm_"+outName+".png")
 
 
 bkgdCanvasNorm=TCanvas("bkgdCanvasNorm","bkgdCanvasNorm",600,800)
 bkgdCanvasNorm.Divide(1,2,0,0)
 bkgdCanvasNorm.cd(1)
 for i in range(len(bkgdHistsNorm)):
-	bkgdHistsNorm[i].Draw("same HIST")
+	bkgdHistsNorm[i].Draw("SAME HIST E1")
 	bkgdHistsNorm[i].SetStats(0)
 	bkgdHistsNorm[i].SetLineColor(i+1)
+	bkgdHistsNorm[i].SetMarkerSize(0)
 myText(0.65, 0.6, 1, "#sqrt{s}= 13 TeV")
 myText(0.65, 0.55, 1, "59.9/fb")
 myText(0.65, 0.5, 1, "VBF Hinv")
 ATLASLabel(0.65, 0.65, "Internal")
 bkgdHistsNorm[0].SetMaximum(ymax(bkgdHistsNorm))
 bkgdHistsNorm[0].SetTitle("Area Normalized Bkgd; ; Normalized Entries")
-legend.Draw()
+legend2.Draw()
 bkgdCanvasNorm.cd(2)
 for j in range(len(bkgdHistsRatio)):
-	bkgdHistsRatio[j].Draw("same HIST C")
+	bkgdHistsRatio[j].Draw("SAME HIST")
 	bkgdHistsRatio[j].SetStats(0)
 	bkgdHistsRatio[j].SetLineColor(j+1)
+	bkgdHistsRatio[j].SetMarkerSize(0)
 bkgdHistsRatio[0].SetTitle(" ; averageIntPerXing (#mu); Ratio (region / 0LVR)")
-bkgdCanvasNorm.SaveAs("compareMu_bkgdNorm.png")
+bkgdHistsRatio[0].GetYaxis().SetRangeUser(0,2)
+bkgdCanvasNorm.SaveAs("compareMu_bkgdNorm_"+outName+".png")
 
