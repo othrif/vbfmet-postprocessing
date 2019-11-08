@@ -1,7 +1,7 @@
 """
 
-This module configures input files 
-       
+This module configures input files
+
 """
 
 import os
@@ -17,16 +17,16 @@ import ROOT
 import HInvPlot.JobOptions as config
 
 log = config.getLog('Input.py')
-    
+
 #-------------------------------------------------------------------------
 class ReadEvent:
     """ ReadEvent -  read events """
-        
+
     def __init__(self, alg_name, options, my_files, my_runs_map, syst_name):
-        
+
         self.name       = alg_name
         self.read_reg   = ROOT.Msl.Registry()
-        self.read_alg   = ROOT.Msl.ReadEvent()        
+        self.read_alg   = ROOT.Msl.ReadEvent()
         self.algs       = []
         self.trees      = options.trees.split(',')
         self.files      = my_files
@@ -42,47 +42,48 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::Skim',          options.skim)
         self.read_reg.SetVal('ReadEvent::Lumi',          options.int_lumi)
         self.read_reg.SetVal('ReadEvent::METChoice',     options.met_choice)
-        self.read_reg.SetVal('ReadEvent::JetVetoPt',     options.jet_veto_pt) 
+        self.read_reg.SetVal('ReadEvent::JetVetoPt',     options.jet_veto_pt)
         self.read_reg.SetVal('ReadEvent::LoadBaseLep',   options.LoadBaseLep)
         self.read_reg.SetVal('ReadEvent::OverlapPh',     options.OverlapPh)
         self.read_reg.SetVal('ReadEvent::BTagCut',       options.BTagCut)
         self.read_reg.SetVal('ReadEvent::TMVAWeightPath',options.mva_weights_path)
         self.read_reg.SetVal('ReadEvent::TrigString',    options.trig_name)  # specify a trigger from the command line
-        self.read_reg.SetVal('ReadEvent::mergePTV',      options.mergePTV)  
+        self.read_reg.SetVal('ReadEvent::mergePTV',      options.mergePTV)
         self.read_reg.SetVal('ReadEvent::mergeExt',      options.mergeExt)
+        self.read_reg.SetVal('ReadEvent::noVjWeight',      options.noVjWeight)
         self.read_reg.SetVal('ReadEvent::Year',          options.year)          
-            
+
         self.read_reg.SetVal('ReadEvent::Print',      'yes')
         self.read_reg.SetVal('ReadEvent::Trees',      ' '.join(self.trees))
         self.read_reg.SetVal('ReadEvent::Files',      ' '.join(self.files))
-        
-        self.read_reg.SetVal('ReadEvent::MCIDs',      ' '.join(my_runs_map.keys()))        
-        self.read_reg.SetVal('ReadEvent::Samples',    ' '.join(my_runs_map.values())) 
+
+        self.read_reg.SetVal('ReadEvent::MCIDs',      ' '.join(my_runs_map.keys()))
+        self.read_reg.SetVal('ReadEvent::Samples',    ' '.join(my_runs_map.values()))
         self.read_reg.SetVal('ReadEvent::InputCount', -1.0) # 9983282
 
         self.read_reg.SetVal('ReadEvent::Sumw',options.sumw)
         self.read_reg.SetVal('ReadEvent::Nraw',options.nraw)
-        
+
         # Load the systematics
         syst_class = systematics.systematics('All')
         #self.read_reg.SetVal('ReadEvent::SystList',','.join(syst_class.getsystematicsList()))
-        
-        if options.cfile != None:          
+
+        if options.cfile != None:
             self.read_reg.SetVal('ReadEvent::CutFlowFile', options.cfile)
-            
-            rawfile = None            
+
+            rawfile = None
             if   options.cfile.count('txt'): rawfile = options.cfile.replace('txt', 'raw')
             elif options.cfile.count('cut'): rawfile = options.cfile.replace('cut', 'raw')
 
             if rawfile:
                 self.read_reg.SetVal('ReadEvent::RawFlowFile', rawfile)
-        
+
         all_runs = []
-        
-        self.read_reg.SetVal('ReadEvent::AllRuns',    ','.join(sorted(all_runs)))      
+
+        self.read_reg.SetVal('ReadEvent::AllRuns',    ','.join(sorted(all_runs)))
 
         #
-        # Additional input variables 
+        # Additional input variables
         #    - read branches from tree and add to Event::VarHolder as enums
         #
         inp_vars = get_vars.GetVarStr(0, syst_name)
@@ -97,31 +98,31 @@ class ReadEvent:
 
     def SetTrees(self,trees):
         self.trees = trees
-        
+
     def ClearAlgs(self):
         self.algs=[]
         self.read_alg.ClearAlgs()
-        
+
     def SetSystName(self,systName):
         self.read_alg.SetSystName(systName)
     def SetWeightSystName(self,systName):
         self.read_alg.SetWeightSystName(systName)
 
     def ReadFile(self, path):
-        
+
         if not os.path.exists(path):
             log.warning('ReadFile - could not find file: %s' %path)
             return None
-    
+
         self.read_alg.Read(path)
-        
+
     def ReadAllFiles(self):
         # Files are passed in the config
         for path in self.files:
             if not os.path.exists(path):
                 log.warning('ReadFile - could not find file: %s' %path)
                 return None
-    
+
         self.read_alg.ReadAllFile()
 
     def Save(self, rfile, dirname = None, writeStyle='RECREATE'):
@@ -143,7 +144,7 @@ class ReadEvent:
         rfile.Write()
         rfile.Close()
         del rfile
-        
+
     def ConvertAlgToList(self, par):
         if type(par) == type([]):
             return par
@@ -172,7 +173,7 @@ class ReadEvent:
 
     def GetName(self):
         return self.name
-  
+
     def PrintAlgs(self):
         return self.read_alg.PrintAlgs()
 
@@ -181,12 +182,12 @@ class ReadEvent:
 
 #-------------------------------------------------------------------------
 def _processSimlNtupleDir(path, syst, runs):
-    """    
-    Recursive function - collect all files that match run numbers and systematics    
+    """
+    Recursive function - collect all files that match run numbers and systematics
     """
 
     files = {}
-    
+
     if not os.path.isdir(path):
         return files
 
@@ -195,14 +196,14 @@ def _processSimlNtupleDir(path, syst, runs):
 
         if os.path.isdir(fpath) and len(file) > 2:
             results = _processSimlNtupleDir(fpath, syst, runs)
-            
+
             for run, val in results.iteritems():
                 if run in files:
                     log.warning('processSimlNtupleDir - 0: skip duplicate run %s: %s' %(run, fpath))
                 else:
                     files[run] = val
             continue
-            
+
         if not os.path.isfile(fpath):
             continue
 
@@ -229,15 +230,15 @@ def _processSimlNtupleDir(path, syst, runs):
 
 #-------------------------------------------------------------------------
 def getInputSimlFiles(input_file,file_list, printFiles=False):
-    """    
+    """
     Collect input MC files:
       - match run numbers and systematic name
-      - check for missing run numbers    
+      - check for missing run numbers
     """
 
     files = []
     if input_file :
-        try:    
+        try:
             f=open(input_file)
         except IOError:
             log.error('Failed to open the file with the list of input files: %s' %input_file)
@@ -255,17 +256,17 @@ def getInputSimlFiles(input_file,file_list, printFiles=False):
 
     elif file_list :
         files = file_list.split(',')
-    
+
     return files
 
 #-------------------------------------------------------------------------
 def _processDataNtupleDir(path):
-    """    
+    """
     Recursive function - collect all data files
     """
 
     files = []
-    
+
     if not os.path.isdir(path):
         return files
 
@@ -274,7 +275,7 @@ def _processDataNtupleDir(path):
         print 'file: ',file
         if fpath.lower().count('data') == 0:
             continue
-        
+
         if os.path.isdir(fpath) and len(file) > 2:
             files += _processDataNtupleDir(fpath)
             continue
@@ -286,9 +287,9 @@ def _processDataNtupleDir(path):
 
 #-------------------------------------------------------------------------
 def getInputDataFiles(paths):
-    """    
+    """
     Collect input data files:
-      - match period     
+      - match period
     """
 
     results = []
@@ -298,7 +299,7 @@ def getInputDataFiles(paths):
         paths = [paths]
 
     for path in paths:
-        if os.path.isdir(path):        
+        if os.path.isdir(path):
             if path.count('ntupleOutput'):
                 inputs += [path]
             else:
@@ -320,13 +321,13 @@ def getInputDataFiles(paths):
             fpath = path.rstrip('/')+'/'+file
 
             if os.path.isdir(fpath):
-                
+
                 #if fpath.count('data_all'):
                 if fpath.count('/data') or fpath.count('/allData'):
                     files += _processDataNtupleDir(fpath)
 
         results += files
-    
+
         log.info('getInputDataFiles - processed input directory:')
         log.info('                    path: %s'         %path)
         log.info('                    added %d file(s)' %len(files))
@@ -334,11 +335,11 @@ def getInputDataFiles(paths):
         log.info('getInputDataFiles - added %d file(s):'  %len(files))
         for file in files:
             log.info('                    %s' %file)
-                    
+
     return results
-    
+
 #-------------------------------------------------------------------------
-# Create map from sample keys to run numbers 
+# Create map from sample keys to run numbers
 #
 def prepareBkgRuns(keys,options=None):
 
@@ -364,10 +365,10 @@ def prepareBkgRuns(keys,options=None):
                   '346588':'ggF125 reshower',}
     #sig_ggF125 = {'364162':'Wmunu_MAXHTPTV140_280_CVetoBVeto',}
     #sig_VH125     = {'364106':'TBD',}
-    #sig_VH125v2     = {'364148':'TBD',}    
+    #sig_VH125v2     = {'364148':'TBD',}
     sig_VBF125     = {'308276':'VBF125 - met',
-                      '308567':'VBF125 - all',                                                                                        
-                      '346600':'VBF125 - met>75',                                                                                        
+                      '308567':'VBF125 - all',
+                      '346600':'VBF125 - met>75',
                           }
     sig_vbfgam = {'312243':'vbf gamma', }
     alt_VBF = {'308275':'VBF125 - H75',
@@ -382,29 +383,29 @@ def prepareBkgRuns(keys,options=None):
 
     bkg_wewk =     {'308096':'WenuEWK',
                     '308097':'WmunuEWK',
-                    '308098':'WtaunuEWK',                    
+                    '308098':'WtaunuEWK',
                         }
     bkg_wewkpow =     {'363237':'WenuEWK',
                        '363238':'WmunuEWK',
-                       '363239':'WtaunuEWK',                    
+                       '363239':'WtaunuEWK',
                         }
 
     bkg_zgewk =     {'363266':'ZnnEWK',
                     '363267':'ZeeEWK',
-                    '363268':'ZmmEWK',                    
-                    '363269':'ZttEWK',                    
+                    '363268':'ZmmEWK',
+                    '363269':'ZttEWK',
                         }
-    
+
     bkg_wgewk =     {'363270':'WenEWK',
                      '363271':'WmnEWK',
-                     '363272':'WtnEWK',  }                  
-        
+                     '363272':'WtnEWK',  }
+
     bkg_new = {#'312243':'',
                    '343982':'',
                    '343983':'',
                    '343984':'',
                    '343985':'',
-                   '343986':'',                   
+                   '343986':'',
                    }
     bkg_zee_228 = {'421301':'zee_ptvEnh'}
     bkg_zqcd_LO_Filt = {    '311429':'Znunu_TightVBF_Np01',
@@ -424,7 +425,7 @@ def prepareBkgRuns(keys,options=None):
                             '311443':'Ztautau_TightVBF_Np3',
                             '311444':'Ztautau_TightVBF_Np4',
                             }
-        
+
     bkg_wqcd_LO_Filt = {'311445':'Wenu_Ht140_280_13TeV_BVCVVBF',
                        '311446':'Wmunu_Ht140_280_13TeV_BVCVVBF',
                        '311447':'Wenu_Ht280_500_13TeV_BVCVVBF',
@@ -435,7 +436,7 @@ def prepareBkgRuns(keys,options=None):
                        '311452':'Wmunu_Ht700_13TeV_VBF',
                        '311453':'Wtaunu_Ht500_13TeV_VBF',
                            }
-        
+
     bkg_wqcd_mnu =     {'364156':'Wmunu_MAXHTPTV0_70_CVetoBVeto',
                     '364157':'Wmunu_MAXHTPTV0_70_CFilterBVeto',
                     '364158':'Wmunu_MAXHTPTV0_70_BFilter',
@@ -450,32 +451,32 @@ def prepareBkgRuns(keys,options=None):
                     '364167':'Wmunu_MAXHTPTV280_500_BFilter',
                     '364168':'Wmunu_MAXHTPTV500_1000',
                     '364169':'Wmunu_MAXHTPTV1000_E_CMS',  }
-    bkg_wqcd_enu={'364170':'Wenu_MAXHTPTV0_70_CVetoBVeto',      
-                    '364171':'Wenu_MAXHTPTV0_70_CFilterBVeto',    
-                    '364172':'Wenu_MAXHTPTV0_70_BFilter',         
-                    '364173':'Wenu_MAXHTPTV70_140_CVetoBVeto',    
-                    '364174':'Wenu_MAXHTPTV70_140_CFilterBVeto',  
-                    '364175':'Wenu_MAXHTPTV70_140_BFilter',       
-                    '364176':'Wenu_MAXHTPTV140_280_CVetoBVeto',   
-                    '364177':'Wenu_MAXHTPTV140_280_CFilterBVeto', 
+    bkg_wqcd_enu={'364170':'Wenu_MAXHTPTV0_70_CVetoBVeto',
+                    '364171':'Wenu_MAXHTPTV0_70_CFilterBVeto',
+                    '364172':'Wenu_MAXHTPTV0_70_BFilter',
+                    '364173':'Wenu_MAXHTPTV70_140_CVetoBVeto',
+                    '364174':'Wenu_MAXHTPTV70_140_CFilterBVeto',
+                    '364175':'Wenu_MAXHTPTV70_140_BFilter',
+                    '364176':'Wenu_MAXHTPTV140_280_CVetoBVeto',
+                    '364177':'Wenu_MAXHTPTV140_280_CFilterBVeto',
                     '364178':'Wenu_MAXHTPTV140_280_BFilter',
-                    '364179':'Wenu_MAXHTPTV280_500_CVetoBVeto',   
-                    '364180':'Wenu_MAXHTPTV280_500_CFilterBVeto', 
-                    '364181':'Wenu_MAXHTPTV280_500_BFilter',      
+                    '364179':'Wenu_MAXHTPTV280_500_CVetoBVeto',
+                    '364180':'Wenu_MAXHTPTV280_500_CFilterBVeto',
+                    '364181':'Wenu_MAXHTPTV280_500_BFilter',
                     '364182':'Wenu_MAXHTPTV500_1000',
-                    '364183':'Wenu_MAXHTPTV1000_E_CMS',   }        
+                    '364183':'Wenu_MAXHTPTV1000_E_CMS',   }
     bkg_wqcd_tnu={'364184':'Wtaunu_MAXHTPTV0_70_CVetoBVeto',
                     '364185':'Wtaunu_MAXHTPTV0_70_CFilterBVeto',
                     '364186':'Wtaunu_MAXHTPTV0_70_BFilter',
-                    '364187':'Wtaunu_MAXHTPTV70_140_CVetoBVeto',     
-                    '364188':'Wtaunu_MAXHTPTV70_140_CFilterBVeto',   
+                    '364187':'Wtaunu_MAXHTPTV70_140_CVetoBVeto',
+                    '364188':'Wtaunu_MAXHTPTV70_140_CFilterBVeto',
                     '364189':'Wtaunu_MAXHTPTV70_140_BFilter',
                     '364190':'Wtaunu_MAXHTPTV140_280_CVetoBVeto',
-                    '364191':'Wtaunu_MAXHTPTV140_280_CFilterBVeto',  
+                    '364191':'Wtaunu_MAXHTPTV140_280_CFilterBVeto',
                     '364192':'Wtaunu_MAXHTPTV140_280_BFilter',
                     '364193':'Wtaunu_MAXHTPTV280_500_CVetoBVeto',
-                    '364194':'Wtaunu_MAXHTPTV280_500_CFilterBVeto',  
-                    '364195':'Wtaunu_MAXHTPTV280_500_BFilter',       
+                    '364194':'Wtaunu_MAXHTPTV280_500_CFilterBVeto',
+                    '364195':'Wtaunu_MAXHTPTV280_500_BFilter',
                     '364196':'Wtaunu_MAXHTPTV500_1000',
                     '364197':'Wtaunu_MAXHTPTV1000_E_CMS',
                         }
@@ -484,17 +485,17 @@ def prepareBkgRuns(keys,options=None):
     bkg_wqcd.update(bkg_wqcd_mnu)
     bkg_wqcd.update(bkg_wqcd_tnu)
     bkg_zewk =     {'308092':'ZeeEWK',
-                    '308093':'ZmmEWK',                        
+                    '308093':'ZmmEWK',
                     '308094':'ZttEWK',
-                    '308095':'ZnnEWK',                     
+                    '308095':'ZnnEWK',
                         }
 
     bkg_zewkpow =     {'363234':'ZeeEWK',
-                       '363235':'ZmmEWK',                        
+                       '363235':'ZmmEWK',
                        '363236':'ZttEWK',
-                       '363233':'ZnnEWK',                     
+                       '363233':'ZnnEWK',
                    }
-    
+
     bkg_zqcd_zmm = {'364100':'Zmumu_MAXHTPTV0_70_CVetoBVeto',
                     '364101':'TBD',
                     '364102':'TBD',
@@ -678,9 +679,9 @@ def prepareBkgRuns(keys,options=None):
     #else:
     #    bkg_zqcd.update(bkg_zqcd_znn)
     bkg_top1 = {
-        '117360':'tchan->e', 
-        '117361':'tchan->mu', 
-        '117362':'tchan->tau', 
+        '117360':'tchan->e',
+        '117361':'tchan->mu',
+        '117362':'tchan->tau',
         '108343':'schan->e',
         '108344':'schan->mu',
         '108345':'schan->tau',
@@ -709,7 +710,7 @@ def prepareBkgRuns(keys,options=None):
         #'410648':'Wt_DR_dilepton_top',
         #'410649':'Wt_DR_dilepton_antitop',
         }
-        
+
     # default!!! Powheg+Pythia 8
     bkg_top1 = {
         '410658':'tchan_top', #lepton filtered
@@ -719,7 +720,7 @@ def prepareBkgRuns(keys,options=None):
         '410646':'Wt_top',
         '410647':'Wt_top',
         } #410643,410642,410648,410649
-        
+
     bkg_top2.update(bkg_top1)
     bkg_top_other = {'410472':'ttbar(w/dil)',#                remove dilepton
                      '410648':'Wt_DR_dilepton_top',
@@ -729,7 +730,7 @@ def prepareBkgRuns(keys,options=None):
                      #'410644':'schan_top_lept',
                      #'410645':'schan_antitop_lept',
                      #'410646':'Wt_top_incl',
-                     #'410647':'Wt_antitop_incl',                     
+                     #'410647':'Wt_antitop_incl',
         }
     bkg_z_strong_madgraph_znn = {'361515':'Znn_Np0',
                       '361516':'Znn_Np1',
@@ -788,7 +789,7 @@ def prepareBkgRuns(keys,options=None):
                       '363166':'BTD',
                       '363167':'BTD',
                       '363168':'BTD',
-                      '363169':'BTD',                      
+                      '363169':'BTD',
                       '363170':'BTD',
                       }
     bkg_z_strong_madgraph={}
@@ -883,10 +884,10 @@ def prepareBkgRuns(keys,options=None):
                       '301027':'BTD',
                       '301028':'BTD',
                       '301029':'BTD',
-                      '301030':'BTD',                      
+                      '301030':'BTD',
                       '301031':'BTD',
-                      '301032':'BTD',                      
-                      '301033':'BTD',                      
+                      '301032':'BTD',
+                      '301033':'BTD',
                       '301034':'BTD',
                       '301035':'BTD',
                       '301036':'BTD',
@@ -907,9 +908,9 @@ def prepareBkgRuns(keys,options=None):
     bkg_datadriveqcd = {'-123':'Loose',}
     bkg_qcdw = {
                    '310502':'powerlaw',
-                   '304784':'powerlaw',                   
+                   '304784':'powerlaw',
                    '361020':'JZ0W',
-                   '361021':'JZ1W',                   
+                   '361021':'JZ1W',
                    '361022':'JZ2W',
                    '361023':'JZ3W',
                    '361024':'JZ4W',
@@ -940,12 +941,12 @@ def prepareBkgRuns(keys,options=None):
                   '363359':'W+W-->qqln',
                   '363360':'W+W-->lnqq',
                   '363489':'WZ->lnqq',
-                  '363355':'ZZ->qqnn',                        
-                  '363356':'ZZ->qqll',                        
-                  '363357':'WZ->qqnn',                        
+                  '363355':'ZZ->qqnn',
+                  '363356':'ZZ->qqll',
+                  '363357':'WZ->qqnn',
                   '363358':'WZ->qqll',
                   }
-        
+
     bkg_vbfExt = {'309662':'Wenu_MAXHTPTV70_140',
                   '309663':'Wmunu_MAXHTPTV70_140',
                   '309664':'Wtaunu_MAXHTPTV70_140',
@@ -965,7 +966,7 @@ def prepareBkgRuns(keys,options=None):
                   '309678':'Wtaunu_MAXHTPTV140_280_CVBV',
                   '309679':'Wtaunu_MAXHTPTV140_280_CFBV',
                       }
-        
+
     bkg_vbfPTVExt = {'364216':'Zmumu_PTV500_1000',
                      '364217':'Zmumu_PTV1000_E_CMS',
                      '364218':'Zee_PTV500_1000',
@@ -980,13 +981,12 @@ def prepareBkgRuns(keys,options=None):
                      '364227':'Wenu_PTV1000_E_CMS',
                      '364228':'Wtaunu_PTV500_1000',
                      '364229':'Wtaunu_PTV1000_E_CMS',
-                      }        
-        
+                      }
+
     bkg_vbfFiltZ = {'345099':'TBD',
-                        '345100':'TBD',
-                        '345101':'TBD',
-                        '345102':'TBD',
-                        }
+                    '345100':'TBD',
+                    '345101':'TBD',
+                    '345102':'TBD',}
     bkg_lowMassZ = {'364198':'TBD',
                         '364199':'TBD',
                         '364200':'TBD',
@@ -1004,7 +1004,7 @@ def prepareBkgRuns(keys,options=None):
                         '364212':'TBD',
                         '364213':'TBD',
                         '364214':'TBD',
-                        '364215':'TBD',                        
+                        '364215':'TBD',
                         }
     bkg_sherpa_zg = {'364500':'eegamma_pty_7_15',
                      '364501':'eegamma_pty_15_35',
@@ -1058,23 +1058,23 @@ def prepareBkgRuns(keys,options=None):
                   '361042':'SinglePhotonPt70_140_CVetoBVeto',
                   '361043':'SinglePhotonPt70_140_CFilterBVeto',
                   '361044':'SinglePhotonPt70_140_BFilter',
-                  '361045':'SinglePhotonPt140_280_CVetoBVeto',                      
+                  '361045':'SinglePhotonPt140_280_CVetoBVeto',
                   '361046':'SinglePhotonPt140_280_CFilterBVeto',
                   '361047':'SinglePhotonPt140_280_BFilter',
                   '361048':'SinglePhotonPt280_500_CVetoBVeto',
-                  '361049':'SinglePhotonPt280_500_CFilterBVeto',                  
-                  '361050':'SinglePhotonPt280_500_BFilter',                  
-                  '361051':'SinglePhotonPt500_1000_CVetoBVeto',                  
-                  '361052':'SinglePhotonPt500_1000_CFilterBVeto',                  
-                  '361053':'SinglePhotonPt500_1000_BFilter',                  
-                  '361054':'SinglePhotonPt1000_2000_CVetoBVeto',                  
-                  '361055':'SinglePhotonPt1000_2000_CFilterBVeto',                  
-                  '361056':'SinglePhotonPt1000_2000_BFilter',                  
-                  '361057':'SinglePhotonPt2000_4000_CVetoBVeto',                  
+                  '361049':'SinglePhotonPt280_500_CFilterBVeto',
+                  '361050':'SinglePhotonPt280_500_BFilter',
+                  '361051':'SinglePhotonPt500_1000_CVetoBVeto',
+                  '361052':'SinglePhotonPt500_1000_CFilterBVeto',
+                  '361053':'SinglePhotonPt500_1000_BFilter',
+                  '361054':'SinglePhotonPt1000_2000_CVetoBVeto',
+                  '361055':'SinglePhotonPt1000_2000_CFilterBVeto',
+                  '361056':'SinglePhotonPt1000_2000_BFilter',
+                  '361057':'SinglePhotonPt2000_4000_CVetoBVeto',
                   '361058':'SinglePhotonPt2000_4000_CFilterBVeto',
                   '361059':'SinglePhotonPt2000_4000_BFilter',
-                  '361060':'SinglePhotonPt4000_CVetoBVeto',                  
-                  '361061':'SinglePhotonPt4000_CFilterBVeto',                  
+                  '361060':'SinglePhotonPt4000_CVetoBVeto',
+                  '361061':'SinglePhotonPt4000_CFilterBVeto',
                   '361062':'SinglePhotonPt4000_BFilter',
                   } #305444
     bkg_Vqq_gamma = {'305435':'WqqGammaPt140_280',
@@ -1088,7 +1088,7 @@ def prepareBkgRuns(keys,options=None):
                          '305443':'ZqqGammaPt1000_2000',
                          '305444':'ZqqGammaPt2000_inf',
                          }
-    
+
     if options.mergePTV:
         for ki,yi in bkg_vbfPTVExt.iteritems():
             if yi[0]=='W': bkg_wqcd[ki]=yi
@@ -1123,6 +1123,8 @@ def prepareBkgRuns(keys,options=None):
                 #'zewk':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
                 'top2':bkg_top2, # all top
+                #'top2':bkg_zewkpow,
+                #'top2':{'312487':'Znunu_PTV100_140_MJJ0_500_KtMerging','312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',}, # all top
                 #'top1':bkg_top1,
                 ##'hvbf':bkg_wqcd_mnu,
                 ##'wewk':bkg_wqcd_tnu,
@@ -1153,33 +1155,47 @@ def prepareBkgRuns(keys,options=None):
                 #'zewk':bkg_z_strong_madgraph_zmm,
                 #'zqcd':bkg_z_strong_madgraph_zee,
                 #'top2':bkg_z_strong_madgraph_ztt,
-                #'top1':bkg_z_strong_madgraph_znn,                
+                #'top1':bkg_z_strong_madgraph_znn,
                 }
 
     if not options.mergePTV:
+        bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
+        bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
         if  not options.year==2018:
             bkg_keys['wdpi'].update(bkg_vbfPTVExt)
         else:
             for ki,yi in bkg_vbfPTVExt.iteritems():
                 if not yi.count('Znunu'): bkg_keys['wdpi'][ki]=yi
+    else:
+        bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
+        bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)        
     if not options.mergeExt:
         bkg_keys['wdpi'].update(bkg_vbfExt)
         bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
-        bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)        
+        bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)
         bkg_keys['wdpi'].update(bkg_new)
+
+    if not options.mergeMGExt:
+        bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
+        bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)
+    else:
+        #bkg_keys['zqcdMad']=bkg_zqcd_LO_Filt
+        bkg_keys['zqcdMad'].update(bkg_zqcd_LO_Filt)
+        bkg_keys['wqcdMad'].update(bkg_wqcd_LO_Filt)
+        #bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
+        #bkg_keys['wdpi'].update(bkg_z_strong_madgraph)        
+        #bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)        
     if options.year!=2018:
         bkg_keys['wdpi'].update(bkg_zqcd_znn_mc16e)
 
     # extra samples here for now
-    bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
-    bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
     bkg_keys['wdpi'].update(bkg_wewkpow)
     bkg_keys['wdpi'].update(bkg_zewkpow)
     bkg_keys['wdpi'].update(bkg_zee_228)
 
     if False:
         bkg_keys['zqcdPow']=bkg_z_strong_powheg
-        bkg_keys['vbfz']=bkg_vbfFiltZ        
+        bkg_keys['vbfz']=bkg_vbfFiltZ
         bkg_keys['zldy']=bkg_lowMassZ
     else:
         #extra_samples=bkg_lowMassZ
@@ -1187,19 +1203,19 @@ def prepareBkgRuns(keys,options=None):
         extra_samples=bkg_vbfFiltZ
         extra_samples.update(bkg_z_strong_powheg)
         bkg_keys['wdpi'].update(extra_samples)
-        bkg_keys['wdpi'].update(bkg_Vqq_gamma)        
-        
+        bkg_keys['wdpi'].update(bkg_Vqq_gamma)
+
     #
-    # Select MC samples 
+    # Select MC samples
     #
     if        keys  == 'all'   : keys = bkg_keys.keys()
     elif type(keys) == type(''): keys = keys.split(',')
     elif type(keys) != type([]): keys = []
 
     res_keys = {}
-            
+
     for key in keys:
-        if key in bkg_keys:                
+        if key in bkg_keys:
             for run in bkg_keys[key]:
                 res_keys[run] = key
         else:

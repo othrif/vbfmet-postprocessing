@@ -88,13 +88,14 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::MaxNEvent",     fMaxNEvent);
 
   reg.Get("ReadEvent::TMVAWeightPath",     fTMVAWeightPath);
-  
+
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
   reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
   reg.Get("ReadEvent::OverlapPh",     fOverlapPh);
   reg.Get("ReadEvent::mergeExt",      fMergeExt);
   reg.Get("ReadEvent::mergePTV",      fMergePTV);
   reg.Get("ReadEvent::BTagCut",       fBTagCut);
+  reg.Get("ReadEvent::noVjWeight",      fnoVjWeight);
   reg.Get("ReadEvent::Year",          fYear);  
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
@@ -117,7 +118,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
     fTMVAReader->AddVariable("jet2_pt", &fTMVAVars[6]);
     fTMVAReader->BookMVA( fMVAName, fTMVAWeightPath);
   }
-  
+
   // set met phi
   fMETChoice_phi = fMETChoice;
   fMETChoice_phi.replace(fMETChoice_phi.end()-2, fMETChoice_phi.end(),"phi");
@@ -229,14 +230,17 @@ void Msl::ReadEvent::Init(TTree* tree)
   // Init
   for(unsigned i=0; i<fVarVec.size(); ++i)
     fVarVec.at(i).SetVarBranch(tree);
+  vjWeight=1.0;
   xeSFTrigWeight=1.0;
   xeSFTrigWeight__1up=1.0;
   xeSFTrigWeight__1down=1.0;
   xeSFTrigWeight_nomu=1.0;
   xeSFTrigWeight_nomu__1up=1.0;
-  xeSFTrigWeight_nomu__1down=1.0;  
+  xeSFTrigWeight_nomu__1down=1.0;
+  tree->SetBranchStatus("vjWeight", 1);
+  tree->SetBranchAddress("vjWeight", &vjWeight);
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
-  tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);  
+  tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
   if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
     //tree->SetBranchAddress("puSyst2018Weight",        &puweight);
@@ -245,7 +249,7 @@ void Msl::ReadEvent::Init(TTree* tree)
       tree->SetBranchAddress("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
       tree->SetBranchAddress("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
       tree->SetBranchAddress("xeSFTrigWeight_nomu__1up",&xeSFTrigWeight_nomu__1up);
-      tree->SetBranchAddress("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);      
+      tree->SetBranchAddress("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);
     }
   }
   else{
@@ -558,7 +562,6 @@ void Msl::ReadEvent::Read(const std::string &path)
   cout << "------------------------------------------------------------------" << endl;
   log() << "Read - process new file: "                         << endl
 	<< "   path:      " << path                            << endl;
-
   //
   // Read events from tree(s) and call sub-algorithms for processing
   //
@@ -645,7 +648,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::n_el_w);
   fSkipVarsQCD.insert(Mva::n_mu_baseline_noOR);
   fSkipVarsQCD.insert(Mva::lep_trig_match);
-  
+
   for(int i = 0; i < nevent; i++) {
     //
     // Clear event
@@ -655,9 +658,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // read in tree
     rtree->GetEntry(i);
 
-    
+
     if(fRunNumber==-123) fIsDDQCD=true;
-    
+
     // Fill event
     for(unsigned a=0; a<fVarVec.size(); ++a){
       if(fIsDDQCD && fSkipVarsQCD.find(fVarVec.at(a).var)!=fSkipVarsQCD.end()) continue;//skip missing vars in QCD
@@ -669,11 +672,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->RepVar(Mva::n_el_w, 0);
       event->RepVar(Mva::n_mu_baseline_noOR, 0);
       event->RepVar(Mva::lep_trig_match, 0);
-    }    
+    }
 
     event->RunNumber = fRunNumber;
-    event->RandomRunNumber = fRandomRunNumber;    
-    event->EventNumber = fEventNumber;    
+    event->RandomRunNumber = fRandomRunNumber;
+    event->EventNumber = fEventNumber;
     event->isMC = fisMC;
     // identify the sample
     if(!fisMC){
@@ -682,8 +685,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       //if(!fMCEventCount) event->SetWeight(fWeight/puweight);
       else event->SetWeight(1.0);
     }else{
-      if(!fMCEventCount) event->SetWeight((fWeight*fLumi));
-      //if(!fMCEventCount) event->SetWeight((fWeight*fLumi/puweight));
+      if(!fMCEventCount) {
+        if(fnoVjWeight) event->SetWeight((fWeight*fLumi/vjWeight)); // assume vjweight is already applied to the nominal weight
+        else event->SetWeight(fWeight*fLumi);
+      }
       else  event->SetWeight(1.0);
       if(fIsDDQCD) event->SetWeight(fWeight);
       //if(fIsDDQCD) event->SetWeight(fWeight/puweight);
@@ -708,7 +713,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->RepVar(Mva::xeSFTrigWeight__1down, xeSFTrigWeight__1down);
     event->RepVar(Mva::xeSFTrigWeight_nomu,        xeSFTrigWeight_nomu);
     event->RepVar(Mva::xeSFTrigWeight_nomu__1up,   xeSFTrigWeight_nomu__1up);
-    event->RepVar(Mva::xeSFTrigWeight_nomu__1down, xeSFTrigWeight_nomu__1down);    
+    event->RepVar(Mva::xeSFTrigWeight_nomu__1down, xeSFTrigWeight_nomu__1down);
 
     if(fLoadBaseLep && false){
       // Fill Electrons with the baseline electrons for this looser lepton selection
@@ -863,7 +868,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       for(unsigned iJet=0; iJet<event->jets.size(); ++iJet){
 	if(fabs(event->jets.at(iJet).eta)<2.5 && event->jets.at(iJet).HasVar(Mva::jetBtagWeight) && fBTagCut<event->jets.at(iJet).GetVar(Mva::jetBtagWeight)) ++nBjet;
       }
-      event->RepVar(Mva::n_bjet, nBjet); 
+      event->RepVar(Mva::n_bjet, nBjet);
     }
     if(fJetVetoPt>0.0)
       event->RepVar(Mva::n_jet, nJet);
@@ -957,7 +962,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // Fill Base electrons
     unsigned n_baselep=0;
-    unsigned n_wlep=0;    
+    unsigned n_wlep=0;
     unsigned n_siglep=0;
     if(baseel_pt){
       //unsigned n_baseel=0;
@@ -1160,9 +1165,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     //else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
     //else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K
     if(325713<=fRandomRunNumber && fRandomRunNumber<=341649 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // All periods
-    
-    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF 
-    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF 
+
+    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
+    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
     // 2018 update trigger for later periods => value 5 for
     //if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     //else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
@@ -1182,7 +1187,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     int midRun = 302872; // was 302872
     if(fRandomRunNumber<=284484)                                  runPeriod = 1;
     else if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun) runPeriod = 2; // 2016
-    else if(fRandomRunNumber >midRun && fRandomRunNumber< 325713) runPeriod = 3; // 2016    
+    else if(fRandomRunNumber >midRun && fRandomRunNumber< 325713) runPeriod = 3; // 2016
     else if(325713<=fRandomRunNumber && fRandomRunNumber<=328393) runPeriod = 10; // 2017 HLT_xe90_pufit_L1XE50
     else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470) runPeriod = 11; // 2017 HLT_xe100_pufit_L1XE55
     else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975) runPeriod = 12; // 2017 HLT_xe110_pufit_L1XE55
@@ -1198,10 +1203,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if(trigger_met_byrun==0 && (trigger_met_encoded & 0x10) == 0x10 ){
       if(fRandomRunNumber<=284484)                                  trigger_met_byrun = 4;
       else if(fRandomRunNumber >284484 && fRandomRunNumber<=midRun) trigger_met_byrun = 5;
-      else if(fRandomRunNumber >midRun)                             trigger_met_byrun = 6;   
+      else if(fRandomRunNumber >midRun)                             trigger_met_byrun = 6;
     }// 2015+2016
     event->RepVar(Mva::trigger_met_byrun, trigger_met_byrun);
-    event->RepVar(Mva::runPeriod,         runPeriod);    
+    event->RepVar(Mva::runPeriod,         runPeriod);
 
     // apply the overlap
     if(fOverlapPh && fisMC){
@@ -1216,7 +1221,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }else{
       event->RepVar(Mva::in_vy_overlapCut,1.0);
     }
-    
+
     // Change the leptons to base leptons - after filling the event
     if(fLoadBaseLep) ChangeLep(*event);
 
@@ -1239,7 +1244,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->RepVar(Mva::tmva, fTMVAReader->EvaluateMVA( fTMVAVars, fMVAName ));
       //std::cout << "inputs: " << fTMVAVars[0] << " " << fTMVAVars[1] << " " << fTMVAVars[2] << " " << fTMVAVars[3] << " " << fTMVAVars[4] << " " << fTMVAVars[5] << " " << event->GetVar(Mva::tmva) << std::endl;
     }else if(!event->HasVar(Mva::tmva)) { event->AddVar(Mva::tmva, 0.0); }
-    
+
     //
     // Process sub-algorithms
     //
@@ -1557,7 +1562,7 @@ void Msl::ReadEvent::ChangeLep(Event &event)
   if(event.baseel.size()==0 && event.basemu.size()==2){
     event.RepVar(Mva::lepCh0, event.basemu.at(0).GetVar(Mva::charge));
     event.RepVar(Mva::lepCh1, event.basemu.at(1).GetVar(Mva::charge));
-    
+
     unsigned chanFlavor=0;
     if(event.basemu.size()==2 && (event.basemu.at(0).GetVar(Mva::charge)*event.basemu.at(1).GetVar(Mva::charge))>0) chanFlavor=6;
     if(event.basemu.size()==2 && (event.basemu.at(0).GetVar(Mva::charge)*event.basemu.at(1).GetVar(Mva::charge))<0) chanFlavor=7;
@@ -1583,7 +1588,7 @@ void Msl::ReadEvent::ChangeLep(Event &event)
   //  if(basemu_ptvarcone20->at(i)/basemu_pt->at(i)<0.2){
   //    met+=event.basemu.at(i).GetVec();
   //    ++n_mu;
-  //    
+  //
   //  }
 
   // removing the leptons

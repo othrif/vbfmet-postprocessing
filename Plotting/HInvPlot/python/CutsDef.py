@@ -245,8 +245,9 @@ def FilterCuts(options):
     if options==None:
         return cuts
     if options.mergePTV:
-        cuts += [CutItem('CutMergePTV','passVjetsPTV > 0')]
-    if options.mergeExt:
+        cuts += [CutItem('CutMergePTV','passVjetsPTV > 0.5')]
+        #cuts += [CutItem('CutMergeExt','passVjetsFilter > 0')]        
+    if options.mergeExt or options.mergeMGExt:
         cuts += [CutItem('CutMergeExt','passVjetsFilter > 0')]
     return cuts
 
@@ -320,10 +321,11 @@ def getJetCuts(basic_cuts, options, isPh=False):
             else:
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]#80,50
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')] # move to 50
+                #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.35')]
             #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
-        cuts = [CutItem('CutNjet',  'n_jet == 2')]
+        cuts = [CutItem('CutNjet',  'n_jet == 2')]        
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 60.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
 
@@ -371,6 +373,7 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0, maxMET
                 cutMET.AddCut(CutItem('FJVT', 'j0fjvt < 0.2 && j1fjvt < 0.2'), 'AND')
             cuts = [cutMET]
         else:
+            #cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
             cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
 	    if basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt' and basic_cuts.analysis!='njgt4':
                 cutMET.AddCut(CutItem('LowMET', '%s > %s' %(met_choice, metCut)), 'OR')
@@ -848,7 +851,10 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
         if options.OverlapPh:
             reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamEWK,wgamEWK,bkgs,data')
         else:
-            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
+            if options.mergeMGExt:                            
+                reg.SetVal(key, 'higgs,tall,wqcdMad,wewk,zqcdMad,zewk,mqcd,bkgs,data')
+            else:
+                reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 

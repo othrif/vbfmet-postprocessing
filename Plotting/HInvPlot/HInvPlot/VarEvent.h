@@ -36,19 +36,20 @@ namespace Msl
       jj_mass,
 
       trigger_met,
-      trigger_met_encoded,      
+      trigger_met_encoded,
       trigger_met_encodedv2,
       trigger_met_byrun,
-      runPeriod,      
+      runPeriod,
       trigger_lep,
-      lep_trig_match,      
+      lep_trig_match,
       passJetCleanTight,
+      vjWeight,
       xeSFTrigWeight,
       xeSFTrigWeight__1up,
       xeSFTrigWeight__1down,
       xeSFTrigWeight_nomu,
       xeSFTrigWeight_nomu__1up,
-      xeSFTrigWeight_nomu__1down,      
+      xeSFTrigWeight_nomu__1down,
       //
       // KInematic variables read directly from standard ntuples
       //   - enum name must match branch name from HWW tree

@@ -42,9 +42,8 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hjj_deta_diff(0),
 				  hjj_deta_abs(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),
-				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),
-				  hWMadMCIDQCD(0),
-				  hZPowMCIDQCD(0),
+				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),hZMadFMCIDQCD(0),
+				  hZPowMCIDQCD(0),hZShMCIDQCD(0)
 				  hmu_njet2(0),
 				  hmu_njet34(0),
 				  hj2Eta(0),
@@ -152,9 +151,11 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hZMCIDQCD    = GetTH1("ZMCIDQCD",     100,  364099.5,364199.5);
   hWMCIDQCD    = GetTH1("WMCIDQCD",     100,  364155.5,364255.5);
   hZMadMCIDQCD = GetTH1("ZMadMCIDQCD",  10,  361509.5,361519.5);
-  hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 100, 363122.5,363222.5);  
+  hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 100, 363122.5,363222.5);
+  hZMadFMCIDQCD= GetTH1("ZMadFMCIDQCD", 25, 311428.5,311453.5);    
   hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
-  hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);  
+  hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);
+  hZShMCIDQCD  = GetTH1("ZShMCIDQCD",   84,  312447.5,312531.5);    
 
   hmu_njet2           = GetTH1("mu_njet2", 100, -0.5, 99.5);
   hmu_njet34          = GetTH1("mu_njet34", 100, -0.5, 99.5);
@@ -239,8 +240,10 @@ bool Msl::PlotEvent::DoExec(Event &event)
   hWMCIDQCD->Fill(event.RunNumber, weight);
   hZMadMCIDQCD->Fill(event.RunNumber, weight);
   hZMad2MCIDQCD->Fill(event.RunNumber, weight);
+  hZMadFMCIDQCD->Fill(event.RunNumber, weight);  
   hWMadMCIDQCD->Fill(event.RunNumber, weight);  
   hZPowMCIDQCD->Fill(event.RunNumber, weight);
+  hZShMCIDQCD->Fill(event.RunNumber, weight);  
   float jj_deta = event.GetVar(Mva::jj_deta);
   if(hjj_deta_signed) hjj_deta_signed->Fill(( fabs(event.GetVar(Mva::jetEta0)) > fabs(event.GetVar(Mva::jetEta1)) ? -1.0*jj_deta : jj_deta), weight);
   if(hjj_deta_diff) hjj_deta_diff->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1))), weight);
