@@ -56,7 +56,10 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hj2metsig_eta28(0),
 				  hj3metsig_eta28(0),
 				  hratio_mu_njet2(0),
-				  hratio_mu_njet34(0)
+				  hratio_mu_njet34(0),
+				  hmu_cc(0),
+				  hmu_cf(0),
+				  hmu_ff(0)
 {
 }
 
@@ -294,6 +297,11 @@ bool Msl::PlotEvent::DoExec(Event &event)
     else if(tmp.Pt()<55.0){ hJetEtaPt35->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet35EMEC; }
     else{  hJetEtaPt55->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet55EMEC; }
   }
+  if (fabs(event.jets.at(0).eta)<2.5 && fabs(event.jets.at(1).eta)<2.5) hmu_cc->Fill(event.GetVar(Mva::averageIntPerXing), weight);
+  else if (fabs(event.jets.at(0).eta)>=2.5 && fabs(event.jets.at(1).eta)>=2.5) hmu_ff->Fill(event.GetVar(Mva::averageIntPerXing), weight);
+  else hmu_cf->Fill(event.GetVar(Mva::averageIntPerXing), weight);
+	
+
   if(event.jets.size()>2){
     const TLorentzVector j1v = event.jets.at(0).GetLVec();
     const TLorentzVector j2v = event.jets.at(1).GetLVec();
