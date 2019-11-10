@@ -43,7 +43,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hjj_deta_abs(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),hZMadFMCIDQCD(0),
-				  hZPowMCIDQCD(0),hZShMCIDQCD(0)
+				  hZPowMCIDQCD(0),hZShMCIDQCD(0),
 				  hmu_njet2(0),
 				  hmu_njet34(0),
 				  hj2Eta(0),
@@ -57,7 +57,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hratio_mu_njet2(0),
 				  hratio_mu_njet34(0),
 				  hmu_cc(0),
-				  hmu_cf(0),
+				  hmu_fc(0),
 				  hmu_ff(0)
 {
 }
@@ -302,7 +302,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   }
   if (fabs(event.jets.at(0).eta)<2.5 && fabs(event.jets.at(1).eta)<2.5) hmu_cc->Fill(event.GetVar(Mva::averageIntPerXing), weight);
   else if (fabs(event.jets.at(0).eta)>=2.5 && fabs(event.jets.at(1).eta)>=2.5) hmu_ff->Fill(event.GetVar(Mva::averageIntPerXing), weight);
-  else hmu_cf->Fill(event.GetVar(Mva::averageIntPerXing), weight);
+  else hmu_fc->Fill(event.GetVar(Mva::averageIntPerXing), weight);
 	
 
   if(event.jets.size()>2){

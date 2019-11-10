@@ -138,6 +138,8 @@ namespace Msl
     TH1                        *hZMadMCIDQCD;
     TH1                        *hZMad2MCIDQCD;
     TH1                        *hZMadFMCIDQCD;        
+    TH1                        *hZPowMCIDQCD;
+    TH1                        *hZShMCIDQCD;
     TH1                        *hWMadMCIDQCD;
     TH1			       *hmu_njet2;
     TH1			       *hmu_njet34;
@@ -149,15 +151,15 @@ namespace Msl
     TH1                        *hj3fjvt_eta28; 
     TH1			       *hj2metsig_eta28;     
     TH1			       *hj3metsig_eta28;     
-    TH1			       *hmu_cc;
-    TH1			       *hmu_fc;
-    TH1			       *hmu_ff;
 
     TH2			       *hratio_mu_njet2;
     TH2			       *hratio_mu_njet34;
 
-    TH1                        *hZPowMCIDQCD;
-    TH1                        *hZShMCIDQCD;
+    TH1			       *hmu_cc;
+    TH1			       *hmu_fc;
+    TH1			       *hmu_ff;
+
+
     std::map<Mva::Var,TH1*>    fHistVec;
   };
 }
