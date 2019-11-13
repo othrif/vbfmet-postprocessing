@@ -241,6 +241,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight);
   m_tree_out->Branch("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
   if(m_currentVariation=="Nominal"){ // only write for the nominal
+    m_tree_out->Branch("puWeight",&puWeight);
     m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
     m_tree_out->Branch("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
     m_tree_out->Branch("xeSFTrigWeight_nomu__1up",&xeSFTrigWeight_nomu__1up);
@@ -714,7 +715,7 @@ StatusCode VBFAnalysisAlg::execute() {
 	//std::cout << "puSyst2018Wei: " << puSyst2018Weight << " up: " << tMapFloat["puSyst2018Weight__1up"]  << " down: " << tMapFloat["puSyst2018Weight__1down"] << std::endl;
       }
     }
-    //puSyst2018Weight=1.0;
+    puSyst2018Weight=1.0;
   } // end pileup weight systematic
 
   if (m_isMC){
@@ -1066,7 +1067,11 @@ StatusCode VBFAnalysisAlg::execute() {
   ATH_MSG_DEBUG ("n_jet = 2!");
   if (!(unsigned(n_jet) == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
   if (!(unsigned(n_jet) == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
-  if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < DPhijjCut) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+  if(!m_LooseSkim){
+    if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < DPhijjCut) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+  }else{
+    if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < DPhijjCut) & (jj_deta > DEtajjCut) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+  }
   ATH_MSG_DEBUG ("Pass VBF cuts!");
   // encoding met triggers
   trigger_met_encoded=0;
@@ -1101,14 +1106,17 @@ StatusCode VBFAnalysisAlg::execute() {
   bool passMETTrig = trigger_met_encodedv2>0 || trigger_met>0 || trigger_met_encoded>0;
   if(m_METTrigPassThru) passMETTrig=true;
   ATH_MSG_DEBUG ("Assign trigger_met value");
+  float jet_pt_sum = jet_pt->at(0) + jet_pt->at(1);
+  if(n_jet>2) jet_pt_sum+=jet_pt->at(2);
+  if(n_jet>3) jet_pt_sum+=jet_pt->at(3);
   if(n_el== 1) {
-    met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
+    met_significance = met_tst_et/1000/sqrt((el_pt->at(0) + jet_pt_sum)/1000.);
   }else if(baseel_pt && n_baseel == 1 && baseel_pt->size()==1){
-    met_significance = met_tst_et/1000/sqrt((baseel_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
+    met_significance = met_tst_et/1000/sqrt((baseel_pt->at(0) + jet_pt_sum)/1000.);
   }else if(n_mu == 1){
-    met_significance = met_tst_et/1000/sqrt((mu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
+    met_significance = met_tst_et/1000/sqrt((mu_pt->at(0) + jet_pt_sum)/1000.);
   }else if(basemu_pt && n_basemu == 1 && basemu_pt->size()>0){
-    met_significance = met_tst_et/1000/sqrt((basemu_pt->at(0) + jet_pt->at(0) + jet_pt->at(1))/1000.);
+    met_significance = met_tst_et/1000/sqrt((basemu_pt->at(0) + jet_pt_sum)/1000.);
   }else {
     met_significance = 0;
   }
@@ -1164,7 +1172,8 @@ StatusCode VBFAnalysisAlg::execute() {
 
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*puWeight*(met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
+  w = weight*mcEventWeight*(met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
+  if(m_doPUWeight) w *= puWeight;
   if(m_doVjetRW) w *= vjWeight;
 
   if(m_theoVariation){
@@ -1261,7 +1270,8 @@ StatusCode VBFAnalysisAlg::execute() {
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight);
 
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_puWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
+    if(m_doPUWeight) tMapFloatW[it->first]*=tmp_puWeight;
     if(m_doVjetRW) tMapFloatW[it->first] *= tmp_vjWeight;
     //std::cout << "sys: " << it->first << " pu: " << tmp_puSyst2018Weight << " " << tMapFloatW[it->first] << std::endl;
   }//end systematic weight loop
