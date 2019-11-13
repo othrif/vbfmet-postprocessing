@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser( description = "Looping over sys and samples fo
 
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
 parser.add_argument( "--metOptSyst", dest = "metOptSyst", action="store_true", default = False, help = "Do only the met optimization systematics" )
-parser.add_argument( "--slc7", dest = "slc7", action="store_true", default = False, help = "Do slc7" )
+parser.add_argument( "--slc7", dest = "slc7", action="store_true", default = False, help = "Do slc7 for chicago tier3" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", default = "/eos/user/r/rzou/v04/list", help = "list of ntuples to run over" )
 #parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "/home/rzou/STPostProcessing/run/f_out_total_v05.root", help = "file with the total number of event processed" )
@@ -24,9 +24,11 @@ parser.add_argument("-e", "--UseExtMC", dest = "UseExtMC", action="store_true", 
 parser.add_argument("--UseExtMGVjet", dest = "UseExtMGVjet", action="store_true", default = False, help = "Use MG extended MC samples" )
 parser.add_argument( "--METTrigPassThru", dest = "METTrigPassThru", action="store_true", default = False, help = "Use met trigger pass through" )
 parser.add_argument( "--TightSkim", dest = "TightSkim", action="store_true", default = False, help = "Use tight skimming" )
+parser.add_argument( "--AltSkim", dest = "AltSkim", action="store_true", default = False, help = "Use alternate skimming.MET>200, no jet veto, no dphijj" )
 parser.add_argument( "--QGTagger", dest = "QGTagger", action="store_true", default = False, help = "Use qgtagger. available in releases newer than 21.2.76" )
 parser.add_argument( "--useTrigMuonSF", dest = "useTrigMuonSF", action="store_false", default = True, help = "Uses muon trigger SF instead of 1 when called ")
 parser.add_argument( "--theoVariation", dest = "theoVariation", action="store_true", default = False, help = "Run Theory uncertainties ")
+parser.add_argument("--doVjetRW", dest = "doVjetRW", action="store_true", default = False, help = "apply V+jets theory reweighing" )
 args, unknown = parser.parse_known_args()
 
 
@@ -69,7 +71,7 @@ buildPaths = os.getenv('CMAKE_PREFIX_PATH')
 buildPathsVec = buildPaths.split(':')
 buildDir =  buildPathsVec[0][:buildPathsVec[0].find(CMTCONFIG)].rstrip('/')
 os.system("rm -rf "+workDir)
-os.system("mkdir "+workDir)                
+os.system("mkdir "+workDir)
 
 listofrunN = workDir+"/filelist"
 listofrunNMC = workDir+"/filelistMC"
@@ -110,7 +112,7 @@ else:
         foundV = False
         for p,s in enumerate(sampledir.split(".")):
             if s[0]=="v":
-                samplePattern+="."+s
+                samplePattern+="."+s+"."
                 foundV = True
         if not(foundV):
             print "ERROR: samples have different names than assumed!"
@@ -118,7 +120,7 @@ else:
         if (samplePatternGlobal != samplePattern) and (samplePatternGlobal != ""):
             print "ERROR: samples have different patterns!"
             break
-        samplePatternGlobal = samplePattern+'.'
+        samplePatternGlobal = samplePattern
 f.close()
 fMC.close()
 
@@ -137,6 +139,10 @@ if args.theoVariation:
     UseExtMC += " --theoVariation"
 if args.TightSkim:
     UseExtMC += " --TightSkim"
+if args.AltSkim:
+    UseExtMC += " --AltSkim"
+if args.doVjetRW:
+    UseExtMC += " --doVjetRW"
 
 for syst in systlist:
     print listofrunN

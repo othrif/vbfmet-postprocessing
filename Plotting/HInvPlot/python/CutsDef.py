@@ -300,6 +300,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
             if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5':
                 #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
                 cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
+                #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.35')]
                 cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
             if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 90.0')]
@@ -307,7 +308,6 @@ def getJetCuts(basic_cuts, options, isPh=False):
             else:
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]#80,50
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')] # move to 50
-                #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.35')]
             #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:

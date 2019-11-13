@@ -2,12 +2,16 @@ import ROOT
 import subprocess
 import pickle
 import sys
-#l = open('v21Loose.txt','r')
-#l = open('v26bLoose_rui_sort.txt','r')
-#l = open('v26gam.txt','r')
-#l = open('v28PlowSystd.txt','r')
-#l = open('v34LMC_mc16a.txt')
-l = open('sig.txt')
+import argparse
+import sys
+
+parser = argparse.ArgumentParser( description = "get total Nevent to weight samples", add_help=True , fromfile_prefix_chars='@')
+parser.add_argument( "-l", "--list", type = str, dest = "filelist", default = "filteredSherpa.txt", help = "text file with list of datasets" )
+parser.add_argument( "-o", "--output", type = str, dest = "output", default = "myMap.p", help = "output file name" )
+parser.add_argument( "-s", "--site", type = str, dest = "site", default = "MWT2_UC_LOCALGROUPDISK", help = "grid site: MWT2_UC_LOCALGROUPDISK or DESY-HH_LOCALGROUPDISK" )
+args, unknown = parser.parse_known_args()
+
+l = open(args.filelist)
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt
 myMap = {}
@@ -30,9 +34,7 @@ for ite in l:
     #proc = subprocess.Popen(['/bin/bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     #stdout,error = proc.communicate('rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  '+i+'/')
         proc = subprocess.Popen(['/bin/bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        stdout = proc.communicate('rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  '+i.strip()+'/')
-    #stdout = proc.communicate('rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  '+i+'/')
-    
+        stdout = proc.communicate('rucio list-file-replicas --pfns --protocol root --rse  '+args.site+' '+i.strip()+'/')
         print stdout
         print 'Return note: ',proc.returncode
         returnCode=proc.returncode
@@ -52,5 +54,5 @@ for ite in l:
 print myMap
 
 
-pickle.dump( myMap, open( "myMap_mc16a.p", "wb" ) )
+pickle.dump( myMap, open(args.output, "wb" ) )
 print 'done'

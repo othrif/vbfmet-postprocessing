@@ -23,8 +23,10 @@ arg_group.add_argument("--UseExtMGVjet", dest="UseExtMGVjet", action="store_true
 arg_group.add_argument("--METTrigPassThru", dest="METTrigPassThru", action="store_true",default=False,help="Pass through for the met trigger skim")
 arg_group.add_argument("--QGTagger", dest="QGTagger", action="store_true",default=False,help="Run the QGTagger when true")
 arg_group.add_argument("--TightSkim", dest="TightSkim", action="store_true",default=False,help="Run TightSkim when set to true")
+arg_group.add_argument("--AltSkim", dest="AltSkim", action="store_true",default=False,help="Run AltSkim when set to true")
 arg_group.add_argument("--theoVariation", dest='theoVariation', action="store_true", default=False, help="do theory systematic variations, default: False")
 arg_group.add_argument("--oneTrigMuon", dest='oneTrigMuon', action="store_true", default=False, help="set muon trigger SF to 1, default: False")
+arg_group.add_argument("--doVjetRW", dest='doVjetRW', action="store_true", default=False, help="apply V+jets theory reweighing ")
 
 # parse the commandline options
 args = config.parse_args()
@@ -58,12 +60,14 @@ athAlgSeq += CfgMgr.VBFAnalysisAlg("VBFAnalysisAlg",
                                    currentSample = currentSample,
                                    isMC = isMC,
                                    LooseSkim = (not args.TightSkim),
+                                   AltSkim = args.AltSkim,
                                    ExtraVars=True,
                                    UseExtMC=args.UseExtMC,
                                    UseExtMGVjet=args.UseExtMGVjet,
                                    METTrigPassThru=args.METTrigPassThru,
                                    QGTagger=args.QGTagger,
                                    oneTrigMuon=args.oneTrigMuon,
+                                   doVjetRW=args.doVjetRW,
                                    runNumberInput = runNumber,
                                    theoVariation = args.theoVariation and isSherpaVjets
                                    );

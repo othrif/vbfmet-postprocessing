@@ -71,6 +71,10 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
                     for i in tmpmj: multijets+=[(0.70803802)*i] # MET>170... from scaling to low mjj
                 if METCut==180: 
                     for i in tmpmj: multijets+=[(0.53423362)*i] # MET>180... from scaling to low mjj
+        elif Binning==0:
+            multijets = [400, 200, 200]
+        elif Binning==6:
+            multijets = [300.0, 135, 120.0, 70.0, 120.0, 120.0, 50.0]
         else:
             print 'MJ is not defined for binning: ',Binning
 
@@ -81,7 +85,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
     f_multijet = ROOT.TFile("multijet.root", "recreate")
     for multijet in multijets:
         hist=None
-        if doDoubleRatio and a==(len(multijets)-1):
+        if doDoubleRatio and a==(len(multijets)):
             hist   = ROOT.TH1F("hmultijet_antiVBFSel_1Nom_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1Nom_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
             histUp = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncHigh_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncHigh_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
             histDw = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncLow_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncLow_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
@@ -156,7 +160,7 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
         fakeelem = fakeelesm[a-1]
         histpLowSig=None
         histmLowSig=None
-        if doDoubleRatio and a==(len(fakeelesp)-1):
+        if doDoubleRatio and a==(len(fakeelesp)):
             histpLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
             histmLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
         else:
@@ -168,7 +172,7 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
         histmLowSig.Write()
         histm=None
         histp=None
-        if doDoubleRatio and a==(len(fakeelesp)-1):
+        if doDoubleRatio and a==(len(fakeelesp)):
             histp = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts;;", 1, 0.5, 1.5)
             histm = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts;;", 1, 0.5, 1.5)
         else:

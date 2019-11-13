@@ -18,6 +18,7 @@
 #include "PATInterfaces/SystematicRegistry.h"
 
 #include "SignalSystHelper.h"
+#include "VJetsSystHelper.h"
 #include "TTree.h"
 #include "TH1D.h"
 #include <vector>
@@ -65,6 +66,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool is2015;
   bool is2016;
   bool m_LooseSkim = true;
+  bool m_AltSkim = false;
+  bool m_doPUWeight=true;
   bool m_extraVars = true;
   bool m_contLep   = false;
   bool m_QGTagger   = true;
@@ -72,10 +75,12 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TTree *m_tree = 0;
   TTree *m_tree_out = 0;
   SignalSystHelper     my_signalSystHelper;
+  VJetsSystHelper      my_vjSystHelper;
+
 
   SUSY::CrossSectionDB *my_XsecDB;
-  std::map<TString,asg::AnaToolHandle<CP::IJetQGTagger> >      m_jetQGTool;                     //! 
-  std::map<TString,CP::SystematicSet>        m_systSet;                     //! 
+  std::map<TString,asg::AnaToolHandle<CP::IJetQGTagger> >      m_jetQGTool;                     //!
+  std::map<TString,CP::SystematicSet>        m_systSet;                     //!
   //  const TFile outputFile;
   TString m_treeName = "MiniNtuple";
   TString outputFileName = "ntuple";
@@ -89,6 +94,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::map<TString, Float_t> tMapFloat;
   std::map<TString, Float_t> tMapFloatW;
   vector<TString> m_qgVars;
+  std::vector<TString> m_vjVariations;
 
   // jet container
   xAOD::JetContainer* m_newJets;
@@ -112,10 +118,12 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::string m_mcCampaign;
   bool m_theoVariation;
   bool m_oneTrigMuon;
+  bool m_doVjetRW ;
 
   Float_t crossSection;
   Double_t weight;
   Float_t w;
+  Double_t vjWeight;
   Float_t met_significance;
   Int_t trigger_met;
   Int_t trigger_met_encoded;
@@ -380,6 +388,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   TBranch    *b_tau_phi;
 
   TBranch    *b_mcEventWeights;
+
+  Float_t         truth_V_dressed_pt=-9999;
+  TBranch        *b_truth_V_dressed_pt;   //!
+
 
 };
 

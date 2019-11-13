@@ -9,7 +9,7 @@ def BinomialErr(n2, n1, err1=0.0):
     if err1>0.0:
         total_num = (n1/err1)**2
 
-            
+
     eff = n2/n1
     if total_num<0.0:
         return 1;
@@ -17,7 +17,7 @@ def BinomialErr(n2, n1, err1=0.0):
         return 0.2/math.sqrt(total_num);
     elif total_num<1500.3 and total_num>0.0 and eff==1.0:
         return 0.01/math.sqrt(total_num);
-    
+
     if eff>1.0:
         print 'eff too high',eff
         #print total_num
@@ -55,7 +55,7 @@ def ComputeEff(nums, dens, w=1.0):
     den = dens[0]
 
     ratio = num.Clone()
-    ratio.Divide(den)  
+    ratio.Divide(den)
     ratios=[]
 
     # Set the binomial errors
@@ -69,7 +69,7 @@ def ComputeEff(nums, dens, w=1.0):
     ## Set the binomial errors
     #for i in range(0,num.GetNbinsX()+1):
     #    ratio1.SetBinError(i, BinomialErr(num.GetBinContent(i), den.GetBinContent(i), den.GetBinError(i)))
-    #ratios+=[ratio1]    
+    #ratios+=[ratio1]
     return ratios
 
 #---------------------------------------------------------------------
@@ -79,11 +79,11 @@ def getLog(name, level = 'INFO', debug=False):
 
     import logging
     import sys
-    
+
     f = logging.Formatter("Py:%(name)s: %(levelname)s - %(message)s")
     h = logging.StreamHandler(sys.stdout)
     h.setFormatter(f)
-    
+
     log = logging.getLogger(name)
     log.addHandler(h)
 
@@ -92,7 +92,7 @@ def getLog(name, level = 'INFO', debug=False):
     else:
         if level == 'DEBUG':   log.setLevel(logging.DEBUG)
         if level == 'INFO':    log.setLevel(logging.INFO)
-        if level == 'WARNING': log.setLevel(logging.WARNING)    
+        if level == 'WARNING': log.setLevel(logging.WARNING)
         if level == 'ERROR':   log.setLevel(logging.ERROR)
 
     return log
@@ -101,9 +101,9 @@ def getLog(name, level = 'INFO', debug=False):
 # Common command line option parser
 #
 def getParser():
-    
+
     from optparse import OptionParser
-    
+
     p = OptionParser(usage='usage: <path:ROOT file directory>', version='0.1')
 
     #
@@ -111,7 +111,7 @@ def getParser():
     #
     p.add_option('-n','--nevent',  type='int',    dest='nevent',         default=0,         help='number of events')
     p.add_option('--year',         type='int',    dest='year',           default=2012,      help='analysis year')
-    
+
     p.add_option('--int-lumi',     type='float',  default=36207.66,       dest='int_lumi',    help='int luminosity 2017: 44307.4, 2018: 58450.1')
     p.add_option('-r','--rfile',   type='string', default='out.root',    dest='rfile',      help='output ROOT file')
     p.add_option('-c','--cfile',   type='string', default=None,          dest='cfile',      help='cutflow tables')
@@ -119,46 +119,46 @@ def getParser():
     p.add_option('-l','--lfile',   type='string', default=None,          dest='lfile',      help='limit root file')
     p.add_option('-i', '--input',  type='string', default=None,          dest='input',      help='Input text file with root files')
     p.add_option('-f', '--files',  type='string', default=None,          dest='files',      help='Input files (comma separated)')
-        
+
     p.add_option('--debug-alg',    type='string', default='no',          dest='debug_alg',  help='')
     p.add_option('--print-alg',    type='string', default='no',          dest='print_alg',  help='')
 
-    p.add_option('--region',       type='string', default='sr,gamsr,zcr,wcr,gamzcr,gamwcr,metsf',          dest='region',     help='')    
+    p.add_option('--region',       type='string', default='sr,gamsr,zcr,wcr,gamzcr,gamwcr,metsf',          dest='region',     help='')
     p.add_option('--chan',         type='string', default=None,          dest='chan',       help='')
     p.add_option('--njet',         type='string', default=None,          dest='njet',       help='')
     p.add_option('--syst',         type='string', default='Nominal',     dest='syst',       help='')
     p.add_option('--sample',       type='string', default='all',         dest='sample',        help='')
-    p.add_option('-a','--analysis',     type='string', default='allmjj',      dest='analysis',        help='')    
+    p.add_option('-a','--analysis',     type='string', default='allmjj',      dest='analysis',        help='')
     p.add_option('--cut',          type='string', default='BeforeMT',    dest='cut',        help='')
     p.add_option('--var',          type='string', default='Mll',         dest='var',        help='MT variable used for limits')
     p.add_option('--lep-sign',     type='string', default='0',           dest='lep_sign',   help='Lepton Sign...0 is opposite sign, 1 is SS')
     p.add_option('--trees',        type='string', default='',      dest='trees',      help='Tree name: QCDunwNominal,VBFH125Nominal,VH125Nominal,VVVNominal,W_strongNominal,Z_strongNominal,Z_strongPTVExtNominal,Z_strong_VBFFiltNominal,ggFH125Nominal,QCDwNominal,VBFHOtherNominal,VVNominal,W_EWKNominal,Z_EWKNominal,Z_strongExtNominal,Z_strong_LowMassNominal,dataNominal,ttbarNominal')
     p.add_option('--trig-name',    type='string', default='',            dest='trig_name',  help='Trigger name if wanted. TRIG_xe80_tclcw, TRIG_lep, TRIG_2mu8_EFxe40_tclcw')
-    p.add_option('--mva-weights-path',    type='string', default='',            dest='mva_weights_path',  help='full path to weights files for tmva')     
+    p.add_option('--mva-weights-path',    type='string', default='',            dest='mva_weights_path',  help='full path to weights files for tmva')
     p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
     p.add_option('--mergePTV',  action='store_true', default=False,   dest='mergePTV',          help='Merge the pTV slices')
     p.add_option('--mergeKTPTV',  action='store_true', default=False,   dest='mergeKTPTV',          help='Merge the KT pTV slices')    
     p.add_option('--mergeMGExt',  action='store_true', default=False,   dest='mergeMGExt',          help='Merge the MG extensions')
     p.add_option('--mergeExt',  action='store_true', default=False,   dest='mergeExt',          help='Merge the Sherpa extension slices')
-    p.add_option('--r207Ana',  action='store_true', default=False,   dest='r207Ana',          help='Run the release 20.7 analysis')    
-    
+    p.add_option('--r207Ana',  action='store_true', default=False,   dest='r207Ana',          help='Run the release 20.7 analysis')
+    p.add_option('--noVjWeight',  action='store_true', default=False,   dest='noVjWeight',          help='Disable V+jets reweighing')
     # Should try to reduce these number of options
     p.add_option('--skim',         action='store_true', default=False,   dest='skim',           help='Skim ntuples to met trigger or 3L')
     p.add_option('--jet-veto-pt',  type='float'       , default=-10,     dest='jet_veto_pt',    help='pT for jet veto')
     p.add_option('--BTagCut',  type='float'       , default=-10,     dest='BTagCut',    help='BTagCut for tagging: 0.94, 0.83, 0.64, 0.11 for the 60, 70, 77, and 85 OP')
     p.add_option('--DetailLvl',    type='int'       ,   default=0,       dest='DetailLvl',      help='Integer for detail level of plotting. =1 plots jet variables only')
-    
+
     p.add_option('--vv-vr',    action='store_true', default=False,   dest='vv_vr',            help='Run the VV VR')
-    p.add_option('--pu-weight-one',    action='store_true', default=False,   dest='pu_weight_one',            help='Pileup Weight One')    
+    p.add_option('--pu-weight-one',    action='store_true', default=False,   dest='pu_weight_one',            help='Pileup Weight One')
 
     p.add_option('--no-plot',  action='store_true', default=False,   dest='no_plot',          help='Do not plot')
     p.add_option('--ignore-njet',  action='store_true', default=False,   dest='ignore_njet',          help='Ignore Njet')
     p.add_option('--ignore-met',   action='store_true', default=False,   dest='ignore_met',          help='Ignore MET')
-    p.add_option('--LoadBaseLep',  action='store_true', default=False,   dest='LoadBaseLep',          help='Use looser leptons')    
+    p.add_option('--LoadBaseLep',  action='store_true', default=False,   dest='LoadBaseLep',          help='Use looser leptons')
     p.add_option('--OverlapPh',    action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')
     p.add_option('--debug',        action='store_true', default=False,   dest='debug',      help='')
     p.add_option('--print',        action='store_true', default=False,   dest='print',      help='')
-    p.add_option('--print-run',    action='store_true', default=False,   dest='print_run',  help='')    
+    p.add_option('--print-run',    action='store_true', default=False,   dest='print_run',  help='')
     p.add_option('--print-xsec',   action='store_true', default=False,   dest='print_xsec', help='')
     p.add_option('--print-raw',    action='store_true', default=False,   dest='print_raw',  help='')
     p.add_option('--print-evt',    action='store_true', default=False,   dest='print_evt',  help='')
@@ -168,17 +168,17 @@ def getParser():
 
     p.add_option('--sumw',         type='float'       , default=0,       dest='sumw',       help='Sumw of total dataset')
     p.add_option('--nraw',         type='float'       , default=0,       dest='nraw',       help='Raw number of events of the subset that one is running over')
-        
+
     #
     # Options for batchPenn.py
     #
-    p.add_option('--njob',        type='int',          default=0,         dest='njob')    
-    p.add_option('--job-key',     type='string',       default='job',     dest='job_key')    
+    p.add_option('--njob',        type='int',          default=0,         dest='njob')
+    p.add_option('--job-key',     type='string',       default='job',     dest='job_key')
 
     p.add_option('--submit',      action='store_true', default=False,     dest='submit_penn', help='submit jobs')
     p.add_option('--overwrite',   action='store_true', default=False,     dest='overwrite',   help='overwrite files')
     p.add_option('--save-tree',   action='store_true', default=False,     dest='save_tree',   help='save trees')
-    
+
     return p
 
 #-----------------------------------------------------------------------------
@@ -201,73 +201,73 @@ def setPlotDefaults(root, options = None):
 
     #root.gROOT.SetStyle('Plain')
 
-    root.gStyle.SetFillColor(10)           
-    root.gStyle.SetFrameFillColor(10)      
-    root.gStyle.SetCanvasColor(10)         
-    root.gStyle.SetPadColor(10)            
-    root.gStyle.SetTitleFillColor(0)       
-    root.gStyle.SetStatColor(10)   
-    
+    root.gStyle.SetFillColor(10)
+    root.gStyle.SetFrameFillColor(10)
+    root.gStyle.SetCanvasColor(10)
+    root.gStyle.SetPadColor(10)
+    root.gStyle.SetTitleFillColor(0)
+    root.gStyle.SetStatColor(10)
+
     root.gStyle.SetCanvasBorderMode(0)
-    root.gStyle.SetFrameBorderMode(0) 
-    root.gStyle.SetPadBorderMode(0)   
-    root.gStyle.SetDrawBorder(0)      
+    root.gStyle.SetFrameBorderMode(0)
+    root.gStyle.SetPadBorderMode(0)
+    root.gStyle.SetDrawBorder(0)
     root.gStyle.SetTitleBorderSize(0)
-    
+
     root.gStyle.SetFuncWidth(2)
     root.gStyle.SetHistLineWidth(2)
     root.gStyle.SetFuncColor(2)
-    
+
     root.gStyle.SetPadTopMargin(0.08)
     root.gStyle.SetPadBottomMargin(0.16)
     root.gStyle.SetPadLeftMargin(0.16)
     root.gStyle.SetPadRightMargin(0.12)
-  
+
     # set axis ticks on top and right
-    root.gStyle.SetPadTickX(1)         
-    root.gStyle.SetPadTickY(1)         
-  
+    root.gStyle.SetPadTickX(1)
+    root.gStyle.SetPadTickY(1)
+
     # Set the background color to white
-    root.gStyle.SetFillColor(10)           
-    root.gStyle.SetFrameFillColor(10)      
-    root.gStyle.SetCanvasColor(10)         
-    root.gStyle.SetPadColor(10)            
-    root.gStyle.SetTitleFillColor(0)       
-    root.gStyle.SetStatColor(10)           
-  
-  
+    root.gStyle.SetFillColor(10)
+    root.gStyle.SetFrameFillColor(10)
+    root.gStyle.SetCanvasColor(10)
+    root.gStyle.SetPadColor(10)
+    root.gStyle.SetTitleFillColor(0)
+    root.gStyle.SetStatColor(10)
+
+
     # Turn off all borders
     root.gStyle.SetCanvasBorderMode(0)
-    root.gStyle.SetFrameBorderMode(0) 
-    root.gStyle.SetPadBorderMode(0)   
-    root.gStyle.SetDrawBorder(0)      
-    root.gStyle.SetTitleBorderSize(0) 
-  
+    root.gStyle.SetFrameBorderMode(0)
+    root.gStyle.SetPadBorderMode(0)
+    root.gStyle.SetDrawBorder(0)
+    root.gStyle.SetTitleBorderSize(0)
+
     # Set the size of the default canvas
-    root.gStyle.SetCanvasDefH(400)          
-    root.gStyle.SetCanvasDefW(650)          
+    root.gStyle.SetCanvasDefH(400)
+    root.gStyle.SetCanvasDefW(650)
     #gStyle->SetCanvasDefX(10)
-    #gStyle->SetCanvasDefY(10)   
-  
+    #gStyle->SetCanvasDefY(10)
+
     # Set fonts
     font = 42
     root.gStyle.SetLabelFont(font,'xyz')
-    root.gStyle.SetStatFont(font)       
-    root.gStyle.SetTitleFont(font)      
+    root.gStyle.SetStatFont(font)
+    root.gStyle.SetTitleFont(font)
     root.gStyle.SetTitleFont(font,'xyz')
-    root.gStyle.SetTextFont(font)       
-    root.gStyle.SetTitleX(0.3)        
-    root.gStyle.SetTitleW(0.4)        
-  
+    root.gStyle.SetTextFont(font)
+    root.gStyle.SetTitleX(0.3)
+    root.gStyle.SetTitleW(0.4)
+
    # Set Line Widths
    #gStyle->SetFrameLineWidth(0)
     root.gStyle.SetFuncWidth(2)
     root.gStyle.SetHistLineWidth(2)
     root.gStyle.SetFuncColor(2)
-  
+
    # Set tick marks and turn off grids
     root.gStyle.SetNdivisions(505,'xyz')
-  
+
    # Set Data/Stat/... and other options
     root.gStyle.SetOptDate(0)
     root.gStyle.SetDateX(0.1)
@@ -300,35 +300,35 @@ def setPlotDefaults(root, options = None):
     root.gStyle.SetLabelSize(0.065, 'xyz')
     root.gStyle.SetTextAlign(22)
     root.gStyle.SetTextSize(0.12)
-    
-    #root.gStyle.SetPaperSize(root.TStyle.kA4)  
+
+    #root.gStyle.SetPaperSize(root.TStyle.kA4)
     root.gStyle.SetPalette(1)
-  
+
     #root.gStyle.SetHistMinimumZero(True)
-   
+
     root.gROOT.ForceStyle()
 
 #-------------------------------------------------------------------------
 def getATLASLabels(ROOT,pad, x, y, text=None, lumi=4.71, year='2011',trigger=None, split=0.07):
-    
+
     l = ROOT.TLatex(x, y, 'ATLAS')
     l.SetNDC()
     l.SetTextFont(72)
     l.SetTextSize(0.055)
-    l.SetTextAlign(11)    
+    l.SetTextAlign(11)
     l.SetTextColor(ROOT.kBlack)
-    l.Draw()    
-    
+    l.Draw()
+
     delx = 0.05*pad.GetWh()/(pad.GetWw())
     labs = [l]
-    
+
     if True:
         p = ROOT.TLatex(x+0.15, y, 'Internal')
         p.SetNDC()
         p.SetTextFont(42)
         p.SetTextSize(0.055)
         p.SetTextAlign(11)
-        p.SetTextColor(ROOT.kBlack)        
+        p.SetTextColor(ROOT.kBlack)
         p.Draw()
         labs += [p]
         if year=='2012':
@@ -351,7 +351,7 @@ def getATLASLabels(ROOT,pad, x, y, text=None, lumi=4.71, year='2011',trigger=Non
 
         if trigger:
             b = ROOT.TLatex(x, y-split*2.0+0.01, '%s' %(trigger))
-            
+
             b.SetNDC()
             b.SetTextFont(42)
             b.SetTextSize(0.04)
@@ -362,7 +362,7 @@ def getATLASLabels(ROOT,pad, x, y, text=None, lumi=4.71, year='2011',trigger=Non
 
 
     if text != None:
-        
+
         c = ROOT.TLatex(x, y-split*2.0+0.01, text)
         c.SetNDC()
         c.SetTextFont(42)
@@ -371,7 +371,7 @@ def getATLASLabels(ROOT,pad, x, y, text=None, lumi=4.71, year='2011',trigger=Non
         c.SetTextColor(ROOT.kBlack)
         c.Draw()
         labs += [c]
-       
+
     return labs
 
 #------------------------------
