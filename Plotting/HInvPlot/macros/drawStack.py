@@ -325,6 +325,9 @@ def getHistPars(hist):
     'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},     
         'mu_njet2'  : {'xtitle':'Njet==2, Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
         'mu_njet34'  : {'xtitle':'Njet>2, Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
+        'mu_cc'  : {'xtitle':'Average Interactions per Xing (#mu), 2 central jets',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
+        'mu_fc'  : {'xtitle':'Average Interactions per Xing (#mu), 1 central 1 forward jet',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
+        'mu_ff'  : {'xtitle':'Average Interactions per Xing (#mu), 2 forward jets',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
 
         }
 

@@ -56,9 +56,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hj3metsig_eta28(0),
 				  hratio_mu_njet2(0),
 				  hratio_mu_njet34(0),
-				  hmu_cc(0),
-				  hmu_fc(0),
-				  hmu_ff(0)
+				  hmu_cc(0),  hmu_fc(0),  hmu_ff(0)
 {
 }
 
@@ -169,6 +167,9 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hj3metsig_eta28     = GetTH1("j3metsig_eta28", 200, 0.0, 20.0);
   hratio_mu_njet2     = GetTH2("j3EtaMuNjet2", 100, -0.5, 99.5, 22,  -4.5,  4.5);
   hratio_mu_njet34    = GetTH2("j3EtaMuNjet34", 100, -0.5, 99.5, 22,  -4.5,  4.5);
+  hmu_cc           = GetTH1("mu_cc", 100, -0.5, 99.5);
+  hmu_ff          = GetTH1("mu_ff", 100, -0.5, 99.5);
+  hmu_fc          = GetTH1("mu_fc", 100, -0.5, 99.5);
 
   // jj_mass limits
   float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 }; 
@@ -300,9 +301,9 @@ bool Msl::PlotEvent::DoExec(Event &event)
     else if(tmp.Pt()<55.0){ hJetEtaPt35->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet35EMEC; }
     else{  hJetEtaPt55->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet55EMEC; }
   }
-  if (fabs(event.jets.at(0).eta)<2.5 && fabs(event.jets.at(1).eta)<2.5) hmu_cc->Fill(event.GetVar(Mva::averageIntPerXing), weight);
-  else if (fabs(event.jets.at(0).eta)>=2.5 && fabs(event.jets.at(1).eta)>=2.5) hmu_ff->Fill(event.GetVar(Mva::averageIntPerXing), weight);
-  else hmu_fc->Fill(event.GetVar(Mva::averageIntPerXing), weight);
+  if (fabs(event.jets.at(0).eta)<2.5 && fabs(event.jets.at(1).eta)<2.5 && hmu_cc) hmu_cc->Fill(event.GetVar(Mva::averageIntPerXing), weight);
+  else if (fabs(event.jets.at(0).eta)>=2.5 && fabs(event.jets.at(1).eta)>=2.5 && hmu_ff) hmu_ff->Fill(event.GetVar(Mva::averageIntPerXing), weight);
+  else if (hmu_fc)  hmu_fc->Fill(event.GetVar(Mva::averageIntPerXing), weight);
 	
 
   if(event.jets.size()>2){
