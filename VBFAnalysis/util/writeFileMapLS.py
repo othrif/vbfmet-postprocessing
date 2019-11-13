@@ -37,6 +37,8 @@ for ite in l:
                     files+=[a.strip()]
     ikey = i
     ikey = (ikey.rstrip('/'))[ikey.rfind('/')+1:]
+    if i.count('345323'):
+        ikey = 'user.schae.v34L.345323.hww.e5901_s3126_r9364_p3895_MiniNtuple.root'
     if i.count('361515'):
         ikey = 'user.othrif.v07.361515.Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV70_140_BFilter.e5340_s3126_r9364_p3575_MiniNtuple.root'
     elif i.count('361516'):
@@ -54,7 +56,7 @@ for ite in l:
 print myMap
 
 # merging two maps
-if True:
+if False:
     oldMap = pickle.load( open( 'mapOld.p', "rb" ) )
     for ii,k in oldMap.iteritems():
         i=ii.strip('\n').strip(' ').strip('\n')
