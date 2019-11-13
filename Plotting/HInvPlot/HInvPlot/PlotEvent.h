@@ -134,6 +134,7 @@ namespace Msl
     
     TH1                        *hZMCIDQCD;
     TH1                        *hWMCIDQCD;
+    TH1                        *hZPTVMCIDQCD;    
 
     TH1                        *hZMadMCIDQCD;
     TH1                        *hZMad2MCIDQCD;

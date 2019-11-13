@@ -46,7 +46,7 @@ p.add_option('--draw-norm',     action='store_true', default=False,   dest='draw
 p.add_option('--do-ratio',      action='store_true', default=False,   dest='do_ratio')
 p.add_option('--force-ratio',   action='store_true', default=False,   dest='force_ratio')
 p.add_option('--stack-signal',  action='store_true', default=False,   dest='stack_signal')
-p.add_option('--ph-ana',  action='store_true', default=False,   dest='ph_ana')
+p.add_option('--ph-ana',        action='store_true', default=False,   dest='ph_ana')
 
 p.add_option('--debug',         action='store_true', default=False,   dest='debug')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
