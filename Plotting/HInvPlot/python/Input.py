@@ -1127,6 +1127,7 @@ def prepareBkgRuns(keys,options=None):
                 'wqcd':bkg_wqcd,
                 'zewk':bkg_zewk,
                 #'zewk':bkg_zewkpow,
+                #'top2':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
                 'top2':bkg_top2, # all top
                 #'top2':{'345323':'hww'}, # all top
