@@ -563,7 +563,7 @@ def prepareBkgRuns(keys,options=None):
                     '366016':'pt140',
                     '366017':'pt280',
                     '366018':'pt280',
-                    '366019':'pt70CVBV',
+                    '366019':'pt70cfilterVBV',
                     '366020':'pt100',
                     '366021':'pt100',
                     '366022':'pt100',
@@ -572,7 +572,7 @@ def prepareBkgRuns(keys,options=None):
                     '366025':'pt140',
                     '366026':'pt280',
                     #'366027':'pt280', # does not exist
-                    '366028':'pt70cfilter',
+                    '366028':'pt70CVBV',
                     '366029':'pt100',
                     '366030':'pt100',
                     '366031':'pt100',
@@ -673,11 +673,11 @@ def prepareBkgRuns(keys,options=None):
     bkg_zqcd.update(bkg_zqcd_zmm)
     bkg_zqcd.update(bkg_zqcd_zee)
     bkg_zqcd.update(bkg_zqcd_ztt)
-    if options.year==2018:
+    if options.year==2018 or options.mergePTV:
         bkg_zqcd.update(bkg_zqcd_znn_mc16e)
-    bkg_zqcd.update(bkg_zqcd_znn)
-    #else:
-    #    bkg_zqcd.update(bkg_zqcd_znn)
+    else:
+        bkg_zqcd.update(bkg_zqcd_znn)
+
     bkg_top1 = {
         '117360':'tchan->e',
         '117361':'tchan->mu',
@@ -945,6 +945,12 @@ def prepareBkgRuns(keys,options=None):
                   '363356':'ZZ->qqll',
                   '363357':'WZ->qqnn',
                   '363358':'WZ->qqll',
+                  # adding the VBFHWW tautau samples
+                  '345948':'VBFHWW',
+                  '346190':'VBFHtautaull',
+                  '346191':'VBFHtautaulph',
+                  '346192':'VBFHtautaulmh',
+                  '346193':'VBFHtautauhh',
                   }
 
     bkg_vbfExt = {'309662':'Wenu_MAXHTPTV70_140',
@@ -1110,9 +1116,9 @@ def prepareBkgRuns(keys,options=None):
                 #'whww':sig_VH125v2,
                 'vbfg':sig_vbfgam,
                 'whww':alt_VBF,
-                'hvbf500':{'308279':'VBF125 - H500',},                
-                'hvbf1k':{'308281':'VBF125 - H1000',},                
-                'hvbf3k':{'308283':'VBF125 - H3000',},                
+                'hvbf500':{'308279':'VBF125 - H500',},
+                'hvbf1k':{'308281':'VBF125 - H1000',},
+                'hvbf3k':{'308283':'VBF125 - H3000',},
                 'hggf':sig_ggF125,
                 'tth':sig_tth125,
                 'hvbf':sig_VBF125,
@@ -1121,8 +1127,10 @@ def prepareBkgRuns(keys,options=None):
                 'wqcd':bkg_wqcd,
                 'zewk':bkg_zewk,
                 #'zewk':bkg_zewkpow,
+                #'top2':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
                 'top2':bkg_top2, # all top
+                #'top2':{'345323':'hww'}, # all top
                 #'top2':bkg_zewkpow,
                 #'top2':{'312487':'Znunu_PTV100_140_MJJ0_500_KtMerging','312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',}, # all top
                 #'top1':bkg_top1,
@@ -1158,17 +1166,21 @@ def prepareBkgRuns(keys,options=None):
                 #'top1':bkg_z_strong_madgraph_znn,
                 }
 
-    if not options.mergePTV:
+    if not options.mergeKTPTV:
         bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
         bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
-        if  not options.year==2018:
+    else:
+        bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
+        bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)
+    if not options.mergePTV:
+        bkg_keys['wdpi'].update(bkg_zqcd_znn)        
+        if  options.year!=2018:
             bkg_keys['wdpi'].update(bkg_vbfPTVExt)
+            bkg_keys['wdpi'].update(bkg_zqcd_znn_mc16e)            
         else:
             for ki,yi in bkg_vbfPTVExt.iteritems():
                 if not yi.count('Znunu'): bkg_keys['wdpi'][ki]=yi
-    else:
-        bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
-        bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)        
+
     if not options.mergeExt:
         bkg_keys['wdpi'].update(bkg_vbfExt)
         bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
@@ -1183,10 +1195,8 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['zqcdMad'].update(bkg_zqcd_LO_Filt)
         bkg_keys['wqcdMad'].update(bkg_wqcd_LO_Filt)
         #bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
-        #bkg_keys['wdpi'].update(bkg_z_strong_madgraph)        
-        #bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)        
-    if options.year!=2018:
-        bkg_keys['wdpi'].update(bkg_zqcd_znn_mc16e)
+        #bkg_keys['wdpi'].update(bkg_z_strong_madgraph)
+        #bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)
 
     # extra samples here for now
     bkg_keys['wdpi'].update(bkg_wewkpow)
@@ -1204,7 +1214,6 @@ def prepareBkgRuns(keys,options=None):
         extra_samples.update(bkg_z_strong_powheg)
         bkg_keys['wdpi'].update(extra_samples)
         bkg_keys['wdpi'].update(bkg_Vqq_gamma)
-
     #
     # Select MC samples
     #
