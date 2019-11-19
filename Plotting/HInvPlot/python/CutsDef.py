@@ -659,7 +659,11 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
         else:
             cuts += metCuts(basic_cuts,options, True)
     if do_met_signif:
-        cuts += [CutItem('CutMetSignif','met_significance > 4.0')]
+        #cuts += [CutItem('CutMetSignif','met_significance > 4.0')]
+        cutMetSignif = CutItem('CutMetSignif')
+        cutMetSignif.AddCut(CutItem('Muon',  'n_mu>0'), 'OR')
+        cutMetSignif.AddCut(CutItem('METSig', 'met_significance > 4.0'), 'OR')
+        cuts += [cutMetSignif]        
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=True)
 

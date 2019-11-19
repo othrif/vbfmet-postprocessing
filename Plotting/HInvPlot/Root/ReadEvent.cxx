@@ -647,6 +647,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::n_el_w);
   fSkipVarsQCD.insert(Mva::n_mu_baseline_noOR);
   fSkipVarsQCD.insert(Mva::lep_trig_match);
+  fSkipVarsQCD.insert(Mva::truth_jj_deta);  
+  fSkipVarsQCD.insert(Mva::truth_jj_dphi);  
+  fSkipVarsQCD.insert(Mva::truth_jj_mass);  
+  fSkipVarsQCD.insert(Mva::truth_j1_pt);  
+  fSkipVarsQCD.insert(Mva::truth_j2_pt);  
 
   for(int i = 0; i < nevent; i++) {
     //
@@ -1127,6 +1132,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }
     event->RepVar(Mva::truth_jj_mass, truth_jj_mass);
     event->RepVar(Mva::truth_jj_deta, truth_deta_jj);
+    if(event->truth_jets.size()>0){ event->RepVar(Mva::truth_j1_pt,   event->truth_jets.at(0).pt);    } else  event->RepVar(Mva::truth_j1_pt, 0.0);
     event->AddVar(Mva::FilterMet,     filterMet);
     event->AddVar(Mva::TruthFilter,   truthFilter);
     event->AddVar(Mva::truthJet1Pt,   truthJet1);
