@@ -375,12 +375,12 @@ tree_out.Branch( 'jet_NTracks', mystruct.jet_NTracks)
 #f = ROOT.TFile.Open('/eos/atlas/atlascerngroupdisk/penn-ww/out_QCD_Tenacious.root')
 #f = ROOT.TFile.Open('out_QCD_Tenacious.root')
 #f = ROOT.TFile.Open('out_QCD_Loose.root')
-f = ROOT.TFile.Open('mj20156.root')
+f = ROOT.TFile.Open('mjMC.root')
 IsLoose=False
 
 GeV=1.0e3
 tree = f.Get('PredictionTree')
-fout = ROOT.TFile.Open('foutLoose2016_skim200_mctest.root','RECREATE')
+fout = ROOT.TFile.Open('foutLooseMC_skim200_mctest.root','RECREATE')
 z=0
 v1 = ROOT.TLorentzVector()
 v2 = ROOT.TLorentzVector()
@@ -396,8 +396,8 @@ for e in tree:
     if z%10000 ==0:
         print 'Event: ',z
         sys.stdout.flush()
-    if z>100000:
-        break
+    #if z>100000:
+    #    break
     z+=1
     
     # remove those with ntries not >0. -2 is the unsmeared events
