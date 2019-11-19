@@ -127,6 +127,10 @@ std::string Msl::Mva::Convert2Str(Var var)
     case truth_jj_mass:	          return "truth_jj_mass";
     case FilterMet:	          return "FilterMet";
     case truth_jj_deta:	          return "truth_jj_deta";
+    case truth_jj_dphi:	          return "truth_jj_dphi";
+    case truth_j1_pt:	          return "truth_j1_pt";
+    case truth_j2_pt:	          return "truth_j2_pt";
+    case SherpaVTruthPt:	  return "SherpaVTruthPt";
     case truthJet1Pt:	          return "truthJet1Pt";
     case nTruthJetMatch:	  return "nTruthJetMatch";
     case jetPt3:	          return "jetPt3";
@@ -279,6 +283,10 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "truth_jj_mass")     return truth_jj_mass;
   if(var == "FilterMet")         return FilterMet;
   if(var == "truth_jj_deta")     return truth_jj_deta;
+  if(var == "truth_jj_dphi")     return truth_jj_dphi;
+  if(var == "truth_j1_pt")       return truth_j1_pt;
+  if(var == "truth_j2_pt")       return truth_j2_pt;
+  if(var == "SherpaVTruthPt")    return SherpaVTruthPt;
   if(var == "truthJet1Pt")       return truthJet1Pt;
   if(var == "nTruthJetMatch")    return nTruthJetMatch;
   if(var == "jetPt3")	         return jetPt3;
@@ -518,6 +526,10 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(truth_jj_mass);
     vars.push_back(FilterMet);
     vars.push_back(truth_jj_deta);
+    vars.push_back(truth_jj_dphi);
+    vars.push_back(truth_j1_pt);        
+    vars.push_back(truth_j2_pt);
+    vars.push_back(SherpaVTruthPt);
     vars.push_back(truthJet1Pt);
     vars.push_back(nTruthJetMatch);
     vars.push_back(jetPt3);

@@ -103,7 +103,7 @@ samplesPrint =['Samples','VBFH125',
 #f=ROOT.TFile.Open('SumHF_Sep20_v32PFE.root')
 #f=ROOT.TFile.Open('SumHF_Oct1_oneTrig_All.root')
 #f=ROOT.TFile.Open('/share/t3data2/schae/METScan/MET150/v34E/SumHF_2018_MET150.root')
-f=ROOT.TFile.Open('SumHF_2018_doubleRatio_bin7.root')
+f=ROOT.TFile.Open('/tmp/SumHF_20156_2017_2018_MET150_wMJ.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400.root')#
@@ -144,6 +144,8 @@ for bin_num in bins:
         sTot=bin_num-1
         break
 
+table_per_bin={}
+for b in bins: table_per_bin[b]={}
 region_cf=[]
 for rmy in regions:
     if nRegion==0:
@@ -199,13 +201,26 @@ for rmy in regions:
             lineBkg=1.0
         line +='%0.3f +/- %0.3f\t' %(lineData/lineBkg, math.sqrt(1./lineData+bkgFracErr**2)*(lineData/lineBkg))
         print line
+
+        region_name = ['']
+        if r.count('twoEle'):  region_name=['Zee']
+        elif r.count('twoMu'):  region_name=['Zmm']
+        elif r.count('oneEleNegLowSigC'):  region_name=['WenminusLowMetSig']
+        elif r.count('oneElePosLowSigC'):  region_name=['WenplusLowMetSig']
+        elif r.count('oneEleNeg'):  region_name=['Wenminus']
+        elif r.count('oneElePos'):  region_name=['Wenplus']
+        elif r.count('oneMuNeg'):  region_name=['Wmnminus']
+        elif r.count('oneMuPos'):  region_name=['Wmnplus']
+        elif r.count('_SR'):  region_name=['SR']
+        table_per_bin[bin_num][region_name[0]]=[lineData,lineBkg,'%0.3f $\\pm$ %0.3f\t' %(lineData/lineBkg, math.sqrt(1./lineData+bkgFracErr**2)*(lineData/lineBkg))]
+        #[[sreg,totalData,totalBkg,'%0.3f\t%0.3f +/- %0.3f\t' %(totalBkgFracErr, totalData/totalBkg, math.sqrt(totalBkgFracErr**2+1./totalData)*(totalData/totalBkg))]]        
         nRegion+=1
         if nRegion==sTot:
             nRegion=0
             totalData=0
             totalBkg=0
             totalBkgErr=0
-            rline='Sum\t'
+            rline='Sum\t' 
             sreg=['Region']
             if r.count('twoEle'):  sreg=['Zee']
             elif r.count('twoMu'):  sreg=['Zmm']
@@ -231,9 +246,44 @@ for rmy in regions:
             region_cf+=[sreg]            
             #bkgFracErr
             totalBkgFracErr = math.sqrt(totalBkgErr)/totalBkg
+            
             rline+='%0.3f\t%0.3f +/- %0.3f\t' %(totalBkgFracErr, totalData/totalBkg, math.sqrt(totalBkgFracErr**2+1./totalData)*(totalData/totalBkg))
             print rline
+            
 print 'done'
+
+print table_per_bin
+keys_regions = ['SR','Zee','Zmm','Wmnminus','Wmnplus','Wenminus','Wenplus']
+print ''
+print '\\resizebox{\\textwidth}{!}{ '
+print '\\begin{tabular}{ll|ccccccc}'
+table_per_bin_line='Bin Number & Yield '
+for keyn in keys_regions:
+    table_per_bin_line+=' & %s'  %keyn
+print table_per_bin_line,' \\\\\\hline\\hline'
+for b in bins:
+    if b>11:
+        continue
+    for v in [0,1,2]:
+        table_per_bin_line='%s ' %b
+        if v==0: table_per_bin_line+=' & Data'
+        if v==1: table_per_bin_line+=' & Bkg'
+        if v==2: table_per_bin_line+=' & Data/Bkg'
+            
+        for keyn in keys_regions:
+            if v==0:
+                if keyn=='SR':
+                    table_per_bin_line+=' & - ' #%(table_per_bin[b][keyn][v]) #  to unblind
+                else:
+                    table_per_bin_line+=' & %i ' %(table_per_bin[b][keyn][v])
+            elif v==1:
+                table_per_bin_line+=' & %0.1f ' %(table_per_bin[b][keyn][v])                
+            else:
+                table_per_bin_line+=' & %s ' %(table_per_bin[b][keyn][v])                
+        print table_per_bin_line,'\\\\'
+    
+print '\\end{tabular}'
+print '}'
 
 print ''
 print '\\resizebox{\\textwidth}{!}{ '
