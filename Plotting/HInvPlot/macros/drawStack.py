@@ -46,7 +46,7 @@ p.add_option('--draw-norm',     action='store_true', default=False,   dest='draw
 p.add_option('--do-ratio',      action='store_true', default=False,   dest='do_ratio')
 p.add_option('--force-ratio',   action='store_true', default=False,   dest='force_ratio')
 p.add_option('--stack-signal',  action='store_true', default=False,   dest='stack_signal')
-p.add_option('--ph-ana',  action='store_true', default=False,   dest='ph_ana')
+p.add_option('--ph-ana',        action='store_true', default=False,   dest='ph_ana')
 
 p.add_option('--debug',         action='store_true', default=False,   dest='debug')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
@@ -267,7 +267,7 @@ def getHistPars(hist):
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
         'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':False},
-    'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},
+    'met_cst_jet'     : {'xtitle':'E_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
