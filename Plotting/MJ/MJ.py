@@ -1,6 +1,223 @@
 import ROOT
 import math
 import sys
+def GetPUProb(jet_pt, jet_eta, jet_jvt, avgmu, jet_fjvt):
+    unc=0.0
+    if abs(jet_eta)<2.4:
+        if jet_pt<30:
+            if jet_jvt<0.11:      unc = 1;
+            elif jet_jvt<0.25: unc = 0.0730 + 0.0024 * avgmu + 0.00001 * avgmu * avgmu;
+            elif jet_jvt<0.85: unc = 0.0995 + 0.0031 * avgmu + 0.00005 * avgmu * avgmu;
+            elif jet_jvt<0.95: unc = 0.0311 + 0.0025 * avgmu + 0.00005 * avgmu * avgmu;
+            else:  unc = 0.0308 -0.0010 * avgmu + 0.00006 * avgmu * avgmu ;
+        elif jet_pt<40:
+            if jet_jvt<0.11:      unc = 1.;
+            elif jet_jvt<0.25: unc = 1.;
+            elif jet_jvt<0.85: unc = -0.0188 + 0.0039 * avgmu + 0.00002 * avgmu * avgmu;
+            elif jet_jvt<0.95: unc = 0.0252 -0.0009 * avgmu + 0.00006 * avgmu * avgmu  ;
+            else:                  unc = 0.0085 -0.0003 * avgmu + 0.00002 * avgmu * avgmu  ;
+        elif jet_pt<50:
+            if jet_jvt<0.11:      unc = 1;
+            elif jet_jvt<0.25: unc = 0.0345 -0.0006 * avgmu + 0.00004 * avgmu * avgmu  ;
+            elif jet_jvt<0.85: unc = 0.1078 -0.0051 * avgmu + 0.00011 * avgmu * avgmu  ;
+            elif jet_jvt<0.95: unc = -0.0026 + 0.0005 * avgmu + 0.00002 * avgmu * avgmu;
+            else:                  unc = 0.0090 -0.0004 * avgmu + 0.00001 * avgmu * avgmu  ;
+        elif jet_pt<60:
+            if jet_jvt<0.11:      unc = 1;
+            elif jet_jvt<0.25: unc = -0.0321 + 0.0030 * avgmu -0.00002 * avgmu * avgmu;
+            elif jet_jvt<0.85: unc = 0.0260 -0.0007 * avgmu + 0.00003 * avgmu * avgmu ;
+            else:                  unc = -0.0040 + 0.0003 * avgmu;
+        elif jet_pt<100:
+            unc = 0.9492 -2.0757 * jet_jvt + 1.13328 * jet_jvt * jet_jvt;
+        elif jet_pt<150:
+            unc = 0.7888 -1.8372 * jet_jvt + 1.05539 * jet_jvt * jet_jvt;
+    elif jet_eta<2.6:
+        if jet_pt<30:
+            if jet_jvt<0.11:      unc = 0.2633 + 0.0091 * avgmu + -0.00009 * avgmu * avgmu;
+            elif jet_jvt<0.25: unc = 0.1841 + 0.0144 * avgmu + -0.00008 * avgmu * avgmu;
+            elif jet_jvt<0.85: unc = 0.1401 + 0.0048 * avgmu + 0.00006 * avgmu * avgmu ;
+            elif jet_jvt<0.95: unc = -0.0118 + 0.0076 * avgmu + 0.00003 * avgmu * avgmu;
+            else:              unc = 0.0534 + -0.0011 * avgmu + 0.00010 * avgmu * avgmu;
+        elif jet_pt<40:
+            if jet_jvt<0.11:      unc = 0.1497 + 0.0133 * avgmu + -0.00015 * avgmu * avgmu  ;
+            elif jet_jvt<0.25: unc = -0.2260 + 0.0276 * avgmu + -0.00021 * avgmu * avgmu ;
+            elif jet_jvt<0.85: unc = 0.2743 + -0.0093 * avgmu + 0.00022 * avgmu * avgmu  ;
+            elif jet_jvt<0.95: unc = 0.0604 + 0.0006 * avgmu + 0.00006 * avgmu * avgmu   ;
+            else:                  unc = 0.0478 + -0.0009 * avgmu + 0.00004 * avgmu * avgmu  ;
+        elif jet_pt<50:
+            if jet_jvt<0.11:      unc = -0.2187 + 0.0317 * avgmu + -0.00037 * avgmu * avgmu ;
+            elif jet_jvt<0.25: unc = 0.0964 + 0.0053 * avgmu + 0.00002 * avgmu * avgmu   ;
+            elif jet_jvt<0.85: unc = 1.1730 + -0.0624 * avgmu + 0.00088 * avgmu * avgmu  ;
+            elif jet_jvt<0.95: unc = -0.2011 + 0.0151 * avgmu + -0.00018 * avgmu * avgmu ;
+            else:                  unc = 0.0145 + -0.0003 * avgmu + 0.00002 * avgmu * avgmu  ;
+        elif jet_pt<60:
+            if jet_jvt<0.11:      unc = 0.0051 + 0.0113 * avgmu + -0.00008 * avgmu * avgmu  ;
+            elif jet_jvt<0.25: unc = -0.1024 + 0.0109 * avgmu + -0.00006 * avgmu * avgmu ;
+            elif jet_jvt<0.85: unc = 1.2491 + -0.0501 * avgmu + 0.00052 * avgmu * avgmu  ;
+            else:                  unc = 0.0267 + -0.0014 * avgmu + 0.00003 * avgmu * avgmu  ;
+        elif jet_pt<100:
+            unc = 0.8951 -2.4995 * jet_jvt + 1.63229 * jet_jvt * jet_jvt;
+        elif jet_pt<150:
+            unc = 0.9998 -1.7319 * jet_jvt + 0.72680 * jet_jvt * jet_jvt;
+    elif jet_eta<2.7:
+        if jet_pt<30:
+            if jet_jvt<0.11:      unc = 0.3001 + 0.0054 * avgmu -0.00004 * avgmu * avgmu  ;
+            elif jet_jvt<0.25: unc = 0.0663 + 0.0198 * avgmu -0.00013 * avgmu * avgmu  ;
+            elif jet_jvt<0.85: unc = -0.0842 + 0.0163 * avgmu -0.00008 * avgmu * avgmu ;
+            elif jet_jvt<0.95: unc = -0.0219 + 0.0080 * avgmu + 0.00003 * avgmu * avgmu;
+            else:                  unc = 0.0461 -0.0003 * avgmu + 0.00012 * avgmu * avgmu  ;
+        elif jet_pt<40:
+            if jet_jvt<0.11:      unc = 0.1885 + 0.0083 * avgmu -0.00006 * avgmu * avgmu ;
+            elif jet_jvt<0.25: unc = -0.0286 + 0.0150 * avgmu -0.00007 * avgmu * avgmu;
+            elif jet_jvt<0.85: unc = 0.0152 + 0.0028 * avgmu + 0.00005 * avgmu * avgmu;
+            elif jet_jvt<0.95: unc = 0.1815 -0.0076 * avgmu + 0.00018 * avgmu * avgmu ;
+            else:                  unc = 0.0192 -0.0003 * avgmu + 0.00007 * avgmu * avgmu ;
+        elif jet_pt<50:
+            if jet_jvt<0.11:      unc = 0.1257 + 0.0074 * avgmu -0.00004 * avgmu * avgmu  ;
+            elif jet_jvt<0.25: unc = -0.0276 + 0.0080 * avgmu + 0.00000 * avgmu * avgmu;
+            elif jet_jvt<0.85: unc = 0.1403 -0.0051 * avgmu + 0.00009 * avgmu * avgmu  ;
+            elif jet_jvt<0.95: unc = 0.2078 -0.0101 * avgmu + 0.00017 * avgmu * avgmu  ;
+            else:                  unc = 0.2597 -0.0132 * avgmu + 0.00020 * avgmu * avgmu  ;
+        elif jet_pt<60:
+            if jet_jvt<0.11:      unc = 0.1111 + 0.0045 * avgmu -0.00000 * avgmu * avgmu ;
+            elif jet_jvt<0.25: unc = 0.0975 -0.0011 * avgmu + 0.00008 * avgmu * avgmu ;
+            elif jet_jvt<0.85: unc = 0.0920 -0.0053 * avgmu + 0.00013 * avgmu * avgmu ;
+            else:                  unc = -0.0071 + 0.0016 * avgmu -0.00001 * avgmu * avgmu;
+        elif jet_pt<100:
+            unc = 0.4660 -1.2116 * jet_jvt + 0.78807 * jet_jvt * jet_jvt;
+        elif jet_pt<150:
+            unc = 0.2254 -0.5476 * jet_jvt + 0.32617 * jet_jvt * jet_jvt;
+    #} end eta 2.7
+    else: #forward jets
+        fjvt = jet_fjvt; 
+        if jet_fjvt>0.6:
+            fjvt= 0.6; # the pileup more or less plateaus at 0.6
+        if jet_pt<30:       unc = 0.5106 + 1.2566 * fjvt -1.15060  * fjvt * fjvt;
+        elif jet_pt<40:  unc = 0.2972 + 1.9418 * fjvt -1.82694  * fjvt * fjvt;
+        elif jet_pt<50:  unc = 0.1543 + 1.9864 * fjvt -1.48429  * fjvt * fjvt;
+        elif jet_pt<60:  unc = 0.1050 + 1.3196 * fjvt + 0.03554 * fjvt * fjvt;
+        elif jet_pt<120: unc = 0.0400 + 0.5653 * fjvt + 1.96323 * fjvt * fjvt;
+        # max of 0.9 seems reasonable
+        if jet_fjvt>0.6: unc = 0.9; 
+
+    unc = min(unc, 1.0);
+    unc = max(unc, 0.0);
+    return unc;
+
+def RotateXY(mat, phi):
+
+    V11 = mat[0][0]*math.cos(phi)**2+math.sin(phi)**2*mat[1][1]
+    V12 = -math.cos(phi)*math.sin(phi)*( mat[0][0] - mat[1][1] )
+    V21 = -math.cos(phi)*math.sin(phi)*( mat[0][0] - mat[1][1] )
+    V22 = mat[0][0]*math.sin(phi)**2+math.cos(phi)**2*mat[1][1]
+    
+    #mat_new=[[math.cos(phi)*mat[0][0],-math.sin(phi)*mat[1][0]],[math.sin(phi)*mat[1][0],-math.cos(phi)*mat[1][1]]]
+    mat_new=[[V11,V12],[V21,V22]]
+    return mat_new
+
+def MultMatrix(Xcom, X, mat):
+
+    mat_new=[[math.cos(phi)*mat[0][0],-math.sin(phi)*mat[1][0]],[math.sin(phi)*mat[1][0],-math.cos(phi)*mat[1][1]]]
+    return mat_new
+
+def InvertMatrix(mat):
+
+    det = mat[0][0]*mat[1][1]-mat[0][1]*mat[1][0]
+    #print det
+    m=[[0.0,0.0],[0.0,0.0]]    
+    if det==0.0:
+        return m
+
+    m[0][0]=1.0/det*(mat[1][1])
+    m[1][0]=-1.0/det*(mat[1][0])
+    m[0][1]=-1.0/det*(mat[0][1])
+    m[1][1]=1.0/det*(mat[0][0])
+    return m
+
+def AddMatrix(X, Y):
+
+    mat_new=[[0.0,0.0],[0.0,0.0]]
+    mat_new[0][0]=X[0][0]+Y[0][0]
+    mat_new[0][1]=X[0][1]+Y[0][1]
+    mat_new[1][0]=X[1][0]+Y[1][0]
+    mat_new[1][1]=X[1][1]+Y[1][1]
+    return mat_new
+
+def METSig(e, allJets):
+
+    # add tight cleaning
+    # add met tenacious
+    # add met sig
+    met_reso=0.0
+    #SUM_MATRIX=[[0.0,0.0],[0.0,0.0]]
+    SUM_MATRIX=[[10.0,0.0],[0.0,10.0]] # met soft
+    SUM_ET=[0.0,0.0]
+    MET_TENAC=[0.0,0.0]
+    #print 'MET: ',e.MET,' soft: ',e.METsoft
+    jet_et=[0.0,0.0]
+    njet=0
+    ht=0
+    for j in range(0,allJets):
+        #print 'pT: ',e.JetPt[j]
+        if abs(e.JetEta[j])<2.4 and e.JetJVT[j]<0.59:
+            continue
+        #MET_TENAC[0]+=
+        #MET_TENAC[1]+=
+        met_reso+=e.JetPt[j]*0.03
+        ht+=e.JetPt[j]
+        jet_et[0]+=e.JetPt[j]*math.cos(e.JetPhi[j])
+        jet_et[1]+=e.JetPt[j]*math.sin(e.JetPhi[j])
+        if (abs(e.JetEta[j])>2.4 and e.JetPt[j]>35.0e3) or (abs(e.JetEta[j])<2.5 and abs(e.JetJVT[j])>0.11):
+            if (abs(e.JetEta[j])<2.4 and abs(e.JetJVT[j])>0.91 and e.JetPt[j]<40.0e3):
+                MET_TENAC[0]+=e.JetPt[j]*math.cos(e.JetPhi[j])
+                MET_TENAC[1]+=e.JetPt[j]*math.sin(e.JetPhi[j])
+            if  (abs(e.JetEta[j])>2.4 and (e.JetFJVT[j]<0.5 or e.JetPt[j]>120e3)):
+                MET_TENAC[0]+=e.JetPt[j]*math.cos(e.JetPhi[j])
+                MET_TENAC[1]+=e.JetPt[j]*math.sin(e.JetPhi[j])                
+        njet+=1
+        jet_2v = [e.JetPt[j]*math.cos(e.JetPhi[j]),e.JetPt[j]*math.sin(e.JetPhi[j])]
+        pu_prob = GetPUProb(e.JetPt[j], e.JetEta[j], e.JetJVT[j], e.avIntPerXing, e.JetFJVT[j])
+        jet_pt_reso = math.hypot(pu_prob,0.03)
+        jet_u = [[(e.JetPt[j]*jet_pt_reso)**2,0.0],[0.0,(e.JetPt[j]*0.02)**2]]
+        #if e.JetJVT[j]<0.05 and abs(e.JetEta[j])<2.7:
+        #    jet_u = [[(e.JetPt[j]*0.95)**2,0.0],[0.0,(e.JetPt[j]*0.02)**2]]
+        #elif e.JetJVT[j]<0.59 and abs(e.JetEta[j])<2.7:
+        #    jet_u = [[(e.JetPt[j]*0.40)**2,0.0],[0.0,(e.JetPt[j]*0.02)**2]]
+        #elif abs(e.JetEta[j])>2.7 and e.JetPt[j]<40.0e3:
+        #    jet_u = [[(e.JetPt[j]*0.95)**2,0.0],[0.0,(e.JetPt[j]*0.02)**2]]
+        #elif abs(e.JetEta[j])>2.7:
+        #    jet_u = [[(e.JetPt[j]*0.1)**2,0.0],[0.0,(e.JetPt[j]*0.02)**2]]
+        #else:
+        #    jet_u = [[(e.JetPt[j]*0.06)**2,0.0],[0.0,(e.JetPt[j]*0.02)**2]]
+        jet_xy_V = RotateXY(jet_u,-1.0*e.JetPhi[j])
+        SUM_MATRIX=AddMatrix(SUM_MATRIX,jet_xy_V)
+        SUM_ET=[jet_2v[0]+SUM_ET[0], jet_2v[1]+SUM_ET[1]]
+
+    # Multiply S = E . V-1. E
+    met_x = e.MET*math.cos(e.METphi) 
+    met_y = e.MET*math.sin(e.METphi) 
+    SUM_MATRIX=InvertMatrix(SUM_MATRIX)
+    SUM_ET=[met_x, met_y]
+    V1 = SUM_MATRIX[0][0]*SUM_ET[0] + SUM_MATRIX[0][1]*SUM_ET[1]
+    V2 = SUM_MATRIX[1][0]*SUM_ET[0] + SUM_MATRIX[1][1]*SUM_ET[1]
+    S = V1*SUM_ET[0] + V2*SUM_ET[1]
+    met_over_sqrtht = 0
+    if ht>0.0:
+        met_over_sqrtht=(e.MET)/math.sqrt(ht)
+
+    #print 'before met_x: ',met_x,met_y,jet_et[0],jet_et[1]
+    met_x += jet_et[0]
+    met_y += jet_et[1]
+    #print 'met_x: ',met_x,met_y
+    #print math.sqrt(met_x*met_x+met_y*met_y),' soft: ',e.METsoft
+    met_tenac_x = met_x - MET_TENAC[0]
+    met_tenac_y = met_y - MET_TENAC[1]
+    met_tenac_et = math.hypot(met_tenac_x,met_tenac_y)# math.sqrt(met_tenac_x*met_tenac_x+met_tenac_y*met_tenac_y)
+    
+    met_tenac_phi = math.atan2(met_tenac_y,met_tenac_x)
+    #print met_tenac_et,e.MET,math.sqrt(S)
+    return met_over_sqrtht,met_tenac_et,met_tenac_phi,math.sqrt(S)
+
 # create output
 ROOT.gROOT.ProcessLine(
 "struct MyStruct {\
@@ -11,6 +228,7 @@ ROOT.gROOT.ProcessLine(
    Float_t   met_tenacious_tst_j1_dphi;\
    Float_t   met_tenacious_tst_j2_dphi;\
    Float_t   met_tenacious_tst_et;\
+   Float_t   met_tenacious_tst_nolep_et;\
    Float_t   met_tenacious_tst_phi;\
    Float_t   met_cst_jet;\
    Float_t   met_soft_tst_et;\
@@ -30,6 +248,8 @@ ROOT.gROOT.ProcessLine(
    Int_t     n_el;\
    Int_t     n_ph;\
    Int_t     n_mu_w;\
+   Int_t     n_jetPU;\
+   Int_t     n_jetHS;\
    Int_t     n_el_w;\
    Int_t     n_mu_baseline_noOR;\
    Int_t     lep_trig_match;\
@@ -94,6 +314,7 @@ tree_out.Branch( 'w', ROOT.AddressOf( mystruct, 'w' ), 'w/F' )
 tree_out.Branch( 'met_tenacious_tst_j1_dphi', ROOT.AddressOf( mystruct, 'met_tenacious_tst_j1_dphi' ), 'met_tenacious_tst_j1_dphi/F' )
 tree_out.Branch( 'met_tenacious_tst_j2_dphi', ROOT.AddressOf( mystruct, 'met_tenacious_tst_j2_dphi' ), 'met_tenacious_tst_j2_dphi/F' )
 tree_out.Branch( 'met_tenacious_tst_et', ROOT.AddressOf( mystruct, 'met_tenacious_tst_et' ), 'met_tenacious_tst_et/F' )
+tree_out.Branch( 'met_tenacious_tst_nolep_et', ROOT.AddressOf( mystruct, 'met_tenacious_tst_nolep_et' ), 'met_tenacious_tst_nolep_et/F' )
 tree_out.Branch( 'met_tenacious_tst_phi', ROOT.AddressOf( mystruct, 'met_tenacious_tst_phi' ), 'met_tenacious_tst_phi/F' )
 tree_out.Branch( 'met_cst_jet', ROOT.AddressOf( mystruct, 'met_cst_jet' ), 'met_cst_jet/F' )
 tree_out.Branch( 'met_soft_tst_et', ROOT.AddressOf( mystruct, 'met_soft_tst_et' ), 'met_soft_tst_et/F' )
@@ -105,6 +326,8 @@ tree_out.Branch( 'n_tau', ROOT.AddressOf( mystruct, 'n_tau' ), 'n_tau/I' )
 #tree_out.Branch( 'n_pv', ROOT.AddressOf( mystruct, 'n_pv' ), 'n_pv/I' )
 tree_out.Branch( 'n_el', ROOT.AddressOf( mystruct, 'n_el' ), 'n_el/I' )
 tree_out.Branch( 'n_ph', ROOT.AddressOf( mystruct, 'n_ph' ), 'n_ph/I' )
+tree_out.Branch( 'n_jetPU', ROOT.AddressOf( mystruct, 'n_jetPU' ), 'n_jetPU/I' )
+tree_out.Branch( 'n_jetHS', ROOT.AddressOf( mystruct, 'n_jetHS' ), 'n_jetHS/I' )
 tree_out.Branch( 'n_mu', ROOT.AddressOf( mystruct, 'n_mu' ), 'n_mu/I' )
 tree_out.Branch( 'n_baseel', ROOT.AddressOf( mystruct, 'n_baseel' ), 'n_baseel/I' )
 tree_out.Branch( 'n_mu_w', ROOT.AddressOf( mystruct, 'n_mu_w' ), 'n_mu_w/I' )
@@ -152,12 +375,12 @@ tree_out.Branch( 'jet_NTracks', mystruct.jet_NTracks)
 #f = ROOT.TFile.Open('/eos/atlas/atlascerngroupdisk/penn-ww/out_QCD_Tenacious.root')
 #f = ROOT.TFile.Open('out_QCD_Tenacious.root')
 #f = ROOT.TFile.Open('out_QCD_Loose.root')
-f = ROOT.TFile.Open('mj2017.root')
+f = ROOT.TFile.Open('mj20156.root')
 IsLoose=False
 
 GeV=1.0e3
 tree = f.Get('PredictionTree')
-fout = ROOT.TFile.Open('foutLoose2017_skim500_mctest.root','RECREATE')
+fout = ROOT.TFile.Open('foutLoose2016_skim200_mctest.root','RECREATE')
 z=0
 v1 = ROOT.TLorentzVector()
 v2 = ROOT.TLorentzVector()
@@ -173,8 +396,8 @@ for e in tree:
     if z%10000 ==0:
         print 'Event: ',z
         sys.stdout.flush()
-    #if z>100000:
-    #    break
+    if z>100000:
+        break
     z+=1
     
     # remove those with ntries not >0. -2 is the unsmeared events
@@ -226,10 +449,7 @@ for e in tree:
         mystruct.jet_timing.push_back(0.0)
         mystruct.jet_jvt.push_back(e.JetJVT[i])
         mystruct.jet_NTracks.push_back(e.JetNTracks[i])
-        if IsLoose:
-            mystruct.jet_fjvt.push_back(0.0)
-        else:
-            mystruct.jet_fjvt.push_back(e.JetFJVT[i])
+        mystruct.jet_fjvt.push_back(e.JetFJVT[i])
     
     # jet cuts
     met.SetPtEtaPhiM(e.MET, 0.0, e.METphi, 0.0)
@@ -248,25 +468,27 @@ for e in tree:
     jj_deta = abs(mystruct.jet_eta[0] - mystruct.jet_eta[1])
     jj_dphi = abs(v1.DeltaPhi(v2))
     # dphijj cut
-    if jj_dphi >1.8:
+    if jj_dphi >2.0:
         continue
     
     #jj_dphi=5
     jj_mass = (v1+v2).M()
-    if jj_mass<500.0e3:
+    if jj_mass<200.0e3:
         continue
     # write output tree
+    met_over_sqrtht,met_tenac_et,met_tenac_phi,metsig_tst = METSig(e, allJets)
     mystruct.jj_mass = jj_mass
     mystruct.jj_dphi = jj_dphi
     mystruct.jj_deta = jj_deta
     mystruct.w = weight
     mystruct.met_tenacious_tst_j1_dphi = j1_met_dphi
     mystruct.met_tenacious_tst_j2_dphi = j2_met_dphi
-    mystruct.met_tenacious_tst_et = e.MET*GeV
-    mystruct.met_tenacious_tst_phi = e.METphi
-    mystruct.met_cst_jet = e.MHTDefReb*GeV # MHT includes the soft term.
+    mystruct.met_tenacious_tst_et = met_tenac_et*GeV
+    mystruct.met_tenacious_tst_nolep_et = met_tenac_et*GeV
+    mystruct.met_tenacious_tst_phi = met_tenac_phi
+    mystruct.met_cst_jet = e.MHTDefReb*GeV 
     mystruct.met_soft_tst_et = e.METsoft*GeV
-    mystruct.met_significance=e.METsig
+    mystruct.met_significance=met_over_sqrtht  #e.METsig
     mystruct.max_mj_over_mjj=-9999.0
     mystruct.maxCentrality=-9999.0
     mystruct.trigger_met_encoded=1
@@ -287,7 +509,7 @@ for e in tree:
     mystruct.met_tst_nolep_et = e.MET*GeV
     mystruct.met_tst_nolep_j1_dphi = j1_met_dphi
     mystruct.met_tst_nolep_j2_dphi = j2_met_dphi
-    mystruct.metsig_tst=e.METsig
+    mystruct.metsig_tst=metsig_tst #e.METsig = value from the seed jets
             
     #print minNjet
     for j in range(2,minNjet):
@@ -313,6 +535,8 @@ for e in tree:
     #mystruct.n_pv=e.NVtx
     mystruct.n_tau=0
     mystruct.n_ph=e.NPhotons
+    mystruct.n_jetPU=e.NjetsPU
+    mystruct.n_jetHS=e.NjetsHS
     mystruct.n_el=0
     mystruct.n_mu_w=0
     mystruct.n_el_w=0
