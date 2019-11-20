@@ -1133,6 +1133,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->RepVar(Mva::truth_jj_mass, truth_jj_mass);
     event->RepVar(Mva::truth_jj_deta, truth_deta_jj);
     if(event->truth_jets.size()>0){ event->RepVar(Mva::truth_j1_pt,   event->truth_jets.at(0).pt);    } else  event->RepVar(Mva::truth_j1_pt, 0.0);
+    if(event->truth_jets.size()>1){ event->RepVar(Mva::truth_j2_pt,   event->truth_jets.at(1).pt);    } else  event->RepVar(Mva::truth_j2_pt, 0.0);    
     event->AddVar(Mva::FilterMet,     filterMet);
     event->AddVar(Mva::TruthFilter,   truthFilter);
     event->AddVar(Mva::truthJet1Pt,   truthJet1);
