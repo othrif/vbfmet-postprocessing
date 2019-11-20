@@ -1,9 +1,9 @@
 import ROOT
-
+import sys
 from optparse import OptionParser
 
 p = OptionParser(usage="usage: <path:ROOT file directory>", version="0.1")
-p.add_option('--var',           type='string', default='jj_mass_variableBin,truth_jj_mass,truth_jj_deta,truth_jj_dphi,truth_j1_pt,truth_j2_pt,jj_deta,jj_dphi,met_tst_nolep_et', dest='var') #SherpaVTruthPt
+p.add_option('--var',           type='string', default='n_jet,met_cst_jet,jj_mass_variableBin,jj_deta,jj_dphi,met_tst_nolep_et,mll', dest='var') #SherpaVTruthPt
 p.add_option('--filename','-f', type='string', default='/tmp/v34ATest_v18.root', dest='filename')
 p.add_option('--year',         type='int',    default=2016,          dest='year')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
@@ -197,28 +197,30 @@ def Style():
     ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasUtils.C')
     ROOT.SetAtlasStyle()
 
-def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
-    can.Clear()
-
+def GetHist(hname1, hpath, f1,  can, sigsamples, doData=False):
     h1=None
-    for hpath1 in hpath1all:
-        hname=hpath1+hname1
+    for hsamp in sigsamples:
+        hname=hpath+hsamp+'/'+hname1
         print hname
         h1b = f1.Get(hname)
+        #print hsamp,' ',h1b.Integral()
         if h1:
-            h1.Add(h1b)
+            if doData:
+                h1.Add(h1b,-1.0)
+            else:
+                h1.Add(h1b)
         else:
-            h1 = h1b
-    h2=None
-    for hpath2 in hpath2all:
-        hnamev2=hpath2+hname1    
-        print hnamev2
-        h2b = f1.Get(hnamev2)
-        if h2:
-            h2.Add(h2b)
-        else:
-            h2 = h2b
+            h1 = h1b.Clone()
 
+    #print 'Total: ',h1.Integral()
+    return h1.Clone()
+    
+def Draw(can, hname, bkgsub1hist, bkgsub2hist,  sig1hist, sig2hist, hpath1, hpath2, dataMinBkg=True):
+    
+    can.Clear()
+    hname1=hname
+    h1 = bkgsub1hist
+    h2 = bkgsub2hist
     h1.SetStats(0)
     h2.SetStats(0)
     h1.SetLineColor(1)
@@ -227,20 +229,19 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     h2.SetMarkerColor(2)
     h1.SetMarkerSize(0.5)
     h2.SetMarkerSize(0.5)
+    h3 = sig1hist.Clone()
+    h4 = sig2hist.Clone()
     
-    hpath1=hpath1all[0]
-    hpath2=hpath2all[0]
-
-    type_sample='QCD '
-    type_sample_out='qcd'
-    if hpath1.count('_zqcd') or hpath1.count('_wqcd'):
-        type_sample='QCD '
-    if hpath1.count('_zewk') or hpath1.count('_wewk'):
-        type_sample='EWK '
-        type_sample_out='ewk'
-    if len(hpath1all)>1:
-        type_sample='QCD+EWK '
-        type_sample_out='qcdewk'
+    type_sample=''
+    type_sample_out='dataMinusBkg'
+    #if hpath1.count('_zqcd') or hpath1.count('_wqcd'):
+    #    type_sample='QCD '
+    #if hpath1.count('_zewk') or hpath1.count('_wewk'):
+    #    type_sample='EWK '
+    #    type_sample_out='ewk'
+    #if len(hpath1all)>1:
+    #    type_sample='QCD+EWK '
+    #    type_sample_out='qcdewk'
     num_name = 'Z#rightarrow#nu#nu'
     den_name = 'Z#rightarrow ll'
     comp1='znn'
@@ -291,7 +292,7 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     #pad1.SetGridx();         # Vertical grid
     pad1.Draw();             # Draw the upper pad: pad1
     pad1.cd();               # pad1 becomes the current pad
-    extra_text_save='_varComp'
+    extra_text_save='_regComp'
     extra_text='VBF H125'
     rebin=2
     if hname.count('_hggf'):
@@ -305,6 +306,9 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
 
     if hname.count('ph_pt'):
         h1.GetXaxis().SetTitle('Photon p_{T} [GeV]')
+    if hname=='mll':
+        h1.Rebin(5)
+        h2.Rebin(5)
     if hname=='ph_pt_lead':
         h1.Rebin(5)
         h2.Rebin(5)
@@ -319,6 +323,9 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     if hname1=='jj_deta':
         h1.Rebin(rebin)
         h2.Rebin(rebin)
+    if hname1=='met_cst_jet':
+        h1.Rebin(5)
+        h2.Rebin(5)
     if hname1=='met_tst_et':
         h1.Rebin(rebin)
         h2.Rebin(rebin) 
@@ -327,24 +334,23 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
         h2.Rebin(rebin) 
     if hname1=='met_tst_nolep_et':
         h1.Rebin(10)
-        h2.Rebin(10) 
-    if GetError:
-        h1.GetYaxis().SetTitle('Relative Error')        
+        h2.Rebin(10)
+    if dataMinBkg:
+        h1.GetYaxis().SetTitle('Normalized (Data - Bkg)')
     else:
         h1.GetYaxis().SetTitle('Normalized Events')
 
-
-    if GetError:
-        h1 = PlotError(h1)
-        h2 = PlotError(h2)
+    #h1.Draw()
+    #h2.Draw('same')
     h1.DrawNormalized()
     h2.DrawNormalized('same')
+    h1.GetYaxis().SetRangeUser(0.1,h1.GetMaximum()*1.6)
 
     e=ROOT.Double(0.0)
     print 'Integral old: ',h1.IntegralAndError(0,1001,e),'+/-',e
     print 'Integral new: ',h2.IntegralAndError(0,1001,e),'+/-',e
     
-    leg = ROOT.TLegend(0.6,0.5,0.92,0.8)
+    leg = ROOT.TLegend(0.6,0.5,0.92,0.75)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
     leg.AddEntry(h1,type_sample+num_name)
@@ -434,7 +440,7 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     elif  hname.count('jj_deta'):
         hratio.GetXaxis().SetTitle('#Delta#eta_{jj}')
     elif  hname.count('jj_dphi'):
-        hratio.GetXaxis().SetTitle('#Delta#phi_{jj}')        
+        hratio.GetXaxis().SetTitle('#Delta#phi_{jj}')
     elif  hname.count('met_tst_et'):
         hratio.GetXaxis().SetTitle('MET [GeV]')
     elif  hname.count('met_truth_et'):
@@ -443,9 +449,15 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
         hratio.GetXaxis().SetTitle('3rd jet p_{T} [GeV]')
     elif  hname.count('met_tst_nolep_et'):
         hratio.GetXaxis().SetTitle('MET (no leptons) [GeV]')
+    elif  hname.count('mll'):
+        hratio.GetXaxis().SetTitle('m_{ll} [GeV]')
+    elif  hname.count('n_jet'):
+        hratio.GetXaxis().SetTitle('N_{jet}')
+    elif  hname.count('met_cst_jet'):
+        hratio.GetXaxis().SetTitle('E_{T,miss}^{jet,no-jvt} [GeV]')
        
     hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
-    hratio.GetYaxis().SetRangeUser(0.0,2.0)       
+    hratio.GetYaxis().SetRangeUser(0.5,1.5)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -461,10 +473,10 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     can.Update()
     if options.wait:
         can.WaitPrimitive()
-    if GetError:
-        can.SaveAs(hname1+'_'+comp1+'_'+comp2+'_'+type_sample_out+extra_text_save+'_err.pdf')
-    else:
-        can.SaveAs(hname1+'_'+comp1+'_'+comp2+'_'+type_sample_out+extra_text_save+'.pdf')
+    #if GetError:
+    #    can.SaveAs(hname1+'_'+comp1+'_'+comp2+'_'+type_sample_out+extra_text_save+'_err.pdf')
+    #else:
+    can.SaveAs(hname1+'_'+comp1+'_'+comp2+'_'+type_sample_out+extra_text_save+'.pdf')
     
 def Fit(_suffix=''):
 
@@ -477,39 +489,34 @@ def Fit(_suffix=''):
     hnames=['met_tst_et','jj_mass','jj_deta','jj_dphi','n_jet','j3Pt','met_truth_et','jj_mass','jj_deta','met_tst_et','jj_dphi']
     hnames = options.var.split(',')
 
-    path1=['pass_zcr_allmjj_ee_Nominal/plotEvent_zqcd/']
-    path2=['pass_zcr_allmjj_uu_Nominal/plotEvent_zqcd/']
+    sigsamples1 = ['zqcd','zewk']
+    bkgsamples1 = ['data','wewk','wqcd','tall']#,'dqcd']
+    path1='pass_zcr_allmjj_ee_Nominal/plotEvent_'
+    path2='pass_zcr_allmjj_uu_Nominal/plotEvent_'
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-    #sys.exit(0)
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
-    path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        sig1hist = GetHist(hname, path1, f1, can, sigsamples1, doData=False)
+        bkgsub1hist = GetHist(hname, path1, f1, can, bkgsamples1, doData=True)
+        sig2hist = GetHist(hname, path2, f1, can, sigsamples1, doData=False)
+        bkgsub2hist = GetHist(hname, path2, f1, can, bkgsamples1, doData=True)
 
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/']
-    path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        Draw(can, hname,bkgsub1hist,bkgsub2hist, sig1hist, sig2hist, path1, path2, dataMinBkg=True)
+        #Draw(can, hname,sig1hist,sig2hist, path1,path2)        
 
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/','pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
-    path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/','pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
+    sigsamples1 = ['wqcd','wewk']
+    bkgsamples1 = ['data','zewk','zqcd','tall']#,'dqcd']
+    path1='pass_wcr_allmjj_e_Nominal/plotEvent_'
+    path2='pass_wcr_allmjj_u_Nominal/plotEvent_'
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)        
-
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
-    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/']
-    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        sig1hist = GetHist(hname, path1, f1, can, sigsamples1, doData=False)
+        bkgsub1hist = GetHist(hname, path1, f1, can, bkgsamples1, doData=True)
+        sig2hist = GetHist(hname, path2, f1, can, sigsamples1, doData=False)
+        bkgsub2hist = GetHist(hname, path2, f1, can, bkgsamples1, doData=True)
         
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/','pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
-    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/','pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)         
+        Draw(can, hname,bkgsub1hist,bkgsub2hist, sig1hist, sig2hist, path1, path2, dataMinBkg=True)
+        #Draw(can, hname,sig1hist,sig2hist, path1,path2)    
+    sys.exit(0)
+
+    
+
 setPlotDefaults(ROOT)
 Fit('90V')
