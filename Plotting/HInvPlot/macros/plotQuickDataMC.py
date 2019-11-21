@@ -231,7 +231,14 @@ def Draw(can, hname, bkgsub1hist, bkgsub2hist,  sig1hist, sig2hist, hpath1, hpat
     h2.SetMarkerSize(0.5)
     h3 = sig1hist.Clone()
     h4 = sig2hist.Clone()
-    
+    histos = [h1,h2,h3,h4]
+    ncolor=1
+    for h in histos:
+        h.SetMarkerSize(0.5)
+        h.SetStats(0)
+        h.SetLineColor(ncolor)
+        h.SetMarkerColor(ncolor)
+        ncolor+=1
     type_sample=''
     type_sample_out='dataMinusBkg'
     #if hpath1.count('_zqcd') or hpath1.count('_wqcd'):
@@ -307,34 +314,26 @@ def Draw(can, hname, bkgsub1hist, bkgsub2hist,  sig1hist, sig2hist, hpath1, hpat
     if hname.count('ph_pt'):
         h1.GetXaxis().SetTitle('Photon p_{T} [GeV]')
     if hname=='mll':
-        h1.Rebin(5)
-        h2.Rebin(5)
-    if hname=='ph_pt_lead':
-        h1.Rebin(5)
-        h2.Rebin(5)
-        h1.GetXaxis().SetRangeUser(5.0,1000.0)
-        h2.GetXaxis().SetRangeUser(5.0,1000.0)
-    if hname1=='jj_mass':
-        h1.Rebin(rebin)
-        h2.Rebin(rebin)
+        for h in histos:
+            h.Rebin(5)
+    if hname1=='jj_mass' or hname1=='jj_deta':
+        for h in histos:
+            h.Rebin(rebin)
     if  hname.count('truth_jj_mass'):
-        h1.Rebin(10)
-        h2.Rebin(10)
-    if hname1=='jj_deta':
-        h1.Rebin(rebin)
-        h2.Rebin(rebin)
+        for h in histos:
+            h.Rebin(10)
     if hname1=='met_cst_jet':
-        h1.Rebin(5)
-        h2.Rebin(5)
+        for h in histos:
+            h.Rebin(5)
     if hname1=='met_tst_et':
-        h1.Rebin(rebin)
-        h2.Rebin(rebin) 
+        for h in histos:
+            h.Rebin(rebin) 
     if hname1=='jj_dphi':
-        h1.Rebin(rebin)
-        h2.Rebin(rebin) 
+        for h in histos:
+            h.Rebin(rebin) 
     if hname1=='met_tst_nolep_et':
-        h1.Rebin(10)
-        h2.Rebin(10)
+        for h in histos:
+            h.Rebin(10)
     if dataMinBkg:
         h1.GetYaxis().SetTitle('Normalized (Data - Bkg)')
     else:
@@ -342,9 +341,10 @@ def Draw(can, hname, bkgsub1hist, bkgsub2hist,  sig1hist, sig2hist, hpath1, hpat
 
     #h1.Draw()
     #h2.Draw('same')
+    h1.GetYaxis().SetRangeUser(0.001,h1.GetMaximum()*1.7)
     h1.DrawNormalized()
     h2.DrawNormalized('same')
-    h1.GetYaxis().SetRangeUser(0.1,h1.GetMaximum()*1.6)
+    
 
     e=ROOT.Double(0.0)
     print 'Integral old: ',h1.IntegralAndError(0,1001,e),'+/-',e
@@ -375,7 +375,15 @@ def Draw(can, hname, bkgsub1hist, bkgsub2hist,  sig1hist, sig2hist, hpath1, hpat
     if intden>0.0:
         hratio.Scale(h1.Integral()/intden)
     hratio.Divide(h1)
+
+    hratioMC = h4.Clone()
+    intden = h4.Integral()
+    if intden>0.0:
+        hratioMC.Scale(h3.Integral()/intden)    
+    hratioMC.Divide(h3)
+    
     hratio.GetYaxis().SetRangeUser(0,2.0)
+    hratioMC.GetYaxis().SetRangeUser(0,2.0)
     pad1.SetLogy(0)
     pad2.SetLogy(0)
     pad1.SetLogx(0)
@@ -470,6 +478,14 @@ def Draw(can, hname, bkgsub1hist, bkgsub2hist,  sig1hist, sig2hist, hpath1, hpat
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);    
     hratio.Draw()
+    hratioMC.Draw('same')
+    leg1 = ROOT.TLegend(0.7,0.8,0.92,0.99)
+    leg1.SetBorderSize(0)
+    leg1.SetFillColor(0)
+    leg1.AddEntry(hratio,'Data - bkg')
+    leg1.AddEntry(hratioMC,'MC ratio')
+    leg1.Draw()
+    
     can.Update()
     if options.wait:
         can.WaitPrimitive()
@@ -499,7 +515,7 @@ def Fit(_suffix=''):
         sig2hist = GetHist(hname, path2, f1, can, sigsamples1, doData=False)
         bkgsub2hist = GetHist(hname, path2, f1, can, bkgsamples1, doData=True)
 
-        Draw(can, hname,bkgsub1hist,bkgsub2hist, sig1hist, sig2hist, path1, path2, dataMinBkg=True)
+        Draw(can, hname, bkgsub1hist,bkgsub2hist, sig1hist, sig2hist, path1, path2, dataMinBkg=True)
         #Draw(can, hname,sig1hist,sig2hist, path1,path2)        
 
     sigsamples1 = ['wqcd','wewk']
