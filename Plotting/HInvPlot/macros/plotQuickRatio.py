@@ -3,7 +3,7 @@ import ROOT
 from optparse import OptionParser
 
 p = OptionParser(usage="usage: <path:ROOT file directory>", version="0.1")
-p.add_option('--var',           type='string', default='jj_mass_variableBin,truth_jj_mass,truth_jj_deta,truth_jj_dphi,truth_j1_pt,truth_j2_pt,jj_deta,jj_dphi,met_tst_nolep_et', dest='var') #SherpaVTruthPt
+p.add_option('--var',           type='string', default='jj_mass_variableBin,truth_jj_mass_variableBin,truth_jj_mass,truth_jj_deta,truth_jj_dphi,truth_j1_pt,truth_j2_pt,jj_deta,jj_dphi,met_tst_nolep_et', dest='var') #SherpaVTruthPt
 p.add_option('--filename','-f', type='string', default='/tmp/v34ATest_v18.root', dest='filename')
 p.add_option('--year',         type='int',    default=2016,          dest='year')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
@@ -256,6 +256,8 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
             comp1='zee'
     if hpath1.count('_sr_'):
         num_name = 'Z#rightarrow#nu#nu'
+        if hpath1.count('_wewk') or hpath1.count('_wqcd'):
+            num_name = 'W#rightarrowl_{lost}#nu'
     if hpath1.count('_wcr_'):
         num_name = 'W#rightarrow l#nu'
         comp1='wle'        
@@ -313,7 +315,7 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     if hname1=='jj_mass':
         h1.Rebin(rebin)
         h2.Rebin(rebin)
-    if  hname.count('truth_jj_mass'):
+    if  hname=='truth_jj_mass':
         h1.Rebin(10)
         h2.Rebin(10)
     if hname1=='jj_deta':
@@ -422,9 +424,9 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     elif  hname.count('jj_mass'):
         hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
     elif  hname.count('truth_jj_deta'):
-        hratio.GetXaxis().SetTitle('#Delta#eta_{jj}')
+        hratio.GetXaxis().SetTitle('Truth #Delta#eta_{jj}')
     elif  hname.count('truth_jj_dphi'):
-        hratio.GetXaxis().SetTitle('#Delta#phi_{jj}')
+        hratio.GetXaxis().SetTitle('Truth #Delta#phi_{jj}')
     elif  hname.count('truth_j1_pt'):
         hratio.GetXaxis().SetTitle('Truth Lead Jet p_{T} [GeV]')
     elif  hname.count('truth_j2_pt'):
