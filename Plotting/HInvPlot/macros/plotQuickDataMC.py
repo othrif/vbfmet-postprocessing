@@ -5,7 +5,7 @@ from optparse import OptionParser
 p = OptionParser(usage="usage: <path:ROOT file directory>", version="0.1")
 p.add_option('--var',           type='string', default='n_jet,met_cst_jet,jj_mass_variableBin,jj_deta,jj_dphi,met_tst_nolep_et,mll', dest='var') #SherpaVTruthPt
 p.add_option('--filename','-f', type='string', default='/tmp/v34ATest_v18.root', dest='filename')
-p.add_option('--year',         type='int',    default=2016,          dest='year')
+p.add_option('--year',         type='int',    default=2019,          dest='year') #: 2016, 2017, 2018, 2019=all years
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
 #p.add_option('--filename','-f', type='string', default='pass_sr_hipt_1j_eu', dest='filename')
 (options, args) = p.parse_args()
@@ -38,6 +38,8 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
             a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(36000/1.0e3))
         if options.year==2017:
             a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(44000/1.0e3))
+        if options.year==2019:
+            a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(139000/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.04)
@@ -362,6 +364,15 @@ def Draw(can, hname, bkgsub1hist, bkgsub2hist,  sig1hist, sig2hist, hpath1, hpat
     for text in texts:
         text.Draw()
 
+    chi2 = h1.Chi2Test      (h2, 'UW CHI2')
+    kval = h1.KolmogorovTest(h2, '')
+    ks_text = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
+    ks_text.SetNDC()
+    ks_text.SetTextSize(0.055)
+    ks_text.SetTextAlign(11)
+    ks_text.SetTextColor(ROOT.kBlack)
+    ks_text.Draw()
+
     can.cd();          # Go back to the main canvas before defining pad2
     pad2 = ROOT.TPad("pad2", "pad2", 0, 0.03, 1, 0.3);
     pad2.SetTopMargin(0);
@@ -485,6 +496,16 @@ def Draw(can, hname, bkgsub1hist, bkgsub2hist,  sig1hist, sig2hist, hpath1, hpat
     leg1.AddEntry(hratio,'Data - bkg')
     leg1.AddEntry(hratioMC,'MC ratio')
     leg1.Draw()
+
+    chi2 = hratio.Chi2Test      (hratioMC, 'UW CHI2')
+    kval = hratio.KolmogorovTest(hratioMC, '')
+    print 'chi2: ',chi2,' KS: ',kval    
+    ks_text2 = ROOT.TLatex(0.3, 0.92, 'KS MC and data-bkg: %.2f' %kval)
+    ks_text2.SetNDC()
+    ks_text2.SetTextSize(0.095)
+    ks_text2.SetTextAlign(11)
+    ks_text2.SetTextColor(ROOT.kBlack)
+    ks_text2.Draw()
     
     can.Update()
     if options.wait:

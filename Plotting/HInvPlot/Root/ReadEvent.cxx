@@ -1102,7 +1102,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Checking the truth filtering
     //
     int truthFilter=0;
-    double truth_deta_jj=-10.0, truth_jj_mass=-10.0, filterMet=-10.0, truthJet1=-10.0;
+    double truth_deta_jj=-10.0, truth_jj_mass=-10.0, filterMet=-10.0, truthJet1=-10.0, truth_dphi_jj=-10.0;
     if(event->truth_jets.size()>1){
       float tmet_px=0.0, tmet_py=0.0;
       TVector3 tmet;
@@ -1119,6 +1119,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       truthJet1 = event->truth_jets.at(1).pt;
       if(truthJet1>35.0){
 	truth_deta_jj = fabs(event->truth_jets.at(0).eta - event->truth_jets.at(1).eta);
+	truth_dphi_jj = event->truth_jets.at(0).GetVec().DeltaPhi(event->truth_jets.at(1).GetVec());
 	truth_jj_mass=truth_jj.M();
       }
       //filterMet = sqrt(tmet_px*tmet_px+tmet_py*tmet_py);//tmet.Pt();
@@ -1132,6 +1133,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     }
     event->RepVar(Mva::truth_jj_mass, truth_jj_mass);
     event->RepVar(Mva::truth_jj_deta, truth_deta_jj);
+    event->RepVar(Mva::truth_jj_dphi, truth_dphi_jj);    
     if(event->truth_jets.size()>0){ event->RepVar(Mva::truth_j1_pt,   event->truth_jets.at(0).pt);    } else  event->RepVar(Mva::truth_j1_pt, 0.0);
     if(event->truth_jets.size()>1){ event->RepVar(Mva::truth_j2_pt,   event->truth_jets.at(1).pt);    } else  event->RepVar(Mva::truth_j2_pt, 0.0);    
     event->AddVar(Mva::FilterMet,     filterMet);

@@ -208,16 +208,16 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
         if h1:
             h1.Add(h1b)
         else:
-            h1 = h1b
+            h1 = h1b.Clone()
     h2=None
     for hpath2 in hpath2all:
-        hnamev2=hpath2+hname1    
+        hnamev2=hpath2+hname1
         print hnamev2
         h2b = f1.Get(hnamev2)
         if h2:
             h2.Add(h2b)
         else:
-            h2 = h2b
+            h2 = h2b.Clone()
 
     h1.SetStats(0)
     h2.SetStats(0)
@@ -335,13 +335,21 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     else:
         h1.GetYaxis().SetTitle('Normalized Events')
 
-
     if GetError:
         h1 = PlotError(h1)
         h2 = PlotError(h2)
     h1.DrawNormalized()
     h2.DrawNormalized('same')
-
+    
+    chi2 = h1.Chi2Test      (h2, 'UW CHI2')
+    kval = h1.KolmogorovTest(h2, '')
+    ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
+    ks_text2.SetNDC()
+    ks_text2.SetTextSize(0.055)
+    ks_text2.SetTextAlign(11)
+    ks_text2.SetTextColor(ROOT.kBlack)
+    ks_text2.Draw()
+    
     e=ROOT.Double(0.0)
     print 'Integral old: ',h1.IntegralAndError(0,1001,e),'+/-',e
     print 'Integral new: ',h2.IntegralAndError(0,1001,e),'+/-',e
@@ -479,39 +487,39 @@ def Fit(_suffix=''):
     hnames=['met_tst_et','jj_mass','jj_deta','jj_dphi','n_jet','j3Pt','met_truth_et','jj_mass','jj_deta','met_tst_et','jj_dphi']
     hnames = options.var.split(',')
 
-    path1=['pass_zcr_allmjj_ee_Nominal/plotEvent_zqcd/']
-    path2=['pass_zcr_allmjj_uu_Nominal/plotEvent_zqcd/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-    #sys.exit(0)
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
-    path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/']
-    path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+    #path1=['pass_zcr_allmjj_ee_Nominal/plotEvent_zqcd/']
+    #path2=['pass_zcr_allmjj_uu_Nominal/plotEvent_zqcd/']
+    #for hname in hnames:
+    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+    ##sys.exit(0)
+    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
+    #path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
+    #for hname in hnames:
+    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+    #
+    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/']
+    #path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/']
+    #for hname in hnames:
+    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
 
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/','pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
     path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/','pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
     for hname in hnames:
         Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)        
 
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
-    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/']
-    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-        
-    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/','pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
-    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/','pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
-    for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)         
+    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
+    #path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
+    #for hname in hnames:
+    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+    #
+    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/']
+    #path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/']
+    #for hname in hnames:
+    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+    #    
+    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/','pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
+    #path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/','pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
+    #for hname in hnames:
+    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)         
 setPlotDefaults(ROOT)
 Fit('90V')
