@@ -38,6 +38,8 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
             a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(36000/1.0e3))
         if options.year==2017:
             a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(44000/1.0e3))
+        if options.year==2019:
+            a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(139000/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.04)
@@ -197,27 +199,33 @@ def Style():
     ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasUtils.C')
     ROOT.SetAtlasStyle()
 
-def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
+def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=[''],extra=''):
     can.Clear()
 
     h1=None
+    hname=''
     for hpath1 in hpath1all:
         hname=hpath1+hname1
         print hname
         h1b = f1.Get(hname)
+        #print hname,h1b.Integral()
         if h1:
             h1.Add(h1b)
         else:
             h1 = h1b.Clone()
+    #print 'Total: ',hname,h1.Integral()
     h2=None
+    hnamev2=''
     for hpath2 in hpath2all:
         hnamev2=hpath2+hname1
         print hnamev2
         h2b = f1.Get(hnamev2)
+        #print hnamev2,h2b.Integral()
         if h2:
             h2.Add(h2b)
         else:
             h2 = h2b.Clone()
+    #print 'Total: ',hnamev2,h2.Integral()
 
     h1.SetStats(0)
     h2.SetStats(0)
@@ -338,11 +346,13 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     if GetError:
         h1 = PlotError(h1)
         h2 = PlotError(h2)
+    h1.GetYaxis().SetRangeUser(0.01,h1.GetMaximum()*1.5)
     h1.DrawNormalized()
     h2.DrawNormalized('same')
     
     chi2 = h1.Chi2Test      (h2, 'UW CHI2')
     kval = h1.KolmogorovTest(h2, '')
+    print 'chi2: ',chi2,' ks: ',kval
     ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
     ks_text2.SetNDC()
     ks_text2.SetTextSize(0.055)
@@ -455,7 +465,7 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
         hratio.GetXaxis().SetTitle('MET (no leptons) [GeV]')
        
     hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
-    hratio.GetYaxis().SetRangeUser(0.0,2.0)       
+    hratio.GetYaxis().SetRangeUser(0.5,1.5)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -471,6 +481,7 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=['']):
     can.Update()
     if options.wait:
         can.WaitPrimitive()
+    extra_text_save+=extra
     if GetError:
         can.SaveAs(hname1+'_'+comp1+'_'+comp2+'_'+type_sample_out+extra_text_save+'_err.pdf')
     else:
@@ -487,39 +498,45 @@ def Fit(_suffix=''):
     hnames=['met_tst_et','jj_mass','jj_deta','jj_dphi','n_jet','j3Pt','met_truth_et','jj_mass','jj_deta','met_tst_et','jj_dphi']
     hnames = options.var.split(',')
 
-    #path1=['pass_zcr_allmjj_ee_Nominal/plotEvent_zqcd/']
-    #path2=['pass_zcr_allmjj_uu_Nominal/plotEvent_zqcd/']
-    #for hname in hnames:
-    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-    ##sys.exit(0)
-    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
-    #path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
-    #for hname in hnames:
-    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-    #
-    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/']
-    #path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/']
-    #for hname in hnames:
-    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+    path1=['pass_zcr_allmjj_ee_Nominal/plotEvent_zqcd/']
+    path2=['pass_zcr_allmjj_uu_Nominal/plotEvent_zqcd/']
+    for hname in hnames:
+        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+    #sys.exit(0)
+    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
+    path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
+    for hname in hnames:
+        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+    
+    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/']
+    path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/']
+    for hname in hnames:
+        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
 
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/','pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
     path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/','pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
     for hname in hnames:
         Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)        
 
-    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
-    #path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
-    #for hname in hnames:
-    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-    #
-    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/']
-    #path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/']
-    #for hname in hnames:
-    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
-    #    
-    #path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/','pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
-    #path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/','pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
-    #for hname in hnames:
-    #    Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)         
+    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
+    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
+    for hname in hnames:
+        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+    
+    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/']
+    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/']
+    for hname in hnames:
+        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        
+    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/','pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
+    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/','pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
+    for hname in hnames:
+        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+
+    # Ratio of wln to Znn
+    path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/','pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
+    path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/','pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
+    for hname in hnames:
+        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2,extra='_ZtoW')
 setPlotDefaults(ROOT)
 Fit('90V')
