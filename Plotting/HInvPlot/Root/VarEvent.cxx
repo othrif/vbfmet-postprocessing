@@ -125,6 +125,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case j1fjvt:	          return "j1fjvt";
     case TruthFilter:	          return "TruthFilter";
     case truth_jj_mass:	          return "truth_jj_mass";
+    case truth_max_jj_mass:	  return "truth_max_jj_mass";
     case FilterMet:	          return "FilterMet";
     case truth_jj_deta:	          return "truth_jj_deta";
     case truth_jj_dphi:	          return "truth_jj_dphi";
@@ -281,6 +282,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "j1fjvt")            return j1fjvt;
   if(var == "TruthFilter")       return TruthFilter;
   if(var == "truth_jj_mass")     return truth_jj_mass;
+  if(var == "truth_max_jj_mass") return truth_max_jj_mass;  
   if(var == "FilterMet")         return FilterMet;
   if(var == "truth_jj_deta")     return truth_jj_deta;
   if(var == "truth_jj_dphi")     return truth_jj_dphi;
@@ -524,6 +526,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(j1fjvt);
     vars.push_back(TruthFilter);
     vars.push_back(truth_jj_mass);
+    vars.push_back(truth_max_jj_mass);    
     vars.push_back(FilterMet);
     vars.push_back(truth_jj_deta);
     vars.push_back(truth_jj_dphi);

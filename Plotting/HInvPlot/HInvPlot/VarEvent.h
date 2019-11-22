@@ -143,6 +143,7 @@ namespace Msl
       j1fjvt,
       TruthFilter,
       truth_jj_mass,
+      truth_max_jj_mass,      
       FilterMet,
       truth_jj_deta,
       truth_jj_dphi,
