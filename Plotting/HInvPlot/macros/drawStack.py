@@ -501,7 +501,7 @@ def getStyle(sample):
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
     color_wgamewk = ROOT.kOrange-5
-    color_zgamewk = ROOT.kOrange-6    
+    color_zgamewk = ROOT.kOrange-6 
     color_ttg = ROOT.kBlue   -9
     color_pho = ROOT.kGreen -3  
     color_wdpi = ROOT.kOrange-5
@@ -530,8 +530,8 @@ def getStyle(sample):
         'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'wgam':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'zgamewk':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
-        'wgamewk':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'zgamewk':{'color':color_zgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'wgamewk':{'color':color_wgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
