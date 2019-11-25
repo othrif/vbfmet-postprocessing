@@ -774,7 +774,7 @@ StatusCode VBFAnalysisAlg::execute() {
       //std::set<int> mg_w_incl_highHT = {363615,363616,};
       //std::map<int,int> mg_w_LF_map = {{311445,363606},{311446,363630},{311447,363609},{311448,363633},{311449,363654},{311450,363657}};
       std::map<int,int> mg_w_LF_map = {{311445,363606},{311448,363633},{311449,363654},{311450,363657}};
-      if(runNumber==311446 || runNumber==311447) {  weight=-1;  return StatusCode::SUCCESS; } 
+      if(runNumber==311446 || runNumber==311447) {  weight=-1;  return StatusCode::SUCCESS; }
       std::map<int,int> mg_w_LF_map_rev;
       for(std::map<int,int>::iterator it = mg_w_LF_map.begin(); it!=mg_w_LF_map.end(); ++it) { mg_w_LF_map_rev[it->second] = it->first; }
 
@@ -1018,7 +1018,7 @@ StatusCode VBFAnalysisAlg::execute() {
      (runNumber>=366010 && runNumber<=366035) || // Znn ptvmjj
      (runNumber>=364156 && runNumber<=364169) || // Wmunu MAXPTHT
      (runNumber>=364170 && runNumber<=364183) || // Wenu MAXPTHT
-     (runNumber>=364184 && runNumber<=364197)){  // Wtaunu MAXPTHT  
+     (runNumber>=364184 && runNumber<=364197)){  // Wtaunu MAXPTHT
     if(SherpaVTruthPt<100.0e3) passVjetsPTV=true; // keep if pTV>100
     //else if(SherpaVTruthPt>500.0e3) passVjetsPTV=true; // remove if pTV>500 // these should come from the PTV samples
     else passVjetsPTV = false;

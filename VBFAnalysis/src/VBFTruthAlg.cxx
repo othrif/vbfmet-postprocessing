@@ -390,17 +390,11 @@ if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > 150e3)
 if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > 150e3) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiLow = true;
 if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiLow = true;
 
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.8) & (new_met_et > 150e3) & (new_nels == 0) & (new_nmus == 0))            SRPhiLow= true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.8) & (new_met_nolep_et > 150e3) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.8) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.8) & (new_met_nolep_et > 150e3) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.8) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiLow = true;
-
-if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 1.8) & (new_met_et > 150e3) & (new_nels == 0) & (new_nmus == 0))            SRNjet    = true;
-if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 1.8) & (new_met_nolep_et > 150e3) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZNjet = true;
-if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 1.8) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZNjet = true;
-if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 1.8) & (new_met_nolep_et > 150e3) & (new_nels == 1) & (new_nmus == 0) )           CRWNjet = true;
-if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 1.8) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
+if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_et > 150e3) & (new_nels == 0) & (new_nmus == 0))            SRNjet    = true;
+if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZNjet = true;
+if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZNjet = true;
+if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 1) & (new_nmus == 0) )           CRWNjet = true;
+if (vbfSkim & (2 < new_njets & new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
 
 std::map<TString,bool> regDecision;
 regDecision["Incl"]=true;

@@ -950,14 +950,14 @@ def main(argv):
 
     # Add branches
     T = f.Get(treeName)
-    ckkw15branch = T.Branch("ckkw15_Weight", ckkw15,"ckkw15_Weight/F")
-    ckkw30branch = T.Branch("ckkw30_Weight", ckkw30,"ckkw30_Weight/F")
-    fac025branch = T.Branch("fac025_Weight", fac025,"fac025_Weight/F")
-    fac4branch = T.Branch("fac4_Weight", fac4,"fac4_Weight/F")
-    renorm025branch = T.Branch("renorm025_Weight", renorm025,"renorm025_Weight/F")
-    renorm4branch = T.Branch("renorm4_Weight", renorm4,"renorm4_Weight/F")
-    qsf025branch = T.Branch("qsf025_Weight", qsf025,"qsf025_Weight/F")
-    qsf4branch = T.Branch("qsf4_Weight", qsf4,"qsf4_Weight/F")
+    ckkw15branch = T.Branch("wvjets_ckkw15", ckkw15,"wvjets_ckkw15/F")
+    ckkw30branch = T.Branch("wvjets_ckkw30", ckkw30,"wvjets_ckkw30/F")
+    fac025branch = T.Branch("wvjets_fac025", fac025,"wvjets_fac025/F")
+    fac4branch = T.Branch("wvjets_fac4", fac4,"wvjets_fac4/F")
+    renorm025branch = T.Branch("wvjets_renorm025", renorm025,"wvjets_renorm025/F")
+    renorm4branch = T.Branch("wvjets_renorm4", renorm4,"wvjets_renorm4/F")
+    qsf025branch = T.Branch("wvjets_qsf025", qsf025,"wvjets_qsf025/F")
+    qsf4branch = T.Branch("wvjets_qsf4", qsf4,"wvjets_qsf4/F")
 
     print "Adding Weights"
     nEvts = T.GetEntries()
@@ -970,13 +970,15 @@ def main(argv):
 
         MCID = T.runNumber
         nTruthJets = T.n_jet_truth
+        weight = T.w
 
         decayType = "none"
 
         # Find the Decay type
         if ((MCID >= 361372 and MCID <= 361443) or (MCID >= 363102 and MCID <= 363122) or (MCID >= 363361 and MCID <= 363363) or (MCID >= 363364 and MCID <= 363411) or (MCID >= 364100 and MCID <= 364141) or (MCID >= 364218 and MCID <=364219) or (MCID >= 364216 and MCID <=364217) or (MCID >= 364220 and MCID <=364221)   ):
             decayType = "Zee"
-            #        if ((MCID >= 361444 and MCID <= 361467) or (MCID >= 363412 and MCID <= 363435) or (MCID >= 364142 and MCID <= 364155)  ): #OLD ZNUNU SAMPLES
+        if ((MCID >= 361444 and MCID <= 361467) or (MCID >= 363412 and MCID <= 363435) or (MCID >= 364142 and MCID <= 364155)  ): #OLD ZNUNU SAMPLES
+            decayType = "Znunu"
         if ((MCID >= 361444 and MCID <= 361467) or (MCID >= 366010 and MCID <= 366035) or (MCID>=364222 and MCID<=364223) ): #NEW ZNUNU SAMPLES
             decayType = "Znunu"
             if iEvt%1000 == 0:
@@ -1012,32 +1014,32 @@ def main(argv):
         else:
             if (ZpTBin<10): #Due to difference in filtering between samples we use and CKKW reweighting samples, some samples are reweighted with a mix of 2 CKKW reweighting samples. These are indicated by being >1 digits long, with each digit being a different reweighting sample
                 if decayType == "Zee":
-                    ckkw15[0] = ZeeHistograms[0].GetBinContent(ZpTBin,TruthJetBin)
-                    ckkw30[0] =  ZeeHistograms[1].GetBinContent(ZpTBin,TruthJetBin)
-                    fac025[0] =  ZeeHistograms[2].GetBinContent(ZpTBin,TruthJetBin)
-                    fac4[0] =  ZeeHistograms[3].GetBinContent(ZpTBin,TruthJetBin)
-                    renorm025[0] =  ZeeHistograms[4].GetBinContent(ZpTBin,TruthJetBin)
-                    renorm4[0] =  ZeeHistograms[5].GetBinContent(ZpTBin,TruthJetBin)
-                    qsf025[0] =  ZeeHistograms[6].GetBinContent(ZpTBin,TruthJetBin)
-                    qsf4[0] =  ZeeHistograms[7].GetBinContent(ZpTBin,TruthJetBin)
+                    ckkw15[0] =     weight*ZeeHistograms[0].GetBinContent(ZpTBin,TruthJetBin)
+                    ckkw30[0] =     weight*ZeeHistograms[1].GetBinContent(ZpTBin,TruthJetBin)
+                    fac025[0] =     weight*ZeeHistograms[2].GetBinContent(ZpTBin,TruthJetBin)
+                    fac4[0] =       weight*ZeeHistograms[3].GetBinContent(ZpTBin,TruthJetBin)
+                    renorm025[0] =  weight*ZeeHistograms[4].GetBinContent(ZpTBin,TruthJetBin)
+                    renorm4[0] =    weight*ZeeHistograms[5].GetBinContent(ZpTBin,TruthJetBin)
+                    qsf025[0] =     weight*ZeeHistograms[6].GetBinContent(ZpTBin,TruthJetBin)
+                    qsf4[0] =       weight*ZeeHistograms[7].GetBinContent(ZpTBin,TruthJetBin)
                 elif decayType == "Znunu":
-                    ckkw15[0] = ZnunuHistograms[0].GetBinContent(ZpTBin,TruthJetBin)
-                    ckkw30[0] =  ZnunuHistograms[1].GetBinContent(ZpTBin,TruthJetBin)
-                    fac025[0] =  ZnunuHistograms[2].GetBinContent(ZpTBin,TruthJetBin)
-                    fac4[0] =  ZnunuHistograms[3].GetBinContent(ZpTBin,TruthJetBin)
-                    renorm025[0] =  ZnunuHistograms[4].GetBinContent(ZpTBin,TruthJetBin)
-                    renorm4[0] =  ZnunuHistograms[5].GetBinContent(ZpTBin,TruthJetBin)
-                    qsf025[0] =  ZnunuHistograms[6].GetBinContent(ZpTBin,TruthJetBin)
-                    qsf4[0] =  ZnunuHistograms[7].GetBinContent(ZpTBin,TruthJetBin)
+                    ckkw15[0] =     weight*ZnunuHistograms[0].GetBinContent(ZpTBin,TruthJetBin)
+                    ckkw30[0] =     weight*ZnunuHistograms[1].GetBinContent(ZpTBin,TruthJetBin)
+                    fac025[0] =     weight*ZnunuHistograms[2].GetBinContent(ZpTBin,TruthJetBin)
+                    fac4[0] =       weight*ZnunuHistograms[3].GetBinContent(ZpTBin,TruthJetBin)
+                    renorm025[0] =  weight*ZnunuHistograms[4].GetBinContent(ZpTBin,TruthJetBin)
+                    renorm4[0] =    weight*ZnunuHistograms[5].GetBinContent(ZpTBin,TruthJetBin)
+                    qsf025[0] =     weight*ZnunuHistograms[6].GetBinContent(ZpTBin,TruthJetBin)
+                    qsf4[0] =       weight*ZnunuHistograms[7].GetBinContent(ZpTBin,TruthJetBin)
                 elif decayType == "Wenu":
-                    ckkw15[0] = WenuHistograms[0].GetBinContent(ZpTBin,TruthJetBin)
-                    ckkw30[0] =  WenuHistograms[1].GetBinContent(ZpTBin,TruthJetBin)
-                    fac025[0] =  WenuHistograms[2].GetBinContent(ZpTBin,TruthJetBin)
-                    fac4[0] =  WenuHistograms[3].GetBinContent(ZpTBin,TruthJetBin)
-                    renorm025[0] =  WenuHistograms[4].GetBinContent(ZpTBin,TruthJetBin)
-                    renorm4[0] =  WenuHistograms[5].GetBinContent(ZpTBin,TruthJetBin)
-                    qsf025[0] =  WenuHistograms[6].GetBinContent(ZpTBin,TruthJetBin)
-                    qsf4[0] =  WenuHistograms[7].GetBinContent(ZpTBin,TruthJetBin)
+                    ckkw15[0] =     weight*WenuHistograms[0].GetBinContent(ZpTBin,TruthJetBin)
+                    ckkw30[0] =     weight*WenuHistograms[1].GetBinContent(ZpTBin,TruthJetBin)
+                    fac025[0] =     weight*WenuHistograms[2].GetBinContent(ZpTBin,TruthJetBin)
+                    fac4[0] =       weight*WenuHistograms[3].GetBinContent(ZpTBin,TruthJetBin)
+                    renorm025[0] =  weight*WenuHistograms[4].GetBinContent(ZpTBin,TruthJetBin)
+                    renorm4[0] =    weight*WenuHistograms[5].GetBinContent(ZpTBin,TruthJetBin)
+                    qsf025[0] =     weight*WenuHistograms[6].GetBinContent(ZpTBin,TruthJetBin)
+                    qsf4[0] =       weight*WenuHistograms[7].GetBinContent(ZpTBin,TruthJetBin)
                 else:
                     exit(0)
                 if iEvt%1000 == 0:
@@ -1048,32 +1050,32 @@ def main(argv):
                 ZpTBin1 = int(ZpTBinString[0])
                 ZpTBin2 = int(ZpTBinString[1])
                 if decayType == "Zee":
-                    ckkw15[0]    = (ZeeHistograms[0].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[0].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    ckkw30[0]    = (ZeeHistograms[1].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[1].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    fac025[0]    = (ZeeHistograms[2].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[2].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    fac4[0]      = (ZeeHistograms[3].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[3].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    renorm025[0] = (ZeeHistograms[4].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[4].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    renorm4[0]   = (ZeeHistograms[5].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[5].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    qsf025[0]    = (ZeeHistograms[6].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[6].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    qsf4[0]      = (ZeeHistograms[7].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[7].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    ckkw15[0]    = weight*(ZeeHistograms[0].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[0].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    ckkw30[0]    = weight*(ZeeHistograms[1].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[1].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    fac025[0]    = weight*(ZeeHistograms[2].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[2].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    fac4[0]      = weight*(ZeeHistograms[3].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[3].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    renorm025[0] = weight*(ZeeHistograms[4].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[4].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    renorm4[0]   = weight*(ZeeHistograms[5].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[5].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    qsf025[0]    = weight*(ZeeHistograms[6].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[6].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    qsf4[0]      = weight*(ZeeHistograms[7].GetBinContent(ZpTBin1,TruthJetBin)+ZeeHistograms[7].GetBinContent(ZpTBin2,TruthJetBin))/2
                 elif decayType == "Znunu":
-                    ckkw15[0]    = (ZnunuHistograms[0].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[0].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    ckkw30[0]    = (ZnunuHistograms[1].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[1].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    fac025[0]    = (ZnunuHistograms[2].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[2].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    fac4[0]      = (ZnunuHistograms[3].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[3].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    renorm025[0] = (ZnunuHistograms[4].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[4].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    renorm4[0]   = (ZnunuHistograms[5].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[5].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    qsf025[0]    = (ZnunuHistograms[6].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[6].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    qsf4[0]      = (ZnunuHistograms[7].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[7].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    ckkw15[0]    = weight*(ZnunuHistograms[0].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[0].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    ckkw30[0]    = weight*(ZnunuHistograms[1].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[1].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    fac025[0]    = weight*(ZnunuHistograms[2].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[2].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    fac4[0]      = weight*(ZnunuHistograms[3].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[3].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    renorm025[0] = weight*(ZnunuHistograms[4].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[4].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    renorm4[0]   = weight*(ZnunuHistograms[5].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[5].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    qsf025[0]    = weight*(ZnunuHistograms[6].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[6].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    qsf4[0]      = weight*(ZnunuHistograms[7].GetBinContent(ZpTBin1,TruthJetBin) + ZnunuHistograms[7].GetBinContent(ZpTBin2,TruthJetBin))/2
                 elif decayType == "Wenu":
-                    ckkw15[0]    = (WenuHistograms[0].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[0].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    ckkw30[0]    = (WenuHistograms[1].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[1].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    fac025[0]    = (WenuHistograms[2].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[2].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    fac4[0]      = (WenuHistograms[3].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[3].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    renorm025[0] = (WenuHistograms[4].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[4].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    renorm4[0]   = (WenuHistograms[5].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[5].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    qsf025[0]    = (WenuHistograms[6].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[6].GetBinContent(ZpTBin2,TruthJetBin))/2
-                    qsf4[0]      = (WenuHistograms[7].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[7].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    ckkw15[0]    = weight*(WenuHistograms[0].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[0].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    ckkw30[0]    = weight*(WenuHistograms[1].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[1].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    fac025[0]    = weight*(WenuHistograms[2].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[2].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    fac4[0]      = weight*(WenuHistograms[3].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[3].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    renorm025[0] = weight*(WenuHistograms[4].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[4].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    renorm4[0]   = weight*(WenuHistograms[5].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[5].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    qsf025[0]    = weight*(WenuHistograms[6].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[6].GetBinContent(ZpTBin2,TruthJetBin))/2
+                    qsf4[0]      = weight*(WenuHistograms[7].GetBinContent(ZpTBin1,TruthJetBin) + WenuHistograms[7].GetBinContent(ZpTBin2,TruthJetBin))/2
                 else:
                     exit(0)
                 if iEvt%1000 == 0:
