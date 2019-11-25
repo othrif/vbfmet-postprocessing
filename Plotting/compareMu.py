@@ -93,9 +93,11 @@ if "SR" in labels:
 	sr2=labels.index("SR")
 else:
 	sr2=len(dataHists)+1#is never reached
+nolep=labels.index("0LVR-MJ")
+nolepmj=labels.index("0LVR")
 
 for i in range(len(dataHists)):
-	if i!=sr and i!=sr2:# and names[i].find("nomj")<=0:
+	if i!=sr and i!=sr2 and names[i].find("nomj")<=0:
 		dataHists[i].Draw("SAME HIST E1")
 		dataHists[i].SetStats(0)
 		dataHists[i].SetLineColor(i+1)
@@ -109,7 +111,6 @@ ATLASLabel(0.65, 0.65, "Internal")
 dataHists[0].SetMaximum(ymax(dataHists))
 dataHists[0].SetTitle("2018 Data;averageIntPerXing;Entries")
 legend.Draw()
-dataCanvas.SaveAs("compareMu_data_"+outName+".png")
 
 legend2=TLegend(0.7,0.7,0.9,0.9)
 bkgdCanvas=TCanvas("bkgdCanvas","bkgdCanvas",600,600)
@@ -127,14 +128,12 @@ ATLASLabel(0.65, 0.65, "Internal")
 bkgdHists[0].SetMaximum(ymax(bkgdHists))
 bkgdHists[0].SetTitle("Sum of Backgrounds (+QCD);averageIntPerXing;Entries")
 legend2.Draw()
-bkgdCanvas.SaveAs("compareMu_bkgd_"+outName+".png")
 
 
 
 
 print "Computing ratios with respect to 0LVR-MJ"
 #area normalize ratio wrt 0lvr
-nolep=labels.index("0LVR-MJ")
 dataHistsRatio[nolep].Scale(1/dataHistsRatio[nolep].Integral())
 bkgdHistsRatio[nolep].Scale(1/bkgdHistsRatio[nolep].Integral())
 for i in range(len(dataHistsNorm)):
@@ -153,7 +152,7 @@ dataCanvasNorm=TCanvas("dataCanvasNorm","dataCanvasNorm",600,800)
 dataCanvasNorm.Divide(1,2,0,0)
 dataCanvasNorm.cd(1)
 for i in range(len(dataHistsNorm)):
-	if i!=sr and i!=sr2:# and names[i].find("nomj")<=0:
+	if i!=sr and i!=sr2 and i!=nolep:
 		dataHistsNorm[i].Draw("SAME HIST E1")
 		dataHistsNorm[i].SetStats(0)
 		dataHistsNorm[i].SetLineColor(i+1)
@@ -167,14 +166,13 @@ dataHistsNorm[0].SetTitle("Area Normalized Data; ; Normalized Entries")
 legend.Draw()
 dataCanvasNorm.cd(2)
 for j in range(len(dataHistsRatio)):
-	if j!=sr and j!=sr2:# and names[j].find("nomj")<=0:
+	if j!=sr and j!=sr2 and j!=nolep:
 		dataHistsRatio[j].Draw("SAME HIST")
 		dataHistsRatio[j].SetStats(0)
 		dataHistsRatio[j].SetLineColor(j+1)
 		dataHistsRatio[j].SetMarkerSize(0)
-dataHistsRatio[0].SetTitle(" ; averageIntPerXing (#mu); Ratio (region / 0LVR)")
+dataHistsRatio[0].SetTitle(" ; averageIntPerXing (#mu); Ratio (region / 0LVR-MJ)")
 dataHistsRatio[0].GetYaxis().SetRangeUser(0,2)
-dataCanvasNorm.SaveAs("compareMu_dataNorm_"+outName+".png")
 
 
 bkgdCanvasNorm=TCanvas("bkgdCanvasNorm","bkgdCanvasNorm",600,800)
@@ -198,7 +196,13 @@ for j in range(len(bkgdHistsRatio)):
 	bkgdHistsRatio[j].SetStats(0)
 	bkgdHistsRatio[j].SetLineColor(j+1)
 	bkgdHistsRatio[j].SetMarkerSize(0)
-bkgdHistsRatio[0].SetTitle(" ; averageIntPerXing (#mu); Ratio (region / 0LVR)")
+bkgdHistsRatio[0].SetTitle(" ; averageIntPerXing (#mu); Ratio (region / 0LVR-MJ)")
 bkgdHistsRatio[0].GetYaxis().SetRangeUser(0,2)
+
+os.system("mkdir compareMuOutput_"+outName)
+dataCanvas.SaveAs("compareMu_data_"+outName+".png")
+bkgdCanvas.SaveAs("compareMu_bkgd_"+outName+".png")
+dataCanvasNorm.SaveAs("compareMu_dataNorm_"+outName+".png")
 bkgdCanvasNorm.SaveAs("compareMu_bkgdNorm_"+outName+".png")
+os.system("mv *.png compareMuOutput_"+outName)
 
