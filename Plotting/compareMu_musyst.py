@@ -32,6 +32,8 @@ inDir=sys.argv[1]
 if inDir[-1]!='/':
         inDir+='/'
 
+outName=sys.argv[2]
+
 inFiles=os.listdir(inDir)
 inFiles.sort(key=str.lower)#alphebetize
 fileSets=len(inFiles)/3.
@@ -49,6 +51,7 @@ for infile in inFiles:
 		count+=1	
 
 	in_tmp=ROOT.TFile(inDir+infile,"READ")
+	print in_tmp
 	data=in_tmp.Get("data_averageIntPerXing")
 	data.SetDirectory(0)
 	dataHists[count].append(data)
@@ -166,4 +169,7 @@ for i in range(len(bkgdGraph)):
 	myText(0.65, 0.7, 1, labels[i])
 	legend.SetBorderSize(0)
 	legend.Draw()
-	canvas[i].SaveAs("musyst_"+labels[i]+".png")
+	canvas[i].SaveAs("musyst_"+labels[i]+str(i)+".png")
+
+os.system("mkdir compareMuOutput_musyst_"+outName)
+os.system("mv *.png compareMuOutput_musyst_"+outName)
