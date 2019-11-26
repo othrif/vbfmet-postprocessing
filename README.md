@@ -78,9 +78,9 @@ athena VBFAnalysis/HFInputJobOptions.py --evtMax 10 --filesInput /eos/user/r/rzo
 For running on condor:
 ```bash
 # run on condor over all the contributions and nominal only
-submitHFInputCondor.py -n
+submitHFInputCondor.py --mergeKTPTV --extraVars 7 --Binning 11 -d submitTest -i /home/schae/testarea/HInv/runSherpa227/v34ATight120/ -n --slc7
 # run on condor over all the contributions and systematics
-submitHFInputCondor.py
+submitHFInputCondor.py --mergeKTPTV --extraVars 7 --Binning 11 -d submitTest -i /home/schae/testarea/HInv/runSherpa227/v34ATight120/ --slc7
 ```
 You can change the list of systematics in VBFAnalysis/python/systematics.py and list of contributions in VBFAnalysis/python/sample.py.
 

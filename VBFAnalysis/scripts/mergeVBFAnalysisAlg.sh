@@ -1,7 +1,7 @@
 #!/bin/bash                                                                                                                                                                                                       
 #OUTDIRM=/share/t3data2/schae/v32ETight
 #OUTDIRM=${1:-v34mc16a}
-OUTDIRM=v34ELooseNoPileupWeightNoHemi
+OUTDIRM=v34ATight120
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
@@ -44,10 +44,10 @@ hadd $OUTDIRM/Zg_EWK.root  Zg_EWK*.root
 hadd $OUTDIRM/Wg_EWK.root  Wg_EWK*.root
 hadd $OUTDIRM/TTH125.root  TTH125*.root
 
-#hadd $OUTDIRM/Wg_strong.root Wg_strong*root
-#hadd $OUTDIRM/Zg_strong.root Zg_strong*root
-#hadd $OUTDIRM/ttg.root ttg*root
+hadd $OUTDIRM/Wg_strong.root Wg_strong*root
+hadd $OUTDIRM/Zg_strong.root Zg_strong*root
+hadd $OUTDIRM/ttg.root ttg*root
 #hadd $OUTDIRM/SinglePhotonBCL.root SinglePhotonBCL*root
 #rm SinglePhotonBCL*root
-#hadd $OUTDIRM/SinglePhoton.root SinglePhoton*root
-#hadd $OUTDIRM/VqqGam.root VqqGam*root
+hadd $OUTDIRM/SinglePhoton.root SinglePhoton*root
+hadd $OUTDIRM/VqqGam.root VqqGam*root
