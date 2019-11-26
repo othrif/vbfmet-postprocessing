@@ -28,11 +28,17 @@ def ymaxArray(array):
 
 SetAtlasStyle()
 
+print "To draw PRW systematics as a band (rather than cross error bars), call program with argument \"bands\" "
+
 inDir=sys.argv[1]
 if inDir[-1]!='/':
         inDir+='/'
 
-outName=sys.argv[2]
+print len(sys.argv)
+bands=False
+if len(sys.argv)==3:
+	if sys.argv[2]=="bands":
+		bands=True
 
 inFiles=os.listdir(inDir)
 inFiles.sort(key=str.lower)#alphebetize
@@ -51,7 +57,7 @@ for infile in inFiles:
 		count+=1	
 
 	in_tmp=ROOT.TFile(inDir+infile,"READ")
-	print in_tmp
+	#print in_tmp
 	data=in_tmp.Get("data_averageIntPerXing")
 	data.SetDirectory(0)
 	dataHists[count].append(data)
@@ -108,44 +114,48 @@ for i in range(len(bkgdHists)):
 
 
 labels=[]
+analysis=[]
 for infile in names:
-	if infile.find("nomj")>0:
-		if infile.find("allmjj")>0 and infile[infile.find("allmjj")+7]=="n":
-			labels.append("SR-MJ")
-		elif infile.find("mjjLow200")>0 and infile[infile.find("mjjLow200")+10]=="n":#0lvr
-			labels.append("0LVR-MJ")
-		elif infile.find("njgt")>0 and infile[infile.find("njgt")+5]=="n":
-			labels.append("SR-MJ")
-		elif infile.find("mjjLowNjetFJVT")>0 and infile[infile.find("mjjLowNjetFJVT")+15]=="n":#0lvr
-			labels.append("0LVR-MJ")
-		
-	else:
-		if infile.find("allmjj")>0 and infile[infile.find("allmjj")+7]!="n":
+	if infile.find("allmjj")>0:
+		analysis.append("allmjj")
+		if infile[infile.find("allmjj")+7]!="n":
 			labels.append("WCR_"+infile[infile.find("allmjj")+7])
-		elif infile.find("allmjj")>0 and infile[infile.find("allmjj")+7]=="n":
+		elif infile[infile.find("allmjj")+7]=="n":
 			labels.append("SR")
-		elif infile.find("mjjLow200")>0 and infile[infile.find("mjjLow200")+10]!="n":#1lvr
+	elif infile.find("mjjLow200")>0:
+		analysis.append("mjjLow200")
+		if infile[infile.find("mjjLow200")+10]!="n":#1lvr
 			labels.append("1LVR_"+infile[infile.find("mjjLow200")+10])
-		elif infile.find("mjjLow200")>0 and infile[infile.find("mjjLow200")+10]=="n":#0lvr
+		elif infile[infile.find("mjjLow200")+10]=="n":#0lvr
 			labels.append("0LVR")
-		elif infile.find("njgt")>0 and infile[infile.find("njgt")+5]!="n":
-			labels.append("WCR_"+infile[infile.find("njgt")+5])
-		elif infile.find("njgt")>0 and infile[infile.find("njgt")+5]=="n":
+	elif infile.find("njgt4")>0:
+		analysis.append("njgt4")
+		if infile[infile.find("njgt4")+6]!="n":
+			labels.append("WCR_"+infile[infile.find("njgt4")+6])
+		elif infile[infile.find("njgt4")+6]=="n":
 			labels.append("SR")
-		elif infile.find("mjjLowNjetFJVT")>0 and infile[infile.find("mjjLowNjetFJVT")+15]!="n":#1lvr
+	elif infile.find("mjjLowNjetFJVT")>0:
+		analysis.append("mjjLowNjetFJVT")
+		if infile[infile.find("mjjLowNjetFJVT")+15]!="n":#1lvr
 			labels.append("1LVR_"+infile[infile.find("mjjLowNjetFJVT")+15])
-		elif infile.find("mjjLowNjetFJVT")>0 and infile[infile.find("mjjLowNjetFJVT")+15]=="n":#0lvr
+		elif infile[infile.find("mjjLowNjetFJVT")+15]=="n":#0lvr
+			labels.append("0LVR")
+	elif infile.find("njgt")>0:
+		analysis.append("njgt")
+		if infile[infile.find("njgt")+5]!="n":
+			labels.append("WCR_"+infile[infile.find("njgt")+5])
+		elif infile[infile.find("njgt")+5]=="n":
+			labels.append("SR")
+	elif infile.find("mjjLowNjet")>0:
+		analysis.append("mjjLowNjet")
+		if infile[infile.find("mjjLowNjet")+11]!="n":#1lvr
+			labels.append("1LVR_"+infile[infile.find("mjjLowNjet")+11])
+		elif infile[infile.find("mjjLowNjet")+11]=="n":#0lvr
 			labels.append("0LVR")
 
-
-if "SR-MJ" in labels:
-	sr=labels.index("SR-MJ")
-else:
-	sr=len(names)+1#is never reached
+sr=[]
 if "SR" in labels:
-	sr2=labels.index("SR")
-else:
-	sr2=len(names)+1#is never reached
+	sr.append(labels.index("SR"))
 
 stackGraph=[]
 canvas=[]
@@ -154,9 +164,16 @@ legend.AddEntry(bkgdGraph[0],"All backgrounds-MJ",'l')
 legend.AddEntry(dataGraphNom[0],"Data",'p')
 for i in range(len(bkgdGraph)):
 	stackGraph.append(TMultiGraph())
-	bkgdGraph[i].SetMarkerSize(0)
-	stackGraph[i].Add(bkgdGraph[i],"ap")
-	if i!=sr and i!=sr2:
+	if bands:
+		bkgdGraph[i].SetFillColor(kBlack)
+		bkgdGraph[i].SetFillStyle(3003)
+		stackGraph[i].Add(bkgdGraph[i],"a3")
+		stackGraph[i].Add(bkgdGraphNom[i],"C")
+		bkgdGraph[i].SetMarkerSize(0)
+	else:
+		bkgdGraph[i].SetMarkerSize(0)
+		stackGraph[i].Add(bkgdGraph[i],"ap")
+	if len(sr)>0 and i not in sr:
 		stackGraph[i].Add(dataGraphNom[i],"P")
 
 	canvas.append(TCanvas("canvas"+str(i),"canvas"+str(i),600,600))
@@ -169,7 +186,11 @@ for i in range(len(bkgdGraph)):
 	myText(0.65, 0.7, 1, labels[i])
 	legend.SetBorderSize(0)
 	legend.Draw()
-	canvas[i].SaveAs("musyst_"+labels[i]+str(i)+".png")
+	if bands:
+		canvas[i].SaveAs("musyst_"+analysis[i]+"_"+labels[i]+"_bands.png")
+	else:
+		canvas[i].SaveAs("musyst_"+analysis[i]+"_"+labels[i]+".png")
 
-os.system("mkdir compareMuOutput_musyst_"+outName)
-os.system("mv *.png compareMuOutput_musyst_"+outName)
+if not os.path.exists("compareMuOutput_musyst"):
+	os.system("mkdir compareMuOutput_musyst")
+os.system("mv *.png compareMuOutput_musyst")
