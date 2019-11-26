@@ -65,16 +65,17 @@ StatusCode VBFAnalysisAlg::initialize() {
     my_signalSystHelper.initialize();
 
     // Vjets weight + systematics
-    if(m_isMC && m_currentVariation=="Nominal")
-      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
-      std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
-      my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
-      my_vjSystHelper.applyEWCorrection(true);
-      my_vjSystHelper.applyQCDCorrection(true);
-      my_vjSystHelper.mergePDF(true);
-      my_vjSystHelper.smoothQCDCorrection(false);
-      my_vjSystHelper.initialize();
-      m_vjVariations = my_vjSystHelper.getAllVariationNames();
+    if(m_isMC && m_currentVariation=="Nominal"){
+      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
+	std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
+	my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
+	my_vjSystHelper.applyEWCorrection(true);
+	my_vjSystHelper.applyQCDCorrection(true);
+	my_vjSystHelper.mergePDF(true);
+	my_vjSystHelper.smoothQCDCorrection(false);
+	my_vjSystHelper.initialize();
+	m_vjVariations = my_vjSystHelper.getAllVariationNames();
+      }
     }
 
     // qg tagging
@@ -549,7 +550,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //Vjets weight and systematics
   vjWeight = 1.0;
 
-  if ( m_isMC  && (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos )) {
+  if ( m_isMC  && (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos )) {
     // Nominal
     vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(0));
     // Variations
@@ -669,7 +670,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
-  if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
+  if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567 || runNumber==308276)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
     //nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;// tighter mjj>1TeV
     nloEWKWeight=1.0 - 0.000350*(met_truth_et/1.0e3) - 0.0430;
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
@@ -681,7 +682,7 @@ StatusCode VBFAnalysisAlg::execute() {
     float up = -0.000333*(met_truth_et/1.0e3) - 0.0450;
     float down = -0.000366 *(met_truth_et/1.0e3) - 0.0410;
     float syst = fabs(up-down)/2.0;
-    if(m_currentVariation=="Nominal"){
+    if(m_currentVariation=="Nominal"){ 
       tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
       tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
     }
@@ -719,6 +720,9 @@ StatusCode VBFAnalysisAlg::execute() {
     }
     puSyst2018Weight=1.0;
   } // end pileup weight systematic
+
+  // "calibrate" the data mu
+  if(!m_isMC) averageIntPerXing/=1.03;
 
   if (m_isMC){
     // hack for when the cross-section code messed up
@@ -1359,15 +1363,17 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       if(m_runNumberInput==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);
       if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);// filtered Sherpa samples use nnPDF
 
-      if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
-        tMapFloat["nloEWKWeight__1up"]=1.0;
-        tMapFloatW["nloEWKWeight__1up"]=1.0;
-        m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
-      }
-      if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
-	tMapFloat["nloEWKWeight__1down"]=1.0;
-	tMapFloatW["nloEWKWeight__1down"]=1.0;
-	m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
+      if(m_runNumberInput==346600 || m_runNumberInput==308276 || m_runNumberInput==308567) {
+	if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
+	  tMapFloat["nloEWKWeight__1up"]=1.0;
+	  tMapFloatW["nloEWKWeight__1up"]=1.0;
+	  m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
+	}
+	if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
+	  tMapFloat["nloEWKWeight__1down"]=1.0;
+	  tMapFloatW["nloEWKWeight__1down"]=1.0;
+	  m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
+	}
       }
       if(tMapFloat.find("puSyst2018Weight__1up")==tMapFloat.end()){
 	tMapFloat ["puSyst2018Weight__1up"]=1.0;
@@ -1380,12 +1386,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
       }
       if(tMapFloat.find("puSyst2018Weight__1down")==tMapFloat.end()){
-  tMapFloat ["puSyst2018Weight__1down"]=1.0;
-  tMapFloatW["puSyst2018Weight__1down"]=1.0;
-  m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
+	tMapFloat ["puSyst2018Weight__1down"]=1.0;
+	tMapFloatW["puSyst2018Weight__1down"]=1.0;
+	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
       }
-
-
+      // QG inputs
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){
 	  tMapFloat[m_qgVars.at(iQG)]=1.0;
@@ -1394,17 +1399,18 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	}
       }// end qg variables
 
-    // Vjets weight + systematics
-    for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){
-      if(tMapFloat.find(m_vjVariations.at(iVj))==tMapFloat.end()){
-        tMapFloat[m_vjVariations.at(iVj)]=1.0;
-        tMapFloatW[m_vjVariations.at(iVj)]=1.0;
-        m_tree_out->Branch("w"+m_vjVariations.at(iVj),&(tMapFloatW[m_vjVariations.at(iVj)]));
-      }
-      }// end Vjets variations
-
-    }
-  }
+      // Vjets weight + systematics
+      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
+	for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){
+	  if(tMapFloat.find(m_vjVariations.at(iVj))==tMapFloat.end()){
+	    tMapFloat[m_vjVariations.at(iVj)]=1.0;
+	    tMapFloatW[m_vjVariations.at(iVj)]=1.0;
+	    m_tree_out->Branch("w"+m_vjVariations.at(iVj),&(tMapFloatW[m_vjVariations.at(iVj)]));
+	  }
+	}// end Vjets variations
+      }// end check that this is a vjets sample
+    } // end this is nominal
+  }// end this is MC
 
   m_tree->SetBranchStatus("runNumber", 1);
   m_tree->SetBranchStatus("randomRunNumber", 1);
