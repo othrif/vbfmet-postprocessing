@@ -46,7 +46,7 @@ p.add_option('--draw-norm',     action='store_true', default=False,   dest='draw
 p.add_option('--do-ratio',      action='store_true', default=False,   dest='do_ratio')
 p.add_option('--force-ratio',   action='store_true', default=False,   dest='force_ratio')
 p.add_option('--stack-signal',  action='store_true', default=False,   dest='stack_signal')
-p.add_option('--ph-ana',  action='store_true', default=False,   dest='ph_ana')
+p.add_option('--ph-ana',        action='store_true', default=False,   dest='ph_ana')
 
 p.add_option('--debug',         action='store_true', default=False,   dest='debug')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
@@ -266,7 +266,7 @@ def getHistPars(hist):
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
         'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':False},
-    'met_cst_jet'     : {'xtitle':'CST Jet MET [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':0.1},
+    'met_cst_jet'     : {'xtitle':'E_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
@@ -274,6 +274,10 @@ def getHistPars(hist):
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_mass'     : {'xtitle':'Truth m_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_deta'     : {'xtitle':'Truth #Delta#eta_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_jj_dphi'     : {'xtitle':'Truth #Delta#phi_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_j1_pt'     : {'xtitle':'Truth lead Jet p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_j2_pt'     : {'xtitle':'Truth lead Jet p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'SherpaVTruthPt'     : {'xtitle':'Sherpa p_{T} V [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},                
     'truthJet1Pt'     : {'xtitle':'Truth sub-lead Jet p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'nTruthJetMatch'     : {'xtitle':'Number of Truth Matched Jets'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_baseel'     : {'xtitle':'Number of Base Electrons'   ,         'ytitle':'Events',   'ymin':0.1},

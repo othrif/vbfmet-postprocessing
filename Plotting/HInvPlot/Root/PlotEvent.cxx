@@ -19,6 +19,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hTruthTauPt(0), hTruthTauEta(0),
 				  hminDRLep(0),
 				  hjj_mass_variableBin(0),
+				  htruth_jj_mass_variableBin(0),
 				  htmva_variableBin(0),
 				  hmj34(0),
 				  hmax_j_eta(0),
@@ -41,7 +42,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hjj_deta_signed(0),
 				  hjj_deta_diff(0),
 				  hjj_deta_abs(0),
-				  hZMCIDQCD(0), hWMCIDQCD(0),
+				  hZMCIDQCD(0), hWMCIDQCD(0),hZPTVMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),hZMadFMCIDQCD(0),
 				  hWMadMCIDQCD(0),
 				  hZPowMCIDQCD(0),hZShMCIDQCD(0)
@@ -115,7 +116,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hJetEMECvsBCIDPosPt25 = GetTH2("JetEMECvsBCIDPosPt25",  5,  -0.5,  4.5, 35, 0.0, 70);
   hJetEMECvsBCIDPosPt35 = GetTH2("JetEMECvsBCIDPosPt35",  5,  -0.5,  4.5, 35, 0.0, 70);
   hJetEMECvsBCIDPosPt55 = GetTH2("JetEMECvsBCIDPosPt55",  5,  -0.5,  4.5, 35, 0.0, 70);  
-  hMetvsMu = GetTH2("MetvsMu",  50, 0.0, 500.0, 10,  0.0,  100);  
+  hMetvsMu = GetTH2("MetvsMu",  50, 0.0, 500.0, 10,  0.0,  100);
   hmj1              = GetTH1("mj1",              50,  0.0,   2000.0);
   hmj2              = GetTH1("mj2",              50,  0.0,   2000.0);
   hminDRmj2         = GetTH1("minDRmj2",         50,  0.0,   2000.0);
@@ -135,6 +136,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hmuEta          = GetTH1("muEta",          30,  0.0,  3.0);    
   
   hZMCIDQCD    = GetTH1("ZMCIDQCD",     100,  364099.5,364199.5);
+  hZPTVMCIDQCD    = GetTH1("ZPTVMCIDQCD",     26,  366009.5,366035.5);  
   hWMCIDQCD    = GetTH1("WMCIDQCD",     100,  364155.5,364255.5);
   hZMadMCIDQCD = GetTH1("ZMadMCIDQCD",  10,  361509.5,361519.5);
   hZMad2MCIDQCD= GetTH1("ZMad2MCIDQCD", 100, 363122.5,363222.5);
@@ -145,7 +147,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
 
   // jj_mass limits
   float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 }; 
-  hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  8,  binsjjmass); 
+  hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  8,  binsjjmass);
+  htruth_jj_mass_variableBin = GetTH1("truth_jj_mass_variableBin",  8,  binsjjmass);   
   
   // TMVA variable binned
   float binstmva[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
@@ -191,7 +194,8 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //
   //std::cout << "Run:" << " " << event.RunNumber << " event: " << event.EventNumber << std::endl;
   //FillHist(hZMCIDQCD,   Mva::jj_deta, event, weight);
-  hZMCIDQCD->Fill(event.RunNumber, weight);
+  hZPTVMCIDQCD->Fill(event.RunNumber, weight);
+  hZMCIDQCD->Fill(event.RunNumber, weight);  
   hWMCIDQCD->Fill(event.RunNumber, weight);
   hZMadMCIDQCD->Fill(event.RunNumber, weight);
   hZMad2MCIDQCD->Fill(event.RunNumber, weight);
@@ -204,6 +208,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   if(hjj_deta_diff) hjj_deta_diff->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1))), weight);
   if(hjj_deta_abs) hjj_deta_abs->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1)))/jj_deta, weight);    
   FillHist(hjj_mass_variableBin,   Mva::jj_mass, event, weight);
+  FillHist(htruth_jj_mass_variableBin,   Mva::truth_jj_mass, event, weight);  
   FillHist(htmva_variableBin,      Mva::tmva,    event, weight);
   if(hMetvsMu && event.HasVar(Mva::averageIntPerXing)) hMetvsMu->Fill(event.GetVar(Mva::met_tst_nolep_et), event.GetVar(Mva::averageIntPerXing), weight);
   if(event.truth_mu.size()>0){

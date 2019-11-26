@@ -231,9 +231,9 @@ def FilterCuts(options):
     cuts = []
     if options==None:
         return cuts
-    if options.mergePTV:
-        cuts += [CutItem('CutMergePTV','passVjetsPTV > 0.5')]
-        #cuts += [CutItem('CutMergeExt','passVjetsFilter > 0')]        
+    if options.mergePTV or options.mergeKTPTV:
+        #cuts += [CutItem('CutMergePTV','passVjetsPTV > 0.5')]
+        cuts += [CutItem('CutMergeExt','passVjetsFilter > 0.5')]        
     if options.mergeExt or options.mergeMGExt:
         cuts += [CutItem('CutMergeExt','passVjetsFilter > 0')]
     return cuts
@@ -342,7 +342,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
     return cuts
 
 #-------------------------------------------------------------------------
-def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=120.0, maxMET=-1):
+def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET=-1):
 
     met_choice = options.met_choice # the met_choice is filled into this variable
     if isLep:
@@ -416,10 +416,10 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
         return GetCuts(cuts)
     if not ignore_met:
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
-            cuts += metCuts(basic_cuts,options,metCut=120.0, cstCut=100.0)#, maxMET=150.0)
+            cuts += metCuts(basic_cuts,options,metCut=130.0, cstCut=100.0)#, maxMET=150.0)
         else:
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
-            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=120.0)
+            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0)
             #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
 
@@ -507,7 +507,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
     cuts += [CutItem('CutMet',       '%s > 100.0' %(met_choice))]
     # does the vertex matter? does the CST met cut matter? does the fjvt cuts matter?
     #cuts += metCuts(basic_cuts,options, metCut=100.0, cstCut=0.0)
-    #cuts += metCuts(basic_cuts,options, metCut=100.0, cstCut=120.0)
+    #cuts += metCuts(basic_cuts,options, metCut=100.0, cstCut=130.0)
     # VBF cuts
     cuts += getVBFCuts(options, basic_cuts, isLep=isLep)
 
@@ -637,7 +637,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
 def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met_signif=False,syst='Nominal'):
 
     cuts = FilterCuts(options)
-    if basic_cuts.chan in ['u','um','up']:
+    if basic_cuts.chan in ['u','um','up','l']:
         cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
     else:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
@@ -659,7 +659,11 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
         else:
             cuts += metCuts(basic_cuts,options, True)
     if do_met_signif:
-        cuts += [CutItem('CutMetSignif','met_significance > 4.0')]
+        #cuts += [CutItem('CutMetSignif','met_significance > 4.0')]
+        cutMetSignif = CutItem('CutMetSignif')
+        cutMetSignif.AddCut(CutItem('Muon',  'n_mu_w>0'), 'OR')
+        cutMetSignif.AddCut(CutItem('METSig', 'met_significance > 4.0'), 'OR')
+        cuts += [cutMetSignif]        
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=True)
 

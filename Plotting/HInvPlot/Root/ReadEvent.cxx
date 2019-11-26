@@ -647,6 +647,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::n_el_w);
   fSkipVarsQCD.insert(Mva::n_mu_baseline_noOR);
   fSkipVarsQCD.insert(Mva::lep_trig_match);
+  fSkipVarsQCD.insert(Mva::truth_jj_deta);  
+  fSkipVarsQCD.insert(Mva::truth_jj_dphi);  
+  fSkipVarsQCD.insert(Mva::truth_jj_mass);  
+  fSkipVarsQCD.insert(Mva::truth_j1_pt);  
+  fSkipVarsQCD.insert(Mva::truth_j2_pt);  
 
   for(int i = 0; i < nevent; i++) {
     //
@@ -1097,7 +1102,16 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Checking the truth filtering
     //
     int truthFilter=0;
-    double truth_deta_jj=-10.0, truth_jj_mass=-10.0, filterMet=-10.0, truthJet1=-10.0;
+    double truth_deta_jj=-10.0, truth_jj_mass=-10.0, filterMet=-10.0, truthJet1=-10.0, truth_dphi_jj=-10.0;
+    std::vector<TLorentzVector> truth_jets_overlaprm;
+    for(unsigned tj=0; tj<event->truth_jets.size(); ++tj){
+      bool skipJet=false;
+      TLorentzVector tmpj = event->truth_jets.at(tj).GetLVec();
+      for(unsigned iMuo=0; iMuo<event->muons.size(); ++iMuo){ if(event->muons.at(iMuo).GetLVec().DeltaR(tmpj)<0.3){ skipJet=true; break;} }
+      for(unsigned iEle=0; iEle<event->electrons.size(); ++iEle){ if(event->electrons.at(iEle).GetLVec().DeltaR(tmpj)<0.3){ skipJet=true; break;} }
+      if(!skipJet) truth_jets_overlaprm.push_back(tmpj);
+    }
+    float truth_max_jj_mass=0.0;
     if(event->truth_jets.size()>1){
       float tmet_px=0.0, tmet_py=0.0;
       TVector3 tmet;
@@ -1114,6 +1128,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       truthJet1 = event->truth_jets.at(1).pt;
       if(truthJet1>35.0){
 	truth_deta_jj = fabs(event->truth_jets.at(0).eta - event->truth_jets.at(1).eta);
+	truth_dphi_jj = event->truth_jets.at(0).GetVec().DeltaPhi(event->truth_jets.at(1).GetVec());
 	truth_jj_mass=truth_jj.M();
       }
       //filterMet = sqrt(tmet_px*tmet_px+tmet_py*tmet_py);//tmet.Pt();
@@ -1124,9 +1139,37 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       //std::cout << "truthFilter: " << truthFilter << " met: " << tmet.Pt()
       //<< " mjj: " << truth_jj.M() << " truthJetPt: " << event->truth_jets.at(1).pt
       //	<< std::endl;
+
+      std::vector<TLorentzVector> truth_jets_max;
+      for(unsigned itj=0; itj<event->truth_jets.size(); ++itj){
+	if(event->truth_jets.at(itj).pt<40.0) continue;
+	truth_jets_max.push_back(event->truth_jets.at(itj).GetLVec());
+      }
+      for(unsigned itj=0; itj<truth_jets_max.size(); ++itj){
+	for(unsigned jtj=itj+1; jtj<truth_jets_max.size(); ++jtj){	
+	  float tmp_mjj =(truth_jets_max.at(itj)+truth_jets_max.at(jtj)).M();
+	  if(truth_max_jj_mass<tmp_mjj) truth_max_jj_mass = tmp_mjj;
+	}
+      }
+    }
+    event->RepVar(Mva::truth_max_jj_mass, truth_max_jj_mass);    
+    event->RepVar(Mva::truth_jj_mass, truth_jj_mass);
+    event->RepVar(Mva::truth_jj_deta, truth_deta_jj);
+    event->RepVar(Mva::truth_jj_dphi, truth_dphi_jj);
+
+    // recompute after overlap
+    truth_jj_mass=-10; truth_deta_jj=-10.0; truth_dphi_jj=10.0;
+    if(truth_jets_overlaprm.size()>1){
+      TLorentzVector truth_jj = truth_jets_overlaprm.at(0)+truth_jets_overlaprm.at(1);
+      truth_deta_jj = fabs(truth_jets_overlaprm.at(0).Eta() - truth_jets_overlaprm.at(1).Eta());
+      truth_dphi_jj = truth_jets_overlaprm.at(0).DeltaPhi(truth_jets_overlaprm.at(1));
+      truth_jj_mass=truth_jj.M();      
     }
     event->RepVar(Mva::truth_jj_mass, truth_jj_mass);
     event->RepVar(Mva::truth_jj_deta, truth_deta_jj);
+    event->RepVar(Mva::truth_jj_dphi, truth_dphi_jj);    
+    if(truth_jets_overlaprm.size()>0){ event->RepVar(Mva::truth_j1_pt, truth_jets_overlaprm.at(0).Pt());    } else  event->RepVar(Mva::truth_j1_pt, 0.0);
+    if(truth_jets_overlaprm.size()>1){ event->RepVar(Mva::truth_j2_pt, truth_jets_overlaprm.at(1).Pt());    } else  event->RepVar(Mva::truth_j2_pt, 0.0);    
     event->AddVar(Mva::FilterMet,     filterMet);
     event->AddVar(Mva::TruthFilter,   truthFilter);
     event->AddVar(Mva::truthJet1Pt,   truthJet1);
