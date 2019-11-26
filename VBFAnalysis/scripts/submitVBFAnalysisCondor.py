@@ -25,6 +25,7 @@ parser.add_argument("--UseExtMGVjet", dest = "UseExtMGVjet", action="store_true"
 parser.add_argument( "--METTrigPassThru", dest = "METTrigPassThru", action="store_true", default = False, help = "Use met trigger pass through" )
 parser.add_argument( "--TightSkim", dest = "TightSkim", action="store_true", default = False, help = "Use tight skimming" )
 parser.add_argument( "--AltSkim", dest = "AltSkim", action="store_true", default = False, help = "Use alternate skimming.MET>200, no jet veto, no dphijj" )
+parser.add_argument( "--PhotonSkim", dest = "PhotonSkim", action="store_true", default = False, help = "Use photon skimming mjj>200, n_ph>0" )
 parser.add_argument( "--QGTagger", dest = "QGTagger", action="store_true", default = False, help = "Use qgtagger. available in releases newer than 21.2.76" )
 parser.add_argument( "--useTrigMuonSF", dest = "useTrigMuonSF", action="store_false", default = True, help = "Uses muon trigger SF instead of 1 when called ")
 parser.add_argument( "--theoVariation", dest = "theoVariation", action="store_true", default = False, help = "Run Theory uncertainties ")
@@ -139,6 +140,8 @@ if args.theoVariation:
     UseExtMC += " --theoVariation"
 if args.TightSkim:
     UseExtMC += " --TightSkim"
+if args.PhotonSkim:
+    UseExtMC += " --PhotonSkim"
 if args.AltSkim:
     UseExtMC += " --AltSkim"
 if args.doVjetRW:

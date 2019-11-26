@@ -14,6 +14,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
   declareProperty( "LooseSkim", m_LooseSkim = true, "true if loose skimming is requested" );
+  declareProperty( "PhotonSkim", m_PhotonSkim = false, "true if photon skimming is requested" );
   declareProperty( "AltSkim", m_AltSkim = false, "true if alternate skimming is requested" );
   declareProperty( "ExtraVars", m_extraVars = true, "true if extra variables should be output" );
   declareProperty( "QGTagger", m_QGTagger = false, "true if extra variables should be output for QGTagger" );
@@ -261,6 +262,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("passVjetsFilterTauEl", &passVjetsFilterTauEl );
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("MGVTruthPt", &MGVTruthPt);
+  if(m_currentVariation=="Nominal") m_tree_out->Branch("SherpaVTruthPt", &SherpaVTruthPt);
   m_tree_out->Branch("in_vy_overlap", &in_vy_overlap);
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("lep_trig_match", &lep_trig_match);
@@ -599,7 +601,7 @@ StatusCode VBFAnalysisAlg::execute() {
     truth_jj_dphi = fabs(jjtruth.DeltaPhi(tmp));
     truth_j2_pt = truth_jet_pt->at(1);
     jjtruth += tmp;
-    truth_jj_mass =jjtruth.M();
+    truth_jj_mass = jjtruth.M();
     // the LO MG filtering required overlap with electrons and taus. we need to implement this for the merging
     for(unsigned itjet=0; itjet<truth_jet_pt->size(); ++itjet){
       bool passOR_truthjet=true;
@@ -1009,7 +1011,8 @@ StatusCode VBFAnalysisAlg::execute() {
   // Now we have the KT merged 100-500 GeV in PTV samples. We want to merge these as well.
   if((runNumber>=312448 && runNumber<=312531)){
     passVjetsPTV=true; // these are the KT merged samples 100-500 GeV
-    // use passVjetsFilter as it was calculated
+    // use passVjetsFilter as it was calculated...nothing more needs to be done here
+    if(SherpaVTruthPt<120.0e3) passVjetsFilter=false; //remove if pTV<140 
   }
   else if((runNumber>=364100 && runNumber<=364113) || // Zmm MAXPTHT
      (runNumber>=364114 && runNumber<=364127) || // Zee MAXPTHT
@@ -1024,7 +1027,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else passVjetsPTV = false;
 
     // merging using the truth info
-    if(SherpaVTruthPt>100.0e3 && SherpaVTruthPt<500.0e3) passVjetsFilter=(!passVjetsFilter); //flip to use those that fail
+    if(SherpaVTruthPt>120.0e3 && SherpaVTruthPt<500.0e3) passVjetsFilter=(!passVjetsFilter); //flip to use those that fail
     else passVjetsFilter=true;
   }else{ passVjetsFilter=true; }
 
@@ -1060,7 +1063,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
 
-  bool GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>250.0e3);
+  bool GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (n_jet < 2) return StatusCode::SUCCESS;
   if (!(n_jet < 5) && !(m_LooseSkim || m_AltSkim)) return StatusCode::SUCCESS;
@@ -1072,6 +1075,9 @@ StatusCode VBFAnalysisAlg::execute() {
   }else{
     if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < DPhijjCut) & (jj_deta > DEtajjCut) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
   }
+  // skim on the photon plus jet events
+  if(m_PhotonSkim && !GammaMETSR) return StatusCode::SUCCESS;
+
   ATH_MSG_DEBUG ("Pass VBF cuts!");
   // encoding met triggers
   trigger_met_encoded=0;

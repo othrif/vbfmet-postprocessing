@@ -1,5 +1,48 @@
 class systematics(object):
     def __init__(self,mode):
+
+        # list the theory uncertainties that are wanted for ZEWK, WEWK, ZStrong, and WStrong
+        # for the PTV systematics, the systematics are the same for ZEWK, WEWK, ZStrong, and WStrong.
+        # Using the transfer factor method, the systematics list will be different for each of ZEWK, WEWK, ZStrong, and WStrong. 
+        # These names need to be updated for the tranfer method. 
+        # Currently this is all commented out. Uncomment to run these.
+        self.systematicsZewkTheory = []
+        #self.systematicsZewkTheory = ['vjets_d1kappa_EW__1up','vjets_d1kappa_EW__1down',
+        #                              'vjets_d2kappa_EW__1up','vjets_d2kappa_EW__1down',
+        #                              'vjets_d3kappa_EW__1up','vjets_d3kappa_EW__1down',
+        #                              'vjets_d1K_NNLO__1up','vjets_d1K_NNLO__1down',
+        #                              'vjets_d2K_NNLO__1up','vjets_d2K_NNLO__1down',
+        #                              'vjets_d3K_NNLO__1up','vjets_d3K_NNLO__1down',
+        #                              'vjets_dK_NNLO_mix__1up','vjets_dK_NNLO_mix__1down',
+        #                              'vjets_dK_PDF__1up','vjets_dK_PDF__1down',]
+        self.systematicsWewkTheory = self.systematicsZewkTheory
+        self.systematicsZstrongTheory = self.systematicsZewkTheory
+        self.systematicsWstrongTheory = self.systematicsZewkTheory
+
+        self.systematicsSignalPDF = ['ATLAS_PDF4LHC_NLO_30_alphaS__1up','ATLAS_PDF4LHC_NLO_30_alphaS__1down',
+                                     'ATLAS_PDF4LHC_NLO_30_EV30__1up','ATLAS_PDF4LHC_NLO_30_EV29__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV28__1up','ATLAS_PDF4LHC_NLO_30_EV27__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV26__1up','ATLAS_PDF4LHC_NLO_30_EV25__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV24__1up','ATLAS_PDF4LHC_NLO_30_EV23__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV22__1up','ATLAS_PDF4LHC_NLO_30_EV21__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV20__1up','ATLAS_PDF4LHC_NLO_30_EV19__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV18__1up','ATLAS_PDF4LHC_NLO_30_EV17__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV16__1up','ATLAS_PDF4LHC_NLO_30_EV15__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV14__1up','ATLAS_PDF4LHC_NLO_30_EV13__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV12__1up','ATLAS_PDF4LHC_NLO_30_EV11__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV10__1up','ATLAS_PDF4LHC_NLO_30_EV9__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV8__1up','ATLAS_PDF4LHC_NLO_30_EV7__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV6__1up','ATLAS_PDF4LHC_NLO_30_EV5__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV4__1up','ATLAS_PDF4LHC_NLO_30_EV3__1up',
+                                     'ATLAS_PDF4LHC_NLO_30_EV2__1up','ATLAS_PDF4LHC_NLO_30_EV1__1up',]        
+        self.systematicsGGFSignal =['ggF_gg2H_PSVarWeights__1up','ggF_gg2H_PSVarWeights__1down'] 
+        self.systematicsVBFSignal =['VBF_qqH_STJetVeto34__1up','VBF_qqH_STJetVeto34__1down',
+                                    'VBF_qqH_25__1up','VBF_qqH_2jet__1up',
+                                    'VBF_qqH_Mjj1500__1up','VBF_qqH_Mjj1000__1up',
+                                    'VBF_qqH_Mjj700__1up','VBF_qqH_Mjj350__1up',
+                                    'VBF_qqH_Mjj120__1up','VBF_qqH_Mjj60__1up',
+                                    'VBF_qqH_200__1up','VBF_qqH_tot__1up'] 
+        
         self.systematicsListDown=["MET_SoftTrk_ResoParaDown", "MET_SoftTrk_ResoPerpDown", 'JET_JER_EffectiveNP_1__1down', 'JET_JER_EffectiveNP_2__1down', 'JET_JER_EffectiveNP_3__1down', 'JET_JER_EffectiveNP_4__1down', 'JET_JER_EffectiveNP_5__1down', 'JET_JER_EffectiveNP_6__1down', 'JET_JER_EffectiveNP_7restTerm__1down',
                                      'ATLAS_PDF4LHC_NLO_30_EV30__1down','ATLAS_PDF4LHC_NLO_30_EV29__1down',
                                      'ATLAS_PDF4LHC_NLO_30_EV28__1down','ATLAS_PDF4LHC_NLO_30_EV27__1down',
@@ -103,28 +146,13 @@ class systematics(object):
                                         #'JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff'
                                         ]
             # add the theory systematics
-            self.systematicsList += ['ATLAS_PDF4LHC_NLO_30_alphaS__1up','ATLAS_PDF4LHC_NLO_30_alphaS__1down',
-                                     'ATLAS_PDF4LHC_NLO_30_EV30__1up','ATLAS_PDF4LHC_NLO_30_EV29__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV28__1up','ATLAS_PDF4LHC_NLO_30_EV27__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV26__1up','ATLAS_PDF4LHC_NLO_30_EV25__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV24__1up','ATLAS_PDF4LHC_NLO_30_EV23__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV22__1up','ATLAS_PDF4LHC_NLO_30_EV21__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV20__1up','ATLAS_PDF4LHC_NLO_30_EV19__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV18__1up','ATLAS_PDF4LHC_NLO_30_EV17__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV16__1up','ATLAS_PDF4LHC_NLO_30_EV15__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV14__1up','ATLAS_PDF4LHC_NLO_30_EV13__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV12__1up','ATLAS_PDF4LHC_NLO_30_EV11__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV10__1up','ATLAS_PDF4LHC_NLO_30_EV9__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV8__1up','ATLAS_PDF4LHC_NLO_30_EV7__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV6__1up','ATLAS_PDF4LHC_NLO_30_EV5__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV4__1up','ATLAS_PDF4LHC_NLO_30_EV3__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV2__1up','ATLAS_PDF4LHC_NLO_30_EV1__1up',
-                                    'VBF_qqH_STJetVeto34__1up','VBF_qqH_STJetVeto34__1down',
-                                    'VBF_qqH_25__1up','VBF_qqH_2jet__1up',
-                                    'VBF_qqH_Mjj1500__1up','VBF_qqH_Mjj1000__1up',
-                                    'VBF_qqH_Mjj700__1up','VBF_qqH_Mjj350__1up',
-                                    'VBF_qqH_Mjj120__1up','VBF_qqH_Mjj60__1up',
-                                    'VBF_qqH_200__1up','VBF_qqH_tot__1up']
+            self.systematicsList += self.systematicsVBFSignal+self.systematicsSignalPDF + self.systematicsGGFSignal
+
+            # add the V+jets theory uncertainties
+            self.systematicsList += self.systematicsZewkTheory
+            self.systematicsList += self.systematicsWewkTheory
+            self.systematicsList += self.systematicsZstrongTheory
+            self.systematicsList += self.systematicsWstrongTheory
 
             # Filter out the unwanted systematics 
             systematicsList_tmp = []
@@ -148,28 +176,13 @@ class systematics(object):
 'MUON_EFF_BADMUON_STAT__1down','MUON_EFF_BADMUON_STAT__1up','MUON_EFF_BADMUON_SYS__1down','MUON_EFF_BADMUON_SYS__1up','MUON_EFF_ISO_STAT__1down','MUON_EFF_ISO_STAT__1up','MUON_EFF_ISO_SYS__1down','MUON_EFF_ISO_SYS__1up','MUON_EFF_RECO_STAT__1down','MUON_EFF_RECO_STAT__1up','MUON_EFF_RECO_STAT_LOWPT__1down','MUON_EFF_RECO_STAT_LOWPT__1up','MUON_EFF_RECO_SYS__1down','MUON_EFF_RECO_SYS__1up','MUON_EFF_RECO_SYS_LOWPT__1down','MUON_EFF_RECO_SYS_LOWPT__1up','MUON_EFF_TTVA_STAT__1down','MUON_EFF_TTVA_STAT__1up','MUON_EFF_TTVA_SYS__1down','MUON_EFF_TTVA_SYS__1up','MUON_EFF_TrigStatUncertainty__1down','MUON_EFF_TrigStatUncertainty__1up','MUON_EFF_TrigSystUncertainty__1down','MUON_EFF_TrigSystUncertainty__1up',
 'PH_EFF_ID_Uncertainty__1down','PH_EFF_ID_Uncertainty__1up','PH_EFF_ISO_Uncertainty__1down','PH_EFF_ISO_Uncertainty__1up','PH_EFF_TRIGGER_Uncertainty__1down','PH_EFF_TRIGGER_Uncertainty__1up',
 'PRW_DATASF__1down','PRW_DATASF__1up','xeSFTrigWeight__1up','xeSFTrigWeight__1down','nloEWKWeight__1up','nloEWKWeight__1down','JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff','puSyst2018Weight__1up','puSyst2018Weight__1down']
-            self.systematicsList += ['ATLAS_PDF4LHC_NLO_30_alphaS__1up','ATLAS_PDF4LHC_NLO_30_alphaS__1down',
-                                     'ATLAS_PDF4LHC_NLO_30_EV30__1up','ATLAS_PDF4LHC_NLO_30_EV29__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV28__1up','ATLAS_PDF4LHC_NLO_30_EV27__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV26__1up','ATLAS_PDF4LHC_NLO_30_EV25__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV24__1up','ATLAS_PDF4LHC_NLO_30_EV23__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV22__1up','ATLAS_PDF4LHC_NLO_30_EV21__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV20__1up','ATLAS_PDF4LHC_NLO_30_EV19__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV18__1up','ATLAS_PDF4LHC_NLO_30_EV17__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV16__1up','ATLAS_PDF4LHC_NLO_30_EV15__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV14__1up','ATLAS_PDF4LHC_NLO_30_EV13__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV12__1up','ATLAS_PDF4LHC_NLO_30_EV11__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV10__1up','ATLAS_PDF4LHC_NLO_30_EV9__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV8__1up','ATLAS_PDF4LHC_NLO_30_EV7__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV6__1up','ATLAS_PDF4LHC_NLO_30_EV5__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV4__1up','ATLAS_PDF4LHC_NLO_30_EV3__1up',
-                                     'ATLAS_PDF4LHC_NLO_30_EV2__1up','ATLAS_PDF4LHC_NLO_30_EV1__1up',
-                                    'VBF_qqH_STJetVeto34__1up','VBF_qqH_STJetVeto34__1down',
-                                    'VBF_qqH_25__1up','VBF_qqH_2jet__1up',
-                                    'VBF_qqH_Mjj1500__1up','VBF_qqH_Mjj1000__1up',
-                                    'VBF_qqH_Mjj700__1up','VBF_qqH_Mjj350__1up',
-                                    'VBF_qqH_Mjj120__1up','VBF_qqH_Mjj60__1up',
-                                    'VBF_qqH_200__1up','VBF_qqH_tot__1up']
+            self.systematicsList+=self.systematicsVBFSignal+self.systematicsSignalPDF + self.systematicsGGFSignal
+            # add the V+jets theory uncertainties
+            self.systematicsList += self.systematicsZewkTheory
+            self.systematicsList += self.systematicsWewkTheory
+            self.systematicsList += self.systematicsZstrongTheory
+            self.systematicsList += self.systematicsWstrongTheory
+
         elif mode == "Electrons":
             self.systematicsList = ["Nominal", "EG_RESOLUTION_ALL__1down", "EG_RESOLUTION_ALL__1up", "EG_SCALE_ALL__1down", "EG_SCALE_ALL__1up", "EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down",  "EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1up", "EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1down", "EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1up"]
         elif mode == "Muons":
@@ -194,27 +207,14 @@ class systematics(object):
                                     'JET_JER_DataVsMC_MC16__1up', 'JET_JER_DataVsMC_MC16__1down',
                                 ]
         elif mode == "SigTheory":
-            self.systematicsList= ['ATLAS_PDF4LHC_NLO_30_EV30__1up','ATLAS_PDF4LHC_NLO_30_EV29__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV28__1up','ATLAS_PDF4LHC_NLO_30_EV27__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV26__1up','ATLAS_PDF4LHC_NLO_30_EV25__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV24__1up','ATLAS_PDF4LHC_NLO_30_EV23__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV22__1up','ATLAS_PDF4LHC_NLO_30_EV21__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV20__1up','ATLAS_PDF4LHC_NLO_30_EV19__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV18__1up','ATLAS_PDF4LHC_NLO_30_EV17__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV16__1up','ATLAS_PDF4LHC_NLO_30_EV15__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV14__1up','ATLAS_PDF4LHC_NLO_30_EV13__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV12__1up','ATLAS_PDF4LHC_NLO_30_EV11__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV10__1up','ATLAS_PDF4LHC_NLO_30_EV9__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV8__1up','ATLAS_PDF4LHC_NLO_30_EV7__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV6__1up','ATLAS_PDF4LHC_NLO_30_EV5__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV4__1up','ATLAS_PDF4LHC_NLO_30_EV3__1up',
-                                    'ATLAS_PDF4LHC_NLO_30_EV2__1up','ATLAS_PDF4LHC_NLO_30_EV1__1up',
-                                    'VBF_qqH_25__1up','VBF_qqH_2jet__1up',
-                                    'VBF_qqH_Mjj1500__1up','VBF_qqH_Mjj1000__1up',
-                                    'VBF_qqH_Mjj700__1up','VBF_qqH_Mjj350__1up',
-                                    'VBF_qqH_Mjj120__1up','VBF_qqH_Mjj60__1up',
-                                    'VBF_qqH_200__1up','VBF_qqH_tot__1up'
-                                       ]
+            self.systematicsList=self.systematicsVBFSignal+self.systematicsSignalPDF + self.systematicsGGFSignal
+        elif mode == "VjetTheory":
+            # add the V+jets theory uncertainties
+            self.systematicsList = self.systematicsZewkTheory
+            self.systematicsList += self.systematicsWewkTheory
+            self.systematicsList += self.systematicsZstrongTheory
+            self.systematicsList += self.systematicsWstrongTheory
+
         elif mode == "OneSided": # this is used to list all systematics that need to by symmeterized in plotting
             self.systematicsList = ["MET_SoftTrk_ResoPara", "MET_SoftTrk_ResoPerp",'JET_JER_DataVsMC_MC16__1up','JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up','JET_JER_DataVsMC_MC16__1up','JET_QG_trackFakes','JET_QG_trackeff']
             # add theory systematics
