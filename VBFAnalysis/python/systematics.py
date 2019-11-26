@@ -201,11 +201,13 @@ class systematics(object):
                                     'JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up',
                                     'JET_EffectiveNP_Mixed1__1down','JET_EffectiveNP_Mixed1__1up',
                                     'JET_EtaIntercalibration_Modelling__1up','JET_EtaIntercalibration_Modelling__1down',
-                                    'JET_Pileup_RhoTopology__1up','JET_Pileup_RhoTopology__1down',
                                     'JET_EffectiveNP_Modelling1__1up','JET_EffectiveNP_Modelling1__1down',
-                                    'JET_Pileup_OffsetNPV__1up','JET_Pileup_OffsetNPV__1down',
                                     'JET_JER_EffectiveNP_1__1up','JET_JER_EffectiveNP_1__1down',
                                     'JET_JER_DataVsMC_MC16__1up', 'JET_JER_DataVsMC_MC16__1down',
+                                    'JET_Pileup_OffsetMu__1down','JET_Pileup_OffsetMu__1up',
+                                    'JET_Pileup_OffsetNPV__1down','JET_Pileup_OffsetNPV__1up',
+                                    'JET_Pileup_PtTerm__1down','JET_Pileup_PtTerm__1up',
+                                    'JET_Pileup_RhoTopology__1down','JET_Pileup_RhoTopology__1up',
                                 ]
         elif mode == "SigTheory":
             self.systematicsList=self.systematicsVBFSignal+self.systematicsSignalPDF + self.systematicsGGFSignal
