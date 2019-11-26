@@ -89,6 +89,7 @@ namespace Msl
       kWDPI,
       kttv,
       kttg,
+      kvgg,
       kpho,
       kphoAlt,
       kvvv,

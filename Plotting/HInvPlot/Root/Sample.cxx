@@ -73,6 +73,7 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kWDPI:  return "wdpi";
     case kttv:   return "ttv";
     case kttg:   return "ttg";
+    case kvgg:   return "vgg";      
     case kpho:   return "pho";
     case kphoAlt:   return "phoAlt";
     case kvvv:   return "vvv";
@@ -153,6 +154,7 @@ std::string Msl::Mva::Convert2Std(Sample s)
     case kWDPI: return "wdpi";
     case kttv:  return "ttv";
     case kttg:  return "ttg";
+    case kvgg:  return "vgg";      
     case kpho:  return "pho";
     case kphoAlt:  return "phoAlt";
     case kvvv:  return "vvv";
@@ -210,6 +212,7 @@ std::string Msl::Mva::Convert2Tex(const SampleSet &s)
   if(s.GetName() == "wdpi")  return "$WW$ DPI";
   if(s.GetName() == "ttv")   return "$t\\bar{t}+V$";
   if(s.GetName() == "ttg")   return "$t\\bar{t}+\\gamma$";
+  if(s.GetName() == "vgg")   return "$V+\\gamma\\gamma$";  
   if(s.GetName() == "pho")   return "$\\gamma$";
   if(s.GetName() == "phoAlt")   return "$\\gamma$";
   if(s.GetName() == "vvv")   return "VVV";
@@ -283,6 +286,7 @@ Msl::Mva::Sample Msl::Mva::Convert2Sample(const std::string &s)
   if(s == "wdpi") return kWDPI;
   if(s == "ttv")  return kttv;
   if(s == "ttg")  return kttg;
+  if(s == "vgg")  return kvgg;  
   if(s == "pho")  return kpho;
   if(s == "phoAlt")  return kphoAlt;
   if(s == "vvv")  return kvvv;
@@ -366,6 +370,7 @@ const std::vector<Msl::Mva::Sample>& Msl::Mva::GetAllSamples()
     vars.push_back(kWDPI);
     vars.push_back(kttv);
     vars.push_back(kttg);
+    vars.push_back(kvgg);
     vars.push_back(kpho);
     vars.push_back(kphoAlt);
     vars.push_back(kvvv);

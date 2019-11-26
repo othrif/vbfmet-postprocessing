@@ -1142,18 +1142,15 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
       std::vector<TLorentzVector> truth_jets_max;
       for(unsigned itj=0; itj<event->truth_jets.size(); ++itj){
-	if(event->truth_jets.at(itj).pt<35.0) continue;
+	if(event->truth_jets.at(itj).pt<40.0) continue;
 	truth_jets_max.push_back(event->truth_jets.at(itj).GetLVec());
       }
-      std::vector<float> vec_mjj;
       for(unsigned itj=0; itj<truth_jets_max.size(); ++itj){
 	for(unsigned jtj=itj+1; jtj<truth_jets_max.size(); ++jtj){	
-	  vec_mjj.push_back((truth_jets_max.at(itj)+truth_jets_max.at(jtj)).M());
+	  float tmp_mjj =(truth_jets_max.at(itj)+truth_jets_max.at(jtj)).M();
+	  if(truth_max_jj_mass<tmp_mjj) truth_max_jj_mass = tmp_mjj;
 	}
       }
-      //std::max<float>(vec_mjj.begin(),vec_mjj.end());
-      auto it = std::max_element(std::begin(vec_mjj), std::end(vec_mjj));
-      truth_max_jj_mass = *it;
     }
     event->RepVar(Mva::truth_max_jj_mass, truth_max_jj_mass);    
     event->RepVar(Mva::truth_jj_mass, truth_jj_mass);

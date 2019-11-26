@@ -232,8 +232,8 @@ def FilterCuts(options):
     if options==None:
         return cuts
     if options.mergePTV or options.mergeKTPTV:
-        cuts += [CutItem('CutMergePTV','passVjetsPTV > 0.5')]
-        #cuts += [CutItem('CutMergeExt','passVjetsFilter > 0')]        
+        #cuts += [CutItem('CutMergePTV','passVjetsPTV > 0.5')]
+        cuts += [CutItem('CutMergeExt','passVjetsFilter > 0.5')]        
     if options.mergeExt or options.mergeMGExt:
         cuts += [CutItem('CutMergeExt','passVjetsFilter > 0')]
     return cuts

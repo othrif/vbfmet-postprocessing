@@ -108,6 +108,7 @@ myplots = [
               ['n_truth_tau', '4', '-0.5', '3.5'],
               ['FilterMet', '50', '0.0', '500.0'],
               ['met_truth_phi', '6', '0.0', '6.2'],
+              ['truth_max_jj_mass', '50', '0.0', '5000.0'],
               ['truth_j1_pt', '25', '0.0', '500.0'],
               ['truth_jj_deta', '10', '0.0', '10.0'],
               ['truthJet1Pt', '50', '0.0', '150.0'],
@@ -173,6 +174,7 @@ mev_vars = ['jj_mass',
             'met_soft_tst_sumet',
             'met_cst_jet',
             'met_truth_et',
+            'SherpaVTruthPt',
                 ]
 
 def GetVarStr(entry=0, syst_name='Nominal'):
