@@ -68,6 +68,7 @@ os.system("mkdir "+workDir)
 listoffiles = workDir+"/filelist"
 listoffilesMC = workDir+"/filelistMC"
 listoffilesVBFMC = workDir+"/filelistVBFMC"
+listoffilesGGFMC = workDir+"/filelistGGFMC"
 listoffilesGGFVBFMC = workDir+"/filelistGGFVBFMC"
 listoffilesZstrongMC = workDir+"/filelistZstrongMC"
 listoffilesWstrongMC = workDir+"/filelistWstrongMC"
@@ -76,6 +77,7 @@ listoffilesZewkMC = workDir+"/filelistZewkMC"
 f = open(listoffiles, 'w')
 fMC = open(listoffilesMC, 'w')
 fVBFMC = open(listoffilesVBFMC, 'w')
+fGGFMC = open(listoffilesGGFMC, 'w')
 fGGFVBFMC = open(listoffilesGGFVBFMC, 'w')
 fZstrongMC = open(listoffilesZstrongMC, 'w')
 fWstrongMC = open(listoffilesWstrongMC, 'w')
@@ -92,6 +94,7 @@ for line in p.stdout.readlines():
         fVBFMC.write(filepath+"\n")
         fGGFVBFMC.write(filepath+"\n")
     if (filepath.split("/")[-1][:4] == "ggFH"):
+        fGGFMC.write(filepath+"\n")
         fGGFVBFMC.write(filepath+"\n")
     if (filepath.split("/")[-1][:4] == "Z_st"):
         fZstrongMC.write(filepath+"\n")
@@ -104,6 +107,7 @@ for line in p.stdout.readlines():
 f.close()
 fMC.close()
 fVBFMC.close()
+fGGFMC.close()
 fGGFVBFMC.close()
 fZstrongMC.close()
 fWstrongMC.close()
@@ -146,6 +150,8 @@ for syst in systlist:
         continue
     if syst in sys.systematicsVBFSignal:
         MCFileListToUse=listoffilesVBFMC
+    if syst in sys.systematicsGGFSignal:
+        MCFileListToUse=listoffilesGGFMC
     if syst in sys.systematicsSignalPDF:
         MCFileListToUse=listoffilesGGFVBFMC
     if syst in sys.systematicsZewkTheory:
