@@ -197,6 +197,11 @@ class systematics(object):
             self.systematicsList = ['Nominal','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up',]
         elif mode == "JER":
             self.systematicsList = ['Nominal', 'JET_JER_DataVsMC_MC16__1up', 'JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up']
+        elif mode == "Pileup":
+            self.systematicsList = ['Nominal','JET_Pileup_OffsetMu__1down','JET_Pileup_OffsetMu__1up',
+                                    'JET_Pileup_OffsetNPV__1down','JET_Pileup_OffsetNPV__1up',
+                                    'JET_Pileup_PtTerm__1down','JET_Pileup_PtTerm__1up',
+                                    'JET_Pileup_RhoTopology__1down','JET_Pileup_RhoTopology__1up',]
         elif mode == "METSystOpt":
             self.systematicsList = ['Nominal', 'xeSFTrigWeight__1up','xeSFTrigWeight__1down','JET_JvtEfficiency__1down','JET_JvtEfficiency__1up',
                                     'JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up',
