@@ -303,7 +303,7 @@ StatusCode HFInputAlg::execute() {
   }
   if(!passSample)  return StatusCode::SUCCESS;
   // if merging the sherpa sample from kt filtered, then require passVjetsFilter
-  if(mergeKTPTV && passVjetsFilter<0.5) return  StatusCode::SUCCESS;
+  if(mergeKTPTV && passVjetsFilterTauEl<0.5) return  StatusCode::SUCCESS;
   /// register the vjets samples
   bool isVjets =(currentSample=="W_strong") || (currentSample=="Z_strong") || (currentSample=="Z_EWK") || (currentSample=="W_EWK") || (currentSample=="Z_strongPTVExt") || (currentSample=="Z_strongExt") || (currentSample=="Z_strong_VBFFilt") || (currentSample=="W_strongExt");
   bool isTop = (currentSample=="ttbar");
@@ -722,6 +722,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("randomRunNumber", 1);
   m_tree->SetBranchStatus("eventNumber", 1);
   m_tree->SetBranchStatus("passVjetsFilter", 1);
+  m_tree->SetBranchStatus("passVjetsFilterTauEl", 1);
   m_tree->SetBranchStatus("in_vy_overlap", 1);
   m_tree->SetBranchStatus("passJetCleanTight", 1);
   m_tree->SetBranchStatus("averageIntPerXing", 1);
@@ -784,6 +785,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("lep_trig_match", &lep_trig_match);
   m_tree->SetBranchAddress("in_vy_overlap", &in_vy_overlap);
   m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
+  m_tree->SetBranchAddress("passVjetsFilterTauEl", &passVjetsFilterTauEl);
   m_tree->SetBranchAddress("passJetCleanTight", &passJetCleanTight);
   m_tree->SetBranchAddress("n_jet",&n_jet);
   m_tree->SetBranchAddress("n_bjet",&n_bjet);

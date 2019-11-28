@@ -12,7 +12,7 @@ from VBFAnalysis.buildCondorScript import *
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
-parser.add_argument( "--metOptSyst", dest = "metOptSyst", action="store_true", default = False, help = "Do only the met optimization systematics" )
+parser.add_argument( "--OptSyst", type = str, dest = "OptSyst", default = None, help = "run syst short list: METSystOpt, Pileup")
 parser.add_argument( "--slc7", dest = "slc7", action="store_true", default = False, help = "Do slc7 for chicago tier3" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", default = "/eos/user/r/rzou/v04/list", help = "list of ntuples to run over" )
@@ -38,8 +38,8 @@ systlist  = []
 if args.nominal:
     sys = VBFAnalysis.systematics.systematics("Nominal")
     systlist = sys.getsystematicsList()
-elif args.metOptSyst:
-    sys = VBFAnalysis.systematics.systematics("METSystOpt")
+elif args.OptSyst!=None:
+    sys = VBFAnalysis.systematics.systematics(args.OptSyst)
     sysW = VBFAnalysis.systematics.systematics("WeightSyst")
     systlistA = sys.getsystematicsList()
     # remove the weight systematics to avoid empty ntuples. weight systematics are saved as weights
