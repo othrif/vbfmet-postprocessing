@@ -110,6 +110,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   ULong64_t eventNumber;
   Bool_t in_vy_overlap;
   Bool_t passVjetsFilter;
+  Bool_t passVjetsFilterTauEl;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_lep;
