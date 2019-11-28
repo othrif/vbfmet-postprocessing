@@ -163,6 +163,7 @@ namespace Msl
       phEta,
       met_tst_ph_dphi,
       passVjetsFilter,
+      passVjetsFilterTauEl,
       passVjetsPTV,
       jetBtagWeight,
       jetTrackWidth,
