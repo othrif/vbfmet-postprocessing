@@ -51,6 +51,7 @@ myvars = [    ['jj_deta', '50', '0.0', '10.0'],
 myvars_notplotted = [['trigger_met_encoded', '2', '0.0', '1.0'],
                          ['trigger_met_encodedv2', '2', '0.0', '1.0'],
               ['passVjetsFilter', '2', '0.0', '1.0'],
+              ['passVjetsFilterTauEl', '2', '0.0', '1.0'],              
               ['passVjetsPTV', '2', '0.0', '1.0'],
                          ['passJetCleanTight', '2', '-0.5', '1.5'],
         ]
