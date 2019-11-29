@@ -14,6 +14,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "isMC", m_isMC = true, "true if sample is MC" );
   declareProperty( "LooseSkim", m_LooseSkim = true, "true if loose skimming is requested" );
+  declareProperty( "PhotonSkim", m_PhotonSkim = false, "true if photon skimming is requested" );
   declareProperty( "AltSkim", m_AltSkim = false, "true if alternate skimming is requested" );
   declareProperty( "ExtraVars", m_extraVars = true, "true if extra variables should be output" );
   declareProperty( "QGTagger", m_QGTagger = false, "true if extra variables should be output for QGTagger" );
@@ -64,16 +65,17 @@ StatusCode VBFAnalysisAlg::initialize() {
     my_signalSystHelper.initialize();
 
     // Vjets weight + systematics
-    if(m_isMC && m_currentVariation=="Nominal")
-      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
-      std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
-      my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
-      my_vjSystHelper.applyEWCorrection(true);
-      my_vjSystHelper.applyQCDCorrection(true);
-      my_vjSystHelper.mergePDF(true);
-      my_vjSystHelper.smoothQCDCorrection(false);
-      my_vjSystHelper.initialize();
-      m_vjVariations = my_vjSystHelper.getAllVariationNames();
+    if(m_isMC && m_currentVariation=="Nominal"){
+      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
+	std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
+	my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
+	my_vjSystHelper.applyEWCorrection(true);
+	my_vjSystHelper.applyQCDCorrection(true);
+	my_vjSystHelper.mergePDF(true);
+	my_vjSystHelper.smoothQCDCorrection(false);
+	my_vjSystHelper.initialize();
+	m_vjVariations = my_vjSystHelper.getAllVariationNames();
+      }
     }
 
     // qg tagging
@@ -261,6 +263,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("passVjetsFilterTauEl", &passVjetsFilterTauEl );
   m_tree_out->Branch("passVjetsPTV", &passVjetsPTV );
   m_tree_out->Branch("MGVTruthPt", &MGVTruthPt);
+  if(m_currentVariation=="Nominal") m_tree_out->Branch("SherpaVTruthPt", &SherpaVTruthPt);
   m_tree_out->Branch("in_vy_overlap", &in_vy_overlap);
   m_tree_out->Branch("trigger_lep", &trigger_lep);
   m_tree_out->Branch("lep_trig_match", &lep_trig_match);
@@ -547,7 +550,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //Vjets weight and systematics
   vjWeight = 1.0;
 
-  if ( m_isMC  && (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong") || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos )) {
+  if ( m_isMC  && (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos )) {
     // Nominal
     vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(0));
     // Variations
@@ -599,7 +602,7 @@ StatusCode VBFAnalysisAlg::execute() {
     truth_jj_dphi = fabs(jjtruth.DeltaPhi(tmp));
     truth_j2_pt = truth_jet_pt->at(1);
     jjtruth += tmp;
-    truth_jj_mass =jjtruth.M();
+    truth_jj_mass = jjtruth.M();
     // the LO MG filtering required overlap with electrons and taus. we need to implement this for the merging
     for(unsigned itjet=0; itjet<truth_jet_pt->size(); ++itjet){
       bool passOR_truthjet=true;
@@ -667,7 +670,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
-  if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
+  if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567 || runNumber==308276)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
     //nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;// tighter mjj>1TeV
     nloEWKWeight=1.0 - 0.000350*(met_truth_et/1.0e3) - 0.0430;
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
@@ -679,7 +682,7 @@ StatusCode VBFAnalysisAlg::execute() {
     float up = -0.000333*(met_truth_et/1.0e3) - 0.0450;
     float down = -0.000366 *(met_truth_et/1.0e3) - 0.0410;
     float syst = fabs(up-down)/2.0;
-    if(m_currentVariation=="Nominal"){
+    if(m_currentVariation=="Nominal"){ 
       tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
       tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
     }
@@ -717,6 +720,9 @@ StatusCode VBFAnalysisAlg::execute() {
     }
     puSyst2018Weight=1.0;
   } // end pileup weight systematic
+
+  // "calibrate" the data mu
+  if(!m_isMC) averageIntPerXing/=1.03;
 
   if (m_isMC){
     // hack for when the cross-section code messed up
@@ -1009,7 +1015,8 @@ StatusCode VBFAnalysisAlg::execute() {
   // Now we have the KT merged 100-500 GeV in PTV samples. We want to merge these as well.
   if((runNumber>=312448 && runNumber<=312531)){
     passVjetsPTV=true; // these are the KT merged samples 100-500 GeV
-    // use passVjetsFilter as it was calculated
+    // use passVjetsFilter as it was calculated...nothing more needs to be done here
+    if(SherpaVTruthPt<120.0e3) passVjetsFilter=false; //remove if pTV<140 
   }
   else if((runNumber>=364100 && runNumber<=364113) || // Zmm MAXPTHT
      (runNumber>=364114 && runNumber<=364127) || // Zee MAXPTHT
@@ -1024,7 +1031,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else passVjetsPTV = false;
 
     // merging using the truth info
-    if(SherpaVTruthPt>100.0e3 && SherpaVTruthPt<500.0e3) passVjetsFilter=(!passVjetsFilter); //flip to use those that fail
+    if(SherpaVTruthPt>120.0e3 && SherpaVTruthPt<500.0e3) passVjetsFilter=(!passVjetsFilter); //flip to use those that fail
     else passVjetsFilter=true;
   }else{ passVjetsFilter=true; }
 
@@ -1060,7 +1067,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
 
-  bool GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>250.0e3);
+  bool GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (n_jet < 2) return StatusCode::SUCCESS;
   if (!(n_jet < 5) && !(m_LooseSkim || m_AltSkim)) return StatusCode::SUCCESS;
@@ -1072,6 +1079,9 @@ StatusCode VBFAnalysisAlg::execute() {
   }else{
     if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < DPhijjCut) & (jj_deta > DEtajjCut) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
   }
+  // skim on the photon plus jet events
+  if(m_PhotonSkim && !GammaMETSR) return StatusCode::SUCCESS;
+
   ATH_MSG_DEBUG ("Pass VBF cuts!");
   // encoding met triggers
   trigger_met_encoded=0;
@@ -1353,15 +1363,17 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       if(m_runNumberInput==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);
       if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);// filtered Sherpa samples use nnPDF
 
-      if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
-        tMapFloat["nloEWKWeight__1up"]=1.0;
-        tMapFloatW["nloEWKWeight__1up"]=1.0;
-        m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
-      }
-      if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
-	tMapFloat["nloEWKWeight__1down"]=1.0;
-	tMapFloatW["nloEWKWeight__1down"]=1.0;
-	m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
+      if(m_runNumberInput==346600 || m_runNumberInput==308276 || m_runNumberInput==308567) {
+	if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
+	  tMapFloat["nloEWKWeight__1up"]=1.0;
+	  tMapFloatW["nloEWKWeight__1up"]=1.0;
+	  m_tree_out->Branch("wnloEWKWeight__1up",&(tMapFloatW["nloEWKWeight__1up"]));
+	}
+	if(tMapFloat.find("nloEWKWeight__1down")==tMapFloat.end()){
+	  tMapFloat["nloEWKWeight__1down"]=1.0;
+	  tMapFloatW["nloEWKWeight__1down"]=1.0;
+	  m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
+	}
       }
       if(tMapFloat.find("puSyst2018Weight__1up")==tMapFloat.end()){
 	tMapFloat ["puSyst2018Weight__1up"]=1.0;
@@ -1374,12 +1386,11 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
       }
       if(tMapFloat.find("puSyst2018Weight__1down")==tMapFloat.end()){
-  tMapFloat ["puSyst2018Weight__1down"]=1.0;
-  tMapFloatW["puSyst2018Weight__1down"]=1.0;
-  m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
+	tMapFloat ["puSyst2018Weight__1down"]=1.0;
+	tMapFloatW["puSyst2018Weight__1down"]=1.0;
+	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
       }
-
-
+      // QG inputs
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
 	if(tMapFloat.find(m_qgVars.at(iQG))==tMapFloat.end()){
 	  tMapFloat[m_qgVars.at(iQG)]=1.0;
@@ -1388,17 +1399,18 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	}
       }// end qg variables
 
-    // Vjets weight + systematics
-    for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){
-      if(tMapFloat.find(m_vjVariations.at(iVj))==tMapFloat.end()){
-        tMapFloat[m_vjVariations.at(iVj)]=1.0;
-        tMapFloatW[m_vjVariations.at(iVj)]=1.0;
-        m_tree_out->Branch("w"+m_vjVariations.at(iVj),&(tMapFloatW[m_vjVariations.at(iVj)]));
-      }
-      }// end Vjets variations
-
-    }
-  }
+      // Vjets weight + systematics
+      if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
+	for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){
+	  if(tMapFloat.find(m_vjVariations.at(iVj))==tMapFloat.end()){
+	    tMapFloat[m_vjVariations.at(iVj)]=1.0;
+	    tMapFloatW[m_vjVariations.at(iVj)]=1.0;
+	    m_tree_out->Branch("w"+m_vjVariations.at(iVj),&(tMapFloatW[m_vjVariations.at(iVj)]));
+	  }
+	}// end Vjets variations
+      }// end check that this is a vjets sample
+    } // end this is nominal
+  }// end this is MC
 
   m_tree->SetBranchStatus("runNumber", 1);
   m_tree->SetBranchStatus("randomRunNumber", 1);

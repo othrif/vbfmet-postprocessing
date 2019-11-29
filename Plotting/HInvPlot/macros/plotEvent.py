@@ -142,7 +142,7 @@ def prepareSeqWCR(basic_cuts, region, alg_take=None, syst='Nominal'):
     region = 'wcr'
 
     do_met_signif=False
-    if basic_cuts.chan in ['ep','em','e']:
+    if basic_cuts.chan in ['ep','em','e','l']:
         do_met_signif=True
 
     if basic_cuts.chan in ['ee','uu','ll','nn','eu'] or not passRegion(region):

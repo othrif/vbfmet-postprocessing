@@ -581,11 +581,29 @@ def prepareBkgRuns(keys,options=None):
                     '366034':'pt140',
                     '366035':'pt280',
                     }
-    bkg_zqcd_sh_ktExt = {'312448':'Zee_PTV100_140_MJJ0_500_KtMerging',
+
+    bkg_zqcd_sh_ktExtalt = {'312448':'Zee_PTV100_140_MJJ0_500_KtMerging',
                          '312449':'Zee_PTV100_140_MJJ500_1000_KtMerging',
-                         '312450':'Zee_PTV100_140_MJJ1000__E_CMS_KtMerging',
                          '312451':'Zee_PTV140_220_MJJ0_500_KtMerging',
                          '312452':'Zee_PTV140_220_MJJ500_1000_KtMerging',
+                         '312460':'Zmm_PTV100_140_MJJ0_500_KtMerging',
+                         '312461':'Zmm_PTV100_140_MJJ500_1000_KtMerging',
+                         '312463':'Zmm_PTV140_220_MJJ0_500_KtMerging',
+                         '312464':'Zmm_PTV140_220_MJJ500_1000_KtMerging',
+                         '312472':'Ztt_PTV100_140_MJJ0_500_KtMerging',
+                         '312473':'Ztt_PTV100_140_MJJ500_1000_KtMerging',
+                         '312475':'Ztt_PTV140_220_MJJ0_500_KtMerging',
+                         '312476':'Ztt_PTV140_220_MJJ500_1000_KtMerging',
+                         '312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',
+                         '312485':'Znunu_PTV100_140_MJJ500_1000_KtMerging',
+                         '312487':'Znunu_PTV140_220_MJJ0_500_KtMerging',
+                         '312488':'Znunu_PTV140_220_MJJ500_1000_KtMerging',                         
+                                }
+    bkg_zqcd_sh_ktExt = {#'312448':'Zee_PTV100_140_MJJ0_500_KtMerging',
+                         #'312449':'Zee_PTV100_140_MJJ500_1000_KtMerging',
+                         '312450':'Zee_PTV100_140_MJJ1000__E_CMS_KtMerging',
+                         #'312451':'Zee_PTV140_220_MJJ0_500_KtMerging',
+                         #'312452':'Zee_PTV140_220_MJJ500_1000_KtMerging',
                          '312453':'Zee_PTV140_220_MJJ1000__E_CMS_KtMerging',
                          '312454':'Zee_PTV220_280_MJJ0_500_KtMerging',
                          '312455':'Zee_PTV220_280_MJJ500_1000_KtMerging',
@@ -593,11 +611,11 @@ def prepareBkgRuns(keys,options=None):
                          '312457':'Zee_PTV280_500_MJJ0_500_KtMerging',
                          '312458':'Zee_PTV280_500_MJJ500_1000_KtMerging',
                          '312459':'Zee_PTV280_500_MJJ1000__E_CMS_KtMerging',
-                         '312460':'Zmm_PTV100_140_MJJ0_500_KtMerging',
-                         '312461':'Zmm_PTV100_140_MJJ500_1000_KtMerging',
+                         #'312460':'Zmm_PTV100_140_MJJ0_500_KtMerging',
+                         #'312461':'Zmm_PTV100_140_MJJ500_1000_KtMerging',
                          '312462':'Zmm_PTV100_140_MJJ1000__E_CMS_KtMerging',
-                         '312463':'Zmm_PTV140_220_MJJ0_500_KtMerging',
-                         '312464':'Zmm_PTV140_220_MJJ500_1000_KtMerging',
+                         #'312463':'Zmm_PTV140_220_MJJ0_500_KtMerging',
+                         #'312464':'Zmm_PTV140_220_MJJ500_1000_KtMerging',
                          '312465':'Zmm_PTV140_220_MJJ1000__E_CMS_KtMerging',
                          '312466':'Zmm_PTV220_280_MJJ0_500_KtMerging',
                          '312467':'Zmm_PTV220_280_MJJ500_1000_KtMerging',
@@ -605,11 +623,11 @@ def prepareBkgRuns(keys,options=None):
                          '312469':'Zmm_PTV280_500_MJJ0_500_KtMerging',
                          '312470':'Zmm_PTV280_500_MJJ500_1000_KtMerging',
                          '312471':'Zmm_PTV280_500_MJJ1000__E_CMS_KtMerging',
-                         '312472':'Ztt_PTV100_140_MJJ0_500_KtMerging',
-                         '312473':'Ztt_PTV100_140_MJJ500_1000_KtMerging',
+                         #'312472':'Ztt_PTV100_140_MJJ0_500_KtMerging',
+                         #'312473':'Ztt_PTV100_140_MJJ500_1000_KtMerging',
                          '312474':'Ztt_PTV100_140_MJJ1000__E_CMS_KtMerging',
-                         '312475':'Ztt_PTV140_220_MJJ0_500_KtMerging',
-                         '312476':'Ztt_PTV140_220_MJJ500_1000_KtMerging',
+                         #'312475':'Ztt_PTV140_220_MJJ0_500_KtMerging',
+                         #'312476':'Ztt_PTV140_220_MJJ500_1000_KtMerging',
                          '312477':'Ztt_PTV140_220_MJJ1000__E_CMS_KtMerging',
                          '312478':'Ztt_PTV220_280_MJJ0_500_KtMerging',
                          '312479':'Ztt_PTV220_280_MJJ500_1000_KtMerging',
@@ -617,11 +635,11 @@ def prepareBkgRuns(keys,options=None):
                          '312481':'Ztt_PTV280_500_MJJ0_500_KtMerging',
                          '312482':'Ztt_PTV280_500_MJJ500_1000_KtMerging',
                          '312483':'Ztt_PTV280_500_MJJ1000__E_CMS_KtMerging',
-                         '312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',
-                         '312485':'Znunu_PTV100_140_MJJ500_1000_KtMerging',
+                         #'312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',
+                         #'312485':'Znunu_PTV100_140_MJJ500_1000_KtMerging',
                          '312486':'Znunu_PTV100_140_MJJ1000__E_CMS_KtMerging',
-                         '312487':'Znunu_PTV140_220_MJJ0_500_KtMerging',
-                         '312488':'Znunu_PTV140_220_MJJ500_1000_KtMerging',
+                         #'312487':'Znunu_PTV140_220_MJJ0_500_KtMerging',
+                         #'312488':'Znunu_PTV140_220_MJJ500_1000_KtMerging',
                          '312489':'Znunu_PTV140_220_MJJ1000__E_CMS_KtMerging',
                          '312490':'Znunu_PTV220_280_MJJ0_500_KtMerging',
                          '312491':'Znunu_PTV220_280_MJJ500_1000_KtMerging',
@@ -630,6 +648,7 @@ def prepareBkgRuns(keys,options=None):
                          '312494':'Znunu_PTV280_500_MJJ500_1000_KtMerging',
                          '312495':'Znunu_PTV280_500_MJJ1000__E_CMS_KtMerging',
                      }
+    bkg_zqcd_sh_ktExt.update(bkg_zqcd_sh_ktExtalt)
     bkg_wqcd_sh_ktExt = {
                          '312496':'Wenu_PTV100_140_MJJ0_500_KtMerging',
                          '312497':'Wenu_PTV100_140_MJJ500_1000_KtMerging',
@@ -1050,7 +1069,48 @@ def prepareBkgRuns(keys,options=None):
                      '364534':'tngamma_pty_70_140',
                      '364535':'tngamma_pty_140_E',
                  }
-    bkg_ttg = {'410082':'ttgamma_noallhad',}
+    bkg_mg_zg = {'345775':'FxFx_eegamma_HT0_125',
+                '345776':'FxFx_eegamma_HTGT125_MjjLT150',
+                '345777':'FxFx_eegamma_HTGT125_MjjLT500',
+                '345778':'FxFx_eegamma_HTGT125_MjjGT500',
+                '345779':'FxFx_mumugamma_HT0_125',
+                '345780':'FxFx_mumugamma_HTGT125_MjjLT150',
+                '345781':'FxFx_mumugamma_HTGT125_MjjLT500',
+                '345782':'FxFx_mumugamma_HTGT125_MjjGT500',
+                '345784':'FxFx_nunugamma_pty_140',
+                         }
+
+    bkg_sherpa_vgg = {'364550':'eegammagamma_pty_17_myy_80',
+                      '364552':'eegammagamma_pty_35_70',
+                      '364553':'eegammagamma_pty_70_140',
+                      '364554':'eegammagamma_pty_140_E_CMS',
+                          '364555':'mumugammagamma_pty_17_myy_80',
+                          '364557':'mumugammagamma_pty_35_70',
+                          '364558':'mumugammagamma_pty_70_140',
+                          '364559':'mumugammagamma_pty_140_E_CMS',
+                          '364560':'tautaugammagamma_pty_17_myy_80',
+                          '364562':'tautaugammagamma_pty_35_70',
+                          '364563':'tautaugammagamma_pty_70_140',
+                          '364564':'tautaugammagamma_pty_140_E_CMS',
+                          '364565':'nunugammagamma_pty_17_myy_80',
+                          '364567':'nunugammagamma_pty_35_70',
+                          '364568':'nunugammagamma_pty_70_140',
+                          '364569':'nunugammagamma_pty_140_E_CMS',
+                          '364570':'enugammagamma_pty_17_myy_80',
+                          '364572':'enugammagamma_pty_35_70',
+                          '364573':'enugammagamma_pty_70_140',
+                          '364574':'enugammagamma_pty_140_E_CMS',
+                          '364575':'munugammagamma_pty_17_myy_80',
+                          '364577':'munugammagamma_pty_35_70',
+                          '364578':'munugammagamma_pty_70_140',
+                          '364579':'munugammagamma_pty_140_E_CMS',
+                          '364580':'taunugammagamma_pty_17_myy_80',
+                          '364582':'taunugammagamma_pty_35_70',
+                          '364583':'taunugammagamma_pty_70_140',
+                          '364584':'taunugammagamma_pty_140_E_CMS',
+                          }
+    bkg_ttg = {'410082':'ttgamma_noallhad',
+                   }
     bkg_pho = {'364541':'SinglePhoton_pty_17_35',
                '364542':'SinglePhoton_pty_35_70',
                '364543':'SinglePhoton_pty_70_140',
@@ -1130,6 +1190,7 @@ def prepareBkgRuns(keys,options=None):
                 #'top2':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
                 'top2':bkg_top2, # all top
+                #'top2':bkg_zqcd_sh_ktExtalt, # all top
                 #'top2':{'345323':'hww'}, # all top
                 #'top2':bkg_zewkpow,
                 #'top2':{'312487':'Znunu_PTV100_140_MJJ0_500_KtMerging','312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',}, # all top
@@ -1155,6 +1216,7 @@ def prepareBkgRuns(keys,options=None):
                 'ttg':bkg_ttg,
                 'pho':bkg_pho,
                 'phoAlt':bkg_pho_v2,
+                'vgg':bkg_sherpa_vgg,
                 #'zqcdMad':bkg_zqcd,
                 #'wqcdMad':bkg_wqcd,
                 #'hvbf':bkg_w_strong_madgraph_wmnu,
@@ -1173,7 +1235,7 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
         bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)
     if not options.mergePTV:
-        bkg_keys['wdpi'].update(bkg_zqcd_znn)        
+        #bkg_keys['wdpi'].update(bkg_zqcd_znn)        
         if  options.year!=2018:
             bkg_keys['wdpi'].update(bkg_vbfPTVExt)
             bkg_keys['wdpi'].update(bkg_zqcd_znn_mc16e)            
@@ -1202,7 +1264,10 @@ def prepareBkgRuns(keys,options=None):
     bkg_keys['wdpi'].update(bkg_wewkpow)
     bkg_keys['wdpi'].update(bkg_zewkpow)
     bkg_keys['wdpi'].update(bkg_zee_228)
+    bkg_keys['wdpi'].update(bkg_mg_zg)
 
+    bkg_keys['wdpi'].update({'410083':'ttgamma4080_noallhad','410084':'ttgamma80_noallhad'})
+    
     if False:
         bkg_keys['zqcdPow']=bkg_z_strong_powheg
         bkg_keys['vbfz']=bkg_vbfFiltZ

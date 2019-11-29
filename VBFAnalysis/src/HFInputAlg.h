@@ -51,7 +51,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   int npevents = 0;
   int year     = 2016;
   Bool_t isMC = true;
-  Bool_t isMadgraph = true;
+  Bool_t isMadgraph = false;
+  Bool_t mergeKTPTV = false;
   Bool_t doTMVA = false;
   Bool_t doLowNom = false; //put nominal yields for "Low" histogram for asymmetric systematics for HistFitter
   Bool_t isHigh = true;
@@ -78,7 +79,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::map<unsigned, TTree *> m_signalOverlapTreeMap;
   unsigned long long m_sigOverlapEvent;
   vector<int> m_sigOverlapCategory;
-  //output tree                                                                                                                                                                                                   
+  //output tree
   std::string currentVariation = "Nominal";
   std::string currentSample = "Z_strong";//"W_strong";
 
@@ -108,6 +109,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t randomRunNumber;
   ULong64_t eventNumber;
   Bool_t in_vy_overlap;
+  Bool_t passVjetsFilter;
+  Bool_t passVjetsFilterTauEl;
   Int_t passJetCleanLoose;
   Int_t passJetCleanTight;
   Int_t trigger_lep;
