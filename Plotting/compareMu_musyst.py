@@ -24,6 +24,9 @@ def ymaxArray(array):
 			if array[i][j].GetMaximum()>ymax:
 				ymax=array[i][j].GetMaximum()
 	return ymax+ymax*0.2
+
+def quad(x0,x1):
+	return math.sqrt(x0**2 + x1**2)
 #############################################
 
 SetAtlasStyle()
@@ -51,10 +54,14 @@ bkgdHists=[[] for _ in xrange(int(fileSets))]
 names=[]
 
 count=-1
+mcStats=[]
+hists=[]
 for infile in inFiles:
+	nom=False
 	if infile.find("up")<=0 and infile.find("down")<=0:
 		names.append(infile)
 		count+=1	
+		nom=True
 
 	in_tmp=ROOT.TFile(inDir+infile,"READ")
 	#print in_tmp
@@ -64,8 +71,13 @@ for infile in inFiles:
 	bkgd=in_tmp.Get("totbkg_averageIntPerXing")
 	bkgd.SetDirectory(0)
 	bkgdHists[count].append(bkgd)
+	if nom:
+		stack=in_tmp.Get("stack")
+		list0=stack.GetListOfPrimitives()
+		for entry in list0:
+			if entry.InheritsFrom('TGraph'):
+				mcStats.append(entry)
 	in_tmp.Close()
-
 
 dataArray=[array('d') for _ in xrange(int(fileSets))]
 bkgdArray=[array('d') for _ in xrange(int(fileSets))]
@@ -91,23 +103,34 @@ for i in range(len(bkgdHists)):
 		downVal=bkgdHists[i][2].GetBinContent(j+1)
 		upVar=upVal-nomVal
 		downVar=nomVal-downVal
+		upMC=mcStats[i].GetErrorYhigh(j)
+		downMC=mcStats[i].GetErrorYlow(j) 
+		#print upMC, downMC
 		#print "Bin "+str(j+1)
 		#print "BKGD: "+str(nomVal)+"(up "+str(upVar)+", down "+str(downVar)+")"
 		bkgdArray[i].append(nomVal)
 		dataArray[i].append(dataHists[i][0].GetBinContent(j+1))
 		if downVar>0 and upVar>0:	
-			bkgdArrayUp[i].append(upVar)
-			bkgdArrayDown[i].append(downVar)
+			#bkgdArrayUp[i].append(upVar)
+			#bkgdArrayDown[i].append(downVar)
+			bkgdArrayUp[i].append(quad(upVar,upMC))
+			bkgdArrayDown[i].append(quad(downVar,downMC))
 		elif downVar<0 and upVar<0:
-			bkgdArrayUp[i].append(abs(downVar))
-			bkgdArrayDown[i].append(abs(upVar))
+			#bkgdArrayUp[i].append(abs(downVar))
+			#bkgdArrayDown[i].append(abs(upVar))
+			bkgdArrayUp[i].append(quad(downVar,upMC))
+			bkgdArrayDown[i].append(quad(upVar,downMC))
 		else:
 			if downVar<0:
-				bkgdArrayUp[i].append(math.sqrt(upVar**2+abs(downVar)**2))
-				bkgdArrayDown[i].append(0.0)
+				#bkgdArrayUp[i].append(math.sqrt(upVar**2+abs(downVar)**2))
+				#bkgdArrayDown[i].append(0.0)
+				bkgdArrayUp[i].append(quad(quad(upVar,downVar),upMC))
+				bkgdArrayDown[i].append(downMC)
 			else:
-				bkgdArrayUp[i].append(0.0)
-				bkgdArrayDown[i].append(math.sqrt(downVar**2+abs(upVar)**2))
+				#bkgdArrayUp[i].append(0.0)
+				#bkgdArrayDown[i].append(math.sqrt(downVar**2+abs(upVar)**2))
+				bkgdArrayUp[i].append(upMC)
+				bkgdArrayDown[i].append(quad(quad(upVar,downVar),downMC))
 	bkgdGraph.append(TGraphAsymmErrors(xbins,xbinArray,bkgdArray[i],halfXbin,halfXbin,bkgdArrayDown[i],bkgdArrayUp[i]))
 	dataGraphNom.append(TGraph(xbins,xbinArray,dataArray[i]))
 	bkgdGraphNom.append(TGraph(xbins,xbinArray,bkgdArray[i]))
@@ -163,11 +186,11 @@ sr=[]
 if "SR" in labels:
 	sr.append(labels.index("SR"))
 
-print sr, len(sr)
+#print sr, len(sr)
 
 stackGraph=[]
 canvas=[]
-legend=TLegend(0.65,0.55,0.9,0.65)
+legend=TLegend(0.65,0.5,0.9,0.6)
 legend.AddEntry(bkgdGraph[0],"All backgrounds-MJ",'l')
 legend.AddEntry(dataGraphNom[0],"Data",'p')
 for i in range(len(bkgdGraph)):
@@ -183,7 +206,6 @@ for i in range(len(bkgdGraph)):
 		stackGraph[i].Add(bkgdGraph[i],"ap")
 	if (len(sr)>0 and i not in sr) or len(sr)==0:
 		stackGraph[i].Add(dataGraphNom[i],"P")
-		print "add data"
 
 	canvas.append(TCanvas("canvas"+str(i),"canvas"+str(i),600,600))
 	bkgdGraph[i].SetTitle("2018 Data;averageIntPerXing (PRW syst);Entries")
@@ -193,6 +215,7 @@ for i in range(len(bkgdGraph)):
 	myText(0.65, 0.8, 1, "59.9/fb")
 	myText(0.65, 0.75, 1, "VBF Hinv")
 	myText(0.65, 0.7, 1, labels[i])
+	myText(0.65, 0.65, 1, MC stat+PRW error bars")
 	legend.SetBorderSize(0)
 	legend.Draw()
 	if bands:
@@ -203,3 +226,4 @@ for i in range(len(bkgdGraph)):
 if not os.path.exists("compareMuOutput_musyst"):
 	os.system("mkdir compareMuOutput_musyst")
 os.system("mv *.png compareMuOutput_musyst")
+
