@@ -152,10 +152,18 @@ for infile in names:
 			labels.append("1LVR_"+infile[infile.find("mjjLowNjet")+11])
 		elif infile[infile.find("mjjLowNjet")+11]=="n":#0lvr
 			labels.append("0LVR")
+	elif infile.find("fjvtVR")>0:
+		analysis.append("fjvtVR")
+		if infile[infile.find("fjvtVR")+7]!="n":#1lvr
+			labels.append("1LfjvtVR_"+infile[infile.find("fjvtVR")+7])
+		elif infile[infile.find("fjvtVR")+7]=="n":#0lvr
+			labels.append("0LfjvtVR")
 
 sr=[]
 if "SR" in labels:
 	sr.append(labels.index("SR"))
+
+print sr, len(sr)
 
 stackGraph=[]
 canvas=[]
@@ -173,8 +181,9 @@ for i in range(len(bkgdGraph)):
 	else:
 		bkgdGraph[i].SetMarkerSize(0)
 		stackGraph[i].Add(bkgdGraph[i],"ap")
-	if len(sr)>0 and i not in sr:
+	if (len(sr)>0 and i not in sr) or len(sr)==0:
 		stackGraph[i].Add(dataGraphNom[i],"P")
+		print "add data"
 
 	canvas.append(TCanvas("canvas"+str(i),"canvas"+str(i),600,600))
 	bkgdGraph[i].SetTitle("2018 Data;averageIntPerXing (PRW syst);Entries")

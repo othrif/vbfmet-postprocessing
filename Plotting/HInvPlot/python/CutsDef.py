@@ -288,12 +288,18 @@ def ExtraCuts(basic_cuts, options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
 
     # Cut is under discussion
+    cutFjvt = CutItem('CutFJVT')
     if not isEMu:
-        cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
-    if basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt' and basic_cuts.analysis!='njgt4' and basic_cuts.analysis!'fjvtVR':
-        cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
+        #cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
+        cutFjvt.AddCut(CutItem('CutJetMETSoft','met_soft_tst_et < 20.0'),'AND')
+    if basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt' and basic_cuts.analysis!='njgt4' and basic_cuts.analysis!='fjvtVR':
+        #cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
+        cutFjvt.AddCut(CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5'),'AND')
     elif basic_cuts.analysis=='fjvtVR':
-	cuts += [CutItem('CutFJVT', 'j0fjvt > 0.5 || j1fjvt > 0.5 || (j0fjvt > 0.5 && j1fjvt > 0.5)')]
+	cutFjvt.AddCut(CutItem('CutFJVT0', 'j0fjvt > 0.5'),'OR')
+	cutFjvt.AddCut(CutItem('CutFJVT1', 'j1fjvt > 0.5'),'OR')
+	cutFjvt.AddCut(CutItem('CutFJVT2', 'j0fjvt > 0.5 && j1fjvt > 0.5'),'OR')
+    cuts += [cutFjvt]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
     return cuts
@@ -382,7 +388,9 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET
 	    if basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt' and basic_cuts.analysis!='njgt4' and basic_cuts.analysis!='fjvtVR':
                 cutMET.AddCut(CutItem('LowMET', '%s > %s' %(met_choice, metCut)), 'OR')
 	    elif basic_cuts.analysis=='fjvtVR':
-                cutMET.AddCut(CutItem('LowMET', '%s > %s && (j0fjvt > 0.2 || j1fjvt > 0.2  || (j0fjvt > 0.2 && j1fjvt > 0.2))' %(met_choice, metCut)), 'OR')
+                cutMET.AddCut(CutItem('LowMET0', '%s > %s && j0fjvt > 0.2' %(met_choice, metCut)), 'OR')
+                cutMET.AddCut(CutItem('LowMET1', '%s > %s && j1fjvt > 0.2' %(met_choice, metCut)), 'OR')
+                cutMET.AddCut(CutItem('LowMET2', '%s > %s && j0fjvt > 0.2 && j1fjvt > 0.2' %(met_choice, metCut)), 'OR')
 	    else:
                 cutMET.AddCut(CutItem('LowMET', '%s > %s && j0fjvt < 0.2 && j1fjvt < 0.2' %(met_choice, metCut)), 'OR')
             cuts = [cutMET]
