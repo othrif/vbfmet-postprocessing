@@ -135,6 +135,7 @@ def getSelKeyLabel(selkey):
         elif selkey.count('njgt2_'):  proc += ',2<N_{jet}'            
         elif selkey.count('njgt3_'):  proc += ',3<N_{jet}'            
         elif selkey.count('mjjLowNjet2_'):  proc += ',2<N_{jet},M_{jj}<0.8TeV'            
+        elif selkey.count('fjvtVR'):  proc += ', fJVT VR'            
         if selkey.count('sr_'):  proc += ', SR'
         elif selkey.count('wcr'):
             if 'anti' in selkey:

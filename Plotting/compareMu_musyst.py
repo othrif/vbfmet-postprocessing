@@ -37,6 +37,15 @@ inDir=sys.argv[1]
 if inDir[-1]!='/':
         inDir+='/'
 
+#directory structure: files must be contined in subdirectory that is the name of the variable to plot
+var=inDir
+print var
+var=var[:-1]#remove final /
+direc=var.rfind("/") #find variable name
+var=var[direc+1:]
+print var
+print inDir
+
 print len(sys.argv)
 bands=False
 if len(sys.argv)==3:
@@ -65,10 +74,10 @@ for infile in inFiles:
 
 	in_tmp=ROOT.TFile(inDir+infile,"READ")
 	#print in_tmp
-	data=in_tmp.Get("data_averageIntPerXing")
+	data=in_tmp.Get("data_"+var)
 	data.SetDirectory(0)
 	dataHists[count].append(data)
-	bkgd=in_tmp.Get("totbkg_averageIntPerXing")
+	bkgd=in_tmp.Get("totbkg_"+var)
 	bkgd.SetDirectory(0)
 	bkgdHists[count].append(bkgd)
 	if nom:
@@ -83,17 +92,27 @@ dataArray=[array('d') for _ in xrange(int(fileSets))]
 bkgdArray=[array('d') for _ in xrange(int(fileSets))]
 bkgdArrayUp=[array('d') for _ in xrange(int(fileSets))]
 bkgdArrayDown=[array('d') for _ in xrange(int(fileSets))]
+prwUp=[array('d') for _ in xrange(int(fileSets))]
+prwDown=[array('d') for _ in xrange(int(fileSets))]
+mcUp=[array('d') for _ in xrange(int(fileSets))]
+mcDown=[array('d') for _ in xrange(int(fileSets))]
 
 dataGraphNom=[]
 bkgdGraphNom=[]
 bkgdGraph=[]
+bkgdGraphprw=[]
+bkgdGraphmc=[]
 
 xbins=dataHists[0][0].GetNbinsX()
 xbinWidth=dataHists[0][0].GetBinWidth(1)
-xbinArray,halfXbin=array('d'),array('d')
+xbinArray,xbinArray1,xbinArray2,halfXbin,zeros=array('d'),array('d'),array('d'),array('d'),array('d')
+rang=xbins*xbinWidth
 for xbin in range(xbins):
 	xbinArray.append(dataHists[0][0].GetBinCenter(xbin+1))
+	xbinArray1.append(dataHists[0][0].GetBinCenter(xbin+1)+(rang*0.01))
+	xbinArray2.append(dataHists[0][0].GetBinCenter(xbin+1)-(rang*0.01))
 	halfXbin.append(xbinWidth/2.0)
+	zeros.append(0.0)
 
 #use syst to set errors
 for i in range(len(bkgdHists)):
@@ -103,35 +122,41 @@ for i in range(len(bkgdHists)):
 		downVal=bkgdHists[i][2].GetBinContent(j+1)
 		upVar=upVal-nomVal
 		downVar=nomVal-downVal
-		upMC=mcStats[i].GetErrorYhigh(j)
+		upMC=mcStats[i].GetErrorYhigh(j)#why are indices off? confirmed this is correctly matched with nominal bins...
 		downMC=mcStats[i].GetErrorYlow(j) 
-		#print upMC, downMC
 		#print "Bin "+str(j+1)
-		#print "BKGD: "+str(nomVal)+"(up "+str(upVar)+", down "+str(downVar)+")"
+		#print "BKGD: vals..... nom = "+str(nomVal)+", up= "+str(upVal)+", down= "+str(downVal)
+		#print "BKGD: PRW "+str(nomVal)+"(up "+str(upVar)+", down "+str(downVar)+")"
+		#print "BKGD: MC "+str(nomVal)+"(up "+str(upMC)+", down "+str(downMC)+")"
 		bkgdArray[i].append(nomVal)
 		dataArray[i].append(dataHists[i][0].GetBinContent(j+1))
+		mcUp[i].append(upMC)
+		mcDown[i].append(downMC)
 		if downVar>0 and upVar>0:	
-			#bkgdArrayUp[i].append(upVar)
-			#bkgdArrayDown[i].append(downVar)
 			bkgdArrayUp[i].append(quad(upVar,upMC))
 			bkgdArrayDown[i].append(quad(downVar,downMC))
+			prwUp[i].append(upVar)
+			prwDown[i].append(downVar)
 		elif downVar<0 and upVar<0:
-			#bkgdArrayUp[i].append(abs(downVar))
-			#bkgdArrayDown[i].append(abs(upVar))
 			bkgdArrayUp[i].append(quad(downVar,upMC))
 			bkgdArrayDown[i].append(quad(upVar,downMC))
+			prwUp[i].append(abs(downVar))
+			prwDown[i].append(abs(upVar))
 		else:
 			if downVar<0:
-				#bkgdArrayUp[i].append(math.sqrt(upVar**2+abs(downVar)**2))
-				#bkgdArrayDown[i].append(0.0)
 				bkgdArrayUp[i].append(quad(quad(upVar,downVar),upMC))
 				bkgdArrayDown[i].append(downMC)
+				prwUp[i].append(quad(upVar,downVar))
+				prwDown[i].append(0.0)
 			else:
-				#bkgdArrayUp[i].append(0.0)
-				#bkgdArrayDown[i].append(math.sqrt(downVar**2+abs(upVar)**2))
 				bkgdArrayUp[i].append(upMC)
 				bkgdArrayDown[i].append(quad(quad(upVar,downVar),downMC))
+				prwUp[i].append(0.0)
+				prwDown[i].append(quad(downVar,upVar))
+		#print "BKGD: COMB (up "+str(bkgdArrayUp[i][j])+", down "+str(bkgdArrayDown[i][j])+")"
 	bkgdGraph.append(TGraphAsymmErrors(xbins,xbinArray,bkgdArray[i],halfXbin,halfXbin,bkgdArrayDown[i],bkgdArrayUp[i]))
+	bkgdGraphprw.append(TGraphAsymmErrors(xbins,xbinArray1,bkgdArray[i],zeros,zeros,prwDown[i],prwUp[i]))
+	bkgdGraphmc.append(TGraphAsymmErrors(xbins,xbinArray2,bkgdArray[i],zeros,zeros,mcDown[i],mcUp[i]) )
 	dataGraphNom.append(TGraph(xbins,xbinArray,dataArray[i]))
 	bkgdGraphNom.append(TGraph(xbins,xbinArray,bkgdArray[i]))
 
@@ -191,8 +216,15 @@ if "SR" in labels:
 stackGraph=[]
 canvas=[]
 legend=TLegend(0.65,0.5,0.9,0.6)
-legend.AddEntry(bkgdGraph[0],"All backgrounds-MJ",'l')
+legend.AddEntry(bkgdGraph[0],"All backgrounds",'l')
+legend.AddEntry(bkgdGraphprw[0],"PRW syst only",'l')
+legend.AddEntry(bkgdGraphmc[0],"MC Stat syst only",'l')
 legend.AddEntry(dataGraphNom[0],"Data",'p')
+legendSR=TLegend(0.65,0.5,0.9,0.6)
+legendSR.AddEntry(bkgdGraph[0],"All backgrounds-MJ",'l')
+legendSR.AddEntry(bkgdGraphprw[0],"PRW syst only",'l')
+legendSR.AddEntry(bkgdGraphmc[0],"MC Stat syst only",'l')
+legendSR.AddEntry(dataGraphNom[0],"Data",'p')
 for i in range(len(bkgdGraph)):
 	stackGraph.append(TMultiGraph())
 	if bands:
@@ -203,27 +235,40 @@ for i in range(len(bkgdGraph)):
 		bkgdGraph[i].SetMarkerSize(0)
 	else:
 		bkgdGraph[i].SetMarkerSize(0)
-		stackGraph[i].Add(bkgdGraph[i],"ap")
+		bkgdGraph[i].SetLineWidth(2)
+		bkgdGraphprw[i].SetMarkerSize(0)
+		bkgdGraphprw[i].SetLineColor(kRed)
+		bkgdGraphmc[i].SetMarkerSize(0)
+		bkgdGraphmc[i].SetLineColor(kBlue)
+		stackGraph[i].Add(bkgdGraphmc[i])
+		stackGraph[i].Add(bkgdGraphprw[i])
+		stackGraph[i].Add(bkgdGraph[i])
 	if (len(sr)>0 and i not in sr) or len(sr)==0:
 		stackGraph[i].Add(dataGraphNom[i],"P")
 
 	canvas.append(TCanvas("canvas"+str(i),"canvas"+str(i),600,600))
-	bkgdGraph[i].SetTitle("2018 Data;averageIntPerXing (PRW syst);Entries")
-	stackGraph[i].Draw()
+	stackGraph[i].SetTitle("2018 Data;"+var+";Entries")
+	stackGraph[i].Draw("AP")
 	ATLASLabel(0.6, 0.9, "Internal")
 	myText(0.65, 0.85, 1, "#sqrt{s}= 13 TeV")
 	myText(0.65, 0.8, 1, "59.9/fb")
 	myText(0.65, 0.75, 1, "VBF Hinv")
 	myText(0.65, 0.7, 1, labels[i])
-	myText(0.65, 0.65, 1, MC stat+PRW error bars")
-	legend.SetBorderSize(0)
-	legend.Draw()
+	myText(0.65, 0.65, 1, "MC stat+PRW error bars")
+	if i==sr:
+		legendSR.SetBorderSize(0)
+		legendSR.Draw()
+	else:
+		legend.SetBorderSize(0)
+		legend.Draw()
 	if bands:
 		canvas[i].SaveAs("musyst_"+analysis[i]+"_"+labels[i]+"_bands.png")
+		canvas[i].SaveAs("musyst_"+analysis[i]+"_"+labels[i]+"_bands.pdf")
 	else:
 		canvas[i].SaveAs("musyst_"+analysis[i]+"_"+labels[i]+".png")
+		canvas[i].SaveAs("musyst_"+analysis[i]+"_"+labels[i]+".pdf")
 
-if not os.path.exists("compareMuOutput_musyst"):
-	os.system("mkdir compareMuOutput_musyst")
-os.system("mv *.png compareMuOutput_musyst")
-
+if not os.path.exists("compareMuOutput_musyst_"+var):
+	os.system("mkdir compareMuOutput_musyst_"+var)
+os.system("mv *.png compareMuOutput_musyst_"+var)
+os.system("mv *.pdf compareMuOutput_musyst_"+var)
