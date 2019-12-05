@@ -39,14 +39,10 @@ if inDir[-1]!='/':
 
 #directory structure: files must be contined in subdirectory that is the name of the variable to plot
 var=inDir
-print var
 var=var[:-1]#remove final /
 direc=var.rfind("/") #find variable name
 var=var[direc+1:]
-print var
-print inDir
 
-print len(sys.argv)
 bands=False
 if len(sys.argv)==3:
 	if sys.argv[2]=="bands":
