@@ -3,7 +3,7 @@
 OUTDIRM=${1:-v34mc16a}
 #OUTDIRM=v34ELooseNoPileupWeightNoHemi
 mkdir $OUTDIRM
-hadd $OUTDIRM/data.root data*root
+#hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
 #rm VVV*root
 hadd $OUTDIRM/Z_strong_VBFFilt.root Z_strong_VBFFilt*root

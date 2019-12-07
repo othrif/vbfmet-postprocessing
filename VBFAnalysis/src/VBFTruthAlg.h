@@ -201,7 +201,7 @@ private:
    vector<float>   *new_mu_eta;
    vector<float>   *new_mu_phi;
    vector<int>     *new_mu_pdgid;
-   vector<float>   *new_mu_charge;
+   vector<float>     *new_mu_charge;
    Int_t           new_nbosons;
    vector<float>   *new_boson_m;
    vector<float>   *new_boson_pt;
@@ -215,6 +215,7 @@ private:
    vector<float>   *new_nu_eta;
    vector<float>   *new_nu_phi;
    vector<int>     *new_nu_pdgid;
+   vector<float>   *new_nu_charge;
    Float_t         new_met_et;
    Float_t         new_met_phi;
    Float_t         new_met_nolep_et;

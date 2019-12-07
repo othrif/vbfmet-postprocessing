@@ -105,6 +105,7 @@ StatusCode VBFTruthAlg::initialize() {
   new_boson_eta = new std::vector<float>(0);
   new_boson_phi = new std::vector<float>(0);
   new_boson_pdgid = new std::vector<int>(0);
+  new_nu_charge = new std::vector<float>(0);
   new_nu_e = new std::vector<float>(0);
   new_nu_pt = new std::vector<float>(0);
   new_nu_eta = new std::vector<float>(0);
@@ -123,6 +124,7 @@ StatusCode VBFTruthAlg::initialize() {
   m_tree_out->Branch("njets",&new_njets);
   m_tree_out->Branch("nels",&new_nels);
   m_tree_out->Branch("nmus",&new_nmus);
+  m_tree_out->Branch("nnus",&new_nnus);
   m_tree_out->Branch("jj_mass",&new_jj_mass);
   m_tree_out->Branch("jj_deta",&new_jj_deta);
   m_tree_out->Branch("jj_dphi",&new_jj_dphi);
@@ -144,16 +146,15 @@ StatusCode VBFTruthAlg::initialize() {
   m_tree_out->Branch("jet_E",&new_jet_E);
   m_tree_out->Branch("met_significance",&new_met_significance);
   m_tree_out->Branch("lep_jet_dR",&new_lep_jet_dR);
-/*  m_tree_out->Branch("boson_m",&new_boson_m);
-  m_tree_out->Branch("boson_pt",&new_boson_pt);
-  m_tree_out->Branch("boson_phi",&new_boson_phi);
-  m_tree_out->Branch("boson_eta",&new_boson_eta);
-  m_tree_out->Branch("boson_pdgid",&new_boson_pdgid);
-  m_tree_out->Branch("nu_m",&new_nu_m);
+  m_tree_out->Branch("boson_m",&boson_m);
+  m_tree_out->Branch("boson_pt",&boson_pt);
+  m_tree_out->Branch("boson_phi",&boson_phi);
+  m_tree_out->Branch("boson_eta",&boson_eta);
+  m_tree_out->Branch("boson_pdgid",&boson_pdgid);
   m_tree_out->Branch("nu_pt",&new_nu_pt);
   m_tree_out->Branch("nu_phi",&new_nu_phi);
   m_tree_out->Branch("nu_eta",&new_nu_eta);
-  m_tree_out->Branch("nu_pdgid",&new_nu_pdgid);*/
+  m_tree_out->Branch("nu_pdgid",&new_nu_charge);
   m_tree_out->Branch("mll",&new_Mll);
   m_tree_out->Branch("hasZ",&new_hasZ);
 
@@ -224,7 +225,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   my_jets jet_signal;
   jet_signal.num_jets = 0;
   for (size_t jeti = 0; jeti < jet_pt->size(); jeti++)
-    if(jet_pt->at(jeti)>25e3 && fabs(jet_eta->at(jeti)) < 4.5)
+  //  if(jet_pt->at(jeti)>25e3 && fabs(jet_eta->at(jeti)) < 4.5)
     {
       jet_signal.index[jet_signal.num_jets] = jeti;
       jet_signal.E[jet_signal.num_jets] =  jet_E->at(jeti);
@@ -241,7 +242,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   my_leptons el_signal;
   el_signal.num_leptons = 0;
   for (size_t lepi = 0; lepi < el_pt->size(); lepi++)
-    if(el_pt->at(lepi)>10e3 && fabs(el_eta->at(lepi)) < 2.5)
+ //   if(el_pt->at(lepi)>10e3 && fabs(el_eta->at(lepi)) < 2.5)
     {
       el_signal.index[el_signal.num_leptons] = lepi;
       el_signal.pT[el_signal.num_leptons] = el_pt->at(lepi);
@@ -259,7 +260,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   my_leptons mu_signal;
   mu_signal.num_leptons = 0;
   for (size_t lepi = 0; lepi < mu_pt->size(); lepi++)
-    if(mu_pt->at(lepi)>10e3 && fabs(mu_eta->at(lepi)) < 2.5)
+  //  if(mu_pt->at(lepi)>10e3 && fabs(mu_eta->at(lepi)) < 2.5)
     {
       mu_signal.index[mu_signal.num_leptons] = lepi;
       mu_signal.pT[mu_signal.num_leptons] = mu_pt->at(lepi);
@@ -272,6 +273,24 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   new_nmus = mu_signal.num_leptons;
   sortLeptons(&mu_signal);
   containsZ(&mu_signal);
+
+  // neutrinos
+  my_leptons nu_signal;
+  nu_signal.num_leptons = 0;
+  for (size_t lepi = 0; lepi < nu_pt->size(); lepi++)
+   // if(nu_pt->at(lepi)>10e3 && fabs(nu_eta->at(lepi)) < 2.5)
+    {
+      nu_signal.index[nu_signal.num_leptons] = lepi;
+      nu_signal.pT[nu_signal.num_leptons] = nu_pt->at(lepi);
+      nu_signal.phi[nu_signal.num_leptons] = nu_phi->at(lepi);
+      nu_signal.eta[nu_signal.num_leptons] = nu_eta->at(lepi);
+      nu_signal.is_electron[nu_signal.num_leptons] = false;
+      nu_signal.charge[nu_signal.num_leptons] = nu_pdgid->at(lepi);
+      nu_signal.num_leptons++;
+  }
+  new_nnus = nu_signal.num_leptons;
+  sortLeptons(&nu_signal);
+  containsZ(&nu_signal);
 
 // Fill new variables of tree
   new_jet_E->clear();
@@ -286,6 +305,10 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   new_el_eta->clear();
   new_el_phi->clear();
   new_el_charge->clear();
+  new_nu_pt->clear();
+  new_nu_eta->clear();
+  new_nu_phi->clear();
+  new_nu_charge->clear();
 
   for (size_t i_jet=0; i_jet<new_njets; i_jet++){
       new_jet_E->push_back(jet_signal.E[i_jet]);
@@ -305,9 +328,16 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
       new_mu_phi->push_back(mu_signal.phi[i_mu]);
       new_mu_charge->push_back(mu_signal.charge[i_mu]);
   }
+  for (size_t i_nu=0; i_nu<new_nnus; i_nu++){
+      new_nu_pt->push_back(nu_signal.pT[i_nu]);
+      new_nu_eta->push_back(nu_signal.eta[i_nu]);
+      new_nu_phi->push_back(nu_signal.phi[i_nu]);
+      new_nu_charge->push_back(nu_signal.charge[i_nu]);
+  }
 
   if(new_nels>1) {new_Mll = el_signal.Mll; new_hasZ = el_signal.has_Z_OS;}
   else if(new_nmus>1) {new_Mll = mu_signal.Mll; new_hasZ = mu_signal.has_Z_OS;}
+  else if(new_nnus>1) {new_Mll = nu_signal.Mll; new_hasZ = nu_signal.has_Z_OS;}
   else {new_Mll = -9999.; new_hasZ = el_signal.has_Z_OS;}
 
   computejj(&jet_signal, new_jj_mass, new_jj_deta, new_jj_dphi);
@@ -432,7 +462,14 @@ new_w = weight*EventWeight;
       }
     }
 
-m_tree_out->Fill();
+
+   // speed up
+  Bool_t saveMe = (new_njets > 1 && new_jet_pt->at(0) >= 60e3 && new_jet_pt->at(1) >= 40e3);
+  saveMe &= (new_jj_mass > 200e3 && new_jj_deta>2.5);
+  saveMe &= (new_met_et > 100e3 || new_met_nolep_et > 100e3);
+
+  if (saveMe)
+    m_tree_out->Fill();
 
 return StatusCode::SUCCESS;
 }
