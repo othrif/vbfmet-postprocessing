@@ -135,23 +135,10 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
     if Binning==10:
         fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
         fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
-    if Binning==11:
-        fakeelesp = [7.4, 7.0, 4.1, 3.4, 1.8, 7.4, 7.0, 4.1, 3.4, 1.8, 5.8]
-        fakeelesm = [7.4, 7.0, 4.1, 3.4, 1.8, 7.4, 7.0, 4.1, 3.4, 1.8, 5.8]
+    if Binning==11: # set for all years
+        fakeelesp = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1]
+        fakeelesm = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1]
 
-    # later years
-    if year==2017:
-        if Binning==11:
-            fakeelesp = [9.2, 8.3, 15.0, 8.9, 3.7, 9.2, 8.3, 15.0, 8.9, 3.7, 2.0]
-            fakeelesm = [9.2, 8.3, 15.0, 8.9, 3.7, 9.2, 8.3, 15.0, 8.9, 3.7, 5.3]
-        else:
-            print 'MJ is not defined for binning: ',Binning
-    elif year==2018:
-        if Binning==11:
-            fakeelesp = [12.5, 14.6, 15.8, 15.8, 3.8, 12.5, 14.6, 15.8, 15.8, 3.8, 5.3]
-            fakeelesm = [12.5, 14.6, 15.8, 15.8, 3.8, 12.5, 14.6, 15.8, 15.8, 3.8, 5.3]
-        else:
-            print 'MJ is not defined for binning: ',Binning
     if doDoubleRatio:
         fakeelesp+=[12.5]
         fakeelesm+=[12.5]

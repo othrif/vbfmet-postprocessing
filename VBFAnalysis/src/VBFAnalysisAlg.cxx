@@ -65,7 +65,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     my_signalSystHelper.initialize();
 
     // Vjets weight + systematics
-    if(m_isMC && m_currentVariation=="Nominal"){
+    if(m_isMC){
       if ( m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos ) {
 	std::string vjFilePath = "VBFAnalysis/theoretical_corrections.root";
 	my_vjSystHelper.setInputFileName(PathResolverFindCalibFile(vjFilePath));
@@ -73,6 +73,7 @@ StatusCode VBFAnalysisAlg::initialize() {
 	my_vjSystHelper.applyQCDCorrection(true);
 	my_vjSystHelper.mergePDF(true);
 	my_vjSystHelper.smoothQCDCorrection(false);
+	my_vjSystHelper.setNominalOnly(m_currentVariation!="Nominal");
 	my_vjSystHelper.initialize();
 	m_vjVariations = my_vjSystHelper.getAllVariationNames();
       }
@@ -550,13 +551,15 @@ StatusCode VBFAnalysisAlg::execute() {
   //Vjets weight and systematics
   vjWeight = 1.0;
 
-  if ( m_isMC  && (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos )) {
+  if ( m_isMC && (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos )) {
     // Nominal
     vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(0));
-    // Variations
-    for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){ // exclude nominal
-      tMapFloat[m_vjVariations.at(iVj)]=my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(iVj));
-    }
+    if(m_currentVariation=="Nominal"){
+      // Variations
+      for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){ // exclude nominal
+	tMapFloat[m_vjVariations.at(iVj)]=my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(iVj));
+      }
+    }// end systematics
   }
 
   // iterate event count

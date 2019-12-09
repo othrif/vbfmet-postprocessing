@@ -25,6 +25,7 @@ VJetsSystHelper::VJetsSystHelper()
    m_applyQCDCorrection["vvj"] = true;
    m_smoothQCDCorrection = true;
    m_mergePDF = true;
+   m_nominalOnly = false;
 }
 
 VJetsSystHelper::~VJetsSystHelper()
@@ -100,6 +101,8 @@ int VJetsSystHelper::initialize()
      variations.push_back("vjets_" + TString::Format("dK_PDF_%d__1up", p + 1));
      variations.push_back("vjets_" + TString::Format("dK_PDF_%d__1down", p + 1));
    }
+
+   if(m_nominalOnly){ variations.clear(); variations.push_back("Nominal"); }
    m_variations = variations;
 
    TFile *fIn = TFile::Open(m_inputName, "READ");
@@ -477,4 +480,8 @@ TH1 *rebinHisto(TH1 *h)
    }
 
    return hr;
+}
+
+void VJetsSystHelper::setNominalOnly(bool setNominalOnly){
+  m_nominalOnly=setNominalOnly;
 }
