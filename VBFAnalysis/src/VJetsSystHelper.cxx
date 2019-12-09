@@ -118,8 +118,8 @@ int VJetsSystHelper::initialize()
       TH1 *hMC_SmoothUp = (TH1*)hMC->Clone(process + "_mc_smoothUp");
       TH1 *hMC_SmoothDn = (TH1*)hMC->Clone(process + "_mc_smoothDn");
       TH1 *hSLO = getHisto(fIn, process + "_pTV_LO");
-      TH1 *hNNLO = getHisto(fIn, process + "_pTV_NNLO");
-      TH1 *hKNLO = getHisto(fIn, process + "_pTV_K_NLO");
+      //TH1 *hNNLO = getHisto(fIn, process + "_pTV_NNLO");
+      //TH1 *hKNLO = getHisto(fIn, process + "_pTV_K_NLO");
       TH1 *hKNNLO = getHisto(fIn, process + "_pTV_K_NNLO");
       TH1 *hd1KNNLO = getHisto(fIn, process + "_pTV_d1K_NNLO");
       TH1 *hd2KNNLO = getHisto(fIn, process + "_pTV_d2K_NNLO");
@@ -251,7 +251,7 @@ int VJetsSystHelper::initialize()
             double d2kappa_EW = hd2kEW->GetBinContent(bin);
             double d3kappa_EW = hd3kEW->GetBinContent(bin);
             double K_NNLO = hKNNLO->GetBinContent(bin);
-            double K_NLO = hKNLO->GetBinContent(bin);
+            //double K_NLO = hKNLO->GetBinContent(bin);
             double d1K_NNLO = hd1KNNLO->GetBinContent(bin);
             double d2K_NNLO = hd2KNNLO->GetBinContent(bin);
             double d3K_NNLO = hd3KNNLO->GetBinContent(bin);
@@ -264,7 +264,7 @@ int VJetsSystHelper::initialize()
 
 
             double sLO = hSLO->GetBinContent(bin);
-            double thNNLO = hNNLO->GetBinContent(bin);
+            //double thNNLO = hNNLO->GetBinContent(bin);
 
             double e_kappa_EW = kappa_EW + e[0] * d1kappa_EW + e[1] * d2kappa_EW + e[2] * d3kappa_EW;
             double e_K_NNLO = K_NNLO + e[3] * d1K_NNLO + e[4] * d2K_NNLO + e[5] * d3K_NNLO ;

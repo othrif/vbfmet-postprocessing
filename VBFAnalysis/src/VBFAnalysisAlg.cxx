@@ -1016,7 +1016,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if((runNumber>=312448 && runNumber<=312531)){
     passVjetsPTV=true; // these are the KT merged samples 100-500 GeV
     // use passVjetsFilter as it was calculated...nothing more needs to be done here
-    if(SherpaVTruthPt<120.0e3) passVjetsFilter=false; //remove if pTV<140 
+    if(SherpaVTruthPt<120.0e3){ passVjetsFilter=false; passVjetsFilterTauEl=false; } //remove if pTV<140 
   }
   else if((runNumber>=364100 && runNumber<=364113) || // Zmm MAXPTHT
      (runNumber>=364114 && runNumber<=364127) || // Zee MAXPTHT
@@ -1031,9 +1031,9 @@ StatusCode VBFAnalysisAlg::execute() {
     else passVjetsPTV = false;
 
     // merging using the truth info
-    if(SherpaVTruthPt>120.0e3 && SherpaVTruthPt<500.0e3) passVjetsFilter=(!passVjetsFilter); //flip to use those that fail
-    else passVjetsFilter=true;
-  }else{ passVjetsFilter=true; }
+    if(SherpaVTruthPt>120.0e3 && SherpaVTruthPt<500.0e3){ passVjetsFilter=(!passVjetsFilter); passVjetsFilterTauEl=(!passVjetsFilterTauEl); }//flip to use those that fail
+    else{ passVjetsFilter=true; passVjetsFilterTauEl=true; }
+  }else{ passVjetsFilter=true; passVjetsFilterTauEl=true; }
 
   // Fixing a bug in the variables
   if(jet_phi->size()>1){
