@@ -642,6 +642,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::met_tenacious_tst_nolep_phi);
   fSkipVarsQCD.insert(Mva::bcid);
   fSkipVarsQCD.insert(Mva::BCIDDistanceFromFront);
+  fSkipVarsQCD.insert(Mva::passVjetsFilterTauEl);
   fSkipVarsQCD.insert(Mva::lb);
   fSkipVarsQCD.insert(Mva::n_mu_w);
   fSkipVarsQCD.insert(Mva::n_el_w);
@@ -675,6 +676,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->RepVar(Mva::n_mu_w, 0);
       event->RepVar(Mva::n_el_w, 0);
       event->RepVar(Mva::n_mu_baseline_noOR, 0);
+      event->RepVar(Mva::passVjetsFilterTauEl, 1);      
       event->RepVar(Mva::lep_trig_match, 0);
     }
 

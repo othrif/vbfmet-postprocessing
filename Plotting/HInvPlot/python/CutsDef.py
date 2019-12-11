@@ -27,6 +27,7 @@ class BasicCuts:
         if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
                             'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2',
                                 'njgt2','njgt2lt5','njgt3lt5',
+                                'LowMETQCDRevFJVT',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
                             'metsfVBFTopo','metsfxe110XE70','metsfxe110XE65',
                             'metsfxe90','metsfxe100','metsfxe110L155','metsfxe100L150',
@@ -276,7 +277,10 @@ def ExtraCuts(options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
     # Cut is under discussion
     if not isEMu:
         cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
-    cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
+    if options.ReverseFJVT:
+        cuts += [CutItem('CutFJVT','j0fjvt > 0.5 || j1fjvt > 0.5')]
+    else:
+        cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
     return cuts
@@ -354,15 +358,27 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET
         cuts = [cutMET]
         cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 150.0')]
     else:
-        if basic_cuts.analysis.count('LowMETQCD'):
+        if basic_cuts.analysis.count('LowMETQCDRevFJVT'):
+            cutMET.AddCut(CutItem('HighMET', '%s < 180.0 && %s > 150.0' %(met_choice,met_choice)), 'AND')
+            if basic_cuts.analysis.count('FJVT'):
+                cutMET.AddCut(CutItem('FJVT', 'j0fjvt > 0.2 || j1fjvt > 0.2'), 'AND')
+            cuts = [cutMET]
+        elif basic_cuts.analysis.count('LowMETQCD'):
             cutMET.AddCut(CutItem('HighMET', '%s < 150.0 && %s > 100.0' %(met_choice,met_choice)), 'AND')
             if basic_cuts.analysis.count('FJVT'):
-                cutMET.AddCut(CutItem('FJVT', 'j0fjvt < 0.2 && j1fjvt < 0.2'), 'AND')
+                if options.ReverseFJVT:
+                    cutMET.AddCut(CutItem('FJVT', 'j0fjvt > 0.2 || j1fjvt > 0.2'), 'AND')
+                else:
+                    cutMET.AddCut(CutItem('FJVT', 'j0fjvt < 0.2 && j1fjvt < 0.2'), 'AND')
             cuts = [cutMET]
         else:
             #cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
             cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
-            cutMET.AddCut(CutItem('LowMET', '%s > %s && j0fjvt < 0.2 && j1fjvt < 0.2' %(met_choice, metCut)), 'OR')
+            if options.ReverseFJVT:
+                cutMET.AddCut(CutItem('LowMETfjvt1', '%s > %s && j0fjvt > 0.2' %(met_choice, metCut)), 'OR')
+                cutMET.AddCut(CutItem('LowMETfjvt2', '%s > %s && j1fjvt > 0.2' %(met_choice, metCut)), 'OR')
+            else:
+                cutMET.AddCut(CutItem('LowMET', '%s > %s && j0fjvt < 0.2 && j1fjvt < 0.2' %(met_choice, metCut)), 'OR')
             cuts = [cutMET]
             #cuts += [CutItem('CutMetLow',       '%s > 100.0' %(options.met_choice))]
             cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > %s' %(cstCut))]
@@ -551,7 +567,10 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
 
     # add the extra cuts...decide if we want these
     #cuts += ExtraCuts(options)
-    cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]
+    if options.ReverseFJVT:
+        cuts += [CutItem('CutFJVT','j0fjvt > 0.4 || j1fjvt > 0.4')]
+    else:
+        cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
 
