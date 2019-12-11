@@ -225,6 +225,7 @@ ROOT.gROOT.ProcessLine(
    Float_t   jj_dphi;\
    Float_t   jj_deta;\
    Float_t   w;\
+   Float_t   TriggerEffWeight;\
    Float_t   met_tenacious_tst_j1_dphi;\
    Float_t   met_tenacious_tst_j2_dphi;\
    Float_t   met_tenacious_tst_et;\
@@ -264,6 +265,7 @@ ROOT.gROOT.ProcessLine(
    Int_t     trigger_met_encoded;\
    Int_t     trigger_met_encodedv2;\
    Bool_t     passVjetsFilter;\
+   Bool_t     passVjetsFilterTauEl;\
    Bool_t     passVjetsPTV;\
    Int_t     passJetCleanTight;\
    Float_t   met_tst_phi;\
@@ -301,7 +303,7 @@ flts=['met_soft_tst_phi',
 ints =['passJetCleanTight',
   'trigger_met_encoded',
   'trigger_met_encodedv2',]
-bols=[  'passVjetsFilter',
+bols=[  'passVjetsFilter','passVjetsFilterTauEl',
   'passVjetsPTV',]
 from ROOT import MyStruct
 mystruct = MyStruct()
@@ -311,6 +313,7 @@ tree_out.Branch( 'jj_mass', ROOT.AddressOf( mystruct, 'jj_mass' ), 'jj_mass/F' )
 tree_out.Branch( 'jj_dphi', ROOT.AddressOf( mystruct, 'jj_dphi' ), 'jj_dphi/F' )
 tree_out.Branch( 'jj_deta', ROOT.AddressOf( mystruct, 'jj_deta' ), 'jj_deta/F' )
 tree_out.Branch( 'w', ROOT.AddressOf( mystruct, 'w' ), 'w/F' )
+tree_out.Branch( 'TriggerEffWeight', ROOT.AddressOf( mystruct, 'TriggerEffWeight' ), 'TriggerEffWeight/F' )
 tree_out.Branch( 'met_tenacious_tst_j1_dphi', ROOT.AddressOf( mystruct, 'met_tenacious_tst_j1_dphi' ), 'met_tenacious_tst_j1_dphi/F' )
 tree_out.Branch( 'met_tenacious_tst_j2_dphi', ROOT.AddressOf( mystruct, 'met_tenacious_tst_j2_dphi' ), 'met_tenacious_tst_j2_dphi/F' )
 tree_out.Branch( 'met_tenacious_tst_et', ROOT.AddressOf( mystruct, 'met_tenacious_tst_et' ), 'met_tenacious_tst_et/F' )
@@ -375,12 +378,12 @@ tree_out.Branch( 'jet_NTracks', mystruct.jet_NTracks)
 #f = ROOT.TFile.Open('/eos/atlas/atlascerngroupdisk/penn-ww/out_QCD_Tenacious.root')
 #f = ROOT.TFile.Open('out_QCD_Tenacious.root')
 #f = ROOT.TFile.Open('out_QCD_Loose.root')
-f = ROOT.TFile.Open('mjMC.root')
+f = ROOT.TFile.Open('mj2018.root')
 IsLoose=False
 
 GeV=1.0e3
 tree = f.Get('PredictionTree')
-fout = ROOT.TFile.Open('foutLooseMC_skim200_mctest.root','RECREATE')
+fout = ROOT.TFile.Open('foutLoose2018_skim200_v17_nodphijj.root','RECREATE')
 z=0
 v1 = ROOT.TLorentzVector()
 v2 = ROOT.TLorentzVector()
@@ -481,6 +484,7 @@ for e in tree:
     mystruct.jj_dphi = jj_dphi
     mystruct.jj_deta = jj_deta
     mystruct.w = weight
+    mystruct.TriggerEffWeight = e.TriggerEffWeight
     mystruct.met_tenacious_tst_j1_dphi = j1_met_dphi
     mystruct.met_tenacious_tst_j2_dphi = j2_met_dphi
     mystruct.met_tenacious_tst_et = met_tenac_et*GeV
@@ -494,6 +498,7 @@ for e in tree:
     mystruct.trigger_met_encoded=1
     mystruct.trigger_met_encodedv2=1
     mystruct.passVjetsFilter=1
+    mystruct.passVjetsFilterTauEl=1
     mystruct.passVjetsPTV=1
     mystruct.passJetCleanTight=1
     mystruct.met_tst_phi = e.METphi
