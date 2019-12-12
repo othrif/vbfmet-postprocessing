@@ -363,6 +363,7 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET
             if basic_cuts.analysis.count('FJVT'):
                 cutMET.AddCut(CutItem('FJVT', 'j0fjvt > 0.2 || j1fjvt > 0.2'), 'AND')
             cuts = [cutMET]
+            cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 130.0')]
         elif basic_cuts.analysis.count('LowMETQCD'):
             cutMET.AddCut(CutItem('HighMET', '%s < 150.0 && %s > 100.0' %(met_choice,met_choice)), 'AND')
             if basic_cuts.analysis.count('FJVT'):
@@ -371,6 +372,7 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET
                 else:
                     cutMET.AddCut(CutItem('FJVT', 'j0fjvt < 0.2 && j1fjvt < 0.2'), 'AND')
             cuts = [cutMET]
+            cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 100.0')]
         else:
             #cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
             cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
