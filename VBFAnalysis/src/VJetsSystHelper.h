@@ -19,6 +19,7 @@ public:
   void applyEWCorrection(bool doApply, TString processes = "eej,evj,vvj");
   void applyQCDCorrection(bool doApply, TString processes = "eej,evj,vvj");
   void smoothQCDCorrection(bool doSmooth);
+  void setNominalOnly(bool setNominalOnly);
   void mergePDF(bool do_merge_PDF);
   TF1 *getFitFunction(TString process) {return m_fit[process];}
 
@@ -39,6 +40,7 @@ private:
   std::map<TString, bool> m_applyQCDCorrection;
   bool m_smoothQCDCorrection;
   bool m_mergePDF;
+  bool m_nominalOnly;
   std::map<TString, TF1 *>m_fit;
 };
 
