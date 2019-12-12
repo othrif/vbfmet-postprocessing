@@ -266,7 +266,10 @@ void Msl::ReadEvent::Init(TTree* tree)
 	}
       }
     }
-    if(!found_weight_syst) std::cout << "ERROR - Failed to find weight for " << fWeightSystName << std::endl;
+    if(!found_weight_syst){
+      std::cout << "ERROR - Failed to find weight for " << fWeightSystName << " Setting to nominal." << std::endl;
+      tree->SetBranchAddress("w", &fWeight);
+    }
   }
   tree->SetBranchAddress("runNumber",&fRunNumber);
   tree->SetBranchAddress("randomRunNumber",&fRandomRunNumber);
