@@ -1245,8 +1245,6 @@ def prepareBkgRuns(keys,options=None):
 
     if not options.mergeExt:
         bkg_keys['wdpi'].update(bkg_vbfExt)
-        bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
-        bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)
         bkg_keys['wdpi'].update(bkg_new)
 
     if not options.mergeMGExt:
