@@ -47,7 +47,11 @@ for ite in l:
             for a in allF:
                 if len(a.strip())>1:
                     files+=[a.strip()]
-    myMap[i]=files
+
+    ikey=i
+    if i.count('346600'):
+        ikey = 'user.schae.v35LSyst.346600.invSig.e7613_s3126_r9364_p3895_MiniNtuple.root'
+    myMap[ikey]=files
     n+=1
     #if n>5:
     #    break
