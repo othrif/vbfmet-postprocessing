@@ -461,7 +461,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
             elif basic_cuts.GetSelKey().count('trig'): # this is broken!!!
                 cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 11')]
         elif basic_cuts.GetSelKey().count('metsfxe110XE70'):
-            cuts += [CutItem('CutMETTrigRuns30', 'runPeriod == 30')]
+            #cuts += [CutItem('CutMETTrigRuns30', 'runPeriod == 30')]
             if basic_cuts.GetSelKey().count('trig'):
                 cuts += [CutItem('CutMETTrigMET', 'trigger_met_encodedv2 == 5')]
         elif basic_cuts.GetSelKey().count('metsfxe110XE65'):
@@ -473,8 +473,8 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
             cuts += [CutItem('CutMETTrigRuns10', 'runPeriod == 10')]
         elif basic_cuts.GetSelKey().count('metsfxe100'):
             cuts += [CutItem('CutMETTrigRuns11', 'runPeriod == 11')]
-        elif basic_cuts.GetSelKey().count('metsfxe110L155'):
-            cuts += [CutItem('CutMETTrigRuns12', 'runPeriod == 12')]
+        #elif basic_cuts.GetSelKey().count('metsfxe110L155'): # ran all year
+        #    #cuts += [CutItem('CutMETTrigRuns12', 'runPeriod == 12')]
         elif basic_cuts.GetSelKey().count('metsfxe100L150'):
             cuts += [CutItem('CutMETTrigRuns13', 'runPeriod == 13')]
         # apply the trigger
