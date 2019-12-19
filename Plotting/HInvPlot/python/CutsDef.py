@@ -49,7 +49,7 @@ class BasicCuts:
         self.JetEta = ''
         if Analysis.count('metsf'):
             self.DEtajjLowerCut   = 3.5 # was 3.5
-            self.MjjLowerCut   = 1500.0
+            self.MjjLowerCut   = 600.0
             if Analysis.count('VBFTopo'):
                 self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
                 self.DEtajjLowerCut   = 4.2 # was 3.5
@@ -473,10 +473,10 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
             cuts += [CutItem('CutMETTrigRuns10', 'runPeriod == 10')]
         elif basic_cuts.GetSelKey().count('metsfxe100'):
             cuts += [CutItem('CutMETTrigRuns11', 'runPeriod == 11')]
-        #elif basic_cuts.GetSelKey().count('metsfxe110L155'): # ran all year
-        #    #cuts += [CutItem('CutMETTrigRuns12', 'runPeriod == 12')]
+        elif basic_cuts.GetSelKey().count('metsfxe110L155'): # ran all year
+            cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13 || runPeriod == 12 || runPeriod == 11 || runPeriod == 10')]
         elif basic_cuts.GetSelKey().count('metsfxe100L150'):
-            cuts += [CutItem('CutMETTrigRuns13', 'runPeriod == 13')]
+            cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13')]
         # apply the trigger
         if basic_cuts.GetSelKey().count('trig'):
             cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 4')]

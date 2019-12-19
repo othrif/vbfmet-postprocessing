@@ -1,7 +1,22 @@
+#!/usr/bin/env python
+import os
+import sys
+import subprocess
+import argparse
 import ROOT
+import math
+
+parser = argparse.ArgumentParser( description = "Changing to MG relative uncertainties", add_help=True , fromfile_prefix_chars='@')
+parser.add_argument("--lumi", dest='lumi', default=36e3, help="Lumi")
+parser.add_argument("--year", dest='year', default=2016, help="Year")
+parser.add_argument("--input", dest='input', default='v34ALooseMETPassThru_ktmerge.root', help="input file name")
+parser.add_argument("--mvar", dest='mvar', default='met_tst_et', help="MET variable: met_cst_jet, met_tst_et, met_tenacious_tst_et")
+parser.add_argument("--outdir", dest='outdir', default='/tmp/plotTrig', help="Output Directory")
+parser.add_argument("--wait", action='store_true', dest='wait', default=False, help="wait")
+args, unknown = parser.parse_known_args()
+
 import HInvPlot.JobOptions as config
 import HInvPlot.CutsDef    as hstudy
-import os,sys
 
 #-----------------------------------------
 def Style():
@@ -39,6 +54,10 @@ def GetHists(f,cut_path, zcut_path, mvar):
     zBkgQCDpath = cut_path+'/plotEvent_zqcd/'+mvar
     topBkgpath = cut_path+'/plotEvent_tall/'+mvar
 
+    dplot    = f.Get(dpath)
+    if not dplot:
+        print dpath
+        sys.exit(0)
     dplot    = f.Get(dpath).Clone()
     wQCDplot = f.Get(wQCDpath).Clone()
     wEWKplot = f.Get(wEWKpath).Clone()
@@ -95,13 +114,17 @@ def DrawError(trig, input_hist):
         input_err.SetBinError(i,err)
     return input_err
     
-def DrawSF(can,trig,lep, mvar, fname,year=2018):    
+def DrawSF(can,trig, lep, mvar, fnameA,year=2018):    
     
     if lep=='u':
         #met_tenacious_tst_et
         mvar = mvar.replace('_tst_et','_tst_nolep_et')
     
-    f = ROOT.TFile.Open(fname+'.root') 
+    f = ROOT.TFile.Open(fnameA)
+    if not f:
+        print 'file: ',fnameA
+        sys.exit(0)
+    fname=fnameA.rstrip('.root')
     den_path = 'pass_metsf_metsf'+trig+'_'+lep+'_Nominal'
     num_path = 'pass_metsf_metsftrig'+trig+'J400_'+lep+'_Nominal'    
     zden_path = 'pass_metsf_metsf'+trig+'_nn_Nominal'
@@ -176,9 +199,10 @@ def DrawSF(can,trig,lep, mvar, fname,year=2018):
     
     leg.Draw()
     can.Update()
-    can.WaitPrimitive()
+    if args.wait:
+        can.WaitPrimitive()
     #raw_input('waiting...')
-    can.SaveAs(den_path+'.pdf')
+    can.SaveAs(args.outdir+'/'+den_path+'.pdf')
 
     SFW = deff[0].Clone()
     SFZ = deff[0].Clone()
@@ -211,18 +235,21 @@ def DrawSF(can,trig,lep, mvar, fname,year=2018):
     leg.AddEntry(SFBkg,'W+bkg')
     leg.Draw()
     can.Update()
-    #can.WaitPrimitive()
+    if args.wait:
+        can.WaitPrimitive()
     #raw_input('waiting...')
-    can.SaveAs(fname+'_'+den_path+'_SF.pdf')
+    can.SaveAs(args.outdir+'/'+fname+'_'+den_path+'_SF.pdf')
     print 'Wfunc'
     Wfunc=DoFit('WSFFit'+fname+'_'+den_path,SFW)
     print 'Zfunc'
     Zfunc=DoFit('ZSFFit'+fname+'_'+den_path,SFZ)
+    Zfunc.SetLineColor(2)
     print 'bkgfunc'
     bkgfunc=DoFit('bkgSFFit'+fname+'_'+den_path,SFBkg)
-    
+    bkgfunc.SetLineColor(3)
     can.Update()
-    can.WaitPrimitive()
+    if args.wait:
+        can.WaitPrimitive()
     f.Close()
     return [SFZ,SFW,SFBkg,deff[0],weff[0],zeff[0],bkgeff[0],Wfunc,Zfunc,bkgfunc,trig_err]
 
@@ -248,8 +275,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        #a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(36.1e3/1.0e3))
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(40e3/1.0e3))        
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(args.lumi/1.0e3))        
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -308,37 +334,52 @@ def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110',input_er
     for t in texts:
         t.Draw()
     can.Update()
-    can.SaveAs(plt_name+'.pdf')
+    if args.wait:
+        can.WaitPrimitive()
+    can.SaveAs(args.outdir+'/'+plt_name+'.pdf')
 
 ###########################################################################
 # Main function for command line execuation
 #
 if __name__ == "__main__":
 
+    if args.outdir:
+        if not os.path.exists(args.outdir):
+            os.mkdir(args.outdir)
+    
     Style()
     can = ROOT.TCanvas('stack', 'stack', 500, 500)
-    #f = ROOT.TFile.Open('v26metsf_v3.root')
     mvar = 'met_tst_et'
-    fname='v26metsf_v5_tenac_njet2'
-    fname='v26metsf_v8_tenac_nj3'
-    fname='v26metsf_v3'
-    #fname='v26metsf_v8_tenac_nj3_detjj25'
-    #fname='v26metsf_v8_tenac_nj3'
-    #f = ROOT.TFile.Open('v26metsf_v4_tenac.root')
-    #f = ROOT.TFile.Open('v26metsf_v7_tenac_fjvt.root')
-    #f = ROOT.TFile.Open('v26metsf_v7_tenac_fjvtCST120.root')
-    #f = ROOT.TFile.Open('v26metsf_v6_tenac_detajj25.root')
-    #f = ROOT.TFile.Open('v26metsf_v6_tenac_detajj25_njet2.root')      
     #mvar = 'met_tenacious_tst_et'
     #mvar = 'met_cst_jet'
     trig='xe90'
     lep='u'
-    fname='v26metsf_v8_tenac_detjj25'
-    fname='v26metsf_v3'
-    #fname='v26metsf_v8_tenac_detjj25_CST120'
-    ####xe90_u_detajj25 = DrawSF(can,trig,lep, mvar, fname)
-    ####trig='xe70'
-    ####xe70_u_detajj25 = DrawSF(can,trig,lep, mvar, fname)
+    fname=args.input
+    mvar = args.mvar
+    if args.year==2016:
+        xe90_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2016)
+        trig='xe70'
+        xe70_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2016)
+        trig='xe110'
+        xe110_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2016)
+        lep='e'
+        xe90_e_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2016)
+        trig='xe70'
+        xe70_e_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2016)
+        trig='xe110'
+        xe110_e_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2016)    
+
+        DrawList(can,[xe70_u_detajj25[2],xe90_u_detajj25[2],xe110_u_detajj25[2]],['xe70J400','xe90J400','xe110J400'],'METSF20156',ytitle='Trigger SF',trig=trig)
+        DrawList(can,[xe110_e_detajj25[2],xe110_u_detajj25[2]],['W#rightarrow e#nu','W#rightarrow#mu#nu'],'METSFxe110_e_vs_mu',ytitle='Trigger SF',trig=trig)
+        DrawList(can,[xe110_e_detajj25[6],xe110_u_detajj25[6],xe110_u_detajj25[5]],['W#rightarrow e#nu','W#rightarrow#mu#nu','Z#rightarrow#nu#nu'],'METEffxe110_e_vs_mu',ytitle='Trigger Eff',trig=trig)
+
+    if args.year==2017:
+        trig='metsfxe110L155'
+        xe110_2017_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2018)
+    if args.year==2018:
+        trig='metsfxe110XE70'
+        xe110_2017_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2018)        
+
     ####
     ####
     ####trig='xe70'
@@ -457,7 +498,6 @@ if __name__ == "__main__":
     #trig='VBFTopo'
     trig='xe110XE70'
     #trig='xe110XE65'
-    mvar = 'met_tst_et'
     #fname='/tmp/v28Loose_metsf_VBFTopo'
     #fname='/tmp/v28Loose_metsf'
     #xe1108_u_tenac = DrawSF(can, trig, lep, mvar, fname)
@@ -472,27 +512,27 @@ if __name__ == "__main__":
 
     #trig='xe110'
     #trig='xe110L155'
-    trig='VBFTopo'
     #trig='VBFTopo'
-    fname ='v28Loose_metsf_reg' #v28Loose_metsf_VBFTopo.root
-    #Generic_u_tenac = DrawSF(can, trig, lep, mvar, fname)
-    #v28Loose_metsf_VBFMETUniq.root
-    #v28Loose_metsf_VBFTopo.root
-    trig='VBFTopo'
+    ##trig='VBFTopo'
+    #fname ='v28Loose_metsf_reg' #v28Loose_metsf_VBFTopo.root
+    ##Generic_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    ##v28Loose_metsf_VBFMETUniq.root
+    ##v28Loose_metsf_VBFTopo.root
     #trig='VBFTopo'
-    fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
-    XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
-    fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
-    fname ='v28Loose_metsf_withORVBFTopo_9070_tenac_xe90VBFVersion' #v28Loose_metsf_VBFTopo.root    
-    VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    ##trig='VBFTopo'
     #fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
-    #VBFTopoUniq_u_tenac = DrawSF(can, trig, lep, mvar, fname)        
-
-    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['#mu XE','#mu XEORVBFxe90'],'xeComparison_mu_SF_xe90', ytitle='Trigger Eff.',trig='xe,VBFOR')
-
-    lep='e'
-    fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
-    XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
-    fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
-    VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
-    DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['e XE','e XEORVBFxe90'],'xeComparison_e_SF_xe90', ytitle='Trigger Eff.',trig='xe,VBFOR')    
+    #XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    #fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
+    #fname ='v28Loose_metsf_withORVBFTopo_9070_tenac_xe90VBFVersion' #v28Loose_metsf_VBFTopo.root    
+    #VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    ##fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
+    ##VBFTopoUniq_u_tenac = DrawSF(can, trig, lep, mvar, fname)        
+    #
+    #DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['#mu XE','#mu XEORVBFxe90'],'xeComparison_mu_SF_xe90', ytitle='Trigger Eff.',trig='xe,VBFOR')
+    #
+    #lep='e'
+    #fname ='/tmp/v28Loose_metsf_METOnly_9070' #v28Loose_metsf_VBFTopo.root
+    #XEOnly_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    #fname ='/tmp/v28Loose_metsf_withORVBFTopo_9070' #v28Loose_metsf_VBFTopo.root    
+    #VBFTopo_u_tenac = DrawSF(can, trig, lep, mvar, fname)
+    #DrawList(can,[XEOnly_u_tenac[3],VBFTopo_u_tenac[3]],['e XE','e XEORVBFxe90'],'xeComparison_e_SF_xe90', ytitle='Trigger Eff.',trig='xe,VBFOR')    
