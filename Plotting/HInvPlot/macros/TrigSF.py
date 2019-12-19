@@ -7,8 +7,8 @@ import ROOT
 import math
 
 parser = argparse.ArgumentParser( description = "Changing to MG relative uncertainties", add_help=True , fromfile_prefix_chars='@')
-parser.add_argument("--lumi", dest='lumi', default=36e3, help="Lumi")
-parser.add_argument("--year", dest='year', default=2016, help="Year")
+parser.add_argument("--lumi", dest='lumi', default=36, help="Lumi")
+parser.add_argument("--year", dest='year', default='2016', help="Year")
 parser.add_argument("--input", dest='input', default='v34ALooseMETPassThru_ktmerge.root', help="input file name")
 parser.add_argument("--mvar", dest='mvar', default='met_tst_et', help="MET variable: met_cst_jet, met_tst_et, met_tenacious_tst_et")
 parser.add_argument("--outdir", dest='outdir', default='/tmp/plotTrig', help="Output Directory")
@@ -275,7 +275,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(args.lumi/1.0e3))        
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %sf fb^{-1}' %(args.lumi))        
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -356,7 +356,8 @@ if __name__ == "__main__":
     lep='u'
     fname=args.input
     mvar = args.mvar
-    if args.year==2016:
+    print 'Year: ',args.year
+    if args.year=='2016':
         xe90_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2016)
         trig='xe70'
         xe70_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2016)
@@ -373,13 +374,24 @@ if __name__ == "__main__":
         DrawList(can,[xe110_e_detajj25[2],xe110_u_detajj25[2]],['W#rightarrow e#nu','W#rightarrow#mu#nu'],'METSFxe110_e_vs_mu',ytitle='Trigger SF',trig=trig)
         DrawList(can,[xe110_e_detajj25[6],xe110_u_detajj25[6],xe110_u_detajj25[5]],['W#rightarrow e#nu','W#rightarrow#mu#nu','Z#rightarrow#nu#nu'],'METEffxe110_e_vs_mu',ytitle='Trigger Eff',trig=trig)
 
-    if args.year==2017:
-        trig='metsfxe110L155'
+    elif args.year=='2017':
+        args.lumi='44'
+        trig='xe110L155'
         xe110_2017_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2018)
-    if args.year==2018:
-        trig='metsfxe110XE70'
-        xe110_2017_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2018)        
-
+        lep='e'
+        xe110_2017_e_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2018)
+        DrawList(can,[xe110_2017_e_detajj25[2],xe110_2017_u_detajj25[2]],['W#rightarrow e#nu','W#rightarrow#mu#nu'],'METSFxe110_2017_e_vs_mu',ytitle='Trigger SF',trig=trig)
+        DrawList(can,[xe110_2017_e_detajj25[6],xe110_2017_u_detajj25[6],xe110_2017_u_detajj25[5]],['W#rightarrow e#nu','W#rightarrow#mu#nu','Z#rightarrow#nu#nu'],'METEffxe110_2017_e_vs_mu',ytitle='Trigger Eff',trig=trig)        
+    elif args.year=='2018':
+        args.lumi='59'
+        trig='xe110XE70'
+        xe110_2018_u_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2018)
+        lep='e'
+        xe110_2018_e_detajj25 = DrawSF(can,trig,lep, mvar, fname,year=2018)
+        DrawList(can,[xe110_2018_e_detajj25[2],xe110_2018_u_detajj25[2]],['W#rightarrow e#nu','W#rightarrow#mu#nu'],'METSFxe110_2018_e_vs_mu',ytitle='Trigger SF',trig=trig)
+        DrawList(can,[xe110_2018_e_detajj25[6],xe110_2018_u_detajj25[6],xe110_2018_u_detajj25[5]],['W#rightarrow e#nu','W#rightarrow#mu#nu','Z#rightarrow#nu#nu'],'METEffxe110_2018_e_vs_mu',ytitle='Trigger Eff',trig=trig)
+    else:
+        print 'Trigger is not defined. Try 2016, 2017, or 2018'
     ####
     ####
     ####trig='xe70'

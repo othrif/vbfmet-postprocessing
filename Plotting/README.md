@@ -111,3 +111,29 @@ object-based MET sigificance by passing ```-v metsig_tst```.
 this is done if the switch ```-p``` is added.
 
 Run with ```-h``` to see the full list of options.
+
+
+==========
+
+Options for SFs:
+nohup python HInvPlot/macros/plotEvent.py  -i v34ALooseMETPassThru.txt   -r v34ALooseMETPassThru_ktmerge.root     --mergeKTPTV -a metsf &> /tmp/logMETSFAKT &
+nohup python HInvPlot/macros/plotEvent.py  -i v34ALooseMETPassThru.txt   -r v34ALooseMETPassThru_noktmerge.root      -a metsf &> /tmp/logMETSFAnoKT &
+
+nohup python HInvPlot/macros/plotEvent.py  -i v34DLooseMETPassThru.txt   -r v34DLooseMETPassThru_ktmerge.root  --year 2017   --mergeKTPTV -a metsf &> /tmp/logMETSFDKT &
+nohup python HInvPlot/macros/plotEvent.py  -i v34DLooseMETPassThru.txt   -r v34DLooseMETPassThru_noktmerge.root   --year 2017    -a metsf &> /tmp/logMETSFDnoKT &
+
+nohup python HInvPlot/macros/plotEvent.py  -i v34ELooseMETPassThru.txt   -r v34ELooseMETPassThru_ktmerge.root --year 2018    --mergeKTPTV -a metsf &> /tmp/logMETSFEKT &
+nohup python HInvPlot/macros/plotEvent.py  -i v34ELooseMETPassThru.txt   -r v34ELooseMETPassThru_noktmerge.root  --year 2018    -a metsf &> /tmp/logMETSFEnoKT &
+
+nohup python HInvPlot/macros/plotEvent.py  -i /tmp/v34ELooseMETPassThru.txt   -r /tmp/v34ELooseMETPassThru_ktmerge.root --year 2018    --mergeKTPTV -a metsf &> /tmp/logMETSFEKT &
+nohup python HInvPlot/macros/plotEvent.py  -i /tmp/v34ELooseMETPassThru.txt   -r /tmp/v34ELooseMETPassThru_noktmerge.root  --year 2018    -a metsf &> /tmp/logMETSFEnoKT &
+
+nohup python HInvPlot/macros/plotEvent.py  -i /tmp/v34ELooseMETPassThru.txt   -r /tmp/v34ELooseMETPassThru_njcut_ktmerge.root --year 2018   --metsf-cuts 2  --mergeKTPTV -a metsf &> /tmp/logMETSFEKT_njcut &
+nohup python HInvPlot/macros/plotEvent.py  -i /tmp/v34ELooseMETPassThru.txt   -r /tmp/v34ELooseMETPassThru_njcut_noktmerge.root  --year 2018   --metsf-cuts 2  -a metsf &> /tmp/logMETSFEnoKT_njcut &
+nohup python HInvPlot/macros/plotEvent.py  -i /tmp/v34ELooseMETPassThru.txt   -r /tmp/v34ELooseMETPassThru_3j_ktmerge.root --year 2018  --metsf-cuts 1  --mergeKTPTV -a metsf &> /tmp/logMETSFEKT_3j &
+nohup python HInvPlot/macros/plotEvent.py  -i
+/tmp/v34ELooseMETPassThru.txt   -r
+/tmp/v34ELooseMETPassThru_3j_noktmerge.root  --year 2018
+--metsf-cuts 1   -a metsf &> /tmp/logMETSFEnoKT_3j &
+
+> python HInvPlot/macros/TrigSF.py --wait --year 2018 --input /tmp/v34ELooseMETPassThru_ktmerge.root
