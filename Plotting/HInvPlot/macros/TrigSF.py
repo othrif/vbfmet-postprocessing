@@ -13,6 +13,7 @@ parser.add_argument("--input", dest='input', default='v34ALooseMETPassThru_ktmer
 parser.add_argument("--mvar", dest='mvar', default='met_tst_et', help="MET variable: met_cst_jet, met_tst_et, met_tenacious_tst_et")
 parser.add_argument("--outdir", dest='outdir', default='/tmp/plotTrig', help="Output Directory")
 parser.add_argument("--wait", action='store_true', dest='wait', default=False, help="wait")
+parser.add_argument("--mg", action='store_true', dest='mg', default=False, help="measure mg")
 args, unknown = parser.parse_known_args()
 
 import HInvPlot.JobOptions as config
@@ -47,13 +48,16 @@ def GetHists(f,cut_path, zcut_path, mvar):
     wEWKpath = cut_path+'/plotEvent_wewk/'+mvar
     zQCDpath = zcut_path+'/plotEvent_zqcd/'+mvar
     zEWKpath = zcut_path+'/plotEvent_zewk/'+mvar
-    #zQCDpath = zcut_path+'/plotEvent_zqcdMad/'+mvar
+    if args.mg:
+        zQCDpath = zcut_path+'/plotEvent_zqcdMad/'+mvar
+        wQCDpath = zcut_path+'/plotEvent_wqcdMad/'+mvar
     #zEWKpath = zcut_path+'/plotEvent_zewk/'+mvar
 
     zBkgEWKpath = cut_path+'/plotEvent_zewk/'+mvar
     zBkgQCDpath = cut_path+'/plotEvent_zqcd/'+mvar
     topBkgpath = cut_path+'/plotEvent_tall/'+mvar
-
+    if args.mg:
+        zBkgQCDpath = cut_path+'/plotEvent_zqcdMad/'+mvar
     dplot    = f.Get(dpath)
     if not dplot:
         print dpath
@@ -74,7 +78,7 @@ def GetHists(f,cut_path, zcut_path, mvar):
     zQCDplot = f.Get(zQCDpath).Clone()
     zEWKplot = f.Get(zEWKpath).Clone()
 
-    rebin=3
+    rebin=2
     plts = [dplot,wQCDplot,wEWKplot,zQCDplot,zEWKplot,bkgTot]
     if not mvar.count('nolep') or True:
         for p in plts:
@@ -307,7 +311,7 @@ def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110',input_er
     
     plts[0].GetXaxis().SetTitle('Loose MET [GeV]')
     #if mvar.count('tenacious'):
-    plts[0].GetXaxis().SetTitle('Tenacious MET [GeV]')
+    #plts[0].GetXaxis().SetTitle('Tenacious MET [GeV]')
     #plts[0].GetXaxis().SetRangeUser(0.6,1.2)
     plts[0].GetYaxis().SetTitle(ytitle)
     for p in plts:
