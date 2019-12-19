@@ -526,6 +526,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
 
     cuts += getJetCuts(basic_cuts, options);
     cuts += [CutItem('CutMet',       '%s > 100.0' %(met_choice))]
+    cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     # does the vertex matter? does the CST met cut matter? does the fjvt cuts matter?
     #cuts += metCuts(basic_cuts,options, metCut=100.0, cstCut=0.0)
     #cuts += metCuts(basic_cuts,options, metCut=100.0, cstCut=130.0)
