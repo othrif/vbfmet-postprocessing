@@ -8,9 +8,13 @@ import math
 
 def check(v):
 
+    # use inverted uncertainties
+    if v<0.9999:
+        return 1./(2.-v)
     return v
 
 def ReturnNewSyst(sysname, vals, listV):
+    line=''
     debug=False
     new_vals = []
     for h in vals:
@@ -35,7 +39,7 @@ def ReturnNewSyst(sysname, vals, listV):
     for  bin_num1 in range(1,maxBin-1):
         linesys=''
         bin_num=maxBin-bin_num1
-        for  bin_num1 in range(1,bin_num-1): linesys+='0.0,'
+        for  bin_num1 in range(1,bin_num-1): linesys+='1.0,'
         #listV[bin_num-1]
         if debug:
             print bin_num,new_vals[bin_num-1],listV[bin_num-1][vsysname]
@@ -47,16 +51,22 @@ def ReturnNewSyst(sysname, vals, listV):
         linesys+='%0.4f,' %(sysup)
         #newSystmig23up=new_vals[bin_num-2]*listV[bin_num-2][vsysname]+newSystmig23up
         #newSystmig23dw-=newSystmig23up
-        for  bin_num1 in range(bin_num,11): linesys+='0.0,'
-        print sysname+'_mig%s_%s ' %(bin_num-1,bin_num),linesys.rstrip(',')
+        for  bin_num1 in range(bin_num,11): linesys+='1.0,'
+        tmp_line=sysname+('_mig%s_%s ' %(bin_num-1,bin_num))+linesys.rstrip(',')
+        line+=tmp_line+'\n'
+        print tmp_line
         if bin_num==2:
             bin1Syst=new_vals[bin_num-2]*listV[bin_num-2][vsysname]
             if debug:
                 print 'low bin: ',bin1Syst,new_vals[bin_num-2],listV[bin_num-2][vsysname]
             bin1Syst+=newSystmig23up
-            linesys1+='%0.4f,' %(1.-bin1Syst/listV[bin_num-2][vsysname])
-            for  a in range(2,maxBin): linesys1+='0.0,'
-            print sysname+'_uncbin1 ',linesys1.rstrip(',')
+            
+            linesys1+=('%0.4f,' %(check(1.-bin1Syst/listV[bin_num-2][vsysname])))
+            for  a in range(2,maxBin): linesys1+='1.0,'
+            tmp_line=sysname+'_uncbin1 '+linesys1.rstrip(',')
+            print tmp_line
+            line+=tmp_line+'\n'
+    return line
 def GetBins(fY, l, listV):
     addToList=False
     if len(listV)>0:
@@ -87,6 +97,7 @@ parser.add_argument("--inputYields", dest='inputYields', default='/tmp/HF.root',
 args, unknown = parser.parse_known_args()
 
 fin = open(args.input,'r')
+fout = open(args.output,'w')
 
 fY = ROOT.TFile.Open(args.inputYields)
 regionYields={}
@@ -105,6 +116,7 @@ regions=['SRup','SRdown','ZCRup','ZCRdown','WCRup','WCRdown']
 curr_region=''
 last_region=''
 systMap={}
+tot_line=''
 for i in fin:
     curr_line = i.rstrip('\n')
     regionLine=False
@@ -119,6 +131,7 @@ for i in fin:
         print 'Done with region: ',last_region
         last_region=curr_region
         print curr_region
+        tot_line+=curr_region+'\n'
     else:
         entries = (curr_line.strip()).split(' ')
         if len(entries)==2:
@@ -131,10 +144,14 @@ for i in fin:
                 print 'ERROR did not find string in ',curr_region
             systMap[entries[0]]=entries[1].split(',')
             print entries[0],systMap[entries[0]]
-            ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString])
+            tot_line+=ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString]) 
         else:
             print 'ERROR could not parse:',entries
             print curr_line
 
+fout.write(tot_line)
+fout.close()
+fin.close()
+fY.Close()
 print 'DONE'
 
