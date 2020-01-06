@@ -164,7 +164,9 @@ def prepareSeqWCRAntiID(basic_cuts, region, alg_take=None, syst='Nominal'):
     if basic_cuts.chan in ['ee','uu','ll','nn','eu', 'l'] or not passRegion(region):
         return ('', [])
 
-    pass_alg = hstudy.preparePassEventForWCRAntiID('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
+    # XXX make configurable?
+    do_met_signif=False
+    pass_alg = hstudy.preparePassEventForWCRAntiID('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif)
     plot_alg = prepareListPlot(selkey, alg_take, region=region, syst=syst)
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
@@ -232,6 +234,25 @@ def main():
         anas = ['allmjj','mjj800dphijj1','mjj800dphijj2','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj3500dphijj2','mjj3500dphijj1']
     if options.analysis.count('allmjjdphijjnj'):
         anas = ['allmjj','mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2','njgt2']
+    if options.analysis.count('allmjjnj'):
+        anas = ['allmjj', 'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2', 'njgt2']
+
+    # All mjj + njet bins with metsig < 4 and metsig > 4 bins added in.
+    if options.analysis == "metsig":
+        anas = ['allmjj', 'allmjjmslt4', 'allmjjmsgt4']
+    if options.analysis == "metsigjj":
+        anas = ['allmjj', 'allmjjmslt4', 'allmjjmsgt4', 'mjj800nj2', 'mjj800nj2mslt4', 'mjj800nj2msgt4',
+                'mjj1000nj2', 'mjj1000nj2mslt4', 'mjj1000nj2msgt4', 'mjj1500nj2', 'mjj1500nj2mslt4', 'mjj1500nj2msgt4',
+                'mjj2000nj2', 'mjj2000nj2mslt4', 'mjj2000nj2msgt4', 'mjj3500nj2', 'mjj3500nj2mslt4', 'mjj3500nj2msgt4',
+                'njgt2', 'njgt2mslt4', 'njgt2msgt4']
+
+    if options.analysis == "metsiglep":
+        anas = ['allmjj', 'allmjjlepptlow', 'allmjjleppthigh']
+    if options.analysis == "metsiglepjj":
+        anas = ['allmjj', 'allmjjlepptlow', 'allmjjleppthigh', 'mjj800nj2', 'mjj800nj2lepptlow', 'mjj800nj2leppthigh',
+                'mjj1000nj2', 'mjj1000nj2lepptlow', 'mjj1000nj2leppthigh', 'mjj1500nj2', 'mjj1500nj2lepptlow',
+                'mjj1500nj2leppthigh', 'mjj2000nj2', 'mjj2000nj2lepptlow', 'mjj2000nj2leppthigh', 'mjj3500nj2',
+                'mjj3500nj2lepptlow', 'mjj3500nj2leppthigh', 'njgt2', 'njgt2lepptlow', 'njgt2leppthigh']
 
     if options.analysis=='qcd':
         anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','LowMETQCDRevFJVT']
