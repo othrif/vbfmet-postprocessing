@@ -5,7 +5,6 @@ import subprocess
 import argparse
 import ROOT
 import math
-import sys
 
 parser = argparse.ArgumentParser( description = "Changing to MG relative uncertainties", add_help=True , fromfile_prefix_chars='@')
 parser.add_argument("--mg", dest='mg_file', default='/tmp/HF_MG.root', help="Madgraph HF file")

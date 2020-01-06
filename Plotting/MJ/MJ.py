@@ -1,6 +1,17 @@
+#!/usr/bin/env python
+import os
+import sys
+import subprocess
+import argparse
 import ROOT
 import math
 import sys
+
+parser = argparse.ArgumentParser( description = " MJ root", add_help=True , fromfile_prefix_chars='@')
+parser.add_argument("--input", dest='input', default='mj2017.root', help="Input")
+parser.add_argument("--output", dest='output', default='foutLoose2017_skim.root', help="output")
+args, unknown = parser.parse_known_args()
+
 def GetPUProb(jet_pt, jet_eta, jet_jvt, avgmu, jet_fjvt):
     unc=0.0
     if abs(jet_eta)<2.4:
@@ -226,6 +237,7 @@ ROOT.gROOT.ProcessLine(
    Float_t   jj_deta;\
    Float_t   w;\
    Float_t   TriggerEffWeight;\
+   Float_t   TriggerEffWeightBDT;\
    Float_t   met_tenacious_tst_j1_dphi;\
    Float_t   met_tenacious_tst_j2_dphi;\
    Float_t   met_tenacious_tst_et;\
@@ -314,6 +326,7 @@ tree_out.Branch( 'jj_dphi', ROOT.AddressOf( mystruct, 'jj_dphi' ), 'jj_dphi/F' )
 tree_out.Branch( 'jj_deta', ROOT.AddressOf( mystruct, 'jj_deta' ), 'jj_deta/F' )
 tree_out.Branch( 'w', ROOT.AddressOf( mystruct, 'w' ), 'w/F' )
 tree_out.Branch( 'TriggerEffWeight', ROOT.AddressOf( mystruct, 'TriggerEffWeight' ), 'TriggerEffWeight/F' )
+tree_out.Branch( 'TriggerEffWeightBDT', ROOT.AddressOf( mystruct, 'TriggerEffWeightBDT' ), 'TriggerEffWeightBDT/F' )
 tree_out.Branch( 'met_tenacious_tst_j1_dphi', ROOT.AddressOf( mystruct, 'met_tenacious_tst_j1_dphi' ), 'met_tenacious_tst_j1_dphi/F' )
 tree_out.Branch( 'met_tenacious_tst_j2_dphi', ROOT.AddressOf( mystruct, 'met_tenacious_tst_j2_dphi' ), 'met_tenacious_tst_j2_dphi/F' )
 tree_out.Branch( 'met_tenacious_tst_et', ROOT.AddressOf( mystruct, 'met_tenacious_tst_et' ), 'met_tenacious_tst_et/F' )
@@ -378,12 +391,12 @@ tree_out.Branch( 'jet_NTracks', mystruct.jet_NTracks)
 #f = ROOT.TFile.Open('/eos/atlas/atlascerngroupdisk/penn-ww/out_QCD_Tenacious.root')
 #f = ROOT.TFile.Open('out_QCD_Tenacious.root')
 #f = ROOT.TFile.Open('out_QCD_Loose.root')
-f = ROOT.TFile.Open('mj2018.root')
+f = ROOT.TFile.Open(args.input)
 IsLoose=False
 
 GeV=1.0e3
 tree = f.Get('PredictionTree')
-fout = ROOT.TFile.Open('foutLoose2018_skim200_v17_nodphijj.root','RECREATE')
+fout = ROOT.TFile.Open(args.output,'RECREATE')
 z=0
 v1 = ROOT.TLorentzVector()
 v2 = ROOT.TLorentzVector()
@@ -485,6 +498,7 @@ for e in tree:
     mystruct.jj_deta = jj_deta
     mystruct.w = weight
     mystruct.TriggerEffWeight = e.TriggerEffWeight
+    mystruct.TriggerEffWeightBDT = e.TriggerEffWeightBDT
     mystruct.met_tenacious_tst_j1_dphi = j1_met_dphi
     mystruct.met_tenacious_tst_j2_dphi = j2_met_dphi
     mystruct.met_tenacious_tst_et = met_tenac_et*GeV
