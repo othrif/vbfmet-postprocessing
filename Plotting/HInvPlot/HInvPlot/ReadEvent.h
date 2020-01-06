@@ -175,6 +175,7 @@ namespace Msl
     bool                        fIsDDQCD;
     // Input vars
     float fWeight;
+    float fTriggerEffWeight;
     double vjWeight;
     float xeSFTrigWeight;
     float xeSFTrigWeight__1up;
