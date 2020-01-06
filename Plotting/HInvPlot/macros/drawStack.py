@@ -47,6 +47,7 @@ p.add_option('--do-ratio',      action='store_true', default=False,   dest='do_r
 p.add_option('--force-ratio',   action='store_true', default=False,   dest='force_ratio')
 p.add_option('--stack-signal',  action='store_true', default=False,   dest='stack_signal')
 p.add_option('--ph-ana',        action='store_true', default=False,   dest='ph_ana')
+p.add_option('--no-signal',     action='store_true', default=False,   dest='no_signal')
 
 p.add_option('--debug',         action='store_true', default=False,   dest='debug')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
@@ -61,6 +62,10 @@ p.add_option('--draw-syst',       action='store_true', default=False,   dest='dr
 p.add_option('--make-syst-table', action='store_true', default=False,   dest='make_syst_table')
 
 p.add_option('--atlas-style', dest='atlas_style_path', default="/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/")
+
+# Allow canvas size and legend coords to be overriden on the command line.
+p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.64, 0.5, 0.99, 0.89), type=float)
+p.add_option('--canvas-size', dest="canvas_size", nargs=2, default=(500, 500), type=int)
 
 (options, args) = p.parse_args()
 
@@ -119,21 +124,22 @@ def getSelKeyLabel(selkey):
             elif selkey.count('_ee'): proc = 'Z#rightarrow ee'
             elif selkey.count('_eu'): proc = 'e#mu'
             elif selkey.count('_em'): proc = 'W#rightarrow e^{-}#nu'
+            elif selkey.count('_ep'): proc = 'W#rightarrow e^{+}#nu'
             elif selkey.count('_uu'): proc = 'Z#rightarrow#mu#mu'
             elif selkey.count('_l'): proc = 'W#rightarrow l#nu'
             elif selkey.count('_e'): proc = 'W#rightarrow e#nu'
             elif selkey.count('_u'): proc = 'W#rightarrow#mu#nu'
 
-        if selkey.count('LowMETQCD_'):  proc += ', Low MET QCD'        
-        elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'        
-        elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'        
+        if selkey.count('LowMETQCD_'):  proc += ', Low MET QCD'
+        elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'
+        elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'
         elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
-        elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<0.8TeV'
+        elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<1TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
-        elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'            
-        elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'            
-        elif selkey.count('njgt2_'):  proc += ',2<N_{jet}'            
-        elif selkey.count('njgt3_'):  proc += ',3<N_{jet}'            
+        elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'
+        elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'
+        elif selkey.count('njgt2_'):  proc += ',2<N_{jet}'
+        elif selkey.count('njgt3_'):  proc += ',3<N_{jet}'
         if selkey.count('sr_'):  proc += ', SR'
         elif selkey.count('wcr'):
             if 'anti' in selkey:
@@ -141,7 +147,7 @@ def getSelKeyLabel(selkey):
             else:
                 proc += ', WCR'
         elif selkey.count('zcr'): proc += ', ZCR'
-        if selkey.count('FJVT_'):  proc += ',f-jvt'                    
+        if selkey.count('FJVT_'):  proc += ',f-jvt'
     return proc
 
 #-------------------------------------------------------------------------
@@ -205,6 +211,7 @@ def getHistPars(hist):
         'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5}, #5
         'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
         'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
+        'jetHT' : {'xtitle':'H_{T} [GeV]',          'ytitle':'Events', 'rebin':2, 'logy':True, 'LtoRCut':0},
         'jetEta1': {'xtitle':'Sub-Leading jet #eta'  ,       'ytitle':'Events', 'rebin':5},
         'jet1Phi': {'xtitle':'Sub-Leading jet #phi'  ,       'ytitle':'Events', 'rebin':2},
         'jetPt1' : {'xtitle':'p_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
@@ -243,6 +250,7 @@ def getHistPars(hist):
         'JetEMECvsBCIDPosPt55'  : {'xtitle':'Jet #eta wth 55<p_{T} GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
 
         'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
+        'baseElPt'   : {'xtitle':'Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':4, 'xmax': 600, 'logy': True},
         'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
         'muon_den_pt'   : {'xtitle':'Anti-Id Muon p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'lepEta' : {'xtitle':'Lepton #eta [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
@@ -265,7 +273,8 @@ def getHistPars(hist):
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
-        'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':False},
+        'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
+        'alljet_metsig'     : {'xtitle':'MET Significance (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
     'met_cst_jet'     : {'xtitle':'E_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
@@ -287,6 +296,7 @@ def getHistPars(hist):
     'met_tst_j1_dphi'     : {'xtitle':'#Delta#phi(j1,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tst_j2_dphi'     : {'xtitle':'#Delta#phi(j2,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'ptvarcone20'     : {'xtitle':'ptvarcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'baselep_ptvarcone_0'     : {'xtitle':'ptvarcone20/p_{T}'   ,         'ytitle':'Events'},
     'ptvarcone30'     : {'xtitle':'ptvarcone30/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
     'topoetcone20'     : {'xtitle':'topoetcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
 
@@ -317,7 +327,7 @@ def getHistPars(hist):
     'avgmj3_over_mjj'     : {'xtitle':'Average min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
-    'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},     
+    'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
         }
 
     try:
@@ -503,7 +513,7 @@ def getStyle(sample):
     color_wgamewk = ROOT.kOrange-5
     color_zgamewk = ROOT.kOrange-6    
     color_ttg = ROOT.kBlue   -9
-    color_pho = ROOT.kGreen -3  
+    color_pho = ROOT.kGreen -3
     color_wdpi = ROOT.kOrange-5
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
@@ -620,12 +630,12 @@ def updateCanvas(can, name=None, leg=None, option = '', data_hist=None, bkg_sum_
             can.Write()
             if data_hist:
                 data_hist.hist.SetDirectory(outfile)
-                data_hist.hist.SetName("data_"+data_hist.hist.GetName())                
+                data_hist.hist.SetName("data_"+data_hist.hist.GetName())
                 data_hist.hist.Write()
             if bkg_sum_hist:
                 bkg_sum_hist.SetDirectory(outfile)
                 bkg_sum_hist.SetName("totbkg_"+bkg_sum_hist.GetName())
-                bkg_sum_hist.Write()                
+                bkg_sum_hist.Write()
             outfile.Close()
             print "file "+str(outfile)+" has been created"
 
@@ -1411,8 +1421,8 @@ class DrawStack:
     def Draw(self, can):
         log.info('DrawStack - draw: %s' %self.name)
 
-        #self.leg = ROOT.TLegend(0.58, 0.72, 0.85, 0.89)
-        self.leg = ROOT.TLegend(0.64, 0.5, 0.99, 0.89)
+        # Allow legend location to be overriden on the command line.
+        self.leg = ROOT.TLegend(*options.legend_coords)
         self.leg.SetBorderSize(0)
         self.leg.SetFillStyle (0)
         self.leg.SetTextFont(42);
@@ -1507,7 +1517,7 @@ class DrawStack:
         if options.draw_norm: self.bkg_sum.DrawNormalized('HIST')
         else:                 self.stack.Draw('HIST')
 
-        if not options.stack_signal:
+        if not options.stack_signal and not options.no_signal:
             self.UpdateHist(self.sign.hist,self.sign.sample)
             self.sign.DrawHist('SAME HIST', self.leg, True)
         self.UpdateStack()
@@ -1558,7 +1568,7 @@ class DrawStack:
         self.leg.Draw()
         self.leg1.Draw()
 
-        self.texts = getATLASLabels(can, 0.19, 0.85, selkey=self.selkey)
+        self.texts = getATLASLabels(can, 0.19, 0.85+0.02, selkey=self.selkey)
         for text in self.texts:
             text.Draw()
 
@@ -1726,7 +1736,7 @@ class DrawStack:
                             cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
                         elif leftToRight==3: # add bins together
                             cut_NsigOpp = self.sign.hist.Integral(ibin+1,10001)
-                            cut_NbkgOpp = self.bkg_sum.Integral(ibin+1,10001)                            
+                            cut_NbkgOpp = self.bkg_sum.Integral(ibin+1,10001)
                         elif (leftToRight==4 and ibin%2==0): # pair every 2 bins together
                             cut_Nsig = self.sign.hist.GetBinContent(ibin)
                             cut_Nbkg = self.bkg_sum.GetBinContent(ibin)
@@ -1744,7 +1754,7 @@ class DrawStack:
                         #else:
                         #    cut_Nsig = self.sign.hist.Integral(ibin,ibin)
                         #    cut_Nbkg = self.bkg_sum.Integral(ibin,ibin)
-                                
+
                         #print 'cut_Nbkg: ',cut_Nbkg,' ',cut_Nsig
                         if cut_Nsig>0.0 and cut_Nbkg>0.0:
                             signifV = 2.0*math.sqrt(cut_Nbkg)/cut_Nsig
@@ -1912,12 +1922,12 @@ class DrawStack:
             self.error_map['bkg_ratio'].SetMarkerColor(1)
             self.error_map['bkg_ratio'].SetMarkerSize(0)
             self.error_map['bkg_ratio'].SetLineColor(1)
-            self.error_map['bkg_ratio'].Draw('SAME E2')            
+            self.error_map['bkg_ratio'].Draw('SAME E2')
             # JES error ratio
             if syst_jes_ratio:
                 self.error_map['syst_jes_ratio'] = syst_jes_ratio.Clone()
                 self.error_map['syst_jes_ratio'].SetFillColor(0)
-                self.error_map['syst_jes_ratio'].SetLineColor(3)            
+                self.error_map['syst_jes_ratio'].SetLineColor(3)
                 self.error_map['syst_jes_ratio'].SetLineWidth(2)
                 self.error_map['syst_jes_ratio'].SetMarkerColor(3)
                 self.error_map['syst_jes_ratio'].SetLineStyle(1)
@@ -1943,7 +1953,7 @@ class DrawStack:
                         elif self.signifCR.GetBinContent(i)>0.0:
                             optv=self.signifCR.GetBinContent(i)
                 print 'combine last 3 bins: ',optv
-                        
+
             else:
                 self.ratio.Draw('same')
             self.pads[ipad].RedrawAxis()
@@ -2009,7 +2019,7 @@ class DrawStack:
                         elif e1<0:
                             e2=syst_jesr.GetErrorYlow(m-1)
                             new_e = ROOT.Double(math.sqrt(e1*e1+e2*e2))
-                            syst_jesr.SetPointEYlow(m-1,new_e)                        
+                            syst_jesr.SetPointEYlow(m-1,new_e)
         #
         # Calculate the systematic band for a ratio plot
         #
@@ -2048,7 +2058,7 @@ class DrawStack:
                 eyu=syst_jesr.GetErrorYhigh   (j-1)/val
                 eyd=syst_jesr.GetErrorYlow    (j-1)/val
                 syst_jesr_ratio.SetPointEYhigh(j-1,eyu)
-                syst_jesr_ratio.SetPointEYlow (j-1,eyd)           
+                syst_jesr_ratio.SetPointEYlow (j-1,eyd)
             #print 'err up: ',eyu,' down: ',eyd
 
         return syst_jesr_ratio
@@ -2126,7 +2136,7 @@ class DrawStack:
         if 'xmax' in pars and 'xmin' in pars:
             self.stack.GetXaxis().SetRangeUser(pars['xmin'],pars['xmax'])
         elif 'xmin' in pars:
-            self.stack.GetXaxis().SetRangeUser(pars['xmin'],1.0)              
+            self.stack.GetXaxis().SetRangeUser(pars['xmin'],1.0)
         elif 'xmax' in pars:
             self.stack.GetXaxis().SetRangeUser(0.0,pars['xmax'])
         elif options.xmax != None:
@@ -2176,7 +2186,7 @@ class DrawStack:
         if 'xmax' in pars and 'xmin' in pars:
             h.GetXaxis().SetRangeUser(pars['xmin'],pars['xmax'])
         elif 'xmin' in pars:
-            h.GetXaxis().SetRangeUser(pars['xmin'],1.0)            
+            h.GetXaxis().SetRangeUser(pars['xmin'],1.0)
         elif 'xmax' in pars:
             h.GetXaxis().SetRangeUser(0.0,pars['xmax'])
         elif options.xmax != None:
@@ -2382,14 +2392,14 @@ def main():
     print 'Reading nSyst: ',len(mysyst.getsystematicsListWithDown())
     for ia in mysyst.getsystematicsListWithDown():
         sfiles[ia]=rfile
-        
+
     #-----------------------------------------------------------------------------------------
     # automatically set the lumi for the 2017 and 2018
     if options.year==2018 and options.int_lumi==36207.66:
         options.int_lumi=58450.1
     if options.year==2017 and options.int_lumi==36207.66:
         options.int_lumi=44307.4
-        
+
     #
     # Select histograms and samples for stacks
     #
@@ -2431,7 +2441,7 @@ def main():
 
     #config.setPlotDefaults(ROOT)
     Style()
-    can = ROOT.TCanvas('stack', 'stack', 500, 500)
+    can = ROOT.TCanvas('stack', 'stack', *options.canvas_size)
     can.Draw()
     can.cd()
 
