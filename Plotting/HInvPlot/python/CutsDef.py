@@ -473,10 +473,10 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
     elif options.year==2017:
         if basic_cuts.GetSelKey().count('metsfxe90'):
             cuts += [CutItem('CutMETTrigRuns10', 'runPeriod == 10')]
-        elif basic_cuts.GetSelKey().count('metsfxe100'):
-            cuts += [CutItem('CutMETTrigRuns11', 'runPeriod == 11')]
         elif basic_cuts.GetSelKey().count('metsfxe110L155'): # ran all year
             cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13 || runPeriod == 12 || runPeriod == 11 || runPeriod == 10')]
+        elif basic_cuts.GetSelKey().count('metsfxe100'):
+            cuts += [CutItem('CutMETTrigRuns11', 'runPeriod == 11')]
         elif basic_cuts.GetSelKey().count('metsfxe100L150'):
             cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13')]
         # apply the trigger

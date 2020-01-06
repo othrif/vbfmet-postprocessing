@@ -879,19 +879,28 @@ double HFInputAlg::weightXETrigSF(const float met_pt, unsigned metRunNumber, int
   double p0 = 99.4255;
   double p1 = 38.6145;
   double e0 = 0.000784094;
-  double e1 = 0.05;
-  if(metRunNumber<=284484)                        { p0 = 110.396; p1 = 19.4147; e1 = 0.06; }  // 2015 xe70
-  if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 111.684; p1 = 19.147;  e1 = 0.08; }  // 2016 xe90
-  if(metRunNumber>302872)                         { p0 = 68.8679; p1 = 54.0594; e1 = 0.06; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
+  double e1 = 0.044;
+  if(metRunNumber<=284484)                        { p0 = 110.396; p1 = 19.4147; e1 = 0.044; }  // 2015 xe70
+  if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 111.684; p1 = 19.147;  e1 = 0.04; }  // 2016 xe90
+  if(metRunNumber>302872)                         { p0 = 68.8679; p1 = 54.0594; e1 = 0.044; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
   //if(325713<=metRunNumber && metRunNumber<=328393) { p0 = 86.6614; p1 = 49.8935; e1 = 0.05; } // 2017 xe90_pufit_L1XE50
   //if(329385<=metRunNumber && metRunNumber<=330470) { p0 = 103.780; p1 = 57.2547; e1 = 0.05; } // 2017 xe100_pufit_L1XE55
   //if(330857<=metRunNumber && metRunNumber<=331975) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
   //if(331975< metRunNumber && metRunNumber<=341649) { p0 = 103.152; p1 = 38.6121; e1 = 0.05; } // 2017 xe110_pufit_L1XE50
   //if(350067> metRunNumber && metRunNumber>=348197) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
   //if(350067<=metRunNumber && metRunNumber<=364292) { p0 = 107.509; p1 = 32.0065; e1 = 0.05; } // 2018 xe110_xe65_L1XE50
-  if(325713<=metRunNumber && metRunNumber<=341649) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
-  if(364292>= metRunNumber && metRunNumber>=348197) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
+  if(325713<=metRunNumber && metRunNumber<=341649) { p0 = 118.959; p1 = 32.2808; e1 = 0.04; } // 2017 xe110_pufit_L1XE55
+  if(364292>= metRunNumber && metRunNumber>=348197) { p0 = 104.830; p1 = 38.5267; e1 = 0.04; } // 2018 xe110_xe70_L1XE50
 
+  // MET SFs for the sherpa KT merged samples
+  if(mergeKTPTV){
+    if(metRunNumber<=284484)                        { p0 = 84.3168; p1 = 27.3595; e1 = 0.044; }  // 2015 xe70
+    if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 86.7595; p1 = 32.775;  e1 = 0.04; }  // 2016 xe90
+    if(metRunNumber>302872)                         { p0 = 60.4248; p1 = 46.3655; e1 = 0.044; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
+    if(325713<=metRunNumber && metRunNumber<=341649) { p0 = 76.5705; p1 = 52.2262; e1 = 0.04; } // 2017 xe110_pufit_L1XE55
+    if(364292>= metRunNumber && metRunNumber>=348197) { p0 = 73.372; p1 = 56.583; e1 = 0.04; } // 2018 xe110_xe70_L1XE50
+  }
+  
   double x = met_pt / 1.0e3;
   if (x < 100) { return 0; }
   if (x > 240) { x = 240; }

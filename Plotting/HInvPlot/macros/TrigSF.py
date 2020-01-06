@@ -26,7 +26,7 @@ def Style():
         print("Error: could not find ATLAS style macros at: " + atlas_style_path)
         sys.exit(1)
     ROOT.gROOT.LoadMacro(os.path.join(atlas_style_path, 'AtlasStyle.C'))
-    ROOT.gROOT.LoadMacro(os.path.join(atlas_style_path, 'AtlasUtils.C'))
+    #ROOT.gROOT.LoadMacro(os.path.join(atlas_style_path, 'AtlasUtils.C'))
     ROOT.SetAtlasStyle()
     
 class function_turnon:
@@ -86,7 +86,7 @@ def GetHists(f,cut_path, zcut_path, mvar):
     
     return dplot,wQCDplot,wEWKplot,zQCDplot,zEWKplot,bkgTot
 
-def DoFit(name, hist):
+def DoFit(name, hist, color=1):
     ROOT.gROOT.LoadMacro("fit.C");
     func=ROOT.TF1("func", ROOT.fitf, 120.0,300.0, 2)
     func.SetParameters(110.0,30.0)
@@ -95,7 +95,11 @@ def DoFit(name, hist):
     func.SetParLimits(1, 0.0,  100.0)
     myfit = hist.Fit(func)
     func.SetLineColor(2)
+    #myfit.SetLineColor(2)
     print name,func.GetParameter(0),func.GetParameter(1)
+    hist.GetFunction("func").SetLineColor(color);
+    print 'Par error: ', hist.GetFunction("func").GetParError(0)
+    print 'Par error: ', hist.GetFunction("func").GetParError(1)    
     func.SetName(name)
     return func
 
@@ -234,8 +238,8 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     SFZ.Draw('same')
     SFBkg.Draw('same')
     leg.Clear()
-    leg.AddEntry(SFZ,'Z')
-    leg.AddEntry(SFW,'W')
+    leg.AddEntry(SFZ,'Z#rightarrow#nu#nu')
+    leg.AddEntry(SFW,'W#rightarrow l#nu')
     leg.AddEntry(SFBkg,'W+bkg')
     leg.Draw()
     can.Update()
@@ -244,16 +248,42 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     #raw_input('waiting...')
     can.SaveAs(args.outdir+'/'+fname+'_'+den_path+'_SF.pdf')
     print 'Wfunc'
-    Wfunc=DoFit('WSFFit'+fname+'_'+den_path,SFW)
+    Wfunc=DoFit('WSFFit'+fname+'_'+den_path,SFW, SFW.GetLineColor())
     print 'Zfunc'
-    Zfunc=DoFit('ZSFFit'+fname+'_'+den_path,SFZ)
+    Zfunc=DoFit('ZSFFit'+fname+'_'+den_path,SFZ, SFZ.GetLineColor())
     Zfunc.SetLineColor(2)
     print 'bkgfunc'
-    bkgfunc=DoFit('bkgSFFit'+fname+'_'+den_path,SFBkg)
+    bkgfunc=DoFit('bkgSFFit'+fname+'_'+den_path,SFBkg, SFBkg.GetLineColor())
     bkgfunc.SetLineColor(3)
+    #SFBkg.GetFunction("func").SetFillColor(SFBkg.GetLineColor())
+    #SFBkg.GetFunction("func").SetFillStyle(3001)
+    #SFBkg.GetFunction("func").Draw('E3 same')
+    WfuncSyst = SFBkg.Clone()
+    for x in range(1,WfuncSyst.GetNbinsX()+1):
+        binx = WfuncSyst.GetXaxis().GetBinCenter(x)
+        yval = SFBkg.GetFunction("func").Eval(binx)
+        WfuncSyst.SetBinContent(x, yval)
+        sferr=0.003
+        e0=0.000784094;
+        e1=0.04
+        if args.year=='2016':
+            e1=0.045
+        if binx<210.0:
+            sferr=((e0)*(150-binx)+e1)*0.6
+        WfuncSyst.SetBinError(x,sferr )
+    WfuncSyst.SetMarkerSize(0)
+    WfuncSyst.SetLineStyle(4)
+    WfuncSyst.SetFillColor(SFBkg.GetLineColor())
+    WfuncSyst.SetFillStyle(3001)
+    WfuncSyst.Draw("same E3")
+    leg.AddEntry(WfuncSyst,'SF Unc')
+    texts = getATLASLabels(can, 0.2, 0.88,trig)
+    for t in texts:
+        t.Draw()
     can.Update()
     if args.wait:
         can.WaitPrimitive()
+    can.SaveAs(args.outdir+'/'+fname+'_'+den_path+'_SFfit.pdf')
     f.Close()
     return [SFZ,SFW,SFBkg,deff[0],weff[0],zeff[0],bkgeff[0],Wfunc,Zfunc,bkgfunc,trig_err]
 
@@ -279,7 +309,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %sf fb^{-1}' %(args.lumi))        
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %s fb^{-1}' %(args.lumi))        
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
