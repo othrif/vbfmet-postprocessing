@@ -103,6 +103,14 @@ for k in  region_nom_to_syst_map.keys():
 
         print iname,rel_err,' sherpa: ',sh_rel_err
         nj+=1
+        # use the average
+        if args.mergeSyst:
+            if hmg_nom.GetBinContent(1)>0.0 and hsh_nom.GetBinContent(1)>0.0:
+                stat_sh = hsh_nom.GetBinError(1)/hsh_nom.GetBinContent(1)
+                stat_mg = hmg_nom.GetBinError(1)/hmg_nom.GetBinContent(1)
+                if (stat_sh+stat_mg)>0.0:
+                    rel_err = (stat_sh*rel_err+stat_mg*sh_rel_err)/(stat_sh+stat_mg)
+            print 'avg - ',iname,rel_err,' sherpa: ',sh_rel_err
         hsh.SetBinContent(1,hsh.GetBinContent(1)*rel_err)
         fsh.cd()
         #hsh.Write("",ROOT.TObject.kOverwrite)
