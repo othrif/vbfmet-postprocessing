@@ -259,6 +259,17 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     #SFBkg.GetFunction("func").SetFillStyle(3001)
     #SFBkg.GetFunction("func").Draw('E3 same')
     WfuncSyst = SFBkg.Clone()
+    # Count bins
+    nbinsX =0
+    for x in range(1,WfuncSyst.GetNbinsX()+1):
+        if 100<=WfuncSyst.GetXaxis().GetBinLowEdge(x):
+            nbinsX+=1
+        if 300<WfuncSyst.GetXaxis().GetBinLowEdge(x):
+            break
+    chi2 = SFBkg.GetFunction("func").GetChisquare()
+    chi2_ndof = (chi2)/(nbinsX-2)
+    print 'chi2: ',chi2_ndof
+    
     for x in range(1,WfuncSyst.GetNbinsX()+1):
         binx = WfuncSyst.GetXaxis().GetBinCenter(x)
         yval = SFBkg.GetFunction("func").Eval(binx)
@@ -277,7 +288,7 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     WfuncSyst.SetFillStyle(3001)
     WfuncSyst.Draw("same E3")
     leg.AddEntry(WfuncSyst,'SF Unc')
-    texts = getATLASLabels(can, 0.2, 0.88,trig)
+    texts = getATLASLabels(can, 0.2, 0.88, trig, text2='#chi^{2}/N_{dof}=%0.3f' %chi2_ndof)
     for t in texts:
         t.Draw()
     can.Update()
@@ -287,7 +298,7 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     f.Close()
     return [SFZ,SFW,SFBkg,deff[0],weff[0],zeff[0],bkgeff[0],Wfunc,Zfunc,bkgfunc,trig_err]
 
-def getATLASLabels(pad, x, y, text=None, selkey=None):
+def getATLASLabels(pad, x, y, text=None, selkey=None, text2=None):
     l = ROOT.TLatex(x, y, 'ATLAS')
     l.SetNDC()
     l.SetTextFont(62)
@@ -327,6 +338,14 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         c.SetTextAlign(12)
         c.SetTextColor(ROOT.kBlack)
         labs += [c]
+    if text2 != None:
+        d = ROOT.TLatex(x, y-0.16, text2)
+        d.SetNDC()
+        d.SetTextFont(42)
+        d.SetTextSize(0.05)
+        d.SetTextAlign(12)
+        d.SetTextColor(ROOT.kBlack)
+        labs += [d]
     return labs
         
 def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110',input_err=None):
