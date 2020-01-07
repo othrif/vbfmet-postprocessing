@@ -244,7 +244,8 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
   if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
-    if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeight", &fTriggerEffWeight);
+    //if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeight", &fTriggerEffWeight);
+    if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);
     //TriggerEffWeight, TriggerEffWeightBDT
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){

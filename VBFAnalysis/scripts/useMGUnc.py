@@ -75,6 +75,7 @@ for i in hList:
 for k in  region_nom_to_syst_map.keys():
     print k,len(region_nom_to_syst_map[k])
 
+nj=0
 #sys.exit(0)
 for k in  region_nom_to_syst_map.keys():
     print 'Key: ',k
@@ -101,10 +102,14 @@ for k in  region_nom_to_syst_map.keys():
             sh_rel_err = hsh.GetBinContent(1)/hsh_nom.GetBinContent(1)
 
         print iname,rel_err,' sherpa: ',sh_rel_err
-        hsh.SetBinError(1,hsh.GetBinContent(1)*rel_err)
+        nj+=1
+        hsh.SetBinContent(1,hsh.GetBinContent(1)*rel_err)
+        fsh.cd()
         #hsh.Write("",ROOT.TObject.kOverwrite)
         hsh.Write(hsh.GetName(),ROOT.TObject.kOverwrite)
         #hsh.Write(0,2,0)
+    #if nj>100:
+    #    break
 #fsh.Write()
 fsh.Close()
 fmg.Close()
