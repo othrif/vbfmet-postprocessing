@@ -94,10 +94,10 @@ for k in  region_nom_to_syst_map.keys():
         if not hmg or not hsh:
             print 'ERROR loading syst: ',iname,hmg,hsh
             continue
-        rel_err=0.0
+        rel_err=1.0
         if hmg_nom.GetBinContent(1)>0.0:
             rel_err = hmg.GetBinContent(1)/hmg_nom.GetBinContent(1)
-        sh_rel_err=0.0            
+        sh_rel_err=1.0            
         if hsh_nom.GetBinContent(1)>0.0:
             sh_rel_err = hsh.GetBinContent(1)/hsh_nom.GetBinContent(1)
 
