@@ -9,6 +9,7 @@ import math
 parser = argparse.ArgumentParser( description = "Changing to MG relative uncertainties", add_help=True , fromfile_prefix_chars='@')
 parser.add_argument("--mg", dest='mg_file', default='/tmp/HF_MG.root', help="Madgraph HF file")
 parser.add_argument("--sh", dest='sh_file', default='/tmp/HF_SH.root', help="Sherpa HF file")
+parser.add_argument("--mergeSyst", action='store_true',  dest='mergeSyst', default=False, help="Merge the systematics by weight")
 args, unknown = parser.parse_known_args()
 
 regions=[
@@ -32,7 +33,7 @@ samples =['hZ_strong_',
 bins=[1,2,3,4,5,6,7,8,9,10,11]
 
 fmg=ROOT.TFile.Open(args.mg_file)
-fsh=ROOT.TFile.Open(args.sh_file,'UPDATE')
+fsh=ROOT.TFile.Open(args.sh_file,"UPDATE")
 
 # create a region map
 region_nom_to_syst_map={}
@@ -99,9 +100,11 @@ for k in  region_nom_to_syst_map.keys():
         if hsh_nom.GetBinContent(1)>0.0:
             sh_rel_err = hsh.GetBinContent(1)/hsh_nom.GetBinContent(1)
 
-        #print rel_err,' sherpa: ',sh_rel_err
+        print iname,rel_err,' sherpa: ',sh_rel_err
         hsh.SetBinError(1,hsh.GetBinContent(1)*rel_err)
-        hsh.Write("",ROOT.TObject.kOverwrite)
+        #hsh.Write("",ROOT.TObject.kOverwrite)
+        hsh.Write(hsh.GetName(),ROOT.TObject.kOverwrite)
+        #hsh.Write(0,2,0)
 #fsh.Write()
 fsh.Close()
 fmg.Close()
