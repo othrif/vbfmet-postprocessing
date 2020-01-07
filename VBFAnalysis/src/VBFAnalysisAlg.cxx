@@ -1837,11 +1837,11 @@ double VBFAnalysisAlg::weightXETrigSF(const float met_pt, unsigned metRunNumber,
 
   // MET SFs for the sherpa KT merged samples
   if(true){ //mergeKTPTV these are for the truth kt merging
-    if(metRunNumber<=284484)                        { p0 = 84.3168; p1 = 27.3595; e1 = 0.044; }  // 2015 xe70
-    if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 86.7595; p1 = 32.775;  e1 = 0.04; }  // 2016 xe90
-    if(metRunNumber>302872)                         { p0 = 60.4248; p1 = 46.3655; e1 = 0.044; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
-    if(325713<=metRunNumber && metRunNumber<=341649) { p0 = 74.0597; p1 = 50.4828; e1 = 0.04; } // 2017 xe110_pufit_L1XE55
-    if(364292>= metRunNumber && metRunNumber>=348197) { p0 = 73.372; p1 = 56.583; e1 = 0.04; } // 2018 xe110_xe70_L1XE50
+    if(metRunNumber<=284484)                        { p0 = 74.08; p1 = 32.07; e1 = 0.044; }  // 2015 xe70
+    if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 80.72; p1 = 37.08;  e1 = 0.04; }  // 2016 xe90
+    if(metRunNumber>302872)                         { p0 = 78.76; p1 = 34.62; e1 = 0.044; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
+    if(325713<=metRunNumber && metRunNumber<=341649) { p0 = 62.3667; p1 = 54.946; e1 = 0.04; } // 2017 xe110_pufit_L1XE55
+    if(364292>= metRunNumber && metRunNumber>=348197) { p0 = 74.018; p1 = 35.8145; e1 = 0.04; } // 2018 xe110_xe70_L1XE50
   }
   
   double x = met_pt / 1.0e3;

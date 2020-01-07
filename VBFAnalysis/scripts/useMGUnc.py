@@ -82,7 +82,13 @@ for k in  region_nom_to_syst_map.keys():
     khists = region_nom_to_syst_map[k]
     hmg_nom=fmg.Get(k)
     hsh_nom=fsh.Get(k)
-
+    if hsh_nom.GetBinContent(1)<0.0:
+        # removing a negative yeild
+        print 'Removing a negative nominal yield: ',hsh_nom.GetBinContent(1)
+        hsh_nom.SetBinContent(1,0.001)
+        fsh.cd()
+        hsh_nom.Write(hsh_nom.GetName(),ROOT.TObject.kOverwrite)
+        
     if not hmg_nom or not hsh_nom:
         print 'Could not load: ',k,hmg_nom,hsh_nom
         continue
@@ -111,7 +117,20 @@ for k in  region_nom_to_syst_map.keys():
                 if (stat_sh+stat_mg)>0.0:
                     rel_err = (stat_sh*rel_err+stat_mg*sh_rel_err)/(stat_sh+stat_mg)
             print 'avg - ',iname,rel_err,' sherpa: ',sh_rel_err
-        hsh.SetBinContent(1,hsh.GetBinContent(1)*rel_err)
+        if hsh.GetBinContent(1)<0.0:
+            # removing a negative yeild
+            print 'Removing a negative yield: ',hsh.GetBinContent(1)
+            hsh.SetBinContent(1,0.001)
+        DoReset=True
+        if abs(1.-rel_err)>abs(1.-sh_rel_err):            
+            if stat_mg>0.4 or hmg_nom.GetBinContent(1)<5.0:
+                print 'Stats are too small to reset anything: ',stat_mg
+                DoReset=False
+            print 'Larger relative ERROR: ',rel_err,sh_rel_err,' MG: ',hmg_nom.GetBinContent(1),'+/-',hmg_nom.GetBinError(1),' SH: ',hsh_nom.GetBinContent(1),' +/- ',hsh_nom.GetBinError(1)
+        else:
+            print 'Smaller relative ERROR: ',rel_err,sh_rel_err,' MG: ',hmg_nom.GetBinContent(1),'+/-',hmg_nom.GetBinError(1),' SH: ',hsh_nom.GetBinContent(1),' +/- ',hsh_nom.GetBinError(1)
+        if DoReset:
+            hsh.SetBinContent(1,hsh.GetBinContent(1)*rel_err)
         fsh.cd()
         #hsh.Write("",ROOT.TObject.kOverwrite)
         hsh.Write(hsh.GetName(),ROOT.TObject.kOverwrite)
