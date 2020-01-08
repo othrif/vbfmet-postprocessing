@@ -16,7 +16,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hBaseMuPt(0), hBaseMuEta(0),
 				  hTruthElPt(0), hTruthElEta(0),
 				  hBaseElPt(0), hBaseElEta(0),
-				  hTruthTauPt(0), hTruthTauEta(0),
+				  hTruthTauPt(0), hTruthTauDR(0), hTruthTauEta(0),
 				  hminDRLep(0),
 				  hjj_mass_variableBin(0),
 				  htruth_jj_mass_variableBin(0),
@@ -123,7 +123,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hj3Jvt            = GetTH1("j3Jvt",            12,  -0.2,  1.0);
   hj3FJvt           = GetTH1("j3FJvt",           22,  -0.2,  2.0);
 
-  if(fDetailLvl<5){
+   if(fDetailLvl<5){
     hJetEtaPt25       = GetTH1("JetEtaPt25",       90,  -4.5,  4.5);		  
     hJetEtaPt35       = GetTH1("JetEtaPt35",       90,  -4.5,  4.5);		  
     hJetEtaPt55       = GetTH1("JetEtaPt55",       90,  -4.5,  4.5);
@@ -149,7 +149,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
     hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
     hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);
     hZShMCIDQCD  = GetTH1("ZShMCIDQCD",   84,  312447.5,312531.5);   
-  }
+    }
 
   // jj_mass limits
   float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 }; 
@@ -273,24 +273,24 @@ bool Msl::PlotEvent::DoExec(Event &event)
     
     for(unsigned iJet=2; iJet<event.jets.size(); ++iJet){
       tmp=event.jets.at(iJet).GetLVec();
-      hcentrality->Fill(event.GetVar(Mva::maxCentrality), weight);
+      if(hcentrality) hcentrality->Fill(event.GetVar(Mva::maxCentrality), weight);
       
       float dRj1=tmp.DeltaR(j1v);
       float dRj2=tmp.DeltaR(j2v);
       if(hdRj1) hdRj1->Fill(dRj1, weight);
       if(hdRj2) hdRj2->Fill(dRj2, weight);
-      hminDR->Fill(std::min(dRj1,dRj2), weight);
-      if(tmp.Pt()<35.0){ hJetEtaPt25->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet25EMEC; }
-      else if(tmp.Pt()<55.0){ hJetEtaPt35->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet35EMEC; }
-      else{  hJetEtaPt55->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet55EMEC; }
+      if(hminDR) hminDR->Fill(std::min(dRj1,dRj2), weight);
+      if(hJetEtaPt25 && tmp.Pt()<35.0){ hJetEtaPt25->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet25EMEC; }
+      else if(hJetEtaPt35 && tmp.Pt()<55.0){ hJetEtaPt35->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet35EMEC; }
+      else if(hJetEtaPt55){  hJetEtaPt55->Fill(tmp.Eta(),weight); if(fabs(tmp.Eta())>2.5 && fabs(tmp.Eta())<3.2)++njet55EMEC; }
             
       float mj1 =  (tmp+j1v).M();
       float mj2 =  (tmp+j2v).M();
       if(hmj1) hmj1->Fill(mj1, weight);
       if(hmj2) hmj2->Fill(mj2, weight);
       if(hminDRmj2) hminDRmj2->Fill((dRj1<dRj2 ? mj1 : mj2), weight);
-      hmin_mj3->Fill(std::min(mj1,mj2), weight);
-      hmin_mj3_over_mjj->Fill(event.GetVar(Mva::maxmj3_over_mjj), weight);
+      if(hmin_mj3) hmin_mj3->Fill(std::min(mj1,mj2), weight);
+      if(hmin_mj3_over_mjj) hmin_mj3_over_mjj->Fill(event.GetVar(Mva::maxmj3_over_mjj), weight);
     }
     if(event.jets.size()>3){
       float mj34 = (event.jets.at(2).GetLVec()+event.jets.at(3).GetLVec()).M();
