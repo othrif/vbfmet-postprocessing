@@ -137,3 +137,22 @@ nohup python HInvPlot/macros/plotEvent.py  -i
 --metsf-cuts 1   -a metsf &> /tmp/logMETSFEnoKT_3j &
 
 > python HInvPlot/macros/TrigSF.py --wait --year 2018 --input /tmp/v34ELooseMETPassThru_ktmerge.root
+
+
+==========
+
+nohup python HInvPlot/macros/plotEvent.py  -i v34ALooseSYSTJan7.txt
+-r /tmp/mca20156.root   --chan nn,e,u,l,ee,uu,ll  --DetailLvl 10
+--mergeKTPTV  &> /tmp/test & tail -f /tmp/test
+
+python HInvPlot/macros/submitPlotEventCondor.py -i
+/home/schae/testarea/HInv/source/Plotting/v34ELooseSYSTJan7.txt
+--extraCommand=" --chan nn,e,u,l,ee,uu,ll --DetailLvl 10 --mergeKTPTV
+--year 2018 " -d v34PlotsEJan7
+
+python HInvPlot/macros/submitPlotEventCondor.py -i
+/home/schae/testarea/HInv/source/Plotting/v34DLooseSYSTJan7.txt
+--extraCommand=" --chan nn,e,u,l,ee,uu,ll --DetailLvl 10 --mergeKTPTV
+--year 2017 " -d v34PlotsDJan7
+
+python HInvPlot/macros/submitPlotEventCondor.py -i /home/schae/testarea/HInv/source/Plotting/v34ALooseSYSTJan7.txt --extraCommand=" --chan nn,e,u,l,ee,uu,ll --DetailLvl 10 --mergeKTPTV " -d v34PlotsAJan7
