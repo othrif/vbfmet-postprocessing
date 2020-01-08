@@ -1,7 +1,7 @@
 #!/bin/bash                                                                                                                                                                                                       
 #OUTDIRM=/share/t3data2/schae/v32ETight
 #OUTDIRM=${1:-v34mc16a}
-OUTDIRM=v34ELooseSYSTJan7
+OUTDIRM=v34ALooseSYSTJan8
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
