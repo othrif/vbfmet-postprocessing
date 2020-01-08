@@ -146,7 +146,7 @@ def getParser():
     p.add_option('--skim',         action='store_true', default=False,   dest='skim',           help='Skim ntuples to met trigger or 3L')
     p.add_option('--jet-veto-pt',  type='float'       , default=-10,     dest='jet_veto_pt',    help='pT for jet veto')
     p.add_option('--BTagCut',  type='float'       , default=-10,     dest='BTagCut',    help='BTagCut for tagging: 0.94, 0.83, 0.64, 0.11 for the 60, 70, 77, and 85 OP')
-    p.add_option('--DetailLvl',    type='int'       ,   default=0,       dest='DetailLvl',      help='Integer for detail level of plotting. =1 plots jet variables only')
+    p.add_option('--DetailLvl',    type='int'       ,   default=0,       dest='DetailLvl',      help='Integer for detail level of plotting. =1 plots jet variables only, 10 removes a lot of plots')
     p.add_option('--metsf-cuts',   type='int',   default=0,  dest='metsf_cuts',          help='METSF cuts: 0 Nominal, 1 nj3, 2 no centrality')
     
     p.add_option('--vv-vr',    action='store_true', default=False,   dest='vv_vr',            help='Run the VV VR')
