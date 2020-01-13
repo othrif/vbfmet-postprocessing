@@ -239,6 +239,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   xeSFTrigWeight_nomu__1down=1.0;
   tree->SetBranchStatus("vjWeight", 1);
   tree->SetBranchAddress("vjWeight", &vjWeight);
+  tree->SetBranchAddress("TriggerEffWeight", &trigEffWeight);
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
   tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
   if(fWeightSystName=="Nominal" || fIsDDQCD){
@@ -700,6 +701,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         else event->SetWeight(fWeight*fLumi);
       }
       else  event->SetWeight(1.0);
+      //if(fIsDDQCD) event->SetWeight(fWeight*trigEffWeight);
       if(fIsDDQCD) event->SetWeight(fWeight);
       //if(fIsDDQCD) event->SetWeight(fWeight/puweight);
       if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){

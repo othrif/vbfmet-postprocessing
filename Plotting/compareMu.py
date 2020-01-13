@@ -63,6 +63,10 @@ for infile in names:
 			labels.append("SR-MJ")
 		elif infile.find("mjjLowNjetFJVT")>0 and infile[infile.find("mjjLowNjetFJVT")+15]=="n":#0lvr
 			labels.append("0LVR-MJ")
+		elif infile.find("fjvtVR")>0 and infile[infile.find("fjvtVR")+17]=="n":#0lvr
+			labels.append("0LVR-MJ")
+		elif infile.find("LowMETQCDRevFJVT")>0 and infile[infile.find("LowMETQCDRevFJVT")+17]=="n":#0lvr
+			labels.append("0LVR-MJ")
 		
 	else:
 		if infile.find("allmjj")>0 and infile[infile.find("allmjj")+7]!="n":
@@ -81,6 +85,14 @@ for infile in names:
 			labels.append("1LVR_"+infile[infile.find("mjjLowNjetFJVT")+15])
 		elif infile.find("mjjLowNjetFJVT")>0 and infile[infile.find("mjjLowNjetFJVT")+15]=="n":#0lvr
 			labels.append("0LVR")
+		elif infile.find("fjvtVR")>0 and infile[infile.find("fjvtVR")+7]!="n":#1lvr
+			labels.append("1LVR_"+infile[infile.find("fjvtVR")+7])
+		elif infile.find("fjvtVR")>0 and infile[infile.find("fjvtVR")+7]=="n":#0lvr
+			labels.append("0LVR")
+		elif infile.find("LowMETQCDRevFJVT")>0 and infile[infile.find("LowMETQCDRevFJVT")+17]!="n":#1lvr
+			labels.append("1LVR_"+infile[infile.find("LowMETQCDRevFJVT")+17])
+		elif infile.find("LowMETQCDRevFJVT")>0 and infile[infile.find("LowMETQCDRevFJVT")+17]=="n":#0lvr
+			labels.append("0LVR")
 
 
 dataCanvas=TCanvas("dataCanvas","dataCanvas",600,600)
@@ -93,11 +105,14 @@ if "SR" in labels:
 	sr2=labels.index("SR")
 else:
 	sr2=len(dataHists)+1#is never reached
+
+#nolep=labels.index("0LVR")
 nolep=labels.index("0LVR-MJ")
-nolepmj=labels.index("0LVR")
+#nolepmj=labels.index("0LVR")
+
 
 for i in range(len(dataHists)):
-	if i!=sr and i!=sr2 and names[i].find("nomj")<=0:
+	if i!=sr and i!=sr2:# and names[i].find("nomj")<=0:
 		dataHists[i].Draw("SAME HIST E1")
 		dataHists[i].SetStats(0)
 		dataHists[i].SetLineColor(i+1)
@@ -152,7 +167,7 @@ dataCanvasNorm=TCanvas("dataCanvasNorm","dataCanvasNorm",600,800)
 dataCanvasNorm.Divide(1,2,0,0)
 dataCanvasNorm.cd(1)
 for i in range(len(dataHistsNorm)):
-	if i!=sr and i!=sr2 and i!=nolep:
+	if i!=sr and i!=sr2:# and i!=nolep:
 		dataHistsNorm[i].Draw("SAME HIST E1")
 		dataHistsNorm[i].SetStats(0)
 		dataHistsNorm[i].SetLineColor(i+1)

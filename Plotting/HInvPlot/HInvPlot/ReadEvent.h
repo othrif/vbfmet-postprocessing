@@ -176,6 +176,7 @@ namespace Msl
     // Input vars
     float fWeight;
     float puweight;
+    float trigEffWeight;
     double vjWeight;
     float xeSFTrigWeight;
     float xeSFTrigWeight__1up;
