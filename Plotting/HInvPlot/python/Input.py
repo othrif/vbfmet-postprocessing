@@ -1235,18 +1235,16 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
         bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)
     if not options.mergePTV:
-        #bkg_keys['wdpi'].update(bkg_zqcd_znn)        
+        #bkg_keys['wdpi'].update(bkg_zqcd_znn)
         if  options.year!=2018:
             bkg_keys['wdpi'].update(bkg_vbfPTVExt)
-            bkg_keys['wdpi'].update(bkg_zqcd_znn_mc16e)            
+            bkg_keys['wdpi'].update(bkg_zqcd_znn_mc16e)
         else:
             for ki,yi in bkg_vbfPTVExt.iteritems():
                 if not yi.count('Znunu'): bkg_keys['wdpi'][ki]=yi
 
     if not options.mergeExt:
         bkg_keys['wdpi'].update(bkg_vbfExt)
-        bkg_keys['wdpi'].update(bkg_zqcd_LO_Filt)
-        bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)
         bkg_keys['wdpi'].update(bkg_new)
 
     if not options.mergeMGExt:

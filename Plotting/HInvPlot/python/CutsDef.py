@@ -22,7 +22,7 @@ class BasicCuts:
       Optional parameters:
     """
 
-    def __init__(self, Analysis, Chan, SameSign=0):
+    def __init__(self, Analysis, Chan, options, SameSign=0):
 
         if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
 			    'mjjLowNjet','mjjLowNjet2','mjjLowNjetFJVT','njgt','njgt4',
@@ -52,12 +52,13 @@ class BasicCuts:
         self.JetEta = ''
         if Analysis.count('metsf'):
             self.DEtajjLowerCut   = 3.5 # was 3.5
-            self.MjjLowerCut   = 1500.0
+            self.MjjLowerCut   = 600.0
             if Analysis.count('VBFTopo'):
                 self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
                 self.DEtajjLowerCut   = 4.2 # was 3.5
                 self.MjjLowerCut   = 1500.0
-            #self.NjetCut   = 'n_jet == 3'
+            if options.metsf_cuts==1:
+                self.NjetCut   = 'n_jet == 3'
         if Analysis.count('mjj1000'):
             self.MjjLowerCut   = 1000.0
             self.MjjUpperCut   = 1500.0
@@ -318,9 +319,10 @@ def getJetCuts(basic_cuts, options, isPh=False):
             cuts += basic_cuts.GetLeadJetEtaCut()
             if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and basic_cuts.analysis!='mjjLowNjet' and basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt':
                 #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
-                cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
-                #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.35')]
-                cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
+                if options.metsf_cuts==0:
+                    cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
+                    #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.35')]
+                    cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
             if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 90.0')]
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 70.0')] # move to 50
@@ -476,7 +478,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
             elif basic_cuts.GetSelKey().count('trig'): # this is broken!!!
                 cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 11')]
         elif basic_cuts.GetSelKey().count('metsfxe110XE70'):
-            cuts += [CutItem('CutMETTrigRuns30', 'runPeriod == 30')]
+            #cuts += [CutItem('CutMETTrigRuns30', 'runPeriod == 30')]
             if basic_cuts.GetSelKey().count('trig'):
                 cuts += [CutItem('CutMETTrigMET', 'trigger_met_encodedv2 == 5')]
         elif basic_cuts.GetSelKey().count('metsfxe110XE65'):
@@ -488,10 +490,10 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
             cuts += [CutItem('CutMETTrigRuns10', 'runPeriod == 10')]
         elif basic_cuts.GetSelKey().count('metsfxe100'):
             cuts += [CutItem('CutMETTrigRuns11', 'runPeriod == 11')]
-        elif basic_cuts.GetSelKey().count('metsfxe110L155'):
-            cuts += [CutItem('CutMETTrigRuns12', 'runPeriod == 12')]
+        elif basic_cuts.GetSelKey().count('metsfxe110L155'): # ran all year
+            cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13 || runPeriod == 12 || runPeriod == 11 || runPeriod == 10')]
         elif basic_cuts.GetSelKey().count('metsfxe100L150'):
-            cuts += [CutItem('CutMETTrigRuns13', 'runPeriod == 13')]
+            cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13')]
         # apply the trigger
         if basic_cuts.GetSelKey().count('trig'):
             cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 4')]
@@ -539,6 +541,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
 
     cuts += getJetCuts(basic_cuts, options);
     cuts += [CutItem('CutMet',       '%s > 100.0' %(met_choice))]
+    cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     # does the vertex matter? does the CST met cut matter? does the fjvt cuts matter?
     #cuts += metCuts(basic_cuts,options, metCut=100.0, cstCut=0.0)
     #cuts += metCuts(basic_cuts,options, metCut=100.0, cstCut=130.0)
