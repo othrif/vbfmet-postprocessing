@@ -12,7 +12,7 @@ regions=[
 'VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts',
 'VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts',
 ]
-
+unblind=False
 #hdata_NONE_twoEleCR3_obs_cuts
 samples =['hVBFH125_',
           'hggFH125_',
@@ -40,6 +40,7 @@ samplesPrint =['Samples','VBFH125',
           'eleFakes',
           'multijet',
           'data',
+          #'Signal',
           'total bkg','data/bkg'
 ]
 
@@ -104,7 +105,10 @@ samplesPrint =['Samples','VBFH125',
 #f=ROOT.TFile.Open('SumHF_Oct1_oneTrig_All.root')
 #f=ROOT.TFile.Open('/share/t3data2/schae/METScan/MET150/v34E/SumHF_2018_MET150.root')
 #f=ROOT.TFile.Open('/tmp/SumHF_Sep19_baseline.root')
-f=ROOT.TFile.Open('/share/t3data2/schae/PileupStudies/v34AKTHF/HF_v34LAKTMerge.root')
+#f=ROOT.TFile.Open('/share/t3data2/schae/PileupStudies/v34AKTHF/HF_v34LAKTMerge.root')
+#f=ROOT.TFile.Open('/tmp/HF_jan7_mc16all_nom.root')
+#f=ROOT.TFile.Open('/tmp/HFalltest.root')
+f=ROOT.TFile.Open('/tmp/HFnom_mc16a.root')
 #f=ROOT.TFile.Open('/share/t3data2/schae/METScan/MET150/v34A/SumHF_2016_MET150_Nom_wMJ.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
 #f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
@@ -163,6 +167,7 @@ for rmy in regions:
         su=0
         lineBkgErr=0.0
         lineBkg=0.0
+        lineSig=0.0
         lineData=0.0
         for s in samples:
             histname=s+r
@@ -184,6 +189,7 @@ for rmy in regions:
                 SumErrList[su]+=e**2
                 if s=='hVBFH125_' or s=='hggFH125_' or s=='hVH125_':
                     line+=''
+                    lineSig+=integral
                 elif s!='hdata_':
                     lineBkgErr+=e**2
                     lineBkg+=integral
@@ -214,7 +220,7 @@ for rmy in regions:
         elif r.count('oneMuNeg'):  region_name=['Wmnminus']
         elif r.count('oneMuPos'):  region_name=['Wmnplus']
         elif r.count('_SR'):  region_name=['SR']
-        table_per_bin[bin_num][region_name[0]]=[lineData,lineBkg,'%0.3f $\\pm$ %0.3f\t' %(lineData/lineBkg, math.sqrt(1./lineData+bkgFracErr**2)*(lineData/lineBkg))]
+        table_per_bin[bin_num][region_name[0]]=[lineData,lineSig,lineBkg,'%0.3f $\\pm$ %0.3f\t' %(lineData/lineBkg, math.sqrt(1./lineData+bkgFracErr**2)*(lineData/lineBkg))]
         #[[sreg,totalData,totalBkg,'%0.3f\t%0.3f +/- %0.3f\t' %(totalBkgFracErr, totalData/totalBkg, math.sqrt(totalBkgFracErr**2+1./totalData)*(totalData/totalBkg))]]        
         nRegion+=1
         if nRegion==sTot:
@@ -222,6 +228,8 @@ for rmy in regions:
             totalData=0
             totalBkg=0
             totalBkgErr=0
+            totalSig=0
+            totalSigErr=0
             rline='Sum\t' 
             sreg=['Region']
             if r.count('twoEle'):  sreg=['Zee']
@@ -238,12 +246,13 @@ for rmy in regions:
                 #rline+='%0.2f\t' %(SumList[su])
                 rline+='%0.2f +/- %0.2f\t' %(SumList[su],math.sqrt(SumErrList[su]))
                 if samples[su]=='hVBFH125_' or samples[su]=='hggFH125_' or samples[su]=='hVH125_':
-                    pass
+                    totalSig+=SumList[su]
+                    totalSigErr+=SumErrList[su]
                 elif samples[su]!='hdata_':
                     totalBkg+=SumList[su]
                     totalBkgErr+=SumErrList[su]
                 else:
-                    totalData=SumList[su]
+                    totalData=SumList[su] 
             sreg+=[totalBkg]
             region_cf+=[sreg]            
             #bkgFracErr
@@ -266,22 +275,29 @@ print table_per_bin_line,' \\\\\\hline\\hline'
 for b in bins:
     if b>11:
         continue
-    for v in [0,1,2]:
+    for v in [0,1,2,3]:
         table_per_bin_line='%s ' %b
         if v==0: table_per_bin_line+=' & Data'
-        if v==1: table_per_bin_line+=' & Bkg'
-        if v==2: table_per_bin_line+=' & Data/Bkg'
+        if v==1: table_per_bin_line+=' & Signal'
+        if v==2: table_per_bin_line+=' & Bkg'
+        if v==3: table_per_bin_line+=' & Data/Bkg'
             
         for keyn in keys_regions:
             if v==0:
                 if keyn=='SR':
-                    table_per_bin_line+=' & - ' #%(table_per_bin[b][keyn][v]) #  to unblind
+                    if unblind:
+                        table_per_bin_line+=' & %i ' %(table_per_bin[b][keyn][v])
+                    else:
+                        table_per_bin_line+=' & - ' 
                 else:
                     table_per_bin_line+=' & %i ' %(table_per_bin[b][keyn][v])
-            elif v==1:
+            elif v==1 or v==2:
                 table_per_bin_line+=' & %0.1f ' %(table_per_bin[b][keyn][v])                
-            else:
-                table_per_bin_line+=' & %s ' %(table_per_bin[b][keyn][v])                
+            elif v==3:
+                if keyn=='SR' and not unblind:
+                    table_per_bin_line+=' & - ' #%(table_per_bin[b][keyn][v])
+                else:
+                    table_per_bin_line+=' & %s ' %(table_per_bin[b][keyn][v])
         print table_per_bin_line,'\\\\'
     
 print '\\end{tabular}'
@@ -292,7 +308,7 @@ print '\\resizebox{\\textwidth}{!}{ '
 print '\\begin{tabular}{l|ccccccccc}'
 cline=''
 #print region_cf
-for b in range(0,len(region_cf[0])+1):
+for b in range(0,len(region_cf[0])+1): # bins
     cline=samplesPrint[b]+'\t& '
     for r in range(0,len(region_cf)):
     #for b in range(0,len(samples)+2):
@@ -301,9 +317,15 @@ for b in range(0,len(region_cf[0])+1):
             cline+='%s\t& ' %(region_cf[r][b])
             extra='\\hline\\hline'
         elif b>=len(region_cf[0]):
-            cline+='%0.3f\t& ' %(region_cf[r][b-2]/region_cf[r][b-1] )
+            if unblind or region_cf[r][0]!="SR":
+                cline+='%0.3f\t& ' %(region_cf[r][b-2]/region_cf[r][b-1] )
+            else:
+                cline+=' - \t& '
         elif b==len(region_cf[0])-2:# data
-            cline+='%0.0f\t& ' %(region_cf[r][b])
+            if unblind or region_cf[r][0]!="SR":
+                cline+='%0.0f\t& ' %(region_cf[r][b])
+            else:
+                cline+=' - \t& ' #%(region_cf[r][b])
         else:
             cline+='%0.1f\t& ' %(region_cf[r][b] )
             if b==len(region_cf[0])-3:# mj
