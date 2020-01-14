@@ -47,6 +47,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hptvarcone20(0),
 				  hptvarcone30(0),
 				  htopoetcone20(0),
+				  hJetHT(0),hAllJetMETSig(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),hZPTVMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),hZMadFMCIDQCD(0),
 				  hWMadMCIDQCD(0),
@@ -311,8 +312,8 @@ bool Msl::PlotEvent::DoExec(Event &event)
   // Hmm.. why is this necessary?
   // It seems that if we don't explicitly ->Fill() here with weights,
   // the python gets the weights wrong, since nothing is capable of setting it.
-  if (event.HasVar(Mva::jetHT)) hJetHT->Fill(event.GetVar(Mva::jetHT), weight);
-  if (event.HasVar(Mva::alljet_metsig)) hAllJetMETSig->Fill(event.GetVar(Mva::alljet_metsig), weight);
+  if (hJetHT && event.HasVar(Mva::jetHT)) hJetHT->Fill(event.GetVar(Mva::jetHT), weight);
+  if (hAllJetMETSig && event.HasVar(Mva::alljet_metsig)) hAllJetMETSig->Fill(event.GetVar(Mva::alljet_metsig), weight);
 
   // jet DR
   float minDR=999.0;

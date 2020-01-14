@@ -6,10 +6,10 @@ import argparse
 import ROOT
 import math
 
-def check(v):
+def check(v,ispdf=False):
 
     # use inverted uncertainties
-    if v<0.9999:
+    if v<0.9999 and not ispdf:
         return 1./(2.-v)
     return v
 
@@ -41,6 +41,15 @@ def ReturnNewSyst(sysname, vals, listV):
     maxBin=12
     tot_err=0.0
     tmp_line=sysname+'_uncbin11 '
+    if sysname.count('pdf_'):
+        for  bin_num1Z in range(0,maxBin-1):
+            #tmp_line+='1.0,'
+            newSystmig11=new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
+            newSystmig11=check(1.-newSystmig11/listV[bin_num1Z][vsysname],ispdf=True)
+            tmp_line+='%0.5f,' %newSystmig11
+        print tmp_line.rstrip(',')
+        line+=tmp_line.rstrip(',')
+        return line+'\n'
     for  bin_num1Z in range(1,maxBin-1):
         tmp_line+='1.0,'
     newSystmig11=new_vals[10]*listV[10][vsysname]
