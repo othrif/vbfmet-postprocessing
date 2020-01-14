@@ -11,7 +11,7 @@
 using namespace std;
 
 //-----------------------------------------------------------------------------
-Msl::PlotEvent::PlotEvent():      fPassAlg(0),
+Msl::PlotEvent::PlotEvent():      fPassAlg(0), 
 				  hTruthMuPt(0), hTruthMuEta(0),
 				  hBaseMuPt(0), hBaseMuEta(0),
 				  hTruthElPt(0), hTruthElEta(0),
@@ -32,7 +32,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hJetEMECvsBCIDPosPt25(0),
 				  hJetEMECvsBCIDPosPt35(0),
 				  hJetEMECvsBCIDPosPt55(0),
-				  hMetvsMu(0),
+                                  hMetvsMu(0),
 				  hmj1(0),
 				  hmj2(0),
 				  hminDRmj2(0),
@@ -76,9 +76,9 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   reg.Get("PlotEvent::VarPref", fVarPref);
 
   fVarVec =  Mva::ReadVars(reg, "PlotEvent::VarVec", GetAlgName());
-  reg.Get("PlotEvent::NBinVec", fNBinVec);
-  reg.Get("PlotEvent::LoVec",   fLoVec);
-  reg.Get("PlotEvent::HiVec",   fHiVec);
+  reg.Get("PlotEvent::NBinVec", fNBinVec);  
+  reg.Get("PlotEvent::LoVec",   fLoVec);  
+  reg.Get("PlotEvent::HiVec",   fHiVec);  
 
   //
   // Read configuration for selecting MC samples
@@ -152,10 +152,10 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
     }
 
   // jj_mass limits
-  float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 };
+  float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 }; 
   hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  8,  binsjjmass);
-  htruth_jj_mass_variableBin = GetTH1("truth_jj_mass_variableBin",  8,  binsjjmass);
-
+  htruth_jj_mass_variableBin = GetTH1("truth_jj_mass_variableBin",  8,  binsjjmass);   
+  
   // TMVA variable binned
   float binstmva[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
   htmva_variableBin =  GetTH1("tmva_variableBin",  7,  binstmva);
@@ -164,7 +164,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   for(unsigned a=0; a<fVarVec.size(); ++a){
     fHistVec[fVarVec[a]] =  GetTH1(Mva::Convert2Str(fVarVec[a]),unsigned(fNBinVec[a]), float(fLoVec[a]), float(fHiVec[a]));
   }
-
+  
     if(fDebug) {
       fSample.Print(std::cout, "   ");
     }
@@ -194,7 +194,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //
   //fEvents.push_back(VarStore(event, fVars));
   //fEvents.back().SetWeight(weight);
-
+  
   //
   // Fill histograms
   //
@@ -212,7 +212,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   float jj_deta = event.GetVar(Mva::jj_deta);
   if(hjj_deta_signed) hjj_deta_signed->Fill(( fabs(event.GetVar(Mva::jetEta0)) > fabs(event.GetVar(Mva::jetEta1)) ? -1.0*jj_deta : jj_deta), weight);
   if(hjj_deta_diff) hjj_deta_diff->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1))), weight);
-  if(hjj_deta_abs) hjj_deta_abs->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1)))/jj_deta, weight);
+  if(hjj_deta_abs) hjj_deta_abs->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1)))/jj_deta, weight);    
   FillHist(hjj_mass_variableBin,   Mva::jj_mass, event, weight);
   FillHist(htruth_jj_mass_variableBin,   Mva::truth_jj_mass, event, weight);  
   FillHist(htmva_variableBin,      Mva::tmva,    event, weight);
@@ -236,7 +236,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(hmuEta) hmuEta->Fill(event.electrons.at(0).eta, weight);
     if(hmuEta) hmuEta->Fill(event.electrons.at(1).eta, weight);        
   }
-
+  
   if(event.basemu.size()>0){
     if(hBaseMuPt) hBaseMuPt ->Fill(event.basemu.at(0).pt, weight);
     if(hBaseMuEta) hBaseMuEta->Fill(event.basemu.at(0).eta, weight);
@@ -270,7 +270,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   if(event.jets.size()>2){
     const TLorentzVector j1v = event.jets.at(0).GetLVec();
     const TLorentzVector j2v = event.jets.at(1).GetLVec();
-
+    
     for(unsigned iJet=2; iJet<event.jets.size(); ++iJet){
       tmp=event.jets.at(iJet).GetLVec();
       if(hcentrality) hcentrality->Fill(event.GetVar(Mva::maxCentrality), weight);
@@ -308,18 +308,12 @@ bool Msl::PlotEvent::DoExec(Event &event)
   }
   // end testing
 
-  // Hmm.. why is this necessary?
-  // It seems that if we don't explicitly ->Fill() here with weights,
-  // the python gets the weights wrong, since nothing is capable of setting it.
-  if (event.HasVar(Mva::jetHT)) hJetHT->Fill(event.GetVar(Mva::jetHT), weight);
-  if (event.HasVar(Mva::alljet_metsig)) hAllJetMETSig->Fill(event.GetVar(Mva::alljet_metsig), weight);
-
   // jet DR
   float minDR=999.0;
   for(unsigned il=0; il<event.muons.size(); ++il){
     if(hptvarcone20 && event.muons.at(il).HasVar(Mva::ptvarcone20)) hptvarcone20->Fill(event.muons.at(il).GetVar(Mva::ptvarcone20), weight);
     if(hptvarcone30 && event.muons.at(il).HasVar(Mva::ptvarcone30)) hptvarcone30->Fill(event.muons.at(il).GetVar(Mva::ptvarcone30), weight);
-    if(htopoetcone20 && event.muons.at(il).HasVar(Mva::topoetcone20)) htopoetcone20->Fill(event.muons.at(il).GetVar(Mva::topoetcone20), weight);
+    if(htopoetcone20 && event.muons.at(il).HasVar(Mva::topoetcone20)) htopoetcone20->Fill(event.muons.at(il).GetVar(Mva::topoetcone20), weight);     
     for(unsigned ij=0; ij<event.jets.size(); ++ij){
       float qDR = event.jets.at(ij).GetVec().DeltaR(event.muons.at(il).GetVec());
       if(minDR>qDR) minDR = qDR;
@@ -328,7 +322,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   for(unsigned il=0; il<event.electrons.size(); ++il){
     if(hptvarcone20 && event.electrons.at(il).HasVar(Mva::ptvarcone20)) hptvarcone20->Fill(event.electrons.at(il).GetVar(Mva::ptvarcone20), weight);
     if(hptvarcone30 && event.electrons.at(il).HasVar(Mva::ptvarcone30)) hptvarcone30->Fill(event.electrons.at(il).GetVar(Mva::ptvarcone30), weight);
-    if(htopoetcone20 && event.electrons.at(il).HasVar(Mva::topoetcone20)) htopoetcone20->Fill(event.electrons.at(il).GetVar(Mva::topoetcone20), weight);
+    if(htopoetcone20 && event.electrons.at(il).HasVar(Mva::topoetcone20)) htopoetcone20->Fill(event.electrons.at(il).GetVar(Mva::topoetcone20), weight);        
     for(unsigned ij=0; ij<event.jets.size(); ++ij){
       float qDR = event.jets.at(ij).GetVec().DeltaR(event.electrons.at(il).GetVec());
       if(minDR>qDR) minDR = qDR;
@@ -339,7 +333,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   // fill stored variables
   for(unsigned a=0; a<fVarVec.size(); ++a){
     FillHist(fHistVec[fVarVec[a]], fVarVec[a], event, weight);
-  }
+  }  
   return true;
 }
 
@@ -369,7 +363,7 @@ void Msl::PlotEvent::PlotVar(const Mva::Var var)
     return;
   }
 
-  const pair<double, double> res = GetMinMax(var);
+  const pair<double, double> res = GetMinMax(var); 
   if(!(res.first < res.second)) {
     return;
   }
@@ -410,7 +404,7 @@ std::pair<double, double> Msl::PlotEvent::GetMinMax(Mva::Var var) const
 
   for(unsigned i = 0; i < fEvents.size(); ++i) {
     const VarStore &event = fEvents.at(i);
-
+    
     double val = 0.0;
     if(event.GetVar(var, val)) {
       res.first  = std::min<double>(res.first,  val);

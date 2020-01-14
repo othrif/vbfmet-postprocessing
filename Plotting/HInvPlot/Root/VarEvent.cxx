@@ -45,7 +45,6 @@ std::string Msl::Mva::Convert2Str(Var var)
     case met_tenacious_tst_nolep_et:	  return "met_tenacious_tst_nolep_et";
     case met_tenacious_tst_nolep_phi:	  return "met_tenacious_tst_nolep_phi";
     case met_significance:	  return "met_significance";
-    case alljet_metsig:           return "alljet_metsig";
     case metsig_tst:	          return "metsig_tst";
     case met_tenacious_tst_et:	  return "met_tenacious_tst_et";
     case met_tight_tst_et:	  return "met_tight_tst_et";
@@ -95,7 +94,6 @@ std::string Msl::Mva::Convert2Str(Var var)
     case jetPt1:	          return "jetPt1";
     case jetEta0:	          return "jetEta0";
     case jetEta1:	          return "jetEta1";
-    case jetHT:                   return "jetHT";
     case etaj0TimesEtaj1:	  return "etaj0TimesEtaj1";
     case lepPt0:	          return "lepPt0";
     case lepPt1:	          return "lepPt1";
@@ -206,7 +204,6 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "met_tenacious_tst_nolep_phi")  return met_tenacious_tst_nolep_phi;
   if(var == "met_significance")  return met_significance;
   if(var == "metsig_tst")          return metsig_tst;
-  if(var == "alljet_metsig")       return alljet_metsig;
   if(var == "met_tenacious_tst_et")return met_tenacious_tst_et;
   if(var == "met_tight_tst_et")    return met_tight_tst_et;
   if(var == "met_tighter_tst_et")  return met_tighter_tst_et;
@@ -255,7 +252,6 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "jetPt1")            return jetPt1;
   if(var == "jetEta0")           return jetEta0;
   if(var == "jetEta1")           return jetEta1;
-  if(var == "jetHT")             return jetHT;
   if(var == "etaj0TimesEtaj1")   return etaj0TimesEtaj1;
   if(var == "lepPt0")            return lepPt0;
   if(var == "lepPt1")            return lepPt1;
@@ -453,7 +449,6 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(met_tenacious_tst_nolep_phi);
     vars.push_back(met_significance);
     vars.push_back(metsig_tst);
-    vars.push_back(alljet_metsig);
     vars.push_back(met_tenacious_tst_et);
     vars.push_back(met_tight_tst_et);
     vars.push_back(met_tighter_tst_et);
@@ -502,7 +497,6 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(jetPt1);
     vars.push_back(jetEta0);
     vars.push_back(jetEta1);
-    vars.push_back(jetHT);
     vars.push_back(etaj0TimesEtaj1);
     vars.push_back(lepPt0);
     vars.push_back(lepPt1);

@@ -6,11 +6,8 @@
 # Ben Rosser <bjr@sas.upenn.edu>
 
 import array
-import collections
-import csv
 import math
 import os
-import string
 import sys
 
 import ROOT
@@ -24,10 +21,7 @@ ROOT.SetAtlasStyle()
 
 import argparse
 
-# The uncertainties package provides for error propagation.
-# needs to be installed by hand: "pip install --user uncertainties"
-# after setting up a release.
-import uncertainties
+import collections
 
 # Hardcoded bin/region labels.
 # these can be overridden by passing -t [text] to set text on the legend.
@@ -41,56 +35,9 @@ region_labels = {"wcranti_mjj2000_e": "M_{jj} #geq 2000 GeV",
                  "wcranti_mjj1000_u": "1000 #leq M_{jj} #leq 1500 GeV",
                  "wcranti_allmjj_u": "M_{jj} #geq 800 GeV"}
 
-tex_region_labels = {
-    "allmjj": "M_{jj} > \unit[800]{GeV}",
-    "mjj800dphijj1nj2": r"800 < m_{jj} < \unit[1000]{GeV}, \Delta \phi_{jj} < 1",
-    "mjj1000dphijj1nj2": r"1000 < m_{jj} < \unit[1500]{GeV}, \Delta \phi_{jj} < 1",
-    "mjj1500dphijj1nj2": r"1500 < m_{jj} < \unit[2000]{GeV}, \Delta \phi_{jj} < 1",
-    "mjj2000dphijj1nj2": r"2000 < m_{jj} < \unit[3500]{GeV}, \Delta \phi_{jj} < 1",
-    "mjj3500dphijj1nj2": r"m_{jj} > \unit[3500]{GeV}, \Delta \phi_{jj} > 1",
-    "mjj800dphijj2nj2": r"800 < m_{jj} < \unit[1000]{GeV}, \Delta \phi_{jj} > 1",
-    "mjj1000dphijj2nj2": r"1000 < m_{jj} < \unit[1500]{GeV}, \Delta \phi_{jj} > 1",
-    "mjj1500dphijj2nj2": r"1500 < m_{jj} < \unit[2000]{GeV}, \Delta \phi_{jj} > 1",
-    "mjj2000dphijj2nj2": r"2000 < m_{jj} < \unit[3500]{GeV}, \Delta \phi_{jj} > 1",
-    "mjj3500dphijj2nj2": r"m_{jj} > \unit[3500]{GeV}, \Delta \phi_{jj} > 1",
-    "njgt2": r"N_\text{jets} > 2"
-                    }
-
 # Hardcoded labels for electron and muon regions.
 process_labels = {"e": "W #rightarrow e#nu",
-                  "ep": "W #rightarrow e^{+}#nu",
-                  "em": "W #rightarrow e^{-}#nu",
                   "u": "W #rightarrow #mu#nu"}
-
-def parse_cut(cutstring):
-    mjj_cut = ''
-    dphi_cut = ''
-    njet_cut = 'gt2'
-
-    if 'mjj' in cutstring:
-        cutstring = cutstring[cutstring.find("mjj") + len("mjj"):]
-        if len(cutstring) != 0:
-            while cutstring[0] in string.digits:
-                mjj_cut += cutstring[0]
-                cutstring = cutstring[1:]
-
-    if 'dphijj' in cutstring:
-        cutstring = cutstring[cutstring.find("dphijj") + len("dphijj"):]
-        if len(cutstring) != 0:
-            while cutstring[0] in string.digits:
-                dphi_cut += cutstring[0]
-                cutstring = cutstring[1:]
-
-    # this one is a bit more hardcoded.
-    if 'nj' in cutstring:
-        njet_cut = cutstring[cutstring.find("nj") + len("nj"):]
-
-    if mjj_cut == '':
-        mjj_cut = '800'
-    if dphi_cut == '':
-        dphi_cut = '2'
-
-    return mjj_cut, dphi_cut, njet_cut
 
 def compute_ratio(args, tfile, region):
     histname = os.path.join(region, "plotEvent_data", args.var)
@@ -114,44 +61,65 @@ def compute_ratio(args, tfile, region):
             sys.exit(1)
     print("")
 
-    if args.avg:
-        mean = data_hist.GetMean()
-        mean_error = data_hist.GetMeanError()
-        print("Average value in bin " + str(region) +  " = " + str(mean) + " +/- " + str(mean_error))
+    # Okay, now make a new histogram to get the uncertainty!
+    two_bin_initial = ROOT.TH1F("two_bins_initial", "two_bins_initial", 2, 0, 2)
+    two_bin_final = ROOT.TH1F("two_bins_final", "two_bins_final", 2, 0, 2)
 
     # Integrate from 0 to 4 and retrieve the integrated error.
     low_error = ROOT.Double()
     low = data_hist.IntegralAndError(0, args.cutoff, low_error)
+    low_var = float(low_error)**2
 
     # Integrate from 4 and above (bin 5+) and retrieve the integrated error.
     high_error = ROOT.Double()
     high = data_hist.IntegralAndError(args.cutoff + 1, data_hist.GetNbinsX()+2, high_error)
+    high_var = float(high_error)**2
 
-    ulow = uncertainties.ufloat(low, low_error)
-    uhigh = uncertainties.ufloat(high, high_error)
+    # Fill one histogram with the number of low (<4) and high (>4) events.
+    two_bin_final.SetBinContent(1, low)
+    two_bin_final.SetBinError(1, math.sqrt(low_var))
+    two_bin_final.SetBinContent(2, high)
+    two_bin_final.SetBinError(2, math.sqrt(high_var))
 
+    # Fill another with the number of events *before* this cut.
+    for i in range(1, 3):
+        two_bin_initial.SetBinContent(i, low+high)
+        two_bin_initial.SetBinError(i, math.sqrt(low_var + high_var))
+
+    # Using a TEfficiency, compute the error from applying the cut "metsig <= 4".
+    # Since these histograms are weighted, TEfficiency wants to use Bayesian
+    # statistics with a uniform prior-- I think only Bayesian methods are supported here.
+    efficiency = ROOT.TEfficiency(two_bin_final, two_bin_initial)
+    efficiency.SetStatisticOption(ROOT.TEfficiency.kBUniform)
+    efficiency.SetPosteriorMode()
+    value = efficiency.GetEfficiency(1)
+
+    # The ratio, then, is just the efficiency of this cut over (1 - efficiency).
+    # (as that gives us the efficiency of the cut metsig > 4).
+    ratio = value / (1-value)
+
+    # The error on the efficiency, though, is the maximum of the low/up error.
+    error = max(efficiency.GetEfficiencyErrorLow(1), efficiency.GetEfficiencyErrorUp(1))
+
+    # ...or, we can compute the error using binomial statistics instead.
     try:
-        ratio = (ulow / uhigh).n
-        ratio_error = (ulow / uhigh).s
-    except:
-        ratio = 0.0
-        ratio_error = 0.0
+        binomial_error = 1/(low+high) * math.sqrt(low * (1 - low/(low+high)))
+    except ValueError:
+        binomial_error = 0
 
-    if args.invert:
-        try:
-            ratio = (uhigh / ulow).n
-            ratio_error = (uhigh / ulow).s
-        except:
-            ratio = 0.0
-            ratio_error = 0.0
+    # Regardless of what we do, we need to propagate the error on the efficiency
+    # to the error on the ratio, which should be the same regardless.
+    ratio_error = error * math.fabs(1 / (1-value)**2)
+    ratio_bin_error = binomial_error * math.fabs(1 / (1-value)**2)
 
     print("")
     if data_hist.GetBinContent(0) != 0:
         print("Below 0 = %f +/- %f" % (data_hist.GetBinContent(0), data_hist.GetBinError(0)))
 
-    print("Below 4 = %f +/- %f" % (low, low_error))
-    print("Above 4 = %f +/- %f" % (high, high_error))
-    print("Ratio = %f +/- %f" % (ratio, ratio_error))
+    print("Below 4 = %f +/- %f" % (low, math.sqrt(low_var)))
+    print("Above 4 = %f +/- %f" % (high, math.sqrt(high_var)))
+    print("Ratio (TEfficiency) = %f +/- %f" % (ratio, ratio_error))
+    print("Ratio (Binomial) = %f +/- %f" % (ratio, ratio_bin_error))
     print("")
 
     # Now that we've made the estimate, draw the MEt significance template shape.
@@ -179,13 +147,14 @@ def compute_ratio(args, tfile, region):
     # Also look up the process (this could be the W to mu nu CR!) and get
     # a human-readable description.
     # This is fragile.
-    process_char = args.region.split("_")[-1]
+    process_char = args.region[-1]
     try:
         process = process_labels[process_char]
     except KeyError:
         process = process_labels['e']
 
-    # Dynamically relocate the legend depending on whether or not we have    # text describing the selection region.
+    # Dynamically relocate the legend depending on whether or not we have
+    # text describing the selection region.
     lower_bound = 0.70
     if not region_text == "":
         lower_bound -= 0.04
@@ -196,7 +165,7 @@ def compute_ratio(args, tfile, region):
     legend.AddEntry(0, process + ", Anti-ID", "")
     if not region_text == "":
         legend.AddEntry(0, region_text, "")
-    legend.AddEntry(0, "Ratio: %0.2f #pm %0.2f" % (ratio, ratio_error), "")
+    legend.AddEntry(0, "Ratio: %0.2f #pm %0.2f" % (ratio, ratio_bin_error), "")
     legend.SetBorderSize(0)
     legend.SetFillColor(0)
     legend.SetMargin(0)
@@ -212,8 +181,7 @@ def compute_ratio(args, tfile, region):
     if args.wait:
         raw_input()
 
-    # This is a bit of a mess.
-    return ratio, ratio_error, low, low_error, high, high_error
+    return ratio, ratio_bin_error
 
 def main():
     parser = argparse.ArgumentParser(description="A script to make template plots for lepton fake estimation.")
@@ -228,7 +196,7 @@ def main():
     parser.add_argument('-r', '--region', dest="region", default="wcranti_allmjj_e", help="Region from HInvPlot to look at.")
     parser.add_argument('-v', '--var', dest="var", default="met_significance", help="Variable to plot.")
     parser.add_argument('-c', '--cutoff', dest="cutoff", default=40, type=int, help="Threshold value at which to take the ratio.")
-    parser.add_argument('-b', '--rebin', dest="rebin", default=10, type=int, help="Number to rebin by when drawing the template shape plot.")
+    parser.add_argument('-b', '--rebin', dest="rebin", default=10, help="Number to rebin by when drawing the template shape plot.")
     parser.add_argument('-a', '--all', dest="all", action="store_true", help="Run estimate for all regions. Ignore -r.")
     parser.add_argument('-p', '--plusminus', dest="plusminus", action="store_true", help="Run estimate for ep and em regions too.")
     parser.add_argument('-l', '--lumi', dest="lumi", default="36.2", help="Integrated lumi (fb^-1) for datasets, defaults to 2015+16 lumi.")
@@ -237,11 +205,6 @@ def main():
     parser.add_argument('--xlabel', dest="xlabel", default="MET Significance [GeV^{1/2}]", help="Label for x axis.")
     parser.add_argument('--ylabel', dest="ylabel", default="Events", help="Label for y axis.")
     parser.add_argument('-y', '--year', dest="year", default=2016, type=int, help="The year, will set lumi automatically.")
-
-    parser.add_argument('-o', '--output', dest="output", default="fake_leptons.csv", help="CSV file containing output fake lepton info.")
-
-    parser.add_argument('--avg', action="store_true", dest="avg", help="Only print average values after subtracting MC; do nothing else.")
-    parser.add_argument('-i', '--invert', action="store_true", dest="invert", help="Invert the ratio to be high/low instead of low/high.")
 
     # Load arguments.
     args = parser.parse_args()
@@ -264,8 +227,6 @@ def main():
     # Run this for all wcranti regions.
     else:
         ratios = collections.OrderedDict()
-        lows = collections.OrderedDict()
-        highs = collections.OrderedDict()
         maxlen = -1
         for key in keys:
             region = key.GetName()
@@ -275,68 +236,16 @@ def main():
                 if not (args.plusminus and ('em_Nominal' in region or 'ep_Nominal' in region)):
                     continue
             print("Calculating estimate for region: " + region)
-
-            # This is kind of ugly.
-            args.region = region[len("pass_"):-len("_Nominal")]
-
-            ratio, ratio_error, low, low_error, high, high_error = compute_ratio(args, tfile, region)
-            lows[region] = (low, low_error)
-            highs[region] = (high, high_error)
-            if not (low <= 0 or high <= 0):
-                ratios[region] = (ratio, ratio_error)
-            else:
-                ratios[region] = (-1, -1)
-
+            ratio, ratio_error = compute_ratio(args, tfile, region)
+            ratios[region] = (ratio, ratio_error)
             print("")
             if len(region) >= maxlen:
                 maxlen = len(region)
 
         for name, (ratio, ratio_error) in ratios.iteritems():
             # I really should use new python string formatting for this.
-            if ratio == -1:
-                message = "%-" + str(maxlen) +  "s = 0 (Error)"
-                print(message % str(name))
-            else:
-                message = "%-" + str(maxlen) +  "s = %f +/- %f"
-                print(message % (str(name), ratio, ratio_error))
-
-        # Write out CSV record.
-        csvname = args.output.replace(".csv", "_" + str(args.year) + ".csv")
-        with open(csvname, 'wb') as csvfile:
-            writer = csv.writer(csvfile, delimiter=',')
-            # So ROOT can parse this later.
-            writer.writerow(["region/C","channel/C","mjj/F","dphijj/F","njets/C","year/F","low","lowerr","high","higherr","ratio","ratioerr"])
-
-            # Print tex output too.
-            print("")
-            print("Bin & Events $ < \unit[4]{\sqrt{GeV}} $ & Events $ > \unit[4]{\sqrt{GeV}} $ & Ratio \\\\ ")
-            print("\hline")
-            for name, (ratio, ratio_error) in ratios.iteritems():
-                low, low_error = lows[name]
-                high, high_error = highs[name]
-                # TODO: Replace name with tex-friendly string.
-                try:
-                    split_name = name.split('_')
-                    region = split_name[2]
-                    channel = split_name[3]
-                    message = "$ " + tex_region_labels[region]
-                    if 'p' in channel:
-                        message += ", " + channel[0] + "^+"
-                    elif 'm' in channel:
-                        message += ", " + channel[0] + "^-"
-                    message += " $ "
-                except KeyError:
-                    message = name.replace("_", "\\_")
-                message += " & $ \\num{" + str(low) + "} \pm \\num{" + str(low_error) + "} $ &"
-                message += " $ \\num{" + str(high) + "} \pm \\num{" + str(high_error) + "} $ & "
-                if ratio != -1:
-                    message += "$ \\num{" + str(ratio) + "} \pm \\num{" + str(ratio_error) + "} $ "
-                message += "  \\\\ "
-                print(message)
-
-                # Write to CSV.
-                mjj_cut, dphi_cut, njet_cut = parse_cut(region)
-                writer.writerow([region, channel, mjj_cut, dphi_cut, njet_cut, args.year, low, low_error, high, high_error, ratio, ratio_error])
+            message = "%-" + str(maxlen) +  "s = %f +/- %f"
+            print(message % (str(name), ratio, ratio_error))
 
 if __name__ == '__main__':
     main()
