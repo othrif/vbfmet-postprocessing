@@ -245,7 +245,7 @@ StatusCode HFInputAlg::execute() {
   m_tree->GetEntry(m_tree->GetReadEntry());
 
   // check if we need to output the physics tree for signal overlap
-  if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634)){
+  if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634 || runNumber==346693 || runNumber==346694 || runNumber==345596)){
     m_doSigOverlapTree=true;
     if(m_signalOverlapFileMap.find(runNumber)==m_signalOverlapFileMap.end()){
       stringstream soName;
@@ -255,6 +255,8 @@ StatusCode HFInputAlg::execute() {
       m_signalOverlapTreeMap[runNumber]->SetDirectory(m_signalOverlapFileMap[runNumber]);
       m_signalOverlapTreeMap[runNumber]->Branch("event", &m_sigOverlapEvent, "event/l");
       m_signalOverlapTreeMap[runNumber]->Branch("category",&m_sigOverlapCategory);
+      m_signalOverlapTreeMap[runNumber]->Branch("dsid",&runNumber);
+      m_signalOverlapTreeMap[runNumber]->Branch("year",&year);
     }
   }else{  m_doSigOverlapTree=false; }
 

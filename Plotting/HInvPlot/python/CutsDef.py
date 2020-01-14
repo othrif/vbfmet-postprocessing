@@ -345,7 +345,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
         cuts += basic_cuts.GetDEtajjCut()
         cuts += basic_cuts.GetMjjCut()
     #cuts += [CutItem('CutMu40','averageIntPerXing>40.0')]
-
+    #cuts += [CutItem('CutOneHSJet',  'nTruthJetMatch == 1')] 
     return cuts
 
 #-------------------------------------------------------------------------

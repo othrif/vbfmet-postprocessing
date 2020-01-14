@@ -814,6 +814,8 @@ StatusCode VBFAnalysisAlg::execute() {
     if(NgenCorrected>0)  weight = crossSection/NgenCorrected;
     else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber );
     ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
+    //correct the LO SHERPA to H7 EWK
+    if(m_isMC && runNumber>=308092 && runNumber<=308098) weight*=0.000047991*truth_jj_mass/1.0e3+0.8659;
   } else {
     weight = 1;
   }
@@ -1363,8 +1365,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 
       // initialize the VBF & ggF variables
       if(m_runNumberInput==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
-      if(m_runNumberInput==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);
-      if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out);// filtered Sherpa samples use nnPDF
+      if(m_runNumberInput==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out, true); 
+      // uncomment if you want to add the nnpdf inputs. would kind of double count
+      //if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out, false);// filtered Sherpa samples use nnPDF
 
       if(m_runNumberInput==346600 || m_runNumberInput==308276 || m_runNumberInput==308567) {
 	if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
