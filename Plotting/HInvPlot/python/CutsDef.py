@@ -866,7 +866,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
             if options.mergeMGExt:                            
                 reg.SetVal(key, 'higgs,tall,wqcdMad,wewk,zqcdMad,zewk,dqcd,bkgs,data')
             else:
-                reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
+                reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 
