@@ -35,7 +35,8 @@ print systlist
 ### Remake submitDir ###
 workDir = os.getcwd()+"/"+args.submitDir
 bDir= os.getenv('ROOTCOREDIR')
-buildDir = workDir[:bDir.find("/Plotting")]
+#buildDir = workDir[:bDir.find("/Plotting")]
+buildDir = bDir[:bDir.find("/Plotting")]
 os.system("rm -rf "+workDir)
 os.system("mkdir "+workDir)                
 #os.system("chmod uog+w "+workDir) 
@@ -50,6 +51,7 @@ extraCommand=' '
 if args.extraCommand:
     extraCommand=' '+args.extraCommand+' '
 TESTAREA=buildDir+'/Plotting'
+print 'TESTAREA:',TESTAREA
 runCommand = '''python '''+TESTAREA+'''/HInvPlot/macros/plotEvent.py --syst "$1"  -r out_"$1".root -i '''+args.inputFile+extraCommand
 print runCommand
 writeCondorShell(workDir, buildDir, '', runCommand, "PlotEventCondorSub")
