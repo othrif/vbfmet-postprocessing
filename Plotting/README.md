@@ -27,7 +27,7 @@ To plot, run:
 python HInvPlot/macros/plotEvent.py -i input.txt 
 ```
 
-You must specify the year for 2017 and 2018 to set the right triggers and the lumi. Lumi for 2018 is 59937:
+You must specify the year for 2017 and 2018 to set the right triggers and the lumi. Lumi for 2018 is 58450.1:
 ```
 python HInvPlot/macros/plotEvent.py  -i v27Loose.txt  -r /tmp/v27Loose.root  --r207Ana  --year 2017 --OverlapPh  --int-lumi 44307.4
 ```
