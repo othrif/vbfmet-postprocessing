@@ -806,9 +806,9 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
     sigs['tth']  = ['tth']
-    sigs['hvbf500']  = ['hvbf500']    
-    sigs['hvbf1k']  = ['hvbf1k']    
-    sigs['hvbf3k']  = ['hvbf3k']    
+    #sigs['hvbf500']  = ['hvbf500']    
+    #sigs['hvbf1k']  = ['hvbf1k']    
+    #sigs['hvbf3k']  = ['hvbf3k']    
 
     bkgs = {}
 
@@ -835,14 +835,14 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     other['zqcdMad'] = ['zqcdMad']
     other['wqcdMad'] = ['wqcdMad']
     other['zqcdPow'] = ['zqcdPow']
-    if not options.OverlapPh:
-        other['ttg']  = ['ttg']
-        other['pho']  = ['pho']
-        other['phoAlt']  = ['phoAlt']
-        other['wgam'] = ['wgam']
-        other['zgam'] = ['zgam']
-        other['wgamewk'] = ['wgamewk']
-        other['zgamewk'] = ['zgamewk']
+    #if not options.OverlapPh:
+    #    other['ttg']  = ['ttg']
+    #    other['pho']  = ['pho']
+    #    other['phoAlt']  = ['phoAlt']
+    #    other['wgam'] = ['wgam']
+    #    other['zgam'] = ['zgam']
+    #    other['wgamewk'] = ['wgamewk']
+    #    other['zgamewk'] = ['zgamewk']
 
     samples = {}
     samples.update(sigs)
