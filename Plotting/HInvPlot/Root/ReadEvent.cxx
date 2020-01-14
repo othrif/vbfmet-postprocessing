@@ -237,12 +237,16 @@ void Msl::ReadEvent::Init(TTree* tree)
   xeSFTrigWeight_nomu=1.0;
   xeSFTrigWeight_nomu__1up=1.0;
   xeSFTrigWeight_nomu__1down=1.0;
+  fTriggerEffWeight=1.0;
   tree->SetBranchStatus("vjWeight", 1);
   tree->SetBranchAddress("vjWeight", &vjWeight);
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
   tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
   if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
+    //if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeight", &fTriggerEffWeight);
+    if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);
+    //TriggerEffWeight, TriggerEffWeightBDT
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){
       tree->SetBranchAddress("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
@@ -698,7 +702,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         else event->SetWeight(fWeight*fLumi);
       }
       else  event->SetWeight(1.0);
-      if(fIsDDQCD) event->SetWeight(fWeight);
+      if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight);
       if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
 	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;

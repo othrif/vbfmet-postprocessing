@@ -27,7 +27,7 @@ To plot, run:
 python HInvPlot/macros/plotEvent.py -i input.txt 
 ```
 
-You must specify the year for 2017 and 2018 to set the right triggers and the lumi. Lumi for 2018 is 59937:
+You must specify the year for 2017 and 2018 to set the right triggers and the lumi. Lumi for 2018 is 58450.1:
 ```
 python HInvPlot/macros/plotEvent.py  -i v27Loose.txt  -r /tmp/v27Loose.root  --r207Ana  --year 2017 --OverlapPh  --int-lumi 44307.4
 ```
@@ -137,3 +137,22 @@ nohup python HInvPlot/macros/plotEvent.py  -i
 --metsf-cuts 1   -a metsf &> /tmp/logMETSFEnoKT_3j &
 
 > python HInvPlot/macros/TrigSF.py --wait --year 2018 --input /tmp/v34ELooseMETPassThru_ktmerge.root
+
+
+==========
+
+nohup python HInvPlot/macros/plotEvent.py  -i v34ALooseSYSTJan7.txt
+-r /tmp/mca20156.root   --chan nn,e,u,l,ee,uu,ll  --DetailLvl 10
+--mergeKTPTV  &> /tmp/test & tail -f /tmp/test
+
+python HInvPlot/macros/submitPlotEventCondor.py -i
+/home/schae/testarea/HInv/source/Plotting/v34ELooseSYSTJan7.txt
+--extraCommand=" --chan nn,e,u,l,ee,uu,ll --DetailLvl 10 --mergeKTPTV
+--year 2018 " -d v34PlotsEJan7
+
+python HInvPlot/macros/submitPlotEventCondor.py -i
+/home/schae/testarea/HInv/source/Plotting/v34DLooseSYSTJan7.txt
+--extraCommand=" --chan nn,e,u,l,ee,uu,ll --DetailLvl 10 --mergeKTPTV
+--year 2017 " -d v34PlotsDJan7
+
+python HInvPlot/macros/submitPlotEventCondor.py -i /home/schae/testarea/HInv/source/Plotting/v34ALooseSYSTJan7.txt --extraCommand=" --chan nn,e,u,l,ee,uu,ll --DetailLvl 10 --mergeKTPTV " -d v34PlotsAJan7

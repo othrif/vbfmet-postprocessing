@@ -5,7 +5,7 @@ from optparse import OptionParser
 p = OptionParser(usage="usage: <path:ROOT file directory>", version="0.1")
 p.add_option('--var',           type='string', default='jj_mass_variableBin,truth_jj_mass_variableBin,truth_jj_mass,truth_jj_deta,truth_jj_dphi,truth_j1_pt,truth_j2_pt,jj_deta,jj_dphi,met_tst_nolep_et', dest='var') #SherpaVTruthPt
 p.add_option('--filename','-f', type='string', default='/tmp/v34ATest_v18.root', dest='filename')
-p.add_option('--year',         type='int',    default=2016,          dest='year')
+p.add_option('--year',         type='int',    default=2019,          dest='year') #: 2016, 2017, 2018, 2019=all years
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
 #p.add_option('--filename','-f', type='string', default='pass_sr_hipt_1j_eu', dest='filename')
 (options, args) = p.parse_args()
@@ -336,8 +336,8 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=[''],extra=''):
         h1.Rebin(rebin)
         h2.Rebin(rebin) 
     if hname1=='met_tst_nolep_et':
-        h1.Rebin(10)
-        h2.Rebin(10) 
+        h1.Rebin(5)
+        h2.Rebin(5) 
     if GetError:
         h1.GetYaxis().SetTitle('Relative Error')        
     else:
