@@ -7,9 +7,9 @@
  * @Author : Doug Schaefer
  *
  * @Brief  :
- *
+ * 
  *  Algorithm for plotting reconstructed variables for di-lepton pairs
- *
+ * 
  **********************************************************************************/
 
 // Local
@@ -29,20 +29,20 @@ namespace Msl
 
     PlotEvent();
     virtual ~PlotEvent();
-
+    
     void DoConf(const Registry &reg);
 
     bool DoExec(Msl::Event &event);
 
     void DoSave(TDirectory *dir);
-
+    
     void SetPassAlg(IExecAlg *alg) { fPassAlg = alg; }
 
     //
     // Specialized functions for working with stored variables
     //
-    bool HasVar(Mva::Var var) const;
-
+    bool HasVar(Mva::Var var) const;    
+    
     std::pair<double, double> GetMinMax(Mva::Var var) const;
 
     void PlotVar(const Mva::Var var);
@@ -50,11 +50,11 @@ namespace Msl
     unsigned           GetNBinLim() const { return fNBinLim; }
     const std::string& GetSelKey () const { return fSelKey;  }
     const std::string& GetRegion () const { return fRegion;  }
-
+    
     const std::vector<Msl::VarStore>& GetEvents() const { return fEvents; }
 
     void FillHist(TH1 *h, Mva::Var var) const;
-
+    
     double FillHist(TH1 *h, Mva::Var var, const Msl::Event &event, double weight) const;
 
   public:
@@ -75,7 +75,7 @@ namespace Msl
 
     IExecAlg                   *fPassAlg;
     Mva::SampleSet              fSample;
-
+    
     MvaVec                      fVars;
     EventVec                    fEvents;
 
@@ -84,32 +84,29 @@ namespace Msl
     std::vector<int>            fNBinVec;
     std::vector<double>         fLoVec;
     std::vector<double>         fHiVec;
-
+    
     // Histograms:
     TH1                        *hTruthMuPt;
     TH1                        *hTruthMuEta;
     TH1                        *hBaseMuPt;
     TH1                        *hBaseMuEta;
     TH1                        *hTruthElPt;
-    TH1                        *hTruthElEta;
+    TH1                        *hTruthElEta;    
     TH1                        *hBaseElPt;
     TH1                        *hBaseElEta;
     TH1                        *hTruthTauPt;
     TH1                        *hTruthTauDR;
-    TH1                        *hTruthTauEta;
-    TH1                        *hminDRLep;
+    TH1                        *hTruthTauEta;    
+    TH1                        *hminDRLep;    
     TH1                        *hptvarcone20;
     TH1                        *hptvarcone30;
     TH1                        *htopoetcone20;
-
-    TH1                        *hJetHT;
-    TH1                        *hAllJetMETSig;
-
+    
     TH1                        *hjj_mass_variableBin;
     TH1                        *htruth_jj_mass_variableBin;
     TH1                        *htmva_variableBin;
     TH1                        *hmj34;
-    TH1                        *hmax_j_eta;
+    TH1                        *hmax_j_eta;    
     TH1                        *hdRj1;
     TH1                        *hdRj2;
     TH1                        *hminDR;
@@ -122,27 +119,27 @@ namespace Msl
     TH2                        *hMetvsMu;
     TH1                        *hmj1;
     TH1                        *hmj2;
-    TH1                        *hminDRmj2;
+    TH1                        *hminDRmj2;    
     TH1                        *hmin_mj3;
     TH1                        *hmin_mj3_over_mjj;
     TH1                        *hcentrality;
     TH1                        *hjj_deta_signed;
     TH1                        *hjj_deta_diff;
     TH1                        *hjj_deta_abs;
-    TH1                        *hj3Pt;
-    TH1                        *hj3Eta;
-    TH1                        *hj3Jvt;
-    TH1                        *hj3FJvt;
-    TH1                        *hmuDR;
+    TH1                        *hj3Pt;      
+    TH1                        *hj3Eta;      
+    TH1                        *hj3Jvt;      
+    TH1                        *hj3FJvt;      
+    TH1                        *hmuDR;      
     TH1                        *hmuEta;
-
+    
     TH1                        *hZMCIDQCD;
     TH1                        *hWMCIDQCD;
     TH1                        *hZPTVMCIDQCD;    
 
     TH1                        *hZMadMCIDQCD;
     TH1                        *hZMad2MCIDQCD;
-    TH1                        *hZMadFMCIDQCD;
+    TH1                        *hZMadFMCIDQCD;        
     TH1                        *hWMadMCIDQCD;
     TH1                        *hZPowMCIDQCD;
     TH1                        *hZShMCIDQCD;
