@@ -16,6 +16,8 @@ YEAR=$2
 
 # It'd be nice if we could make these for all selkeys automatically with no hardcoding.
 python HInvPlot/macros/drawStack.py ${SAMPLE} --year ${YEAR} --vars met_significance --do-eps --save --atlas-style ~/root/atlasstyle/ --selkey pass_wcranti_allmjj_e_Nominal
+python HInvPlot/macros/drawStack.py ${SAMPLE} --year ${YEAR} --vars met_significance --do-eps --save --atlas-style ~/root/atlasstyle/ --selkey pass_wcranti_allmjj_em_Nominal
+python HInvPlot/macros/drawStack.py ${SAMPLE} --year ${YEAR} --vars met_significance --do-eps --save --atlas-style ~/root/atlasstyle/ --selkey pass_wcranti_allmjj_ep_Nominal
 python HInvPlot/macros/drawStack.py ${SAMPLE} --year ${YEAR} --vars met_significance --do-eps --save --atlas-style ~/root/atlasstyle/ --selkey pass_wcranti_mjj800dphijj1nj2_e_Nominal
 python HInvPlot/macros/drawStack.py ${SAMPLE} --year ${YEAR} --vars met_significance --do-eps --save --atlas-style ~/root/atlasstyle/ --selkey pass_wcranti_mjj1000dphijj1nj2_e_Nominal
 python HInvPlot/macros/drawStack.py ${SAMPLE} --year ${YEAR} --vars met_significance --do-eps --save --atlas-style ~/root/atlasstyle/ --selkey pass_wcranti_mjj1500dphijj1nj2_e_Nominal
