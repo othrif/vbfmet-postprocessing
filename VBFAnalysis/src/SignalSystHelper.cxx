@@ -185,7 +185,7 @@ void SignalSystHelper::setggFVars(std::map<TString, Float_t> &tMapFloat, std::ve
 }
 
 // create variations
-void SignalSystHelper::initggFVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree){
+void SignalSystHelper::initggFVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree, bool isggF){
 
   std::string var_name = "";
   // add the ggF PDF variations
@@ -205,12 +205,14 @@ void SignalSystHelper::initggFVars(std::map<TString, Float_t> &tMapFloat, std::m
   tree->Branch("wATLAS_PDF4LHC_NLO_30_alphaS__1down",&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]));
 
   // Used the parton shower weights
-  tMapFloat["ggF_gg2H_PSVarWeights__1up"]=1.0;
-  tMapFloatW["ggF_gg2H_PSVarWeights__1up"]=1.0;
-  tree->Branch("wggF_gg2H_PSVarWeights__1up",&(tMapFloatW["ggF_gg2H_PSVarWeights__1up"]));
-  tMapFloat["ggF_PSVarWeights__1down"]=1.0;
-  tMapFloatW["ggF_gg2H_PSVarWeights__1down"]=1.0;
-  tree->Branch("wggF_gg2H_PSVarWeights__1down",&(tMapFloatW["ggF_gg2H_PSVarWeights__1down"]));
+  if(isggF){
+    tMapFloat["ggF_gg2H_PSVarWeights__1up"]=1.0;
+    tMapFloatW["ggF_gg2H_PSVarWeights__1up"]=1.0;
+    tree->Branch("wggF_gg2H_PSVarWeights__1up",&(tMapFloatW["ggF_gg2H_PSVarWeights__1up"]));
+    tMapFloat["ggF_PSVarWeights__1down"]=1.0;
+    tMapFloatW["ggF_gg2H_PSVarWeights__1down"]=1.0;
+    tree->Branch("wggF_gg2H_PSVarWeights__1down",&(tMapFloatW["ggF_gg2H_PSVarWeights__1down"]));
+  }
 }
 
 // create variations
