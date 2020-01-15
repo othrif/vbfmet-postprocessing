@@ -50,6 +50,7 @@ Msl::ReadEvent::ReadEvent():
   fTMVAReader   (nullptr),
   fTMVAWeightPath(""),
   fMVAName      (""),
+  fMJTriggerEff("TriggerEffWeightBDT"),
   fDebug        (false),
   fPrint        (false),
   fPrintEvent   (false),
@@ -88,6 +89,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::MaxNEvent",     fMaxNEvent);
 
   reg.Get("ReadEvent::TMVAWeightPath",     fTMVAWeightPath);
+  reg.Get("ReadEvent::MJTriggerEff",       fMJTriggerEff);
 
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
   reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
@@ -244,8 +246,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
   if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
-    //if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeight", &fTriggerEffWeight);
-    if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);
+    if(fIsDDQCD) tree->SetBranchAddress(fMJTriggerEff.c_str(), &fTriggerEffWeight);
     //TriggerEffWeight, TriggerEffWeightBDT
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){

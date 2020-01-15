@@ -26,8 +26,9 @@ class BasicCuts:
 
         if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
                             'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2',
+
                             'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2',
-                                'njgt2','njgt2lt5','njgt3lt5',
+                                'njgt2','njgt2lt5','njgt3lt5','nj3',
                                 'LowMETQCDRevFJVT',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
                             'metsfVBFTopo','metsfxe110XE70','metsfxe110XE65',
@@ -81,6 +82,8 @@ class BasicCuts:
             self.DEtajjLowerCut   = 3.8
             self.DEtajjUpperCut   = -1
             self.NjetCut = 'n_jet == 2'
+        if Analysis.count('nj3'):
+            self.NjetCut = 'n_jet == 3'
         if Analysis.count('deta25'):
             self.DEtajjLowerCut = 2.5
             self.DEtajjUpperCut = 3.8
@@ -342,12 +345,17 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
             cuts += basic_cuts.GetLeadJetEtaCut()
-            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5':
+            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and not basic_cuts.analysis!='nj3':
                 #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
                 if options.metsf_cuts==0:
                     cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
                     #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.35')]
                     cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
+            elif basic_cuts.analysis=='nj3': #OR
+                cutCent = CutItem('CutJetCent')
+                cutCent.AddCut(CutItem('Cen',  'maxCentrality >0.6'), 'OR')
+                cutCent.AddCut(CutItem('mjj',  'maxmj3_over_mjj >0.05'), 'OR')
+                cuts += [cutCent]
             if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 90.0')]
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 70.0')] # move to 50
