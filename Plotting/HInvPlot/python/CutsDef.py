@@ -82,7 +82,7 @@ class BasicCuts:
             self.DEtajjLowerCut   = 3.8
             self.DEtajjUpperCut   = -1
             self.NjetCut = 'n_jet == 2'
-        if Analysis.count('nj3'):
+        if Analysis=='nj3':
             self.NjetCut = 'n_jet == 3'
         if Analysis.count('deta25'):
             self.DEtajjLowerCut = 2.5
@@ -345,7 +345,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
             cuts += basic_cuts.GetLeadJetEtaCut()
-            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and not basic_cuts.analysis!='nj3':
+            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and basic_cuts.analysis!='nj3':
                 #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
                 if options.metsf_cuts==0:
                     cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
