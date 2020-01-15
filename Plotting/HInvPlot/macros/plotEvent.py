@@ -234,7 +234,7 @@ def main():
         anas = ['allmjj','mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2','njgt2']
 
     if options.analysis=='qcd':
-        anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','LowMETQCDRevFJVT']
+        anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','LowMETQCDRevFJVT','nj3']
         chans   = ['nn']
     if options.analysis.count('RedChan'):
         chans   = ['nn','ee','uu','ll','l','e','u']
