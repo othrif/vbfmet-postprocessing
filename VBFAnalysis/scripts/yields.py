@@ -1,6 +1,16 @@
+#!/usr/bin/env python 
+
+import os
+import argparse
 import ROOT
 import math
 import sys
+
+parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
+parser.add_argument( "-i", "--input", type = str, dest = "input", default = "/tmp/HFsys_all.root", help = "input file name" )
+parser.add_argument( "-t", "--unblind", action = "store_true", dest = "unblind", default = False, help = "unblind the tables");
+args, unknown = parser.parse_known_args()
+
 regions=[
 'VBFjetSel_XNom_SRX_obs_cuts',
 'VBFjetSel_XNom_twoEleCRX_obs_cuts',
@@ -12,7 +22,7 @@ regions=[
 'VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts',
 'VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts',
 ]
-unblind=False
+unblind=args.unblind
 #hdata_NONE_twoEleCR3_obs_cuts
 samples =['hVBFH125_',
           'hggFH125_',
@@ -44,91 +54,11 @@ samplesPrint =['Samples','VBFH125',
           'total bkg','data/bkg'
 ]
 
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhotonAllSyst_v26New.root')
-#f=ROOT.TFile.Open('SumHF_noMET.root')
-#f=ROOT.TFile.Open('SumHF_lepVeto.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_v26c.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_Madgraph_v26c.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhotonAllSyst_Madgraph_v26New.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLepZonly_v26c.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_DPhijjMjjBinningNjetBin_v26c.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLepDilepTrig_v26c.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_BaseLepVeto_AllSyst_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_SystAll_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Madgraph_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('/home/schae/testarea/HInv/runLoosev26Syst/SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_DPhijjMjjBinningNjetBin_v26c_DPhiFix_QCDEst_J400.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_v26c_DPhiFix_J400_XSSig.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400_XSSig.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_XSSig_METTenac.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_XSSig_METMuonTrigOR.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400_XSSig.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_XSSig_METMuonTrigOR_BaseLep.root')
-#f=ROOT.TFile.Open('SumHF_delete.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMETTenac_v26c_DPhiFixQCDEst_J400_XSSig_TopFix_TrigFix.root')
-#f=ROOT.TFile.Open('/home/schae/testarea/HInv/runLoosev26/SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_final.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_doPlot.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_UpdateMETSF_doPlot.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_Tenac_UpdateMETSF_METTrig.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_Tenac_UpdateMETSF.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_Tenac_UpdateMETSF_lepMETTrig.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400_XSSig_badTrig.root')
-#f=ROOT.TFile.Open('Sum_NominalOnly_QG.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_UpdateMETSF.root')
-#f=ROOT.TFile.Open('SumHF_NoTrigSFbutLepTrig.root')
-#f=ROOT.TFile.Open('SumHF_NoTrigSF.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_7binMET_v26c_DPhiFixQCDEst_J400_XSSig_updateXESF_UpdateMETSF.root')
-#f=ROOT.TFile.Open('SumHF_nobveto.root')
-#f=ROOT.TFile.Open('SumHF_bveto.root')
-#f=ROOT.TFile.Open('SumHF_bveto_MuonMETOnly.root')
-#f=ROOT.TFile.Open('SumHF_bveto_MuonMETOR.root')
-#f=ROOT.TFile.Open('/tmp/Sum_NominalOnly_noQGBins.root')
-#f=ROOT.TFile.Open('/tmp/Sum_NominalOnly_QG.root')
-#f=ROOT.TFile.Open('SumHF_tmva.root')
-#f=ROOT.TFile.Open('SumHF_tmva_11var.root')
-#f=ROOT.TFile.Open('SumHF_tmva_11var_mjj800SoftDPhi2.root')
-#f=ROOT.TFile.Open('SumHF_tmva_11var_mjj900.root')
-#f=ROOT.TFile.Open('SumHF_tmva_11vartest4.root')
-#f=ROOT.TFile.Open('SumHF_v31_CBv2.root')
-#f=ROOT.TFile.Open('SumHF_v31_CB_mu_noOR.root')
-#f=ROOT.TFile.Open('SumHF_Sep20_v32PFE.root')
-#f=ROOT.TFile.Open('SumHF_Oct1_oneTrig_All.root')
-#f=ROOT.TFile.Open('/share/t3data2/schae/METScan/MET150/v34E/SumHF_2018_MET150.root')
-#f=ROOT.TFile.Open('/tmp/SumHF_Sep19_baseline.root')
-#f=ROOT.TFile.Open('/share/t3data2/schae/PileupStudies/v34AKTHF/HF_v34LAKTMerge.root')
-#f=ROOT.TFile.Open('/tmp/HF_jan7_mc16all_nom.root')
-#f=ROOT.TFile.Open('/tmp/HFalltest.root')
-f=ROOT.TFile.Open('/tmp/HFnom_mc16a.root')
-#f=ROOT.TFile.Open('/share/t3data2/schae/METScan/MET150/v34A/SumHF_2016_MET150_Nom_wMJ.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_Nominal_r207Ana_UpdateMETSF.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_v26c_DPhiFix_J400.root')
-#f=ROOT.TFile.Open('SumHF_BaselineCuts_ZeroPhoton_AllSyst_Extension_v26c_DPhiFix_J400.root')#
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_SigXS.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFix_QCDEst.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBin_v26c_DPhiFixQCDEst_J400_SigXS.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBin_v26c_DPhiFixQCDEst_J400_XSSig.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400_XSSig.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_Syst_Extension_DPhijjMjjBinningNjetBinDilepTrig_v26c_DPhiFixQCDEst_J400.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_Extension_LooseLepDilepTrig_v26c_DPhiFix.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_NjetBin_v26c.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LowMETBin_v26c.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_LooseLep_v26c.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_NominalOnly_TenaciousMET_v26c.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_Madgraph_v26c.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_FJVT.root')
-#f=ROOT.TFile.Open('SumHF_nj2.root')
-#f=ROOT.TFile.Open('SumHF_LooseCuts_ZeroPhoton_AllSyst_v26c_FixedLepTrig.root')
-#f=ROOT.TFile.Open('SumHF.root')
+if not os.path.exists(args.input):
+    print 'input file does not exist: ',args.input
+    sys.exit(0)
+    
+f=ROOT.TFile.Open(args.input)
 
 SumList=[]
 SumErrList=[]
