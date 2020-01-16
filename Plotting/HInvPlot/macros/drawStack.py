@@ -905,7 +905,9 @@ class DrawStack:
             syst_key = copy.deepcopy(syst)
             if syst in symm_list:
                 DO_SYMM=True
+                #print 'Symmeterize: ',syst
                 if syst in mysystOneSided.getsystematicsOneSidedMap():
+                    #print 'In map: ',syst
                     syst_key = mysystOneSided.getsystematicsOneSidedMap()[syst]
 
             bkg_ent = None
@@ -922,7 +924,7 @@ class DrawStack:
 
             bkg_ent.sample = 'bkgs'
             self.sys_bkgs[syst] = bkg_ent
-            #print 'integral: ',bkg_ent.hist.Integral()
+            #print syst,'integral: ',bkg_ent.hist.Integral()
             self.sys_sigs[syst] = self.ReadSample(sfile, self.sign.sample, syst_key, DO_SYMM=DO_SYMM)
 
     #-------------------------

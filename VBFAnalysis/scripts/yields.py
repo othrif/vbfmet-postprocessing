@@ -7,7 +7,7 @@ import math
 import sys
 
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
-parser.add_argument( "-i", "--input", type = str, dest = "input", default = "/tmp/HFsys_all.root", help = "input file name" )
+parser.add_argument( "-i", "--input", type = str, dest = "input", default = "/tmp/HFsys_all_Jan13.root", help = "input file name" )
 parser.add_argument( "-t", "--unblind", action = "store_true", dest = "unblind", default = False, help = "unblind the tables");
 args, unknown = parser.parse_known_args()
 
@@ -277,8 +277,8 @@ for sample in samples:
         #print vname
         #if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
         #if vname.count('VBFjetSel') and vname.count('_oneEleNegLowSigCR3_') and vname.count(sample):
-        if vname.count('VBFjetSel') and vname.count('_SR5') and vname.count(sample):
-        #if vname.count('VBFjetSel') and vname.count('_twoMuCR4') and vname.count(sample):
+        #if vname.count('VBFjetSel') and vname.count('_SR5') and vname.count(sample):
+        if vname.count('VBFjetSel') and vname.count('_twoMuCR4') and vname.count(sample):
             h=f.Get(vname)
             intBkg=h.IntegralAndError(0,1001,mye)
             #print '%0.2f ' %(intBkg)+vname 
