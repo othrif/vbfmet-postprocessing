@@ -247,6 +247,10 @@ void Msl::ReadEvent::Init(TTree* tree)
   if(fWeightSystName=="Nominal" || fIsDDQCD){
     tree->SetBranchAddress("w",        &fWeight);
     if(fIsDDQCD) tree->SetBranchAddress(fMJTriggerEff.c_str(), &fTriggerEffWeight);
+    //if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);        
+    //if(fIsDDQCD && fMJTriggerEff=="TriggerEffWeightBDT") tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);    
+    //if(fIsDDQCD && fMJTriggerEff=="TriggerEffWeight") tree->SetBranchAddress("TriggerEffWeight", &fTriggerEffWeight);
+    std::cout << "QCD Weight name: " << fMJTriggerEff << std::endl;
     //TriggerEffWeight, TriggerEffWeightBDT
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){
@@ -805,9 +809,12 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     unsigned nJet_cenj50=0;
     //unsigned nJet30=0;
     //unsigned nJet40=0;
+    float jetht = 0.0;
+    float jetht_over_threshold = 0.0;
     for(unsigned iJet=0; iJet<jet_pt->size(); ++iJet){
       RecParticle new_jet;
       new_jet.pt  = jet_pt->at(iJet)/1.0e3;
+      jetht += new_jet.pt;
       if(jet_m && jet_m->size()>iJet) new_jet.m   = jet_m->at(iJet)/1.0e3;
       new_jet.eta = jet_eta->at(iJet);
       new_jet.phi = jet_phi->at(iJet);
@@ -824,9 +831,16 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_jet.AddVar(Mva::jvt,jvt);
       }
       if(jet_fjvt && jet_fjvt->size()>iJet)new_jet.AddVar(Mva::fjvt,jet_fjvt->at(iJet));
-      if(jet_pt->at(iJet)>fJetVetoPt) ++nJet;
+      if (jet_pt->at(iJet)>fJetVetoPt) {
+        ++nJet;
+        jetht_over_threshold += new_jet.pt;
+      }
       event->jets.push_back(new_jet);
     }
+
+    // Store jet HT!
+    // Happily, this is also the variable we need to recompute met significance.
+    event->AddVar(Mva::jetHT, jetht);
 
     TLorentzVector tmp;
     const TLorentzVector j1v = event->jets.at(0).GetLVec();
@@ -1092,6 +1106,31 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       }
     }
 
+    // Compute a new (non-object-based) MET significance:
+    // * only look at base lepton pt.
+    // * use all jets (i.e. jetHT as computed above).
+    // * respect MET choice (which defaults to met_tst_et, so that should be okay?)
+    // I'm a tad nervous about the normalization. Has event->met.Pt() really been converted to GeV?
+    float new_metsig = 0.0;
+    float basept0 = 0.0;
+    if (event->baseel.size() > 0 || event->basemu.size() > 0) {
+      if (event->baseel.size() == 1) {
+        basept0 = event->baseel[0].pt;
+      } else if (event->basemu.size() == 1) {
+        basept0 = event->basemu[0].pt;
+      }
+      new_metsig = event->met.Pt() / sqrt(jetht + basept0);
+    }
+
+    //if (event->GetVar(Mva::n_jet) == 2) {
+    //  if (new_metsig != event->GetVar(Mva::met_significance)) {
+    //    cout << "New metsig = " << new_metsig << ", old metsig = " << event->GetVar(Mva::met_significance) << " with njets = " << event->GetVar(Mva::n_jet) << ", lepton pt = " << basept0 << std::endl;
+    //  } else {
+    //    cout << "New metsig = " << new_metsig << ", old metsig = " << event->GetVar(Mva::met_significance) << " with njets = " << event->GetVar(Mva::n_jet) << ", lepton pt = " << basept0 << std::endl;
+    //  }
+    //}
+
+    event->AddVar(Mva::alljet_metsig, new_metsig);
 
     // extra jets - computing the dPhi
     float met_tst_j3_dphi=-999.0;
@@ -1464,13 +1503,13 @@ void Msl::ReadEvent::FillEvent(Event &event)
 
     // Store whichever is larger. The uninitialized pT should be 0!
     if (leadBaseEl.Pt() >= leadBaseMu.Pt()) {
-      event.RepVar(Mva::baselepPt0, leadBaseEl.Pt());
-      event.RepVar(Mva::baselepCh0, event.baseel.at(0).GetVar(Mva::charge));
-      event.RepVar(Mva::baselep_ptvarcone_0, event.baseel.at(0).GetVar(Mva::ptvarcone20));
+      event.AddVar(Mva::baselepPt0, leadBaseEl.Pt());
+      event.AddVar(Mva::baselepCh0, event.baseel.at(0).GetVar(Mva::charge));
+      event.AddVar(Mva::baselep_ptvarcone_0, event.baseel.at(0).GetVar(Mva::ptvarcone20));
     } else {
-      event.RepVar(Mva::baselepPt0, leadBaseMu.Pt());
-      event.RepVar(Mva::baselepCh0, event.basemu.at(0).GetVar(Mva::charge));
-      event.RepVar(Mva::baselep_ptvarcone_0, event.basemu.at(0).GetVar(Mva::ptvarcone30));
+      event.AddVar(Mva::baselepPt0, leadBaseMu.Pt());
+      event.AddVar(Mva::baselepCh0, event.basemu.at(0).GetVar(Mva::charge));
+      event.AddVar(Mva::baselep_ptvarcone_0, event.basemu.at(0).GetVar(Mva::ptvarcone30));
     }
   }
 

@@ -332,10 +332,10 @@ def Draw(can, hname, bkgsub1hist, bkgsub2hist,  sig1hist, sig2hist, hpath1, hpat
             h.Rebin(rebin) 
     if hname1=='jj_dphi':
         for h in histos:
-            h.Rebin(rebin) 
+            h.Rebin(rebin)
     if hname1=='met_tst_nolep_et':
         for h in histos:
-            h.Rebin(10)
+            h.Rebin(5)
     if dataMinBkg:
         h1.GetYaxis().SetTitle('Normalized (Data - Bkg)')
     else:
