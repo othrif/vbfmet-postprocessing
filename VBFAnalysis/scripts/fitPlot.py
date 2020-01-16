@@ -1277,7 +1277,7 @@ if __name__=='__main__':
     p.add_option('-i', '--input', type='string', help='input file. Created from plotEvent.py')
     p.add_option('-c', '--compare', type='string', help='Compare any number of input files. Does not support --syst atm. example: --compare rfile1.root,rfile2.root')
 
-    p.add_option('--lumi', type='float', default=36.1, help='Defines the integrated luminosity shown in the label')
+    p.add_option('--lumi', type='float', default=139, help='Defines the integrated luminosity shown in the label')
     p.add_option('--nBin', type='int', default=1, help='Defines which bin is plotted')
     p.add_option('-s', '--syst', type='string', default="", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
     p.add_option('-d', '--data', action='store_true', help='Draw data')

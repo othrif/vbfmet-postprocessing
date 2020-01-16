@@ -242,6 +242,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t met_truth_phi=-9999;
   Float_t met_truth_sumet=-9999;
   Float_t GenMET_pt=-9999;
+  Double_t truthF_jj_mass=-9999;
   Double_t truth_jj_mass=-9999;
   Double_t truth_jj_dphi=-9999;
   Double_t truth_j2_pt=-9999;

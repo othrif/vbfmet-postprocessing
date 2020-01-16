@@ -475,8 +475,10 @@ StatusCode HFInputAlg::execute() {
 
   if(!v26Ntuples){
     SR_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 0));
-    We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el_w == 1));
-    Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu_w == 1));
+    //We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el_w == 1));
+    //Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu_w == 1));
+    We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el == 1));
+    Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu == 1));
     Zee_lepVeto = ((n_baseel == 2) && (n_basemu_noOR == 0) && (n_el == 2));
     Zmm_lepVeto = ((n_baseel == 0) && (n_basemu_noOR == 2) && (n_mu == 2));
   }else if(m_extraVars>0){
