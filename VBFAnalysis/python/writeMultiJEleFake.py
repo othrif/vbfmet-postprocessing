@@ -102,8 +102,8 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
             hist   = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
             histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
             histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-            histClosUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR"+str(a)+"_obs_cuts" %year, "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR"+str(a)+"_obs_cuts;;" %year, 1, 0.5, 1.5)
-            histClosDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR"+str(a)+"_obs_cuts" %year, "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR"+str(a)+"_obs_cuts;;" %year, 1, 0.5, 1.5) 
+            histClosUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %year+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %year+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histClosDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %year+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %year+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) 
         hist.SetBinContent(1,multijet)
         #hist.SetBinError(1,multijet*0.25)
         hist.SetBinError(1,multijets_statunc[a-1]) # stat uncertainty
@@ -111,9 +111,9 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
         histUp.SetBinError(1,0.0)
         histDw.SetBinContent(1,multijet/1.25)
         histDw.SetBinError(1,0.0)
-        histClosUp.SetBinContent(1,multijet/1.23) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+        histClosUp.SetBinContent(1,multijet*1.23) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
         histClosUp.SetBinError(1,0.0)
-        histClosDw.SetBinContent(1,multijet*1.23)
+        histClosDw.SetBinContent(1,multijet/1.23)
         histClosDw.SetBinError(1,0.0)        
         if  year==2017:
             histUp.SetBinContent(1,multijet*1.61) 
@@ -139,7 +139,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
         histClosUp.Write()
         histClosDw.Write()        
         a += 1
-    f_multijet.Write()
+    #f_multijet.Write()
     f_multijet.Close()
  
 def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
