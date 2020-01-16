@@ -48,6 +48,7 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::BTagCut',       options.BTagCut)
         self.read_reg.SetVal('ReadEvent::TMVAWeightPath',options.mva_weights_path)
         self.read_reg.SetVal('ReadEvent::MJTriggerEff',  "TriggerEffWeightBDT") #or TriggerEffWeight
+        #self.read_reg.SetVal('ReadEvent::MJTriggerEff',  "TriggerEffWeight") #or TriggerEffWeight
         self.read_reg.SetVal('ReadEvent::TrigString',    options.trig_name)  # specify a trigger from the command line
         self.read_reg.SetVal('ReadEvent::mergePTV',      options.mergePTV)
         self.read_reg.SetVal('ReadEvent::mergeExt',      options.mergeExt)

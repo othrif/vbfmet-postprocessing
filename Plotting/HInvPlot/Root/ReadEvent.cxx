@@ -1031,8 +1031,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     n_siglep+=event->GetVar(Mva::n_el);
     n_siglep+=event->GetVar(Mva::n_mu);
     event->RepVar(Mva::n_siglep, n_siglep);
-    n_wlep+=event->GetVar(Mva::n_el_w);
-    n_wlep+=event->GetVar(Mva::n_mu_w);
+    //n_wlep+=event->GetVar(Mva::n_el_w);
+    //n_wlep+=event->GetVar(Mva::n_mu_w);
+    n_wlep+=event->GetVar(Mva::n_el);
+    n_wlep+=event->GetVar(Mva::n_mu);
     event->RepVar(Mva::n_lep_w, n_wlep);
 
     // Fill signal photons

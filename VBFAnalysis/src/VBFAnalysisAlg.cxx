@@ -450,6 +450,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("truth_jet_phi",&truth_jet_phi);
     m_tree_out->Branch("truth_jet_m",  &truth_jet_m);
     m_tree_out->Branch("truth_jj_mass",  &truth_jj_mass);
+    m_tree_out->Branch("truthF_jj_mass",  &truthF_jj_mass);
     m_tree_out->Branch("truth_jj_dphi",  &truth_jj_dphi);
     m_tree_out->Branch("truth_j2_pt",  &truth_j2_pt);
     m_tree_out->Branch("n_jet_truth",  &n_jet_truth);
@@ -722,6 +723,8 @@ StatusCode VBFAnalysisAlg::execute() {
       }
     }
     puSyst2018Weight=1.0;
+    tMapFloat["puSyst2018Weight__1down"]=1.0;
+    tMapFloat["puSyst2018Weight__1up"]=1.0;
   } // end pileup weight systematic
 
   // "calibrate" the data mu
@@ -815,7 +818,8 @@ StatusCode VBFAnalysisAlg::execute() {
     else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber );
     ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
     //correct the LO SHERPA to H7 EWK
-    if(m_isMC && runNumber>=308092 && runNumber<=308098) weight*=0.000047991*truth_jj_mass/1.0e3+0.8659;
+    //if(m_isMC && runNumber>=308092 && runNumber<=308098 && truth_jj_mass>200.0e3) weight*=0.000047991*truth_jj_mass/1.0e3+0.8659;
+    if(m_isMC && runNumber>=308092 && runNumber<=308098 && truthF_jj_mass>200.0e3) weight*=0.000047991*truthF_jj_mass/1.0e3+0.8659;
   } else {
     weight = 1;
   }
@@ -1282,16 +1286,18 @@ StatusCode VBFAnalysisAlg::execute() {
     }
 
     if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
-    ATH_MSG_DEBUG("VBFAnalysisAlg Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight);
+    ATH_MSG_DEBUG("VBFAnalysisAlg Looping weight Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight);
 
 
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
+    ATH_MSG_DEBUG("VBFAnalysisAlg Syst total: : " << tMapFloatW[it->first] );
     if(m_doPUWeight) tMapFloatW[it->first]*=tmp_puWeight;
     if(m_doVjetRW) tMapFloatW[it->first] *= tmp_vjWeight;
     //std::cout << "sys: " << it->first << " pu: " << tmp_puSyst2018Weight << " " << tMapFloatW[it->first] << std::endl;
   }//end systematic weight loop
 
-  ATH_MSG_DEBUG("VBFAnalysisAlg: weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " Vjets syst: " << tmp_vjWeight);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: evtNum: " << eventNumber <<" wTOT: " << w << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " Vjets syst: " << tmp_vjWeight << " n_el_w: " << n_el_w << " n_el: " << n_el << " n_mu_w: " << n_mu_w << " n_mu: " << n_mu << " n_jet " << n_jet);
+  //std::cout << "VBFAnalysisAlg: evtNum: " << eventNumber <<" wTOT: " << w << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " Vjets syst: " << tmp_vjWeight << " n_el_w: " << n_el_w << " n_el: " << n_el << " n_mu_w: " << n_mu_w << " n_mu: " << n_mu << " n_jet " << n_jet << std::endl;
 
   // only save events that pass any of the regions
   if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR)) return StatusCode::SUCCESS;
@@ -1430,6 +1436,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("HTXS_errorCode", 1);
     m_tree->SetBranchStatus("HTXS_Stage1_1_Fine_Category_pTjet25", 1);
   }
+  if(m_isMC) m_tree->SetBranchStatus("truthF_jj_mass", 1);
   m_tree->SetBranchStatus("puWeight", 1);
   m_tree->SetBranchStatus("jvtSFWeight", 1);
   m_tree->SetBranchStatus("fjvtSFWeight", 1);
@@ -1623,6 +1630,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("HTXS_errorCode", &HTXS_errorCode);
     m_tree->SetBranchAddress("HTXS_Stage1_1_Fine_Category_pTjet25", &HTXS_Stage1_1_Fine_Category_pTjet25);
   }
+  if(m_isMC) m_tree->SetBranchAddress("truthF_jj_mass", &truthF_jj_mass);
   m_tree->SetBranchAddress("puWeight", &puWeight);
   m_tree->SetBranchAddress("jvtSFWeight", &jvtSFWeight);
   m_tree->SetBranchAddress("fjvtSFWeight", &fjvtSFWeight);
