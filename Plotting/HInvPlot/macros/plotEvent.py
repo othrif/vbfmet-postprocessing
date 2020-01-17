@@ -257,6 +257,16 @@ def main():
     if options.analysis=='qcd':
         anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','LowMETQCDRevFJVT','nj3']
         chans   = ['nn']
+
+    # dphijj > 2 analysis: run with or without binning.
+    if options.analysis == "dphijj3":
+        anas = ['allmjjdphijj3']
+    if options.analysis == "dphijj3all":
+        anas = ['allmjjdphijj3', 'mjj800dphijj3nj2', 'mjj1000dphijj3nj2', 'mjj1500dphijj3nj2', 'mjj2000dphijj3nj2', 'mjj3500dphijj3nj2', 'dphijj3njgt2']
+    if options.analysis == "dphijj3qcd":
+        anas = ['allmjjdphijj3', 'LowMETQCDSRdphijj3', 'LowMETQCDVRdphijj3', 'LowMETQCDdphijj3', 'LowMETQCDSRFJVTdphijj3', 'LowMETQCDVRFJVTdphijj3', 'LowMETQCDFJVTdphijj3']
+        chans = ['nn']
+
     if options.analysis.count('RedChan'):
         chans   = ['nn','ee','uu','ll','l','e','u']
     if options.chan=='short':
