@@ -1066,7 +1066,7 @@ StatusCode VBFAnalysisAlg::execute() {
     DEtajjCut =3.5; // 3.5
   }
   if(m_AltSkim){
-    METCut = 200.0e3;
+    METCut = 100.0e3;
     LeadJetPtCut = 80.0e3; // 60.0e3
     subLeadJetPtCut = 50.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
