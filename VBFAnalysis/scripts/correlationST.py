@@ -13,6 +13,37 @@ def check(v,ispdf=False):
         return 1./(2.-v)
     return v
 
+def ReturnNewSystScaleUncor(sysname, vals, listV):
+    line=''
+    debug=False
+    new_vals = []
+    for h in vals:
+        new_vals+=[1.-float(h)]
+    newSyst=[]
+    vsysname=0
+    if sysname.count('Z_EWK'):    vsysname=1
+    if sysname.count('W_strong'): vsysname=2
+    if sysname.count('W_EWK'):    vsysname=3
+    linesys=''
+    maxBin=12
+    totalSysCorrelated=0.0
+    totalSysUncorrelated=0.0
+    for  bin_num1Z in range(0,maxBin-1):
+        sysV=new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
+        totalSysCorrelated+=sysV
+        totalSysUncorrelated+=(sysV)**2
+    print 'totalSysCorrelated: ',totalSysCorrelated,' uncorr: ',math.sqrt(totalSysUncorrelated)
+    scaleF = totalSysCorrelated/math.sqrt(totalSysUncorrelated)
+    # apply larger syst
+    tmp_line=sysname+' '
+    for  bin_num1Z in range(0,maxBin-1):
+        sysV=new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]*scaleF
+        newSystmig11=check(1.-sysV/listV[bin_num1Z][vsysname],ispdf=False)
+        tmp_line+='%0.5f,' %newSystmig11
+    print tmp_line.rstrip(',')
+    line+=tmp_line.rstrip(',')
+    return line+'\n'
+
 def ReturnNewSyst(sysname, vals, listV):
     line=''
     debug=False
@@ -165,9 +196,10 @@ def GetBins(fY, l, listV):
     
 parser = argparse.ArgumentParser( description = "Changing to MG relative uncertainties", add_help=True , fromfile_prefix_chars='@')
 parser.add_argument("--input",  dest='input', default='listTheorySyst11Bins', help="Input file with systematics")
-parser.add_argument("--output", dest='output', default='listTheorySyst11BinsST', help="Output file with ST approach")
-parser.add_argument("--inputYields", dest='inputYields', default='/tmp/HF.root', help="Input file with yields")
+parser.add_argument("--output", dest='output', default='listTheorySyst11BinsUncorr', help="Output file with ST approach")
+parser.add_argument("--inputYields", dest='inputYields', default='/tmp/HF_jan7_mc16all_nom.root', help="Input file with yields")
 parser.add_argument("--corrDPhi", dest='corrDPhi',action = "store_true",  default=False, help="Correlate dphijj bins")
+parser.add_argument("--scaleUncor", dest='scaleUncor',action = "store_true",  default=True, help="Scale the uncertainties as if uncorrelated to match the correlated syst")
 args, unknown = parser.parse_known_args()
 
 fin = open(args.input,'r')
@@ -218,7 +250,10 @@ for i in fin:
                 print 'ERROR did not find string in ',curr_region
             systMap[entries[0]]=entries[1].split(',')
             print entries[0],systMap[entries[0]]
-            tot_line+=ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString])
+            if not args.scaleUncor:
+                tot_line+=ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString])
+            else:
+                tot_line+=ReturnNewSystScaleUncor(entries[0], systMap[entries[0]],regionYields[yieldRegString])
         else:
             print 'ERROR could not parse:',entries
             print curr_line
