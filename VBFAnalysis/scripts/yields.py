@@ -277,8 +277,8 @@ for sample in samples:
         #print vname
         #if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
         #if vname.count('VBFjetSel') and vname.count('_oneEleNegLowSigCR3_') and vname.count(sample):
-        #if vname.count('VBFjetSel') and vname.count('_SR5') and vname.count(sample):
-        if vname.count('VBFjetSel') and vname.count('_twoMuCR4') and vname.count(sample):
+        if vname.count('VBFjetSel') and vname.count('_SR11') and vname.count(sample):
+        #if vname.count('VBFjetSel') and vname.count('_twoMuCR4') and vname.count(sample):
             h=f.Get(vname)
             intBkg=h.IntegralAndError(0,1001,mye)
             #print '%0.2f ' %(intBkg)+vname 

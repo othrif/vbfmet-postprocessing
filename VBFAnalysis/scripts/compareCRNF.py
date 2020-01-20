@@ -15,6 +15,16 @@ def averageNF(s1,s2):
     print v,e
     return [v,e]
 
+def averageNFList(s1,s2):
+    v1=s1[0]
+    v2=s2[0]
+    e1=s1[1]
+    e2=s2[1]
+    v=(v2*e1+v1*e2)/(e1+e2)
+    e=v*1./math.sqrt(1./(e1/v1)**2+1./(e2/v2)**2)
+    print v,e
+    return [v,e]
+
 def ratioNF(s1,s2):
     b1=s1.strip().rstrip('\t')
     b1list=b1.split('$\\pm$')
@@ -40,7 +50,8 @@ def ratioNFValues(a1,a2,s):
     print s,'ratio: %0.3f +/- %0.3f'%(v,e)
     #return v,e
 
-fil = open('/Users/schae/testarea/HInvNov/my_syst.txt','r')
+#fil = open('/Users/schae/testarea/HInvNov/my_syst.txt','r')
+fil = open('vr.txt')
 
 combine={}
 combine[1]=6
@@ -59,6 +70,10 @@ for line in fil:
     print binmap[nbin]
 
 x=0
+DPHIzee={}
+DPHIzmm={}
+DPHIwe={}
+DPHIwm={}
 zll={}
 we={}
 wm={}
@@ -66,6 +81,13 @@ for i in range(1,11):
     zll[i]=averageNF(binmap[i][0],binmap[i][1])
     we[i]=averageNF(binmap[i][4],binmap[i][5])
     wm[i]=averageNF(binmap[i][2],binmap[i][3])
+
+for i in range(1,6):
+    DPHIzee[i]=averageNF(binmap[i][0],binmap[i+5][0])
+    DPHIzmm[i]=averageNF(binmap[i][1],binmap[i+5][1])
+for i in range(1,6):
+    DPHIwe[i]=averageNFList(we[i],we[i+5])
+    DPHIwm[i]=averageNFList(wm[i],wm[i+5])
 mjjbins={}
 mjjbins[1]='0.8-1.0 TeV: '
 mjjbins[2]='1.0-1.5 TeV: '
@@ -76,10 +98,18 @@ print 'Zll'
 for i in range(1,6):
     #print zll[i],zll[i+5]
     ratioNFValues(zll[i],zll[i+5],mjjbins[i])
-print 'Wmunu'    
+print 'Wmunu'
 for i in range(1,6):    
     ratioNFValues(wm[i],wm[i+5],mjjbins[i])
-print 'Wenu'        
+print 'Wenu'
 for i in range(1,6):
     #print we[i],we[i+5]
     ratioNFValues(we[i],we[i+5],mjjbins[i])        
+print 'Zee/Zmm'
+for i in range(1,6):
+    #print we[i],we[i+5]
+    ratioNFValues(DPHIzee[i],DPHIzmm[i],mjjbins[i]) 
+print 'Wen/Wmn'
+for i in range(1,6):
+    #print we[i],we[i+5]
+    ratioNFValues(DPHIwe[i],DPHIwm[i],mjjbins[i]) 

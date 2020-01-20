@@ -1220,12 +1220,15 @@ class DrawStack:
             if max_bin<s.GetMaximum():
                 max_bin = s.GetMaximum()
 
-        bkg.GetYaxis().SetRangeUser(0.0, 1.2*max_bin)
+        bkg.GetYaxis().SetRangeUser(0.0, 0.35*max_bin)
         self.UpdateHist(bkg, ignore_max=True)
         bkg.Draw('HIST E0')
+        bkg.SetMarkerSize(0)
         if fillData:
+            mydata.SetMarkerSize(0)
             mydata.Draw('SAME')
         for s in sys:
+            s.SetMarkerSize(0)
             s.Draw('HIST SAME')
 
         p = getSelKeyLabel(options.selkey) + ' (sum of backgrounds)'
@@ -1239,11 +1242,11 @@ class DrawStack:
             c.SetTextAlign(12)
             c.SetTextColor(ROOT.kBlack)
             c.Draw()
-        self.texts = getATLASLabels(can, 0.2, 0.88, selkey=self.selkey)
+        self.texts = getATLASLabels(can, 0.2, 0.86, selkey=self.selkey)
         for text in self.texts:
             text.Draw()
 
-        self.leg = ROOT.TLegend(0.51, 0.62, 0.93, 0.89)
+        self.leg = ROOT.TLegend(0.51, 0.55, 0.93, 0.89)
         self.leg.SetBorderSize(0)
         self.leg.SetFillStyle (0)
         #self.leg.SetNColumns  (2)
@@ -1284,7 +1287,9 @@ class DrawStack:
                     s.Divide(bkg)
 
                 # SetRange
-                if math.fabs(s.GetMinimum()-1.0) < 0.05 and math.fabs(s.GetMaximum()-1.0) < 0.05:
+                if math.fabs(s.GetMinimum()-1.0) < 0.025 and math.fabs(s.GetMaximum()-1.0) < 0.025:
+                    s.GetYaxis().SetRangeUser(0.975, 1.025)
+                elif math.fabs(s.GetMinimum()-1.0) < 0.05 and math.fabs(s.GetMaximum()-1.0) < 0.05:
                     s.GetYaxis().SetRangeUser(0.95, 1.05)
                 elif math.fabs(s.GetMinimum()-1.0) < 0.15 and math.fabs(s.GetMaximum()-1.0) < 0.15:
                     s.GetYaxis().SetRangeUser(0.80, 1.20)
