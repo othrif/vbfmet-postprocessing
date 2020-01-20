@@ -178,9 +178,6 @@ class texTable(object):
         return "texTable"
 
 
-
-
-
 class HistClass(object):
     '''Class to easily read out HistFitter input files'''
     Irfile=None #this has to be an open root file
@@ -369,13 +366,22 @@ class HistClass(object):
 def getBinsError(hist, bins):
     BE=0
     for bn in bins:
-        BE+=hist.GetBinError(bn) # FIXME squared or not?
+        if type(hist)==ROOT.TH1F:
+            BE+=hist.GetBinError(bn) # FIXME squared or not?
+        else:
+            BE+=hist.GetErrorYhigh(bn-1)
     return BE
 
 def getBinsYield(hist, bins):
     BC=0
+    x1a=ROOT.Double()
+    y1a=ROOT.Double()
     for bn in bins:
-        BC+=hist.GetBinContent(bn)
+        if type(hist)==ROOT.TH1F:
+            BC+=hist.GetBinContent(bn)
+        else:
+            hist.GetPoint(bn-1,x1a,y1a)
+            BC+=y1a
     return BC
 
 def removeLabel(leg, name):
@@ -441,12 +447,23 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
             DataMC[reg]=0
             if options.data: DataMC[reg]=(getBinsYield(histDict["data"], regionBinsDict[reg])/getBinsYield(histDict["bkgs"], regionBinsDict[reg]))
 
-
     arrArray=[]
+    x1a=ROOT.Double()
+    y1a=ROOT.Double()
     for hkey in histDict:
         tmpArr=[]
         for regkey in regionDict:
-            tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" +- "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
+            #tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" +- "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
+            yldvR=0.0
+            if type(histDict[hkey])==ROOT.TH1F:
+                yldvR=round(histDict[hkey].GetBinContent(regionDict[regkey]),2)
+                yldeR=round(histDict[hkey].GetBinError(regionDict[regkey]),2)
+            else:
+                histDict[hkey].GetPoint(regionDict[regkey]-1,x1a,y1a)
+                yldvR=round(y1a,2)
+                ylde=histDict[hkey].GetErrorYhigh(regionDict[regkey]-1)
+                yldeR=round(ylde,2)
+            tmpArr.append(str(yldvR)+" +- "+str(yldeR))
         arrArray.append(tmpArr)
     arrArray.append([str(round(DataMC2.GetBinContent(dm),2))+" +- "+str(round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
     texTable1=texTable(arrayArray=arrArray)
@@ -655,7 +672,7 @@ def main(options):
                 #    continue
                 pickle_key_remFit = pickle_key[len('Fitted_events_'):]
                 m=0
-                for i in hist_array_keys:                    
+                for i in hist_array_keys:
                     if i in pickle_key_remFit:
                         break
                     m+=1
@@ -666,6 +683,7 @@ def main(options):
                 #print 'check',regDict['oneEleNegCR1'] #+'_cuts' need to strip '_cuts'
                 ireg=0
                 for iname in pickle_region_names:
+                    #print "Setting: ",iname,pickle_key
                     histToSet.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg])
                     ireg+=1
                 
@@ -809,7 +827,7 @@ def main(options):
                     continue
                 pickle_key_remFit = pickle_key[len('Fitted_err_'):]
                 m=0
-                for i in hist_array_keys:                    
+                for i in hist_array_keys:
                     if i in pickle_key_remFit:
                         break
                     m+=1
