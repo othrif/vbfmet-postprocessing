@@ -453,7 +453,7 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
     for hkey in histDict:
         tmpArr=[]
         for regkey in regionDict:
-            #tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" +- "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
+            #tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" $\\pm$ "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
             yldvR=0.0
             if type(histDict[hkey])==ROOT.TH1F:
                 yldvR=round(histDict[hkey].GetBinContent(regionDict[regkey]),2)
@@ -465,7 +465,7 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
                 yldeR=round(ylde,2)
             tmpArr.append(str(yldvR)+" +- "+str(yldeR))
         arrArray.append(tmpArr)
-    arrArray.append([str(round(DataMC2.GetBinContent(dm),2))+" +- "+str(round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
+    arrArray.append([str(round(DataMC2.GetBinContent(dm),2))+" $\\pm$ "+str(round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
     texTable1=texTable(arrayArray=arrArray)
     colmNames=[reg for reg in regionDict]
     rowNames=[hkey.replace("_"," ") for hkey in histDict]+["Data/MC"]
@@ -480,7 +480,7 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
         for regkey in regionBinsDict:
             var=getBinsYield(histDict[hkey], regionBinsDict[regkey])
             varE=getBinsError(histDict[hkey], regionBinsDict[regkey])
-            tmpArr2.append(str(round(var,2))+" +- "+str(round(varE,2)))
+            tmpArr2.append(str(round(var,2))+" $\\pm$ "+str(round(varE,2)))
         arrArray2.append(tmpArr2)
     arrArray2.append([str(round(DataMC[f],3)) for f in DataMC])
     texTable2=texTable(arrayArray=arrArray2)
@@ -783,7 +783,7 @@ def main(options):
                 rat="nan"
                 if centralValue!=0: rat=diff/centralValue
 
-                #print '{0:<10}'.format(tmpHist.proc), '{0:<20}'.format(tmpHist.reg), '{0:<20}'.format(systName), "\t",'{0:<15}'.format(str(rat)), "\t",'{0:<15}'.format(str(diff)),"\t",'{0:<15}'.format(str(tmpHist.hist.GetBinContent(options.nBin))),"+-",'{0:<15}'.format(str(tmpHist.hist.GetBinError(options.nBin))),"\t",'{0:<15}'.format(str(centralValue)),"+-",'{0:<15}'.format(str(centralHist.GetBinError(options.nBin)))
+                #print '{0:<10}'.format(tmpHist.proc), '{0:<20}'.format(tmpHist.reg), '{0:<20}'.format(systName), "\t",'{0:<15}'.format(str(rat)), "\t",'{0:<15}'.format(str(diff)),"\t",'{0:<15}'.format(str(tmpHist.hist.GetBinContent(options.nBin))),"$\\pm$",'{0:<15}'.format(str(tmpHist.hist.GetBinError(options.nBin))),"\t",'{0:<15}'.format(str(centralValue)),"$\\pm$",'{0:<15}'.format(str(centralHist.GetBinError(options.nBin)))
 
             if diff>0:
                 binVariationHigh2[tmpHist.nbin]+=diff**2
@@ -1033,7 +1033,7 @@ def compareMain(options):
                 for n in colmNames:
                     tmpStr=""
                     tmpStr+="{:.2f}".format(histDict[r][p].GetBinContent(HistClass.regDict[n]))
-                    tmpStr+=" +- "
+                    tmpStr+=" $\\pm$ "
                     tmpStr+="{:.2f}".format(histDict[r][p].GetBinError(HistClass.regDict[n]))
                     colmVals.append(tmpStr)
                 rowVals.append(colmVals)
@@ -1070,7 +1070,7 @@ def compareMain(options):
                         var=var/len(HistClass.regionBins[n])
                         varE=varE/len(HistClass.regionBins[n])
                     tmpForRatioVals.append(var)
-                    colmVals.append(str(round(var,2))+" +- "+str(round(varE,2)))
+                    colmVals.append(str(round(var,2))+" $\\pm$ "+str(round(varE,2)))
                 tmpForRatio.append(tmpForRatioVals)
                 rowVals.append(colmVals)
             if options.ratio and not(p=="data/MC"): #TODO add this also for data/MC summary table
