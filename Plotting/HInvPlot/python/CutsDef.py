@@ -24,7 +24,7 @@ class BasicCuts:
 
     def __init__(self, Analysis, Chan, options, SameSign=0):
 
-        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
+        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','mjjLow200dphijj1','mjjLow200dphijj2','fjvtVRdphijj1','fjvtVRdphijj2','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
 			    'mjjLowNjet','mjjLowNjet2','mjjLowNjetFJVT','njgt','njgt4',
 			    'fjvtVR',
                             'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
@@ -84,6 +84,16 @@ class BasicCuts:
         if Analysis.count('mjjLow200'):
             self.MjjLowerCut   = 200.0
             self.MjjUpperCut   = 800.0
+        if Analysis.count('mjjLow200dphijj1'):
+            self.MjjLowerCut   = 200.0
+            self.MjjUpperCut   = 800.0
+            self.DPhijjLowerCut   = -1
+            self.DPhijjUpperCut   = 1.0
+        if Analysis.count('mjjLow200dphijj2'):
+            self.MjjLowerCut   = 200.0
+            self.MjjUpperCut   = 800.0
+            self.DPhijjLowerCut   = 1.0
+            self.DPhijjUpperCut   = 2.0
         if Analysis.count('mjj1500'):
             self.MjjLowerCut   = 1500.0
             self.MjjUpperCut   = 2000.0
@@ -114,10 +124,10 @@ class BasicCuts:
         if Analysis.count('mjj3500'):
             self.MjjLowerCut   = 3500.0
             self.MjjUpperCut   = -1.0
-        if Analysis.count('dphijj1'):
+        if Analysis.count('dphijj1') or Analysis.count('fjvtVRdphijj1'):
             self.DPhijjLowerCut   = -1
             self.DPhijjUpperCut   = 1.0
-        if Analysis.count('dphijj2'):
+        if Analysis.count('dphijj2') or Analysis.count('fjvtVRdphijj2'):
             self.DPhijjLowerCut   = 1.0
             self.DPhijjUpperCut   = 2.0
         if Analysis.count('njgt2'): # single bin
@@ -292,9 +302,9 @@ def ExtraCuts(basic_cuts, options, n_mu=0, n_el=0, isEMu=False, isWCR=False):
     # Cut is under discussion
     if not isEMu:
         cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
-    if options.ReverseFJVT or basic_cuts.analysis=='fjvtVR':
+    if options.ReverseFJVT or basic_cuts.analysis=='fjvtVR' or basic_cuts.analysis=='fjvtVRdphijj1' or basic_cuts.analysis=='fjvtVRdphijj2':
         cuts += [CutItem('CutFJVT','j0fjvt > 0.5 || j1fjvt > 0.5')]
-    elif basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt' and basic_cuts.analysis!='njgt4' and basic_cuts.analysis!='fjvtVR':
+    elif basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt' and basic_cuts.analysis!='njgt4':
         cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
@@ -392,7 +402,7 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET
         else:
             #cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
             cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
-	    if options.ReverseFJVT or basic_cuts.analysis=='fjvtVR':
+	    if options.ReverseFJVT or basic_cuts.analysis=='fjvtVR' or basic_cuts.analysis=='fjvtVRdphijj1' or basic_cuts.analysis=='fjvtVRdphijj2':
             #if options.ReverseFJVT:
                 cutMET.AddCut(CutItem('LowMETfjvt1', '%s > %s && j0fjvt > 0.2' %(met_choice, metCut)), 'OR')
                 cutMET.AddCut(CutItem('LowMETfjvt2', '%s > %s && j1fjvt > 0.2' %(met_choice, metCut)), 'OR')
