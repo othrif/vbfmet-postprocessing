@@ -29,13 +29,23 @@ class BasicCuts:
 			    'fjvtVR',
                             'mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2',
                             'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2',
-                                'njgt2','njgt2lt5','njgt3lt5',
+
+                            'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2',
+                                'njgt2','njgt2lt5','njgt3lt5','nj3',
                                 'LowMETQCDRevFJVT',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
                             'metsfVBFTopo','metsfxe110XE70','metsfxe110XE65',
                             'metsfxe90','metsfxe100','metsfxe110L155','metsfxe100L150',
                             'metsfVBFTopotrigOR','metsfxe110XE70trig','metsfxe110XE65trig',
-                            'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]:
+                            'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',
+                            'allmjjmslt4', 'allmjjmsgt4',
+                                'mjj800nj2mslt4', 'mjj800nj2msgt4', 'mjj1000nj2mslt4', 'mjj1000nj2msgt4', 'mjj1500nj2mslt4', 'mjj1500nj2msgt4',
+                                'mjj2000nj2mslt4', 'mjj2000nj2msgt4', 'mjj3500nj2mslt4', 'mjj3500nj2msgt4', 'njgt2mslt4', 'njgt2msgt4',
+                            'allmjjlepptlow', 'allmjjleppthigh', 'mjj800nj2lepptlow', 'mjj800nj2leppthigh', 'mjj1000nj2lepptlow', 'mjj1000nj2leppthigh',
+                                'mjj1500nj2lepptlow', 'mjj1500nj2leppthigh', 'mjj2000nj2lepptlow', 'mjj2000nj2leppthigh', 'mjj3500nj2lepptlow',
+                                'mjj3500nj2leppthigh', 'njgt2lepptlow', 'njgt2leppthigh',
+                            'allmjjdphijj3', 'mjj800dphijj3nj2', 'mjj1000dphijj3nj2', 'mjj1500dphijj3nj2', 'mjj2000dphijj3nj2', 'mjj3500dphijj3nj2', 'dphijj3njgt2',
+                            'LowMETQCDSRdphijj3', 'LowMETQCDVRdphijj3', 'LowMETQCDdphijj3', 'LowMETQCDSRFJVTdphijj3', 'LowMETQCDVRFJVTdphijj3', 'LowMETQCDFJVTdphijj3']:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
 
         self.analysis = Analysis
@@ -77,6 +87,8 @@ class BasicCuts:
             self.DEtajjLowerCut   = 3.8
             self.DEtajjUpperCut   = -1
             self.NjetCut = 'n_jet == 2'
+        if Analysis=='nj3':
+            self.NjetCut = 'n_jet == 3'
         if Analysis.count('deta25'):
             self.DEtajjLowerCut = 2.5
             self.DEtajjUpperCut = 3.8
@@ -156,6 +168,28 @@ class BasicCuts:
         if Analysis.count('nj2'):
             self.NjetCut = 'n_jet == 2'
 
+        # By default: no special metsig cut.
+        # Apply one if running a 'msgt4' or 'mslt4' analysis.
+        self.MetsigLowerCut = 0.0
+        self.MetsigUpperCut = -1.0
+        if Analysis.count('msgt4'):
+            self.MetsigLowerCut = 4.0
+        if Analysis.count('mslt4'):
+            self.MetsigUpperCut = 4.0
+
+        # Add extra lepton pT cut-- for now, break into bins around the MET cut.
+        self.ExtraLepPtLowerCut = 0.0
+        self.ExtraLepPtUpperCut = -1.0
+        if Analysis.count('lepptlow'):
+            self.ExtraLepPtUpperCut = 150.0
+        elif Analysis.count('leppthigh'):
+            self.ExtraLepPtLowerCut = 150.0
+
+        if Analysis.count('dphijj3'):
+            self.DPhijjLowerCut   = 2.0
+            # limited to 2.5 due to multijet estimate.
+            self.DPhijjUpperCut   = 2.5
+
     def PadKey(self, key, val, pf=None, sf=None):
         if len(key) > 0: key += '_'
         if pf != None: key += pf
@@ -184,6 +218,21 @@ class BasicCuts:
         if self.chan in ['uu','ee','ll']:
             return True
         return False
+
+    def getMetsigCut(self):
+        """ Allow binning in MET significance."""
+        cutMetsig = CutItem('CutMetSignificance')
+        cutMetsig.AddCut(CutItem('Low',  'alljet_metsig > %s' %(self.MetsigLowerCut)), 'AND')
+        if self.MetsigUpperCut>0.0:
+            cutMetsig.AddCut(CutItem('High', 'alljet_metsig < %s' %(self.MetsigUpperCut)), 'AND')
+        return [cutMetsig]
+
+    def getExtraLepPtCut(self):
+        cutExtraLepPt = CutItem('CutLepPtBinning')
+        cutExtraLepPt.AddCut(CutItem('Low',  'baselepPt0 > %s' %(self.ExtraLepPtLowerCut)), 'AND')
+        if self.ExtraLepPtUpperCut > 0.0:
+            cutExtraLepPt.AddCut(CutItem('High', 'baselepPt0 < %s' %(self.ExtraLepPtUpperCut)), 'AND')
+        return [cutExtraLepPt]
 
     def GetMjjCut(self):
         cutMjj = CutItem('CutMjj')
@@ -327,12 +376,17 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
             cuts += basic_cuts.GetLeadJetEtaCut()
-            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and basic_cuts.analysis!='mjjLowNjet' and basic_cuts.analysis!='mjjLowNjetFJVT' and basic_cuts.analysis!='njgt':
+            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and basic_cuts.analysis!='nj3':
                 #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
                 if options.metsf_cuts==0:
                     cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
                     #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.35')]
                     cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
+            elif basic_cuts.analysis=='nj3': #OR
+                cutCent = CutItem('CutJetCent')
+                cutCent.AddCut(CutItem('Cen',  'maxCentrality >0.6'), 'OR')
+                cutCent.AddCut(CutItem('mjj',  'maxmj3_over_mjj >0.05'), 'OR')
+                cuts += [cutCent]
             if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 90.0')]
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 70.0')] # move to 50
@@ -369,7 +423,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
         cuts += basic_cuts.GetDEtajjCut()
         cuts += basic_cuts.GetMjjCut()
     #cuts += [CutItem('CutMu40','averageIntPerXing>40.0')]
-
+    #cuts += [CutItem('CutOneHSJet',  'nTruthJetMatch == 1')] 
     return cuts
 
 #-------------------------------------------------------------------------
@@ -498,10 +552,10 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
     elif options.year==2017:
         if basic_cuts.GetSelKey().count('metsfxe90'):
             cuts += [CutItem('CutMETTrigRuns10', 'runPeriod == 10')]
-        elif basic_cuts.GetSelKey().count('metsfxe100'):
-            cuts += [CutItem('CutMETTrigRuns11', 'runPeriod == 11')]
         elif basic_cuts.GetSelKey().count('metsfxe110L155'): # ran all year
             cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13 || runPeriod == 12 || runPeriod == 11 || runPeriod == 10')]
+        elif basic_cuts.GetSelKey().count('metsfxe100'):
+            cuts += [CutItem('CutMETTrigRuns11', 'runPeriod == 11')]
         elif basic_cuts.GetSelKey().count('metsfxe100L150'):
             cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13')]
         # apply the trigger
@@ -572,7 +626,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     elif basic_cuts.chan in ['uu','u','up','um']:
         cuts += getMETTriggerCut(cut, options, basic_cuts, None, ORTrig=' || trigger_lep > 0')
     elif basic_cuts.chan in ['ee','ll','eu']:
-        cuts += [CutItem('CutTrig',      'trigger_lep > 0')]        
+        cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     else:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
@@ -632,7 +686,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     else:
         if basic_cuts.chan=='uu':
-            cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')   
+            cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
         else:
             cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
@@ -657,7 +711,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
     n_el=2;
     isEMu=False
     if basic_cuts.chan=='ee':
-        n_mu=0; n_el=2; 
+        n_mu=0; n_el=2;
     if basic_cuts.chan=='uu':
         n_mu=2; n_el=0;
     if basic_cuts.chan=='eu':
@@ -719,7 +773,8 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
 
     return GetCuts(cuts)
 
-def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
+def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met_signif=False):
+    # Get WCR cuts. *Don't* use the WCR met significance cut here.
     cuts = getWCRCuts(cut, options, basic_cuts, ignore_met)
 
     # Loop through the WCR cuts. Replace some of them to create the anti-ID region.
@@ -781,17 +836,23 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False):
     new_cuts.append(CutItem("CutNoSigLeps", "n_lep_w == 0"))
 
     # Add the trigger isolation: ptvarcone30/pt < 0.07 for mu, ptvarcone20/pt<0.1
-    # TODO: make this one optional!
-    if basic_cuts.chan[0] == 'e':
-        new_cuts.append(CutItem("CutPtVarCone", "baselep_ptvarcone_0 < 0.1"))
-    else:
-        new_cuts.append(CutItem("CutPtVarCone", "baselep_ptvarcone_0 < 0.07"))
+    # Only do for muons. For now, do for none!
+    #if basic_cuts.chan[0] != 'e':
+    #    new_cuts.append(CutItem("CutPtVarCone", "baselep_ptvarcone_0 > 0.07"))
 
     # Debugging: print out the cuts.
     #print("Selection in anti-ID region (%s):" % (basic_cuts.chan))
     #for cutobj in new_cuts:
     #    print("%s: %s" % (cutobj.cut_name, cutobj.cut_conf))
     #sys.exit(1)
+
+    # Apply metsig cut. By default, will do nothing.
+    # useful for studies of a variable in either low or high met significance.
+    new_cuts += basic_cuts.getMetsigCut()
+
+    # Apply extra lepton pT binning if we're running in that mode.
+    if basic_cuts.ExtraLepPtLowerCut != 0 or basic_cuts.ExtraLepPtUpperCut != -1:
+        new_cuts += basic_cuts.getExtraLepPtCut()
 
     # Return the modified cuts.
     return new_cuts
@@ -831,9 +892,9 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
     sigs['tth']  = ['tth']
-    sigs['hvbf500']  = ['hvbf500']    
-    sigs['hvbf1k']  = ['hvbf1k']    
-    sigs['hvbf3k']  = ['hvbf3k']    
+    #sigs['hvbf500']  = ['hvbf500']    
+    #sigs['hvbf1k']  = ['hvbf1k']    
+    #sigs['hvbf3k']  = ['hvbf3k']    
 
     bkgs = {}
 
@@ -853,21 +914,21 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
         bkgs['wgam'] = ['wgam']
         bkgs['zgam'] = ['zgam']
         bkgs['wgamewk'] = ['wgamewk']
-        bkgs['zgamewk'] = ['zgamewk']        
+        bkgs['zgamewk'] = ['zgamewk']
 
     other={}
     other['dqcd']    = ['dqcd']
     other['zqcdMad'] = ['zqcdMad']
     other['wqcdMad'] = ['wqcdMad']
     other['zqcdPow'] = ['zqcdPow']
-    if not options.OverlapPh:
-        other['ttg']  = ['ttg']
-        other['pho']  = ['pho']
-        other['phoAlt']  = ['phoAlt']
-        other['wgam'] = ['wgam']
-        other['zgam'] = ['zgam']
-        other['wgamewk'] = ['wgamewk']
-        other['zgamewk'] = ['zgamewk']
+    #if not options.OverlapPh:
+    #    other['ttg']  = ['ttg']
+    #    other['pho']  = ['pho']
+    #    other['phoAlt']  = ['phoAlt']
+    #    other['wgam'] = ['wgam']
+    #    other['zgam'] = ['zgam']
+    #    other['wgamewk'] = ['wgamewk']
+    #    other['zgamewk'] = ['zgamewk']
 
     samples = {}
     samples.update(sigs)
@@ -889,9 +950,9 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
             reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamEWK,wgamEWK,bkgs,data')
         else:
             if options.mergeMGExt:                            
-                reg.SetVal(key, 'higgs,tall,wqcdMad,wewk,zqcdMad,zewk,mqcd,bkgs,data')
+                reg.SetVal(key, 'higgs,tall,wqcdMad,wewk,zqcdMad,zewk,dqcd,bkgs,data')
             else:
-                reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,bkgs,data')
+                reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
 
@@ -1029,10 +1090,10 @@ def preparePassEventForWCR(alg_name, options, basic_cuts, cut='BASIC', do_met_si
 
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
 
-def preparePassEventForWCRAntiID(alg_name, options, basic_cuts, cut='BASIC'):
+def preparePassEventForWCRAntiID(alg_name, options, basic_cuts, cut='BASIC', do_met_signif=False):
     """ Prepare events for the anti-ID version of the WCR."""
     reg  = ROOT.Msl.Registry()
-    cuts = getWCRAntiIDCuts(cut, options, basic_cuts, ignore_met=options.ignore_met)
+    cuts = getWCRAntiIDCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, do_met_signif=do_met_signif)
     _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
     return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
 

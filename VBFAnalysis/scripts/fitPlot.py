@@ -21,6 +21,24 @@ import numpy as np
 
 from collections import OrderedDict
 
+def skipThis(key):
+    toskip=False
+    if "VBFHOther" in key: toskip=True
+    if "VH125Old" in key:  toskip=True
+    if "VBFH125Old" in key:  toskip=True
+    if "ggFH125Old" in key:  toskip=True
+    if "Z_strongmVBFFilt" in key:  toskip=True
+    if "Wg_EWK" in key:  toskip=True
+    if "Zg_EWK" in key:  toskip=True
+    if "Zg_strong" in key:  toskip=True
+    if "Wg_strong" in key:  toskip=True
+    if "SinglePhoton" in key:  toskip=True
+    if "VqqGam" in key:  toskip=True
+    if "TTH125" in key:  toskip=True
+    if "Ext" in key:  toskip=True
+    if "Blind" in key:  toskip=True
+    return toskip
+
 def LoadPickleFiles(dir_name):
 
     if not os.path.exists(dir_name):
@@ -43,7 +61,6 @@ def addContent(hist, nbin, content, error):
     newC=hist.GetBinContent(nbin)+content
     hist.SetBinContent(nbin, newC)
     hist.SetBinError(nbin, newE)
-
 
 def is_in_list(name, li):
     for l in li:
@@ -161,9 +178,6 @@ class texTable(object):
         return "texTable"
 
 
-
-
-
 class HistClass(object):
     '''Class to easily read out HistFitter input files'''
     Irfile=None #this has to be an open root file
@@ -197,6 +211,8 @@ class HistClass(object):
             self.syst="Nom"
         else:
             self.syst=self.hname[self.hname.find("VBFjetSel_")+11:self.hname.find("_"+self.reg)] #NOTE this only works for less than 10 bins. for more bins the "+11" has to change to +12
+            if (self.hname[self.hname.find("VBFjetSel_")+10:self.hname.find("VBFjetSel_")+12]).isdigit():
+                self.syst=self.hname[self.hname.find("VBFjetSel_")+12:self.hname.find("_"+self.reg)] #NOTE this only works for less than 10-99 bins. 
             if "Low" in self.syst:
                 self.syst=self.syst.replace("Low","")
                 self.syst_HIGH_LOW="Low"
@@ -350,13 +366,22 @@ class HistClass(object):
 def getBinsError(hist, bins):
     BE=0
     for bn in bins:
-        BE+=hist.GetBinError(bn) # FIXME squared or not?
+        if type(hist)==ROOT.TH1F:
+            BE+=hist.GetBinError(bn) # FIXME squared or not?
+        else:
+            BE+=hist.GetErrorYhigh(bn-1)
     return BE
 
 def getBinsYield(hist, bins):
     BC=0
+    x1a=ROOT.Double()
+    y1a=ROOT.Double()
     for bn in bins:
-        BC+=hist.GetBinContent(bn)
+        if type(hist)==ROOT.TH1F:
+            BC+=hist.GetBinContent(bn)
+        else:
+            hist.GetPoint(bn-1,x1a,y1a)
+            BC+=y1a
     return BC
 
 def removeLabel(leg, name):
@@ -422,12 +447,23 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
             DataMC[reg]=0
             if options.data: DataMC[reg]=(getBinsYield(histDict["data"], regionBinsDict[reg])/getBinsYield(histDict["bkgs"], regionBinsDict[reg]))
 
-
     arrArray=[]
+    x1a=ROOT.Double()
+    y1a=ROOT.Double()
     for hkey in histDict:
         tmpArr=[]
         for regkey in regionDict:
-            tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" +- "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
+            #tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" +- "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
+            yldvR=0.0
+            if type(histDict[hkey])==ROOT.TH1F:
+                yldvR=round(histDict[hkey].GetBinContent(regionDict[regkey]),2)
+                yldeR=round(histDict[hkey].GetBinError(regionDict[regkey]),2)
+            else:
+                histDict[hkey].GetPoint(regionDict[regkey]-1,x1a,y1a)
+                yldvR=round(y1a,2)
+                ylde=histDict[hkey].GetErrorYhigh(regionDict[regkey]-1)
+                yldeR=round(ylde,2)
+            tmpArr.append(str(yldvR)+" +- "+str(yldeR))
         arrArray.append(tmpArr)
     arrArray.append([str(round(DataMC2.GetBinContent(dm),2))+" +- "+str(round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
     texTable1=texTable(arrayArray=arrArray)
@@ -611,9 +647,7 @@ def main(options):
     hnames=[i.GetName() for i in LOK if ("Nom" in i.GetName() or "NONE" in i.GetName())]
     for key in hnames:
         # NOTE here you can specify hisotgrams which should be skipped
-        if "VBFHOther" in key: continue
-        if "Ext" in key: continue
-        if "Blind" in key: continue
+        if skipThis(key): continue
         histObj=HistClass(key)
         if not histObj.hist: continue
         if histObj.isSignal():
@@ -638,7 +672,7 @@ def main(options):
                 #    continue
                 pickle_key_remFit = pickle_key[len('Fitted_events_'):]
                 m=0
-                for i in hist_array_keys:                    
+                for i in hist_array_keys:
                     if i in pickle_key_remFit:
                         break
                     m+=1
@@ -649,6 +683,7 @@ def main(options):
                 #print 'check',regDict['oneEleNegCR1'] #+'_cuts' need to strip '_cuts'
                 ireg=0
                 for iname in pickle_region_names:
+                    #print "Setting: ",iname,pickle_key
                     histToSet.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg])
                     ireg+=1
                 
@@ -708,6 +743,8 @@ def main(options):
             binVariationLow2[b]=0
             binVariationHigh2[b]=0
 
+        num_syst_hist=0
+        num_syst_hist_skipped=0
         histKeys=[i.GetName() for i in rfile.GetListOfKeys()]
         print "process          reg              systematic              diff/central                 diff                  variation                     central"
         for k in histKeys:
@@ -717,14 +754,25 @@ def main(options):
             # check if this is a one sided systematic
             if tmpHist.syst in one_sided_list:
                 tmpHist.onesided=True
-            
+
+            # Check that this is not a sample to be skipped
+            if skipThis(k): continue
+                
             if not(options.syst=="All"):
                 if not(is_in_list(tmpHist.syst, tmpSys.getsystematicsList())):
-                    print "skipping:",tmpHist.syst
+                    if options.debug or (num_syst_hist_skipped%10000)==0:
+                        print "skipping:",tmpHist.syst,k,tmpHist.proc,' nSyst skipped: ',num_syst_hist_skipped
+                        sys.stdout.flush()
+                    num_syst_hist_skipped+=1
                     continue
 
             if not(tmpHist.isSystDict()): continue
             if tmpHist.isSignal(): continue # FIXME revisit this. decide if we want the signal uncertainties added?
+            if options.debug or (num_syst_hist%1200)==0:
+                print 'This is a systematic: ',k,' This is syst number: ',num_syst_hist
+                sys.stdout.flush()
+            num_syst_hist+=1
+                
             systName=tmpHist.syst+"_"+tmpHist.syst_HIGH_LOW
             centralHist=rfile.Get(k.replace(tmpHist.syst+tmpHist.syst_HIGH_LOW, "Nom"))
             centralValue=centralHist.GetBinContent(options.nBin)
@@ -747,11 +795,14 @@ def main(options):
                     binVariationLow2[tmpHist.nbin]+=diff**2
                 else:
                     binVariationHigh2[tmpHist.nbin]+=diff**2
-                    
+
+        x1a=ROOT.Double()
+        y1a=ROOT.Double()
         for b in range(1,len(regDict)+1):
             lowVariation=math.sqrt(binVariationLow2[b])
             highVariation=math.sqrt(binVariationHigh2[b])
-            print "bin, lowVariation, highVariation:",b, lowVariation, highVariation
+            systHistAsym.GetPoint(b-1,x1a,y1a)
+            print "bin, lowVariation, highVariation:",b, lowVariation, highVariation,' central value: ',y1a
             systVariationDict[b]=(lowVariation+highVariation)/2.
             systHist.SetBinError(b, math.sqrt(systVariationDict[b]**2+systHist.GetBinError(b)**2))
             # asymmetric unc.
@@ -776,7 +827,7 @@ def main(options):
                     continue
                 pickle_key_remFit = pickle_key[len('Fitted_err_'):]
                 m=0
-                for i in hist_array_keys:                    
+                for i in hist_array_keys:
                     if i in pickle_key_remFit:
                         break
                     m+=1
@@ -1244,11 +1295,12 @@ if __name__=='__main__':
     p.add_option('-i', '--input', type='string', help='input file. Created from plotEvent.py')
     p.add_option('-c', '--compare', type='string', help='Compare any number of input files. Does not support --syst atm. example: --compare rfile1.root,rfile2.root')
 
-    p.add_option('--lumi', type='float', default=36.1, help='Defines the integrated luminosity shown in the label')
+    p.add_option('--lumi', type='float', default=139, help='Defines the integrated luminosity shown in the label')
     p.add_option('--nBin', type='int', default=1, help='Defines which bin is plotted')
     p.add_option('-s', '--syst', type='string', default="", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
     p.add_option('-d', '--data', action='store_true', help='Draw data')
     p.add_option('--unBlindSR', action='store_true', help='Unblinds the SR bins')
+    p.add_option('--debug', action='store_true', help='Print in debug mode')    
     p.add_option('-r', '--ratio', action='store_true', help='Draw data/MC ratio in case of -i and adds ratios to tables for both -i and -c')
     p.add_option('--yieldTable', action='store_true', help='Produces yield table')
     p.add_option('--saveAs', type='string', help='Saves the canvas in a given format. example argument: pdf')

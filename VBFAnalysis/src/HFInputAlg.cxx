@@ -245,7 +245,7 @@ StatusCode HFInputAlg::execute() {
   m_tree->GetEntry(m_tree->GetReadEntry());
 
   // check if we need to output the physics tree for signal overlap
-  if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634)){
+  if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634 || runNumber==346693 || runNumber==346694 || runNumber==345596)){
     m_doSigOverlapTree=true;
     if(m_signalOverlapFileMap.find(runNumber)==m_signalOverlapFileMap.end()){
       stringstream soName;
@@ -255,6 +255,8 @@ StatusCode HFInputAlg::execute() {
       m_signalOverlapTreeMap[runNumber]->SetDirectory(m_signalOverlapFileMap[runNumber]);
       m_signalOverlapTreeMap[runNumber]->Branch("event", &m_sigOverlapEvent, "event/l");
       m_signalOverlapTreeMap[runNumber]->Branch("category",&m_sigOverlapCategory);
+      m_signalOverlapTreeMap[runNumber]->Branch("dsid",&runNumber);
+      m_signalOverlapTreeMap[runNumber]->Branch("year",&year);
     }
   }else{  m_doSigOverlapTree=false; }
 
@@ -473,8 +475,10 @@ StatusCode HFInputAlg::execute() {
 
   if(!v26Ntuples){
     SR_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 0));
-    We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el_w == 1));
-    Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu_w == 1));
+    //We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el_w == 1));
+    //Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu_w == 1));
+    We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el == 1));
+    Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu == 1));
     Zee_lepVeto = ((n_baseel == 2) && (n_basemu_noOR == 0) && (n_el == 2));
     Zmm_lepVeto = ((n_baseel == 0) && (n_basemu_noOR == 2) && (n_mu == 2));
   }else if(m_extraVars>0){
@@ -879,19 +883,28 @@ double HFInputAlg::weightXETrigSF(const float met_pt, unsigned metRunNumber, int
   double p0 = 99.4255;
   double p1 = 38.6145;
   double e0 = 0.000784094;
-  double e1 = 0.05;
-  if(metRunNumber<=284484)                        { p0 = 110.396; p1 = 19.4147; e1 = 0.06; }  // 2015 xe70
-  if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 111.684; p1 = 19.147;  e1 = 0.08; }  // 2016 xe90
-  if(metRunNumber>302872)                         { p0 = 68.8679; p1 = 54.0594; e1 = 0.06; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
+  double e1 = 0.044;
+  if(metRunNumber<=284484)                        { p0 = 110.396; p1 = 19.4147; e1 = 0.044; }  // 2015 xe70
+  if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 111.684; p1 = 19.147;  e1 = 0.04; }  // 2016 xe90
+  if(metRunNumber>302872)                         { p0 = 68.8679; p1 = 54.0594; e1 = 0.044; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
   //if(325713<=metRunNumber && metRunNumber<=328393) { p0 = 86.6614; p1 = 49.8935; e1 = 0.05; } // 2017 xe90_pufit_L1XE50
   //if(329385<=metRunNumber && metRunNumber<=330470) { p0 = 103.780; p1 = 57.2547; e1 = 0.05; } // 2017 xe100_pufit_L1XE55
   //if(330857<=metRunNumber && metRunNumber<=331975) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
   //if(331975< metRunNumber && metRunNumber<=341649) { p0 = 103.152; p1 = 38.6121; e1 = 0.05; } // 2017 xe110_pufit_L1XE50
   //if(350067> metRunNumber && metRunNumber>=348197) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
   //if(350067<=metRunNumber && metRunNumber<=364292) { p0 = 107.509; p1 = 32.0065; e1 = 0.05; } // 2018 xe110_xe65_L1XE50
-  if(325713<=metRunNumber && metRunNumber<=341649) { p0 = 118.959; p1 = 32.2808; e1 = 0.05; } // 2017 xe110_pufit_L1XE55
-  if(364292>= metRunNumber && metRunNumber>=348197) { p0 = 104.830; p1 = 38.5267; e1 = 0.05; } // 2018 xe110_xe70_L1XE50
+  if(325713<=metRunNumber && metRunNumber<=341649) { p0 = 118.959; p1 = 32.2808; e1 = 0.04; } // 2017 xe110_pufit_L1XE55
+  if(364292>= metRunNumber && metRunNumber>=348197) { p0 = 104.830; p1 = 38.5267; e1 = 0.04; } // 2018 xe110_xe70_L1XE50
 
+  // MET SFs for the sherpa KT merged samples
+  if(mergeKTPTV){
+    if(metRunNumber<=284484)                        { p0 = 74.08; p1 = 32.07; e1 = 0.044; }  // 2015 xe70
+    if(metRunNumber>284484 && metRunNumber<=302872) { p0 = 80.72; p1 = 37.08;  e1 = 0.04; }  // 2016 xe90
+    if(metRunNumber>302872)                         { p0 = 78.76; p1 = 34.62; e1 = 0.044; }  // 2016 xe110 //p0 = 101.759; p1 = 36.5069;
+    if(325713<=metRunNumber && metRunNumber<=341649) { p0 = 62.3667; p1 = 54.946; e1 = 0.04; } // 2017 xe110_pufit_L1XE55
+    if(364292>= metRunNumber && metRunNumber>=348197) { p0 = 74.018; p1 = 35.8145; e1 = 0.04; } // 2018 xe110_xe70_L1XE50
+  }
+  
   double x = met_pt / 1.0e3;
   if (x < 100) { return 0; }
   if (x > 240) { x = 240; }

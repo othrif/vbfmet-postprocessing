@@ -131,6 +131,7 @@ namespace Msl
     std::string                 fMETChoice_phi;
     std::string                 fMETChoice_nolep;
     std::string                 fMETChoice_nolep_phi;
+    std::string                 fMJTriggerEff;
 
     // TMVA
     TMVA::Reader                *fTMVAReader;
@@ -175,8 +176,7 @@ namespace Msl
     bool                        fIsDDQCD;
     // Input vars
     float fWeight;
-    float puweight;
-    float trigEffWeight;
+    float fTriggerEffWeight;
     double vjWeight;
     float xeSFTrigWeight;
     float xeSFTrigWeight__1up;

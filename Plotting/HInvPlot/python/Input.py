@@ -47,6 +47,7 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::OverlapPh',     options.OverlapPh)
         self.read_reg.SetVal('ReadEvent::BTagCut',       options.BTagCut)
         self.read_reg.SetVal('ReadEvent::TMVAWeightPath',options.mva_weights_path)
+        self.read_reg.SetVal('ReadEvent::MJTriggerEff',  "TriggerEffWeightBDT") #or TriggerEffWeight
         self.read_reg.SetVal('ReadEvent::TrigString',    options.trig_name)  # specify a trigger from the command line
         self.read_reg.SetVal('ReadEvent::mergePTV',      options.mergePTV)
         self.read_reg.SetVal('ReadEvent::mergeExt',      options.mergeExt)
@@ -376,10 +377,14 @@ def prepareBkgRuns(keys,options=None):
                '308278':'VBF125 - H300',
                #'308279':'VBF125 - H500', 
                '308280':'VBF125 - H750', 
-               #'308281':'VBF125 - H1000',
+               #'308281':'VBF125 - H1000', 
                '308282':'VBF125 - H2000',
                #'308283':'VBF125 - H3000',
                    }
+    alt_VBFext = {'308279':'VBF125 - H500',
+                  '308281':'VBF125 - H1000', 
+                  '308283':'VBF125 - H3000',}
+    alt_VBF.update(alt_VBFext)
 
     bkg_wewk =     {'308096':'WenuEWK',
                     '308097':'WmunuEWK',
@@ -1176,9 +1181,9 @@ def prepareBkgRuns(keys,options=None):
                 #'whww':sig_VH125v2,
                 'vbfg':sig_vbfgam,
                 'whww':alt_VBF,
-                'hvbf500':{'308279':'VBF125 - H500',},
-                'hvbf1k':{'308281':'VBF125 - H1000',},
-                'hvbf3k':{'308283':'VBF125 - H3000',},
+                #'hvbf500':{'308279':'VBF125 - H500',},
+                #'hvbf1k':{'308281':'VBF125 - H1000',},
+                #'hvbf3k':{'308283':'VBF125 - H3000',},
                 'hggf':sig_ggF125,
                 'tth':sig_tth125,
                 'hvbf':sig_VBF125,
@@ -1209,14 +1214,14 @@ def prepareBkgRuns(keys,options=None):
                 'zqcdMad':bkg_z_strong_madgraph,
                 'wqcdMad':bkg_w_strong_madgraph,
                 'wdpi':bkg_top_other,
-                'wgam':bkg_sherpa_wg,
-                'zgam':bkg_sherpa_zg,
-                'wgamewk':bkg_wgewk,
-                'zgamewk':bkg_zgewk,
-                'ttg':bkg_ttg,
-                'pho':bkg_pho,
-                'phoAlt':bkg_pho_v2,
-                'vgg':bkg_sherpa_vgg,
+                #'wgam':bkg_sherpa_wg,
+                #'zgam':bkg_sherpa_zg,
+                #'wgamewk':bkg_wgewk,
+                #'zgamewk':bkg_zgewk,
+                #'ttg':bkg_ttg,
+                #'pho':bkg_pho,
+                #'phoAlt':bkg_pho_v2,
+                #'vgg':bkg_sherpa_vgg,
                 #'zqcdMad':bkg_zqcd,
                 #'wqcdMad':bkg_wqcd,
                 #'hvbf':bkg_w_strong_madgraph_wmnu,
@@ -1227,7 +1232,24 @@ def prepareBkgRuns(keys,options=None):
                 #'top2':bkg_z_strong_madgraph_ztt,
                 #'top1':bkg_z_strong_madgraph_znn,
                 }
-
+    if options.OverlapPh:
+        bkg_keys['wgam']=bkg_sherpa_wg
+        bkg_keys['zgam']=bkg_sherpa_zg
+        bkg_keys['wgamewk']=bkg_wgewk
+        bkg_keys['zgamewk']=bkg_zgewk
+        bkg_keys['ttg']=bkg_ttg
+        bkg_keys['pho']=bkg_pho
+        bkg_keys['phoAlt']=bkg_pho_v2
+        bkg_keys['vgg']=bkg_sherpa_vgg
+    else:
+        bkg_keys['wdpi'].update(bkg_sherpa_wg)
+        bkg_keys['wdpi'].update(bkg_sherpa_zg)
+        bkg_keys['wdpi'].update(bkg_wgewk)
+        bkg_keys['wdpi'].update(bkg_zgewk)
+        bkg_keys['wdpi'].update(bkg_ttg)
+        bkg_keys['wdpi'].update(bkg_pho)
+        bkg_keys['wdpi'].update(bkg_pho_v2)
+        bkg_keys['wdpi'].update(bkg_sherpa_vgg)        
     if not options.mergeKTPTV:
         bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
         bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
