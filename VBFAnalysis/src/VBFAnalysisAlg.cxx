@@ -685,7 +685,7 @@ StatusCode VBFAnalysisAlg::execute() {
     // use (UP - DOWN) / 2
     float up = -0.000333*(met_truth_et/1.0e3) - 0.0450;
     float down = -0.000366 *(met_truth_et/1.0e3) - 0.0410;
-    float syst = fabs(up-down)/2.0;
+    float syst = fabs(up-down)*2.0;
     if(m_currentVariation=="Nominal"){ 
       tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
       tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
