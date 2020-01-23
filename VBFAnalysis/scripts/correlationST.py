@@ -28,12 +28,26 @@ def ReturnNewSystScaleUncor(sysname, vals, listV):
     maxBin=12
     totalSysCorrelated=0.0
     totalSysUncorrelated=0.0
-    for  bin_num1Z in range(0,maxBin-1):
+    cordphi={}
+    maxBinIter=maxBin
+    if args.corrDPhi:
+        print 'correlate dphi'
+        cordphi[0]=5
+        cordphi[1]=6
+        cordphi[2]=7
+        cordphi[3]=8
+        cordphi[4]=9
+        maxBinIter=6    
+    for  bin_num1Z in range(0,maxBinIter-1):
         sysV=new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
+        if bin_num1Z in cordphi:
+            bin_num1ZAlt = cordphi[bin_num1Z]
+            sysV+=new_vals[bin_num1ZAlt]*listV[bin_num1ZAlt][vsysname]            
         totalSysCorrelated+=sysV
         totalSysUncorrelated+=(sysV)**2
     print 'totalSysCorrelated: ',totalSysCorrelated,' uncorr: ',math.sqrt(totalSysUncorrelated)
     scaleF = totalSysCorrelated/math.sqrt(totalSysUncorrelated)
+    print 'Increase: ',scaleF
     # apply larger syst
     tmp_line=sysname+' '
     for  bin_num1Z in range(0,maxBin-1):
@@ -198,7 +212,7 @@ parser = argparse.ArgumentParser( description = "Changing to MG relative uncerta
 parser.add_argument("--input",  dest='input', default='listTheorySyst11Bins', help="Input file with systematics")
 parser.add_argument("--output", dest='output', default='listTheorySyst11BinsUncorr', help="Output file with ST approach")
 parser.add_argument("--inputYields", dest='inputYields', default='/tmp/HF_jan7_mc16all_nom.root', help="Input file with yields")
-parser.add_argument("--corrDPhi", dest='corrDPhi',action = "store_true",  default=False, help="Correlate dphijj bins")
+parser.add_argument("--corrDPhi", dest='corrDPhi',action = "store_true",  default=True, help="Correlate dphijj bins")
 parser.add_argument("--scaleUncor", dest='scaleUncor',action = "store_true",  default=True, help="Scale the uncertainties as if uncorrelated to match the correlated syst")
 args, unknown = parser.parse_known_args()
 
