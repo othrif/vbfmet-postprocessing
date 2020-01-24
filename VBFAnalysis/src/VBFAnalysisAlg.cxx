@@ -685,7 +685,7 @@ StatusCode VBFAnalysisAlg::execute() {
     // use (UP - DOWN) / 2
     float up = -0.000333*(met_truth_et/1.0e3) - 0.0450;
     float down = -0.000366 *(met_truth_et/1.0e3) - 0.0410;
-    float syst = fabs(up-down)/2.0;
+    float syst = fabs(up-down)*2.0;
     if(m_currentVariation=="Nominal"){ 
       tMapFloat["nloEWKWeight__1down"]=nloEWKWeight - syst;
       tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
@@ -1066,7 +1066,7 @@ StatusCode VBFAnalysisAlg::execute() {
     DEtajjCut =3.5; // 3.5
   }
   if(m_AltSkim){
-    METCut = 200.0e3;
+    METCut = 100.0e3;
     LeadJetPtCut = 80.0e3; // 60.0e3
     subLeadJetPtCut = 50.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
