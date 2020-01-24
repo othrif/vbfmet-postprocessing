@@ -310,7 +310,7 @@ def getHistPars(hist):
     'minDRmj2'     : {'xtitle':'minDR m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'min_mj3'     : {'xtitle':'min m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'min_mj3_over_mjj'     : {'xtitle':'min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},
-    'centrality'     : {'xtitle':'j3 Centrality'   ,         'ytitle':'Events',   'ymin':0.1},
+    'centrality'     : {'xtitle':'j3 Centrality',         'ytitle':'Events',   'ymin':0.1},
     'phcentrality'     : {'xtitle':'#gamma Centrality'   ,         'ytitle':'Events',   'ymin':0.1,'rebin':5},
     'phPt'     : {'xtitle':'#gamma p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'phEta'     : {'xtitle':'#gamma #eta'   ,         'ytitle':'Events',   'ymin':0.1},

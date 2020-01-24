@@ -44,7 +44,7 @@ def ratioNFValues(a1,a2,s):
     v1=a1[0]
     e1=a1[1]
     v2=a2[0]
-    e2=a2[1]    
+    e2=a2[1]
     v=v1/v2
     e=v*math.sqrt((e1/v1)**2+(e2/v2)**2)
     print s,'ratio: %0.3f +/- %0.3f'%(v,e)
@@ -99,17 +99,17 @@ for i in range(1,6):
     #print zll[i],zll[i+5]
     ratioNFValues(zll[i],zll[i+5],mjjbins[i])
 print 'Wmunu'
-for i in range(1,6):    
+for i in range(1,6):
     ratioNFValues(wm[i],wm[i+5],mjjbins[i])
 print 'Wenu'
 for i in range(1,6):
     #print we[i],we[i+5]
-    ratioNFValues(we[i],we[i+5],mjjbins[i])        
+    ratioNFValues(we[i],we[i+5],mjjbins[i])
 print 'Zee/Zmm'
 for i in range(1,6):
     #print we[i],we[i+5]
-    ratioNFValues(DPHIzee[i],DPHIzmm[i],mjjbins[i]) 
+    ratioNFValues(DPHIzee[i],DPHIzmm[i],mjjbins[i])
 print 'Wen/Wmn'
 for i in range(1,6):
     #print we[i],we[i+5]
-    ratioNFValues(DPHIwe[i],DPHIwm[i],mjjbins[i]) 
+    ratioNFValues(DPHIwe[i],DPHIwm[i],mjjbins[i])
