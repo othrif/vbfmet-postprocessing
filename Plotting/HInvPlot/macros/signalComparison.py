@@ -192,8 +192,8 @@ if __name__ == "__main__":
 
     sampleName='H7'
     tpye = 'Sig'
-    fIncl = ROOT.TFile.Open('/tmp/P8.root')
-    fVBFFilt = ROOT.TFile.Open('/tmp/H7.root')
+    fIncl = ROOT.TFile.Open('/tmp/pow.root')
+    fVBFFilt = ROOT.TFile.Open('/tmp/h7.root')
     treeName1 = 'MiniNtuple'
     treeNamePow = 'MiniNtuple'
     plt=None
@@ -201,19 +201,21 @@ if __name__ == "__main__":
     implt=None
     #cuts = '*(jj_mass>1.0e6 && jj_dphi<1.8 && jj_deta>3.8 && met_cst_jet>120.0e3 && met_tst_nolep_et>150.0e3 && jet_pt[0]>80.0e3 && jet_pt[1]>50e3 && n_jet<5 && met_tst_et<20.0e3)'
     #cuts = '*(jj_mass>1.0e6 && jj_dphi<1.8 && jj_deta>3.8 && met_cst_jet>120.0e3 && met_tst_et>150.0e3 && jet_pt[0]>80.0e3 && jet_pt[1]>50e3 && n_jet<5 )'    
-    cuts = '*( truth_jj_mass>250e3)'
-    cuts = '*( truth_jj_mass>250e3)'
+    cuts = '*( truth_jj_mass>800e3 && boson_pt[0]>150e3 && truth_jj_deta>3.0 && truth_jj_dphi<2.5 && jet_pt[1]>40e3)'
+    cuts = '*( truth_jj_mass>800e3 && boson_pt[0]>150e3 && truth_jj_deta>3.0 && truth_jj_dphi<2.5 && jet_pt[1]>40e3)'
     #cuts = '*(jj_mass>0.2e6 && met_truth_et>150e3)'
-    runCutH7=''
-    runCutSh=''
+    runCutH7='/1462043.0'
+    runCutSh='/2662130.7'
     pvar='truth_jj_mass/1.0e3'
     xaxis='Truth m_{jj} [GeV]'
-    pvar='truth_jj_dphi'
-    xaxis='Truth #Delta#phi_{jj}'
-    pvar='truth_jj_deta'
-    xaxis='Truth #Delta#eta_{jj}'
-    pvar='boson_pt[0]/1.0e3'
-    xaxis='boson p_{T} [GeV]'
+    #pvar='truth_jj_dphi'
+    #xaxis='Truth #Delta#phi_{jj}'
+    #pvar='truth_jj_deta'
+    #xaxis='Truth #Delta#eta_{jj}'
+    #pvar='jet_phi[0]-jet_phi[1]'
+    #xaxis='Truth #Delta#phi_{jj}'    
+    #pvar='boson_pt[0]/1.0e3'
+    #xaxis='boson p_{T} [GeV]'
     #pvar='jj_dphi'
     #xaxis='#Delta#phi_{jj}'
     #pvar='met_truth_et/1.0e3'
@@ -226,16 +228,18 @@ if __name__ == "__main__":
     tIncl = fIncl.Get(treeName1)
     n1 = 'Iptruth_jj_mass'
     if pvar.count('jj_mass'):
-        plt = ROOT.TH1F(n1,n1,20,0.0,5000.0)
-    elif pvar.count('jj_dphi'):
-        plt = ROOT.TH1F(n1,n1,30,0.0,3.0)
+        plt = ROOT.TH1F(n1,n1,10,0.0,5000.0)
+    elif pvar=='jet_phi[0]-jet_phi[1]':
+        plt = ROOT.TH1F(n1,n1,50,-7.0,7.0)
+    elif pvar.count('jj_dphi') or pvar.count('truth_jet_phi[0]-truth_jet_phi[1]'):
+        plt = ROOT.TH1F(n1,n1,10,0.0,3.0)
     elif pvar.count('jj_deta'):
         plt = ROOT.TH1F(n1,n1,30,0.0,10.0)
     elif pvar=='truth_jet_phi[0]-truth_jet_phi[1]':
         plt = ROOT.TH1F(n1,n1,50,-7.0,7.0)
     else:
-        plt = ROOT.TH1F(n1,n1,50,0.0,500.0)
-    plt.GetYaxis().SetTitle('Events')
+        plt = ROOT.TH1F(n1,n1,25,0.0,500.0)
+    plt.GetYaxis().SetTitle('Arb. Normalisation')
     plt.GetXaxis().SetTitle(xaxis)
     print tIncl
     tIncl.Draw(pvar+' >>'+n1,'EventWeight'+cuts+runCutSh)
@@ -246,17 +250,17 @@ if __name__ == "__main__":
     tVBFFilt = fVBFFilt.Get(treeNamePow)
     n2='vbfptruth_jj_mass'
     if pvar.count('jj_mass'):
-        vbfplt = ROOT.TH1F(n2,n2,20,0.0,5000.0)
-    elif pvar=='truth_jet_phi[0]-truth_jet_phi[1]':
+        vbfplt = ROOT.TH1F(n2,n2,10,0.0,5000.0)
+    elif pvar=='jet_phi[0]-jet_phi[1]':
         vbfplt = ROOT.TH1F(n2,n2,50,-7.0,7.0)
-    elif pvar.count('jj_dphi'):
-        vbfplt = ROOT.TH1F(n2,n2,30,0.0,3.0)
+    elif pvar.count('jj_dphi') or pvar.count('jet_phi[0]-jet_phi[1]'):
+        vbfplt = ROOT.TH1F(n2,n2,10,0.0,3.0)
     elif pvar.count('jj_deta'):
         vbfplt = ROOT.TH1F(n2,n2,30,0.0,10.0)
     elif pvar=='truth_jet_phi[0]-truth_jet_phi[1]':
         vbfplt = ROOT.TH1F(n2,n2,50,-7.0,7.0)        
     else:
-        vbfplt = ROOT.TH1F(n2,n2,50,0.0,500.0)
+        vbfplt = ROOT.TH1F(n2,n2,25,0.0,500.0)
     vbfplt.GetYaxis().SetTitle('Events')
     vbfplt.GetXaxis().SetTitle(xaxis)
     tVBFFilt.Draw(pvar+' >>'+n2,'EventWeight'+cuts+runCutH7)
@@ -338,8 +342,8 @@ if __name__ == "__main__":
 
     hratio = vbfplt.Clone()
     hratio.Divide(plt)
-    hratio.GetYaxis().SetTitle('P8/H7')
-    hratio.GetYaxis().SetRangeUser(0.5,1.5)       
+    hratio.GetYaxis().SetTitle('H7/P8')
+    hratio.GetYaxis().SetRangeUser(0.8,1.2)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -352,7 +356,17 @@ if __name__ == "__main__":
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);
     hratio.Draw()
-    hratio.Fit('pol1')
+
+    for i in range(1,hratio.GetNbinsX()+1):
+        print hratio.GetBinContent(i)
+    if pvar.count('jj_mass'):
+        hratio.Fit('pol1',"","",800.0,5000.0)
+    if pvar.count('jj_dphi'):
+        hratio.Fit('pol1',"","",0.3,2.5)
+    if pvar.count('jj_deta'):
+        hratio.Fit('pol1',"","",2.5,6.5)
+    if pvar.count('boson_pt'):
+        hratio.Fit('pol1',"","",150.0,350.0)
     can.Update()
     can.WaitPrimitive()
     pvar_out=pvar

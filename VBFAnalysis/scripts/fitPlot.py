@@ -713,6 +713,36 @@ def main(options):
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
 
+    # print the stat uncertainties:
+    if options.show_mc_stat_err:
+        regionsList=[
+        'gamma_stat_oneEleNegLowSigCRX_obs_cuts_bin_0',
+        'gamma_stat_oneElePosLowSigCRX_obs_cuts_bin_0',
+        'gamma_stat_oneEleNegCRX_obs_cuts_bin_0',
+        'gamma_stat_oneElePosCRX_obs_cuts_bin_0',
+        'gamma_stat_oneMuNegCRX_obs_cuts_bin_0',
+        'gamma_stat_oneMuPosCRX_obs_cuts_bin_0',
+        'gamma_stat_twoEleCRX_obs_cuts_bin_0',
+        'gamma_stat_twoMuCRX_obs_cuts_bin_0',
+        'gamma_stat_SRX_obs_cuts_bin_0',    
+        ]
+        regionItr=0
+        print 'syst data_fraction mc_fraction'
+        writeLine=''
+        for i in range(1,hDict["bkgs"].GetNbinsX()+1):
+            if (i-1)%11==0 and i!=1:
+                regionItr+=1
+            binVal=((i)%11)
+            if binVal==0:
+                binVal=11
+            nameGamma = regionsList[regionItr].replace('X_','%s_' %(binVal))
+            total_bin_err = math.sqrt((data.GetBinError(i))**2+(hDict["bkgs"].GetBinError(i))**2)
+            print 'bin: ',i,nameGamma,' %0.3f %0.3f' %((data.GetBinError(i)/total_bin_err),(hDict["bkgs"].GetBinError(i)/total_bin_err))
+            writeLine+=nameGamma+' %0.3f %0.3f\n' %((data.GetBinError(i)/total_bin_err),(hDict["bkgs"].GetBinError(i)/total_bin_err))
+        statFil=open('statunc.txt','w')
+        statFil.write(writeLine)
+        statFil.close()
+
     systHist=hDict["bkgs"]
     systHistAsym = ROOT.TGraphAsymmErrors(systHist)
     hDict["bkgsAsymErr"] = systHistAsym
