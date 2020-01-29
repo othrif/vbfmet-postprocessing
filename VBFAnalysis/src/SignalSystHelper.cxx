@@ -99,7 +99,7 @@ std::string SignalSystHelper::getVBFVarName(int selection){
 }
 
 // set VBF vars
-void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights, Int_t n_jet_truth, Double_t truth_jj_mass){
+void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights, Int_t n_jet_truth, Double_t truth_jj_mass, Double_t truth_jj_dphi){
 
   // add the VBF scale variations
   for(unsigned i=0; i<10; ++i){
@@ -116,29 +116,36 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
   }
   // PS modelling systematics -> removed 1% because these PS weights are supposed to be used to interpret between the HTXS bins
   // add truth_jj_mass, truth_jj_dphi, n_jet_truth
-  tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.01;
-  tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.99;
+
+  tMapFloat["VBF_qqH_DphijjPSVarWeights__1up"]=0.98;
+  tMapFloat["VBF_qqH_DphijjPSVarWeights__1down"]=1.02;
+  if(truth_jj_dphi<1.0 && truth_jj_dphi>0.0){
+    tMapFloat["VBF_qqH_DphijjPSVarWeights__1up"]=1.04;
+    tMapFloat["VBF_qqH_DphijjPSVarWeights__1down"]=0.96;
+  }
+  tMapFloat["VBF_qqH_MjjPSVarWeights__1up"]=1.01;
+  tMapFloat["VBF_qqH_MjjPSVarWeights__1down"]=0.99;
   if(n_jet_truth==2 ){
     if( truth_jj_mass>3.5e6){
-      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.04;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.9988;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1up"]=1.02;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1down"]=0.978;
     } else if( truth_jj_mass>2.0e6){
-      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.018;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.998;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1up"]=1.038;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1down"]=0.98;
     }else if( truth_jj_mass>1.5e6){
-      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.0012;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.997;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1up"]=1.025;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1down"]=0.978;
     }else if( truth_jj_mass>1.0e6){
-      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.000;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.999;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1up"]=1.012;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1down"]=0.998;
     }else if( truth_jj_mass>0.8e6){
-      tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.00;
-      tMapFloat["VBF_qqH_PSVarWeights__1down"]=1.0;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1up"]=1.015;
+      tMapFloat["VBF_qqH_MjjPSVarWeights__1down"]=0.997;
     }
   }
   else if(n_jet_truth>2){
-    tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.005;
-    tMapFloat["VBF_qqH_PSVarWeights__1down"]=0.995;
+    tMapFloat["VBF_qqH_MjjPSVarWeights__1up"]=1.005;
+    tMapFloat["VBF_qqH_MjjPSVarWeights__1down"]=0.995;
   }
 
   // Check the weights are loaded
@@ -242,12 +249,18 @@ void SignalSystHelper::initVBFVars(std::map<TString, Float_t> &tMapFloat, std::m
   tree->Branch("wVBF_qqH_STJetVeto34__1down",&(tMapFloatW["VBF_qqH_STJetVeto34__1down"]));
 
   // Used the parton shower weights
-  tMapFloat["VBF_qqH_PSVarWeights__1up"]=1.0;
-  tMapFloatW["VBF_qqH_PSVarWeights__1up"]=1.0;
-  tree->Branch("wVBF_qqH_PSVarWeights__1up",&(tMapFloatW["VBF_qqH_PSVarWeights__1up"]));
-  tMapFloat["VBF_qqH_PSVarWeights__1down"]=1.0;
-  tMapFloatW["VBF_qqH_PSVarWeights__1down"]=1.0;
-  tree->Branch("wVBF_qqH_PSVarWeights__1down",&(tMapFloatW["VBF_qqH_PSVarWeights__1down"]));
+  tMapFloat["VBF_qqH_MjjPSVarWeights__1up"]=1.0;
+  tMapFloatW["VBF_qqH_MjjPSVarWeights__1up"]=1.0;
+  tree->Branch("wVBF_qqH_MjjPSVarWeights__1up",&(tMapFloatW["VBF_qqH_MjjPSVarWeights__1up"]));
+  tMapFloat["VBF_qqH_MjjPSVarWeights__1down"]=1.0;
+  tMapFloatW["VBF_qqH_MjjPSVarWeights__1down"]=1.0;
+  tree->Branch("wVBF_qqH_MjjPSVarWeights__1down",&(tMapFloatW["VBF_qqH_MjjPSVarWeights__1down"]));
+  tMapFloat["VBF_qqH_DphijjPSVarWeights__1up"]=1.0;
+  tMapFloatW["VBF_qqH_DphijjPSVarWeights__1up"]=1.0;
+  tree->Branch("wVBF_qqH_DphijjPSVarWeights__1up",&(tMapFloatW["VBF_qqH_DphijjPSVarWeights__1up"]));
+  tMapFloat["VBF_qqH_DphijjPSVarWeights__1down"]=1.0;
+  tMapFloatW["VBF_qqH_DphijjPSVarWeights__1down"]=1.0;
+  tree->Branch("wVBF_qqH_DphijjPSVarWeights__1down",&(tMapFloatW["VBF_qqH_DphijjPSVarWeights__1down"]));
 
   // add the VBF PDF variations
   for(unsigned i=1; i<31; ++i){    

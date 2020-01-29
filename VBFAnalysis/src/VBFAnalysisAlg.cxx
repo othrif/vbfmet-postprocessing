@@ -694,7 +694,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
-    if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights,n_jet_truth,truth_jj_mass);
+    if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights,n_jet_truth,truth_jj_mass, truth_jj_dphi);
     if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 111);
     if(runNumber>=312448 && runNumber<=312531) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 115); // filtered sherpa uses nnpdf
 

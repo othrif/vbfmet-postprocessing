@@ -37,7 +37,8 @@ class systematics(object):
                                      'ATLAS_PDF4LHC_NLO_30_EV2__1up','ATLAS_PDF4LHC_NLO_30_EV1__1up',]        
         self.systematicsGGFSignal =['ggF_gg2H_PSVarWeights__1up','ggF_gg2H_PSVarWeights__1down'] 
         self.systematicsVBFSignal =['VBF_qqH_STJetVeto34__1up','VBF_qqH_STJetVeto34__1down',
-                                    'VBF_qqH_PSVarWeights__1up','VBF_qqH_PSVarWeights__1down',
+                                    'VBF_qqH_MjjPSVarWeights__1up','VBF_qqH_MjjPSVarWeights__1down',
+                                    'VBF_qqH_DphijjPSVarWeights__1up','VBF_qqH_DphijjPSVarWeights__1down',
                                     'VBF_qqH_25__1up','VBF_qqH_2jet__1up',
                                     'VBF_qqH_Mjj1500__1up','VBF_qqH_Mjj1000__1up',
                                     'VBF_qqH_Mjj700__1up','VBF_qqH_Mjj350__1up',
