@@ -27,12 +27,13 @@ parser.add_argument( "--doDoubleRatio", dest = "doDoubleRatio", action="store_tr
 parser.add_argument( "--doPlot", dest = "doPlot", action="store_true", default = False, help = "Generate additional histograms for postfit plots")
 parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
 parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis")
+parser.add_argument( "--singleHist", dest = "singleHist", action="store_true", default = False, help = "Runs VBF + MET in one histogram when true")
 parser.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
 parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
 
-writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio)
-writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio)
+writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist)
+writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist)
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:
@@ -131,6 +132,8 @@ if args.doDoubleRatio:
     extraCommand+=' --doDoubleRatio '
 if args.v26Ntuples:
     extraCommand+=' --v26Ntuples '
+if args.singleHist:
+    extraCommand+=' --singleHist '
 if args.doVBFMETGam:
     extraCommand+=' --doVBFMETGam '
 if args.doPlot:

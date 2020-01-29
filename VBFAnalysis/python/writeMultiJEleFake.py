@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 import os
-def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
+def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
     #multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
@@ -88,61 +88,111 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False):
         multijets+=[300.0]
     a = 1
     f_multijet = ROOT.TFile("multijet.root", "recreate")    
-    for multijet in multijets:
-        hist=None
+    if not singleHist:
+        for multijet in multijets:
+            hist=None
+            histClosUp=[]
+            histClosDw=[]
+            if doDoubleRatio and a==(len(multijets)):
+                hist   = ROOT.TH1F("hmultijet_antiVBFSel_1Nom_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1Nom_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+                histUp = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncHigh_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncHigh_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+                histDw = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncLow_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncLow_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+                for yea in [2016, 2017, 2018]:
+                    histClosUp +=[ ROOT.TH1F("hmultijet_antiVBFSel_1MJClos%sUncHigh_AVBFCR1_obs_cuts" %yea, "hmultijet_VBFjetSel_1MJClos%sUncHigh_AVBFCR1_obs_cuts;;" %yea, 1, 0.5, 1.5)]
+                    histClosDw +=[ ROOT.TH1F("hmultijet_antiVBFSel_1MJClos%sUncLow_AVBFCR1_obs_cuts" %yea, "hmultijet_VBFjetSel_1MJClos%sUncLow_AVBFCR1_obs_cuts;;" %yea, 1, 0.5, 1.5) ]
+            else:
+                hist   = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                for yea in [2016, 2017, 2018]:
+                    histClosUp += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)]
+                    histClosDw += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) ]
+            hist.SetBinContent(1,multijet)
+            #hist.SetBinError(1,multijet*0.25)
+            hist.SetBinError(1,multijets_statunc[a-1]) # stat uncertainty
+            histUp.SetBinContent(1,multijet*1.28)
+            histUp.SetBinError(1,0.0)
+            histDw.SetBinContent(1,multijet/1.28)
+            histDw.SetBinError(1,0.0)
+            # setting the default value
+            for itr in range(0,len(histClosUp)):
+                histClosUp[itr].SetBinContent(1,multijet) 
+                histClosUp[itr].SetBinError(1,0.0)
+                histClosDw[itr].SetBinContent(1,multijet)
+                histClosDw[itr].SetBinError(1,0.0)                    
+            if  year==2016:
+                histClosUp[0].SetBinContent(1,multijet*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+                histClosDw[0].SetBinContent(1,multijet/1.8)
+            if  year==2017:
+                histUp.SetBinContent(1,multijet*1.25) 
+                histDw.SetBinContent(1,multijet/1.25)
+                histClosUp[1].SetBinContent(1,multijet*1.5) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                histClosDw[1].SetBinContent(1,multijet/1.5)
+            if  year==2018:
+                histUp.SetBinContent(1,multijet*1.22)
+                histDw.SetBinContent(1,multijet/1.22)
+                histClosUp[2].SetBinContent(1,multijet*1.32) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                histClosDw[2].SetBinContent(1,multijet/1.32)
+            hist.Write()
+            histUp.Write()
+            histDw.Write()
+            for itr in range(0,len(histClosUp)):
+                histClosUp[itr].Write()
+                histClosDw[itr].Write()
+            a += 1
+    else: # write a single histogram
         histClosUp=[]
         histClosDw=[]
-        if doDoubleRatio and a==(len(multijets)):
-            hist   = ROOT.TH1F("hmultijet_antiVBFSel_1Nom_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1Nom_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
-            histUp = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncHigh_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncHigh_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
-            histDw = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncLow_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncLow_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
-            for yea in [2016, 2017, 2018]:
-                histClosUp +=[ ROOT.TH1F("hmultijet_antiVBFSel_1MJClos%sUncHigh_AVBFCR1_obs_cuts" %yea, "hmultijet_VBFjetSel_1MJClos%sUncHigh_AVBFCR1_obs_cuts;;" %yea, 1, 0.5, 1.5)]
-                histClosDw +=[ ROOT.TH1F("hmultijet_antiVBFSel_1MJClos%sUncLow_AVBFCR1_obs_cuts" %yea, "hmultijet_VBFjetSel_1MJClos%sUncLow_AVBFCR1_obs_cuts;;" %yea, 1, 0.5, 1.5) ]
-        else:
-            hist   = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-            histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-            histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-            for yea in [2016, 2017, 2018]:
-                histClosUp += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)]
-                histClosDw += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) ]
-        hist.SetBinContent(1,multijet)
-        #hist.SetBinError(1,multijet*0.25)
-        hist.SetBinError(1,multijets_statunc[a-1]) # stat uncertainty
-        histUp.SetBinContent(1,multijet*1.25)
-        histUp.SetBinError(1,0.0)
-        histDw.SetBinContent(1,multijet/1.25)
-        histDw.SetBinError(1,0.0)
-        # setting the default value
-        for itr in range(0,len(histClosUp)):
-            histClosUp[itr].SetBinContent(1,multijet) 
-            histClosUp[itr].SetBinError(1,0.0)
-            histClosDw[itr].SetBinContent(1,multijet)
-            histClosDw[itr].SetBinError(1,0.0)                    
-        if  year==2016:
-            histClosUp[0].SetBinContent(1,multijet*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
-            histClosDw[0].SetBinContent(1,multijet/1.8)
-        if  year==2017:
-            histUp.SetBinContent(1,multijet*1.51) 
-            histDw.SetBinContent(1,multijet/1.51)
-            histClosUp[1].SetBinContent(1,multijet*1.5) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
-            histClosDw[1].SetBinContent(1,multijet/1.5)
-        if  year==2018:
-            histUp.SetBinContent(1,multijet*1.5)
-            histDw.SetBinContent(1,multijet/1.5)
-            histClosUp[2].SetBinContent(1,multijet*1.32) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
-            histClosDw[2].SetBinContent(1,multijet/1.32)
+        a=89
+        b=1
+        nbins=len(multijets)*9
+        hist   = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)
+        histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)
+        histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)
+        for yea in [2016, 2017, 2018]:
+            histClosUp += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)]
+            histClosDw += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5) ]
+        for multijet in multijets:
+            print multijet
+            hist.SetBinContent(a,multijet)
+            hist.SetBinError(a,multijets_statunc[b-1]) # stat uncertainty
+            histUp.SetBinContent(a,multijet*1.28)
+            histUp.SetBinError(a,0.0)
+            histDw.SetBinContent(a,multijet/1.28)
+            histDw.SetBinError(a,0.0)
+            # setting the default value
+            for itr in range(0,len(histClosUp)):
+                histClosUp[itr].SetBinContent(a,multijet) 
+                histClosUp[itr].SetBinError(a,0.0)
+                histClosDw[itr].SetBinContent(a,multijet)
+                histClosDw[itr].SetBinError(a,0.0)                    
+            if  year==2016:
+                histClosUp[0].SetBinContent(a,multijet*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+                histClosDw[0].SetBinContent(a,multijet/1.8)
+            if  year==2017:
+                histUp.SetBinContent(a,multijet*1.25) 
+                histDw.SetBinContent(a,multijet/1.25)
+                histClosUp[1].SetBinContent(a,multijet*1.5) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                histClosDw[1].SetBinContent(a,multijet/1.5)
+            if  year==2018:
+                histUp.SetBinContent(a,multijet*1.22)
+                histDw.SetBinContent(a,multijet/1.22)
+                histClosUp[2].SetBinContent(a,multijet*1.32) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                histClosDw[2].SetBinContent(a,multijet/1.32)
+
+            a+=1
+            b+=1
+        # writing output
         hist.Write()
         histUp.Write()
         histDw.Write()
         for itr in range(0,len(histClosUp)):
             histClosUp[itr].Write()
             histClosDw[itr].Write()
-        a += 1
     #f_multijet.Write()
     f_multijet.Close()
  
-def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
+def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
 
     f_fakeele = ROOT.TFile("fakeele.root", "recreate")
     fakeelesp = [10.7, 11.6, 5.0]
@@ -179,36 +229,51 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False):
         fakeelesp+=[12.5]
         fakeelesm+=[12.5]
     a = 1
-    for fakeelep in fakeelesp:
-        fakeelem = fakeelesm[a-1]
-        histpLowSig=None
-        histmLowSig=None
-        if doDoubleRatio and a==(len(fakeelesp)):
-            histpLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
-            histmLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
-        else:
-            histpLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-            histmLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histpLowSig.SetBinContent(1,fakeelep)
-        histmLowSig.SetBinContent(1,fakeelem)
-        histpLowSig.Write()
-        histmLowSig.Write()
-        histm=None
-        histp=None
-        if doDoubleRatio and a==(len(fakeelesp)):
-            histp = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts;;", 1, 0.5, 1.5)
-            histm = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts;;", 1, 0.5, 1.5)
-        else:
-            histp = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-            histm = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) 
-        histp.SetBinContent(1,1)
-        histm.SetBinContent(1,1)
+    if not singleHist:
+        for fakeelep in fakeelesp:
+            fakeelem = fakeelesm[a-1]
+            histpLowSig=None
+            histmLowSig=None
+            if doDoubleRatio and a==(len(fakeelesp)):
+                histpLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
+                histmLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
+            else:
+                histpLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histmLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histpLowSig.SetBinContent(1,fakeelep)
+            histmLowSig.SetBinContent(1,fakeelem)
+            histpLowSig.Write()
+            histmLowSig.Write()
+            histm=None
+            histp=None
+            if doDoubleRatio and a==(len(fakeelesp)):
+                histp = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts;;", 1, 0.5, 1.5)
+                histm = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts;;", 1, 0.5, 1.5)
+            else:
+                histp = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histm = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histp.SetBinContent(1,1)
+            histm.SetBinContent(1,1)
+            histp.Write()
+            histm.Write()
+            a += 1
+    else: # write out a single histogram
+        nbins=len(fakeelesp)*9
+        binshift=len(fakeelesp)
+        a=1
+        histp = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)
+        histm = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5) 
+
+        for fakeelep in fakeelesp:
+            fakeelem = fakeelesm[a-1]
+            histp.SetBinContent(a+binshift*3,1)
+            histm.SetBinContent(a+binshift*2,1)
+            a += 1
         histp.Write()
         histm.Write()
-        a += 1
-    f_fakeele.Write()
+    #f_fakeele.Write()
     f_fakeele.Close()
-#writeMultiJet(11, 2018, 150)
+#writeMultiJet(11, 2016, 150)
 #os.chdir('../v34D')
 #writeMultiJet(11, 2017, 150)
 #os.chdir('../v34E')

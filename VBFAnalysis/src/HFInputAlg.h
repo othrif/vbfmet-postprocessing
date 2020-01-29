@@ -27,7 +27,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   virtual StatusCode  beginInputFile(); //start of each input file, only metadata loaded
   //virtual StatusCode  firstExecute();   //once, after first eventdata is loaded (not per file)
   std::string HistoNameMaker(std::string currentSample, std::string currentCR, std::string bin, std::string syst, Bool_t isMC);
-  vector <TH1F*> HistoAppend(std::string name, std::string currentCR);
+  vector <TH1F*> HistoAppend(std::string name, std::string currentCR, int bins=1);
   virtual StatusCode CheckHists(vector <std::pair<vector <TH1F*>, std::string>> hnames);
   void HistoFill(vector<TH1F*> hs, double w);
   bool replace(std::string& str, const std::string& from, const std::string& to);
@@ -50,6 +50,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
  private: 
   int npevents = 0;
   int year     = 2016;
+  int totalBins = 11;
   Bool_t isMC = true;
   Bool_t isMadgraph = false;
   Bool_t mergeKTPTV = false;
@@ -58,6 +59,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Bool_t isHigh = true;
   Bool_t weightSyst=false;
   Bool_t doPlot = false;
+  Bool_t singleHist = false;
   Bool_t doVBFMETGam = false;
   Bool_t doDuplicateCheck = false;
   Bool_t doDoubleRatio = false;
