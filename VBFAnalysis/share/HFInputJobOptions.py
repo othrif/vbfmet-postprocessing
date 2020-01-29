@@ -26,6 +26,7 @@ arg_group.add_argument("--isLow", action="store_true", dest='isLow', default=Fal
 arg_group.add_argument("--weightSyst", action="store_true", dest='weightSyst', default=False, help="is a weight systematic, default: False")
 arg_group.add_argument("--v26Ntuples", action="store_true", dest='v26Ntuples', default=False, help="run v26 style ntuples, default: False")
 arg_group.add_argument("--doVBFMETGam", action="store_true", dest='doVBFMETGam', default=False, help="run VBF+MET+gamma analysis, default: False")
+arg_group.add_argument("--singleHist", action="store_true", dest='singleHist', default=False, help="run VBF+MET into a single histogram, default: True")
 arg_group.add_argument("--oldInput", action="store_true", dest='oldInput', default=False, help="if oldInput, switch to HFInputOldInput")
 arg_group.add_argument("--doPlot", action="store_true", dest='doPlot', default=False, help="doPlot, to turn on additional histograms used for postfit plots, default: False")
 # parse the commandline options
@@ -97,6 +98,7 @@ if True:
                                        weightSyst = args.weightSyst,
                                        doPlot = args.doPlot,
                                        v26Ntuples = args.v26Ntuples,
+                                       singleHist = args.singleHist,
                                        doVBFMETGam = args.doVBFMETGam);
     else:
         if args.currentSample == "physics_micro":
@@ -117,6 +119,7 @@ if True:
                                                year = args.year,
                                                weightSyst = args.weightSyst,
                                                doPlot = args.doPlot,
+                                               singleHist = args.singleHist,
                                                v26Ntuples = args.v26Ntuples,
                                                doVBFMETGam = args.doVBFMETGam);
     
