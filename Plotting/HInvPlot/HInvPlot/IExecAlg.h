@@ -75,6 +75,7 @@ namespace Msl
     TH1* GetTH1(const std::string &name, int nbin,  double xmin, double xmax);
     TH2* GetTH2(const std::string &name, int xnbin, double xmin, double xmax, 
 		int ynbin, double ymin, double ymax);
+    TH2 *GetTH2(const std::string &name, int nbinx,  float xarr[], int nbiny,  float yarr[]);
     TH3* GetTH3(const std::string &name,
 		int xnbin, double xmin, double xmax, 
 		int ynbin, double ymin, double ymax,

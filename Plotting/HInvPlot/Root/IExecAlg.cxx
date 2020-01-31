@@ -154,6 +154,32 @@ TH2* Msl::IExecAlg::GetTH2(const std::string &name, int xnbin, double xmin, doub
 }
 
 //-----------------------------------------------------------------------------
+TH2* Msl::IExecAlg::GetTH2(const std::string &name, int nbinx,  float xarr[], int nbiny,  float yarr[])
+{
+  //
+  // Create TH2 histogram and set directory
+  //
+  
+  HistMap2D::iterator hit = fHists2D.find(name);
+  if(hit != fHists2D.end()) {
+    return hit->second;
+  }
+  
+  TH2 *h = new TH2D(name.c_str(), name.c_str(), nbinx, xarr, nbiny, yarr);
+
+  if(h) {
+    if(!fHists2D.insert(HistMap2D::value_type(name, h)).second) {
+      log() << "GetTH2 - ignore duplicate histogram: " << name << endl;
+    }
+
+    h->SetDirectory(0);
+    h->Sumw2();
+  }
+
+  return h;
+}
+
+//-----------------------------------------------------------------------------
 TH3* Msl::IExecAlg::GetTH3(const std::string &name, int xnbin, double xmin, double xmax, int ynbin, double ymin, double ymax,
 			   int znbin, double zmin, double zmax)
 {
