@@ -394,8 +394,8 @@ StatusCode HFInputAlg::execute() {
     if(metSoftVeto || fJVTVeto || JetTimingVeto || leptonVeto) return StatusCode::SUCCESS;
   
     if(m_extraVars>1){
-      METCut=170.0e3; // try 160
-      METCSTJetCut=150.0e3; // try 140
+      METCut=150.0e3; // try 160
+      METCSTJetCut=130.0e3; // try 140
       jj_detaCut=3.8;
       jetCut = (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05);
     }
