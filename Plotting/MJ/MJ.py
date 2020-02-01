@@ -484,8 +484,8 @@ for e in tree:
     jj_deta = abs(mystruct.jet_eta[0] - mystruct.jet_eta[1])
     jj_dphi = abs(v1.DeltaPhi(v2))
     # dphijj cut
-    if jj_dphi >2.0:
-        continue
+    #if jj_dphi >2.0:
+    #    continue
     
     #jj_dphi=5
     jj_mass = (v1+v2).M()

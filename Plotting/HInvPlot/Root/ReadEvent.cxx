@@ -707,7 +707,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         else event->SetWeight(fWeight*fLumi);
       }
       else  event->SetWeight(1.0);
-      if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight);
+      float MJDDScaling=0.476;
+      if(fYear==2017) MJDDScaling=1.464;
+      else if(fYear==2018) MJDDScaling=0.813;
+      if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight*MJDDScaling);
       if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
 	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;

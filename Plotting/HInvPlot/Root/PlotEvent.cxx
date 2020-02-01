@@ -125,6 +125,9 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hj3Jvt            = GetTH1("j3Jvt",            12,  -0.2,  1.0);
   hj3FJvt           = GetTH1("j3FJvt",           22,  -0.2,  2.0);
 
+  hAllJetMETSig = GetTH1("alljet_metsig", 200, 0, 20);
+  hJetHT = GetTH1("jetHT", 50, 0.0, 1000.0);
+
    if(fDetailLvl<5){
     hJetEtaPt25       = GetTH1("JetEtaPt25",       90,  -4.5,  4.5);		  
     hJetEtaPt35       = GetTH1("JetEtaPt35",       90,  -4.5,  4.5);		  

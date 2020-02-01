@@ -178,9 +178,6 @@ class texTable(object):
         return "texTable"
 
 
-
-
-
 class HistClass(object):
     '''Class to easily read out HistFitter input files'''
     Irfile=None #this has to be an open root file
@@ -369,13 +366,22 @@ class HistClass(object):
 def getBinsError(hist, bins):
     BE=0
     for bn in bins:
-        BE+=hist.GetBinError(bn) # FIXME squared or not?
+        if type(hist)==ROOT.TH1F:
+            BE+=hist.GetBinError(bn) # FIXME squared or not?
+        else:
+            BE+=hist.GetErrorYhigh(bn-1)
     return BE
 
 def getBinsYield(hist, bins):
     BC=0
+    x1a=ROOT.Double()
+    y1a=ROOT.Double()
     for bn in bins:
-        BC+=hist.GetBinContent(bn)
+        if type(hist)==ROOT.TH1F:
+            BC+=hist.GetBinContent(bn)
+        else:
+            hist.GetPoint(bn-1,x1a,y1a)
+            BC+=y1a
     return BC
 
 def removeLabel(leg, name):
@@ -441,14 +447,25 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
             DataMC[reg]=0
             if options.data: DataMC[reg]=(getBinsYield(histDict["data"], regionBinsDict[reg])/getBinsYield(histDict["bkgs"], regionBinsDict[reg]))
 
-
     arrArray=[]
+    x1a=ROOT.Double()
+    y1a=ROOT.Double()
     for hkey in histDict:
         tmpArr=[]
         for regkey in regionDict:
-            tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" +- "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
+            #tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" $\\pm$ "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
+            yldvR=0.0
+            if type(histDict[hkey])==ROOT.TH1F:
+                yldvR=round(histDict[hkey].GetBinContent(regionDict[regkey]),2)
+                yldeR=round(histDict[hkey].GetBinError(regionDict[regkey]),2)
+            else:
+                histDict[hkey].GetPoint(regionDict[regkey]-1,x1a,y1a)
+                yldvR=round(y1a,2)
+                ylde=histDict[hkey].GetErrorYhigh(regionDict[regkey]-1)
+                yldeR=round(ylde,2)
+            tmpArr.append(str(yldvR)+" +- "+str(yldeR))
         arrArray.append(tmpArr)
-    arrArray.append([str(round(DataMC2.GetBinContent(dm),2))+" +- "+str(round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
+    arrArray.append([str(round(DataMC2.GetBinContent(dm),2))+" $\\pm$ "+str(round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
     texTable1=texTable(arrayArray=arrArray)
     colmNames=[reg for reg in regionDict]
     rowNames=[hkey.replace("_"," ") for hkey in histDict]+["Data/MC"]
@@ -463,7 +480,7 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
         for regkey in regionBinsDict:
             var=getBinsYield(histDict[hkey], regionBinsDict[regkey])
             varE=getBinsError(histDict[hkey], regionBinsDict[regkey])
-            tmpArr2.append(str(round(var,2))+" +- "+str(round(varE,2)))
+            tmpArr2.append(str(round(var,2))+" $\\pm$ "+str(round(varE,2)))
         arrArray2.append(tmpArr2)
     arrArray2.append([str(round(DataMC[f],3)) for f in DataMC])
     texTable2=texTable(arrayArray=arrArray2)
@@ -655,7 +672,7 @@ def main(options):
                 #    continue
                 pickle_key_remFit = pickle_key[len('Fitted_events_'):]
                 m=0
-                for i in hist_array_keys:                    
+                for i in hist_array_keys:
                     if i in pickle_key_remFit:
                         break
                     m+=1
@@ -666,6 +683,7 @@ def main(options):
                 #print 'check',regDict['oneEleNegCR1'] #+'_cuts' need to strip '_cuts'
                 ireg=0
                 for iname in pickle_region_names:
+                    #print "Setting: ",iname,pickle_key
                     histToSet.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg])
                     ireg+=1
                 
@@ -694,6 +712,36 @@ def main(options):
     dummyHist.SetMaximum(hStack.GetMaximum()*1.4)
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
+
+    # print the stat uncertainties:
+    if options.show_mc_stat_err:
+        regionsList=[
+        'gamma_stat_oneEleNegLowSigCRX_obs_cuts_bin_0',
+        'gamma_stat_oneElePosLowSigCRX_obs_cuts_bin_0',
+        'gamma_stat_oneEleNegCRX_obs_cuts_bin_0',
+        'gamma_stat_oneElePosCRX_obs_cuts_bin_0',
+        'gamma_stat_oneMuNegCRX_obs_cuts_bin_0',
+        'gamma_stat_oneMuPosCRX_obs_cuts_bin_0',
+        'gamma_stat_twoEleCRX_obs_cuts_bin_0',
+        'gamma_stat_twoMuCRX_obs_cuts_bin_0',
+        'gamma_stat_SRX_obs_cuts_bin_0',    
+        ]
+        regionItr=0
+        print 'syst data_fraction mc_fraction'
+        writeLine=''
+        for i in range(1,hDict["bkgs"].GetNbinsX()+1):
+            if (i-1)%11==0 and i!=1:
+                regionItr+=1
+            binVal=((i)%11)
+            if binVal==0:
+                binVal=11
+            nameGamma = regionsList[regionItr].replace('X_','%s_' %(binVal))
+            total_bin_err = math.sqrt((data.GetBinError(i))**2+(hDict["bkgs"].GetBinError(i))**2)
+            print 'bin: ',i,nameGamma,' %0.3f %0.3f' %((data.GetBinError(i)/total_bin_err),(hDict["bkgs"].GetBinError(i)/total_bin_err))
+            writeLine+=nameGamma+' %0.3f %0.3f\n' %((data.GetBinError(i)/total_bin_err),(hDict["bkgs"].GetBinError(i)/total_bin_err))
+        statFil=open('statunc.txt','w')
+        statFil.write(writeLine)
+        statFil.close()
 
     systHist=hDict["bkgs"]
     systHistAsym = ROOT.TGraphAsymmErrors(systHist)
@@ -765,7 +813,7 @@ def main(options):
                 rat="nan"
                 if centralValue!=0: rat=diff/centralValue
 
-                #print '{0:<10}'.format(tmpHist.proc), '{0:<20}'.format(tmpHist.reg), '{0:<20}'.format(systName), "\t",'{0:<15}'.format(str(rat)), "\t",'{0:<15}'.format(str(diff)),"\t",'{0:<15}'.format(str(tmpHist.hist.GetBinContent(options.nBin))),"+-",'{0:<15}'.format(str(tmpHist.hist.GetBinError(options.nBin))),"\t",'{0:<15}'.format(str(centralValue)),"+-",'{0:<15}'.format(str(centralHist.GetBinError(options.nBin)))
+                #print '{0:<10}'.format(tmpHist.proc), '{0:<20}'.format(tmpHist.reg), '{0:<20}'.format(systName), "\t",'{0:<15}'.format(str(rat)), "\t",'{0:<15}'.format(str(diff)),"\t",'{0:<15}'.format(str(tmpHist.hist.GetBinContent(options.nBin))),"$\\pm$",'{0:<15}'.format(str(tmpHist.hist.GetBinError(options.nBin))),"\t",'{0:<15}'.format(str(centralValue)),"$\\pm$",'{0:<15}'.format(str(centralHist.GetBinError(options.nBin)))
 
             if diff>0:
                 binVariationHigh2[tmpHist.nbin]+=diff**2
@@ -809,7 +857,7 @@ def main(options):
                     continue
                 pickle_key_remFit = pickle_key[len('Fitted_err_'):]
                 m=0
-                for i in hist_array_keys:                    
+                for i in hist_array_keys:
                     if i in pickle_key_remFit:
                         break
                     m+=1
@@ -1015,7 +1063,7 @@ def compareMain(options):
                 for n in colmNames:
                     tmpStr=""
                     tmpStr+="{:.2f}".format(histDict[r][p].GetBinContent(HistClass.regDict[n]))
-                    tmpStr+=" +- "
+                    tmpStr+=" $\\pm$ "
                     tmpStr+="{:.2f}".format(histDict[r][p].GetBinError(HistClass.regDict[n]))
                     colmVals.append(tmpStr)
                 rowVals.append(colmVals)
@@ -1052,7 +1100,7 @@ def compareMain(options):
                         var=var/len(HistClass.regionBins[n])
                         varE=varE/len(HistClass.regionBins[n])
                     tmpForRatioVals.append(var)
-                    colmVals.append(str(round(var,2))+" +- "+str(round(varE,2)))
+                    colmVals.append(str(round(var,2))+" $\\pm$ "+str(round(varE,2)))
                 tmpForRatio.append(tmpForRatioVals)
                 rowVals.append(colmVals)
             if options.ratio and not(p=="data/MC"): #TODO add this also for data/MC summary table
