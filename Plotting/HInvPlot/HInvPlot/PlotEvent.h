@@ -105,6 +105,7 @@ namespace Msl
     TH1                        *hJetHT;
     TH1                        *hAllJetMETSig;
 
+    TH2                        *hjj_mass_dphi_variableBin;
     TH1                        *hjj_mass_variableBin;
     TH1                        *htruth_jj_mass_variableBin;
     TH1                        *htmva_variableBin;

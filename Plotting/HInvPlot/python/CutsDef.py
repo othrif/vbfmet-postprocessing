@@ -403,7 +403,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
     return cuts
 
 #-------------------------------------------------------------------------
-def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET=-1):
+def metCuts(basic_cuts, options, isLep=False, metCut=160.0, cstCut=140.0, maxMET=-1):
 
     met_choice = options.met_choice # the met_choice is filled into this variable
     if isLep:
@@ -494,7 +494,8 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
             cuts += metCuts(basic_cuts,options,metCut=130.0, cstCut=100.0)#, maxMET=150.0)
         else:
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
-            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0)
+            #cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0)
+            cuts += metCuts(basic_cuts,options,metCut=160.0, cstCut=140.0)
             #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
 

@@ -707,9 +707,21 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         else event->SetWeight(fWeight*fLumi);
       }
       else  event->SetWeight(1.0);
-      float MJDDScaling=0.476;
-      if(fYear==2017) MJDDScaling=1.464;
-      else if(fYear==2018) MJDDScaling=0.813;
+      float MJDDScaling=0.8815;
+      if(fYear==2017) MJDDScaling=2.6895;
+      else if(fYear==2018) MJDDScaling=2.10302;
+
+      // Applies the MJ systematics
+      //MJUnc__1up MJClos2016__1up MJClos2017__1up MJClos2018__1up
+      if(fWeightSystName=="MJUnc__1up"){
+	if(fYear==2016) MJDDScaling*=1.387;
+	if(fYear==2017) MJDDScaling*=1.189;
+	if(fYear==2018) MJDDScaling*=1.226;
+      }
+      if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.8;
+      if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.47;
+      if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.43;
+
       if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight*MJDDScaling);
       if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
