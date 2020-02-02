@@ -7,7 +7,7 @@ import math
 import sys
 
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
-parser.add_argument( "-i", "--input", type = str, dest = "input", default = "/tmp/HFsys_all_Jan13.root", help = "input file name" )
+parser.add_argument( "-i", "--input", type = str, dest = "input", default = "/tmp/HFALL_nom_v37.root", help = "input file name" )
 parser.add_argument( "-t", "--unblind", action = "store_true", dest = "unblind", default = False, help = "unblind the tables");
 args, unknown = parser.parse_known_args()
 
@@ -266,7 +266,7 @@ for b in range(0,len(region_cf[0])+1): # bins
     cline=''
 print '\\end{tabular}'
 print '}'
-sys.exit(0)
+#sys.exit(0)
 # Collect systematics
 tobj = f.GetListOfKeys()
 mye=ROOT.Double(0.0)
