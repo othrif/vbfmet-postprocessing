@@ -447,25 +447,38 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
             DataMC[reg]=0
             if options.data: DataMC[reg]=(getBinsYield(histDict["data"], regionBinsDict[reg])/getBinsYield(histDict["bkgs"], regionBinsDict[reg]))
 
+    altArray=[]                
     arrArray=[]
     x1a=ROOT.Double()
     y1a=ROOT.Double()
     for hkey in histDict:
         tmpArr=[]
+        tmpAltArr=[]
         for regkey in regionDict:
             #tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" $\\pm$ "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
             yldvR=0.0
             if type(histDict[hkey])==ROOT.TH1F:
-                yldvR=round(histDict[hkey].GetBinContent(regionDict[regkey]),2)
-                yldeR=round(histDict[hkey].GetBinError(regionDict[regkey]),2)
+                yldvR=int(round(histDict[hkey].GetBinContent(regionDict[regkey]),0))
+                yldeR=int(round(histDict[hkey].GetBinError(regionDict[regkey]),0))
             else:
                 histDict[hkey].GetPoint(regionDict[regkey]-1,x1a,y1a)
-                yldvR=round(y1a,2)
+                yldvR=int(round(y1a,0))
                 ylde=histDict[hkey].GetErrorYhigh(regionDict[regkey]-1)
-                yldeR=round(ylde,2)
-            tmpArr.append(str(yldvR)+" +- "+str(yldeR))
+                yldeR=int(round(ylde,0))
+            tmpArr.append(str(yldvR)+" $\\pm$ "+str(yldeR))
+            if not (hkey=='bkgs' or hkey.count('bkgsAsymErr')):
+                if regkey.count('SR'):
+                    tmpAltArr.append(str(yldvR)+" $\\pm$ "+str(yldeR))
         arrArray.append(tmpArr)
+        if len(tmpAltArr)>0:
+            altArray.append(tmpAltArr)
     arrArray.append([str(round(DataMC2.GetBinContent(dm),2))+" $\\pm$ "+str(round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
+    tmpAltArr=[]
+    for i in regionDict:
+        if i.count('SR'):
+            dm=regionDict[i]
+            tmpAltArr.append(str(round(DataMC2.GetBinContent(dm),2))+" $\\pm$ "+str(round(DataMC2.GetBinError(dm),2)) )
+    altArray.append(tmpAltArr)
     texTable1=texTable(arrayArray=arrArray)
     colmNames=[reg for reg in regionDict]
     rowNames=[hkey.replace("_"," ") for hkey in histDict]+["Data/MC"]
@@ -490,6 +503,20 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
     print texTable2.getTableString()
     print "\n###########\n"
 
+    texTable3=texTable(arrayArray=altArray)
+    colmNames=[]
+    for reg in regionDict:
+        if reg.count('SR'):
+            colmNames+=[reg]
+    rowNames=[]
+    for hkey in histDict:
+        if not (hkey.count('bkgsStat') or hkey.count('bkgsAsymErr')):
+            rowNames+=[hkey.replace("_"," ")]
+    rowNames+=["Data/MC"]
+    texTable3.setNames(rowNames, colmNames)
+    print texTable3.getTableString()
+    print "\n###########\n"
+    
     if makePDF:
         # texTable1.mirror()
         # texTable2.mirror()
