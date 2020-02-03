@@ -113,7 +113,7 @@ class sample(object):
                 self.sampleType = "TTH125"
             elif self.runNumber==312243:
                 self.sampleType = "VBFHgam125"
-            elif ((self.runNumber >= 308275) and self.runNumber <= 308283):
+            elif ((self.runNumber >= 308275) and self.runNumber <= 308283) or (self.runNumber >=313134 and self.runNumber <=313141):
                 self.sampleType = "VBFHOther"
             elif self.runNumber==346588:
                 self.sampleType = "ggFH125"

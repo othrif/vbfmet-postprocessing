@@ -20,6 +20,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hminDRLep(0),
 				  hjj_mass_variableBin(0),
 				  htruth_jj_mass_variableBin(0),
+				  hjj_mass_dphi_variableBin(0),
 				  htmva_variableBin(0),
 				  hmj34(0),
 				  hmax_j_eta(0),
@@ -157,8 +158,10 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
 
   // jj_mass limits
   float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 };
+  float binsdphi [4] = { 0.0, 1.0, 2.0, 3.2 };
   hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  8,  binsjjmass);
   htruth_jj_mass_variableBin = GetTH1("truth_jj_mass_variableBin",  8,  binsjjmass);
+  hjj_mass_dphi_variableBin = GetTH2("jj_mass_dphi_variableBin",  8,  binsjjmass, 3, binsdphi);
 
   // TMVA variable binned
   float binstmva[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
@@ -220,6 +223,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   FillHist(hjj_mass_variableBin,   Mva::jj_mass, event, weight);
   FillHist(htruth_jj_mass_variableBin,   Mva::truth_jj_mass, event, weight);  
   FillHist(htmva_variableBin,      Mva::tmva,    event, weight);
+  if(hjj_mass_dphi_variableBin && event.jets.size()==2) hjj_mass_dphi_variableBin->Fill(event.GetVar(Mva::jj_mass), event.GetVar(Mva::jj_dphi), weight);
   if(hMetvsMu && event.HasVar(Mva::averageIntPerXing)) hMetvsMu->Fill(event.GetVar(Mva::met_tst_nolep_et), event.GetVar(Mva::averageIntPerXing), weight);
   if(event.truth_mu.size()>0){
     if(hTruthMuPt)  hTruthMuPt ->Fill(event.truth_mu.at(0).pt, weight);

@@ -16,6 +16,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("ExtraVars", m_extraVars = 7, "0=20.7 analysis, 1=lepton veto, object def, 2=loose cuts, 3=no met soft cut, 4=no xe SF for muons, 5=lepTrigOnly for muCR, 6=met trig only for muCR, 7=metORLep for muCR (default)" );
   declareProperty("Binning", m_binning = 11, "0=rel20p7 binning. Other options with >0, 11 is default" );
   declareProperty("METDef", m_metdef = 0, "0=loose. 1=tenacious" );
+  declareProperty("singleHist", singleHist = false, "singleHist flag, true for running one histogram with bins for the SRs and CRs");
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   declareProperty("doTMVA", doTMVA = false, "doTMVA flag, true means use the MVA");
@@ -115,56 +116,65 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==9)  bins=9; // mjj binning + mjj>800 + No njet bin
   else if(m_binning==10) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==11) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
+  totalBins = bins-1;
 
   // merging the sherpa kt samples
   std::string currentSamplePlot = currentSample;
   if(mergeKTPTV && currentSample=="Z_strongExt") currentSamplePlot = "Z_strong";
   if(mergeKTPTV && currentSample=="W_strongExt") currentSamplePlot = "W_strong";
 
-  for (int c=1;c<bins;c++) {
-    hSR.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("SR"+to_string(c)),to_string(c), syst, isMC), string("SR"+to_string(c))));
-    hCRWep.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosCR"+to_string(c))));
-    hCRWen.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegCR"+to_string(c))));
-    hCRWepLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosLowSigCR"+to_string(c))));
-    hCRWenLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegLowSigCR"+to_string(c))));
-    hCRWmp.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuPosCR"+to_string(c))));
-    hCRWmn.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuNegCR"+to_string(c))));
-    hCRZee.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC), string("twoEleCR"+to_string(c))));
-    hCRZmm.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC), string("twoMuCR"+to_string(c))));
+  if(!singleHist){
+    for (int c=1;c<bins;c++) {
+      hSR.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("SR"+to_string(c)),to_string(c), syst, isMC), string("SR"+to_string(c))));
+      hCRWep.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosCR"+to_string(c))));
+      hCRWen.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegCR"+to_string(c))));
+      hCRWepLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosLowSigCR"+to_string(c))));
+      hCRWenLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegLowSigCR"+to_string(c))));
+      hCRWmp.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuPosCR"+to_string(c))));
+      hCRWmn.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuNegCR"+to_string(c))));
+      hCRZee.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC), string("twoEleCR"+to_string(c))));
+      hCRZmm.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC), string("twoMuCR"+to_string(c))));
+      vector <std::pair<vector <TH1F*>, std::string>> hnames;
+      hnames.push_back(std::make_pair(hSR.back(),HistoNameMaker(currentSamplePlot,string("SR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWep.back(), HistoNameMaker(currentSamplePlot,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWen.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWepLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWenLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWmp.back(), HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWmn.back(), HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRZee.back(), HistoNameMaker(currentSamplePlot,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRZmm.back(), HistoNameMaker(currentSamplePlot,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC)));
+      CheckHists(hnames);
+    }
+    // Adding the ACR for double ratio for 500-800/1000GeV
+    if(doDoubleRatio){
+      std::string binNameDR="DoubleRatio";
+      hSR.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("AVBFCR1"),binNameDR, syst, isMC), string("AVBFCR")));
+      hCRWep.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosACR1"),binNameDR, syst, isMC), string("oneElePosACR")));
+      hCRWen.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegACR1"),binNameDR, syst, isMC), string("oneEleNegACR")));
+      hCRWepLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosLowSigACR1"),binNameDR, syst, isMC), string("oneElePosLowSigACR")));
+      hCRWenLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigACR1"),binNameDR, syst, isMC), string("oneEleNegLowSigACR")));
+      hCRWmp.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuPosACR1"),binNameDR, syst, isMC), string("oneMuPosACR")));
+      hCRWmn.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuNegACR1"),binNameDR, syst, isMC), string("oneMuNegACR")));
+      hCRZee.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoEleACR1"),binNameDR, syst, isMC), string("twoEleACR")));
+      hCRZmm.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoMuACR1"),binNameDR, syst, isMC), string("twoMuACR")));
+      vector <std::pair<vector <TH1F*>, std::string>> hnames;
+      hnames.push_back(std::make_pair(hSR.back(),HistoNameMaker(currentSamplePlot,string("AVBFCR1"),binNameDR, syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWep.back(), HistoNameMaker(currentSamplePlot,string("oneElePosACR1"),binNameDR, syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWen.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegACR1"),binNameDR, syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWepLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneElePosLowSigACR1"),binNameDR, syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWenLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigACR1"),binNameDR, syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWmp.back(), HistoNameMaker(currentSamplePlot,string("oneMuPosACR1"),binNameDR, syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWmn.back(), HistoNameMaker(currentSamplePlot,string("oneMuNegACR1"),binNameDR, syst, isMC)));
+      hnames.push_back(std::make_pair(hCRZee.back(), HistoNameMaker(currentSamplePlot,string("twoEleACR1"),binNameDR, syst, isMC)));
+      hnames.push_back(std::make_pair(hCRZmm.back(), HistoNameMaker(currentSamplePlot,string("twoMuACR1"),binNameDR, syst, isMC)));
+      CheckHists(hnames);
+    }
+  }else{//one histogram in SR
+    int c=1;
+    hSR.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("SR"+to_string(c)),to_string(c), syst, isMC), string("SR"+to_string(c)), totalBins));
     vector <std::pair<vector <TH1F*>, std::string>> hnames;
     hnames.push_back(std::make_pair(hSR.back(),HistoNameMaker(currentSamplePlot,string("SR"+to_string(c)),to_string(c), syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWep.back(), HistoNameMaker(currentSamplePlot,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWen.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWepLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWenLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWmp.back(), HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWmn.back(), HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC)));
-    hnames.push_back(std::make_pair(hCRZee.back(), HistoNameMaker(currentSamplePlot,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC)));
-    hnames.push_back(std::make_pair(hCRZmm.back(), HistoNameMaker(currentSamplePlot,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC)));
-    CheckHists(hnames);
-  }
-  // Adding the ACR for double ratio for 500-800/1000GeV
-  if(doDoubleRatio){
-    std::string binNameDR="DoubleRatio";
-    hSR.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("AVBFCR1"),binNameDR, syst, isMC), string("AVBFCR")));
-    hCRWep.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosACR1"),binNameDR, syst, isMC), string("oneElePosACR")));
-    hCRWen.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegACR1"),binNameDR, syst, isMC), string("oneEleNegACR")));
-    hCRWepLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosLowSigACR1"),binNameDR, syst, isMC), string("oneElePosLowSigACR")));
-    hCRWenLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigACR1"),binNameDR, syst, isMC), string("oneEleNegLowSigACR")));
-    hCRWmp.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuPosACR1"),binNameDR, syst, isMC), string("oneMuPosACR")));
-    hCRWmn.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuNegACR1"),binNameDR, syst, isMC), string("oneMuNegACR")));
-    hCRZee.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoEleACR1"),binNameDR, syst, isMC), string("twoEleACR")));
-    hCRZmm.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoMuACR1"),binNameDR, syst, isMC), string("twoMuACR")));
-    vector <std::pair<vector <TH1F*>, std::string>> hnames;
-    hnames.push_back(std::make_pair(hSR.back(),HistoNameMaker(currentSamplePlot,string("AVBFCR1"),binNameDR, syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWep.back(), HistoNameMaker(currentSamplePlot,string("oneElePosACR1"),binNameDR, syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWen.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegACR1"),binNameDR, syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWepLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneElePosLowSigACR1"),binNameDR, syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWenLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigACR1"),binNameDR, syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWmp.back(), HistoNameMaker(currentSamplePlot,string("oneMuPosACR1"),binNameDR, syst, isMC)));
-    hnames.push_back(std::make_pair(hCRWmn.back(), HistoNameMaker(currentSamplePlot,string("oneMuNegACR1"),binNameDR, syst, isMC)));
-    hnames.push_back(std::make_pair(hCRZee.back(), HistoNameMaker(currentSamplePlot,string("twoEleACR1"),binNameDR, syst, isMC)));
-    hnames.push_back(std::make_pair(hCRZmm.back(), HistoNameMaker(currentSamplePlot,string("twoMuACR1"),binNameDR, syst, isMC)));
     CheckHists(hnames);
   }
 
@@ -187,14 +197,20 @@ std::string HFInputAlg::HistoNameMaker(std::string currentSample, std::string cu
   }
 }
 
-vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR) {
+vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR, int bins) {
   vector <TH1F*> h;
-  h.push_back(new TH1F((name+"_cuts").c_str(), (name+"_cuts;;").c_str(), 1, 0.5, 1.5));
-  if (doPlot) {
-    h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
-    h.push_back(new TH1F((name+"_met_et").c_str(), (name+"_met_et;;").c_str(), 10, 0, 800));
-    h.push_back(new TH1F((name+"_lepmet_et").c_str(), (name+"_lepmet_et;;").c_str(), 10, 0, 800));
-    if(doTMVA) h.push_back(new TH1F((name+"_tmva").c_str(), (name+"_tmva;;").c_str(), 2000, 0, 1.0));
+  if(!singleHist){
+    h.push_back(new TH1F((name+"_cuts").c_str(), (name+"_cuts;;").c_str(), 1, 0.5, 1.5));
+    if (doPlot) {
+      h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
+      h.push_back(new TH1F((name+"_met_et").c_str(), (name+"_met_et;;").c_str(), 10, 0, 800));
+      h.push_back(new TH1F((name+"_lepmet_et").c_str(), (name+"_lepmet_et;;").c_str(), 10, 0, 800));
+      if(doTMVA) h.push_back(new TH1F((name+"_tmva").c_str(), (name+"_tmva;;").c_str(), 2000, 0, 1.0));
+    }
+  }else{
+    float maxBin = bins*9.0+0.5;
+    int totBins = bins*9;
+    h.push_back(new TH1F((name+"_cuts").c_str(), (name+"_cuts;;").c_str(), totBins, 0.5, maxBin));
   }
   return h;
 }
@@ -378,8 +394,8 @@ StatusCode HFInputAlg::execute() {
     if(metSoftVeto || fJVTVeto || JetTimingVeto || leptonVeto) return StatusCode::SUCCESS;
   
     if(m_extraVars>1){
-      METCut=150.0e3;
-      METCSTJetCut=130.0e3;
+      METCut=160.0e3; // try 160
+      METCSTJetCut=140.0e3; // try 140
       jj_detaCut=3.8;
       jetCut = (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05);
     }
@@ -475,10 +491,10 @@ StatusCode HFInputAlg::execute() {
 
   if(!v26Ntuples){
     SR_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 0));
-    //We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el_w == 1));
-    //Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu_w == 1));
-    We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el == 1));
-    Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu == 1));
+    We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el_w == 1));
+    Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu_w == 1));
+    //We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el == 1));
+    //Wm_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 1) && (n_mu == 1));
     Zee_lepVeto = ((n_baseel == 2) && (n_basemu_noOR == 0) && (n_el == 2));
     Zmm_lepVeto = ((n_baseel == 0) && (n_basemu_noOR == 2) && (n_mu == 2));
   }else if(m_extraVars>0){
@@ -638,16 +654,37 @@ StatusCode HFInputAlg::execute() {
   if(isnan(w_final)) std::cout << "isnan w_final? " << w_final << std::endl;
   if(isnan(xeSFTrigWeight)) std::cout << "isnan xeSFTrigWeight? " << xeSFTrigWeight << std::endl;
 
-  if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
-  if (CRWep) HistoFill(hCRWep[bin],w_final);
-  if (CRWen) HistoFill(hCRWen[bin],w_final);
-  if (CRWepLowSig) HistoFill(hCRWepLowSig[bin],w_final);
-  if (CRWenLowSig) HistoFill(hCRWenLowSig[bin],w_final);
-  if (CRWmp) HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu);
-  if (CRWmn) HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu);
-  if (CRZee) HistoFill(hCRZee[bin],w_final);
-  if (CRZmm) HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu);
+  if(!singleHist){
+    if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
+    if (CRWep) HistoFill(hCRWep[bin],w_final);
+    if (CRWen) HistoFill(hCRWen[bin],w_final);
+    if (CRWepLowSig) HistoFill(hCRWepLowSig[bin],w_final);
+    if (CRWenLowSig) HistoFill(hCRWenLowSig[bin],w_final);
+    if (CRWmp) HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu);
+    if (CRWmn) HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu);
+    if (CRZee) HistoFill(hCRZee[bin],w_final);
+    if (CRZmm) HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu);
+  }else{// one histogram, so need to find the real bin number
+    float myWeight=w_final;
+    if (CRWmp && CRWmn && CRZmm) myWeight=w_final*xeSFTrigWeight_nomu;
+    if (SR) myWeight=w_final*xeSFTrigWeight;
+    
+    int nRegion = -1;
+    if(SR) nRegion=8;
+    if(CRZmm) nRegion=7;
+    if(CRZee) nRegion=6;
+    if(CRWmp) nRegion=5;
+    if(CRWmn) nRegion=4;
+    if(CRWep) nRegion=3;
+    if(CRWen) nRegion=2;
+    if(CRWepLowSig) nRegion=1;
+    if(CRWenLowSig) nRegion=0;
+    if(nRegion>-0.5){
+      float binVal = totalBins*float(nRegion)+bin+1.0; // should start from 1
+      hSR[0][0]->Fill(binVal,myWeight);
+    }
 
+  }
   //  add events to the signal overlap tree
   if(m_doSigOverlapTree && (SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm)){
     m_sigOverlapEvent = eventNumber;
