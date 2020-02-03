@@ -50,7 +50,7 @@ for ite in l:
 
     ikey=i
     if i.count('346600'):
-        ikey = 'user.schae.v35LSyst.346600.invSig.e7613_s3126_r9364_p3895_MiniNtuple.root'
+        ikey = 'user.schae.v37Syst.346600.invSig.e7613_s3126_r9364_p3895_MiniNtuple.root'
     myMap[ikey]=files
     n+=1
     #if n>5:

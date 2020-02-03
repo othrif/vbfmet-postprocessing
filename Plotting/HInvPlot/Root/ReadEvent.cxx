@@ -707,7 +707,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         else event->SetWeight(fWeight*fLumi);
       }
       else  event->SetWeight(1.0);
-      float MJDDScaling=0.8815;
+      float MJDDScaling=0.8815; //0.82109;
       if(fYear==2017) MJDDScaling=2.6895;
       else if(fYear==2018) MJDDScaling=2.10302;
 
