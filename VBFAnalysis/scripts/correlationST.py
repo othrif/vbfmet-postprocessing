@@ -209,11 +209,11 @@ def GetBins(fY, l, listV):
 
     
 parser = argparse.ArgumentParser( description = "Changing to MG relative uncertainties", add_help=True , fromfile_prefix_chars='@')
-parser.add_argument("--input",  dest='input', default='listTheorySyst11Bins', help="Input file with systematics")
-parser.add_argument("--output", dest='output', default='listTheorySyst11BinsUncorr', help="Output file with ST approach")
+parser.add_argument("--input",  dest='input', default='listTheorySystUpdatedv4', help="Input file with systematics")
+parser.add_argument("--output", dest='output', default='listTheorySyst11STv4', help="Output file with ST approach")
 parser.add_argument("--inputYields", dest='inputYields', default='/tmp/HF_jan7_mc16all_nom.root', help="Input file with yields")
 parser.add_argument("--corrDPhi", dest='corrDPhi',action = "store_true",  default=True, help="Correlate dphijj bins")
-parser.add_argument("--scaleUncor", dest='scaleUncor',action = "store_true",  default=True, help="Scale the uncertainties as if uncorrelated to match the correlated syst")
+parser.add_argument("--scaleUncor", dest='scaleUncor',action = "store_true",  default=False, help="Scale the uncertainties as if uncorrelated to match the correlated syst")
 args, unknown = parser.parse_known_args()
 
 fin = open(args.input,'r')

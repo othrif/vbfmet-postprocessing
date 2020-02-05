@@ -45,7 +45,7 @@ samplesPrint =['Samples','VBFH125',
           'Z EWK',
           'W QCD',
           'W EWK',
-          'ttbar',
+          'Top/VV/VVV/VBFWW',
           #'QCD',
           'eleFakes',
           'multijet',
@@ -266,7 +266,7 @@ for b in range(0,len(region_cf[0])+1): # bins
     cline=''
 print '\\end{tabular}'
 print '}'
-#sys.exit(0)
+sys.exit(0)
 # Collect systematics
 tobj = f.GetListOfKeys()
 mye=ROOT.Double(0.0)

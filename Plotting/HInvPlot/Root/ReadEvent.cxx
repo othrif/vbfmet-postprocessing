@@ -696,6 +696,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     event->RandomRunNumber = fRandomRunNumber;
     event->EventNumber = fEventNumber;
     event->isMC = fisMC;
+    
     // identify the sample
     if(!fisMC){
       event->sample = Mva::kData;
@@ -723,6 +724,16 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.43;
 
       if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight*MJDDScaling);
+
+      // define the vv uncertainty
+      if(fRunNumber==364250 || (fRunNumber>=364253 && fRunNumber<=364255) || (fRunNumber==363355) || fRunNumber==363489 || fRunNumber==363494
+	 || (fRunNumber>=363355 && fRunNumber<=363360) || (fRunNumber>=364242 && fRunNumber<=364249) || (fRunNumber>=346190 && fRunNumber<=346194) || fRunNumber==345948){
+	   float vvWeightSys=0.56;
+	   if(fWeightSystName=="vvUnc__1up") vvWeightSys*=(1.44);
+	   if(fWeightSystName=="vvUnc__1down") vvWeightSys/=1.44;
+	   event->AddWeight(vvWeightSys);
+	 }
+      
       if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){
 	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
 	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;

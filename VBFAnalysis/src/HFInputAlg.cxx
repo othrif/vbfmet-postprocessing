@@ -259,7 +259,6 @@ StatusCode HFInputAlg::execute() {
   bool CRZmm = false;
 
   m_tree->GetEntry(m_tree->GetReadEntry());
-
   // check if we need to output the physics tree for signal overlap
   if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634 || runNumber==346693 || runNumber==346694 || runNumber==345596)){
     m_doSigOverlapTree=true;
@@ -410,6 +409,7 @@ StatusCode HFInputAlg::execute() {
     if(currentVariation=="xeSFTrigWeight__1up")   { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 1); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_nolep_et, metRunNumber, 1); }
     if(currentVariation=="xeSFTrigWeight__1down") { xeSFTrigWeight = weightXETrigSF(met_tst_et, metRunNumber, 2); xeSFTrigWeight_nomu = weightXETrigSF(met_tst_nolep_et, metRunNumber, 2); }
   }
+
   // Choose the met trigger
   bool passMETTrig = ((trigger_met &0x1) == 0x1);
   if(year==2017){
@@ -488,7 +488,7 @@ StatusCode HFInputAlg::execute() {
   bool Wm_lepVeto = ((n_el == 0) && (n_mu == 1));
   bool Zee_lepVeto = ((n_el == 2) && (n_mu == 0));
   bool Zmm_lepVeto = ((n_el == 0) && (n_mu == 2));
-
+  bool Zll_METVETO = (met_tst_et<70.0e3);
   if(!v26Ntuples){
     SR_lepVeto  = ((n_baseel == 0) && (n_basemu_noOR == 0));
     We_lepVeto  = ((n_baseel == 1) && (n_basemu_noOR == 0) && (n_el_w == 1));
@@ -550,8 +550,8 @@ StatusCode HFInputAlg::execute() {
   if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance <= 4.0)) CRWenLowSig = true;}
   if ((trigger_lep_Wmu_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
   if ((trigger_lep_Wmu_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
-  if ((trigger_lep_Zee_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
-  if ((trigger_lep_Zmm_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
+  if ((trigger_lep_Zee_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
+  if ((trigger_lep_Zmm_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
 
   // do duplicate check
   if(doDuplicateCheck){
@@ -571,6 +571,15 @@ StatusCode HFInputAlg::execute() {
   //    if(n_jet==2) w_final*=1.07;
   //  }
   //}
+  //%364250,364253,364254,364255,363355-363360,363489,363494,364242-364249, 1.78SYST on 0.56
+  //check if this is VV/VVV. apply the NF 0.56
+  if(isMC && (runNumber==364250 || (runNumber>=364253 && runNumber<=364255) || (runNumber==363355) || runNumber==363489 || runNumber==363494 
+	      || (runNumber>=363355 && runNumber<=363360) || (runNumber>=364242 && runNumber<=364249) || (runNumber>=346190 && runNumber<=346194) || runNumber==345948)){
+    w_final*=0.56;
+    if(currentVariation=="vvUnc__1up") w_final*=(1.44);
+    if(currentVariation=="vvUnc__1down") w_final/=1.44;
+  }
+
   int bin = 0;
   if(doTMVA){
     //float tmvaBinBoundaries[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
@@ -737,7 +746,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree = static_cast<TTree*>(currentFile()->Get(m_treeName));
   std::cout << "Tree Entries: " <<m_tree->GetEntries() <<std::endl;
   m_tree->SetBranchStatus("*",0);
-  if(weightSyst && currentVariation!="xeSFTrigWeight__1up"  && currentVariation!="xeSFTrigWeight__1down"){// MET trigger SF systematic is computed differently. The variable is saved. So here we just pickup the nominal weights
+  if(weightSyst && currentVariation!="xeSFTrigWeight__1up"  && currentVariation!="xeSFTrigWeight__1down" && currentVariation!="vvUnc__1up" && currentVariation!="vvUnc__1down"){// MET trigger SF systematic is computed differently. The variable is saved. So here we just pickup the nominal weights
     bool found=false;
     TObjArray *var_list = m_tree->GetListOfBranches();
     for(unsigned a=0; a<unsigned(var_list->GetEntries()); ++a) { 
