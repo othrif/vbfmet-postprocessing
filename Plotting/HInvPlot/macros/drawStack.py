@@ -258,7 +258,7 @@ def getHistPars(hist):
         'dphill' : {'xtitle':'#Delta #phi_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
         'jj_dphi' : {'xtitle':'#Delta #phi_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
         'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':5,  'ymin':0.1, 'logy':False, 'LtoRCut':1},
-        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':1,  'ymin':1.0, 'logy':True, 'LtoRCut':0},
+        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':4,  'ymin':1.0, 'logy':True, 'LtoRCut':0},
         'met_tst_phi'    : {'xtitle':'E_{T}^{miss} #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_phi'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
