@@ -727,10 +727,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
       // define the vv uncertainty
       if(fRunNumber==364250 || (fRunNumber>=364253 && fRunNumber<=364255) || (fRunNumber==363355) || fRunNumber==363489 || fRunNumber==363494
-	  || (fRunNumber>=363355 && fRunNumber<=363360) || (fRunNumber>=364242 && fRunNumber<=364249)){
+	 || (fRunNumber>=363355 && fRunNumber<=363360) || (fRunNumber>=364242 && fRunNumber<=364249) || (fRunNumber>=346190 && fRunNumber<=346194) || fRunNumber==345948){
 	   float vvWeightSys=0.56;
-	   if(fWeightSystName=="vvUnc__1up") vvWeightSys*=(1.78);
-	   if(fWeightSystName=="vvUnc__1down") vvWeightSys/=1.78;
+	   if(fWeightSystName=="vvUnc__1up") vvWeightSys*=(1.44);
+	   if(fWeightSystName=="vvUnc__1down") vvWeightSys/=1.44;
 	   event->AddWeight(vvWeightSys);
 	 }
       

@@ -574,10 +574,10 @@ StatusCode HFInputAlg::execute() {
   //%364250,364253,364254,364255,363355-363360,363489,363494,364242-364249, 1.78SYST on 0.56
   //check if this is VV/VVV. apply the NF 0.56
   if(isMC && (runNumber==364250 || (runNumber>=364253 && runNumber<=364255) || (runNumber==363355) || runNumber==363489 || runNumber==363494 
-	      || (runNumber>=363355 && runNumber<=363360) || (runNumber>=364242 && runNumber<=364249))){
+	      || (runNumber>=363355 && runNumber<=363360) || (runNumber>=364242 && runNumber<=364249) || (runNumber>=346190 && runNumber<=346194) || runNumber==345948)){
     w_final*=0.56;
-    if(currentVariation=="vvUnc__1up") w_final*=(1.78);
-    if(currentVariation=="vvUnc__1down") w_final/=1.78;
+    if(currentVariation=="vvUnc__1up") w_final*=(1.44);
+    if(currentVariation=="vvUnc__1down") w_final/=1.44;
   }
 
   int bin = 0;
