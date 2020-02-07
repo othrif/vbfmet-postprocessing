@@ -76,6 +76,7 @@ def Smooth(rfile,options,can,systName,histName,regions):
 
     # takes the integral in the region. Then scales by the integral over all regions
     if options.smooth==1:
+        print 'smoothing option 1'
         updateHist=[]
         #rNewfile=ROOT.TFile(options.input,'UPDATE')
         rNewfile=ROOT.TFile('/tmp/HFALL_feb5_sysUPDATE.root','UPDATE')
@@ -87,19 +88,29 @@ def Smooth(rfile,options,can,systName,histName,regions):
             for ibin in range(1,options.binNum+1):
                 if upInt!=0.0 and nomInt!=0.0:
                     sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
+                    if not sysBinH:
+                        continue
                     #sysBinH.Scale(upInt/nomInt)
-                    currentV=sysBinH.GetBinContent(ibin)
-                    sysBinH.SetBinContent(ibin,upInt/nomInt*currentV)
+                    currentV=sysBinH.GetBinContent(1)
+                    #print 'before: ',sysBinH.GetBinContent(1)
+                    sysBinH.SetBinContent(1,upInt/nomInt*currentV)
+                    #print 'after: ',nomInt,upInt,currentV,sysBinH.GetBinContent(1)
                     updateHist+=[sysBinH]
                     #rNewfile.Write("",ROOT.TObject.kOverwrite);
                 if dwInt!=0.0 and nomInt!=0.0:
                     sysBinH=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
+                    if not sysBinH:
+                        continue
                     #sysBinH.Scale(upInt/nomInt)
-                    currentV=sysBinH.GetBinContent(ibin)
-                    sysBinH.SetBinContent(ibin,dwInt/nomInt*currentV)
+                    currentV=sysBinH.GetBinContent(1)
+                    sysBinH.SetBinContent(1,dwInt/nomInt*currentV)
                     updateHist+=[sysBinH]
                     #rNewfile.Write("",ROOT.TObject.kOverwrite);
-        rNewfile.Write("",ROOT.TObject.kOverwrite);
+        for ha in updateHist:
+            #print ha.GetName()
+            rNewfile.cd()
+            ha.Write(ha.GetName(),ROOT.TObject.kOverwrite)
+        #rNewfile.Write("",ROOT.TObject.kOverwrite);
         rNewfile.Close()
         
 def DrawRatio(rfile,options,can,systName,histName,regions):
