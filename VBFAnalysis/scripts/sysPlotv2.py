@@ -82,30 +82,28 @@ def Smooth(rfile,options,can,systName,histName,regions):
         rNewfile=ROOT.TFile('/tmp/HFALL_feb5_sysUPDATE.root','UPDATE')
         for r in regions:
             #print r
-            nomInt = nomMap[r].Integral(0,100)
-            upInt  = sysUpMap[r].Integral(0,100)
-            dwInt  = sysDwMap[r].Integral(0,100)
+            nomInt = nomMap[r].Integral(1,options.binNum)
+            upInt  = sysUpMap[r].Integral(1,options.binNum)
+            dwInt  = sysDwMap[r].Integral(1,options.binNum)
             for ibin in range(1,options.binNum+1):
+                #currentNomV=nomMap[r].GetBinContent(binOrder[ibin-1])
+                currentNomV=nomMap[r].GetBinContent(binOrder[ibin-1])
                 if upInt!=0.0 and nomInt!=0.0:
                     sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
                     if not sysBinH:
                         continue
                     #sysBinH.Scale(upInt/nomInt)
-                    currentV=sysBinH.GetBinContent(1)
-                    #print 'before: ',sysBinH.GetBinContent(1)
-                    sysBinH.SetBinContent(1,upInt/nomInt*currentV)
-                    #print 'after: ',nomInt,upInt,currentV,sysBinH.GetBinContent(1)
+                    sysbef=sysBinH.GetBinContent(1)
+                    sysBinH.SetBinContent(1,upInt/nomInt*currentNomV)
+                    #print 'after: ',nomInt,upInt,currentNomV,sysBinH.GetBinContent(1),sysbef
                     updateHist+=[sysBinH]
-                    #rNewfile.Write("",ROOT.TObject.kOverwrite);
                 if dwInt!=0.0 and nomInt!=0.0:
                     sysBinH=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
                     if not sysBinH:
                         continue
                     #sysBinH.Scale(upInt/nomInt)
-                    currentV=sysBinH.GetBinContent(1)
-                    sysBinH.SetBinContent(1,dwInt/nomInt*currentV)
+                    sysBinH.SetBinContent(1,dwInt/nomInt*currentNomV)
                     updateHist+=[sysBinH]
-                    #rNewfile.Write("",ROOT.TObject.kOverwrite);
         for ha in updateHist:
             #print ha.GetName()
             rNewfile.cd()
@@ -299,6 +297,25 @@ if __name__=='__main__':
     #    openOpt='UPDATE'
     rfile=ROOT.TFile(options.input,openOpt)
     systName='EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR'
+    systToSmooth=[#'EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR',
+                      #'JET_fJvtEfficiency','JET_JvtEfficiency','JET_JvtEfficiency',
+                      #'JET_Pileup_OffsetMu',
+                      #'JET_Pileup_OffsetNPV',
+                      #'JET_Pileup_PtTerm',
+                      #'JET_Pileup_RhoTopology',
+                      #'JET_EffectiveNP_Modelling2',
+                      #'JET_EffectiveNP_Modelling1',
+                      #'JET_EffectiveNP_Modelling3',
+                      'JET_Flavor_Composition',
+                      #'JET_JER_DataVsMC_MC16',
+                      #'JET_JER_EffectiveNP_1',
+                      #'JET_JER_EffectiveNP_2',
+                      #'JET_JER_EffectiveNP_3',
+                      #'JET_JER_EffectiveNP_4',
+                      'MET_SoftTrk_Scale',
+                      'JET_Flavor_Response',
+                      'JET_EtaIntercalibration_TotalStat',
+                      ]
     allSyst=[]
     if options.syst=='All':
         allSystUpAndDown=vbf_syst.systematics('All').getsystematicsList()
@@ -306,6 +323,8 @@ if __name__=='__main__':
             sSystName=s.rstrip('__1up').rstrip('__1down')
             if sSystName not in allSyst:
                 allSyst+=[sSystName]
+    elif options.syst=='weird':
+        allSyst=systToSmooth
     else:
         allSyst=[options.syst]
     print 'Number of syst:',len(allSyst)
