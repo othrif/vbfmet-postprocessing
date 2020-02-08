@@ -28,6 +28,9 @@
 #pragma link C++ class Msl::ReadEvent-;
 #pragma link C++ class Msl::IExecAlg-;
 
+#pragma link C++ class TRExTools-;
+#pragma link C++ class SmoothHist-;
+
 #pragma link C++ class Msl::PassEvent+;
 #pragma link C++ class Msl::PlotEvent+;
 
