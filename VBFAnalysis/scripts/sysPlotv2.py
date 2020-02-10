@@ -1,8 +1,6 @@
 import ROOT
 import sys,os
 import math
-import VBFAnalysis.ATLAS as ATLAS
-import VBFAnalysis.Style as Style
 from optparse import OptionParser
 import HInvPlot.systematics as vbf_syst
 import HInvPlot.JobOptions as config
@@ -185,8 +183,8 @@ def Smooth(rfile,options,can,systName,histName,regions):
 
     # takes the integral in the region. Then scales by the integral over all regions
     updateHist=[]
-    #rNewfile=ROOT.TFile(options.input,'UPDATE')
-    rNewfile=ROOT.TFile('/tmp/HFALL_feb5_sysUPDATE.root','UPDATE')
+    rNewfile=ROOT.TFile(options.inputUpdate,'UPDATE')
+    #rNewfile=ROOT.TFile('/tmp/HFALL_feb5_sysUPDATE.root','UPDATE')
     if options.smooth==1 or (options.smooth==5 and smoothSyle==1):
         print 'smoothing option 1'
         for r in regions:
@@ -435,6 +433,7 @@ if __name__=='__main__':
     p = OptionParser()
 
     p.add_option('-i', '--input', type='string', help='input file. Created from plotEvent.py')
+    p.add_option('--inputUpdate', type='string', help='input file. Created from plotEvent.py')
     p.add_option('-c', '--compare', type='string', help='Compare any number of input files. Does not support --syst atm. example: --compare rfile1.root,rfile2.root')
 
     p.add_option('--lumi', type='float', default=139, help='Defines the integrated luminosity shown in the label')
@@ -472,6 +471,10 @@ if __name__=='__main__':
     ]
     if options.batch:
         ROOT.gROOT.SetBatch(True)
+    else:
+        import VBFAnalysis.ATLAS as ATLAS
+        import VBFAnalysis.Style as Style
+
     # Load libraries
     config.loadLibs(ROOT)
     can=DeclareCanvas(options)
@@ -501,6 +504,9 @@ if __name__=='__main__':
                       'JET_JER_EffectiveNP_2',
                       'JET_JER_EffectiveNP_3',
                       'JET_JER_EffectiveNP_4',
+                      'JET_JER_EffectiveNP_5',
+                      'JET_JER_EffectiveNP_6',
+                      'JET_JER_EffectiveNP_7restTerm',
                       'MET_SoftTrk_Scale',
                       'JET_Flavor_Response',
                       'JET_EtaIntercalibration_TotalStat',
@@ -522,6 +528,8 @@ if __name__=='__main__':
         for histName in histNames:
             if options.smooth:
                 Smooth(rfile,options,can,systNameA,histName,regions+['VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts','VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts'])
-            DrawRatio(rfile,options,can,systNameA,histName,regions)
+            if not options.batch:
+                DrawRatio(rfile,options,can,systNameA,histName,regions)
+            sys.stdout.flush()
     del can
     print 'done'
