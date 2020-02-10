@@ -144,6 +144,8 @@ def Smooth(rfile,options,can,systName,histName,regions):
         smoothSyle=3
     elif systName.count('MET_'):
         smoothSyle=3
+    elif systName.count('PRW_'):
+        smoothSyle=3        
     nomMap={}
     sysUpMap={}
     sysDwMap={}
@@ -267,19 +269,20 @@ def Smooth(rfile,options,can,systName,histName,regions):
                 rhSmoothed = hSmoothed.Clone()                
                 DrawRatio(options,can,nomMap[r], varHist=[sysBefore,rhSmoothed])
             for ibin in range(1,options.binNum+1):
+                nomBinH=rNewfile.Get(HistName(histName, r, 'Nom', ibin))
+                nomV=nomBinH.GetBinContent(1)
                 sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
                 if not sysBinH:
                     continue
-                upV=sysBinH.GetBinContent(1)
-                if upV!=0.0:
-                    sysBinH.SetBinContent(1,upV*CombineSysUpMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
+                if nomV!=0.0:
+                    sysBinH.SetBinContent(1,nomV*CombineSysUpMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
                 updateHist+=[sysBinH]
                 sysBinH=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
                 if not sysBinH:
                     continue
-                dwV=sysBinH.GetBinContent(1)
-                if dwV!=0.0:
-                    sysBinH.SetBinContent(1,dwV*CombineSysDwMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
+                if nomV!=0.0:
+                    #print nomV,(nomV*CombineSysDwMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
+                    sysBinH.SetBinContent(1,nomV*CombineSysDwMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
                 updateHist+=[sysBinH] 
                     
     # write the updated histograms
@@ -438,7 +441,7 @@ if __name__=='__main__':
     p.add_option('--batch', action='store_true', default=False, help='Turn on batch mode')    
     p.add_option('--binNum', type='int', default=11, help='number of bins')    
     p.add_option('--nBin', type='int', default=1, help='Defines which bin is plotted')
-    p.add_option('--smooth', type='int', default=0, help='Smooth options: 1 average bins')    
+    p.add_option('--smooth', type='int', default=0, help='Smooth options: 1 average bins, 2 run parabolic smoothing, 3 avg Wln and Zll, 5 determine style of smoothing')    
     p.add_option('-s', '--syst', type='string', default="All", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
     p.add_option('--pullsFile', type='string', default=None, help='pulls file, print yields')
     p.add_option('-d', '--data', action='store_true', help='Draw data')
@@ -501,7 +504,7 @@ if __name__=='__main__':
                       'MET_SoftTrk_Scale',
                       'JET_Flavor_Response',
                       'JET_EtaIntercalibration_TotalStat',
-                      #'PRW_DATASF', # amanda suggested
+                      'PRW_DATASF', # amanda suggested
                       ]
     allSyst=[]
     if options.syst=='All':
