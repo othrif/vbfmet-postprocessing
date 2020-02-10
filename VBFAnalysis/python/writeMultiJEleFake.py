@@ -254,7 +254,7 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
         #fakeelesm = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1] # met>150 numbers
         fakeelesp = [8.4, 11.0, 6.6, 3.9, 1.9, 8.4, 11.0, 6.6, 3.9, 1.9, 7.0]
         fakeelesm = [8.4, 11.0, 6.6, 3.9, 1.9, 8.4, 11.0, 6.6, 3.9, 1.9, 7.0]
-
+    fakeInit = [1.0238,7.4043,3.1402,3.5567,9.5765,8.6259,7.2854,2.5912,4.6147,1.8996,8.44]
     if doDoubleRatio:
         fakeelesp+=[12.5]
         fakeelesm+=[12.5]
@@ -270,22 +270,66 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
             else:
                 histpLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histmLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-            histpLowSig.SetBinContent(1,fakeelep)
-            histmLowSig.SetBinContent(1,fakeelem)
+            histpLowSig.SetBinContent(1,fakeInit[a-1]/3.0*fakeelep)
+            histmLowSig.SetBinContent(1,fakeInit[a-1]/3.0*fakeelem)
             histpLowSig.Write()
             histmLowSig.Write()
             histm=None
             histp=None
+            histpUncUpLowMjj=None
+            histpUncDwLowMjj=None
+            histpUncUpHighMjj=None
+            histpUncDwHighMjj=None
+            histmUncUpLowMjj=None
+            histmUncDwLowMjj=None
+            histmUncUpHighMjj=None
+            histmUncDwHighMjj=None
+
             if doDoubleRatio and a==(len(fakeelesp)):
                 histp = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosACR1_obs_cuts;;", 1, 0.5, 1.5)
                 histm = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts;;", 1, 0.5, 1.5)
             else:
                 histp = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histm = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-            histp.SetBinContent(1,1)
-            histm.SetBinContent(1,1)
+                histpUncUpLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncHigh_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncHigh_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histpUncDwLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncLow_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncLow_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histpUncUpHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncHigh_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncHigh_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histpUncDwHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncLow_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncLow_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histmUncUpLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElmUncHigh_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElmUncHigh_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histmUncDwLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElmUncLow_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElmUncLow_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histmUncUpHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElmUncHigh_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElmUncHigh_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histmUncDwHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElmUncLow_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElmUncLow_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histp.SetBinContent(1,fakeInit[a-1]/3.0)
+            histm.SetBinContent(1,fakeInit[a-1]/3.0)
+            
+            if (a>=1 and a<=3) or (a>=6 and a<=8) or a==11:
+                histpUncUpLowMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.2)
+                histpUncDwLowMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.2)
+                histmUncUpLowMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.2)
+                histmUncDwLowMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.2)
+                histpUncUpHighMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.1)
+                histpUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.1)
+                histmUncUpHighMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.1)
+                histmUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.1)
+            else:
+                histpUncUpLowMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.1)
+                histpUncDwLowMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.1)
+                histmUncUpLowMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.1)
+                histmUncDwLowMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.5)
+                histpUncUpHighMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.5)
+                histpUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.5)
+                histmUncUpHighMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.5)
+                histmUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.5)
             histp.Write()
             histm.Write()
+            histpUncUpLowMjj.Write()
+            histpUncDwLowMjj.Write()
+            histpUncUpHighMjj.Write()
+            histpUncDwHighMjj.Write()
+            histmUncUpLowMjj.Write()
+            histmUncDwLowMjj.Write()
+            histmUncUpHighMjj.Write()
+            histmUncDwHighMjj.Write()
             a += 1
     else: # write out a single histogram
         nbins=len(fakeelesp)*9
