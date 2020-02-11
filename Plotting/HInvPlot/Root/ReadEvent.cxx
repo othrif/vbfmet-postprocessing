@@ -91,6 +91,8 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::TMVAWeightPath",     fTMVAWeightPath);
   reg.Get("ReadEvent::MJTriggerEff",       fMJTriggerEff);
 
+  reg.Get("ReadEvent::MJNormStrategy", fMJNormStrategy);
+
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
   reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
   reg.Get("ReadEvent::OverlapPh",     fOverlapPh);
@@ -708,20 +710,39 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         else event->SetWeight(fWeight*fLumi);
       }
       else  event->SetWeight(1.0);
-      float MJDDScaling=0.8815; //0.82109;
-      if(fYear==2017) MJDDScaling=2.6895;
-      else if(fYear==2018) MJDDScaling=2.10302;
+      float MJDDScaling=1.0;
 
-      // Applies the MJ systematics
-      //MJUnc__1up MJClos2016__1up MJClos2017__1up MJClos2018__1up
-      if(fWeightSystName=="MJUnc__1up"){
-	if(fYear==2016) MJDDScaling*=1.387;
-	if(fYear==2017) MJDDScaling*=1.189;
-	if(fYear==2018) MJDDScaling*=1.226;
+      // Multijet normalization.
+      // There are currently three legal options:
+      // "off" (no normalization!), "sr" (normalization for SR), "dphijj3" (normalization for high-dphijj).
+      if (fMJNormStrategy == "sr") {
+        if(fYear==2016) MJDDScaling=0.8815; //0.82109;
+        else if(fYear==2017) MJDDScaling=2.6895;
+        else if(fYear==2018) MJDDScaling=2.10302;
+
+        // MJ systematics (MJClos2016__1up MJClos2017__1up MJClos2018__1up)
+        if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.8;
+        if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.47;
+        if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.43;
+
+      } else if (fMJNormStrategy == "dphijj3") {
+        if (fYear == 2016) MJDDScaling = 0.3878;
+        else if (fYear == 2017) MJDDScaling = 0.7424;
+        else if (fYear == 2018) MJDDScaling = 0.5073;
+
+        // MJ systematics for high-dphijj (MJClos2016__1up MJClos2017__1up MJClos2018__1up
+        if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.26;
+        if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.75;
+        if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.18;
       }
-      if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.8;
-      if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.47;
-      if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.43;
+
+      // Applies the MJ systematics (MJUnc__1up)
+      // These seem to be the core/tail systematics-- keep them the same in high-dphijj.
+      if(fWeightSystName=="MJUnc__1up"){
+        if(fYear==2016) MJDDScaling*=1.387;
+        if(fYear==2017) MJDDScaling*=1.189;
+        if(fYear==2018) MJDDScaling*=1.226;
+      }
 
       if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight*MJDDScaling);
 
@@ -733,19 +754,19 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	   if(fWeightSystName=="vvUnc__1down") vvWeightSys/=1.44;
 	   event->AddWeight(vvWeightSys);
 	 }
-      
+
       if(!fIsDDQCD && fCurrRunNumber!=fRunNumber){
-	if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
-	  log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
-	  event->sample = Mva::kNone;
-	}else{
-	  event->sample = Mva::Convert2Sample(fSampleMap.find(fRunNumber)->second);
-	  fCurrSample = event->sample;
-	  fCurrRunNumber=fRunNumber;
-	  if(fDebug) std::cout << "sample: " << event->sample << std::endl;
-	}
+        if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
+          log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
+          event->sample = Mva::kNone;
+        }else{
+          event->sample = Mva::Convert2Sample(fSampleMap.find(fRunNumber)->second);
+          fCurrSample = event->sample;
+          fCurrRunNumber=fRunNumber;
+          if(fDebug) std::cout << "sample: " << event->sample << std::endl;
+        }
       }else{
-	event->sample = fCurrSample;
+        event->sample = fCurrSample;
       }
       if(fIsDDQCD) event->sample=Mva::kQCD;
     }

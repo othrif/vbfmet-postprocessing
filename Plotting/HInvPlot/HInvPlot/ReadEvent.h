@@ -132,6 +132,7 @@ namespace Msl
     std::string                 fMETChoice_nolep;
     std::string                 fMETChoice_nolep_phi;
     std::string                 fMJTriggerEff;
+    std::string                 fMJNormStrategy;
 
     // TMVA
     TMVA::Reader                *fTMVAReader;
