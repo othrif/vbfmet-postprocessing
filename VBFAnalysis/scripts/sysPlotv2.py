@@ -99,15 +99,19 @@ def PrintPulls(rfile,options,can,histName,regions):
         if r.count('one'):
             rkey='WCR'
         #for ibin in range(1,options.binNum+1):
+        totalValPull=0.0
         for ibin in [4,9,5,10]:
-            print 'Bin: ',ibin
+            
             nomBinH=rfile.Get(HistName(histName, r, 'Nom', ibin))
             nomVal=nomBinH.GetBinContent(1)
+            print 'Bin: ',ibin,nomBinH.GetBinContent(1)
             if not nomBinH:
                 print 'could not load Nominal: ',HistName(histName, r, 'Nom', ibin)
-                continue            
+                continue
+            totalValPull=nomBinH.GetBinContent(1)
             for systName,pulls in pullMap.iteritems():
                 pullValue = pulls[0]/pulls[1]
+                #print pullValue
                 sysBinH=rfile.Get(HistName(histName, r, systName+'High', ibin))
                 #print systName #,systMap[rkey+'up']
                 #print systName+'_bin1'
@@ -119,20 +123,27 @@ def PrintPulls(rfile,options,can,histName,regions):
                     dwPull=pullValue*(nomVal)*(float(systMap[rkey+'down'][systName][ibin-1])-1.0)                    
                     if abs(dwPull)>0.01 or  abs(upPull)>0.01:
                         print '%0.2f %0.2f %s %s THEORY %s bin %s' %(upPull, dwPull, systName,histName, r,ibin)
-                if not sysBinH:
+                upPull=0.0
+                dwPull=0.0
+                if sysBinH:
+                    upPull=pullValue*(nomVal-sysBinH.GetBinContent(1))
                     #print 'could not load Syst: ',HistName(histName, r, systName+'High', ibin)
-                    continue
+                    #continue
                 sysBinL=rfile.Get(HistName(histName, r, systName+'Low', ibin))
-                if not sysBinL:
+                if sysBinL:
+                    dwPull=pullValue*(nomVal-sysBinL.GetBinContent(1))
                     #print 'could not load Syst: ',HistName(histName, r, systName+'Low', ibin)
-                    continue
-                upPull=pullValue*(nomVal-sysBinH.GetBinContent(1))
-                dwPull=pullValue*(nomVal-sysBinL.GetBinContent(1))
+                    #continue
+                
+                #print 'pull values:',upPull,dwPull
                 if abs(dwPull)>0.01 or  abs(upPull)>0.01:
                     if pullValue>0.0:
                         print '%0.2f + %0.2f %s %s' %(nomVal,upPull,systName,histName)
+                        totalValPull+=upPull
                     else:
-                        print '%0.2f - %0.2f %s %s' %(nomVal,dwPull,systName,histName)                        
+                        print '%0.2f - %0.2f %s %s' %(nomVal,dwPull,systName,histName)
+                        totalValPull-=dwPull
+            print 'totalValPull: %0.2f' %totalValPull,' bin ',ibin
     pullList.close()
     
 def Smooth(rfile,options,can,systName,histName,regions):
@@ -186,7 +197,7 @@ def Smooth(rfile,options,can,systName,histName,regions):
     # takes the integral in the region. Then scales by the integral over all regions
     updateHist=[]
     #rNewfile=ROOT.TFile(options.input,'UPDATE')
-    rNewfile=ROOT.TFile('/tmp/HFALL_feb5_sysUPDATE.root','UPDATE')
+    rNewfile=ROOT.TFile('/tmp/HFALL_feb10_sysUPDATE.root','UPDATE')
     if options.smooth==1 or (options.smooth==5 and smoothSyle==1):
         print 'smoothing option 1'
         for r in regions:
@@ -349,16 +360,28 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
     legr.SetBorderSize(0)
     legr.SetFillColor(0)
     totalMax=1.0
+    totalMin=1.0    
     # create hists and divide
     for r in regions:
         sysUpMap[r].Divide(nomMap[r])
         sysDwMap[r].Divide(nomMap[r])
         max1=sysUpMap[r].GetMaximum()
         max2=sysDwMap[r].GetMaximum()
+        min1=1.0
+        min2=1.0
+        for i in range(1,options.binNum):
+            if sysUpMap[r].GetBinContent(1)>0.3 and sysUpMap[r].GetBinContent(i)<min1:
+                min1=sysUpMap[r].GetBinContent(1)
+            if sysDwMap[r].GetBinContent(1)>0.3 and sysDwMap[r].GetBinContent(i)<min2:
+                min2=sysDwMap[r].GetBinContent(1)
         if max1>totalMax:
             totalMax=max1
         if max2>totalMax:
             totalMax=max2
+        if min1<totalMin:
+            totalMin=min1
+        if min2<totalMin:
+            totalMin=min2
     # label the bins
     for r in regions:
         sysUpMap[r].GetXaxis().SetBinLabel(1,'0.8<M_{jj}<1.0')
@@ -395,6 +418,8 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
         yup=1.25
     elif totalMax<1.5:
         yup=1.5
+    if abs(1.0-totalMin)>abs(yup-1.0):
+        yup=1.6
     ydw=2.0-yup
     # draw
     for r in regions:
@@ -479,7 +504,7 @@ if __name__=='__main__':
     # read in pulls file and print the yields
     if options.pullsFile!=None:
         #for histName in histNames:
-        for histName in ["Z_strong", "Z_EWK", "ttbar"]:
+        for histName in ["W_strong","W_EWK","Z_strong", "Z_EWK", "ttbar"]:
             PrintPulls(rfile,options,can,histName,['VBFjetSel_XNom_twoEleCRX_obs_cuts','VBFjetSel_XNom_twoMuCRX_obs_cuts'])
         sys.exit(0)
         
@@ -487,6 +512,7 @@ if __name__=='__main__':
     systName='EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR'
     systToSmooth=['EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR',
                       'EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR',
+                      #'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
                       'JET_fJvtEfficiency','JET_JvtEfficiency','JET_JvtEfficiency',
                       'JET_Pileup_OffsetMu',
                       'JET_Pileup_OffsetNPV', # still looks weird. some regions are higher or lower than others
@@ -501,6 +527,9 @@ if __name__=='__main__':
                       'JET_JER_EffectiveNP_2',
                       'JET_JER_EffectiveNP_3',
                       'JET_JER_EffectiveNP_4',
+                      'JET_JER_EffectiveNP_5',
+                      'JET_JER_EffectiveNP_6',
+                      'JET_JER_EffectiveNP_7restTerm',
                       'MET_SoftTrk_Scale',
                       'JET_Flavor_Response',
                       'JET_EtaIntercalibration_TotalStat',
