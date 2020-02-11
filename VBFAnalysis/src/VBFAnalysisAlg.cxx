@@ -16,6 +16,7 @@ VBFAnalysisAlg::VBFAnalysisAlg( const std::string& name, ISvcLocator* pSvcLocato
   declareProperty( "LooseSkim", m_LooseSkim = true, "true if loose skimming is requested" );
   declareProperty( "PhotonSkim", m_PhotonSkim = false, "true if photon skimming is requested" );
   declareProperty( "AltSkim", m_AltSkim = false, "true if alternate skimming is requested" );
+  declareProperty( "MJSkim", m_MJSkim = false, "true if mj skimming is requested" );
   declareProperty( "ExtraVars", m_extraVars = true, "true if extra variables should be output" );
   declareProperty( "QGTagger", m_QGTagger = false, "true if extra variables should be output for QGTagger" );
   declareProperty( "METTrigPassThru", m_METTrigPassThru = false, "true if require no met triggers" );
@@ -1057,7 +1058,9 @@ StatusCode VBFAnalysisAlg::execute() {
   float MjjCut =8e5;
   float DEtajjCut =3.5;
   float DPhijjCut =2.0;
-
+  float minDPhijjCut = -1.0;
+  float MHTCut = -1.0;
+  bool passMJSkim=true;
   if(m_LooseSkim && m_currentVariation=="Nominal"){
     METCut = 100.0e3;
     LeadJetPtCut = 60.0e3; // 60.0e3
@@ -1065,28 +1068,50 @@ StatusCode VBFAnalysisAlg::execute() {
     MjjCut =2e5; // 2e5
     DEtajjCut =3.5; // 3.5
   }
-  if(m_AltSkim){
+  if(m_AltSkim && m_currentVariation=="Nominal"){
+    METCut = 100.0e3;
+    LeadJetPtCut = 80.0e3; // 60.0e3
+    subLeadJetPtCut = 50.0e3; // 40.0e3
+    MjjCut =8e5; // 2e5
+    DEtajjCut =2.5; // 3.5
+    minDPhijjCut=2.0; 
+    DPhijjCut=4.0; // 2.0
+  }else if(m_AltSkim){ // systematics skims
+    METCut = 160.0e3;
+    LeadJetPtCut = 80.0e3; // 60.0e3
+    subLeadJetPtCut = 50.0e3; // 40.0e3
+    MjjCut =8e5; // 2e5
+    DEtajjCut =3.8; // 3.5
+    DPhijjCut=4.0; // 2.0
+    minDPhijjCut=2.0; 
+    MHTCut=140e3;
+  }else if(m_MJSkim){ // systematics skims
     METCut = 100.0e3;
     LeadJetPtCut = 80.0e3; // 60.0e3
     subLeadJetPtCut = 50.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
-    DEtajjCut =2.5; // 3.5
-    DPhijjCut=4.0; // 2.0
+    DEtajjCut =3.8; // 3.5
+    DPhijjCut=2.0; 
+    MHTCut=100e3;
+    passMJSkim=false;
+    if((jj_mass>2e5 && jj_mass<800e5) && (met_cst_jet>120e3) && jj_dphi<DPhijjCut && jj_deta>DEtajjCut && n_jet>1 && n_jet<5 && (jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut)) passMJSkim=true;  // low mjj
+    if((jj_mass>800e5) && (met_cst_jet>100e3) && (met_tst_nolep_et > 100e3 && met_tst_nolep_et<160e3) && (n_baseel==0 && n_basemu==0) && jj_dphi<DPhijjCut && jj_deta>DEtajjCut && n_jet>1 && n_jet<4 && (jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut)) passMJSkim=true;  // low met
   }
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
-
+  if(!passMJSkim) return StatusCode::SUCCESS;
   bool GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (n_jet < 2) return StatusCode::SUCCESS;
   if (!(n_jet < 5) && !(m_LooseSkim || m_AltSkim)) return StatusCode::SUCCESS;
+  if (!(n_jet < 5) &&  (m_AltSkim)) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("n_jet = 2!");
   if (!(unsigned(n_jet) == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
   if (!(unsigned(n_jet) == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
   if(!m_LooseSkim){
-    if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < DPhijjCut) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+    if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (met_cst_jet>MHTCut) & (jj_dphi < DPhijjCut) & (minDPhijjCut<jj_dphi) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
   }else{
-    if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (jj_dphi < DPhijjCut) & (jj_deta > DEtajjCut) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+    if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (met_cst_jet>MHTCut) & (jj_dphi < DPhijjCut) & (minDPhijjCut<jj_dphi) & (jj_deta > DEtajjCut) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
   }
   // skim on the photon plus jet events
   if(m_PhotonSkim && !GammaMETSR) return StatusCode::SUCCESS;
