@@ -9,6 +9,8 @@
 #include "HInvPlot/VarEvent.h"
 #include "HInvPlot/VarEntry.h"
 #include "HInvPlot/VarStore.h"
+#include "HInvPlot/TRExTools.h"
+#include "HInvPlot/SmoothHist.h"
 
 // Specialized algorithms
 #include "HInvPlot/ReadEvent.h"

@@ -458,13 +458,13 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
             #tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" $\\pm$ "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
             yldvR=0.0
             if type(histDict[hkey])==ROOT.TH1F:
-                yldvR=int(round(histDict[hkey].GetBinContent(regionDict[regkey]),0))
-                yldeR=int(round(histDict[hkey].GetBinError(regionDict[regkey]),0))
+                yldvR=(round(histDict[hkey].GetBinContent(regionDict[regkey]),1))
+                yldeR=(round(histDict[hkey].GetBinError(regionDict[regkey]),1))
             else:
                 histDict[hkey].GetPoint(regionDict[regkey]-1,x1a,y1a)
-                yldvR=int(round(y1a,0))
+                yldvR=(round(y1a,1))
                 ylde=histDict[hkey].GetErrorYhigh(regionDict[regkey]-1)
-                yldeR=int(round(ylde,0))
+                yldeR=(round(ylde,1))
             tmpArr.append(str(yldvR)+" $\\pm$ "+str(yldeR))
             if not (hkey=='bkgs' or hkey.count('bkgsAsymErr')):
                 if regkey.count('SR'):

@@ -21,6 +21,8 @@
 <class name="Msl::PlotZFF"/>
 <class name="Msl::PlotFFClosure"/>
 <class name="Msl::PlotIsoSF"/>
+<class name="TRExTools"/>
+<class name="SmoothHist"/>
 
 <class name="std::vector<Msl::IExecAlg *>"/>
 

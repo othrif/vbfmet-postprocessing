@@ -266,7 +266,7 @@ for b in range(0,len(region_cf[0])+1): # bins
     cline=''
 print '\\end{tabular}'
 print '}'
-sys.exit(0)
+#sys.exit(0)
 # Collect systematics
 tobj = f.GetListOfKeys()
 mye=ROOT.Double(0.0)
@@ -277,8 +277,8 @@ for sample in samples:
         #print vname
         #if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
         #if vname.count('VBFjetSel') and vname.count('_oneEleNegLowSigCR3_') and vname.count(sample):
-        if vname.count('VBFjetSel') and vname.count('_SR11') and vname.count(sample):
-        #if vname.count('VBFjetSel') and vname.count('_twoMuCR4') and vname.count(sample):
+        #if vname.count('VBFjetSel') and vname.count('_SR11') and vname.count(sample):
+        if vname.count('VBFjetSel') and vname.count('_twoEleCR5') and vname.count(sample):
             h=f.Get(vname)
             intBkg=h.IntegralAndError(0,1001,mye)
             #print '%0.2f ' %(intBkg)+vname 

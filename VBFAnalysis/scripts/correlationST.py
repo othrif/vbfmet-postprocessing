@@ -58,7 +58,7 @@ def ReturnNewSystScaleUncor(sysname, vals, listV):
     line+=tmp_line.rstrip(',')
     return line+'\n'
 
-def ReturnNewSyst(sysname, vals, listV):
+def ReturnNewSyst(sysname, vals, listV, EWKDecor=True):
     line=''
     debug=False
     new_vals = []
@@ -76,11 +76,28 @@ def ReturnNewSyst(sysname, vals, listV):
     newSystmig12dwhigh=0.0
     newSystmig23uphigh=0.0
     newSystmig23dwhigh=0.0
-
+    doDecorrelation=False
+    deCorrFactor=0.25
     vsysname=0
-    if sysname.count('Z_EWK'):    vsysname=1
-    if sysname.count('W_strong'): vsysname=2
-    if sysname.count('W_EWK'):    vsysname=3
+    if sysname.count('Z_strong'):
+        if EWKDecor:
+            doDecorrelation=True
+            deCorrFactor=0.25
+    if sysname.count('Z_EWK'):
+        vsysname=1
+        if EWKDecor:
+            doDecorrelation=True
+            deCorrFactor=0.9
+    if sysname.count('W_strong'):
+        vsysname=2
+        if EWKDecor:
+            doDecorrelation=True
+            deCorrFactor=0.25
+    if sysname.count('W_EWK'):
+        vsysname=3
+        if EWKDecor:
+            doDecorrelation=True
+            deCorrFactor=0.25
     linesys=''
     linesys1=''
     maxBin=12
@@ -88,7 +105,6 @@ def ReturnNewSyst(sysname, vals, listV):
     tmp_line=sysname+'_uncbin11 '
     if sysname.count('pdf_'):
         for  bin_num1Z in range(0,maxBin-1):
-            #tmp_line+='1.0,'
             newSystmig11=new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
             newSystmig11=check(1.-newSystmig11/listV[bin_num1Z][vsysname],ispdf=True)
             tmp_line+='%0.5f,' %newSystmig11
@@ -107,7 +123,6 @@ def ReturnNewSyst(sysname, vals, listV):
             linesys=''
             bin_num=maxBin-bin_num1
             for  bin_num1 in range(1,bin_num-1): linesys+='1.0,'
-            #listV[bin_num-1]
             if debug:
                 print bin_num,new_vals[bin_num-1],listV[bin_num-1][vsysname]
             newSystmig23up+=new_vals[bin_num-1]*listV[bin_num-1][vsysname]
@@ -138,6 +153,7 @@ def ReturnNewSyst(sysname, vals, listV):
         #binmap={{1,6},{2,7},{3,8},{4,9},{5,10}}
         for  bin_num1 in range(1,maxBin/2-1):
             linesys=''
+            linesys_decorr=''
             bin_num=(maxBin/2)-bin_num1
             bin_num_high=(maxBin/2)-bin_num1+(maxBin/2)-1
             for  bin_num1Z in range(1,bin_num-1): linesys+='1.0,'
@@ -153,28 +169,53 @@ def ReturnNewSyst(sysname, vals, listV):
             sysuphigh = check(1.-newSystmig23uphigh/listV[bin_num_high-1][vsysname])
             linesys+='%0.4f,' %(sysdw)
             linesys+='%0.4f,' %(sysup)
-            #newSystmig23up=new_vals[bin_num-2]*listV[bin_num-2][vsysname]+newSystmig23up
-            #newSystmig23dw-=newSystmig23up
             for  bin_numZ in range(1,(maxBin/2)-bin_num): linesys+='1.0,'
             for  bin_num1Z in range(1,bin_num-1): linesys+='1.0,'
             linesys+='%0.4f,' %(sysdwhigh)
             linesys+='%0.4f,' %(sysuphigh)
-            #print 'bin_num_high',bin_num_high
             for  bin_numZ in range(bin_num_high+1,11): linesys+='1.0,'
             tmp_line=sysname+('_mig%s_%s ' %(bin_num-1,bin_num))+linesys.rstrip(',')
             line+=tmp_line+',1.0'+'\n'
             print tmp_line+',1.0'
+            if doDecorrelation:
+                
+                for  bin_num1Z in range(1,bin_num-1): linesys_decorr+='1.0,'
+                sysdw_decorr = check(1.-deCorrFactor*newSystmig23dw/listV[bin_num-2][vsysname])
+                sysup_decorr = check(1.-deCorrFactor*newSystmig23up/listV[bin_num-1][vsysname])
+                sysdwhigh_decorr = check(1.-deCorrFactor*newSystmig23dwhigh/listV[bin_num_high-2][vsysname])
+                sysuphigh_decorr = check(1.-deCorrFactor*newSystmig23uphigh/listV[bin_num_high-1][vsysname])
+                linesys_decorr+='%0.1f,' %(1.0)
+                linesys_decorr+='%0.4f,' %(sysup_decorr)
+                for  bin_numZ in range(1,(maxBin/2)-bin_num): linesys_decorr+='1.0,'
+                for  bin_num1Z in range(1,bin_num-1): linesys_decorr+='1.0,'
+                linesys_decorr+='%0.1f,' %(1.0)
+                linesys_decorr+='%0.4f,' %(sysuphigh_decorr)
+                for  bin_numZ in range(bin_num_high+1,11): linesys_decorr+='1.0,'
+                tmp_line_decorr=sysname+('_uncbin%s ' %(bin_num))+linesys_decorr.rstrip(',')
+                print tmp_line_decorr+',1.0'
+                line+=tmp_line_decorr+',1.0'+'\n'
             if bin_num==2:
                 # low dphijj
                 bin1Syst=new_vals[bin_num-2]*listV[bin_num-2][vsysname]
+                if doDecorrelation:
+                    bin1Syst*=math.sqrt(1.-deCorrFactor**2)
                 if debug:
                     print 'low bin: ',bin1Syst,new_vals[bin_num-2],listV[bin_num-2][vsysname]
-                bin1Syst+=newSystmig23up
+
+                if doDecorrelation:
+                    bin1Syst+=math.sqrt(1.-deCorrFactor**2)*newSystmig23up
+                else:
+                    bin1Syst+=newSystmig23up
                 # high dphijj
                 bin1Systhigh=new_vals[bin_num_high-2]*listV[bin_num_high-2][vsysname]
+                if doDecorrelation:
+                    bin1Systhigh*=math.sqrt(1.-deCorrFactor**2)
                 if debug:
                     print 'low bin: ',bin1Systhigh,new_vals[bin_num_high-2],listV[bin_num_high-2][vsysname]
-                bin1Systhigh+=newSystmig23uphigh
+                if doDecorrelation:
+                    bin1Systhigh+=math.sqrt(1.-deCorrFactor**2)*newSystmig23uphigh
+                else:
+                    bin1Systhigh+=newSystmig23uphigh
                 # combining for total unc
                 linesys1+=('%0.4f,' %(check(1.-bin1Syst/listV[bin_num-2][vsysname])))
                 for  a in range(2,(maxBin/2)): linesys1+='1.0,'
@@ -183,6 +224,7 @@ def ReturnNewSyst(sysname, vals, listV):
                 tmp_line=sysname+'_uncbin1 '+linesys1.rstrip(',')
                 print tmp_line+',1.0'
                 line+=tmp_line+',1.0'+'\n'
+                
     return line
 
 def GetBins(fY, l, listV):
@@ -265,7 +307,7 @@ for i in fin:
             systMap[entries[0]]=entries[1].split(',')
             print entries[0],systMap[entries[0]]
             if not args.scaleUncor:
-                tot_line+=ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString])
+                tot_line+=ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString], EWKDecor=True)
             else:
                 tot_line+=ReturnNewSystScaleUncor(entries[0], systMap[entries[0]],regionYields[yieldRegString])
         else:
