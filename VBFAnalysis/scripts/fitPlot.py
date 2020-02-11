@@ -458,13 +458,13 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
             #tmpArr.append(str(round(histDict[hkey].GetBinContent(regionDict[regkey]),2))+" $\\pm$ "+str(round(histDict[hkey].GetBinError(regionDict[regkey]),2)))
             yldvR=0.0
             if type(histDict[hkey])==ROOT.TH1F:
-                yldvR=int(round(histDict[hkey].GetBinContent(regionDict[regkey]),0))
-                yldeR=int(round(histDict[hkey].GetBinError(regionDict[regkey]),0))
+                yldvR=(round(histDict[hkey].GetBinContent(regionDict[regkey]),1))
+                yldeR=(round(histDict[hkey].GetBinError(regionDict[regkey]),1))
             else:
                 histDict[hkey].GetPoint(regionDict[regkey]-1,x1a,y1a)
-                yldvR=int(round(y1a,0))
+                yldvR=(round(y1a,1))
                 ylde=histDict[hkey].GetErrorYhigh(regionDict[regkey]-1)
-                yldeR=int(round(ylde,0))
+                yldeR=(round(ylde,1))
             tmpArr.append(str(yldvR)+" $\\pm$ "+str(yldeR))
             if not (hkey=='bkgs' or hkey.count('bkgsAsymErr')):
                 if regkey.count('SR'):
@@ -764,7 +764,7 @@ def main(options):
                 binVal=11
             nameGamma = regionsList[regionItr].replace('X_','%s_' %(binVal))
             total_bin_err = math.sqrt((data.GetBinError(i))**2+(hDict["bkgs"].GetBinError(i))**2)
-            print 'bin: ',i,nameGamma,' %0.3f %0.3f' %((data.GetBinError(i)/total_bin_err),(hDict["bkgs"].GetBinError(i)/total_bin_err))
+            #print 'bin: ',i,nameGamma,' %0.3f %0.3f' %((data.GetBinError(i)/total_bin_err),(hDict["bkgs"].GetBinError(i)/total_bin_err)) #can uncomment to print to command line
             writeLine+=nameGamma+' %0.3f %0.3f\n' %((data.GetBinError(i)/total_bin_err),(hDict["bkgs"].GetBinError(i)/total_bin_err))
         statFil=open('statunc.txt','w')
         statFil.write(writeLine)
@@ -969,6 +969,9 @@ def main(options):
                 systHistAsymRatio.GetPoint(j-1,x1,y1)
                 systHistAsymRatio.SetPoint(j-1,x1,1.0)
                 val=bkgs.GetBinContent(j)
+		if val==0:#AMANDA - hack for bkgonly fits, final bin (99) is empty
+		    print "bin ",i," has no content"
+		    val=0.00001
                 eyu=systHistAsym.GetErrorYhigh   (j-1)/val
                 eyd=systHistAsym.GetErrorYlow    (j-1)/val
                 systHistAsymRatio.SetPointEYhigh(j-1,eyu)
@@ -995,6 +998,7 @@ def main(options):
     namingScheme="Pre-Fit"
     if options.postFitPickleDir!=None:
         namingScheme="Post-Fit"
+
     preFitLabel=ROOT.TLatex(.5,.86,namingScheme+blindStr)
     preFitLabel.SetNDC()
     preFitLabel.SetTextFont(72)
@@ -1008,7 +1012,9 @@ def main(options):
 
     if not options.quite:
         raw_input("Press Enter to continue")
-    if options.saveAs:
+    if options.saveAs and options.postFitPickleDir!=None:
+        can.SaveAs("postFit."+options.saveAs)
+    elif options.saveAs:
         can.SaveAs("preFit."+options.saveAs)
 
     rfile.Close()

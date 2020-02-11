@@ -79,12 +79,25 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True):
     doDecorrelation=False
     deCorrFactor=0.25
     vsysname=0
+    if sysname.count('Z_strong'):
+        if EWKDecor:
+            doDecorrelation=True
+            deCorrFactor=0.25
     if sysname.count('Z_EWK'):
         vsysname=1
         if EWKDecor:
             doDecorrelation=True
-    if sysname.count('W_strong'): vsysname=2
-    if sysname.count('W_EWK'):    vsysname=3
+            deCorrFactor=0.9
+    if sysname.count('W_strong'):
+        vsysname=2
+        if EWKDecor:
+            doDecorrelation=True
+            deCorrFactor=0.25
+    if sysname.count('W_EWK'):
+        vsysname=3
+        if EWKDecor:
+            doDecorrelation=True
+            deCorrFactor=0.25
     linesys=''
     linesys1=''
     maxBin=12
