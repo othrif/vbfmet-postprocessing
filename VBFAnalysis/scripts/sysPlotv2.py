@@ -331,8 +331,10 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 if flatNomInt>0.0:
                     scaleUpVarFlat=(flatUpInt/flatNomInt)
                     scaleDwVarFlat=(flatDwInt/flatNomInt)
-                    if abs(flatUpInt-1.0)>0.1:
-                        scaleUpVarFlat=0.05
+                    if abs(scaleUpVarFlat-1.0)>0.1:
+                        scaleUpVarFlat=0.08
+                    if abs(scaleDwVarFlat-1.0)>0.1:
+                        scaleDwVarFlat=0.08
             for ibin in range(1,options.binNum+1):
                 sysbef=0.0
                 nomH=rNewfile.Get(HistName(histName, r,'Nom', ibin))
@@ -343,7 +345,7 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
                 if not sysBinH:
                     continue
-                sysBinH.SetBinContent(1,currentNomV*flatUpInt)
+                sysBinH.SetBinContent(1,currentNomV*scaleUpVarFlat)
                 updateHist+=[sysBinH]
                 sysbef=sysBinH.GetBinContent(1)
                 sysBinL=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
@@ -353,7 +355,7 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 if systName in systNameToSymmet:
                     if sysbef>0.0:
                         scaleSyst=currentNomV/sysbef*currentNomV
-                sysBinL.SetBinContent(1,scaleSyst)
+                sysBinL.SetBinContent(1,scaleSyst*scaleDwVarFlat)
                 #print currentNomV,sysbef,sysBinL.GetBinContent(1)
                 updateHist+=[sysBinL]
     # write the updated histograms
