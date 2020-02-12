@@ -382,6 +382,7 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 if systName in systNameToSymmet:
                     if sysbef>0.0:
                         scaleSyst=currentNomV/sysbef*currentNomV
+                        scaleDwVarFlat=1.0
                 sysBinL.SetBinContent(1,scaleSyst*scaleDwVarFlat)
                 #print currentNomV,sysbef,sysBinL.GetBinContent(1)
                 updateHist+=[sysBinL]
@@ -413,6 +414,7 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
         hsysdw=ROOT.TH1F(hNameDw,hNameDw,options.binNum,0.5,0.5+options.binNum)        
         for ibin in range(1,options.binNum+1):
             nomBinH=rfile.Get(HistName(histName, r, 'Nom', ibin))
+            #print r,nomBinH.GetBinContent(1)
             if not nomBinH:
                 print 'could not load: ',HistName(histName, r, 'Nom', ibin)
                 continue
@@ -423,6 +425,7 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
             #*nomBinH.GetBinError  (1)
             # up variation
             sysBinH=rfile.Get(HistName(histName, r, systName+'High', ibin))
+            #print 'sys: ',r,sysBinH.GetBinContent(1)
             if not sysBinH:
                 print 'could not load: ',HistName(histName, r, systName+'High', ibin)
                 continue
@@ -435,7 +438,7 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
                 continue
             hsysdw.SetBinContent(binOrder[ibin-1], sysdwBinH.GetBinContent(1))
             hsysdw.SetBinError  (binOrder[ibin-1], 0.0)
-            #print 'down: ',sysdwBinH.GetBinContent(1),' up: ',sysBinH.GetBinContent(1),' nom: ',nomBinH.GetBinContent(1)
+            print r,'down: ',sysdwBinH.GetBinContent(1),' up: ',sysBinH.GetBinContent(1),' nom: ',nomBinH.GetBinContent(1)
         nomMap[r]=h.Clone()
         sysUpMap[r]=hsys.Clone()
         sysDwMap[r]=hsysdw.Clone()
@@ -576,6 +579,7 @@ if __name__=='__main__':
     (options, args) = p.parse_args()
 
     histNames=["W_strong", "Z_strong", "W_EWK", "Z_EWK", "ttbar"] # "multijet", "eleFakes"
+    histNames=["Z_strong"]#, "Z_strong", "W_EWK", "Z_EWK", "ttbar"] # "multijet", "eleFakes"
     regions=[
     'VBFjetSel_XNom_SRX_obs_cuts',
     'VBFjetSel_XNom_twoEleCRX_obs_cuts',
