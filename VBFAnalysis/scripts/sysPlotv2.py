@@ -438,7 +438,7 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
                 continue
             hsysdw.SetBinContent(binOrder[ibin-1], sysdwBinH.GetBinContent(1))
             hsysdw.SetBinError  (binOrder[ibin-1], 0.0)
-            print r,'down: ',sysdwBinH.GetBinContent(1),' up: ',sysBinH.GetBinContent(1),' nom: ',nomBinH.GetBinContent(1)
+            #print r,'down: ',sysdwBinH.GetBinContent(1),' up: ',sysBinH.GetBinContent(1),' nom: ',nomBinH.GetBinContent(1)
         nomMap[r]=h.Clone()
         sysUpMap[r]=hsys.Clone()
         sysDwMap[r]=hsysdw.Clone()
@@ -579,7 +579,6 @@ if __name__=='__main__':
     (options, args) = p.parse_args()
 
     histNames=["W_strong", "Z_strong", "W_EWK", "Z_EWK", "ttbar"] # "multijet", "eleFakes"
-    histNames=["Z_strong"]#, "Z_strong", "W_EWK", "Z_EWK", "ttbar"] # "multijet", "eleFakes"
     regions=[
     'VBFjetSel_XNom_SRX_obs_cuts',
     'VBFjetSel_XNom_twoEleCRX_obs_cuts',
@@ -654,7 +653,7 @@ if __name__=='__main__':
             'JET_fJvtEfficiency', #smoothed
             'JET_JER_DataVsMC_MC16', #smoothed
             ]
-    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16']
+    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency']
     allSyst=[]
     if options.syst=='All':
         allSystUpAndDown=vbf_syst.systematics('All').getsystematicsList()
@@ -667,7 +666,7 @@ if __name__=='__main__':
     elif options.syst=='weird2':
         allSyst=systToSmoothTest
     elif options.syst=='weird10':
-        allSyst=systToSmoothTest10        
+        allSyst=systToSmoothTest10
     else:
         allSyst=[options.syst]
     print 'Number of syst:',len(allSyst)
