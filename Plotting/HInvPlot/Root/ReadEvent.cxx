@@ -57,10 +57,10 @@ Msl::ReadEvent::ReadEvent():
   fMaxNEvent(-1),
   fLumi         (1.0),
   fBTagCut     (-10),
-  fYear         (2016),
   fLoadBaseLep  (false),
   fOverlapPh    (false),
   fIsDDQCD      (false),
+  fYear         (2016),
   genCutFlow    (0),
   procCutFlow0  (0),
   rawCutFlow    (0)

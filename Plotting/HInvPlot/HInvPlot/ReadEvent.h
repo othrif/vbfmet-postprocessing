@@ -131,14 +131,15 @@ namespace Msl
     std::string                 fMETChoice_phi;
     std::string                 fMETChoice_nolep;
     std::string                 fMETChoice_nolep_phi;
-    std::string                 fMJTriggerEff;
-    std::string                 fMJNormStrategy;
 
     // TMVA
     TMVA::Reader                *fTMVAReader;
     std::string                 fTMVAWeightPath;
     std::vector<float>         fTMVAVars;
     TString                     fMVAName;
+
+    std::string                 fMJTriggerEff;
+    std::string                 fMJNormStrategy;
 
     std::vector<std::string>    fTrees;
     std::set<std::string>       fTreesMap;
