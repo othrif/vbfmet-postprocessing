@@ -144,14 +144,15 @@ def PrintPulls(rfile,options,can,histName,regions):
             print 'totalValPull: %0.2f' %totalValPull,' bin ',ibin
     pullList.close()
 
+#symmeterize systematics
 def Symmeterize(hnom, hup, hdw):
 
     for i in range(1,hnom.GetNbinsX()+1):
         inom=hnom.GetBinContent(i)
-        iup=hup.GetBinContent(i)
-        idw=hdw.GetBinContent(i)
+        iup =hup.GetBinContent(i)
+        idw =hdw.GetBinContent(i)
         if iup!=0.0:
-            hdw.SetBinContent(i,inom/iup)
+            hdw.SetBinContent(i,inom/iup*inom)
     
 def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
 
@@ -290,14 +291,14 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
             if systName in systNameToSymmet:
                 Symmeterize(CombineSysNomMap[r],CombineSysUpMap[r],CombineSysDwMap[r])
             # add flat syst for Z in the the W CR
-            if (histName.count('Z_') and r.count('one')) or (histName.count('W_') and r.count('two')):
-                flatNomInt=CombineSysNomMap[r].Integral(1,options.binNum)
-                flatUpInt=CombineSysUpMap[r].Integral(1,options.binNum)
-                flatDwInt=CombineSysDwMap[r].Integral(1,options.binNum)
-                for i in range(1,options.binNum+1):
-                    if flatNomInt>0.0:
-                        CombineSysUpMap[r].SetBinContent(i,(flatUpInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
-                        CombineSysDwMap[r].SetBinContent(i,(flatDwInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
+            #if (histName.count('Z_') and r.count('one')) or (histName.count('W_') and r.count('two')):
+            #    flatNomInt=CombineSysNomMap[r].Integral(1,options.binNum)
+            #    flatUpInt=CombineSysUpMap[r].Integral(1,options.binNum)
+            #    flatDwInt=CombineSysDwMap[r].Integral(1,options.binNum)
+            #    for i in range(1,options.binNum+1):
+            #        if flatNomInt>0.0:
+            #            CombineSysUpMap[r].SetBinContent(i,(flatUpInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
+            #            CombineSysDwMap[r].SetBinContent(i,(flatDwInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
             if options.wait:
                 rhSmoothed = hSmoothed.Clone()                
                 DrawRatio(options,can,nomMap[r], varHist=[sysBefore,rhSmoothed])
@@ -317,7 +318,30 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                     #print nomV,(nomV*CombineSysDwMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
                     sysBinH.SetBinContent(1,nomV*CombineSysDwMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
                 updateHist+=[sysBinH] 
-            
+    elif options.smooth==10:
+        print 'smoothing option 10...symmeterize'
+        for r in regions:
+            for ibin in range(1,options.binNum+1):
+                sysbef=0.0
+                nomH=rNewfile.Get(HistName(histName, r,'Nom', ibin))
+                if not nomH:
+                    print 'could not load: ',HistName(histName, r, 'Nom', ibin)
+                    continue
+                currentNomV=nomH.GetBinContent(1)
+                sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
+                if not sysBinH:
+                    continue
+                sysbef=sysBinH.GetBinContent(1)
+                sysBinL=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
+                if not sysBinL:
+                    continue
+                scaleSyst=sysBinL.GetBinContent(1)
+                if systName in systNameToSymmet:
+                    if sysbef>0.0:
+                        scaleSyst=currentNomV/sysbef*currentNomV
+                sysBinL.SetBinContent(1,scaleSyst)
+                #print currentNomV,sysbef,sysBinL.GetBinContent(1)
+                updateHist+=[sysBinL]
     # write the updated histograms
     for ha in updateHist:
         rNewfile.cd()
@@ -540,6 +564,7 @@ if __name__=='__main__':
     systName='EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR'
     systToSmooth=['EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR',
                       'EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR',
+                      'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
                       'JET_fJvtEfficiency','JET_JvtEfficiency','JET_JvtEfficiency',
                       'JET_Pileup_OffsetMu',
                       'JET_Pileup_OffsetNPV', # still looks weird. some regions are higher or lower than others
@@ -557,10 +582,15 @@ if __name__=='__main__':
                       'JET_JER_EffectiveNP_5',
                       'JET_JER_EffectiveNP_6',
                       'JET_JER_EffectiveNP_7restTerm',
+                      'JET_EtaIntercalibration_Modelling',
                       'MET_SoftTrk_Scale',
                       'JET_Flavor_Response',
                       'JET_EtaIntercalibration_TotalStat',
                       'PRW_DATASF', # amanda suggested
+                      'MET_SoftTrk_ResoPara',
+                      'MET_SoftTrk_ResoPerp',
+                      'JET_EffectiveNP_Mixed2',
+                      'JET_EffectiveNP_Mixed1'
                       ]
     systToSmoothTest=['EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
             'MET_SoftTrk_Scale', #smoothed
@@ -570,7 +600,7 @@ if __name__=='__main__':
             'MET_SoftTrk_ResoPara',
             'MET_SoftTrk_ResoPerp',
             'JET_EffectiveNP_Mixed2',
-            'JET_EffectiveNP_Mixed1',]
+            'JET_EffectiveNP_Mixed1']
     symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16']
     allSyst=[]
     if options.syst=='All':
@@ -590,7 +620,6 @@ if __name__=='__main__':
         for histName in histNames:
             if options.smooth:
                 Smooth(rfile,options,can,systNameA,histName,regions+['VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts','VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts'],symmet)
-            DrawRatio(rfile,options,can,systNameA,histName,regions)
             if not options.batch:
                 DrawRatio(rfile,options,can,systNameA,histName,regions)
             sys.stdout.flush()
