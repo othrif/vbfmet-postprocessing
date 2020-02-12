@@ -145,8 +145,17 @@ def PrintPulls(rfile,options,can,histName,regions):
                         totalValPull-=dwPull
             print 'totalValPull: %0.2f' %totalValPull,' bin ',ibin
     pullList.close()
+
+def Symmeterize(hnom, hup, hdw):
+
+    for i in range(1,hnom.GetNbinsX()+1):
+        inom=hnom.GetBinContent(i)
+        iup=hup.GetBinContent(i)
+        idw=hdw.GetBinContent(i)
+        if iup!=0.0:
+            hdw.SetBinContent(i,inom/iup)
     
-def Smooth(rfile,options,can,systName,histName,regions):
+def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
 
     smoothSyle=1
     if systName.count('EL_'):
@@ -197,7 +206,7 @@ def Smooth(rfile,options,can,systName,histName,regions):
     # takes the integral in the region. Then scales by the integral over all regions
     updateHist=[]
     #rNewfile=ROOT.TFile(options.input,'UPDATE')
-    rNewfile=ROOT.TFile('/tmp/HFALL_feb10_sysUPDATE.root','UPDATE')
+    rNewfile=ROOT.TFile('/tmp/HFALL_feb11_sysUPDATE.root','UPDATE')
     if options.smooth==1 or (options.smooth==5 and smoothSyle==1):
         print 'smoothing option 1'
         for r in regions:
@@ -220,7 +229,11 @@ def Smooth(rfile,options,can,systName,histName,regions):
                     if not sysBinH:
                         continue
                     #sysBinH.Scale(upInt/nomInt)
-                    sysBinH.SetBinContent(1,dwInt/nomInt*currentNomV)
+                    scaleSyst=dwInt/nomInt
+                    if systName in systNameToSymmet:
+                        if upInt>0.0:
+                            scaleSyst=nomInt/upInt
+                    sysBinH.SetBinContent(1,scaleSyst*currentNomV)
                     updateHist+=[sysBinH]
     elif options.smooth==2 or (options.smooth==5 and smoothSyle==2):
         print 'smoothing option 2 - parabolic smoothing'
@@ -230,7 +243,8 @@ def Smooth(rfile,options,can,systName,histName,regions):
             sysBefore=sysUpMap[r].Clone()
             hSmoothed = smooth_tool.smoothHistogram(nomMap[r], sysUpMap[r], True)
             smooth_tool.smoothHistogram(nomMap[r], sysDwMap[r], True)            
-
+            if systName in systNameToSymmet:
+                Symmeterize(CombineSysNomMap[r],sysUpMap[r],sysDwMap[r])
             if options.wait:
                 rhSmoothed = hSmoothed.Clone()                
                 DrawRatio(options,can,nomMap[r], varHist=[sysBefore,rhSmoothed])
@@ -274,8 +288,19 @@ def Smooth(rfile,options,can,systName,histName,regions):
         for r in regions:
             sysBefore=sysUpMap[r].Clone()
             hSmoothed = smooth_tool.smoothHistogram(CombineSysNomMap[r], CombineSysUpMap[r], True)
-            smooth_tool.smoothHistogram(CombineSysNomMap[r], CombineSysDwMap[r], True)            
-
+            smooth_tool.smoothHistogram(CombineSysNomMap[r], CombineSysDwMap[r], True)
+            # symmeterize
+            if systName in systNameToSymmet:
+                Symmeterize(CombineSysNomMap[r],CombineSysUpMap[r],CombineSysDwMap[r])
+            # add flat syst for Z in the the W CR
+            if (histName.count('Z_') and r.count('one')) or (histName.count('W_') and r.count('two')):
+                flatNomInt=CombineSysNomMap[r].Integral(1,options.binNum)
+                flatUpInt=CombineSysUpMap[r].Integral(1,options.binNum)
+                flatDwInt=CombineSysDwMap[r].Integral(1,options.binNum)
+                for i in range(1,options.binNum+1):
+                    if flatNomInt>0.0:
+                        CombineSysUpMap[r].SetBinContent(i,(flatUpInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
+                        CombineSysDwMap[r].SetBinContent(i,(flatDwInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
             if options.wait:
                 rhSmoothed = hSmoothed.Clone()                
                 DrawRatio(options,can,nomMap[r], varHist=[sysBefore,rhSmoothed])
@@ -295,7 +320,7 @@ def Smooth(rfile,options,can,systName,histName,regions):
                     #print nomV,(nomV*CombineSysDwMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
                     sysBinH.SetBinContent(1,nomV*CombineSysDwMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
                 updateHist+=[sysBinH] 
-                    
+            
     # write the updated histograms
     for ha in updateHist:
         rNewfile.cd()
@@ -345,7 +370,8 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
                 print 'could not load: ',HistName(histName, r, systName+'Low', ibin)
                 continue
             hsysdw.SetBinContent(binOrder[ibin-1], sysdwBinH.GetBinContent(1))
-            hsysdw.SetBinError  (binOrder[ibin-1], 0.0)            
+            hsysdw.SetBinError  (binOrder[ibin-1], 0.0)
+            #print 'down: ',sysdwBinH.GetBinContent(1),' up: ',sysBinH.GetBinContent(1),' nom: ',nomBinH.GetBinContent(1)
         nomMap[r]=h.Clone()
         sysUpMap[r]=hsys.Clone()
         sysDwMap[r]=hsysdw.Clone()
@@ -512,7 +538,6 @@ if __name__=='__main__':
     systName='EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR'
     systToSmooth=['EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR',
                       'EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR',
-                      #'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
                       'JET_fJvtEfficiency','JET_JvtEfficiency','JET_JvtEfficiency',
                       'JET_Pileup_OffsetMu',
                       'JET_Pileup_OffsetNPV', # still looks weird. some regions are higher or lower than others
@@ -535,6 +560,16 @@ if __name__=='__main__':
                       'JET_EtaIntercalibration_TotalStat',
                       'PRW_DATASF', # amanda suggested
                       ]
+    systToSmoothTest=['EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
+            'MET_SoftTrk_Scale', #smoothed
+            'JET_fJvtEfficiency', #smoothed
+            'JET_JER_DataVsMC_MC16', #smoothed
+            'JET_EtaIntercalibration_Modelling',
+            'MET_SoftTrk_ResoPara',
+            'MET_SoftTrk_ResoPerp',
+            'JET_EffectiveNP_Mixed2',
+            'JET_EffectiveNP_Mixed1',]
+    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16']
     allSyst=[]
     if options.syst=='All':
         allSystUpAndDown=vbf_syst.systematics('All').getsystematicsList()
@@ -544,13 +579,15 @@ if __name__=='__main__':
                 allSyst+=[sSystName]
     elif options.syst=='weird':
         allSyst=systToSmooth
+    elif options.syst=='weird2':
+        allSyst=systToSmoothTest
     else:
         allSyst=[options.syst]
     print 'Number of syst:',len(allSyst)
     for systNameA in allSyst:
         for histName in histNames:
             if options.smooth:
-                Smooth(rfile,options,can,systNameA,histName,regions+['VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts','VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts'])
+                Smooth(rfile,options,can,systNameA,histName,regions+['VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts','VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts'],symmet)
             DrawRatio(rfile,options,can,systNameA,histName,regions)
     del can
     print 'done'
