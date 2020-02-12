@@ -291,14 +291,14 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
             if systName in systNameToSymmet:
                 Symmeterize(CombineSysNomMap[r],CombineSysUpMap[r],CombineSysDwMap[r])
             # add flat syst for Z in the the W CR
-            #if (histName.count('Z_') and r.count('one')) or (histName.count('W_') and r.count('two')):
-            #    flatNomInt=CombineSysNomMap[r].Integral(1,options.binNum)
-            #    flatUpInt=CombineSysUpMap[r].Integral(1,options.binNum)
-            #    flatDwInt=CombineSysDwMap[r].Integral(1,options.binNum)
-            #    for i in range(1,options.binNum+1):
-            #        if flatNomInt>0.0:
-            #            CombineSysUpMap[r].SetBinContent(i,(flatUpInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
-            #            CombineSysDwMap[r].SetBinContent(i,(flatDwInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
+            if (histName.count('Z_') and r.count('one')) or (histName.count('W_') and r.count('two')):
+                flatNomInt=CombineSysNomMap[r].Integral(1,options.binNum)
+                flatUpInt=CombineSysUpMap[r].Integral(1,options.binNum)
+                flatDwInt=CombineSysDwMap[r].Integral(1,options.binNum)
+                for i in range(1,options.binNum+1):
+                    if flatNomInt>0.0:
+                        CombineSysUpMap[r].SetBinContent(i,(flatUpInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
+                        CombineSysDwMap[r].SetBinContent(i,(flatDwInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
             if options.wait:
                 rhSmoothed = hSmoothed.Clone()                
                 DrawRatio(options,can,nomMap[r], varHist=[sysBefore,rhSmoothed])
@@ -321,6 +321,18 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
     elif options.smooth==10:
         print 'smoothing option 10...symmeterize'
         for r in regions:
+            scaleUpVarFlat=1.0
+            scaleDwVarFlat=1.0
+            # add flat syst for Z in the the W CR
+            if (histName.count('Z_') and r.count('one')) or (histName.count('W_') and r.count('two')):
+                flatNomInt=nomMap[r].Integral(1,options.binNum)
+                flatUpInt=sysUpMap[r].Integral(1,options.binNum)
+                flatDwInt=sysDwMap[r].Integral(1,options.binNum)
+                if flatNomInt>0.0:
+                    scaleUpVarFlat=(flatUpInt/flatNomInt)
+                    scaleDwVarFlat=(flatDwInt/flatNomInt)
+                    if abs(flatUpInt-1.0)>0.1:
+                        scaleUpVarFlat=0.05
             for ibin in range(1,options.binNum+1):
                 sysbef=0.0
                 nomH=rNewfile.Get(HistName(histName, r,'Nom', ibin))
@@ -331,6 +343,8 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
                 if not sysBinH:
                     continue
+                sysBinH.SetBinContent(1,currentNomV*flatUpInt)
+                updateHist+=[sysBinH]
                 sysbef=sysBinH.GetBinContent(1)
                 sysBinL=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
                 if not sysBinL:
@@ -593,14 +607,18 @@ if __name__=='__main__':
                       'JET_EffectiveNP_Mixed1'
                       ]
     systToSmoothTest=['EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
-            'MET_SoftTrk_Scale', #smoothed
-            'JET_fJvtEfficiency', #smoothed
-            'JET_JER_DataVsMC_MC16', #smoothed
+            #'MET_SoftTrk_Scale', #smoothed
+            #'JET_fJvtEfficiency', #smoothed
+            #'JET_JER_DataVsMC_MC16', #smoothed
             'JET_EtaIntercalibration_Modelling',
             'MET_SoftTrk_ResoPara',
             'MET_SoftTrk_ResoPerp',
             'JET_EffectiveNP_Mixed2',
             'JET_EffectiveNP_Mixed1']
+    systToSmoothTest10=['MET_SoftTrk_Scale', #smoothed
+            'JET_fJvtEfficiency', #smoothed
+            'JET_JER_DataVsMC_MC16', #smoothed
+            ]
     symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16']
     allSyst=[]
     if options.syst=='All':
@@ -613,6 +631,8 @@ if __name__=='__main__':
         allSyst=systToSmooth
     elif options.syst=='weird2':
         allSyst=systToSmoothTest
+    elif options.syst=='weird10':
+        allSyst=systToSmoothTest10        
     else:
         allSyst=[options.syst]
     print 'Number of syst:',len(allSyst)
