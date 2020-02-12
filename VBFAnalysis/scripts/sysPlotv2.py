@@ -38,6 +38,25 @@ def DrawRatio(options,can,nom, varHist=[]):
 
     can.Update()
     can.WaitPrimitive()
+
+def ZeroCheck():
+
+    rNewfile=ROOT.TFile(options.inputUpdate,'UPDATE')
+    keysF = rNewfile.GetListOfKeys()
+    updateList=[]
+    for k in keysF:
+        kname=k.GetName()
+        if (kname.count("Z_strong") and kname.count('_one')) or (kname.count("ttbar") and kname.count('_one')):
+            h=rNewfile.Get(kname)
+            if h.GetBinContent(1)<0.0:
+                h.SetBinContent(1,0.0)
+                updateList+=[h]
+    # write the updated histograms
+    for ha in updateList:
+        rNewfile.cd()
+        ha.Write(ha.GetName(),ROOT.TObject.kOverwrite)
+        print ha.GetName(),' set value to 0'
+    rNewfile.Close()
     
 def GetLegLabel(options,can):
 
@@ -324,7 +343,8 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
             scaleUpVarFlat=1.0
             scaleDwVarFlat=1.0
             # add flat syst for Z in the the W CR
-            if (histName.count('Z_') and r.count('one')) or (histName.count('W_') and r.count('two')):
+            if (histName.count('Z_') and r.count('_one')) or (histName.count('W_') and r.count('_two')):
+                #print histName,r
                 flatNomInt=nomMap[r].Integral(1,options.binNum)
                 flatUpInt=sysUpMap[r].Integral(1,options.binNum)
                 flatDwInt=sysDwMap[r].Integral(1,options.binNum)
@@ -332,9 +352,15 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                     scaleUpVarFlat=(flatUpInt/flatNomInt)
                     scaleDwVarFlat=(flatDwInt/flatNomInt)
                     if abs(scaleUpVarFlat-1.0)>0.1:
-                        scaleUpVarFlat=0.08
+                        if scaleUpVarFlat<1.0:
+                            scaleUpVarFlat=0.92
+                        else:
+                            scaleUpVarFlat=1.08
                     if abs(scaleDwVarFlat-1.0)>0.1:
-                        scaleDwVarFlat=0.08
+                        if scaleDwVarFlat<1.0:
+                            scaleDwVarFlat=0.92
+                        else:
+                            scaleDwVarFlat=1.08
             for ibin in range(1,options.binNum+1):
                 sysbef=0.0
                 nomH=rNewfile.Get(HistName(histName, r,'Nom', ibin))
@@ -345,8 +371,9 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
                 if not sysBinH:
                     continue
-                sysBinH.SetBinContent(1,currentNomV*scaleUpVarFlat)
-                updateHist+=[sysBinH]
+                if scaleUpVarFlat!=1.0:
+                    sysBinH.SetBinContent(1,currentNomV*scaleUpVarFlat)
+                    updateHist+=[sysBinH]
                 sysbef=sysBinH.GetBinContent(1)
                 sysBinL=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
                 if not sysBinL:
@@ -543,7 +570,8 @@ if __name__=='__main__':
     p.add_option('-q', '--quite', action='store_true', help='activates Batch mode')
     p.add_option('--texTables', action='store_true', help='Saves tables as pdf. Only works together with --yieldTable')
     p.add_option('--postFitPickleDir', type='string', default=None, help='Directory of post fit yields pickle files. expects the files end in .pickle')    
-    p.add_option('--show-mc-stat-err', action='store_true',  dest='show_mc_stat_err', help='Shows the MC stat uncertainties separately from the data ratio error')    
+    p.add_option('--show-mc-stat-err', action='store_true',  dest='show_mc_stat_err', help='Shows the MC stat uncertainties separately from the data ratio error')
+    p.add_option('--ZeroCheck', action='store_true',  dest='ZeroCheck', help='check for negative entry and set to 0')        
     p.add_option('--plot', default='', help='Plots a variable in a certain region. HFInputAlg.cxx produces these plots with the --doPlot flag . Only works with -i and not with -c. example: jj_mass,SR,1_2_3')
     (options, args) = p.parse_args()
 
@@ -568,6 +596,8 @@ if __name__=='__main__':
     # Load libraries
     config.loadLibs(ROOT)
     can=DeclareCanvas(options)
+    if options.ZeroCheck:
+        ZeroCheck()    
     rfile=ROOT.TFile(options.input,'READ')
     # read in pulls file and print the yields
     if options.pullsFile!=None:
@@ -575,7 +605,6 @@ if __name__=='__main__':
         for histName in ["W_strong","W_EWK","Z_strong", "Z_EWK", "ttbar"]:
             PrintPulls(rfile,options,can,histName,['VBFjetSel_XNom_twoEleCRX_obs_cuts','VBFjetSel_XNom_twoMuCRX_obs_cuts'])
         sys.exit(0)
-        
     # which syst
     systName='EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR'
     systToSmooth=['EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR',
