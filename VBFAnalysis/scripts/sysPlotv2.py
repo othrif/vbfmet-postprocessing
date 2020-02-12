@@ -653,6 +653,9 @@ if __name__=='__main__':
             'JET_fJvtEfficiency', #smoothed
             'JET_JER_DataVsMC_MC16', #smoothed
             ]
+    systToSmoothTestextra=['JET_JER_EffectiveNP_5',
+                      'JET_JER_EffectiveNP_6',
+                      'JET_JER_EffectiveNP_7restTerm',]
     symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency']
     allSyst=[]
     if options.syst=='All':
@@ -667,6 +670,8 @@ if __name__=='__main__':
         allSyst=systToSmoothTest
     elif options.syst=='weird10':
         allSyst=systToSmoothTest10
+    elif options.syst=='weirde':
+        allSyst=systToSmoothTestextra
     else:
         allSyst=[options.syst]
     print 'Number of syst:',len(allSyst)
