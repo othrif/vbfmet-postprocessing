@@ -68,6 +68,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   bool m_LooseSkim = true;
   bool m_PhotonSkim = true;
   bool m_AltSkim = false;
+  bool m_MJSkim = false;
   bool m_doPUWeight=true;
   bool m_extraVars = true;
   bool m_contLep   = false;
