@@ -11,6 +11,7 @@ import sys
 import ROOT
 import math
 import pickle
+import math
 import VBFAnalysis.ATLAS as ATLAS
 import VBFAnalysis.Style as Style
 from optparse import OptionParser
@@ -62,6 +63,59 @@ def addContent(hist, nbin, content, error):
     hist.SetBinContent(nbin, newC)
     hist.SetBinError(nbin, newE)
 
+def Scale(hist, nbins, nf):
+    x1a=ROOT.Double()
+    y1a=ROOT.Double()
+    for nbin in nbins:
+        if type(hist)==ROOT.TH1F:
+            v=hist.GetBinContent(nbin)
+            hist.SetBinContent(nbin,v*nf)
+        else:
+            hist.GetPoint(nbin-1,x1a,y1a)
+            hist.SetPoint(nbin-1,x1a,y1a*nf)
+
+def getNF(histDict, nbins, signalKeys=[], NFOnly=False):
+    sigV=0.0
+    sigE=0.0
+    bkgV=0.0
+    bkgE=0.0
+    dataV=getBinsYield(histDict["data"], nbins)
+    
+    for hkey,hist in histDict.iteritems():
+        if hkey=="signal":
+            continue
+        if hkey in signalKeys:
+            sigV+=getBinsYield(histDict[hkey], nbins)
+            sigE+=(getBinsError(histDict[hkey], nbins))**2
+        elif hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet"]:
+            bkgV+=getBinsYield(histDict[hkey], nbins)
+            bkgE+=(getBinsError(histDict[hkey], nbins))**2
+    nf=(dataV-bkgV)
+    nferr=0
+    if sigV>0.0:
+        nf=(dataV-bkgV)/sigV
+        nferr = nf*math.sqrt((dataV+bkgE)/(dataV**2)+sigE/(sigV**2))
+    if NFOnly:
+        return nf
+    return '%0.2f +/- %0.2f' %(nf,nferr)
+def getDataMC(histDict, nbins):
+    bkgV=0.0
+    bkgE=0.0
+    dataV=getBinsYield(histDict["data"], nbins)
+    
+    for hkey,hist in histDict.iteritems():
+        if hkey=="signal":
+            continue
+        if hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet"]:
+            bkgV+=getBinsYield(histDict[hkey], nbins)
+            bkgE+=(getBinsError(histDict[hkey], nbins))**2
+    nf=dataV
+    nferr=0
+    if bkgV>0:
+        nf=(dataV/bkgV)
+        nferr = nf*math.sqrt(1.0/(dataV)+bkgE/(bkgV**2))
+    return '%0.2f +/- %0.2f' %(nf,nferr)
+    
 def is_in_list(name, li):
     for l in li:
         if name in l: return True
@@ -367,10 +421,10 @@ def getBinsError(hist, bins):
     BE=0
     for bn in bins:
         if type(hist)==ROOT.TH1F:
-            BE+=hist.GetBinError(bn) # FIXME squared or not?
+            BE+=(hist.GetBinError(bn))**2 # FIXME squared or not?
         else:
-            BE+=hist.GetErrorYhigh(bn-1)
-    return BE
+            BE+=(hist.GetErrorYhigh(bn-1))**2
+    return math.sqrt(BE)
 
 def getBinsYield(hist, bins):
     BC=0
@@ -536,18 +590,45 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
         print "aZ:",aZ
     except:
         print "aW,aZ not defined. B_WCR, B_ZCR:",B_WCR, B_ZCR
-
-
+    doCRScaling=True
     for i in range(1,nbins+1):
+        tmpNF_fake_ele_neg = getNF(histDict,[i],["eleFakes"])
+        tmpNF_fake_ele_pos = getNF(histDict,[nbins+i],["eleFakes"])
+        tmpNF_fake_ele = getNF(histDict,[i,nbins+i],["eleFakes"],True)
+        if doCRScaling:
+            Scale(histDict["eleFakes"],[nbins*2+i,nbins*3+i], tmpNF_fake_ele)
+        tmpNF_WCR = getNF(histDict,[nbins*4+i,nbins*5+i,nbins*2+i,nbins*3+i],["W_strong","W_EWK"])
+        tmpNF_ZCR = getNF(histDict,[6*nbins+i,7*nbins+i],["Z_strong","Z_EWK"])
         tmpB_WCR=getBinsYield(histDict["W_strong"], [nbins*4+i,nbins*5+i,nbins*2+i,nbins*3+i])+getBinsYield(histDict["W_EWK"], [nbins*4+i,nbins*5+i,nbins*2+i,nbins*3+i])
         tmpB_WSR=getBinsYield(histDict["W_strong"], [8*nbins+i])+getBinsYield(histDict["W_EWK"], [8*nbins+i])
         tmpB_ZSR=(getBinsYield(histDict["Z_strong"], [8*nbins+i])+getBinsYield(histDict["Z_EWK"], [8*nbins+i]))
         tmpB_ZCR=(getBinsYield(histDict["Z_strong"], [6*nbins+i,7*nbins+i])+getBinsYield(histDict["Z_EWK"], [6*nbins+i,7*nbins+i]))
         try:
+            print "wNF{mr}=".format(mr=(i)),tmpNF_WCR," zNF: ",tmpNF_ZCR," FakeEleNeg: ",tmpNF_fake_ele_neg," FakeElePos: ",tmpNF_fake_ele_pos," FakeELe: ",tmpNF_fake_ele
             print "aW{mr}=".format(mr=(i)),tmpB_WSR/tmpB_WCR
             print "aZ{mr}=".format(mr=(i)),tmpB_ZSR/tmpB_ZCR
         except:
-            print "aW{mr}, aZ{mr} not defined. B_WCR, B_ZCR".format(mr=(i)),tmpB_WCR,tmpB_ZCR
+            print "aW{mr}, aZ{mr} not defined. B_WCR, B_ZCR".format(mr=(i)),tmpB_WCR,tmpB_ZCR,tmpNF_WCR
+
+    print 'reduced kZ,kW'
+    for i in range(1,nbins/2+1):
+        tmpNF_fake_ele = getNF(histDict,[i,nbins+i,i+5,nbins+i+5],["eleFakes"])
+        tmpNF_WCR = getNF(histDict,[nbins*4+i,nbins*5+i,nbins*2+i,nbins*3+i, nbins*4+i+5,nbins*5+i+5,nbins*2+i+5,nbins*3+i+5],["W_strong","W_EWK"])
+        tmpNF_ZCR = getNF(histDict,[6*nbins+i,7*nbins+i,6*nbins+i+5,7*nbins+i+5],["Z_strong","Z_EWK"])
+        tmpNF_WCRv = getNF(histDict,[nbins*4+i,nbins*5+i,nbins*2+i,nbins*3+i, nbins*4+i+5,nbins*5+i+5,nbins*2+i+5,nbins*3+i+5],["W_strong","W_EWK"],True)
+        tmpNF_ZCRv = getNF(histDict,[6*nbins+i,7*nbins+i,6*nbins+i+5,7*nbins+i+5],["Z_strong","Z_EWK"],True)        
+        if doCRScaling:
+            Scale(histDict["Z_strong"],[nbins*8+i,nbins*8+i+5], tmpNF_ZCRv)
+            Scale(histDict["Z_EWK"],[nbins*8+i,nbins*8+i+5], tmpNF_ZCRv)
+            Scale(histDict["W_strong"],[nbins*8+i,nbins*8+i+5], tmpNF_WCRv)
+            Scale(histDict["W_EWK"],[nbins*8+i,nbins*8+i+5], tmpNF_WCRv)
+            
+        tmpNF_SR1=getDataMC(histDict, [nbins*8+i])
+        tmpNF_SR2=getDataMC(histDict, [nbins*8+i+5])
+        try:
+            print "wNF{mr}=".format(mr=(i+5)),tmpNF_WCR," zNF: ",tmpNF_ZCR," FakeELe: ",tmpNF_fake_ele,' SR: ',tmpNF_SR1,' SR5bin: ',tmpNF_SR2
+        except:
+            print "aW{mr}, aZ{mr} not defined. B_WCR, B_ZCR".format(mr=(i+5)),tmpB_WCR,tmpB_ZCR,tmpNF_WCR
 
 
 def getNumberOfBins(rfileInput):
@@ -650,7 +731,6 @@ def main(options):
         hDict[hname].Sumw2()
     data=ROOT.TH1F("data","data",nbins*9,0,nbins*9)
     hDict["data"]=data
-
 
     #Styles
     Style.setStyles(data,[1,0,2,0,0,1,20,1.2])

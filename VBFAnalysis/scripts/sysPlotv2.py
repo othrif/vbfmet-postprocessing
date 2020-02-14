@@ -613,7 +613,7 @@ if __name__=='__main__':
     systToSmooth=['EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR',
                       'EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR',
                       'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
-                      'JET_fJvtEfficiency','JET_JvtEfficiency','JET_JvtEfficiency',
+                      'JET_fJvtEfficiency','JET_JvtEfficiency',
                       'JET_Pileup_OffsetMu',
                       'JET_Pileup_OffsetNPV', # still looks weird. some regions are higher or lower than others
                       'JET_Pileup_PtTerm',
@@ -655,7 +655,8 @@ if __name__=='__main__':
             ]
     systToSmoothTestextra=['JET_JER_EffectiveNP_5',
                       'JET_JER_EffectiveNP_6',
-                      'JET_JER_EffectiveNP_7restTerm',]
+                      'JET_JER_EffectiveNP_7restTerm',
+                               'alpha_JET_JvtEfficiency']
     symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency']
     allSyst=[]
     if options.syst=='All':
