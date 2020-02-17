@@ -42,7 +42,7 @@ class BasicCuts:
                                 'mjj1500nj2lepptlow', 'mjj1500nj2leppthigh', 'mjj2000nj2lepptlow', 'mjj2000nj2leppthigh', 'mjj3500nj2lepptlow',
                                 'mjj3500nj2leppthigh', 'njgt2lepptlow', 'njgt2leppthigh',
                             'allmjjdphijj3', 'mjj800dphijj3nj2', 'mjj1000dphijj3nj2', 'mjj1500dphijj3nj2', 'mjj2000dphijj3nj2', 'mjj3500dphijj3nj2', 'dphijj3njgt2',
-                            'LowMETQCDSRdphijj3', 'LowMETQCDVRdphijj3', 'LowMETQCDdphijj3', 'LowMETQCDSRFJVTdphijj3', 'LowMETQCDVRFJVTdphijj3', 'LowMETQCDFJVTdphijj3']:
+                            'mjjLow200dphijj3', 'LowMETQCDSRdphijj3', 'LowMETQCDVRdphijj3', 'LowMETQCDdphijj3', 'LowMETQCDSRFJVTdphijj3', 'LowMETQCDVRFJVTdphijj3', 'LowMETQCDFJVTdphijj3']:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
 
         self.analysis = Analysis
