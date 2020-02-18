@@ -36,7 +36,8 @@ p.add_option( '--max-mass',  type='string',      default=None,                 d
 p.add_option( '--style',     type='string',      default='atlas',              dest='style',      help='Plot style: atlas, tmhong')
 p.add_option( '--file-type', type='string',      default='eps',                dest='file_type',  help='Image type: pdf eps png')
 p.add_option( '--first',     type='string',      default=None,                 dest='first',      help='Filter for ratio')
-                                                                             
+
+p.add_option( '--scaleXS',      action='store_true',default=False,               dest='scaleXS',      help='Scale the XS')
 p.add_option( '--debug',      action='store_true',default=False,               dest='debug',      help='Run in debug mode')
 p.add_option( '--draw-obs',   action='store_true',default=False,               dest='draw_obs',   help='Draw the observed limit')
 p.add_option( '--no-wait',    action='store_true',default=False,               dest='no_wait',    help='Run in batch mode')
@@ -426,7 +427,10 @@ class LimitHists:
         self.exp.SetXTitle('Mediator Mass [GeV/c^2]')
         self.exp.SetYTitle('#sigma/#sigma_{SM}')
         self.obs.SetXTitle('Mediator Mass [GeV/c^2]')
-        self.obs.SetYTitle('#sigma/#sigma_{SM}')        
+        self.obs.SetYTitle('#sigma/#sigma_{SM}')
+        if options.scaleXS:
+            self.obs.SetYTitle('#sigma_{SM}^{VBF} x  BR_{inv} [pb]') 
+            self.exp.SetYTitle('#sigma_{SM}^{VBF} x  BR_{inv} [pb]') 
         self.sig2_err      .SetName('TwoSigmaBand')
         self.sig1_err      .SetName('OneSigmaBand')
         self.ratio_sig2_err.SetName('TwoSigmaBand')
@@ -735,7 +739,8 @@ def readFitPoints(path):
         fp.neg_1sig = lim.GetBinContent(5)
         fp.neg_2sig = lim.GetBinContent(6)        
         fp.signif   = lim.GetBinContent(7) # TODO verify: May be status now.
-        fp.ScaleXS()
+        if options.scaleXS:
+            fp.ScaleXS()
         if options.debug:
             fp.Print()
 
@@ -1100,6 +1105,8 @@ if __name__=="__main__":
             
         num_hist.GetYaxis().SetRangeUser(0.5, 1.1*max_bin)
         num_hist.SetYTitle('Ratio #sigma/#sigma_{SM}')
+        if options.scaleXS:
+            num_hist.SetYTitle('#sigma_{SM}^{VBF} x  BR_{inv} [pb]')            
         if draw_opt=='':
             draw_opt = 'C SAME'
             num_hist.Draw('AXIS')
