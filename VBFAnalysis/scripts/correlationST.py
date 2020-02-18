@@ -131,7 +131,7 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False):
                 tmp_line+='1,'
             tmp_line=tmp_line.rstrip(',')+'\n'
         line+=tmp_line
-        fraction_remaining = abs(math.sqrt(total_uncorr_unc)/total_corr_unc)
+        fraction_remaining = abs(1.-math.sqrt(total_uncorr_unc)/total_corr_unc)
         print 'unCorrelated fraction: %0.2f' %(math.sqrt(total_uncorr_unc)/total_corr_unc)
         tmp_line=sysname+'_corr11 '
         for  bin_num1Z in range(0,maxBin-1):
