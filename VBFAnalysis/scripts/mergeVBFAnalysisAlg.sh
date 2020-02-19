@@ -19,6 +19,22 @@ rm Z_strongExt*root
 rm Z_strongmVBFFilt*root
 rm W_strongExt*root
 
+hadd $OUTDIRM/VBFH1000.root VBFH1000*root
+rm VBFH1000*root
+hadd $OUTDIRM/VBFH2000.root VBFH2000*root
+rm VBFH2000*root
+hadd $OUTDIRM/VBFH3000.root VBFH3000*root
+rm VBFH3000*root
+hadd $OUTDIRM/VBFH750.root VBFH750*root
+rm VBFH750*root
+hadd $OUTDIRM/VBFH300.root VBFH300*root
+rm VBFH300*root
+hadd $OUTDIRM/VBFH100.root VBFH100*root
+rm VBFH100*root
+hadd $OUTDIRM/VBFH75.root VBFH75*root
+rm VBFH75*root
+hadd $OUTDIRM/VBFH50.root VBFH50*root
+rm VBFH50*root
 # now hadd the standard samples
 #hadd $OUTDIRM/VV.root VV*root
 hadd $OUTDIRM/W_strong.root W_strong*root

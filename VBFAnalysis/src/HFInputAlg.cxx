@@ -122,6 +122,7 @@ StatusCode HFInputAlg::initialize() {
   std::string currentSamplePlot = currentSample;
   if(mergeKTPTV && currentSample=="Z_strongExt") currentSamplePlot = "Z_strong";
   if(mergeKTPTV && currentSample=="W_strongExt") currentSamplePlot = "W_strong";
+  if(year==2018 && currentSample=="Z_strongPTVExt") currentSamplePlot = "Z_strong";
 
   if(!singleHist){
     for (int c=1;c<bins;c++) {
@@ -186,7 +187,7 @@ std::string HFInputAlg::HistoNameMaker(std::string currentSample, std::string cu
   std::string currentSamplePlot = currentSample;
   if(mergeKTPTV && currentSample=="Z_strongExt") currentSamplePlot = "Z_strong";
   if(mergeKTPTV && currentSample=="W_strongExt") currentSamplePlot = "W_strong";
-
+  if(year==2018 && currentSample=="Z_strongPTVExt") currentSamplePlot = "Z_strong";
   if (isMC) {
     if (bin == "") return "h"+currentSamplePlot+ "_"+syst+"_"+currentCR + "_obs";
     else if (bin == "DoubleRatio") return "h"+currentSamplePlot+ "_antiVBFSel_1"+syst+"_"+currentCR + "_obs";
@@ -314,9 +315,11 @@ StatusCode HFInputAlg::execute() {
     if(currentSample=="W_strong") passSample=!(runNumber >= 363600 && runNumber <= 363671) && !(runNumber >= 311429 && runNumber <= 311453) && !(runNumber >= 364216 && runNumber <= 364229);
     else if(currentSample=="Z_strong"){
       passSample=!((runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519)) && !(runNumber >= 311429 && runNumber <= 311453) && !(runNumber >= 366010 && runNumber <= 366035) && !(runNumber >= 364216 && runNumber <= 364229);
-      if(year==2018)       passSample=!((runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519)) && !(runNumber >= 311429 && runNumber <= 311453) && !(runNumber >= 364216 && runNumber <= 364229);
-    }
-    else passSample=true;
+      if(year==2018)       passSample=!((runNumber >= 363147 && runNumber <= 363170) || (runNumber >= 363123 && runNumber <= 363146) || (runNumber >= 361510 && runNumber <= 361519)) && !(runNumber >= 311429 && runNumber <= 311453) && !(runNumber >= 364216 && runNumber <= 364221) && !(runNumber >= 364224 && runNumber <= 364229);
+    }else if(currentSample=="Z_strongPTVExt"){
+      if(year==2018)       passSample=!(runNumber >= 364216 && runNumber <= 364221) && !(runNumber >= 364224 && runNumber <= 364229);
+      else passSample=true;
+    } else passSample=true;
   }
   if(!passSample)  return StatusCode::SUCCESS;
   // if merging the sherpa sample from kt filtered, then require passVjetsFilter
