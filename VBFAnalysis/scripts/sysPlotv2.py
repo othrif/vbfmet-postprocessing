@@ -38,6 +38,25 @@ def DrawRatio(options,can,nom, varHist=[]):
 
     can.Update()
     can.WaitPrimitive()
+
+def ZeroCheck():
+
+    rNewfile=ROOT.TFile(options.inputUpdate,'UPDATE')
+    keysF = rNewfile.GetListOfKeys()
+    updateList=[]
+    for k in keysF:
+        kname=k.GetName()
+        if (kname.count("Z_strong") and kname.count('_one')) or (kname.count("ttbar") and kname.count('_one')):
+            h=rNewfile.Get(kname)
+            if h.GetBinContent(1)<0.0:
+                h.SetBinContent(1,0.0)
+                updateList+=[h]
+    # write the updated histograms
+    for ha in updateList:
+        rNewfile.cd()
+        ha.Write(ha.GetName(),ROOT.TObject.kOverwrite)
+        print ha.GetName(),' set value to 0'
+    rNewfile.Close()
     
 def GetLegLabel(options,can):
 
@@ -143,8 +162,18 @@ def PrintPulls(rfile,options,can,histName,regions):
                         totalValPull-=dwPull
             print 'totalValPull: %0.2f' %totalValPull,' bin ',ibin
     pullList.close()
+
+#symmeterize systematics
+def Symmeterize(hnom, hup, hdw):
+
+    for i in range(1,hnom.GetNbinsX()+1):
+        inom=hnom.GetBinContent(i)
+        iup =hup.GetBinContent(i)
+        idw =hdw.GetBinContent(i)
+        if iup!=0.0:
+            hdw.SetBinContent(i,inom/iup*inom)
     
-def Smooth(rfile,options,can,systName,histName,regions):
+def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
 
     smoothSyle=1
     if systName.count('EL_'):
@@ -195,7 +224,6 @@ def Smooth(rfile,options,can,systName,histName,regions):
     # takes the integral in the region. Then scales by the integral over all regions
     updateHist=[]
     rNewfile=ROOT.TFile(options.inputUpdate,'UPDATE')
-    #rNewfile=ROOT.TFile('/tmp/HFALL_feb5_sysUPDATE.root','UPDATE')
     if options.smooth==1 or (options.smooth==5 and smoothSyle==1):
         print 'smoothing option 1'
         for r in regions:
@@ -218,7 +246,11 @@ def Smooth(rfile,options,can,systName,histName,regions):
                     if not sysBinH:
                         continue
                     #sysBinH.Scale(upInt/nomInt)
-                    sysBinH.SetBinContent(1,dwInt/nomInt*currentNomV)
+                    scaleSyst=dwInt/nomInt
+                    if systName in systNameToSymmet:
+                        if upInt>0.0:
+                            scaleSyst=nomInt/upInt
+                    sysBinH.SetBinContent(1,scaleSyst*currentNomV)
                     updateHist+=[sysBinH]
     elif options.smooth==2 or (options.smooth==5 and smoothSyle==2):
         print 'smoothing option 2 - parabolic smoothing'
@@ -228,7 +260,8 @@ def Smooth(rfile,options,can,systName,histName,regions):
             sysBefore=sysUpMap[r].Clone()
             hSmoothed = smooth_tool.smoothHistogram(nomMap[r], sysUpMap[r], True)
             smooth_tool.smoothHistogram(nomMap[r], sysDwMap[r], True)            
-
+            if systName in systNameToSymmet:
+                Symmeterize(CombineSysNomMap[r],sysUpMap[r],sysDwMap[r])
             if options.wait:
                 rhSmoothed = hSmoothed.Clone()                
                 DrawRatio(options,can,nomMap[r], varHist=[sysBefore,rhSmoothed])
@@ -272,8 +305,19 @@ def Smooth(rfile,options,can,systName,histName,regions):
         for r in regions:
             sysBefore=sysUpMap[r].Clone()
             hSmoothed = smooth_tool.smoothHistogram(CombineSysNomMap[r], CombineSysUpMap[r], True)
-            smooth_tool.smoothHistogram(CombineSysNomMap[r], CombineSysDwMap[r], True)            
-
+            smooth_tool.smoothHistogram(CombineSysNomMap[r], CombineSysDwMap[r], True)
+            # symmeterize
+            if systName in systNameToSymmet:
+                Symmeterize(CombineSysNomMap[r],CombineSysUpMap[r],CombineSysDwMap[r])
+            # add flat syst for Z in the the W CR
+            if (histName.count('Z_') and r.count('one')) or (histName.count('W_') and r.count('two')):
+                flatNomInt=CombineSysNomMap[r].Integral(1,options.binNum)
+                flatUpInt=CombineSysUpMap[r].Integral(1,options.binNum)
+                flatDwInt=CombineSysDwMap[r].Integral(1,options.binNum)
+                for i in range(1,options.binNum+1):
+                    if flatNomInt>0.0:
+                        CombineSysUpMap[r].SetBinContent(i,(flatUpInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
+                        CombineSysDwMap[r].SetBinContent(i,(flatDwInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
             if options.wait:
                 rhSmoothed = hSmoothed.Clone()                
                 DrawRatio(options,can,nomMap[r], varHist=[sysBefore,rhSmoothed])
@@ -293,7 +337,55 @@ def Smooth(rfile,options,can,systName,histName,regions):
                     #print nomV,(nomV*CombineSysDwMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
                     sysBinH.SetBinContent(1,nomV*CombineSysDwMap[r].GetBinContent(binOrder[ibin-1])/CombineSysNomMap[r].GetBinContent(binOrder[ibin-1]))
                 updateHist+=[sysBinH] 
-                    
+    elif options.smooth==10:
+        print 'smoothing option 10...symmeterize'
+        for r in regions:
+            scaleUpVarFlat=1.0
+            scaleDwVarFlat=1.0
+            # add flat syst for Z in the the W CR
+            if (histName.count('Z_') and r.count('_one')) or (histName.count('W_') and r.count('_two')):
+                #print histName,r
+                flatNomInt=nomMap[r].Integral(1,options.binNum)
+                flatUpInt=sysUpMap[r].Integral(1,options.binNum)
+                flatDwInt=sysDwMap[r].Integral(1,options.binNum)
+                if flatNomInt>0.0:
+                    scaleUpVarFlat=(flatUpInt/flatNomInt)
+                    scaleDwVarFlat=(flatDwInt/flatNomInt)
+                    if abs(scaleUpVarFlat-1.0)>0.1:
+                        if scaleUpVarFlat<1.0:
+                            scaleUpVarFlat=0.92
+                        else:
+                            scaleUpVarFlat=1.08
+                    if abs(scaleDwVarFlat-1.0)>0.1:
+                        if scaleDwVarFlat<1.0:
+                            scaleDwVarFlat=0.92
+                        else:
+                            scaleDwVarFlat=1.08
+            for ibin in range(1,options.binNum+1):
+                sysbef=0.0
+                nomH=rNewfile.Get(HistName(histName, r,'Nom', ibin))
+                if not nomH:
+                    print 'could not load: ',HistName(histName, r, 'Nom', ibin)
+                    continue
+                currentNomV=nomH.GetBinContent(1)
+                sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
+                if not sysBinH:
+                    continue
+                if scaleUpVarFlat!=1.0:
+                    sysBinH.SetBinContent(1,currentNomV*scaleUpVarFlat)
+                    updateHist+=[sysBinH]
+                sysbef=sysBinH.GetBinContent(1)
+                sysBinL=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
+                if not sysBinL:
+                    continue
+                scaleSyst=sysBinL.GetBinContent(1)
+                if systName in systNameToSymmet:
+                    if sysbef>0.0:
+                        scaleSyst=currentNomV/sysbef*currentNomV
+                        scaleDwVarFlat=1.0
+                sysBinL.SetBinContent(1,scaleSyst*scaleDwVarFlat)
+                #print currentNomV,sysbef,sysBinL.GetBinContent(1)
+                updateHist+=[sysBinL]
     # write the updated histograms
     for ha in updateHist:
         rNewfile.cd()
@@ -322,6 +414,7 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
         hsysdw=ROOT.TH1F(hNameDw,hNameDw,options.binNum,0.5,0.5+options.binNum)        
         for ibin in range(1,options.binNum+1):
             nomBinH=rfile.Get(HistName(histName, r, 'Nom', ibin))
+            #print r,nomBinH.GetBinContent(1)
             if not nomBinH:
                 print 'could not load: ',HistName(histName, r, 'Nom', ibin)
                 continue
@@ -332,6 +425,7 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
             #*nomBinH.GetBinError  (1)
             # up variation
             sysBinH=rfile.Get(HistName(histName, r, systName+'High', ibin))
+            #print 'sys: ',r,sysBinH.GetBinContent(1)
             if not sysBinH:
                 print 'could not load: ',HistName(histName, r, systName+'High', ibin)
                 continue
@@ -343,7 +437,8 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
                 print 'could not load: ',HistName(histName, r, systName+'Low', ibin)
                 continue
             hsysdw.SetBinContent(binOrder[ibin-1], sysdwBinH.GetBinContent(1))
-            hsysdw.SetBinError  (binOrder[ibin-1], 0.0)            
+            hsysdw.SetBinError  (binOrder[ibin-1], 0.0)
+            #print r,'down: ',sysdwBinH.GetBinContent(1),' up: ',sysBinH.GetBinContent(1),' nom: ',nomBinH.GetBinContent(1)
         nomMap[r]=h.Clone()
         sysUpMap[r]=hsys.Clone()
         sysDwMap[r]=hsysdw.Clone()
@@ -478,7 +573,8 @@ if __name__=='__main__':
     p.add_option('-q', '--quite', action='store_true', help='activates Batch mode')
     p.add_option('--texTables', action='store_true', help='Saves tables as pdf. Only works together with --yieldTable')
     p.add_option('--postFitPickleDir', type='string', default=None, help='Directory of post fit yields pickle files. expects the files end in .pickle')    
-    p.add_option('--show-mc-stat-err', action='store_true',  dest='show_mc_stat_err', help='Shows the MC stat uncertainties separately from the data ratio error')    
+    p.add_option('--show-mc-stat-err', action='store_true',  dest='show_mc_stat_err', help='Shows the MC stat uncertainties separately from the data ratio error')
+    p.add_option('--ZeroCheck', action='store_true',  dest='ZeroCheck', help='check for negative entry and set to 0')        
     p.add_option('--plot', default='', help='Plots a variable in a certain region. HFInputAlg.cxx produces these plots with the --doPlot flag . Only works with -i and not with -c. example: jj_mass,SR,1_2_3')
     (options, args) = p.parse_args()
 
@@ -503,6 +599,8 @@ if __name__=='__main__':
     # Load libraries
     config.loadLibs(ROOT)
     can=DeclareCanvas(options)
+    if options.ZeroCheck:
+        ZeroCheck()    
     rfile=ROOT.TFile(options.input,'READ')
     # read in pulls file and print the yields
     if options.pullsFile!=None:
@@ -510,13 +608,12 @@ if __name__=='__main__':
         for histName in ["W_strong","W_EWK","Z_strong", "Z_EWK", "ttbar"]:
             PrintPulls(rfile,options,can,histName,['VBFjetSel_XNom_twoEleCRX_obs_cuts','VBFjetSel_XNom_twoMuCRX_obs_cuts'])
         sys.exit(0)
-        
     # which syst
     systName='EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR'
     systToSmooth=['EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR',
                       'EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR',
-                      #'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
-                      'JET_fJvtEfficiency','JET_JvtEfficiency','JET_JvtEfficiency',
+                      'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
+                      'JET_fJvtEfficiency','JET_JvtEfficiency',
                       'JET_Pileup_OffsetMu',
                       'JET_Pileup_OffsetNPV', # still looks weird. some regions are higher or lower than others
                       'JET_Pileup_PtTerm',
@@ -533,11 +630,34 @@ if __name__=='__main__':
                       'JET_JER_EffectiveNP_5',
                       'JET_JER_EffectiveNP_6',
                       'JET_JER_EffectiveNP_7restTerm',
+                      'JET_EtaIntercalibration_Modelling',
                       'MET_SoftTrk_Scale',
                       'JET_Flavor_Response',
                       'JET_EtaIntercalibration_TotalStat',
                       'PRW_DATASF', # amanda suggested
+                      'MET_SoftTrk_ResoPara',
+                      'MET_SoftTrk_ResoPerp',
+                      'JET_EffectiveNP_Mixed2',
+                      'JET_EffectiveNP_Mixed1'
                       ]
+    systToSmoothTest=['EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
+            #'MET_SoftTrk_Scale', #smoothed
+            #'JET_fJvtEfficiency', #smoothed
+            #'JET_JER_DataVsMC_MC16', #smoothed
+            'JET_EtaIntercalibration_Modelling',
+            'MET_SoftTrk_ResoPara',
+            'MET_SoftTrk_ResoPerp',
+            'JET_EffectiveNP_Mixed2',
+            'JET_EffectiveNP_Mixed1']
+    systToSmoothTest10=['MET_SoftTrk_Scale', #smoothed
+            'JET_fJvtEfficiency', #smoothed
+            'JET_JER_DataVsMC_MC16', #smoothed
+            ]
+    systToSmoothTestextra=['JET_JER_EffectiveNP_5',
+                      'JET_JER_EffectiveNP_6',
+                      'JET_JER_EffectiveNP_7restTerm',
+                               'alpha_JET_JvtEfficiency']
+    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency']
     allSyst=[]
     if options.syst=='All':
         allSystUpAndDown=vbf_syst.systematics('All').getsystematicsList()
@@ -547,13 +667,19 @@ if __name__=='__main__':
                 allSyst+=[sSystName]
     elif options.syst=='weird':
         allSyst=systToSmooth
+    elif options.syst=='weird2':
+        allSyst=systToSmoothTest
+    elif options.syst=='weird10':
+        allSyst=systToSmoothTest10
+    elif options.syst=='weirde':
+        allSyst=systToSmoothTestextra
     else:
         allSyst=[options.syst]
     print 'Number of syst:',len(allSyst)
     for systNameA in allSyst:
         for histName in histNames:
             if options.smooth:
-                Smooth(rfile,options,can,systNameA,histName,regions+['VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts','VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts'])
+                Smooth(rfile,options,can,systNameA,histName,regions+['VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts','VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts'],symmet)
             if not options.batch:
                 DrawRatio(rfile,options,can,systNameA,histName,regions)
             sys.stdout.flush()

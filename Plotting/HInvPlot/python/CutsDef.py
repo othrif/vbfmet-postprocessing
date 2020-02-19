@@ -661,8 +661,9 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
     if options.r207Ana:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     else:
-        if basic_cuts.chan=='uu':
-            cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
+        if basic_cuts.chan in ['uu','ll']:
+            #cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
+            cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
         else:
             cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
@@ -719,7 +720,8 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
 
     cuts = FilterCuts(options)
     if basic_cuts.chan in ['u','um','up','l']:
-        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
+        #cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
+        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
     else:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
 

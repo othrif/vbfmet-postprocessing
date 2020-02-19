@@ -156,3 +156,5 @@ python HInvPlot/macros/submitPlotEventCondor.py -i
 --year 2017 " -d v34PlotsDJan7
 
 python HInvPlot/macros/submitPlotEventCondor.py -i /home/schae/testarea/HInv/source/Plotting/v34ALooseSYSTJan7.txt --extraCommand=" --chan nn,e,u,l,ee,uu,ll --DetailLvl 10 --mergeKTPTV " -d v34PlotsAJan7
+
+python HInvPlot/macros/drawStack.py out_all_v37febALL.root --vars averageIntPerXing,centrality,j3Pt,jetEta0,jetEta1,jj_deta,jj_dphi,jj_mass,jj_mass_variableBin,met_cst_jet,met_soft_tst_et,met_tst_nolep_et,metsig_tst,min_mj3_over_mjj,n_jet,met_tst_et --do-ratio --save --do-pdf --do-eps --outdir /tmp/ZCR/ --year 2019 --int-lumi=139e3 --draw-syst --selkey pass_zcr_allmjj_uu_Nominal >&/tmp/a1u.log
