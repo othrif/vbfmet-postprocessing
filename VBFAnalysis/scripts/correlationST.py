@@ -42,7 +42,7 @@ def ReturnNewSystScaleUncor(sysname, vals, listV):
         sysV=new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
         if bin_num1Z in cordphi:
             bin_num1ZAlt = cordphi[bin_num1Z]
-            sysV+=new_vals[bin_num1ZAlt]*listV[bin_num1ZAlt][vsysname]            
+            sysV+=new_vals[bin_num1ZAlt]*listV[bin_num1ZAlt][vsysname]
         totalSysCorrelated+=sysV
         totalSysUncorrelated+=(sysV)**2
     print 'totalSysCorrelated: ',totalSysCorrelated,' uncorr: ',math.sqrt(totalSysUncorrelated)
@@ -58,7 +58,7 @@ def ReturnNewSystScaleUncor(sysname, vals, listV):
     line+=tmp_line.rstrip(',')
     return line+'\n'
 
-def ReturnNewSyst(sysname, vals, listV, EWKDecor=True):
+def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False):
     line=''
     debug=False
     new_vals = []
@@ -81,22 +81,22 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True):
     vsysname=0
     if sysname.count('Z_strong'):
         if EWKDecor:
-            doDecorrelation=True
+            doDecorrelation=False
             deCorrFactor=0.25
     if sysname.count('Z_EWK'):
         vsysname=1
         if EWKDecor:
-            doDecorrelation=True
+            doDecorrelation=False
             deCorrFactor=0.9
     if sysname.count('W_strong'):
         vsysname=2
         if EWKDecor:
-            doDecorrelation=True
+            doDecorrelation=False
             deCorrFactor=0.25
     if sysname.count('W_EWK'):
         vsysname=3
         if EWKDecor:
-            doDecorrelation=True
+            doDecorrelation=False
             deCorrFactor=0.25
     linesys=''
     linesys1=''
@@ -111,6 +111,38 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True):
         print tmp_line.rstrip(',')
         line+=tmp_line.rstrip(',')
         return line+'\n'
+
+    # a line per systematic
+    if doUncorr:
+        tmp_line=''
+        total_corr_unc=0.0
+        total_uncorr_unc=0.0
+        for  bin_num1Z in range(0,maxBin-1):
+            tmp_line+=sysname+'_uncbin%i ' %(bin_num1Z+1)
+            for  bin_num1ZBefore in range(0,bin_num1Z):
+                tmp_line+='1,'
+            # move the correlation
+            total_corr_unc+=new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
+            total_uncorr_unc+=(new_vals[bin_num1Z]*listV[bin_num1Z][vsysname])**2
+            newSystmig11=new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
+            newSystmig11=check(1.-newSystmig11/listV[bin_num1Z][vsysname],ispdf=True)
+            tmp_line+='%0.5f,' %newSystmig11
+            for  bin_num1ZBefore in range(bin_num1Z+1,maxBin-1):
+                tmp_line+='1,'
+            tmp_line=tmp_line.rstrip(',')+'\n'
+        line+=tmp_line
+        fraction_remaining = abs(1.-math.sqrt(total_uncorr_unc)/total_corr_unc)
+        print 'unCorrelated fraction: %0.2f' %(math.sqrt(total_uncorr_unc)/total_corr_unc)
+        tmp_line=sysname+'_corr11 '
+        for  bin_num1Z in range(0,maxBin-1):
+            newSystmig11=fraction_remaining*new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
+            newSystmig11=check(1.-newSystmig11/listV[bin_num1Z][vsysname],ispdf=True)
+            tmp_line+='%0.5f,' %newSystmig11
+        print tmp_line.rstrip(',')
+        line+=tmp_line.rstrip(',')+'\n'
+        
+        return line
+        
     for  bin_num1Z in range(1,maxBin-1):
         tmp_line+='1.0,'
     newSystmig11=new_vals[10]*listV[10][vsysname]
@@ -254,6 +286,7 @@ parser = argparse.ArgumentParser( description = "Changing to MG relative uncerta
 parser.add_argument("--input",  dest='input', default='listTheorySystUpdatedv4', help="Input file with systematics")
 parser.add_argument("--output", dest='output', default='listTheorySyst11STv4', help="Output file with ST approach")
 parser.add_argument("--inputYields", dest='inputYields', default='/tmp/HF_jan7_mc16all_nom.root', help="Input file with yields")
+parser.add_argument("--uncor", dest='uncor', action = "store_true",  default=True, help="uncorrelate combination")
 parser.add_argument("--corrDPhi", dest='corrDPhi',action = "store_true",  default=True, help="Correlate dphijj bins")
 parser.add_argument("--scaleUncor", dest='scaleUncor',action = "store_true",  default=False, help="Scale the uncertainties as if uncorrelated to match the correlated syst")
 args, unknown = parser.parse_known_args()
@@ -287,6 +320,7 @@ for i in fin:
             curr_region=curr_line.strip()
             regionLine=True
     if regionLine:
+        print 'Region link: ',i
         continue
     if last_region!=curr_region:
         # continue calculating
@@ -307,9 +341,9 @@ for i in fin:
             systMap[entries[0]]=entries[1].split(',')
             print entries[0],systMap[entries[0]]
             if not args.scaleUncor:
-                tot_line+=ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString], EWKDecor=True)
+                tot_line+=ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString], EWKDecor=True,doUncorr=args.uncor)
             else:
-                tot_line+=ReturnNewSystScaleUncor(entries[0], systMap[entries[0]],regionYields[yieldRegString])
+                tot_line+=ReturnNewSystScaleUncor(entries[0], systMap[entries[0]],regionYields[yieldRegString],doUncorr=args.uncor)
         else:
             print 'ERROR could not parse:',entries
             print curr_line

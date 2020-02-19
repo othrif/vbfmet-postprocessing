@@ -309,13 +309,21 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
             # symmeterize
             if systName in systNameToSymmet:
                 Symmeterize(CombineSysNomMap[r],CombineSysUpMap[r],CombineSysDwMap[r])
-            # add flat syst for Z in the the W CR
+            # add flat syst for Z in the the W CR and make sure the systematics don't go in the same direction
             if (histName.count('Z_') and r.count('one')) or (histName.count('W_') and r.count('two')):
                 flatNomInt=CombineSysNomMap[r].Integral(1,options.binNum)
                 flatUpInt=CombineSysUpMap[r].Integral(1,options.binNum)
                 flatDwInt=CombineSysDwMap[r].Integral(1,options.binNum)
                 for i in range(1,options.binNum+1):
                     if flatNomInt>0.0:
+                        fracUp=(flatUpInt/flatNomInt)
+                        fracDw=(flatDwInt/flatNomInt)
+                        if abs(1.-fracUp)>0.08 and fracUp<1.0:
+                            fracUp=0.92
+                        if abs(1.-fracUp)>0.08 and fracUp>1.0:
+                            fracUp=1.08
+                        if ((1.-fracUp)<1.0 and  (1.-fracDw)<1.0) or ((1.-fracUp)>1.0 and  (1.-fracDw)>1.0):
+                            fracDw=2.-fracUp
                         CombineSysUpMap[r].SetBinContent(i,(flatUpInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
                         CombineSysDwMap[r].SetBinContent(i,(flatDwInt/flatNomInt)*CombineSysNomMap[r].GetBinContent(i))
             if options.wait:
@@ -654,9 +662,11 @@ if __name__=='__main__':
             'JET_JER_DataVsMC_MC16', #smoothed
             ]
     systToSmoothTestextra=['JET_JER_EffectiveNP_5',
-                      'JET_JER_EffectiveNP_6',
-                      'JET_JER_EffectiveNP_7restTerm',]
-    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency','JET_JvtEfficiency']
+                           'JET_JER_EffectiveNP_6',
+                           'JET_JER_EffectiveNP_7restTerm',
+                           'alpha_JET_JvtEfficiency']
+    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency','JET_JvtEfficiency','JET_Flavor_Response','JET_Flavor_Composition','JET_EffectiveNP_Modelling3','JET_EffectiveNP_Modelling1','JET_EffectiveNP_Modelling2']
+
     allSyst=[]
     if options.syst=='All':
         allSystUpAndDown=vbf_syst.systematics('All').getsystematicsList()
