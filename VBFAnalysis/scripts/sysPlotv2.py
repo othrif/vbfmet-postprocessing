@@ -665,7 +665,7 @@ if __name__=='__main__':
                       'JET_JER_EffectiveNP_6',
                       'JET_JER_EffectiveNP_7restTerm',
                                'alpha_JET_JvtEfficiency']
-    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency','JET_Flavor_Response','JET_Flavor_Composition']
+    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency','JET_Flavor_Response','JET_Flavor_Composition','JET_EffectiveNP_Modelling3','JET_EffectiveNP_Modelling1','JET_EffectiveNP_Modelling2']
     allSyst=[]
     if options.syst=='All':
         allSystUpAndDown=vbf_syst.systematics('All').getsystematicsList()
