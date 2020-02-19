@@ -8,7 +8,7 @@ class sample(object):
         self.subfileN=""
         self.load(samplename,syst,Ext)
         self.sampleTypeList = ["W_EWKPow","W_EWK","W_strongExt","W_strong","Z_EWKPow","Z_EWK", "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strong228", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
-                               "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',"data"] # do not change order
+                               "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther", "VBFHAltSignal", "QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',"data"] # do not change order
 
         self.sampleMap = {'data':['data'],
                           'W_EWK':['W_EWK',"W_EWKPow"],
@@ -32,6 +32,7 @@ class sample(object):
                           'signal':['VBFH125','ggFH125','VH125','TTH125','VBFHgam125'],
                           'signalOld':['VBFH125Old','ggFH125Old','VH125Old'],
                           'VBFHOther':['VBFHOther'],
+                          'VBFHAltSignal':['VBFHAltSignal'],
                           'QCD':['QCDw','QCDunw'],
                           }
 
@@ -115,6 +116,8 @@ class sample(object):
                 self.sampleType = "VBFHgam125"
             elif ((self.runNumber >= 308275) and self.runNumber <= 308283) or (self.runNumber >=313134 and self.runNumber <=313141):
                 self.sampleType = "VBFHOther"
+            elif self.runNumber==999999:
+                self.sampleType = "VBFHAltSignal"
             elif self.runNumber==346588:
                 self.sampleType = "ggFH125"
             elif (self.runNumber == 308284):
