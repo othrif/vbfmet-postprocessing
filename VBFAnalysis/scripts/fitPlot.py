@@ -260,6 +260,8 @@ class HistClass(object):
             self.proc+="_"+sp[1]
         self.reg=sp[-3]
         self.mr=self.reg[-1]
+        if (self.reg[-2]).isdigit():
+            self.mr=self.reg[-2]+self.reg[-1]
         self.syst_HIGH_LOW=""
         if "NONE" in self.hname: # These are data hists
             self.syst="Nom"
@@ -1296,12 +1298,22 @@ def plotVar(options):
     var=opt[0]
     reg=opt[1]
     mjjBins=opt[2].split("_")
-
+    plotIndex=0
+    if reg=='twoEleCR':
+        plotIndex=7
+    if reg=='twoMuCR':
+        plotIndex=8
+    if reg=='oneMuPosCR':
+        plotIndex=5
+    if reg=='oneMuNegCR':
+        plotIndex=6    
     rfile=ROOT.TFile(options.input)
 
     postFitPickles=None
     fittedSRVals={}
     fittedSRErrs={}
+    fittedMCVals={}
+    fittedMCErrs={}
     if options.postFitPickleDir!=None:
         postFitPickles = LoadPickleFiles(options.postFitPickleDir)
         for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
@@ -1313,17 +1325,30 @@ def plotVar(options):
                     pickle_key_remFit = pickle_key[len('Fitted_events_'):]
                     #print 'pickle_key_remFit:',pickle_key_remFit
                     #print fpickle[pickle_key][0],pickle_region_names[0],pickle_region_names
-                    fittedSRVals[pickle_key_remFit]=fpickle[pickle_key][0] # 0 is the SR
+                    fittedSRVals[pickle_key_remFit]=fpickle[pickle_key][plotIndex] # 0 is the SR
+                    #print 'Fitted_events_',pickle_key_remFit,fpickle[pickle_key][plotIndex]
                 elif ('Fitted_err_' in pickle_key):
                     pickle_key_remFit = pickle_key[len('Fitted_err_'):]
-                    fittedSRErrs[pickle_key_remFit]=fpickle[pickle_key][0] # 0 is the SR
+                    fittedSRErrs[pickle_key_remFit]=fpickle[pickle_key][plotIndex] # 0 is the SR
+                    #print 'Fitted_err_',pickle_key_remFit,fpickle[pickle_key][plotIndex]
+                elif ('MC_exp_events_' in pickle_key):
+                    pickle_key_remFit = pickle_key[len('MC_exp_events_'):]
+                    fittedMCVals[pickle_key_remFit]=fpickle[pickle_key][plotIndex] # 0 is the SR
+                elif ('MC_exp_err_' in pickle_key):
+                    pickle_key_remFit = pickle_key[len('MC_exp_err_'):]
+                    fittedMCErrs[pickle_key_remFit]=fpickle[pickle_key][plotIndex] # 0 is the SR                    
                 else:
                     continue
- 
+
+    print 'multijet_VBFjetSel_X'
+    for ib in range(1,3):
+        areaName='multijet_VBFjetSel_X'.replace('X','%s' %ib)
+        print areaName,fittedMCVals[areaName],fittedMCErrs[areaName],fittedSRVals[areaName],fittedSRErrs[areaName]
+    
     bkgDict={}
     sigDict={}
     systHistAsymTot = None #ROOT.TGraphAsymmErrors(systHist)
-    systHistAsym = None #ROOT.TGraphAsymmErrors(systHist)    
+    systHistAsym = None #ROOT.TGraphAsymmErrors(systHist)
     #for i in range(0,systHist.GetNbinsX()):
     #    systHistAsym.SetPointEXhigh(i-1,systHist.GetXaxis().GetBinWidth(i)/2.0)
     #    systHistAsym.SetPointEXlow(i-1,systHist.GetXaxis().GetBinWidth(i)/2.0)
@@ -1359,14 +1384,19 @@ def plotVar(options):
                 if totalInt>0.0:
                     error_fraction = fittedSRErrs[key_name]/totalInt
                     for ib in range(1,hObj.hist.GetNbinsX()+1):
-                        hObj.hist.SetBinError(ib,error_fraction*hObj.hist.GetBinContent(ib))
+                        mc_stat_err = hObj.hist.GetBinError(ib)
+                        hObj.hist.SetBinError(ib,math.sqrt(mc_stat_err**2+(error_fraction*hObj.hist.GetBinContent(ib))**2))
                         #print total_err,fittedSRErrs[key_name]
                         # need to spread these out bin by bin
                         systHistAsym.SetBinContent(ib,hObj.hist.GetBinContent(ib))
-                        systHistAsym.SetBinError(ib,error_fraction*hObj.hist.GetBinContent(ib))
+                        systHistAsym.SetBinError(ib,math.sqrt(mc_stat_err**2+(error_fraction*hObj.hist.GetBinContent(ib))**2))
                         #print ib, error_fraction*hObj.hist.GetBinContent(ib)
             #else:
             #    print 'no norm',key_name
+            if not (hObj.mr in mjjBins):
+                print 'skipping: ',hObj.mr,h
+                continue
+            
             if hObj.isBkg():
                 if not systHistAsymTot:
                     systHistAsymTot=systHistAsym.Clone()
@@ -1374,9 +1404,10 @@ def plotVar(options):
                 else:
                     #print 'added'
                     systHistAsymTot.Add(systHistAsym)
+
         if not (hObj.mr in mjjBins):
             continue
-
+                    
         if hObj.isSignal():
             key=hObj.proc
             try:
@@ -1455,8 +1486,8 @@ def plotVar(options):
     #systHistAsymTot.SetLin(bwidth)
     systHistAsymTotA=ROOT.TGraphAsymmErrors(systHistAsymTot)
     for i in range(0,systHistAsymTot.GetNbinsX()+3):
-        systHistAsymTotA.SetPointEXhigh(i+1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
-        systHistAsymTotA.SetPointEXlow(i+1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
+        systHistAsymTotA.SetPointEXhigh(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
+        systHistAsymTotA.SetPointEXlow(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
     Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])    
     systHistAsymTotA.Draw("SAME E2")
     systHistAsymTotA.SetName('Syst')
