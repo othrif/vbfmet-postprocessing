@@ -36,6 +36,7 @@ p.add_option('--xmax',         type='float',  default=None,          dest='xmax'
 p.add_option('--xmin',         type='float',  default=None,          dest='xmin')
 
 p.add_option('--blind',         action='store_true', default=False,   dest='blind')
+p.add_option('--normalizeBkg',  action='store_true', default=False,   dest='normalizeBkg')
 p.add_option('--madgraph',      action='store_true', default=False,   dest='madgraph')
 p.add_option('--do-eps',        action='store_true', default=False,   dest='do_eps')
 p.add_option('--do-pdf',        action='store_true', default=False,   dest='do_pdf')
@@ -257,7 +258,7 @@ def getHistPars(hist):
         'lepPhi' : {'xtitle':'Lepton #phi [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'dphill' : {'xtitle':'#Delta #phi_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
         'jj_dphi' : {'xtitle':'#Delta #phi_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
-        'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':5,  'ymin':0.1, 'logy':False, 'LtoRCut':1},
+        'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':0.1, 'logy':False, 'LtoRCut':1},
         'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':4,  'ymin':1.0, 'logy':True, 'LtoRCut':0},
         'met_tst_phi'    : {'xtitle':'E_{T}^{miss} #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':False},
@@ -669,7 +670,7 @@ def rescaleFirstBin(hist, scale):
 class HistEntry:
     """HistEntry - one histogram in a stacked plot"""
 
-    def __init__(self, hist, sample, hname, nf_map):
+    def __init__(self, hist, sample, hname, nf_map, ZCR=None, WCR=None):
 
         self.sample   = sample
         self.hname    = hname
@@ -710,6 +711,21 @@ class HistEntry:
             self.hist.Scale(self.nf_map[self.sample])
             log.info('Scaling Sample %s by %s ' %(self.sample,self.nf_map[self.sample]))
         self.UpdateStyle(sample)
+
+        # apply the Normalization for the ZCR and WCR if requested.
+        madgraph=''
+        if options.madgraph:
+            madgraph='Mad'
+        if ZCR and (sample in ['zqcd'+madgraph,'qewk']):
+            for i in range(0,self.hist.GetNbinsX()+1):
+                znf = ZCR.GetNF(['zqcd'+madgraph,'zewk'],i)
+                self.hist.SetBinContent(i,znf*self.hist.GetBinContent(i))
+                self.hist.SetBinError(i,znf*self.hist.GetBinError(i))
+        if WCR and (sample in ['wqcd'+madgraph,'wewk']):
+            for i in range(1,self.hist.GetNbinsX()+1):
+                wnf = WCR.GetNF(['wqcd'+madgraph,'wewk'],i)
+                self.hist.SetBinContent(i,wnf*self.hist.GetBinContent(i))
+                self.hist.SetBinError(i,wnf*self.hist.GetBinError(i))
 
     def UpdateStyle(self, sample):
 
@@ -792,12 +808,17 @@ class DrawStack:
         self.nf_map = nf_map
         self.file_pointer = file
         self.zcr_stack = None
-        if options.blind and self.selkey.count('pass_sr') and self.selkey.count('_nn_Nominal'): #and self.selkey=='pass_sr_allmjj_nn_Nominal':
-            replace_sr_name = self.selkey[self.selkey.find('pass_sr_')+len('pass_sr_'): self.selkey.find('_nn_Nominal')]
+        self.wcr_stack = None
+        
+        if ((options.blind or options.normalizeBkg) and self.selkey.count('pass_sr') and self.selkey.count('_nn_')): #and self.selkey=='pass_sr_allmjj_nn_Nominal':
+            replace_sr_name = self.selkey[self.selkey.find('pass_sr_')+len('pass_sr_'): self.selkey.find('_nn_')]
             zcr_name=copy.copy(name)
             if zcr_name.count('_tst_et') and not zcr_name.count('_nolep') and not zcr_name.count('soft'):
                 zcr_name = zcr_name.replace('_tst_et','_tst_nolep_et')
-            self.zcr_stack = DrawStack(zcr_name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_'+replace_sr_name+'_ll_Nominal')
+            systName = self.selkey[self.selkey.find('_nn_')+4:]
+            self.zcr_stack = DrawStack(zcr_name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_zcr_'+replace_sr_name+'_ll_'+systName)
+            self.wcr_stack = DrawStack(zcr_name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_wcr_'+replace_sr_name+'_l_'+systName)            
+            
         self.sign = self.ReadSample(file, sign)
         if options.hscale!=None:
             self.sign.hist.Scale(float(options.hscale))
@@ -859,6 +880,29 @@ class DrawStack:
 
         return histname
 
+    def GetNF(self, samples=[], ibin=1):
+        madgraph=''
+        if options.madgraph:
+            madgraph='Mad'
+        bkgtotal=0.0
+        signtotal=0.0
+        if 'zewk' in samples:
+            zcr_bkg_sum = self.GetTotalBkgHist()
+            signtotal = self.bkgs['zqcd'+madgraph].hist.GetBinContent(ibin)+self.bkgs['zewk'].hist.GetBinContent(ibin)
+            bkgtotal=zcr_bkg_sum.GetBinContent(ibin)-signtotal
+            
+        if 'wewk' in samples:
+            wcr_bkg_sum = self.GetTotalBkgHist()            
+            signtotal = self.bkgs['wqcd'+madgraph].hist.GetBinContent(ibin)+self.bkgs['wewk'].hist.GetBinContent(ibin)
+            bkgtotal=wcr_bkg_sum.GetBinContent(ibin)-signtotal
+            
+        datav = self.data.hist.GetBinContent(ibin)
+        
+        if signtotal>0.0:
+            #print 'NF: ',(datav-bkgtotal)/signtotal,' data:',datav,bkgtotal,signtotal
+            return (datav-bkgtotal)/signtotal
+        return 1.0
+
     def ReadSample(self, file, sample, syst=None, DO_SYMM=False):
 
         path = self.GetHistPath(sample, syst)
@@ -877,7 +921,7 @@ class DrawStack:
             hist_central_value = self.file_pointer.Get(nom_path)
             self.Symmeterize(hist_central_value, hist)
 
-        return HistEntry(hist, sample, self.name, self.nf_map)
+        return HistEntry(hist, sample, self.name, self.nf_map, self.zcr_stack, self.wcr_stack)
 
     #------------------------
     def Symmeterize(self, hnom, hvar):
