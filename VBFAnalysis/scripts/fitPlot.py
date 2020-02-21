@@ -752,7 +752,6 @@ def main(options):
     HistClass.Irfile=rfile
     HistClass.regDict=regDict
 
-
     hnames=[i.GetName() for i in LOK if ("Nom" in i.GetName() or "NONE" in i.GetName())]
     for key in hnames:
         # NOTE here you can specify hisotgrams which should be skipped
@@ -775,11 +774,17 @@ def main(options):
         for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
             pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
             for pickle_key in fpickle.keys():
-                if not ('Fitted_events_' in pickle_key): # only process the fitted events here
+                isError=False
+                if  ('Fitted_events_' in pickle_key): # only process the fitted events here
+                    pickle_key_remFit = pickle_key[len('Fitted_events_'):]
+                elif  ('Fitted_err_' in pickle_key): # only process the fitted events here
+                    pickle_key_remFit = pickle_key[len('Fitted_err_'):]
+                    isError=True
+                else:
                     continue
                 #if ('Fitted_events_VBFH' in pickle_key): # skip signal
                 #    continue
-                pickle_key_remFit = pickle_key[len('Fitted_events_'):]
+                
                 m=0
                 for i in hist_array_keys:
                     if i in pickle_key_remFit:
@@ -793,7 +798,12 @@ def main(options):
                 ireg=0
                 for iname in pickle_region_names:
                     #print "Setting: ",iname,pickle_key
-                    histToSet.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg])
+                    if isError:
+                        #print pickle_key,fpickle[pickle_key][ireg]
+                        totalErrStatSyst = math.sqrt((fpickle[pickle_key][ireg])**2+(histToSet.GetBinError(regDict[iname.rstrip('_cuts')]))**2)
+                        histToSet.SetBinError(regDict[iname.rstrip('_cuts')],totalErrStatSyst)
+                    else:
+                        histToSet.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg])
                     ireg+=1
                 
     #defining bkg hist
@@ -805,7 +815,7 @@ def main(options):
         hDict["bkgs"].Add(hDict[bkg])
         hDict["bkgsStat"].Add(hDict[bkg])
     # Set the MC stat uncertainties to 0 in the systematics plot
-    if not options.show_mc_stat_err:
+    if not options.show_mc_stat_err or postFitPickles!=None:
         for i in range(0,hDict["bkgs"].GetNbinsX()):
             hDict["bkgs"].SetBinError(i,0.0)
 
@@ -1033,7 +1043,7 @@ def main(options):
         rHist.Draw()
         line1.Draw("histsame")
         if options.show_mc_stat_err or options.syst!="" or options.postFitPickleDir!=None:
-            if options.show_mc_stat_err:
+            if options.show_mc_stat_err and options.postFitPickleDir==None: # the post fit already has the MC stat uncertainties included
                 bkgs = hDict["bkgsStat"].Clone() # this only holds the MC stat uncertainty
             for i in range(0,rbkgs.GetNbinsX()+1):
                 rbkgs.SetBinContent(i,1.0)
