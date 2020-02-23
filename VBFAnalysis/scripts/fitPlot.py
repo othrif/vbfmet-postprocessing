@@ -416,9 +416,6 @@ class HistClass(object):
             cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]
             cls.regionBins["lowsigWCRenu"]=cls.regionBins["lowsigWCRep"]+cls.regionBins["lowsigWCRen"]
 
-
-
-
 def getBinsError(hist, bins):
     BE=0
     for bn in bins:
@@ -1356,6 +1353,8 @@ def plotVar(options):
         print areaName,fittedMCVals[areaName],fittedMCErrs[areaName],fittedSRVals[areaName],fittedSRErrs[areaName]
     
     bkgDict={}
+    bkgPreFitDict={}
+    bkgPreFit=None
     sigDict={}
     systHistAsymTot = None #ROOT.TGraphAsymmErrors(systHist)
     systHistAsym = None #ROOT.TGraphAsymmErrors(systHist)
@@ -1366,13 +1365,21 @@ def plotVar(options):
     #systHistAsym.SetPointEYhigh(regDict[iname.rstrip('_cuts')]-1,e_new)
     HistClass.Irfile=rfile
     bkg=None
+    signal=None
+    multijet=None
     hnames=[j.GetName() for j in rfile.GetListOfKeys() if (("Nom" in j.GetName() or "NONE" in j.GetName()) and var in j.GetName() and reg in j.GetName()) ]
-    print hnames
+
     for h in hnames:
         if h.count('Z_strongPTVExt'):
             continue
         hObj=HistClass(h, var)
         systHistAsym=hObj.hist.Clone()
+        if hObj.isBkg() and (hObj.mr in mjjBins):
+            bkgPreFitDict[hObj.proc]=hObj.hist.Clone()
+            if bkgPreFit==None:
+                bkgPreFit=hObj.hist.Clone()
+            else:
+                bkgPreFit.Add(hObj.hist)
         #print h
         #if systHistAsym==None:
             #systHistAsym=ROOT.TGraphAsymmErrors(hObj.hist.Clone())
@@ -1383,6 +1390,7 @@ def plotVar(options):
         if postFitPickles:
             #print h[1:h.find('Nom')] #hZ_EWK_VBFjetSel_1Nom_SR1_obs_jj_mass need to map to VBFH125_VBFjetSel_8
             key_name=h[1:h.find('Nom')]
+            #print 'key_name:',key_name,hObj.hist.Integral()
             if key_name in fittedSRVals:
                 #hObj.hist.SetBinContent(int(hObj.mr)+1,float(fittedSRVals[key_name]))
                 total_err = ROOT.double(0.0)
@@ -1396,13 +1404,9 @@ def plotVar(options):
                     for ib in range(1,hObj.hist.GetNbinsX()+1):
                         mc_stat_err = hObj.hist.GetBinError(ib)
                         hObj.hist.SetBinError(ib,math.sqrt(mc_stat_err**2+(error_fraction*hObj.hist.GetBinContent(ib))**2))
-                        #print total_err,fittedSRErrs[key_name]
                         # need to spread these out bin by bin
                         systHistAsym.SetBinContent(ib,hObj.hist.GetBinContent(ib))
                         systHistAsym.SetBinError(ib,math.sqrt(mc_stat_err**2+(error_fraction*hObj.hist.GetBinContent(ib))**2))
-                        #print ib, error_fraction*hObj.hist.GetBinContent(ib)
-            #else:
-            #    print 'no norm',key_name
             if not (hObj.mr in mjjBins):
                 print 'skipping: ',hObj.mr,h
                 continue
@@ -1412,7 +1416,6 @@ def plotVar(options):
                     systHistAsymTot=systHistAsym.Clone()
                     systHistAsymTot.Sumw2(True)
                 else:
-                    #print 'added'
                     systHistAsymTot.Add(systHistAsym)
 
         if not (hObj.mr in mjjBins):
@@ -1426,13 +1429,12 @@ def plotVar(options):
                 sigDict[key]=hObj.hist.Clone(key)
                 sigDict[key].SetTitle(key)
                 Style.setStyles(sigDict[key], Style.styleDict[key])
-        signal=ROOT.THStack()
+        signalS=ROOT.THStack()
         for h in sorted(sigDict.values()): #TODO this sorting does not work. implement lambda
-            signal.Add(h)
+            signalS.Add(h)
 
         if hObj.isBkg():
             key=hObj.proc
-            #print 'bkg:',key
             if not ("W" in key or "Z" in key):
                 if 'multijet' in key:
                     key='multijet'
@@ -1450,7 +1452,6 @@ def plotVar(options):
         for h in sorted(bkgDict.values()): #TODO this sorting does not work. implement lambda
             bkg.Add(h)
 
-
         if hObj.isData():
             key=hObj.proc
             try:
@@ -1466,6 +1467,14 @@ def plotVar(options):
         dataH.SetTitle("data blinded")
         Style.setStyles(dataH, Style.styleDict["data"])
 
+    for h in sorted(sigDict.values()): #TODO this sorting does not work. implement lambda
+        if signal==None:
+            signal=h.Clone()
+            signal.SetName('signal')
+            signal.SetTitle('signal')
+        else:
+            signal.Add(h)
+        
     can=ROOT.TCanvas("c1","c1",1600,1000)
     if options.ratio:
         can.Divide(1,2)
@@ -1480,39 +1489,60 @@ def plotVar(options):
         ROOT.gPad.SetPad(0,0,1,0.3)
         can.cd(1)
 
-    bkg.Draw("hist")
-    signal.Draw("Psame")
+    bkgH=get_THStack_sum(bkg)
+    bkgH.GetXaxis().SetTitle(var)
+    bkgH.GetYaxis().SetTitle("Entries")
+    bkgH.GetYaxis().SetTitleOffset(0.85)
+    bkgH.GetYaxis().SetTitleSize(1.25*bkgH.GetYaxis().GetTitleSize())
+    if var=='jj_mass':
+        bkgH.GetYaxis().SetTitle("Events / 500 [GeV]")
+    if var=='jj_dphi':
+        bkgH.GetYaxis().SetTitle("Events")
+    if var=='met_tst_et':
+        bkgH.GetYaxis().SetTitle("Events / 50 [GeV]")
+    if var=='jj_deta':
+        bkgH.GetYaxis().SetTitle("Events")
+    bkg.Draw("hist ")
+    upperV=bkg.GetHistogram().GetMaximum()
+    bkgH.GetYaxis().SetRangeUser(0.1, 1.25*upperV)
+    bkgH.Draw('AXIS')
+    bkg.Draw("HIST same")
+    signal.Draw("HIST same")
     if options.data:
         dataH.Draw("PEsame")
 
     fillStyle = 3004
     Style.setStyles(systHistAsymTot,[0,0,0,1,fillStyle,0,0,0])
-    #systHistAsymTot.SetLineColor(1)
     systHistAsymTot.SetFillColor(1)
-    systHistAsymTot.SetFillStyle(3018)    
-    #systHistAsymTot.SetLineWidth(3)
-    bwidth=500.0
-    #systHistAsymTot.GetXaxis().SetBarWidth(bwidth)
-    #systHistAsymTot.SetLin(bwidth)
+    systHistAsymTot.SetFillStyle(fillStyle)
     systHistAsymTotA=ROOT.TGraphAsymmErrors(systHistAsymTot)
     for i in range(0,systHistAsymTot.GetNbinsX()+3):
         systHistAsymTotA.SetPointEXhigh(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
         systHistAsymTotA.SetPointEXlow(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
     Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])    
     systHistAsymTotA.Draw("SAME E2")
-    systHistAsymTotA.SetName('Syst')
-    systHistAsymTotA.SetTitle('Syst')
+    systHistAsymTotA.SetName('Fit Syst')
+    systHistAsymTotA.SetTitle('Fit Syst')
 
-    bkg.GetXaxis().SetTitle(var)
-    bkg.GetYaxis().SetTitle("Entries")
     bkg.SetTitle(reg+" "+",".join(mjjBins))
 
-    leg=ROOT.gPad.BuildLegend(0.7,0.7,0.9,0.9)
+    leg=ROOT.gPad.BuildLegend(0.65,0.6,0.85,0.9)
     leg.SetFillColor(0)
     leg.SetBorderSize(0)
     leg.SetNColumns  (2)
 
-    texts = ATLAS.getATLASLabels(can, 0.4, 0.78, options.lumi, selkey="")
+    alllabels=[]
+    legA=leg.Clone()
+    prims=legA.GetListOfPrimitives()
+    leg.Clear()
+    for ik in prims:
+        if ik.GetLabel() not in alllabels:
+            alllabels+=[ik.GetLabel()]
+            leg.AddEntry(ik.GetObject(),ik.GetLabel())
+        else:
+            ik.Delete()
+            
+    texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="")
     for text in texts:
         text.Draw()
 
@@ -1521,7 +1551,7 @@ def plotVar(options):
         blindStr=", SR blinded"
     preFitLabel=ROOT.TLatex(.7,.6,"Pre-Fit"+blindStr)
     if options.postFitPickleDir!=None:
-        preFitLabel=ROOT.TLatex(.7,.6,"Post-Fit"+blindStr)        
+        preFitLabel=ROOT.TLatex(.7,.55,"Post-Fit"+blindStr)        
     preFitLabel.SetNDC()
     preFitLabel.SetTextFont(72)
     preFitLabel.SetTextSize(0.055)
@@ -1533,41 +1563,96 @@ def plotVar(options):
         can.cd(2)
         rHist=dataH.Clone("ratioHist")
         #sum_bkg=get_THStack_sum(bkg)
-        rHist.GetYaxis().SetRangeUser(0.6,1.4)        
+        rHist.GetYaxis().SetRangeUser(0.601,1.399)
+        rHist.GetYaxis().SetRangeUser(0.701,1.299)
         rHist.Divide(get_THStack_sum(bkg))
         rHist.GetYaxis().SetTitle("Data/MC")
         rHist.GetXaxis().SetTitle(var)
-        rHist.GetYaxis().SetTitleOffset(.35)
-        rHist.GetYaxis().SetTitleSize(0.1)
-        rHist.GetXaxis().SetTitleOffset(.85)
-        rHist.GetXaxis().SetTitleSize(0.1)
+        rHist.GetYaxis().SetTitleOffset(.33)
+        rHist.GetYaxis().SetTitleSize(0.15)
+        rHist.GetXaxis().SetTitleOffset(1.0)
+        rHist.GetXaxis().SetTitleSize(0.15)
         rHist.GetYaxis().CenterTitle()
-        rHist.GetXaxis().SetLabelSize(0.1)
+        rHist.GetXaxis().SetLabelSize(0.12)
         rHist.GetYaxis().SetLabelSize(0.1)
-
+        rHist.GetXaxis().SetTitle('Dijet Invariant Mass m_{jj} [GeV]')
+        if var=='jj_dphi':
+            rHist.GetXaxis().SetTitle("#Delta#phi_{jj}")
+        if var=='met_tst_et':
+            rHist.GetXaxis().SetTitle("Missing Transverse Momentum E_{T}^{miss} [GeV]")
+        if var=='jj_deta':
+            rHist.GetXaxis().SetTitle("#Delta#eta_{jj}")        
         systHistAsymTotRatio=systHistAsymTot.Clone()
         sum_bkg=systHistAsymTot.Clone()
+
+        rsignal=signal.Clone()
+        rbkgPreFit=bkgPreFit.Clone()
+        rmultijet=bkgPreFit.Clone()
+        if 'multijet' in  bkgDict:
+            rmultijet = bkgDict['multijet'].Clone()
+        bkgR=get_THStack_sum(bkg).Clone()
+        for ib in range(0,bkgR.GetNbinsX()+1):
+            bkgR.SetBinError(ib,0.0)
+            rbkgPreFit.SetBinError(ib,0.0)
+            if bkgR.GetBinContent(ib)==0:
+                bkgR.SetBinContent(ib,0.000001)
+                rbkgPreFit.SetBinContent(ib,0.000001)
+        rsignal.Add(bkgR)
+        rsignal.Divide(bkgR)
+        #bkgR.Add(multijet,-1.0)
+        rmultijet.Add(bkgR)
+        rmultijet.Divide(bkgR)
+        rmultijet.SetLineWidth(2)
+        rmultijet.SetFillColor(0)
+        rmultijet.SetFillStyle(0)
+        rsignal.SetLineStyle(7)        
+        rsignal.SetLineWidth(2)        
+        
+        rbkgPreFit.SetLineColor(ROOT.kBlue)
+        rbkgPreFit.SetLineStyle(9)
+        rbkgPreFit.SetMarkerSize(0)        
+        rbkgPreFit.SetMarkerColor(ROOT.kBlue)
+        rbkgPreFit.SetLineWidth(2)
+        rbkgPreFit.SetFillColor(0)
+        rbkgPreFit.SetFillStyle(0)
+        rbkgPreFit.Divide(bkgR)
         for i in range(0,sum_bkg.GetNbinsX()+1):
             sum_bkg.SetBinError(i,0.0)
-            print i,systHistAsymTotRatio.GetBinError(i)
+            #print i,systHistAsymTotRatio.GetBinError(i)
         systHistAsymTotRatio.Divide(sum_bkg)
         systHistAsymTotRatioA=ROOT.TGraphAsymmErrors(systHistAsymTotRatio)
         for i in range(0,systHistAsymTot.GetNbinsX()+3):
             systHistAsymTotRatioA.SetPointEXhigh(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
             systHistAsymTotRatioA.SetPointEXlow(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
-            print i,systHistAsymTotRatio.GetBinContent(i)
+            #print i,systHistAsymTotRatio.GetBinContent(i)
         Style.setStyles(systHistAsymTotRatioA,[0,0,0,1,fillStyle,0,0,0])    
-        
         
         line1=dataH.Clone("line1")
         for i in range(1,line1.GetNbinsX()+1):
             line1.SetBinContent(i,1)
-        Style.setLineAttr(line1,2,2,3)
+        Style.setLineAttr(line1,1,2,3)
         rHist.SetTitle("")
         rHist.SetStats(0)
         rHist.Draw()
         line1.Draw("histsame")
         systHistAsymTotRatioA.Draw("SAME E2")
+        if reg=='SR':
+            rsignal.Draw('same HIST')
+            rmultijet.Draw('same HIST')
+            rbkgPreFit.Draw('same HIST')
+        rHist.Draw('same')
+
+        # legend
+        legR=ROOT.TLegend(0.2,0.8,0.4,1.0)
+        legR.SetFillColor(0)
+        legR.SetBorderSize(0)
+        legR.AddEntry(rsignal,'signal/Bkg')
+        legR.AddEntry(rmultijet,'multijet/Bkg')
+        legR.AddEntry(rbkgPreFit,'pre-fit/post-fit')
+        legR.AddEntry(systHistAsymTotRatioA,'Post fit syst')
+        legR.SetNColumns(2)
+        if reg=='SR':
+            legR.Draw()
         can.GetPad(2).RedrawAxis()
         can.GetPad(2).Modified()
         can.GetPad(2).Update()

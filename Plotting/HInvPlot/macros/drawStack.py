@@ -273,7 +273,7 @@ def getHistPars(hist):
         'jj_deta_abs' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|/#Delta#eta_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
-        'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
+        'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.01,'logy':True},
         'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
         'alljet_metsig'     : {'xtitle':'MET Significance (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
     'met_cst_jet'     : {'xtitle':'E_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
