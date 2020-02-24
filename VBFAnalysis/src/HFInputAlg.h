@@ -86,18 +86,23 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::string currentSample = "Z_strong";//"W_strong";
 
   vector <vector <TH1F*>> hSR;
+  vector <vector <TH1F*>> hCRWe;
   vector <vector <TH1F*>> hCRWep;
   vector <vector <TH1F*>> hCRWen;
+  vector <vector <TH1F*>> hCRWeLowSig;
   vector <vector <TH1F*>> hCRWepLowSig;
   vector <vector <TH1F*>> hCRWenLowSig;
+  vector <vector <TH1F*>> hCRWm;
   vector <vector <TH1F*>> hCRWmp;
   vector <vector <TH1F*>> hCRWmn;
+  vector <vector <TH1F*>> hCRZll;
   vector <vector <TH1F*>> hCRZee;
   vector <vector <TH1F*>> hCRZmm;
 
   Int_t m_extraVars = 0;
   Int_t m_binning = 0;
   Int_t m_metdef = 0;
+  Float_t m_METCut=-1.0;
   Bool_t v26Ntuples=false;
 
   Double_t xeSFTrigWeight;

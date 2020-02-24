@@ -46,7 +46,7 @@ def ZeroCheck():
     updateList=[]
     for k in keysF:
         kname=k.GetName()
-        if (kname.count("Z_strong") and kname.count('_one')) or (kname.count("ttbar") and kname.count('_one')):
+        if (kname.count("Z_strong") and kname.count('_one')) or (kname.count("ttbar") and kname.count('_one')) or  (kname.count("W_strong") and kname.count('_two')):
             h=rNewfile.Get(kname)
             if h.GetBinContent(1)<0.0:
                 h.SetBinContent(1,0.0)
@@ -662,10 +662,11 @@ if __name__=='__main__':
             'JET_JER_DataVsMC_MC16', #smoothed
             ]
     systToSmoothTestextra=['JET_JER_EffectiveNP_5',
-                      'JET_JER_EffectiveNP_6',
-                      'JET_JER_EffectiveNP_7restTerm',
-                               'alpha_JET_JvtEfficiency']
-    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency','JET_Flavor_Response','JET_Flavor_Composition','JET_EffectiveNP_Modelling3','JET_EffectiveNP_Modelling1','JET_EffectiveNP_Modelling2']
+                           'JET_JER_EffectiveNP_6',
+                           'JET_JER_EffectiveNP_7restTerm',
+                           'alpha_JET_JvtEfficiency']
+    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency','JET_JvtEfficiency','JET_Flavor_Response','JET_Flavor_Composition','JET_EffectiveNP_Modelling3','JET_EffectiveNP_Modelling1','JET_EffectiveNP_Modelling2']
+
     allSyst=[]
     if options.syst=='All':
         allSystUpAndDown=vbf_syst.systematics('All').getsystematicsList()

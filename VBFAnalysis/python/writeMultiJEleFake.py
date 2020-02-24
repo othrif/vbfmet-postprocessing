@@ -39,6 +39,8 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
         if METCut>150:
             tmpmj=[83.0,99.6,30.7,21.4,2.4,71.2,132.0,36.97,23.8,0.0,56.5]
             tmpmj_statunc=[24.6,29.3,8.9,10.2,2.4,13.5,21.95,10.5,8.4,0.2,11.0]
+            tmpmj=[71.2,132.0,36.97,23.8,0.0,83.0,99.6,30.7,21.4,2.4,56.5]
+            tmpmj_statunc=[13.5,21.95,10.5,8.4,0.2,24.6,29.3,8.9,10.2,2.4,11.0]
             multijets=[]; multijets_statunc=[];
             MJSF=0.659
             if METCut==160: 
@@ -47,10 +49,14 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 #multijets_statunc = [19.8,23.1,8.4,8.7,1.5,9.3,13.3,6.8,7.3,0.2,7.2]
             if METCut==165:
                 MJSF=0.5434
-            if METCut==170:
+            elif METCut==170:
                 MJSF=0.4518
-            if METCut==180:
-                MJSF=0.659
+            elif METCut==180:
+                MJSF=0.344
+            elif METCut==190:
+                MJSF=0.2306
+            elif METCut==200:
+                MJSF=0.17063
             for i in range(0,len(tmpmj)):
                 multijets+=[(MJSF)*tmpmj[i]] # MET>160... from scaling to low mjj
                 multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
@@ -63,6 +69,8 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             multijets_statunc=[32.8,54.9,13.6,15.2,4.6,27.2,45.4,15.9,18.6,0,32.0]
             tmpmj=[161.3,193.6,59.9,41.5,4.6,132.7,245.7,68.8,44.2,0,182.2]
             tmpmj_statunc=[32.8,54.9,13.6,15.2,4.6,27.2,45.4,15.9,18.6,0,32.0]
+            tmpmj=[132.7,245.7,68.8,44.2,0,161.3,193.6,59.9,41.5,4.6,182.2]
+            tmpmj_statunc=[27.2,45.4,15.9,18.6,0,32.8,54.9,13.6,15.2,4.6,32.0]
             if METCut>150:
                 multijets=[]; multijets_statunc=[];
                 MJSF=0.6991
@@ -75,7 +83,11 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 elif METCut==170: 
                     MJSF=0.540
                 elif METCut==180: 
-                    MJSF=0.659 # note computed
+                    MJSF=0.418 # note computed
+                elif METCut==190: 
+                    MJSF=0.292 # note computed
+                elif METCut==200: 
+                    MJSF=0.209 # note computed
                 for i in range(0,len(tmpmj)):
                     multijets+=[(MJSF)*tmpmj[i]] # MET>160... from scaling to low mjj
                     multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
@@ -88,7 +100,9 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             multijets=[182.1,218.5,67.6,46.8,5.2,174.5,323.1,90.5,58.2,0.0,364.3]
             multijets_statunc=[35.6,42.8,20.3,16.9,5.20,31.9,75.7,24.7,18.9,0.2,71.6]
             tmpmj=[182.1,218.5,67.6,46.8,5.2,174.5,323.1,90.5,58.2,0.0,364.3]
+            tmpmj=[174.5,323.1,90.5,58.2,0.0,182.1,218.5,67.6,46.8,5.2,364.3]
             tmpmj_statunc=[35.6,42.8,20.3,16.9,5.20,31.9,75.7,24.7,18.9,0.2,71.6]
+            tmpmj_statunc=[31.9,75.7,24.7,18.9,0.2,35.6,42.8,20.3,16.9,5.20,71.6]
             if METCut>150:
                 multijets=[]; multijets_statunc=[];
                 MJSF=0.7655
@@ -101,7 +115,11 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 elif METCut==170:
                     MJSF=0.59065
                 elif METCut==180:
-                    MJSF=0.5 # not computed
+                    MJSF=0.483 # not computed
+                elif METCut==190:
+                    MJSF=0.334 # not computed
+                elif METCut==200:
+                    MJSF=0.195 # not computed
                 for i in range(0,len(tmpmj)):
                     multijets+=[(MJSF)*tmpmj[i]] # MET>160... from scaling to low mjj
                     multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
@@ -254,7 +272,7 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
         #fakeelesm = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1] # met>150 numbers
         fakeelesp = [8.4, 11.0, 6.6, 3.9, 4.0, 8.4, 11.0, 6.6, 3.9, 4.0, 7.0]
         fakeelesm = [8.4, 11.0, 6.6, 3.9, 4.0, 8.4, 11.0, 6.6, 3.9, 4.0, 7.0]
-    fakeInit = [1.0238,7.4043,3.1402,3.5567,1.5765,8.6259,7.2854,2.5912,4.6147,0.8996,8.44]
+    fakeInit = [9.0238,7.4043,3.1402,3.5567,1.5765,8.6259,7.2854,3.5912,5.6147,0.8996,8.44]
     if doDoubleRatio:
         fakeelesp+=[12.5]
         fakeelesm+=[12.5]
@@ -267,19 +285,28 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
             if doDoubleRatio and a==(len(fakeelesp)):
                 histpLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneElePosLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
                 histmLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)
+                histLowSig = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleLowSigCR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleLowSigCR1_obs_cuts;;", 1, 0.5, 1.5)                
             else:
                 histpLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histmLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histLowSig = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)                
             histpLowSig.SetBinContent(1,fakeInit[a-1]/3.0*fakeelep)
             histmLowSig.SetBinContent(1,fakeInit[a-1]/3.0*fakeelem)
+            histLowSig.SetBinContent(1,fakeInit[a-1]/3.0*fakeelem)
             histpLowSig.Write()
             histmLowSig.Write()
+            histLowSig.Write()
             histm=None
             histp=None
+            histe=None
             histpUncUpLowMjj=None
             histpUncDwLowMjj=None
             histpUncUpHighMjj=None
             histpUncDwHighMjj=None
+            histeUncUpLowMjj=None
+            histeUncDwLowMjj=None
+            histeUncUpHighMjj=None
+            histeUncDwHighMjj=None            
             histmUncUpLowMjj=None
             histmUncDwLowMjj=None
             histmUncUpHighMjj=None
@@ -290,17 +317,23 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
                 histm = ROOT.TH1F("heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts", "heleFakes_antiVBFSel_1Nom_oneEleNegACR1_obs_cuts;;", 1, 0.5, 1.5)
             else:
                 histp = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histe = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)                
                 histm = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histpUncUpLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncHigh_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncHigh_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histpUncDwLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncLow_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncLow_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histpUncUpHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncHigh_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncHigh_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histpUncDwHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncLow_oneElePosCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncLow_oneElePosCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histeUncUpLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncHigh_oneEleCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncHigh_oneEleCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histeUncDwLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncLow_oneEleCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElUncLow_oneEleCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histeUncUpHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncHigh_oneEleCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncHigh_oneEleCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histeUncDwHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncLow_oneEleCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElUncLow_oneEleCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)                
                 histmUncUpLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElmUncHigh_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElmUncHigh_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histmUncDwLowMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"LPTFakeElmUncLow_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"LPTFakeElmUncLow_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histmUncUpHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElmUncHigh_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElmUncHigh_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 histmUncDwHighMjj = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"HPTFakeElmUncLow_oneEleNegCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"HPTFakeElmUncLow_oneEleNegCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
             histp.SetBinContent(1,fakeInit[a-1]/3.0)
             histm.SetBinContent(1,fakeInit[a-1]/3.0)
+            histe.SetBinContent(1,fakeInit[a-1]/3.0)            
             
             if (a>=1 and a<=3) or (a>=6 and a<=8) or a==11:
                 histpUncUpLowMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.2)
@@ -311,6 +344,10 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
                 histpUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.1)
                 histmUncUpHighMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.1)
                 histmUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.1)
+                histeUncUpHighMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.1)
+                histeUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.1)
+                histeUncUpLowMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.2)
+                histeUncDwLowMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.2)
             else:
                 histpUncUpLowMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.1)
                 histpUncDwLowMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.1)
@@ -320,12 +357,22 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
                 histpUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.5)
                 histmUncUpHighMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.5)
                 histmUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.5)
+                histeUncUpLowMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.1)
+                histeUncDwLowMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.1)
+                histeUncUpHighMjj.SetBinContent(1,fakeInit[a-1]/3.0*1.5)
+                histeUncDwHighMjj.SetBinContent(1,fakeInit[a-1]/3.0/1.5)
+                
             histp.Write()
             histm.Write()
+            histe.Write()
             histpUncUpLowMjj.Write()
             histpUncDwLowMjj.Write()
             histpUncUpHighMjj.Write()
             histpUncDwHighMjj.Write()
+            histeUncUpLowMjj.Write()
+            histeUncDwLowMjj.Write()
+            histeUncUpHighMjj.Write()
+            histeUncDwHighMjj.Write()            
             histmUncUpLowMjj.Write()
             histmUncDwLowMjj.Write()
             histmUncUpHighMjj.Write()
