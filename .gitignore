@@ -9,3 +9,7 @@ Plotting/*.root
 Plotting/*.eps
 Plotting/*.png
 Plotting/*.pdf
+
+# Ignore the asetup save files.
+*.asetup*
+.envBefore_asetup*
