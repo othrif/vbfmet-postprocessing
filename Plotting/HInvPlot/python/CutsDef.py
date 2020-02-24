@@ -455,7 +455,7 @@ def getMETTriggerCut(cut = '', options=None, basic_cuts=None, Localsyst=None, OR
         apply_weight='xeSFTrigWeight__1up'
     elif Localsyst=='xeSFTrigWeight__1down':
         apply_weight='xeSFTrigWeight__1down'
-    if apply_weight!=None and ORTrig!='':
+    if apply_weight!=None and (ORTrig!='' or basic_cuts.chan in ['u','uu']):
         apply_weight=apply_weight.replace('xeSFTrigWeight','xeSFTrigWeight_nomu')
 
     if options.year==2017:
@@ -664,6 +664,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
         if basic_cuts.chan in ['uu','ll']:
             #cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
             cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
+            #cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig='')
         else:
             cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
