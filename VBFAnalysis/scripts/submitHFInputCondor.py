@@ -29,11 +29,11 @@ parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", d
 parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis")
 parser.add_argument( "--singleHist", dest = "singleHist", action="store_true", default = False, help = "Runs VBF + MET in one histogram when true")
 parser.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
-parser.add_argument("--METCut", type=int, dest='METCut', default=150, help="METCut, default: 150 GeV")
+parser.add_argument("--METCut", type=int, dest='METCut', default=160e3, help="METCut, default: 160 MeV")
 parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
 
-writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=args.METCut, singleHist=args.singleHist)
+writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=int(args.METCut/1e3), singleHist=args.singleHist)
 writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist)
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
@@ -65,7 +65,7 @@ buildPaths = os.getenv('CMAKE_PREFIX_PATH')
 buildPathsVec = buildPaths.split(':')
 buildDir =  buildPathsVec[0][:buildPathsVec[0].find(CMTCONFIG)].rstrip('/')
 os.system("rm -rf "+workDir)
-os.system("mkdir "+workDir)                
+os.system("mkdir "+workDir)
 
 listoffiles = workDir+"/filelist"
 listoffilesMC = workDir+"/filelistMC"
@@ -127,6 +127,8 @@ if args.METDef!="0":
     extraCommand+=' --METDef '+args.METDef+' '
 if args.year!=2016:
     extraCommand+=' --year %s ' %(args.year)
+if args.METCut!=160e3:
+    extraCommand+=' --METCut %s ' %(args.METCut)
 if args.doTMVA:
     extraCommand+=' --doTMVA '
 if args.doDoubleRatio:

@@ -39,6 +39,8 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
         if METCut>150:
             tmpmj=[83.0,99.6,30.7,21.4,2.4,71.2,132.0,36.97,23.8,0.0,56.5]
             tmpmj_statunc=[24.6,29.3,8.9,10.2,2.4,13.5,21.95,10.5,8.4,0.2,11.0]
+            tmpmj=[71.2,132.0,36.97,23.8,0.0,83.0,99.6,30.7,21.4,2.4,56.5]
+            tmpmj_statunc=[13.5,21.95,10.5,8.4,0.2,24.6,29.3,8.9,10.2,2.4,11.0]
             multijets=[]; multijets_statunc=[];
             MJSF=0.659
             if METCut==160: 
@@ -47,10 +49,14 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 #multijets_statunc = [19.8,23.1,8.4,8.7,1.5,9.3,13.3,6.8,7.3,0.2,7.2]
             if METCut==165:
                 MJSF=0.5434
-            if METCut==170:
+            elif METCut==170:
                 MJSF=0.4518
-            if METCut==180:
-                MJSF=0.659
+            elif METCut==180:
+                MJSF=0.344
+            elif METCut==190:
+                MJSF=0.2306
+            elif METCut==200:
+                MJSF=0.17063
             for i in range(0,len(tmpmj)):
                 multijets+=[(MJSF)*tmpmj[i]] # MET>160... from scaling to low mjj
                 multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
@@ -63,6 +69,8 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             multijets_statunc=[32.8,54.9,13.6,15.2,4.6,27.2,45.4,15.9,18.6,0,32.0]
             tmpmj=[161.3,193.6,59.9,41.5,4.6,132.7,245.7,68.8,44.2,0,182.2]
             tmpmj_statunc=[32.8,54.9,13.6,15.2,4.6,27.2,45.4,15.9,18.6,0,32.0]
+            tmpmj=[132.7,245.7,68.8,44.2,0,161.3,193.6,59.9,41.5,4.6,182.2]
+            tmpmj_statunc=[27.2,45.4,15.9,18.6,0,32.8,54.9,13.6,15.2,4.6,32.0]
             if METCut>150:
                 multijets=[]; multijets_statunc=[];
                 MJSF=0.6991
@@ -75,7 +83,11 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 elif METCut==170: 
                     MJSF=0.540
                 elif METCut==180: 
-                    MJSF=0.659 # note computed
+                    MJSF=0.418 # note computed
+                elif METCut==190: 
+                    MJSF=0.292 # note computed
+                elif METCut==200: 
+                    MJSF=0.209 # note computed
                 for i in range(0,len(tmpmj)):
                     multijets+=[(MJSF)*tmpmj[i]] # MET>160... from scaling to low mjj
                     multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
@@ -88,7 +100,9 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             multijets=[182.1,218.5,67.6,46.8,5.2,174.5,323.1,90.5,58.2,0.0,364.3]
             multijets_statunc=[35.6,42.8,20.3,16.9,5.20,31.9,75.7,24.7,18.9,0.2,71.6]
             tmpmj=[182.1,218.5,67.6,46.8,5.2,174.5,323.1,90.5,58.2,0.0,364.3]
+            tmpmj=[174.5,323.1,90.5,58.2,0.0,182.1,218.5,67.6,46.8,5.2,364.3]
             tmpmj_statunc=[35.6,42.8,20.3,16.9,5.20,31.9,75.7,24.7,18.9,0.2,71.6]
+            tmpmj_statunc=[31.9,75.7,24.7,18.9,0.2,35.6,42.8,20.3,16.9,5.20,71.6]
             if METCut>150:
                 multijets=[]; multijets_statunc=[];
                 MJSF=0.7655
@@ -101,7 +115,11 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 elif METCut==170:
                     MJSF=0.59065
                 elif METCut==180:
-                    MJSF=0.5 # not computed
+                    MJSF=0.483 # not computed
+                elif METCut==190:
+                    MJSF=0.334 # not computed
+                elif METCut==200:
+                    MJSF=0.195 # not computed
                 for i in range(0,len(tmpmj)):
                     multijets+=[(MJSF)*tmpmj[i]] # MET>160... from scaling to low mjj
                     multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj

@@ -17,6 +17,7 @@ arg_group.add_argument("--doLowNom", action="store_true", dest='doLowNom', defau
 arg_group.add_argument("--extraVars", dest='extraVars', default='7', help="extraVars, cut on the new variables for leptons veto etc, default: 0, 1=lepton vars, 2= includes kinematics, 3=no met soft cut, 4=no xe SF for muons, 5=lepTrigOnly for muCR, 6=met trig only for muCR, 7=metORLep for muCR (default)")
 arg_group.add_argument("--Binning", dest='Binning', default='11', help="Binning, set binning of analysis, rel 20p7: 0, default 11 bins: 11")
 arg_group.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
+arg_group.add_argument("--METCut", dest='METCut', default='-1', help="met cut if set")
 arg_group.add_argument("--isMadgraph", action="store_true", dest='isMadgraph', default=False, help="isMadgraph, default: False")
 arg_group.add_argument("--mergeKTPTV", action="store_true", dest='mergeKTPTV', default=False, help="mergeKTPTV, default: False")
 arg_group.add_argument("--doDoubleRatio", action="store_true", dest='doDoubleRatio', default=False, help="doDoubleRatio, default: False")
@@ -88,6 +89,7 @@ if True:
                                        ExtraVars=int(args.extraVars),
                                        Binning=int(args.Binning),
                                        METDef=int(args.METDef),
+                                       METCut=int(args.METCut),
                                        doLowNom = args.doLowNom,
                                        isHigh = not args.isLow,
                                        isMadgraph = args.isMadgraph,
@@ -110,6 +112,7 @@ if True:
                                                ExtraVars=int(args.extraVars),
                                                Binning=int(args.Binning),
                                                METDef=int(args.METDef),
+                                               METCut=int(args.METCut),
                                                doLowNom = args.doLowNom,
                                                isHigh = not args.isLow,
                                                isMadgraph = args.isMadgraph,

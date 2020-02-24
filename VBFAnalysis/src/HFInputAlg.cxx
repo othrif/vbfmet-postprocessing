@@ -16,6 +16,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("ExtraVars", m_extraVars = 7, "0=20.7 analysis, 1=lepton veto, object def, 2=loose cuts, 3=no met soft cut, 4=no xe SF for muons, 5=lepTrigOnly for muCR, 6=met trig only for muCR, 7=metORLep for muCR (default)" );
   declareProperty("Binning", m_binning = 11, "0=rel20p7 binning. Other options with >0, 11 is default" );
   declareProperty("METDef", m_metdef = 0, "0=loose. 1=tenacious" );
+  declareProperty("METCut", m_METCut = -1, "METCut forced overwrite" );
   declareProperty("singleHist", singleHist = false, "singleHist flag, true for running one histogram with bins for the SRs and CRs");
   declareProperty("isHigh", isHigh = true, "isHigh flag, true for upward systematics");
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
@@ -127,22 +128,30 @@ StatusCode HFInputAlg::initialize() {
   if(!singleHist){
     for (int c=1;c<bins;c++) {
       hSR.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("SR"+to_string(c)),to_string(c), syst, isMC), string("SR"+to_string(c))));
+      hCRWe.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleCR"+to_string(c))));
       hCRWep.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosCR"+to_string(c))));
       hCRWen.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegCR"+to_string(c))));
+      hCRWeLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleLowSigCR"+to_string(c))));
       hCRWepLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosLowSigCR"+to_string(c))));
       hCRWenLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegLowSigCR"+to_string(c))));
+      hCRWm.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuCR"+to_string(c))));
       hCRWmp.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuPosCR"+to_string(c))));
       hCRWmn.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuNegCR"+to_string(c))));
+      hCRZll.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoLepCR"+to_string(c)),to_string(c), syst, isMC), string("twoLepCR"+to_string(c))));
       hCRZee.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC), string("twoEleCR"+to_string(c))));
       hCRZmm.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC), string("twoMuCR"+to_string(c))));
       vector <std::pair<vector <TH1F*>, std::string>> hnames;
       hnames.push_back(std::make_pair(hSR.back(),HistoNameMaker(currentSamplePlot,string("SR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWe.back(), HistoNameMaker(currentSamplePlot,string("oneEleCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWep.back(), HistoNameMaker(currentSamplePlot,string("oneElePosCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWen.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWeLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneEleLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWepLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWenLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWm.back(), HistoNameMaker(currentSamplePlot,string("oneMuCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWmp.back(), HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWmn.back(), HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRZll.back(), HistoNameMaker(currentSamplePlot,string("twoLepCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRZee.back(), HistoNameMaker(currentSamplePlot,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRZmm.back(), HistoNameMaker(currentSamplePlot,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC)));
       CheckHists(hnames);
@@ -204,6 +213,7 @@ vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR, 
     h.push_back(new TH1F((name+"_cuts").c_str(), (name+"_cuts;;").c_str(), 1, 0.5, 1.5));
     if (doPlot) {
       h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
+      h.push_back(new TH1F((name+"_jj_dphi").c_str(), (name+"_jj_dphi;;").c_str(), 6, 0, 3.0));
       h.push_back(new TH1F((name+"_met_et").c_str(), (name+"_met_et;;").c_str(), 10, 0, 800));
       h.push_back(new TH1F((name+"_lepmet_et").c_str(), (name+"_lepmet_et;;").c_str(), 10, 0, 800));
       if(doTMVA) h.push_back(new TH1F((name+"_tmva").c_str(), (name+"_tmva;;").c_str(), 2000, 0, 1.0));
@@ -221,9 +231,10 @@ StatusCode HFInputAlg::CheckHists(vector <std::pair<vector <TH1F*>, std::string>
     CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_cuts", std::get<0>(hname)[0]));
     if (doPlot) {
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_jj_mass", std::get<0>(hname)[1]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_met_et", std::get<0>(hname)[2]));
-      CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_lepmet_et", std::get<0>(hname)[3]));
-      if(doTMVA) CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_tmva", std::get<0>(hname)[4]));
+      CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_jj_dphi", std::get<0>(hname)[2]));
+      CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_met_et", std::get<0>(hname)[3]));
+      CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_lepmet_et", std::get<0>(hname)[4]));
+      if(doTMVA) CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_tmva", std::get<0>(hname)[5]));
     }
   }
   return StatusCode::SUCCESS;
@@ -401,6 +412,11 @@ StatusCode HFInputAlg::execute() {
       jj_detaCut=3.8;
       jetCut = (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05);
     }
+  }
+  // set MET cut if requested
+  if(m_METCut>0.0){
+    METCut=m_METCut;
+    METCSTJetCut=m_METCut-20.0e3;
   }
   xeSFTrigWeight=1.0;
   xeSFTrigWeight_nomu=1.0;
@@ -668,14 +684,14 @@ StatusCode HFInputAlg::execute() {
 
   if(!singleHist){
     if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
-    if (CRWep) HistoFill(hCRWep[bin],w_final);
-    if (CRWen) HistoFill(hCRWen[bin],w_final);
-    if (CRWepLowSig) HistoFill(hCRWepLowSig[bin],w_final);
-    if (CRWenLowSig) HistoFill(hCRWenLowSig[bin],w_final);
-    if (CRWmp) HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu);
-    if (CRWmn) HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu);
-    if (CRZee) HistoFill(hCRZee[bin],w_final);
-    if (CRZmm) HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu);
+    if (CRWep){ HistoFill(hCRWep[bin],w_final); HistoFill(hCRWe[bin],w_final); }
+    if (CRWen){ HistoFill(hCRWen[bin],w_final); HistoFill(hCRWe[bin],w_final); }
+    if (CRWepLowSig){ HistoFill(hCRWepLowSig[bin],w_final); HistoFill(hCRWeLowSig[bin],w_final); }
+    if (CRWenLowSig){ HistoFill(hCRWenLowSig[bin],w_final); HistoFill(hCRWeLowSig[bin],w_final); }
+    if (CRWmp){ HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu); HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu); }
+    if (CRWmn){ HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu); HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu); }
+    if (CRZee){ HistoFill(hCRZee[bin],w_final); HistoFill(hCRZll[bin],w_final); }
+    if (CRZmm){ HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu);   HistoFill(hCRZll[bin],w_final*xeSFTrigWeight_nomu);  }
   }else{// one histogram, so need to find the real bin number
     float myWeight=w_final;
     if (CRWmp && CRWmn && CRZmm) myWeight=w_final*xeSFTrigWeight_nomu;
@@ -719,9 +735,10 @@ void HFInputAlg::HistoFill(vector<TH1F*> hs, double w){
   hs[0]->Fill(1,w);
   if (doPlot) {
     hs[1]->Fill(jj_mass/(1e3),w);
-    hs[2]->Fill(met_tst_et/(1e3),w);
-    hs[3]->Fill(met_tst_nolep_et/(1e3),w);
-    if(doTMVA) hs[4]->Fill(tmva,w);
+    hs[2]->Fill(jj_dphi,w);
+    hs[3]->Fill(met_tst_et/(1e3),w);
+    hs[4]->Fill(met_tst_nolep_et/(1e3),w);
+    if(doTMVA) hs[5]->Fill(tmva,w);
   }
   return ;
 }
