@@ -749,10 +749,19 @@ def main(options):
     HistClass.Irfile=rfile
     HistClass.regDict=regDict
 
+    region_keys = regDict.keys()
     hnames=[i.GetName() for i in LOK if ("Nom" in i.GetName() or "NONE" in i.GetName())]
     for key in hnames:
         # NOTE here you can specify hisotgrams which should be skipped
         if skipThis(key): continue
+        # if the plots are not to shown, then skip
+        checkRegion=False
+        for rkey in region_keys:
+            if rkey in key:
+                checkRegion=True
+                break
+        if not checkRegion:
+            continue
         histObj=HistClass(key)
         if not histObj.hist: continue
         if histObj.isSignal():
@@ -1519,7 +1528,7 @@ def plotVar(options):
     for i in range(0,systHistAsymTot.GetNbinsX()+3):
         systHistAsymTotA.SetPointEXhigh(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
         systHistAsymTotA.SetPointEXlow(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
-    Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])    
+    Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTotA.Draw("SAME E2")
     systHistAsymTotA.SetName('Fit Syst')
     systHistAsymTotA.SetTitle('Fit Syst')
