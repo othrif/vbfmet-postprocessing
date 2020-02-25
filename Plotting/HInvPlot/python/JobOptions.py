@@ -134,6 +134,8 @@ def getParser():
     p.add_option('--lep-sign',     type='string', default='0',           dest='lep_sign',   help='Lepton Sign...0 is opposite sign, 1 is SS')
     p.add_option('--trees',        type='string', default='',      dest='trees',      help='Tree name: QCDunwNominal,VBFH125Nominal,VH125Nominal,VVVNominal,W_strongNominal,Z_strongNominal,Z_strongPTVExtNominal,Z_strong_VBFFiltNominal,ggFH125Nominal,QCDwNominal,VBFHOtherNominal,VVNominal,W_EWKNominal,Z_EWKNominal,Z_strongExtNominal,Z_strong_LowMassNominal,dataNominal,ttbarNominal')
     p.add_option('--trig-name',    type='string', default='',            dest='trig_name',  help='Trigger name if wanted. TRIG_xe80_tclcw, TRIG_lep, TRIG_2mu8_EFxe40_tclcw')
+    p.add_option('--mj-trig-name', type='choice', default='TriggerEffWeightBDT', dest='mj_trigger_name', choices=['TriggerEffWeightBDT', 'TriggerEffWeight'], help='Trigger for multijet.')
+    p.add_option('--mj-norm', type='choice', default="sr", dest="mj_norm", choices=['off', 'dphijj3', 'sr'], help="Normalization for QCD background.")
     p.add_option('--mva-weights-path',    type='string', default='',            dest='mva_weights_path',  help='full path to weights files for tmva')
     p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
     p.add_option('--mergePTV',  action='store_true', default=False,   dest='mergePTV',          help='Merge the pTV slices')
@@ -148,7 +150,7 @@ def getParser():
     p.add_option('--BTagCut',  type='float'       , default=-10,     dest='BTagCut',    help='BTagCut for tagging: 0.94, 0.83, 0.64, 0.11 for the 60, 70, 77, and 85 OP')
     p.add_option('--DetailLvl',    type='int'       ,   default=0,       dest='DetailLvl',      help='Integer for detail level of plotting. =1 plots jet variables only, 10 removes a lot of plots')
     p.add_option('--metsf-cuts',   type='int',   default=0,  dest='metsf_cuts',          help='METSF cuts: 0 Nominal, 1 nj3, 2 no centrality')
-    
+
     p.add_option('--vv-vr',    action='store_true', default=False,   dest='vv_vr',            help='Run the VV VR')
     p.add_option('--pu-weight-one',    action='store_true', default=False,   dest='pu_weight_one',            help='Pileup Weight One')
 
