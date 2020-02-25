@@ -582,7 +582,8 @@ if __name__=='__main__':
     p.add_option('--texTables', action='store_true', help='Saves tables as pdf. Only works together with --yieldTable')
     p.add_option('--postFitPickleDir', type='string', default=None, help='Directory of post fit yields pickle files. expects the files end in .pickle')    
     p.add_option('--show-mc-stat-err', action='store_true',  dest='show_mc_stat_err', help='Shows the MC stat uncertainties separately from the data ratio error')
-    p.add_option('--ZeroCheck', action='store_true',  dest='ZeroCheck', help='check for negative entry and set to 0')        
+    p.add_option('--ZeroCheck', action='store_true',  dest='ZeroCheck', help='check for negative entry and set to 0')
+    p.add_option('--combinePlusMinus', action='store_true',  dest='combinePlusMinus', help='Combine the Positive and negative CRs')            
     p.add_option('--plot', default='', help='Plots a variable in a certain region. HFInputAlg.cxx produces these plots with the --doPlot flag . Only works with -i and not with -c. example: jj_mass,SR,1_2_3')
     (options, args) = p.parse_args()
 
@@ -598,6 +599,14 @@ if __name__=='__main__':
     #'VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts',
     #'VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts',
     ]
+    if options.combinePlusMinus:
+        regions=[
+        'VBFjetSel_XNom_SRX_obs_cuts',
+        'VBFjetSel_XNom_twoLepCRX_obs_cuts',
+        'VBFjetSel_XNom_oneElePosCRX_obs_cuts',
+        'VBFjetSel_XNom_oneMuCRX_obs_cuts',
+        #'VBFjetSel_XNom_oneEleLowSigCRX_obs_cuts',
+        ]
     if options.batch:
         ROOT.gROOT.SetBatch(True)
     else:
@@ -614,7 +623,10 @@ if __name__=='__main__':
     if options.pullsFile!=None:
         #for histName in histNames:
         for histName in ["W_strong","W_EWK","Z_strong", "Z_EWK", "ttbar"]:
-            PrintPulls(rfile,options,can,histName,['VBFjetSel_XNom_twoEleCRX_obs_cuts','VBFjetSel_XNom_twoMuCRX_obs_cuts'])
+            if options.combinePlusMinus:
+                PrintPulls(rfile,options,can,histName,['VBFjetSel_XNom_twoLepCRX_obs_cuts'])
+            else:
+                PrintPulls(rfile,options,can,histName,['VBFjetSel_XNom_twoEleCRX_obs_cuts','VBFjetSel_XNom_twoMuCRX_obs_cuts'])            
         sys.exit(0)
     # which syst
     systName='EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR'
@@ -688,7 +700,10 @@ if __name__=='__main__':
     for systNameA in allSyst:
         for histName in histNames:
             if options.smooth:
-                Smooth(rfile,options,can,systNameA,histName,regions+['VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts','VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts'],symmet)
+                if options.combinePlusMinus:
+                    Smooth(rfile,options,can,systNameA,histName,regions+['VBFjetSel_XNom_oneEleLowSigCRX_obs_cuts',],symmet)                    
+                else:
+                    Smooth(rfile,options,can,systNameA,histName,regions+['VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts','VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts'],symmet)
             if not options.batch:
                 DrawRatio(rfile,options,can,systNameA,histName,regions)
             sys.stdout.flush()

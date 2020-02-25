@@ -170,8 +170,9 @@ for syst in systlist:
         MCFileListToUse=listoffilesWewkMC
     runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+isLow+extraCommand
     print runCommand
-    writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub", slc7=args.slc7)
-    writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, MCFileListToUse)
+    if not args.noSubmit:
+        writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub", slc7=args.slc7)
+        writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, MCFileListToUse)
 
 
 # The low one sided systematics can be handled in the fitting. just call symmeterize in hist fitter
