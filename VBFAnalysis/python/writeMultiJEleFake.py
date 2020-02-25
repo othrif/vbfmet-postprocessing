@@ -41,6 +41,9 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             tmpmj_statunc=[24.6,29.3,8.9,10.2,2.4,13.5,21.95,10.5,8.4,0.2,11.0]
             tmpmj=[71.2,132.0,36.97,23.8,0.0,83.0,99.6,30.7,21.4,2.4,56.5]
             tmpmj_statunc=[13.5,21.95,10.5,8.4,0.2,24.6,29.3,8.9,10.2,2.4,11.0]
+            # these are scaled:
+            tmpmj=[99.7867063926122, 119.74404767113464, 36.90905887052042, 25.72813875664941, 2.8853987390634854, 58.26565689050047, 108.02059985317503, 30.253951337665768, 19.47644148867853, 0.0, 56.5]
+            tmpmj_statunc=[29.57533707540073, 35.22590960606672, 10.700020324027092, 12.262944641019812, 2.8853987390634854, 11.047561348620174, 17.96251641497873, 8.592547715593469, 6.874038172474776, 0.1636675755351137, 11.0]
             multijets=[]; multijets_statunc=[];
             MJSF=0.659
             if METCut==160: 
@@ -52,11 +55,11 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             elif METCut==170:
                 MJSF=0.4518
             elif METCut==180:
-                MJSF=0.344
+                MJSF=0.34
             elif METCut==190:
-                MJSF=0.2306
+                MJSF=0.22
             elif METCut==200:
-                MJSF=0.17063
+                MJSF=0.152
             for i in range(0,len(tmpmj)):
                 multijets+=[(MJSF)*tmpmj[i]] # MET>160... from scaling to low mjj
                 multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
@@ -71,6 +74,9 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             tmpmj_statunc=[32.8,54.9,13.6,15.2,4.6,27.2,45.4,15.9,18.6,0,32.0]
             tmpmj=[132.7,245.7,68.8,44.2,0,161.3,193.6,59.9,41.5,4.6,182.2]
             tmpmj_statunc=[27.2,45.4,15.9,18.6,0,32.8,54.9,13.6,15.2,4.6,32.0]
+            # these are scaled
+            tmpmj=[193.12220019968197, 231.79453167178195, 71.71741966497798, 49.687360869725985, 5.507514698813001, 108.14509178504075, 200.23548644750952, 56.06919604228187, 36.0211986201869, 0.0, 182.2]
+            tmpmj_statunc=[39.27097437414488, 65.73099064452907, 16.283086935621043, 18.198744222164695, 5.507514698813001, 22.16689145857655, 36.999149713947624, 12.957851992329676, 15.15824195329132, 0.0, 32.0]
             if METCut>150:
                 multijets=[]; multijets_statunc=[];
                 MJSF=0.6991
@@ -83,11 +89,11 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 elif METCut==170: 
                     MJSF=0.540
                 elif METCut==180: 
-                    MJSF=0.418 # note computed
+                    MJSF=0.415 # 
                 elif METCut==190: 
-                    MJSF=0.292 # note computed
+                    MJSF=0.290 # 
                 elif METCut==200: 
-                    MJSF=0.209 # note computed
+                    MJSF=0.204 # 
                 for i in range(0,len(tmpmj)):
                     multijets+=[(MJSF)*tmpmj[i]] # MET>160... from scaling to low mjj
                     multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
@@ -103,6 +109,9 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             tmpmj=[174.5,323.1,90.5,58.2,0.0,182.1,218.5,67.6,46.8,5.2,364.3]
             tmpmj_statunc=[35.6,42.8,20.3,16.9,5.20,31.9,75.7,24.7,18.9,0.2,71.6]
             tmpmj_statunc=[31.9,75.7,24.7,18.9,0.2,35.6,42.8,20.3,16.9,5.20,71.6]
+            # these are scaled:
+            tmpmj=[221.24316195217506, 265.4674952583759, 82.13090471151584, 56.8598571079725, 6.317761900885834, 144.3089941630104, 267.19906025254244, 74.84220041118877, 48.130564242333556, 0.0, 364.3]
+            tmpmj_statunc=[43.25236993683379, 52.00004026113725, 24.66357049768893, 20.53272617787896, 6.317761900885834, 26.380841912894166, 62.602812940629725, 20.42654530559517, 15.630028594159864, 0.1653971279805277, 71.6]
             if METCut>150:
                 multijets=[]; multijets_statunc=[];
                 MJSF=0.7655
@@ -115,11 +124,11 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 elif METCut==170:
                     MJSF=0.59065
                 elif METCut==180:
-                    MJSF=0.483 # not computed
+                    MJSF=0.480 # not computed
                 elif METCut==190:
-                    MJSF=0.334 # not computed
+                    MJSF=0.330 # not computed
                 elif METCut==200:
-                    MJSF=0.195 # not computed
+                    MJSF=0.189 # not computed
                 for i in range(0,len(tmpmj)):
                     multijets+=[(MJSF)*tmpmj[i]] # MET>160... from scaling to low mjj
                     multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
@@ -141,16 +150,20 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             histClosDw=[]
             if doDoubleRatio and a==(len(multijets)):
                 hist   = ROOT.TH1F("hmultijet_antiVBFSel_1Nom_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1Nom_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
-                histUp = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncHigh_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncHigh_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
-                histDw = ROOT.TH1F("hmultijet_antiVBFSel_1MJUncLow_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJUncLow_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+                histUp = ROOT.TH1F("hmultijet_antiVBFSel_1MJCoreUncHigh_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJCoreUncHigh_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
+                histDw = ROOT.TH1F("hmultijet_antiVBFSel_1MJCoreUncLow_AVBFCR1_obs_cuts", "hmultijet_VBFjetSel_1MJCoreUncLow_AVBFCR1_obs_cuts;;", 1, 0.5, 1.5)
                 for yea in [2016, 2017, 2018]:
                     histClosUp +=[ ROOT.TH1F("hmultijet_antiVBFSel_1MJClos%sUncHigh_AVBFCR1_obs_cuts" %yea, "hmultijet_VBFjetSel_1MJClos%sUncHigh_AVBFCR1_obs_cuts;;" %yea, 1, 0.5, 1.5)]
                     histClosDw +=[ ROOT.TH1F("hmultijet_antiVBFSel_1MJClos%sUncLow_AVBFCR1_obs_cuts" %yea, "hmultijet_VBFjetSel_1MJClos%sUncLow_AVBFCR1_obs_cuts;;" %yea, 1, 0.5, 1.5) ]
             else:
                 hist   = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-                histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-                histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+                histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
                 for yea in [2016, 2017, 2018]:
+                    histClosUp += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClosHDPhi%sUncHigh_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClosHDPhi%sUncHigh_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)]
+                    histClosDw += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClosHDPhi%sUncLow_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClosHDPhi%sUncLow_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) ]
+                    histClosUp += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClosLDPhi%sUncHigh_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClosLDPhi%sUncHigh_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)]
+                    histClosDw += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClosLDPhi%sUncLow_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClosLDPhi%sUncLow_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) ]
                     histClosUp += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)]
                     histClosDw += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) ]
             hist.SetBinContent(1,multijet)
@@ -169,16 +182,28 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             if  year==2016:
                 histClosUp[0].SetBinContent(1,multijet*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
                 histClosDw[0].SetBinContent(1,multijet/1.8)
+                histClosUp[1].SetBinContent(1,multijet*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+                histClosDw[1].SetBinContent(1,multijet/1.8)
+                histClosUp[2].SetBinContent(1,multijet*1.54) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+                histClosDw[2].SetBinContent(1,multijet/1.54)
             if  year==2017:
                 histUp.SetBinContent(1,multijet*1.189)
                 histDw.SetBinContent(1,multijet/1.189)
-                histClosUp[1].SetBinContent(1,multijet*1.47) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
-                histClosDw[1].SetBinContent(1,multijet/1.47)
+                histClosUp[3].SetBinContent(1,multijet*1.72) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                histClosDw[3].SetBinContent(1,multijet/1.72)
+                histClosUp[4].SetBinContent(1,multijet*1.47) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                histClosDw[4].SetBinContent(1,multijet/1.47)
+                histClosUp[5].SetBinContent(1,multijet*1.24) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                histClosDw[5].SetBinContent(1,multijet/1.24)
             if  year==2018:
                 histUp.SetBinContent(1,multijet*1.226)
                 histDw.SetBinContent(1,multijet/1.226)
-                histClosUp[2].SetBinContent(1,multijet*1.43) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
-                histClosDw[2].SetBinContent(1,multijet/1.43)
+                histClosUp[6].SetBinContent(1,multijet*1.32) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                histClosDw[6].SetBinContent(1,multijet/1.32)
+                histClosUp[7].SetBinContent(1,multijet*1.62) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                histClosDw[7].SetBinContent(1,multijet/1.62)
+                histClosUp[8].SetBinContent(1,multijet*1.19) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                histClosDw[8].SetBinContent(1,multijet/1.19)
             hist.Write()
             histUp.Write()
             histDw.Write()
@@ -193,8 +218,8 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
         b=1
         nbins=len(multijets)*9
         hist   = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)
-        histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)
-        histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)
+        histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)
+        histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)
         for yea in [2016, 2017, 2018]:
             histClosUp += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5)]
             histClosDw += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts;;", nbins, 0.5, nbins+0.5) ]
