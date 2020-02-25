@@ -9,6 +9,7 @@ import sys
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 parser.add_argument( "-i", "--input", type = str, dest = "input", default = "/tmp/HFALL_nom_v37.root", help = "input file name" )
 parser.add_argument( "-t", "--unblind", action = "store_true", dest = "unblind", default = False, help = "unblind the tables");
+parser.add_argument( "--combinePlusMinus", action = "store_true", dest = "combinePlusMinus", default = False, help = "combine the pos and neg CRs");
 args, unknown = parser.parse_known_args()
 
 regions=[
@@ -22,6 +23,14 @@ regions=[
 'VBFjetSel_XNom_oneElePosLowSigCRX_obs_cuts',
 'VBFjetSel_XNom_oneEleNegLowSigCRX_obs_cuts',
 ]
+if args.combinePlusMinus:
+    regions=[
+        'VBFjetSel_XNom_SRX_obs_cuts',
+    'VBFjetSel_XNom_twoLepCRX_obs_cuts',
+    'VBFjetSel_XNom_oneEleCRX_obs_cuts',
+    'VBFjetSel_XNom_oneMuCRX_obs_cuts',
+    'VBFjetSel_XNom_oneEleLowSigCRX_obs_cuts',
+    ]
 unblind=args.unblind
 #hdata_NONE_twoEleCR3_obs_cuts
 samples =['hVBFH125_',
@@ -143,12 +152,16 @@ for rmy in regions:
         region_name = ['']
         if r.count('twoEle'):  region_name=['Zee']
         elif r.count('twoMu'):  region_name=['Zmm']
-        elif r.count('oneEleNegLowSigC'):  region_name=['WenminusLowMetSig']
+        elif r.count('twoLep'):  region_name=['Zll']
+        elif r.count('oneEleLowSigC'):  region_name=['WenuLowMetSig']
+        elif r.count('oneEleNegLowSigC'):  region_name=['WenminusLowMetSig']            
         elif r.count('oneElePosLowSigC'):  region_name=['WenplusLowMetSig']
         elif r.count('oneEleNeg'):  region_name=['Wenminus']
         elif r.count('oneElePos'):  region_name=['Wenplus']
         elif r.count('oneMuNeg'):  region_name=['Wmnminus']
         elif r.count('oneMuPos'):  region_name=['Wmnplus']
+        elif r.count('oneEleC'):  region_name=['Wenu']
+        elif r.count('oneMuC'):  region_name=['Wmunu']
         elif r.count('_SR'):  region_name=['SR']
         table_per_bin[bin_num][region_name[0]]=[lineData,lineSig,lineBkg,'%0.3f $\\pm$ %0.3f\t' %(lineData/lineBkg, math.sqrt(1./lineData+bkgFracErr**2)*(lineData/lineBkg))]
         #[[sreg,totalData,totalBkg,'%0.3f\t%0.3f +/- %0.3f\t' %(totalBkgFracErr, totalData/totalBkg, math.sqrt(totalBkgFracErr**2+1./totalData)*(totalData/totalBkg))]]        
@@ -164,12 +177,16 @@ for rmy in regions:
             sreg=['Region']
             if r.count('twoEle'):  sreg=['Zee']
             elif r.count('twoMu'):  sreg=['Zmm']
+            elif r.count('twoLep'):  sreg=['Zll']
             elif r.count('oneEleNegLowSigC'):  sreg=['WenminusLowMetSig']
             elif r.count('oneElePosLowSigC'):  sreg=['WenplusLowMetSig']
+            elif r.count('oneEleLowSigC'):  sreg=['WenuLowMetSig']
             elif r.count('oneEleNeg'):  sreg=['Wenminus']
             elif r.count('oneElePos'):  sreg=['Wenplus']
             elif r.count('oneMuNeg'):  sreg=['Wmnminus']
             elif r.count('oneMuPos'):  sreg=['Wmnplus']
+            elif r.count('oneEleC'):  sreg=['Wenu']
+            elif r.count('oneMuC'):  sreg=['Wmunu']
             elif r.count('_SR'):  sreg=['SR']
             for su in range(0,len(SumList)):
                 sreg+=[SumList[su]]
@@ -184,7 +201,7 @@ for rmy in regions:
                 else:
                     totalData=SumList[su] 
             sreg+=[totalBkg]
-            region_cf+=[sreg]            
+            region_cf+=[sreg]
             #bkgFracErr
             totalBkgFracErr = math.sqrt(totalBkgErr)/totalBkg
             
@@ -195,6 +212,8 @@ print 'done'
 
 print table_per_bin
 keys_regions = ['SR','Zee','Zmm','Wmnminus','Wmnplus','Wenminus','Wenplus']
+if args.combinePlusMinus:
+    keys_regions = ['SR','Zll','Wmunu','Wenu']
 print ''
 print '\\resizebox{\\textwidth}{!}{ '
 print '\\begin{tabular}{ll|ccccccc}'

@@ -389,32 +389,47 @@ class HistClass(object):
             if cls.nBins==None:
                 cls.nBins=cls.getNumberOfBins()
             for n in range(1,cls.nBins+1):
-                cls.regDict["SR{}".format(n)]=cls.nBins*8+n
-                cls.regDict["oneMuNegCR{}".format(n)]=cls.nBins*4+n
-                cls.regDict["oneMuPosCR{}".format(n)]=cls.nBins*5+n
-                cls.regDict["oneEleNegCR{}".format(n)]=cls.nBins*2+n
-                cls.regDict["oneElePosCR{}".format(n)]=cls.nBins*3+n
-                cls.regDict["twoMuCR{}".format(n)]=cls.nBins*7+n
-                cls.regDict["twoEleCR{}".format(n)]=cls.nBins*6+n
-                cls.regDict["oneEleNegLowSigCR{}".format(n)]=n
-                cls.regDict["oneElePosLowSigCR{}".format(n)]=cls.nBins+n
+                if options.combinePlusMinus:
+                    cls.regDict["SR{}".format(n)]=cls.nBins*4+n
+                    cls.regDict["oneMuCR{}".format(n)]=cls.nBins*2+n
+                    cls.regDict["oneEleCR{}".format(n)]=cls.nBins+n
+                    cls.regDict["twoLepCR{}".format(n)]=cls.nBins*3+n
+                    cls.regDict["oneEleLowSigCR{}".format(n)]=n
+                else:
+                    cls.regDict["SR{}".format(n)]=cls.nBins*8+n
+                    cls.regDict["oneMuNegCR{}".format(n)]=cls.nBins*4+n
+                    cls.regDict["oneMuPosCR{}".format(n)]=cls.nBins*5+n
+                    cls.regDict["oneEleNegCR{}".format(n)]=cls.nBins*2+n
+                    cls.regDict["oneElePosCR{}".format(n)]=cls.nBins*3+n
+                    cls.regDict["twoMuCR{}".format(n)]=cls.nBins*7+n
+                    cls.regDict["twoEleCR{}".format(n)]=cls.nBins*6+n
+                    cls.regDict["oneEleNegLowSigCR{}".format(n)]=n
+                    cls.regDict["oneElePosLowSigCR{}".format(n)]=cls.nBins+n
 
             cls.regionBins=OrderedDict()
-            cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
-            cls.regionBins["ZCRee"]=[cls.regDict[k] for k in cls.regDict if "twoEleCR" in k]
-            cls.regionBins["ZCRmumu"]=[cls.regDict[k] for k in cls.regDict if "twoMuCR" in k]
-            cls.regionBins["WCRep"]=[cls.regDict[k] for k in cls.regDict if "oneElePosCR" in k]
-            cls.regionBins["WCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleNegCR" in k]
-            cls.regionBins["WCRmup"]=[cls.regDict[k] for k in cls.regDict if "oneMuPosCR" in k]
-            cls.regionBins["WCRmun"]=[cls.regDict[k] for k in cls.regDict if "oneMuNegCR" in k]
-            cls.regionBins["lowsigWCRep"]=[cls.regDict[k] for k in cls.regDict if "oneElePosLowSigCR" in k]
-            cls.regionBins["lowsigWCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleNegLowSigCR" in k]
-
-            cls.regionBins["ZCRll"]=cls.regionBins["ZCRee"]+cls.regionBins["ZCRmumu"]
-            cls.regionBins["WCRenu"]=cls.regionBins["WCRep"]+cls.regionBins["WCRen"]
-            cls.regionBins["WCRmunu"]=cls.regionBins["WCRmup"]+cls.regionBins["WCRmun"]
-            cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]
-            cls.regionBins["lowsigWCRenu"]=cls.regionBins["lowsigWCRep"]+cls.regionBins["lowsigWCRen"]
+            if options.combinePlusMinus:
+                cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
+                cls.regionBins["ZCRll"]=[cls.regDict[k] for k in cls.regDict if "twoLepCR" in k]
+                cls.regionBins["WCRenu"]=[cls.regDict[k] for k in cls.regDict if "oneEleCR" in k]
+                cls.regionBins["WCRmunu"]=[cls.regDict[k] for k in cls.regDict if "oneMuCR" in k]
+                cls.regionBins["lowsigWCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleLowSigCR" in k]
+                cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]                
+            else:
+                cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
+                cls.regionBins["ZCRee"]=[cls.regDict[k] for k in cls.regDict if "twoEleCR" in k]
+                cls.regionBins["ZCRmumu"]=[cls.regDict[k] for k in cls.regDict if "twoMuCR" in k]
+                cls.regionBins["WCRep"]=[cls.regDict[k] for k in cls.regDict if "oneElePosCR" in k]
+                cls.regionBins["WCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleNegCR" in k]
+                cls.regionBins["WCRmup"]=[cls.regDict[k] for k in cls.regDict if "oneMuPosCR" in k]
+                cls.regionBins["WCRmun"]=[cls.regDict[k] for k in cls.regDict if "oneMuNegCR" in k]
+                cls.regionBins["lowsigWCRep"]=[cls.regDict[k] for k in cls.regDict if "oneElePosLowSigCR" in k]
+                cls.regionBins["lowsigWCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleNegLowSigCR" in k]
+                
+                cls.regionBins["ZCRll"]=cls.regionBins["ZCRee"]+cls.regionBins["ZCRmumu"]
+                cls.regionBins["WCRenu"]=cls.regionBins["WCRep"]+cls.regionBins["WCRen"]
+                cls.regionBins["WCRmunu"]=cls.regionBins["WCRmup"]+cls.regionBins["WCRmun"]
+                cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]
+                cls.regionBins["lowsigWCRenu"]=cls.regionBins["lowsigWCRep"]+cls.regionBins["lowsigWCRen"]
 
 def getBinsError(hist, bins):
     BE=0
@@ -659,7 +674,9 @@ def main(options):
     ATLAS.Style()
 
     can=ROOT.TCanvas("c","c",1000,600)
-
+    byNum=9
+    if options.combinePlusMinus:
+        byNum=5
     if options.ratio:
         can.Divide(1,2)
         can.cd(1)
@@ -677,7 +694,7 @@ def main(options):
         can.SetLogy()
 
 
-    dummyHist=ROOT.TH1F("dummy","",9*nbins,0,9*nbins)
+    dummyHist=ROOT.TH1F("dummy","",byNum*nbins,0,byNum*nbins)
     dummyHist.SetStats(0)
 
 
@@ -687,33 +704,50 @@ def main(options):
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
-        regDict["SR{}".format(n)]=nbins*8+n
-        regDict["oneMuNegCR{}".format(n)]=nbins*4+n
-        regDict["oneMuPosCR{}".format(n)]=nbins*5+n
-        regDict["oneEleNegCR{}".format(n)]=nbins*2+n
-        regDict["oneElePosCR{}".format(n)]=nbins*3+n
-        regDict["twoMuCR{}".format(n)]=nbins*7+n
-        regDict["twoEleCR{}".format(n)]=nbins*6+n
-        regDict["oneEleNegLowSigCR{}".format(n)]=n
-        regDict["oneElePosLowSigCR{}".format(n)]=nbins+n
+        if options.combinePlusMinus:
+            regDict["SR{}".format(n)]=nbins*4+n
+            regDict["oneMuCR{}".format(n)]=nbins*2+n
+            regDict["oneEleCR{}".format(n)]=nbins+n
+            regDict["twoLepCR{}".format(n)]=nbins*3+n
+            regDict["oneEleLowSigCR{}".format(n)]=n
+        else:        
+            regDict["SR{}".format(n)]=nbins*8+n
+            regDict["oneMuNegCR{}".format(n)]=nbins*4+n
+            regDict["oneMuPosCR{}".format(n)]=nbins*5+n
+            regDict["oneEleNegCR{}".format(n)]=nbins*2+n
+            regDict["oneElePosCR{}".format(n)]=nbins*3+n
+            regDict["twoMuCR{}".format(n)]=nbins*7+n
+            regDict["twoEleCR{}".format(n)]=nbins*6+n
+            regDict["oneEleNegLowSigCR{}".format(n)]=n
+            regDict["oneElePosLowSigCR{}".format(n)]=nbins+n
 
 
     regionBins=OrderedDict()
-    regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
-    regionBins["ZCRee"]=[regDict[k] for k in regDict if "twoEleCR" in k]
-    regionBins["ZCRmumu"]=[regDict[k] for k in regDict if "twoMuCR" in k]
-    regionBins["WCRep"]=[regDict[k] for k in regDict if "oneElePosCR" in k]
-    regionBins["WCRen"]=[regDict[k] for k in regDict if "oneEleNegCR" in k]
-    regionBins["WCRmup"]=[regDict[k] for k in regDict if "oneMuPosCR" in k]
-    regionBins["WCRmun"]=[regDict[k] for k in regDict if "oneMuNegCR" in k]
-    regionBins["lowsigWCRep"]=[regDict[k] for k in regDict if "oneElePosLowSigCR" in k]
-    regionBins["lowsigWCRen"]=[regDict[k] for k in regDict if "oneEleNegLowSigCR" in k]
-
-    regionBins["ZCRll"]=regionBins["ZCRee"]+regionBins["ZCRmumu"]
-    regionBins["WCRenu"]=regionBins["WCRep"]+regionBins["WCRen"]
-    regionBins["WCRmunu"]=regionBins["WCRmup"]+regionBins["WCRmun"]
-    regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]
-    regionBins["lowsigWCRenu"]=regionBins["lowsigWCRep"]+regionBins["lowsigWCRen"]
+    byNum=9
+    if options.combinePlusMinus:
+        byNum=5
+        regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
+        regionBins["ZCRll"]=[regDict[k] for k in regDict if "twoLepCR" in k]
+        regionBins["WCRenu"]=[regDict[k] for k in regDict if "oneEleCR" in k]
+        regionBins["WCRmunu"]=[regDict[k] for k in regDict if "oneMuCR" in k]
+        regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]        
+        regionBins["lowsigWCRen"]=[regDict[k] for k in regDict if "oneEleLowSigCR" in k]
+    else:
+        regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
+        regionBins["ZCRee"]=[regDict[k] for k in regDict if "twoEleCR" in k]
+        regionBins["ZCRmumu"]=[regDict[k] for k in regDict if "twoMuCR" in k]
+        regionBins["WCRep"]=[regDict[k] for k in regDict if "oneElePosCR" in k]
+        regionBins["WCRen"]=[regDict[k] for k in regDict if "oneEleNegCR" in k]
+        regionBins["WCRmup"]=[regDict[k] for k in regDict if "oneMuPosCR" in k]
+        regionBins["WCRmun"]=[regDict[k] for k in regDict if "oneMuNegCR" in k]
+        regionBins["lowsigWCRep"]=[regDict[k] for k in regDict if "oneElePosLowSigCR" in k]
+        regionBins["lowsigWCRen"]=[regDict[k] for k in regDict if "oneEleNegLowSigCR" in k]
+        
+        regionBins["ZCRll"]=regionBins["ZCRee"]+regionBins["ZCRmumu"]
+        regionBins["WCRenu"]=regionBins["WCRep"]+regionBins["WCRen"]
+        regionBins["WCRmunu"]=regionBins["WCRmup"]+regionBins["WCRmun"]
+        regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]
+        regionBins["lowsigWCRenu"]=regionBins["lowsigWCRep"]+regionBins["lowsigWCRen"]
 
     #setting dummyHist
     for k in regDict:
@@ -724,11 +758,12 @@ def main(options):
     dummyHist.Draw()
 
     hists=[]
+    
     for hname in histNames[::-1]:
-        hists.append(ROOT.TH1F(hname,hname,nbins*9,0,nbins*9))
+        hists.append(ROOT.TH1F(hname,hname,nbins*byNum,0,nbins*byNum))
         hDict[hname]=hists[-1]
         hDict[hname].Sumw2()
-    data=ROOT.TH1F("data","data",nbins*9,0,nbins*9)
+    data=ROOT.TH1F("data","data",nbins*byNum,0,nbins*byNum)
     hDict["data"]=data
 
     #Styles
@@ -814,7 +849,7 @@ def main(options):
                 
     #defining bkg hist
     bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","eleFakes","multijet"]+["Others"]
-    bkgs=ROOT.TH1F("bkgs","bkgs",nbins*9,0,nbins*9)
+    bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
     hDict["bkgs"]=bkgs
     hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
     for bkg in bkgsList:
@@ -1126,7 +1161,9 @@ def compareMain(options):
         openRfiles[i]=ROOT.TFile(rfile)
 
     ATLAS.Style()
-
+    byNum=9
+    if options.combinePlusMinus:
+        byNum=5
     mjjBins=None
     # loop over all hists in input file and add their content to the right hist
     histDict={}
@@ -1154,13 +1191,13 @@ def compareMain(options):
                 try:
                     addContent(histDict[i]["bkg"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
                 except:
-                    histDict[i]["bkg"]=ROOT.TH1F("bkg{}".format(i),"",9*mjjBins,0,9*mjjBins)
+                    histDict[i]["bkg"]=ROOT.TH1F("bkg{}".format(i),"",byNum*mjjBins,0,byNum*mjjBins)
                     addContent(histDict[i]["bkg"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
             elif histObj.isData() and options.data:
                 try:
                     addContent(histDict[i]["data"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
                 except:
-                    histDict[i]["data"]=ROOT.TH1F("data{}".format(i),"",9*mjjBins,0,9*mjjBins)
+                    histDict[i]["data"]=ROOT.TH1F("data{}".format(i),"",byNum*mjjBins,0,byNum*mjjBins)
                     addContent(histDict[i]["data"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
 
         if options.data:
@@ -1177,7 +1214,7 @@ def compareMain(options):
 
     c1=ROOT.TCanvas("c1","c2",1600,1200)
 
-    dummyHist=ROOT.TH1F("dummy","",9*mjjBins,0,9*mjjBins)
+    dummyHist=ROOT.TH1F("dummy","",byNum*mjjBins,0,byNum*mjjBins)
     dummyHist.SetStats(0)
     for k in HistClass.regDict:
         dummyHist.GetXaxis().SetBinLabel(HistClass.regDict[k],k)
@@ -1691,7 +1728,8 @@ if __name__=='__main__':
     p.add_option('-s', '--syst', type='string', default="", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
     p.add_option('-d', '--data', action='store_true', help='Draw data')
     p.add_option('--unBlindSR', action='store_true', help='Unblinds the SR bins')
-    p.add_option('--debug', action='store_true', help='Print in debug mode')    
+    p.add_option('--debug', action='store_true', help='Print in debug mode')
+    p.add_option('--combinePlusMinus', action='store_true', help='Combine the plus and minus')
     p.add_option('-r', '--ratio', action='store_true', help='Draw data/MC ratio in case of -i and adds ratios to tables for both -i and -c')
     p.add_option('--yieldTable', action='store_true', help='Produces yield table')
     p.add_option('--saveAs', type='string', help='Saves the canvas in a given format. example argument: pdf')
