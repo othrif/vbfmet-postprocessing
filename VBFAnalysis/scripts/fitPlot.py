@@ -283,7 +283,8 @@ class HistClass(object):
             self.hist=HistClass.Irfile.Get(self.hname)
         if self.hist is None:
             print "Could not retrieve histogram!", self.hname, HistClass.Irfile
-
+        else:
+            print 'Hist: ',self.hname
         if not(self.syst in HistClass.systs):
             HistClass.systs.append(self.syst)
 
@@ -413,7 +414,8 @@ class HistClass(object):
                 cls.regionBins["WCRenu"]=[cls.regDict[k] for k in cls.regDict if "oneEleCR" in k]
                 cls.regionBins["WCRmunu"]=[cls.regDict[k] for k in cls.regDict if "oneMuCR" in k]
                 cls.regionBins["lowsigWCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleLowSigCR" in k]
-                cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]                
+                cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]
+                #cls.regionBins["lowsigWCRenu"]=cls.regionBins["lowsigWCRen"]
             else:
                 cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
                 cls.regionBins["ZCRee"]=[cls.regDict[k] for k in cls.regDict if "twoEleCR" in k]
@@ -732,6 +734,7 @@ def main(options):
         regionBins["WCRmunu"]=[regDict[k] for k in regDict if "oneMuCR" in k]
         regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]        
         regionBins["lowsigWCRen"]=[regDict[k] for k in regDict if "oneEleLowSigCR" in k]
+        #regionBins["lowsigWCRenu"]=regionBins["lowsigWCRen"]
     else:
         regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
         regionBins["ZCRee"]=[regDict[k] for k in regDict if "twoEleCR" in k]
