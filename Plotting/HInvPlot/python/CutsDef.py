@@ -42,7 +42,7 @@ class BasicCuts:
                                 'mjj1500nj2lepptlow', 'mjj1500nj2leppthigh', 'mjj2000nj2lepptlow', 'mjj2000nj2leppthigh', 'mjj3500nj2lepptlow',
                                 'mjj3500nj2leppthigh', 'njgt2lepptlow', 'njgt2leppthigh',
                             'allmjjdphijj3', 'mjj800dphijj3nj2', 'mjj1000dphijj3nj2', 'mjj1500dphijj3nj2', 'mjj2000dphijj3nj2', 'mjj3500dphijj3nj2', 'dphijj3njgt2',
-                            'LowMETQCDSRdphijj3', 'LowMETQCDVRdphijj3', 'LowMETQCDdphijj3', 'LowMETQCDSRFJVTdphijj3', 'LowMETQCDVRFJVTdphijj3', 'LowMETQCDFJVTdphijj3']:
+                            'mjjLow200dphijj3', 'LowMETQCDSRdphijj3', 'LowMETQCDVRdphijj3', 'LowMETQCDdphijj3', 'LowMETQCDSRFJVTdphijj3', 'LowMETQCDVRFJVTdphijj3', 'LowMETQCDFJVTdphijj3']:
             raise NameError('BasicCuts - unknown analysis string: %s' %Analysis)
 
         self.analysis = Analysis
@@ -405,6 +405,10 @@ def getVBFCuts(options, basic_cuts, isLep=False):
 #-------------------------------------------------------------------------
 def metCuts(basic_cuts, options, isLep=False, metCut=160.0, cstCut=140.0, maxMET=-1):
 
+    highMET=180.0
+    if metCut>180.0:
+        highMET=metCut
+
     met_choice = options.met_choice # the met_choice is filled into this variable
     if isLep:
         met_choice=met_choice.replace('_tst','_tst_nolep')
@@ -430,8 +434,7 @@ def metCuts(basic_cuts, options, isLep=False, metCut=160.0, cstCut=140.0, maxMET
             cuts = [cutMET]
             cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 100.0')]
         else:
-            #cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
-            cutMET.AddCut(CutItem('HighMET', '%s > 180.0' %(met_choice)), 'OR')
+            cutMET.AddCut(CutItem('HighMET', '%s > %s' %(met_choice,highMET)), 'OR')
             if options.ReverseFJVT:
                 cutMET.AddCut(CutItem('LowMETfjvt1', '%s > %s && j0fjvt > 0.2' %(met_choice, metCut)), 'OR')
                 cutMET.AddCut(CutItem('LowMETfjvt2', '%s > %s && j1fjvt > 0.2' %(met_choice, metCut)), 'OR')
@@ -455,7 +458,7 @@ def getMETTriggerCut(cut = '', options=None, basic_cuts=None, Localsyst=None, OR
         apply_weight='xeSFTrigWeight__1up'
     elif Localsyst=='xeSFTrigWeight__1down':
         apply_weight='xeSFTrigWeight__1down'
-    if apply_weight!=None and ORTrig!='':
+    if apply_weight!=None and (ORTrig!='' or basic_cuts.chan in ['u','uu']):
         apply_weight=apply_weight.replace('xeSFTrigWeight','xeSFTrigWeight_nomu')
 
     if options.year==2017:
@@ -495,7 +498,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
         else:
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
             #cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0)
-            cuts += metCuts(basic_cuts,options,metCut=160.0, cstCut=140.0)
+            cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
             #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
 
@@ -661,8 +664,10 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
     if options.r207Ana:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     else:
-        if basic_cuts.chan=='uu':
-            cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
+        if basic_cuts.chan in ['uu','ll']:
+            #cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
+            cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
+            #cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig='')
         else:
             cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
@@ -719,7 +724,9 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
 
     cuts = FilterCuts(options)
     if basic_cuts.chan in ['u','um','up','l']:
-        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
+        #cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst='NOXESF', ORTrig=' || trigger_lep > 0')
+        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
+        #cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst)
     else:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
 
