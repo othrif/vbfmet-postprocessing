@@ -102,3 +102,4 @@ To compare different root files you can use the --compare option instead of -i:
 fitPlot.py --compare HFoutput1.root,HFoutput2.root,HFoutput3.root --data --ratio --yieldTable --texTables -q --saveAs png
 ```
 
+python VBFAnalysis/scripts/sysPlotv2.py -i  /tmp/HFALL_feb17d_sysNew_smooth5.New.root  --inputUpdate /tmp/HFALL_feb17d_sysNew_smooth5.New.root       --saveAs png   --syst weird  --smooth 5 --ZeroBias --
