@@ -1,23 +1,5 @@
-variables:
-  GIT_SUBMODULE_STRATEGY: recursive
-
-stages:
-  - package
-  - build
-
 build_image:
-  stage: package
-  variables:
-    TO: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   tags:
     - docker-image-build
-  dependencies:
-    - build
   script:
-  - echo building image
-
-build_job:
-    stage: build
-    image: atlas/analysisbase:21.2.104
-    script:
-    - echo Hello World
+    - ignore
