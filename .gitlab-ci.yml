@@ -1,4 +1,17 @@
+variables:
+  # all submodules will be cloned recursively upon start of CI job
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SSL_NO_VERIFY: "true"
+
+stages:
+  - build
+
+# builds the docker image
+# used in CI tests later on and for RECAST
 build_image:
+  stage: build
+  variables:
+    TO: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
   tags:
     - docker-image-build
   script:
