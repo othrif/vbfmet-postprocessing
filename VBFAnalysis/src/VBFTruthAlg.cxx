@@ -9,7 +9,7 @@
 
 #define LINE std::cerr << __FILE__ << "::" << __FUNCTION__ << "::" << __LINE__ << std::endl;
 
-const std::string regions[] = {"Incl","SRPhiHigh","CRWPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet"};
+const std::string regions[] = {"Incl","SRPhiHigh","CRWPhiHigh","CRWepPhiHigh","CRWenPhiHigh","CRWmpPhiHigh","CRWmnPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRWepPhiLow","CRWenPhiLow","CRWmpPhiLow","CRWmnPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet"};
 const std::string variations[] = {"fac_up","fac_down","renorm_up","renorm_down","both_up","both_down"};
 
 
@@ -361,16 +361,24 @@ if(new_nels==1 && new_nmus==0) {
 
 bool SRPhiHigh = false;
 bool CRWPhiHigh = false;
+bool CRWepPhiHigh = false;
+bool CRWenPhiHigh = false;
+bool CRWmpPhiHigh = false;
+bool CRWmnPhiHigh = false;
 bool CRZPhiHigh = false;
 bool SRPhiLow = false;
 bool CRWPhiLow = false;
+bool CRWepPhiLow = false;
+bool CRWenPhiLow = false;
+bool CRWmpPhiLow = false;
+bool CRWmnPhiLow = false;
 bool CRZPhiLow = false;
 bool SRNjet = false;
 bool CRWNjet = false;
 bool CRZNjet = false;
 
 // Definiing a loose skimming
-//float METCut = 150.0e3;
+float METCut = 200.0e3;
 float LeadJetPtCut = 80.0e3;
 float subLeadJetPtCut = 50.0e3;
 float MjjCut =2e5;
@@ -378,38 +386,49 @@ float DEtajjCut =3.8;
 
 bool vbfSkim = (new_jet_pt->at(0) > LeadJetPtCut) & (new_jet_pt->at(1) > subLeadJetPtCut) & (new_jj_deta > DEtajjCut) & ((new_jet_eta->at(0) * new_jet_eta->at(1))<0) & (new_jj_mass > MjjCut);
 
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > 150e3) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiHigh = true;
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiHigh = true;
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiHigh = true;
+if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
+if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
+if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiHigh = true;
+if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiHigh = true;
+if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiHigh = true;
 
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_et > 150e3) & (new_nels == 0) & (new_nmus == 0))            SRPhiLow= true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > 150e3) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > 150e3) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiLow = true;
+if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1 && el_pdgid->at(0) < 0) & (new_nmus == 0) )           CRWepPhiHigh = true;
+if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1 && el_pdgid->at(0) > 0) & (new_nmus == 0) )           CRWenPhiHigh = true;
+if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1 && mu_pdgid->at(0) < 0) )           CRWmpPhiHigh = true;
+if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1 && mu_pdgid->at(0) > 0) )           CRWmnPhiHigh = true;
 
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 2.0) & (new_met_et > 150e3) & (new_nels == 0) & (new_nmus == 0))            SRPhiLow= true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiLow = true;
+if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiLow= true;
+if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiLow = true;
+if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiLow = true;
+if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiLow = true;
+if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiLow = true;
 
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_et > 150e3) & (new_nels == 0) & (new_nmus == 0))            SRNjet    = true;
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZNjet = true;
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZNjet = true;
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 1) & (new_nmus == 0) )           CRWNjet = true;
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > 150e3) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
+if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 1 && el_pdgid->at(0) < 0) & (new_nmus == 0) )           CRWepPhiLow = true;
+if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1 && mu_pdgid->at(0) < 0) )           CRWmpPhiLow = true;
+if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 1 && el_pdgid->at(0) > 0) & (new_nmus == 0) )           CRWenPhiLow = true;
+if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1 && mu_pdgid->at(0) > 0) )           CRWmnPhiLow = true;
+
+if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRNjet    = true;
+if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZNjet = true;
+if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZNjet = true;
+if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWNjet = true;
+if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
 
 std::map<TString,bool> regDecision;
 regDecision["Incl"]=true;
 regDecision["SRPhiHigh"]=SRPhiHigh;
 regDecision["CRZPhiHigh"]=CRZPhiHigh;
 regDecision["CRWPhiHigh"]=CRWPhiHigh;
+regDecision["CRWepPhiHigh"]=CRWepPhiHigh;
+regDecision["CRWenPhiHigh"]=CRWenPhiHigh;
+regDecision["CRWmpPhiHigh"]=CRWmpPhiHigh;
+regDecision["CRWmnPhiHigh"]=CRWmnPhiHigh;
 regDecision["SRPhiLow"]=SRPhiLow;
 regDecision["CRZPhiLow"]=CRZPhiLow;
-regDecision["CRWPhiLow"]=CRWPhiLow;
+regDecision["CRWepPhiLow"]=CRWepPhiLow;
+regDecision["CRWenPhiLow"]=CRWenPhiLow;
+regDecision["CRWmpPhiLow"]=CRWmpPhiLow;
+regDecision["CRWmnPhiLow"]=CRWmnPhiLow;
 regDecision["SRNjet"]=SRNjet;
 regDecision["CRZNjet"]=CRZNjet;
 regDecision["CRWNjet"]=CRWNjet;
