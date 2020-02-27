@@ -250,7 +250,8 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("xeSFTrigWeight__1down",&xeSFTrigWeight__1down);
     m_tree_out->Branch("xeSFTrigWeight_nomu__1up",&xeSFTrigWeight_nomu__1up);
     m_tree_out->Branch("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);
-    if(m_theoVariation) m_tree_out->Branch("mcEventWeights",&mcEventWeights);
+    //if(m_theoVariation) 
+      m_tree_out->Branch("mcEventWeights",&mcEventWeights);
   }
   if(m_currentVariation=="Nominal") m_tree_out->Branch("eleANTISF",&eleANTISF);
   m_tree_out->Branch("runNumber",&runNumber);

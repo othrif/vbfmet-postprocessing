@@ -61,6 +61,7 @@ Msl::ReadEvent::ReadEvent():
   fOverlapPh    (false),
   fIsDDQCD      (false),
   fYear         (2016),
+  fTheorySystWeight(0),
   genCutFlow    (0),
   procCutFlow0  (0),
   rawCutFlow    (0)
@@ -101,6 +102,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::BTagCut",       fBTagCut);
   reg.Get("ReadEvent::noVjWeight",      fnoVjWeight);
   reg.Get("ReadEvent::Year",          fYear);  
+  reg.Get("ReadEvent::TheorySystWeight",          fTheorySystWeight);  
 
   reg.Get("ReadEvent::Debug",         fDebug        = false);
   reg.Get("ReadEvent::Print",         fPrint        = false);
@@ -163,6 +165,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
 
   // declare vectors
   //
+  mcEventWeights  = new std::vector<float>();  
   el_charge  = new std::vector<float>();
   el_pt      = new std::vector<float>();
   el_eta     = new std::vector<float>();
@@ -285,7 +288,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("runNumber",&fRunNumber);
   tree->SetBranchAddress("randomRunNumber",&fRandomRunNumber);
   tree->SetBranchAddress("eventNumber",&fEventNumber);
-  tree->SetBranchAddress("el_charge",&el_charge);
+  tree->SetBranchAddress("mcEventWeights",&mcEventWeights);
   tree->SetBranchAddress("el_pt",    &el_pt);
   tree->SetBranchAddress("el_eta",   &el_eta);
   tree->SetBranchAddress("el_charge",&el_charge);
@@ -706,8 +709,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       else event->SetWeight(1.0);
     }else{
       if(!fMCEventCount) {
-        if(fnoVjWeight) event->SetWeight((fWeight*fLumi/vjWeight)); // assume vjweight is already applied to the nominal weight
-        else event->SetWeight(fWeight*fLumi);
+	float extraTheoryWeight=1.0;
+	if(fTheorySystWeight!=0 && mcEventWeights && fTheorySystWeight<mcEventWeights->size()) extraTheoryWeight=mcEventWeights->at(fTheorySystWeight);
+        if(fnoVjWeight) event->SetWeight((fWeight*fLumi*extraTheoryWeight/vjWeight)); // assume vjweight is already applied to the nominal weight
+        else event->SetWeight(fWeight*fLumi*extraTheoryWeight);
       }
       else  event->SetWeight(1.0);
       float MJDDScaling=1.0;
