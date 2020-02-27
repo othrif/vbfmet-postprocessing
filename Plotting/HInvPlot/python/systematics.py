@@ -68,7 +68,8 @@ class systematics(object):
                                     'VBF_qqH_Mjj120__1down','VBF_qqH_Mjj60__1down',
                                     'VBF_qqH_200__1down','VBF_qqH_tot__1down',
                                   # MJ unc
-                                  'MJUnc__1down','MJClos2016__1down','MJClos2017__1down','MJClos2018__1down',
+                                  'MJUnc__1down','MJClos2016__1down','MJClos2017__1down','MJClos2018__1down','MJClosHDPhi2016__1down','MJClosHDPhi2017__1down','MJClosHDPhi2018__1down',
+                                     'MJClosLDPhi2016__1down','MJClosLDPhi2017__1down','MJClosLDPhi2018__1down'
                                       ]
         self.systematicsList=""
         self.load(mode)
@@ -119,10 +120,10 @@ class systematics(object):
                                         'MUON_EFF_TrigStatUncertainty__1down', 'MUON_EFF_TrigStatUncertainty__1up', 'MUON_EFF_TrigSystUncertainty__1down',
                                         'MUON_EFF_TrigSystUncertainty__1up', 'MUON_EFF_BADMUON_SYS__1down', 'MUON_EFF_BADMUON_SYS__1up', 'MUON_EFF_ISO_STAT__1down', 'MUON_EFF_ISO_STAT__1up', 'MUON_EFF_ISO_SYS__1down', 'MUON_EFF_ISO_SYS__1up', 'MUON_EFF_RECO_STAT_LOWPT__1down', 'MUON_EFF_RECO_STAT_LOWPT__1up', 'MUON_EFF_RECO_STAT__1down', 'MUON_EFF_RECO_STAT__1up', 'MUON_EFF_RECO_SYS_LOWPT__1down', 'MUON_EFF_RECO_SYS_LOWPT__1up', 'MUON_EFF_RECO_SYS__1down', 'MUON_EFF_RECO_SYS__1up', 'MUON_EFF_TTVA_STAT__1down', 'MUON_EFF_TTVA_STAT__1up', 'MUON_EFF_TTVA_SYS__1down', 'MUON_EFF_TTVA_SYS__1up',
                                         'PRW_DATASF__1down', 'PRW_DATASF__1up','xeSFTrigWeight__1up','xeSFTrigWeight__1down','puSyst2018Weight__1up','puSyst2018Weight__1down',
-                                                'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up', #MJ
+                                        'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','MJClosHDPhi2016__1up','MJClosHDPhi2017__1up','MJClosHDPhi2018__1up',
+                                     'MJClosLDPhi2016__1up','MJClosLDPhi2017__1up','MJClosLDPhi2018__1up' #MJ
                                                 'vvUnc__1up','vvUnc__1down'
             ]
-
             self.systematicsList = ['Nominal',
                                         'EG_RESOLUTION_ALL__1down','EG_RESOLUTION_ALL__1up','EG_SCALE_AF2__1down','EG_SCALE_AF2__1up','EG_SCALE_ALL__1down','EG_SCALE_ALL__1up',
                                         'EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1up',
@@ -151,7 +152,8 @@ class systematics(object):
                                        'PRW_DATASF__1down','PRW_DATASF__1up',
                                        'xeSFTrigWeight__1up','xeSFTrigWeight__1down','puSyst2018Weight__1up','puSyst2018Weight__1down',
                                         'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up',
-                                    'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up', #MJ
+    'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','MJClosHDPhi2016__1up','MJClosHDPhi2017__1up','MJClosHDPhi2018__1up',
+                                     'MJClosLDPhi2016__1up','MJClosLDPhi2017__1up','MJClosLDPhi2018__1up'#MJ
                                     'vvUnc__1up','vvUnc__1down'
                                         #'JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff'
                                         ]
@@ -181,12 +183,14 @@ class systematics(object):
             self.systematicsList = ["Nominal"]
         elif mode == "WeightSyst":
             self.systematicsList = ['FT_EFF_B_systematics__1down','FT_EFF_B_systematics__1up','FT_EFF_C_systematics__1down','FT_EFF_C_systematics__1up','FT_EFF_Light_systematics__1down','FT_EFF_Light_systematics__1up','FT_EFF_extrapolation__1down','FT_EFF_extrapolation__1up','FT_EFF_extrapolation_from_charm__1down','FT_EFF_extrapolation_from_charm__1up','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1up','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','eleANTISFEL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down','eleANTISFEL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up','JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up','JET_JvtEfficiency__1down','JET_JvtEfficiency__1up','MUON_EFF_TrigStatUncertainty__1down','MUON_EFF_TrigStatUncertainty__1up','MUON_EFF_TrigSystUncertainty__1down','MUON_EFF_TrigSystUncertainty__1up','MUON_EFF_BADMUON_SYS__1down','MUON_EFF_BADMUON_SYS__1up','MUON_EFF_ISO_STAT__1down','MUON_EFF_ISO_STAT__1up','MUON_EFF_ISO_SYS__1down','MUON_EFF_ISO_SYS__1up','MUON_EFF_RECO_STAT_LOWPT__1down','MUON_EFF_RECO_STAT_LOWPT__1up','MUON_EFF_RECO_STAT__1down','MUON_EFF_RECO_STAT__1up','MUON_EFF_RECO_SYS_LOWPT__1down','MUON_EFF_RECO_SYS_LOWPT__1up','MUON_EFF_RECO_SYS__1down','MUON_EFF_RECO_SYS__1up','MUON_EFF_TTVA_STAT__1down','MUON_EFF_TTVA_STAT__1up','MUON_EFF_TTVA_SYS__1down','MUON_EFF_TTVA_SYS__1up','PRW_DATASF__1down','PRW_DATASF__1up','xeSFTrigWeight__1up','xeSFTrigWeight__1down','puSyst2018Weight__1up','puSyst2018Weight__1down',
-                                    'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','vvUnc__1up','vvUnc__1down']
+                                    'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','MJClosHDPhi2016__1up','MJClosHDPhi2017__1up','MJClosHDPhi2018__1up',
+                                     'MJClosLDPhi2016__1up','MJClosLDPhi2017__1up','MJClosLDPhi2018__1up','vvUnc__1up','vvUnc__1down']
             self.systematicsList = ['EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1up',
 'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_TriggerEff_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_TriggerEff_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1up','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','JET_JvtEfficiency__1down','JET_JvtEfficiency__1up','JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up','MUON_EFF_BADMUON_SYS__1down','MUON_EFF_BADMUON_SYS__1up','MUON_EFF_ISO_STAT__1down','MUON_EFF_ISO_STAT__1up','MUON_EFF_ISO_SYS__1down','MUON_EFF_ISO_SYS__1up','MUON_EFF_RECO_STAT__1down','MUON_EFF_RECO_STAT__1up','MUON_EFF_RECO_STAT_LOWPT__1down','MUON_EFF_RECO_STAT_LOWPT__1up','MUON_EFF_RECO_SYS__1down','MUON_EFF_RECO_SYS__1up','MUON_EFF_RECO_SYS_LOWPT__1down','MUON_EFF_RECO_SYS_LOWPT__1up','MUON_EFF_TTVA_STAT__1down','MUON_EFF_TTVA_STAT__1up','MUON_EFF_TTVA_SYS__1down','MUON_EFF_TTVA_SYS__1up','MUON_EFF_TrigStatUncertainty__1down','MUON_EFF_TrigStatUncertainty__1up','MUON_EFF_TrigSystUncertainty__1down','MUON_EFF_TrigSystUncertainty__1up',
 'PH_EFF_ID_Uncertainty__1down','PH_EFF_ID_Uncertainty__1up','PH_EFF_ISO_Uncertainty__1down','PH_EFF_ISO_Uncertainty__1up','PH_EFF_TRIGGER_Uncertainty__1down','PH_EFF_TRIGGER_Uncertainty__1up',
                                     'PRW_DATASF__1down','PRW_DATASF__1up','xeSFTrigWeight__1up','xeSFTrigWeight__1down','JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff','puSyst2018Weight__1up','puSyst2018Weight__1down',
-                                    'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','vvUnc__1up','vvUnc__1down']
+                                    'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','MJClosHDPhi2016__1up','MJClosHDPhi2017__1up','MJClosHDPhi2018__1up',
+                                     'MJClosLDPhi2016__1up','MJClosLDPhi2017__1up','MJClosLDPhi2018__1up','vvUnc__1up','vvUnc__1down']
             self.systematicsList+=self.systematicsVBFSignal+self.systematicsSignalPDF + self.systematicsGGFSignal
             # add the V+jets theory uncertainties
             self.systematicsList += self.systematicsZewkTheory
@@ -273,7 +277,8 @@ class systematics(object):
                                     'VBF_qqH_Mjj120__1up','VBF_qqH_Mjj60__1up',
                                      'VBF_qqH_200__1up','VBF_qqH_tot__1up',
                                      #MJ
-                                     'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up']
+                                     'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','MJClosHDPhi2016__1up','MJClosHDPhi2017__1up','MJClosHDPhi2018__1up',
+                                     'MJClosLDPhi2016__1up','MJClosLDPhi2017__1up','MJClosLDPhi2018__1up']
         elif mode == "OneSidedDown": # this is used to list all systematics that need to by symmeterized in plotting
             self.systematicsList = self.systematicsListDown
             
@@ -326,6 +331,12 @@ class systematics(object):
             'MJClos2016__1down' : 'MJClos2016__1up',
             'MJClos2017__1down' : 'MJClos2017__1up',
             'MJClos2018__1down' : 'MJClos2018__1up',
+            'MJClosHDPhi2016__1down' : 'MJClosHDPhi2016__1up',
+            'MJClosHDPhi2017__1down' : 'MJClosHDPhi2017__1up',
+            'MJClosHDPhi2018__1down' : 'MJClosHDPhi2018__1up',
+            'MJClosLDPhi2016__1down' : 'MJClosLDPhi2016__1up',
+            'MJClosLDPhi2017__1down' : 'MJClosLDPhi2017__1up',
+            'MJClosLDPhi2018__1down' : 'MJClosLDPhi2018__1up',
                 'VBF_qqH_25__1down':'VBF_qqH_25__1up',
                 'VBF_qqH_2jet__1down':'VBF_qqH_2jet__1up',
                 'VBF_qqH_Mjj1500__1down':'VBF_qqH_Mjj1500__1up',

@@ -721,15 +721,23 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       // There are currently three legal options:
       // "off" (no normalization!), "sr" (normalization for SR), "dphijj3" (normalization for high-dphijj).
       if (fMJNormStrategy == "sr") {
-        if(fYear==2016) MJDDScaling=0.8815; //0.82109;
-        else if(fYear==2017) MJDDScaling=2.6895;
-        else if(fYear==2018) MJDDScaling=2.10302;
+	float scaledphimj = event->GetVar(Mva::jj_dphi)<1.0 ? 1.22 : 0.82;
+        if(fYear==2016) MJDDScaling=0.8815*scaledphimj; //0.82109;
+        else if(fYear==2017) MJDDScaling=2.6895*scaledphimj;
+        else if(fYear==2018) MJDDScaling=2.10302*scaledphimj;
 
         // MJ systematics (MJClos2016__1up MJClos2017__1up MJClos2018__1up)
-        if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.8;
-        if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.47;
-        if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.43;
+        if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.54;
+        if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.24;
+        if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.19;
 
+        if(fWeightSystName=="MJClosHDPhi2016__1up" && fYear==2016) MJDDScaling*=1.8;
+        if(fWeightSystName=="MJClosHDPhi2017__1up" && fYear==2017) MJDDScaling*=1.47;
+        if(fWeightSystName=="MJClosHDPhi2018__1up" && fYear==2018) MJDDScaling*=1.43;
+        if(fWeightSystName=="MJClosLDPhi2016__1up" && fYear==2016) MJDDScaling*=1.32;
+        if(fWeightSystName=="MJClosLDPhi2017__1up" && fYear==2017) MJDDScaling*=1.72;
+        if(fWeightSystName=="MJClosLDPhi2018__1up" && fYear==2018) MJDDScaling*=1.62;
+	
       } else if (fMJNormStrategy == "dphijj3") {
         if (fYear == 2016) MJDDScaling = 0.3878;
         else if (fYear == 2017) MJDDScaling = 0.7424;
