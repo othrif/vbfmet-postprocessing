@@ -255,7 +255,7 @@ void Msl::ReadEvent::Init(TTree* tree)
     //if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);        
     //if(fIsDDQCD && fMJTriggerEff=="TriggerEffWeightBDT") tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);    
     //if(fIsDDQCD && fMJTriggerEff=="TriggerEffWeight") tree->SetBranchAddress("TriggerEffWeight", &fTriggerEffWeight);
-    std::cout << "QCD Weight name: " << fMJTriggerEff << std::endl;
+    std::cout << "QCD Trigger Weight name: " << fMJTriggerEff << std::endl;
     //TriggerEffWeight, TriggerEffWeightBDT
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){
@@ -611,14 +611,14 @@ void Msl::ReadEvent::Read(const std::string &path)
     fIsDDQCD=(fTrees.at(i).find("QCDDD")!=std::string::npos); // QCDDD
     if(fTrees.at(i).find(fSystName)==std::string::npos && !fIsDDQCD) continue;
 
-    log() << "Read - Running systematic: " << fSystName << " on tree: " << fTrees.at(i) <<std::endl;
+    log() << "Read - Running systematic: " << fSystName << " on tree: " << fTrees.at(i) << " weight syst: " << fWeightSystName << " is qcd? " << fIsDDQCD <<std::endl;
 
     //
     // Read common ntuples
     //
     std::string treeName = std::string(rtree->GetName());
     fisMC = (treeName.find("data")==std::string::npos);
-    fIsDDQCD=(treeName.find("QCDDDNominal")!=std::string::npos); // QCDDD
+    //fIsDDQCD=(treeName.find("QCDDDNominal")!=std::string::npos); // QCDDD
     Init(rtree);
     ReadTree(rtree); // Processes the events
 
@@ -725,7 +725,6 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         if(fYear==2016) MJDDScaling=0.8815*scaledphimj; //0.82109;
         else if(fYear==2017) MJDDScaling=2.6895*scaledphimj;
         else if(fYear==2018) MJDDScaling=2.10302*scaledphimj;
-
         // MJ systematics (MJClos2016__1up MJClos2017__1up MJClos2018__1up)
         if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.54;
         if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.24;
@@ -756,7 +755,6 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         if(fYear==2017) MJDDScaling*=1.189;
         if(fYear==2018) MJDDScaling*=1.226;
       }
-
       if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight*MJDDScaling);
 
       // define the vv uncertainty
