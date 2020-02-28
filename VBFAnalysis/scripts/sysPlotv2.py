@@ -658,7 +658,9 @@ if __name__=='__main__':
                       'MET_SoftTrk_ResoPara',
                       'MET_SoftTrk_ResoPerp',
                       'JET_EffectiveNP_Mixed2',
-                      'JET_EffectiveNP_Mixed1'
+                      'JET_EffectiveNP_Mixed1',
+                      'EG_SCALE_ALL',
+                      'EG_RESOLUTION_ALL'
                       ]
     systToSmoothTest=['EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
             #'MET_SoftTrk_Scale', #smoothed
