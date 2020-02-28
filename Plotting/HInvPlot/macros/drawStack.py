@@ -39,6 +39,7 @@ p.add_option('--blind',         action='store_true', default=False,   dest='blin
 p.add_option('--normalizeBkg',  action='store_true', default=False,   dest='normalizeBkg')
 p.add_option('--madgraph',      action='store_true', default=False,   dest='madgraph')
 p.add_option('--do-eps',        action='store_true', default=False,   dest='do_eps')
+p.add_option('--do-c',          action='store_true', default=False,   dest='do_c')
 p.add_option('--do-pdf',        action='store_true', default=False,   dest='do_pdf')
 p.add_option('--do-root',       action='store_true', default=False,   dest='do_root')
 p.add_option('--do-logy',       action='store_true', default=False,   dest='do_logy')
@@ -273,7 +274,7 @@ def getHistPars(hist):
         'jj_deta_abs' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|/#Delta#eta_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
         'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
-        'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.01,'logy':True},
+        'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.1,'logy':True},
         'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
         'alljet_metsig'     : {'xtitle':'MET Significance (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
     'met_cst_jet'     : {'xtitle':'E_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
@@ -621,6 +622,10 @@ def updateCanvas(can, name=None, leg=None, option = '', data_hist=None, bkg_sum_
 
         if options.do_eps:
             can.Print('%s.eps' %name, 'eps')
+
+        # Support generating .C macro to remake plot.
+        if options.do_c:
+            can.SaveAs('%s.C' % name)
 
         if options.do_pdf:
             can.Print('%s.pdf' %name, 'pdf')
