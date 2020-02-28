@@ -190,9 +190,11 @@ namespace Msl
     int   fRandomRunNumber;    
     ULong64_t fEventNumber;    
     int   fCurrRunNumber;
-    int   fYear;        
+    int   fYear;
+    unsigned fTheorySystWeight;
     Mva::Sample fCurrSample;
 
+    std::vector<float> *mcEventWeights;    
     std::vector<float> *el_charge;
     std::vector<float> *el_pt;
     std::vector<float> *el_eta;

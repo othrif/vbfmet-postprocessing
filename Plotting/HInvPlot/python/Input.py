@@ -54,6 +54,7 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::mergeExt',      options.mergeExt)
         self.read_reg.SetVal('ReadEvent::noVjWeight',      options.noVjWeight)
         self.read_reg.SetVal('ReadEvent::Year',          options.year)
+        self.read_reg.SetVal('ReadEvent::TheorySystWeight', options.TheorySystWeight)        
 
         self.read_reg.SetVal('ReadEvent::Print',      'yes')
         self.read_reg.SetVal('ReadEvent::Trees',      ' '.join(self.trees))

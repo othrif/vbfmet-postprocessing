@@ -1,7 +1,7 @@
 #!/bin/bash                                                                                                                                                                                                       
 #OUTDIRM=/share/t3data2/schae/v32ETight
 #OUTDIRM=${1:-v34mc16a}
-OUTDIRM=v37ESyst
+OUTDIRM=v37ETight
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
@@ -50,6 +50,7 @@ rm VBFH125Old*.root
 hadd $OUTDIRM/VBFH125.root  VBFH125*.root
 #hadd $OUTDIRM/VBFHgam125.root  VBFHgam125*.root
 hadd $OUTDIRM/VBFHOther.root  VBFHOther*.root
+hadd $OUTDIRM/VBFHAltSignal.root  VBFHAltSignal*.root
 #hadd $OUTDIRM/ggFH125Old.root  ggFH125Old*.root
 rm ggFH125Old*.root
 hadd $OUTDIRM/ggFH125.root  ggFH125*.root
