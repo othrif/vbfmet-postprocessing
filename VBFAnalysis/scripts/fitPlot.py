@@ -847,6 +847,8 @@ def main(options):
                         totalErrStatSyst = math.sqrt((fpickle[pickle_key][ireg])**2+(histToSet.GetBinError(regDict[iname.rstrip('_cuts')]))**2)
                         histToSet.SetBinError(regDict[iname.rstrip('_cuts')],totalErrStatSyst)
                     else:
+			#print "Get bin content ",histToSet.GetBinContent(regDict[iname.rstrip('_cuts')])
+			#print "Set bin content ",fpickle[pickle_key][ireg]
                         histToSet.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg])
                     ireg+=1
                 
@@ -878,17 +880,26 @@ def main(options):
 
     # print the stat uncertainties:
     if options.show_mc_stat_err:
-        regionsList=[
-        'gamma_stat_oneEleNegLowSigCRX_obs_cuts_bin_0',
-        'gamma_stat_oneElePosLowSigCRX_obs_cuts_bin_0',
-        'gamma_stat_oneEleNegCRX_obs_cuts_bin_0',
-        'gamma_stat_oneElePosCRX_obs_cuts_bin_0',
-        'gamma_stat_oneMuNegCRX_obs_cuts_bin_0',
-        'gamma_stat_oneMuPosCRX_obs_cuts_bin_0',
-        'gamma_stat_twoEleCRX_obs_cuts_bin_0',
-        'gamma_stat_twoMuCRX_obs_cuts_bin_0',
-        'gamma_stat_SRX_obs_cuts_bin_0',    
-        ]
+	if options.combinePlusMinus:
+            regionsList=[
+            'gamma_stat_oneEleLowSigCRX_obs_cuts_bin_0',
+            'gamma_stat_oneEleCRX_obs_cuts_bin_0',
+            'gamma_stat_oneMuCRX_obs_cuts_bin_0',
+            'gamma_stat_twoLepCRX_obs_cuts_bin_0',
+            'gamma_stat_SRX_obs_cuts_bin_0',    
+            ]
+	else:
+            regionsList=[
+            'gamma_stat_oneEleNegLowSigCRX_obs_cuts_bin_0',
+            'gamma_stat_oneElePosLowSigCRX_obs_cuts_bin_0',
+            'gamma_stat_oneEleNegCRX_obs_cuts_bin_0',
+            'gamma_stat_oneElePosCRX_obs_cuts_bin_0',
+            'gamma_stat_oneMuNegCRX_obs_cuts_bin_0',
+            'gamma_stat_oneMuPosCRX_obs_cuts_bin_0',
+            'gamma_stat_twoEleCRX_obs_cuts_bin_0',
+            'gamma_stat_twoMuCRX_obs_cuts_bin_0',
+            'gamma_stat_SRX_obs_cuts_bin_0',    
+            ]
         regionItr=0
         print 'syst data_fraction mc_fraction'
         writeLine=''
