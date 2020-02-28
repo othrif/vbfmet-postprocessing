@@ -717,7 +717,7 @@ class HistEntry:
         madgraph=''
         if options.madgraph:
             madgraph='Mad'
-        if ZCR and (sample in ['zqcd'+madgraph,'qewk']):
+        if ZCR and (sample in ['zqcd'+madgraph,'zewk']):
             for i in range(0,self.hist.GetNbinsX()+1):
                 znf = ZCR.GetNF(['zqcd'+madgraph,'zewk'],i)
                 self.hist.SetBinContent(i,znf*self.hist.GetBinContent(i))
