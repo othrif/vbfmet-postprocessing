@@ -1085,6 +1085,7 @@ def main(options):
         rHist.GetYaxis().SetTitleSize(0.1)
         rHist.GetYaxis().CenterTitle()
 
+	#Set x axis labels
         for k in regDict:
 	    if options.combinePlusMinus:
 	        index=k.find('R')
@@ -1147,11 +1148,11 @@ def main(options):
     labelTxt.SetTextAlign(11)
     if options.combinePlusMinus:
         labelTxt.SetTextSize(0.03)
-	line0=ROOT.TLine(0.16,0.02,0.16,0.11)
-	line0.Draw()
+	line00=ROOT.TLine(0.16,0.02,0.16,0.11)
+	line00.Draw()
         labelTxt.DrawText(0.17,0.05,"oneEleLowSigCR")
-	line1=ROOT.TLine(0.31,0.02,0.31,0.11)
-	line1.Draw()
+	line0=ROOT.TLine(0.31,0.02,0.31,0.11)
+	line0.Draw()
         labelTxt.DrawText(0.35,0.05,"oneEleCR")
 	line2=ROOT.TLine(0.458,0.02,0.458,0.11)
 	line2.Draw()
