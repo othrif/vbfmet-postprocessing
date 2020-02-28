@@ -257,6 +257,9 @@ def main():
     if options.analysis=='qcd':
         anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','LowMETQCDRevFJVT','nj3']
         chans   = ['nn']
+    if options.analysis=='qcdA':
+        anas = ['allmjj','mjjLow200','LowMETQCDSRFJVT']
+        chans   = ['nn']        
 
     # dphijj > 2 analysis: run with or without binning.
     if options.analysis == "dphijj3":

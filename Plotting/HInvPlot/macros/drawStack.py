@@ -85,6 +85,7 @@ if not options.wait:
 
 log = config.getLog('drawStack.py', debug=options.debug)
 mysyst = import_syst.systematics('All')
+#mysyst = import_syst.systematics('WeightSyst')
 #mysyst = import_syst.systematics('SigTheory')
 mysystOneSided = import_syst.systematics('OneSidedDown')
 
