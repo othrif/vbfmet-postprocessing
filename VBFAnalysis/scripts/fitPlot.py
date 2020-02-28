@@ -1086,9 +1086,16 @@ def main(options):
         rHist.GetYaxis().CenterTitle()
 
         for k in regDict:
-            rHist.GetXaxis().SetBinLabel(regDict[k],k)
+	    if options.combinePlusMinus:
+	        index=k.find('R')
+                rHist.GetXaxis().SetBinLabel(regDict[k],k[index+1::])
+	        rHist.GetXaxis().LabelsOption('h')
+	    else:
+                rHist.GetXaxis().SetBinLabel(regDict[k],k)
         rHist.GetXaxis().SetLabelSize(0.1)
         rHist.GetYaxis().SetLabelSize(0.1)
+	
+	
 
         line1=data.Clone("line1")
         for i in range(1,line1.GetNbinsX()+1):
@@ -1128,17 +1135,46 @@ def main(options):
             systHistAsymRatio.Draw('same e2')
             rHist.Draw('same')
             line1.Draw("histsame")
-                
+        
         can.GetPad(2).RedrawAxis()
         can.GetPad(2).Modified()
         can.GetPad(2).Update()
         can.cd(1)
 
+    #Draw region boxes under axis to clarify plot
+    can.cd()
+    labelTxt = ROOT.TLatex()
+    labelTxt.SetTextAlign(11)
+    if options.combinePlusMinus:
+        labelTxt.SetTextSize(0.03)
+	line0=ROOT.TLine(0.16,0.02,0.16,0.11)
+	line0.Draw()
+        labelTxt.DrawText(0.17,0.05,"oneEleLowSigCR")
+	line1=ROOT.TLine(0.31,0.02,0.31,0.11)
+	line1.Draw()
+        labelTxt.DrawText(0.35,0.05,"oneEleCR")
+	line2=ROOT.TLine(0.458,0.02,0.458,0.11)
+	line2.Draw()
+        labelTxt.DrawText(0.5,0.05,"oneMuCR")
+	line3=ROOT.TLine(0.605,0.02,0.605,0.11)
+	line3.Draw()
+        labelTxt.DrawText(0.645,0.05,"twoLepCR")
+	line4=ROOT.TLine(0.752,0.02,0.752,0.11)
+	line4.Draw()
+        labelTxt.DrawText(0.82,0.05,"SR")
+	line5=ROOT.TLine(0.9,0.02,0.9,0.11)
+	line5.Draw()
+	hline=ROOT.TLine(0.16,0.08,0.9,0.08)
+	hline.Draw()
+	hline0=ROOT.TLine(0.16,0.02,0.9,0.02)
+	hline0.Draw()
+	 
+    can.cd(1)
     ROOT.gPad.RedrawAxis()
     ROOT.gPad.Modified()
     ROOT.gPad.Update()
 
-    can.cd(1)
+    #can.cd(1)
     blindStr=""
     if not options.unBlindSR:
         blindStr=", SR blinded"
