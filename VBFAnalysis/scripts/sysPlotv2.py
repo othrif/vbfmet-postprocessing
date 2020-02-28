@@ -658,7 +658,9 @@ if __name__=='__main__':
                       'MET_SoftTrk_ResoPara',
                       'MET_SoftTrk_ResoPerp',
                       'JET_EffectiveNP_Mixed2',
-                      'JET_EffectiveNP_Mixed1'
+                      'JET_EffectiveNP_Mixed1',
+                      'EG_SCALE_ALL',
+                      'EG_RESOLUTION_ALL'
                       ]
     systToSmoothTest=['EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR',
             #'MET_SoftTrk_Scale', #smoothed
@@ -677,7 +679,13 @@ if __name__=='__main__':
                            'JET_JER_EffectiveNP_6',
                            'JET_JER_EffectiveNP_7restTerm',
                            'alpha_JET_JvtEfficiency']
-    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency','JET_JvtEfficiency','JET_Flavor_Response','JET_Flavor_Composition','JET_EffectiveNP_Modelling3','JET_EffectiveNP_Modelling1','JET_EffectiveNP_Modelling2']
+    systToSmoothTestextraA=['JET_Flavor_Composition',
+                                'JET_JER_EffectiveNP_7restTerm',
+                                'JET_JER_EffectiveNP_3',
+                            #'EG_SCALE_ALL',
+                             #   'EG_RESOLUTION_ALL',
+                                'JET_Pileup_OffsetMu']
+    symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency','JET_JvtEfficiency','JET_Flavor_Response','JET_Flavor_Composition','JET_EffectiveNP_Modelling3','JET_EffectiveNP_Modelling1','JET_EffectiveNP_Modelling2','JET_JER_EffectiveNP_7restTerm','JET_JER_EffectiveNP_3','JET_Pileup_OffsetMu']
 
     allSyst=[]
     if options.syst=='All':
@@ -694,6 +702,8 @@ if __name__=='__main__':
         allSyst=systToSmoothTest10
     elif options.syst=='weirde':
         allSyst=systToSmoothTestextra
+    elif options.syst=='met200':
+        allSyst=systToSmoothTestextraA
     else:
         allSyst=[options.syst]
     print 'Number of syst:',len(allSyst)
