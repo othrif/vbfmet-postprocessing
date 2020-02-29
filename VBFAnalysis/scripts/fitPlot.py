@@ -480,6 +480,7 @@ def make_legend(can):
                    'W_strong':'QCD W',
                    'signal':'Higgs',
                    'data':'Data',                   
+                   'bkgs':'Unc',                   
                    'eleFakes':'e-fakes',
                    'multijet':'Multijet',
                    }
@@ -514,9 +515,11 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
 
     DataMC=OrderedDict()
     for reg in regionBinsDict:
-            DataMC[reg]=0
+        DataMC[reg]=0
+        if getBinsYield(histDict["bkgs"], regionBinsDict[reg])>0.0:
             if options.data: DataMC[reg]=(getBinsYield(histDict["data"], regionBinsDict[reg])/getBinsYield(histDict["bkgs"], regionBinsDict[reg]))
-
+        else:
+            if options.data: DataMC[reg]=(0.0)
     altArray=[]                
     arrArray=[]
     x1a=ROOT.Double()
@@ -758,6 +761,11 @@ def main(options):
     dummyHist.SetMaximum(2000)
     dummyHist.SetMinimum(1)
     dummyHist.GetYaxis().SetTitle("Events")
+    dummyHist.GetYaxis().SetTitleSize(1.4*dummyHist.GetYaxis().GetTitleSize())
+    dummyHist.GetYaxis().SetTitleOffset(0.54*dummyHist.GetYaxis().GetTitleOffset())    
+    dummyHist.GetYaxis().SetRangeUser(1,2000)    
+    if options.cronly:
+        dummyHist.GetXaxis().SetRangeUser(0,44)
     dummyHist.Draw()
 
     hists=[]
@@ -817,6 +825,7 @@ def main(options):
         postFitPickles = LoadPickleFiles(options.postFitPickleDir)
         for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
             pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
+            print 'pickle_region_names:',pickle_region_names
             for pickle_key in fpickle.keys():
                 isError=False
                 if  ('Fitted_events_' in pickle_key): # only process the fitted events here
@@ -874,13 +883,13 @@ def main(options):
         for SRbin in regionBins["SR"]:
             hDict["data"].SetBinContent(SRbin,bkgs.GetBinContent(SRbin))
 
-    dummyHist.SetMaximum(hStack.GetMaximum()*1.4)
+    dummyHist.SetMaximum(hStack.GetMaximum()*3.4)
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
 
     # print the stat uncertainties:
     if options.show_mc_stat_err:
-	if options.combinePlusMinus:
+        if options.combinePlusMinus:
             regionsList=[
             'gamma_stat_oneEleLowSigCRX_obs_cuts_bin_0',
             'gamma_stat_oneEleCRX_obs_cuts_bin_0',
@@ -888,7 +897,7 @@ def main(options):
             'gamma_stat_twoLepCRX_obs_cuts_bin_0',
             'gamma_stat_SRX_obs_cuts_bin_0',    
             ]
-	else:
+        else:
             regionsList=[
             'gamma_stat_oneEleNegLowSigCRX_obs_cuts_bin_0',
             'gamma_stat_oneElePosLowSigCRX_obs_cuts_bin_0',
@@ -1082,7 +1091,7 @@ def main(options):
         rHist.Divide(rbkgs)
         rHist.GetYaxis().SetTitle("Data/MC")
         rHist.GetYaxis().SetTitleOffset(.35)
-        rHist.GetYaxis().SetTitleSize(0.1)
+        rHist.GetYaxis().SetTitleSize(0.15)
         rHist.GetYaxis().CenterTitle()
 
 	#Set x axis labels
@@ -1103,6 +1112,9 @@ def main(options):
             line1.SetBinContent(i,1)
         Style.setLineAttr(line1,2,2,3)
 
+
+        if options.cronly:
+            rHist.GetXaxis().SetRangeUser(0,44)
         rHist.Draw()
         line1.Draw("histsame")
         if options.show_mc_stat_err or options.syst!="" or options.postFitPickleDir!=None:
@@ -1141,35 +1153,6 @@ def main(options):
         can.GetPad(2).Modified()
         can.GetPad(2).Update()
         can.cd(1)
-
-    #Draw region boxes under axis to clarify plot
-    can.cd()
-    labelTxt = ROOT.TLatex()
-    labelTxt.SetTextAlign(11)
-    if options.combinePlusMinus:
-        labelTxt.SetTextSize(0.03)
-	line00=ROOT.TLine(0.16,0.02,0.16,0.11)
-	line00.Draw()
-        labelTxt.DrawText(0.17,0.05,"oneEleLowSigCR")
-	line0=ROOT.TLine(0.31,0.02,0.31,0.11)
-	line0.Draw()
-        labelTxt.DrawText(0.35,0.05,"oneEleCR")
-	line2=ROOT.TLine(0.458,0.02,0.458,0.11)
-	line2.Draw()
-        labelTxt.DrawText(0.5,0.05,"oneMuCR")
-	line3=ROOT.TLine(0.605,0.02,0.605,0.11)
-	line3.Draw()
-        labelTxt.DrawText(0.645,0.05,"twoLepCR")
-	line4=ROOT.TLine(0.752,0.02,0.752,0.11)
-	line4.Draw()
-        labelTxt.DrawText(0.82,0.05,"SR")
-	line5=ROOT.TLine(0.9,0.02,0.9,0.11)
-	line5.Draw()
-	hline=ROOT.TLine(0.16,0.08,0.9,0.08)
-	hline.Draw()
-	hline0=ROOT.TLine(0.16,0.02,0.9,0.02)
-	hline0.Draw()
-	 
     can.cd(1)
     ROOT.gPad.RedrawAxis()
     ROOT.gPad.Modified()
@@ -1179,6 +1162,8 @@ def main(options):
     blindStr=""
     if not options.unBlindSR:
         blindStr=", SR blinded"
+    if options.cronly:
+        blindStr=", CR only"
     namingScheme="Pre-Fit"
     if options.postFitPickleDir!=None:
         namingScheme="Post-Fit"
@@ -1194,12 +1179,64 @@ def main(options):
     can.Modified()
     can.Update()
 
+    #Draw region boxes under axis to clarify plot
+    can.cd()
+    labelTxt = ROOT.TLatex()
+    labelTxt.SetTextAlign(11)
+    if not options.cronly:
+        if options.combinePlusMinus:
+            labelTxt.SetTextSize(0.04)
+        line00=ROOT.TLine(0.16,0.02,0.16,0.11)
+        line00.Draw()
+        labelTxt.DrawLatex(0.19,0.035,"Fake e CR")
+        line0=ROOT.TLine(0.31,0.02,0.31,0.11)
+        line0.Draw()
+        labelTxt.DrawLatex(0.33,0.035,"W#rightarrowe#nu CR")
+        line2=ROOT.TLine(0.458,0.02,0.458,0.11)
+        line2.Draw()
+        labelTxt.DrawLatex(0.48,0.035,"W#rightarrow#mu#nu CR")
+        line3=ROOT.TLine(0.605,0.02,0.605,0.11)
+        line3.Draw()
+        labelTxt.DrawLatex(0.645,0.035,"Z#rightarrowll CR")
+        line4=ROOT.TLine(0.752,0.02,0.752,0.11)
+        line4.Draw()        
+        labelTxt.DrawLatex(0.81,0.035,"SR")
+        line5=ROOT.TLine(0.9,0.02,0.9,0.11)
+        line5.Draw()
+        hline=ROOT.TLine(0.16,0.08,0.9,0.08)
+        hline.Draw()
+        hline0=ROOT.TLine(0.16,0.02,0.9,0.02)
+        hline0.Draw()
+    else:
+        if options.combinePlusMinus:
+            labelTxt.SetTextSize(0.045)
+        line00=ROOT.TLine(0.16,0.02,0.16,0.11)
+        line00.Draw()
+        labelTxt.DrawLatex(0.21,0.035,"Fake e CR")
+        line0=ROOT.TLine(0.345,0.02,0.345,0.11)
+        line0.Draw()
+        labelTxt.DrawLatex(0.395,0.035,"W#rightarrowe#nu CR")
+        line2=ROOT.TLine(0.53,0.02,0.53,0.11)
+        line2.Draw()
+        labelTxt.DrawLatex(0.58,0.035,"W#rightarrow#mu#nu CR")
+        line3=ROOT.TLine(0.715,0.02,0.715,0.11)
+        line3.Draw()
+        labelTxt.DrawLatex(0.765,0.035,"Z#rightarrowll CR")
+        line5=ROOT.TLine(0.9,0.02,0.9,0.11)
+        line5.Draw()
+        hline=ROOT.TLine(0.16,0.08,0.9,0.08)
+        hline.Draw()
+        hline0=ROOT.TLine(0.16,0.02,0.9,0.02)
+        hline0.Draw()        
+
     if not options.quite:
         raw_input("Press Enter to continue")
     if options.saveAs and options.postFitPickleDir!=None:
         can.SaveAs("postFit."+options.saveAs)
+        can.SaveAs("postFit.root")
     elif options.saveAs:
         can.SaveAs("preFit."+options.saveAs)
+        can.SaveAs("preFit.root")        
 
     rfile.Close()
 
@@ -1365,7 +1402,7 @@ def compareMain(options):
             line1.Draw("histsame")
         else:
             c1.SetLogy()
-            dummyHist.SetMaximum(2000)
+            dummyHist.SetMaximum(9000)
             dummyHist.SetMinimum(1)
             dummyHist.GetYaxis().SetTitle("{} Events".format(str(p)))
             dummyHist.Draw()
@@ -1379,6 +1416,8 @@ def compareMain(options):
             #print 'entry_name: ',entry_name
             #if entry_name in NameDict:
             #    entry_name=NameDict[entry_name]
+            if entry_name=='bkgs':
+                entry_name='Unc'
             leg.AddEntry(histDict[k][p],entry_name,"l")
             histDict[k][p].Draw("Ehistsame")
         texts = ATLAS.getATLASLabels(c1, 0.54, 0.78, options.lumi, selkey="")
@@ -1779,6 +1818,7 @@ if __name__=='__main__':
     p.add_option('-s', '--syst', type='string', default="", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
     p.add_option('-d', '--data', action='store_true', help='Draw data')
     p.add_option('--unBlindSR', action='store_true', help='Unblinds the SR bins')
+    p.add_option('--cronly', action='store_true', help='Shows the CR only')    
     p.add_option('--debug', action='store_true', help='Print in debug mode')
     p.add_option('--combinePlusMinus', action='store_true', help='Combine the plus and minus')
     p.add_option('-r', '--ratio', action='store_true', help='Draw data/MC ratio in case of -i and adds ratios to tables for both -i and -c')
