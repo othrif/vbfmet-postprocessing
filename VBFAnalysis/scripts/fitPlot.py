@@ -847,6 +847,8 @@ def main(options):
                         totalErrStatSyst = math.sqrt((fpickle[pickle_key][ireg])**2+(histToSet.GetBinError(regDict[iname.rstrip('_cuts')]))**2)
                         histToSet.SetBinError(regDict[iname.rstrip('_cuts')],totalErrStatSyst)
                     else:
+			#print "Get bin content ",histToSet.GetBinContent(regDict[iname.rstrip('_cuts')])
+			#print "Set bin content ",fpickle[pickle_key][ireg]
                         histToSet.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg])
                     ireg+=1
                 
@@ -878,17 +880,26 @@ def main(options):
 
     # print the stat uncertainties:
     if options.show_mc_stat_err:
-        regionsList=[
-        'gamma_stat_oneEleNegLowSigCRX_obs_cuts_bin_0',
-        'gamma_stat_oneElePosLowSigCRX_obs_cuts_bin_0',
-        'gamma_stat_oneEleNegCRX_obs_cuts_bin_0',
-        'gamma_stat_oneElePosCRX_obs_cuts_bin_0',
-        'gamma_stat_oneMuNegCRX_obs_cuts_bin_0',
-        'gamma_stat_oneMuPosCRX_obs_cuts_bin_0',
-        'gamma_stat_twoEleCRX_obs_cuts_bin_0',
-        'gamma_stat_twoMuCRX_obs_cuts_bin_0',
-        'gamma_stat_SRX_obs_cuts_bin_0',    
-        ]
+	if options.combinePlusMinus:
+            regionsList=[
+            'gamma_stat_oneEleLowSigCRX_obs_cuts_bin_0',
+            'gamma_stat_oneEleCRX_obs_cuts_bin_0',
+            'gamma_stat_oneMuCRX_obs_cuts_bin_0',
+            'gamma_stat_twoLepCRX_obs_cuts_bin_0',
+            'gamma_stat_SRX_obs_cuts_bin_0',    
+            ]
+	else:
+            regionsList=[
+            'gamma_stat_oneEleNegLowSigCRX_obs_cuts_bin_0',
+            'gamma_stat_oneElePosLowSigCRX_obs_cuts_bin_0',
+            'gamma_stat_oneEleNegCRX_obs_cuts_bin_0',
+            'gamma_stat_oneElePosCRX_obs_cuts_bin_0',
+            'gamma_stat_oneMuNegCRX_obs_cuts_bin_0',
+            'gamma_stat_oneMuPosCRX_obs_cuts_bin_0',
+            'gamma_stat_twoEleCRX_obs_cuts_bin_0',
+            'gamma_stat_twoMuCRX_obs_cuts_bin_0',
+            'gamma_stat_SRX_obs_cuts_bin_0',    
+            ]
         regionItr=0
         print 'syst data_fraction mc_fraction'
         writeLine=''
@@ -1074,10 +1085,18 @@ def main(options):
         rHist.GetYaxis().SetTitleSize(0.1)
         rHist.GetYaxis().CenterTitle()
 
+	#Set x axis labels
         for k in regDict:
-            rHist.GetXaxis().SetBinLabel(regDict[k],k)
+	    if options.combinePlusMinus:
+	        index=k.find('R')
+                rHist.GetXaxis().SetBinLabel(regDict[k],k[index+1::])
+	        rHist.GetXaxis().LabelsOption('h')
+	    else:
+                rHist.GetXaxis().SetBinLabel(regDict[k],k)
         rHist.GetXaxis().SetLabelSize(0.1)
         rHist.GetYaxis().SetLabelSize(0.1)
+	
+	
 
         line1=data.Clone("line1")
         for i in range(1,line1.GetNbinsX()+1):
@@ -1117,17 +1136,46 @@ def main(options):
             systHistAsymRatio.Draw('same e2')
             rHist.Draw('same')
             line1.Draw("histsame")
-                
+        
         can.GetPad(2).RedrawAxis()
         can.GetPad(2).Modified()
         can.GetPad(2).Update()
         can.cd(1)
 
+    #Draw region boxes under axis to clarify plot
+    can.cd()
+    labelTxt = ROOT.TLatex()
+    labelTxt.SetTextAlign(11)
+    if options.combinePlusMinus:
+        labelTxt.SetTextSize(0.03)
+	line00=ROOT.TLine(0.16,0.02,0.16,0.11)
+	line00.Draw()
+        labelTxt.DrawText(0.17,0.05,"oneEleLowSigCR")
+	line0=ROOT.TLine(0.31,0.02,0.31,0.11)
+	line0.Draw()
+        labelTxt.DrawText(0.35,0.05,"oneEleCR")
+	line2=ROOT.TLine(0.458,0.02,0.458,0.11)
+	line2.Draw()
+        labelTxt.DrawText(0.5,0.05,"oneMuCR")
+	line3=ROOT.TLine(0.605,0.02,0.605,0.11)
+	line3.Draw()
+        labelTxt.DrawText(0.645,0.05,"twoLepCR")
+	line4=ROOT.TLine(0.752,0.02,0.752,0.11)
+	line4.Draw()
+        labelTxt.DrawText(0.82,0.05,"SR")
+	line5=ROOT.TLine(0.9,0.02,0.9,0.11)
+	line5.Draw()
+	hline=ROOT.TLine(0.16,0.08,0.9,0.08)
+	hline.Draw()
+	hline0=ROOT.TLine(0.16,0.02,0.9,0.02)
+	hline0.Draw()
+	 
+    can.cd(1)
     ROOT.gPad.RedrawAxis()
     ROOT.gPad.Modified()
     ROOT.gPad.Update()
 
-    can.cd(1)
+    #can.cd(1)
     blindStr=""
     if not options.unBlindSR:
         blindStr=", SR blinded"
