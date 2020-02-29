@@ -54,7 +54,7 @@ def getATLASLabels(pad, x, y, lumi, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(lumi))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(lumi))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.04)
