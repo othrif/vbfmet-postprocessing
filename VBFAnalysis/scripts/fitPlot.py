@@ -142,6 +142,24 @@ class texTable(object):
         self.colmNames = None
 
     def getTableString(self):
+        titleKeys={'SR':'SR',
+                       'WCRenu':'W$\\rightarrow$e$\\nu$ CR',
+                       'WCRmunu':'W$\\rightarrow\\mu\\nu$ CR',
+                       'lowsigWCRen':'Fake e CR',
+                       'WCRlnu':'W$\\rightarrow\\ell\\nu$ CR',
+                       'ZCRll':'Z$\\rightarrow\\ell\\ell$ CR',
+                       }
+        NameDict ={'ttbar':'Top$+$VV/VVV',
+                   'Z_EWK':'EWK Z',
+                   'W_EWK':'EWK W',
+                   'Z_strong':'QCD Z',
+                   'W_strong':'QCD W',
+                   'signal':'Higgs',
+                   'data':'Data',                   
+                   'bkgs':'Total Bkg',                   
+                   'eleFakes':'e-fakes',
+                   'multijet':'Multijet',
+                   }
         cString = ("c|"*self.colms)[:-1]
         if self.rowNames:
             cString += "|c"
@@ -152,14 +170,23 @@ class texTable(object):
 '''.format(cs=cString)
         if self.colmNames:
             for i, n in enumerate(self.colmNames):
-                tableString += n + " & "
+                if n in titleKeys:
+                    tableString += titleKeys[n] + " & "
+                else:
+                    tableString += n + " & "                    
                 if i == self.colms:
-                    tableString = tableString[:-2]+"\\\\\n"
+                    if tableString[:-2] in titleKeys:
+                        tableString = titleKeys[tableString[:-2]]+"\\\\\n"
+                    else:
+                        tableString = tableString[:-2]+"\\\\\n"
                     tableString += "\\hline\n"
         rowNameIndex = 0
         for i, e in enumerate(np.nditer(self.mat)):
             if self.rowNames and tmp == 1:
-                tableString += self.rowNames[rowNameIndex] + " & "
+                if self.rowNames[rowNameIndex] in NameDict:
+                    tableString += NameDict[self.rowNames[rowNameIndex]] + " & "
+                else:
+                    tableString += self.rowNames[rowNameIndex] + " & "                    
                 rowNameIndex += 1
             tableString += str(e) + " & "
             if tmp == self.colms:
@@ -414,7 +441,7 @@ class HistClass(object):
                 cls.regionBins["WCRenu"]=[cls.regDict[k] for k in cls.regDict if "oneEleCR" in k]
                 cls.regionBins["WCRmunu"]=[cls.regDict[k] for k in cls.regDict if "oneMuCR" in k]
                 cls.regionBins["lowsigWCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleLowSigCR" in k]
-                cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]
+                #cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]
                 #cls.regionBins["lowsigWCRenu"]=cls.regionBins["lowsigWCRen"]
             else:
                 cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
@@ -430,7 +457,7 @@ class HistClass(object):
                 cls.regionBins["ZCRll"]=cls.regionBins["ZCRee"]+cls.regionBins["ZCRmumu"]
                 cls.regionBins["WCRenu"]=cls.regionBins["WCRep"]+cls.regionBins["WCRen"]
                 cls.regionBins["WCRmunu"]=cls.regionBins["WCRmup"]+cls.regionBins["WCRmun"]
-                cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]
+                #cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]
                 cls.regionBins["lowsigWCRenu"]=cls.regionBins["lowsigWCRep"]+cls.regionBins["lowsigWCRen"]
 
 def getBinsError(hist, bins):
@@ -538,19 +565,19 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
                 yldvR=(round(y1a,1))
                 ylde=histDict[hkey].GetErrorYhigh(regionDict[regkey]-1)
                 yldeR=(round(ylde,1))
-            tmpArr.append(str(yldvR)+" $\\pm$ "+str(yldeR))
+            tmpArr.append(" $%0.0f\\pm$ %0.0f"%(yldvR,yldeR))
             if not (hkey=='bkgs' or hkey.count('bkgsAsymErr')):
                 if regkey.count('SR'):
-                    tmpAltArr.append(str(yldvR)+" $\\pm$ "+str(yldeR))
+                    tmpAltArr.append(" $%0.0f\\pm$ %0.0f"%(yldvR,yldeR))
         arrArray.append(tmpArr)
         if len(tmpAltArr)>0:
             altArray.append(tmpAltArr)
-    arrArray.append([str(round(DataMC2.GetBinContent(dm),2))+" $\\pm$ "+str(round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
+    arrArray.append([" $%0.0f\\pm$ %0.0f"%((round(DataMC2.GetBinContent(dm),2)),round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
     tmpAltArr=[]
     for i in regionDict:
         if i.count('SR'):
             dm=regionDict[i]
-            tmpAltArr.append(str(round(DataMC2.GetBinContent(dm),2))+" $\\pm$ "+str(round(DataMC2.GetBinError(dm),2)) )
+            tmpAltArr.append("$%0.0f\\pm$ %0.0f"%((round(DataMC2.GetBinContent(dm),2)),(round(DataMC2.GetBinError(dm),2))) )
     altArray.append(tmpAltArr)
     texTable1=texTable(arrayArray=arrArray)
     colmNames=[reg for reg in regionDict]
@@ -566,7 +593,7 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
         for regkey in regionBinsDict:
             var=getBinsYield(histDict[hkey], regionBinsDict[regkey])
             varE=getBinsError(histDict[hkey], regionBinsDict[regkey])
-            tmpArr2.append(str(round(var,2))+" $\\pm$ "+str(round(varE,2)))
+            tmpArr2.append("$%0.0f\\pm$ %0.0f" %((round(var,2)),(round(varE,2))))
         arrArray2.append(tmpArr2)
     arrArray2.append([str(round(DataMC[f],3)) for f in DataMC])
     texTable2=texTable(arrayArray=arrArray2)
@@ -598,7 +625,7 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
 
     # Print transfer factors a=B_SR/B_CR
     B_WSR=(getBinsYield(histDict["W_strong"], regionBinsDict["SR"])+getBinsYield(histDict["W_EWK"], regionBinsDict["SR"]))
-    B_WCR=(getBinsYield(histDict["W_strong"], regionBinsDict["WCRlnu"])+getBinsYield(histDict["W_EWK"], regionBinsDict["WCRlnu"]))
+    B_WCR=(getBinsYield(histDict["W_strong"], regionBinsDict["WCRenu"])+getBinsYield(histDict["W_EWK"], regionBinsDict["WCRenu"])+getBinsYield(histDict["W_strong"], regionBinsDict["WCRmunu"])+getBinsYield(histDict["W_EWK"], regionBinsDict["WCRmunu"]))
     B_ZSR=(getBinsYield(histDict["Z_strong"], regionBinsDict["SR"])+getBinsYield(histDict["Z_EWK"], regionBinsDict["SR"]))
     B_ZCR=(getBinsYield(histDict["Z_strong"], regionBinsDict["ZCRll"])+getBinsYield(histDict["Z_EWK"], regionBinsDict["ZCRll"]))
 
@@ -711,7 +738,7 @@ def main(options):
        histNames=["signal"]
     else:
         histNamesSig+=["signal"]#,"VBFH125","ggFH125","VH125"]
-    histNames+=["W_strong", "Z_strong", "W_EWK", "Z_EWK", "eleFakes", "ttbar", "multijet", "Others"] # This order determines the order in which the hists are stacked
+    histNames+=["W_strong", "Z_strong", "W_EWK", "Z_EWK", "eleFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
@@ -800,7 +827,8 @@ def main(options):
     Style.setStyles(hDict["ttbar"],[1,1,1,0,1001,0,0,0])
     Style.setStyles(hDict["eleFakes"],[1,1,1,11,1001,0,0,0])
     Style.setStyles(hDict["multijet"],[1,1,1,12,1001,0,0,0])
-    Style.setStyles(hDict["Others"],[1,1,1,2,1001,0,0,0])
+    if "Others" in hDict:
+        Style.setStyles(hDict["Others"],[1,1,1,2,1001,0,0,0])
 
     # loop over all hists in input file and add their content to the right hist
     rfile=ROOT.TFile(options.input)
@@ -833,7 +861,8 @@ def main(options):
         else:
             if not key.count('hQCDw_'):
                 print key, "could not be identified correctly! BinContent will be added to Others"
-                addContent(hDict["Others"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
+                if "Others" in hDict:
+                    addContent(hDict["Others"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
 
     postFitPickles=None
     if options.postFitPickleDir!=None:
@@ -894,7 +923,7 @@ def main(options):
                     ireg+=1
                 
     #defining bkg hist
-    bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","eleFakes","multijet"]+["Others"]
+    bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","eleFakes","multijet"] #+["Others"]
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
     hDict["bkgs"]=bkgs
     hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
