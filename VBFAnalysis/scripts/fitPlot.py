@@ -704,8 +704,14 @@ def main(options):
 
 
     hDict=OrderedDict()
-    histNames=["signal", "W_strong", "Z_strong", "W_EWK", "Z_EWK", "eleFakes", "ttbar", "multijet", "Others"] # This order determines the order in which the hists are stacked
-
+    hDictSig=OrderedDict()
+    histNames=[]
+    histNamesSig=[]
+    if options.stack_signal:
+       histNames=["signal"]
+    else:
+        histNamesSig+=["signal"]#,"VBFH125","ggFH125","VH125"]
+    histNames+=["W_strong", "Z_strong", "W_EWK", "Z_EWK", "eleFakes", "ttbar", "multijet", "Others"] # This order determines the order in which the hists are stacked
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
@@ -769,17 +775,24 @@ def main(options):
     dummyHist.Draw()
 
     hists=[]
-    
+    histsSig=[]
     for hname in histNames[::-1]:
         hists.append(ROOT.TH1F(hname,hname,nbins*byNum,0,nbins*byNum))
         hDict[hname]=hists[-1]
         hDict[hname].Sumw2()
+    for hname in histNamesSig:
+        histsSig.append(ROOT.TH1F(hname,hname,nbins*byNum,0,nbins*byNum))
+        hDictSig[hname]=histsSig[-1]
+        hDictSig[hname].Sumw2()
     data=ROOT.TH1F("data","data",nbins*byNum,0,nbins*byNum)
     hDict["data"]=data
 
     #Styles
     Style.setStyles(data,[1,0,2,0,0,1,20,1.2])
-    Style.setStyles(hDict["signal"],[2,2,3,0,0,0,0,0])
+    if options.stack_signal:
+        Style.setStyles(hDict["signal"],[ROOT.kOrange,2,3,0,0,0,0,0])
+    else:
+        Style.setStyles(hDictSig["signal"],[ROOT.kOrange,2,3,0,0,0,0,0])
     Style.setStyles(hDict["Z_strong"],[1,1,1,46,1001,0,0,0])
     Style.setStyles(hDict["Z_EWK"],[1,1,1,8,1001,0,0,0])
     Style.setStyles(hDict["W_strong"],[1,1,1,9,1001,0,0,0])
@@ -811,7 +824,10 @@ def main(options):
         histObj=HistClass(key)
         if not histObj.hist: continue
         if histObj.isSignal():
-            addContent(hDict["signal"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
+            if options.stack_signal:
+                addContent(hDict["signal"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
+            else:
+                addContent(hDictSig["signal"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))                
         elif histObj.proc in histNames+["data"]:
             addContent(hDict[histObj.proc], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
         else:
@@ -821,6 +837,10 @@ def main(options):
 
     postFitPickles=None
     if options.postFitPickleDir!=None:
+        if options.scaleSig:
+            for ib in range(0,hDictSig["signal"].GetNbinsX()+1):
+                hDictSig["signal"].SetBinContent(ib,0.0)
+                hDictSig["signal"].SetBinError(ib,0.0)
         hist_array_keys = [i.GetName() for i in hists]
         postFitPickles = LoadPickleFiles(options.postFitPickleDir)
         for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
@@ -837,7 +857,18 @@ def main(options):
                     continue
                 #if ('Fitted_events_VBFH' in pickle_key): # skip signal
                 #    continue
-                
+                if pickle_key_remFit.find('_')>0 and options.scaleSig:
+                    if pickle_key_remFit[:pickle_key_remFit.find('_')] in ['VBFH125','VH125','ggFH125']:
+                        if 'signal' in hDictSig:
+                            ireg=0
+                            for iname in pickle_region_names:
+                                if not isError:
+                                    hDictSig['signal'].SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg]+hDictSig['signal'].GetBinContent(regDict[iname.rstrip('_cuts')]))
+                                else:
+                                    e1=hDictSig['signal'].GetBinError(regDict[iname.rstrip('_cuts')])
+                                    if not options.show_mc_stat_err:
+                                        hDictSig['signal'].SetBinError(regDict[iname.rstrip('_cuts')],math.sqrt((fpickle[pickle_key][ireg])**2+e1**2))
+                                ireg+=1
                 m=0
                 for i in hist_array_keys:
                     if i in pickle_key_remFit:
@@ -854,7 +885,8 @@ def main(options):
                     if isError:
                         #print pickle_key,fpickle[pickle_key][ireg]
                         totalErrStatSyst = math.sqrt((fpickle[pickle_key][ireg])**2+(histToSet.GetBinError(regDict[iname.rstrip('_cuts')]))**2)
-                        histToSet.SetBinError(regDict[iname.rstrip('_cuts')],totalErrStatSyst)
+                        if not options.show_mc_stat_err:
+                            histToSet.SetBinError(regDict[iname.rstrip('_cuts')],totalErrStatSyst)
                     else:
 			#print "Get bin content ",histToSet.GetBinContent(regDict[iname.rstrip('_cuts')])
 			#print "Set bin content ",fpickle[pickle_key][ireg]
@@ -870,7 +902,7 @@ def main(options):
         hDict["bkgs"].Add(hDict[bkg])
         hDict["bkgsStat"].Add(hDict[bkg])
     # Set the MC stat uncertainties to 0 in the systematics plot
-    if not options.show_mc_stat_err or postFitPickles!=None:
+    if not options.show_mc_stat_err and postFitPickles!=None:
         for i in range(0,hDict["bkgs"].GetNbinsX()):
             hDict["bkgs"].SetBinError(i,0.0)
 
@@ -886,7 +918,8 @@ def main(options):
     dummyHist.SetMaximum(hStack.GetMaximum()*3.4)
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
-
+    if not options.stack_signal:
+        hDictSig["signal"].Draw('HISTsame')
     # print the stat uncertainties:
     if options.show_mc_stat_err:
         if options.combinePlusMinus:
@@ -1055,8 +1088,9 @@ def main(options):
                     ey_new = fpickle[pickle_key][ireg]
                     e_new = math.sqrt(ey_low*ey_low+ey_new*ey_new)
                     #print 'e_new:',e_new
-                    systHistAsym.SetPointEYlow(regDict[iname.rstrip('_cuts')]-1,e_new)
-                    systHistAsym.SetPointEYhigh(regDict[iname.rstrip('_cuts')]-1,e_new)
+                    if not options.show_mc_stat_err:
+                        systHistAsym.SetPointEYlow(regDict[iname.rstrip('_cuts')]-1,e_new)
+                        systHistAsym.SetPointEYhigh(regDict[iname.rstrip('_cuts')]-1,e_new)
                     ireg+=1
         
     ROOT.gStyle.SetErrorX(0.5)
@@ -1084,7 +1118,7 @@ def main(options):
         can.cd(2)
         rHist=data.Clone("ratioHist")
         rbkgs = hDict["bkgsStat"].Clone()
-        if options.show_mc_stat_err or options.postFitPickleDir!=None: # removing mc stat unc.
+        if not options.show_mc_stat_err and options.postFitPickleDir!=None: # removing mc stat unc.
             for i in range(0,rbkgs.GetNbinsX()+1):
                 rbkgs.SetBinError(i,0.0)
         
@@ -1818,6 +1852,8 @@ if __name__=='__main__':
     p.add_option('-s', '--syst', type='string', default="", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
     p.add_option('-d', '--data', action='store_true', help='Draw data')
     p.add_option('--unBlindSR', action='store_true', help='Unblinds the SR bins')
+    p.add_option('--scaleSig', action='store_true', help='scale the signal to the post fit values')    
+    p.add_option('--stack-signal', action='store_true', help='Stack the signal')
     p.add_option('--cronly', action='store_true', help='Shows the CR only')    
     p.add_option('--debug', action='store_true', help='Print in debug mode')
     p.add_option('--combinePlusMinus', action='store_true', help='Combine the plus and minus')
