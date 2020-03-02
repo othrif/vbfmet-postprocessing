@@ -45,6 +45,8 @@ styleDict["Zee"]=[46,1,1,46,1001,0,0,0]
 styleDict["QCDw"]=[47,1,1,47,1001,0,0,0]
 styleDict["multijet"]=[12,1,1,12,1001,12,0,0]
 styleDict["Others"]=[49,1,1,49,1001,49,0,0]
+styleDict["ttbar"]=[49,1,1,49,1001,49,0,0]
+styleDict["eleFakes"]=[43,1,1,43,1001,43,0,0]
 
 styleDict["Zjets"]=[4,1,1,4,1001,0,0,0]
 styleDict["Wjets"]=[5,1,1,5,1001,0,0,0]

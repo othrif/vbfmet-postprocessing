@@ -211,15 +211,22 @@ for rmy in regions:
 print 'done'
 
 print table_per_bin
+keys_regions_map={'SR':'SR','Zll':'$Z\\rightarrow\ell\ell$ CR','Wmunu':'$W\\rightarrow\\mu\\nu$ CR','Wenu':'$W\\rightarrow$e$\\nu$ CR','WenuLowMetSig':'Fake e CR'}
 keys_regions = ['SR','Zee','Zmm','Wmnminus','Wmnplus','Wenminus','Wenplus']
 if args.combinePlusMinus:
     keys_regions = ['SR','Zll','Wmunu','Wenu']
 print ''
 print '\\resizebox{\\textwidth}{!}{ '
-print '\\begin{tabular}{ll|ccccccc}'
+if args.combinePlusMinus:
+    print '\\begin{tabular}{ll|ccccc}'
+else:
+    print '\\begin{tabular}{ll|ccccccc}'
 table_per_bin_line='Bin Number & Yield '
 for keyn in keys_regions:
-    table_per_bin_line+=' & %s'  %keyn
+    if keyn in keys_regions_map:
+        table_per_bin_line+=' & %s'  %keys_regions_map[keyn]
+    else:
+        table_per_bin_line+=' & %s'  %keyn        
 print table_per_bin_line,' \\\\\\hline\\hline'
 for b in bins:
     if b>11:
@@ -254,7 +261,10 @@ print '}'
 
 print ''
 print '\\resizebox{\\textwidth}{!}{ '
-print '\\begin{tabular}{l|ccccccccc}'
+if args.combinePlusMinus:
+    print '\\begin{tabular}{l|ccccc}'
+else:
+    print '\\begin{tabular}{l|ccccccccc}'
 cline=''
 #print region_cf
 for b in range(0,len(region_cf[0])+1): # bins
@@ -263,7 +273,10 @@ for b in range(0,len(region_cf[0])+1): # bins
     #for b in range(0,len(samples)+2):
         extra=''
         if b==0:
-            cline+='%s\t& ' %(region_cf[r][b])
+            if region_cf[r][b] in keys_regions_map:
+                cline+='%s\t& ' %(keys_regions_map[region_cf[r][b]])
+            else:
+                cline+='%s\t& ' %(region_cf[r][b])
             extra='\\hline\\hline'
         elif b>=len(region_cf[0]):
             if unblind or region_cf[r][0]!="SR":

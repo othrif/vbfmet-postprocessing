@@ -310,8 +310,8 @@ class HistClass(object):
             self.hist=HistClass.Irfile.Get(self.hname)
         if self.hist is None:
             print "Could not retrieve histogram!", self.hname, HistClass.Irfile
-        else:
-            print 'Hist: ',self.hname
+        #else:
+        #    print 'Hist: ',self.hname
         if not(self.syst in HistClass.systs):
             HistClass.systs.append(self.syst)
 
@@ -493,25 +493,35 @@ def removeLabel(leg, name):
         for prim in LOP:
             print prim.GetLabel()
 
-def make_legend(can):
-    leg=can.BuildLegend(0.0,0.1,0.2,0.5)
+def make_legend(can,poskeys=[0.0,0.1,0.2,0.5],ncolumns=1):
+    leg=can.BuildLegend(poskeys[0],poskeys[1],poskeys[2],poskeys[3])
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
     leg.SetTextFont(42)
+    leg.SetNColumns(ncolumns)    
     leg.SetTextSize(0.04)
     #leg.SetNColumns  (2)
     NameDict ={'ttbar':'Top+VV/VVV',
                    'Z_EWK':'EWK Z',
+                   'EWK W':'EWK W',
                    'W_EWK':'EWK W',
                    'Z_strong':'QCD Z',
                    'W_strong':'QCD W',
                    'signal':'Higgs',
-                   'data':'Data',                   
-                   'bkgs':'Unc',                   
+                   'data':'Data',
+                   'bkgs':'Unc',
                    'eleFakes':'e-fakes',
                    'multijet':'Multijet',
                    }
+    if not options.scaleSig:
+        NameDict['signal']='0.13#timesHiggs'
+    listInputs=[]
     for i in leg.GetListOfPrimitives():
+        if i.GetLabel().strip() in NameDict and  NameDict[i.GetLabel().strip()] in listInputs:
+            continue
+        else:
+            if i.GetLabel().strip() in NameDict:
+                listInputs+=[NameDict[i.GetLabel().strip()]]
         if i.GetLabel() not in ['signal','data']:
             i.GetObject().SetLineColor(i.GetObject().GetFillColor())
             i.GetObject().SetMarkerColor(i.GetObject().GetFillColor())
@@ -519,6 +529,7 @@ def make_legend(can):
             i.SetLabel(NameDict[i.GetLabel()])
     removeLabel(leg, 'dummy')
     removeLabel(leg, 'Others')
+    removeLabel(leg, 'W_EWK')    
     nEntries=len(leg.GetListOfPrimitives())
     #leg.SetY1(0.9-nEntries*0.04)
     return leg
@@ -572,12 +583,12 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
         arrArray.append(tmpArr)
         if len(tmpAltArr)>0:
             altArray.append(tmpAltArr)
-    arrArray.append([" $%0.0f\\pm$ %0.0f"%((round(DataMC2.GetBinContent(dm),2)),round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
+    arrArray.append([" $%0.2f\\pm$ %0.2f"%((round(DataMC2.GetBinContent(dm),2)),round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
     tmpAltArr=[]
     for i in regionDict:
         if i.count('SR'):
             dm=regionDict[i]
-            tmpAltArr.append("$%0.0f\\pm$ %0.0f"%((round(DataMC2.GetBinContent(dm),2)),(round(DataMC2.GetBinError(dm),2))) )
+            tmpAltArr.append("$%0.2f\\pm$ %0.2f"%((round(DataMC2.GetBinContent(dm),2)),(round(DataMC2.GetBinError(dm),2))) )
     altArray.append(tmpAltArr)
     texTable1=texTable(arrayArray=arrArray)
     colmNames=[reg for reg in regionDict]
@@ -1023,12 +1034,31 @@ def main(options):
         histKeys=[i.GetName() for i in rfile.GetListOfKeys()]
         print "process          reg              systematic              diff/central                 diff                  variation                     central"
         for k in histKeys:
+
+            if options.combinePlusMinus:
+                if 'oneElePosCR' in k:
+                    continue
+                elif 'oneEleNegCR' in k:
+                    continue
+                elif 'oneEleNegLowSigCR' in k:
+                    continue
+                elif 'oneElePosLowSigCR' in k:
+                    continue
+                elif 'oneMuNegCR' in k:
+                    continue
+                elif 'oneMuPosCR' in k:
+                    continue                
+                elif 'twoMuCR' in k:
+                    continue                
+                elif 'twoEleCR' in k:
+                    continue   
             if "theoFactors" in k or "NONEBlind" in k: continue
             tmpHist=HistClass(k)
 
             # check if this is a one sided systematic
-            if tmpHist.syst in one_sided_list:
-                tmpHist.onesided=True
+            for sy in tmpHist.systs:
+                if sy in one_sided_list:
+                    tmpHist.onesided=True
 
             # Check that this is not a sample to be skipped
             if skipThis(k): continue
@@ -1294,12 +1324,18 @@ def main(options):
 
     if not options.quite:
         raw_input("Press Enter to continue")
+
+    extraName=''
+    if options.cronly:
+        extraName='_cronly'
+    if not options.unBlindSR:
+        extraName+='_blind'
     if options.saveAs and options.postFitPickleDir!=None:
-        can.SaveAs("postFit."+options.saveAs)
-        can.SaveAs("postFit.root")
+        can.SaveAs("postFit"+extraName+"."+options.saveAs)
+        can.SaveAs("postFit"+extraName+".root")
     elif options.saveAs:
-        can.SaveAs("preFit."+options.saveAs)
-        can.SaveAs("preFit.root")        
+        can.SaveAs("preFit"+extraName+"."+options.saveAs)
+        can.SaveAs("preFit"+extraName+".root")        
 
     rfile.Close()
 
@@ -1512,7 +1548,16 @@ def plotVar(options):
     if reg=='oneMuPosCR':
         plotIndex=5
     if reg=='oneMuNegCR':
-        plotIndex=6    
+        plotIndex=6
+    if options.combinePlusMinus:
+        if reg=='twoLepCR':
+            plotIndex=4
+        if reg=='oneMuCR':
+            plotIndex=3
+        if reg=='oneEleCR':
+            plotIndex=1
+        if reg=='oneEleLowSigCR':
+            plotIndex=2
     rfile=ROOT.TFile(options.input)
 
     postFitPickles=None
@@ -1525,8 +1570,16 @@ def plotVar(options):
         for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
             #['SR7', 'oneElePosCR7', 'oneEleNegCR7', 'oneElePosLowSigCR7', 'oneEleNegLowSigCR7', 'oneMuPosCR7', 'oneMuNegCR7', 'twoEleCR7', 'twoMuCR7']
             pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
+            #print pickle_region_names #['SR8', 'oneEleCR8', 'oneEleLowSigCR8', 'oneMuCR8', 'twoLepCR8']
             for pickle_key in fpickle.keys():
                 print pickle_key
+                if not options.scaleSig:
+                    if 'VH125' in pickle_key:
+                        continue
+                    if 'VBFH125' in pickle_key:
+                        continue
+                    if 'ggFH125' in pickle_key:
+                        continue
                 if  ('Fitted_events_' in pickle_key): # only process the fitted events here
                     pickle_key_remFit = pickle_key[len('Fitted_events_'):]
                     #print 'pickle_key_remFit:',pickle_key_remFit
@@ -1576,8 +1629,10 @@ def plotVar(options):
         if hObj.isBkg() and (hObj.mr in mjjBins):
             bkgPreFitDict[hObj.proc]=hObj.hist.Clone()
             if bkgPreFit==None:
+                #print 'prefit: ',h
                 bkgPreFit=hObj.hist.Clone()
             else:
+                #print 'prefit: ',h                
                 bkgPreFit.Add(hObj.hist)
         #print h
         #if systHistAsym==None:
@@ -1622,10 +1677,14 @@ def plotVar(options):
                     
         if hObj.isSignal():
             key=hObj.proc
+            signal_scale=1.0
+            if not options.scaleSig:
+                signal_scale=0.13
             try:
-                sigDict[key].Add(hObj.hist)
+                sigDict[key].Add(hObj.hist,signal_scale)
             except:
                 sigDict[key]=hObj.hist.Clone(key)
+                sigDict[key].Scale(signal_scale)
                 sigDict[key].SetTitle(key)
                 Style.setStyles(sigDict[key], Style.styleDict[key])
         signalS=ROOT.THStack()
@@ -1637,9 +1696,10 @@ def plotVar(options):
             if not ("W" in key or "Z" in key):
                 if 'multijet' in key:
                     key='multijet'
+                elif 'eleFakes' in key:
+                    key='eleFakes'
                 else:
-                    key="Others"
-                                    
+                    key="ttbar"
             try:
                 bkgDict[key].Add(hObj.hist)
             except:
@@ -1725,22 +1785,27 @@ def plotVar(options):
 
     bkg.SetTitle(reg+" "+",".join(mjjBins))
 
-    leg=ROOT.gPad.BuildLegend(0.65,0.6,0.85,0.9)
-    leg.SetFillColor(0)
-    leg.SetBorderSize(0)
-    leg.SetNColumns  (2)
+    #leg=ROOT.gPad.BuildLegend(0.65,0.6,0.85,0.9)
+    #leg.SetFillColor(0)
+    #leg.SetBorderSize(0)
+    #leg.SetNColumns  (2)
 
-    alllabels=[]
-    legA=leg.Clone()
-    prims=legA.GetListOfPrimitives()
-    leg.Clear()
-    for ik in prims:
-        if ik.GetLabel() not in alllabels:
-            alllabels+=[ik.GetLabel()]
-            leg.AddEntry(ik.GetObject(),ik.GetLabel())
-        else:
-            ik.Delete()
-            
+    #alllabels=[]
+    #legA=leg.Clone()
+    #prims=legA.GetListOfPrimitives()
+    #leg.Clear()
+    #for ik in prims:
+    #    if ik.GetLabel() not in alllabels:
+    #        alllabels+=[ik.GetLabel()]
+    #        leg.AddEntry(ik.GetObject(),ik.GetLabel())
+    #    else:
+    #        ik.Delete()
+    poskeys=[0.67,0.58,0.87,0.93]
+    ncolumns=2
+    if var=='jj_dphi':
+        poskeys=[0.7,0.53,0.9,0.93]
+        ncolumns=1
+    make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
     texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="")
     for text in texts:
         text.Draw()
@@ -1748,9 +1813,9 @@ def plotVar(options):
     blindStr=""
     if not options.unBlindSR and reg=="SR":
         blindStr=", SR blinded"
-    preFitLabel=ROOT.TLatex(.7,.6,"Pre-Fit"+blindStr)
+    preFitLabel=ROOT.TLatex(.45,.88,"Pre-Fit"+blindStr)
     if options.postFitPickleDir!=None:
-        preFitLabel=ROOT.TLatex(.7,.55,"Post-Fit"+blindStr)        
+        preFitLabel=ROOT.TLatex(.45,.88,"Post-Fit"+blindStr)        
     preFitLabel.SetNDC()
     preFitLabel.SetTextFont(72)
     preFitLabel.SetTextSize(0.055)
@@ -1838,20 +1903,21 @@ def plotVar(options):
         if reg=='SR':
             rsignal.Draw('same HIST')
             rmultijet.Draw('same HIST')
-            rbkgPreFit.Draw('same HIST')
+        rbkgPreFit.Draw('same HIST')
         rHist.Draw('same')
 
         # legend
         legR=ROOT.TLegend(0.2,0.8,0.4,1.0)
         legR.SetFillColor(0)
         legR.SetBorderSize(0)
-        legR.AddEntry(rsignal,'signal/Bkg')
-        legR.AddEntry(rmultijet,'multijet/Bkg')
+        if reg=='SR':
+            legR.AddEntry(rsignal,'signal/Bkg')
+            legR.AddEntry(rmultijet,'multijet/Bkg')
         legR.AddEntry(rbkgPreFit,'pre-fit/post-fit')
         legR.AddEntry(systHistAsymTotRatioA,'Post fit syst')
         legR.SetNColumns(2)
-        if reg=='SR':
-            legR.Draw()
+        #if reg=='SR':
+        legR.Draw()
         can.GetPad(2).RedrawAxis()
         can.GetPad(2).Modified()
         can.GetPad(2).Update()
