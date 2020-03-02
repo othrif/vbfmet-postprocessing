@@ -1,6 +1,7 @@
 import ROOT
 
-f=ROOT.TFile.Open('/tmp/HFALL_feb18_nomU.root','UPDATE')
+#f=ROOT.TFile.Open('/tmp/HFALL_feb18_nomU.root','UPDATE')
+f=ROOT.TFile.Open('/tmp/HFPlotALL_plotvar_feb27U.root','UPDATE')
 
 bins=11
 
@@ -11,7 +12,72 @@ bins=11
 #      h.push_back(new TH1F((name+"_met_et").c_str(), (name+"_met_et;;").c_str(), 10, 0, 800));
 #      h.push_back(new TH1F((name+"_lepmet_et").c_str(), (name+"_lepmet_et;;").c_str(), 10, 0, 800));
 
+# fake ele
 hists=[]
+
+for reg in ['oneEleCR','oneEleLowSigCR']:
+    for ibin in range(1,bins+1):
+        hcuts = 'heleFakes_VBFjetSel_XNom_'+reg+'X_obs_cuts'
+        hmjj = 'heleFakes_VBFjetSel_XNom_'+reg+'X_obs_jj_mass'
+        hdphijj = 'heleFakes_VBFjetSel_XNom_'+reg+'X_obs_jj_dphi'
+        print hcuts.replace('X','%s' %ibin)
+        mymj = f.Get(hcuts.replace('X','%s' %ibin))
+        mjj=ROOT.TH1F(hmjj.replace('X','%s' %ibin),hmjj.replace('X','%s' %ibin),10, 0, 5000)
+        dphijj=ROOT.TH1F(hdphijj.replace('X','%s' %ibin),hdphijj.replace('X','%s' %ibin),6, 0, 3.0)
+        print mymj
+        newmjjbin=2
+        if ibin==1 or ibin==6:
+            newmjjbin=2
+            mjj.SetBinContent(newmjjbin,mymj.GetBinContent(1))
+            mjj.SetBinError(newmjjbin,mymj.GetBinError(1))        
+        if ibin==2 or ibin==7:
+            newmjjbin=3
+            mjj.SetBinContent(newmjjbin,mymj.GetBinContent(1))
+            mjj.SetBinError(newmjjbin,mymj.GetBinError(1))
+        if ibin==3 or ibin==8:
+            newmjjbin=4
+            mjj.SetBinContent(newmjjbin,mymj.GetBinContent(1))
+            mjj.SetBinError(newmjjbin,mymj.GetBinError(1))
+        if ibin==4 or ibin==9:
+            newmjjbin=5
+            mjj.SetBinContent(newmjjbin,0.7*mymj.GetBinContent(1))
+            mjj.SetBinError(newmjjbin,0.7*mymj.GetBinError(1))
+            mjj.SetBinContent(newmjjbin+1,0.3*mymj.GetBinContent(1))
+            mjj.SetBinError(newmjjbin+1,0.3*mymj.GetBinError(1))
+        if ibin==5 or ibin==10:
+            newmjjbin=7
+            mjj.SetBinContent(newmjjbin,0.7*mymj.GetBinContent(1))
+            mjj.SetBinError(newmjjbin,0.7*mymj.GetBinError(1))
+            mjj.SetBinContent(newmjjbin+1,0.3*mymj.GetBinContent(1))
+            mjj.SetBinError(newmjjbin+1,0.3*mymj.GetBinError(1))        
+        if ibin==11:
+            mjj.SetBinContent(2,0.38*mymj.GetBinContent(1))
+            mjj.SetBinContent(3,0.25*mymj.GetBinContent(1))
+            mjj.SetBinContent(4,0.18*mymj.GetBinContent(1))
+            mjj.SetBinContent(5,0.13*mymj.GetBinContent(1))
+            mjj.SetBinContent(6,0.05*mymj.GetBinContent(1))
+            mjj.SetBinContent(7,0.01*mymj.GetBinContent(1))  
+        if ibin in [1,2,3,4,5]:
+            dphijj.SetBinContent(1,0.5*mymj.GetBinContent(1))
+            dphijj.SetBinError(1,0.5*mymj.GetBinError(1))
+            dphijj.SetBinContent(2,0.5*mymj.GetBinContent(1))
+            dphijj.SetBinError(2,0.5*mymj.GetBinError(1))
+        if ibin in [6,7,8,9,10]:
+            dphijj.SetBinContent(3,0.5*mymj.GetBinContent(1))
+            dphijj.SetBinError(3,0.5*mymj.GetBinError(1))
+            dphijj.SetBinContent(4,0.5*mymj.GetBinContent(1))
+            dphijj.SetBinError(4,0.5*mymj.GetBinError(1))
+        if ibin ==11:
+            dphijj.SetBinContent(1,0.25*mymj.GetBinContent(1))
+            dphijj.SetBinError(1,0.25*mymj.GetBinError(1))
+            dphijj.SetBinContent(2,0.25*mymj.GetBinContent(1))
+            dphijj.SetBinError(2,0.25*mymj.GetBinError(1))        
+            dphijj.SetBinContent(3,0.25*mymj.GetBinContent(1))
+            dphijj.SetBinError(3,0.25*mymj.GetBinError(1))
+            dphijj.SetBinContent(4,0.25*mymj.GetBinContent(1))
+            dphijj.SetBinError(4,0.25*mymj.GetBinError(1))
+        hists+=[mjj,dphijj]
+    
 for ibin in range(1,bins+1):
     print 'hmultijet_VBFjetSel_XNom_SRX_obs_cuts'.replace('X','%s' %ibin)
     mymj = f.Get('hmultijet_VBFjetSel_XNom_SRX_obs_cuts'.replace('X','%s' %ibin))
