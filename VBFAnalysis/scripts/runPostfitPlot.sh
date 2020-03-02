@@ -9,7 +9,7 @@
 #Example command
 # ./runPullPlots.sh inputRoot.root pickleDir/
 #(required input first argument, optional pickle directory for postfit plots)
-#highlight option FALSE by default
+
 
 inputs=("$@")
 if [ "$#" == 2 ]; then
@@ -19,6 +19,6 @@ else
 fi
 
 
-echo "Running \"python fitPlot.py -i ${inputs[0]} --ratio --data --show-mc-stat-err $postfit --saveAs pdf -q\""
-python fitPlot.py -i ${inputs[0]} --ratio --data --show-mc-stat-err $postfit --saveAs pdf -q
+echo "Running \"python fitPlot.py -i ${inputs[0]} --data --ratio --show-mc-stat-err $postfit --saveAs pdf -q\""
+python fitPlot.py -i ${inputs[0]} --data --ratio --show-mc-stat-err $postfit --saveAs pdf -q
 

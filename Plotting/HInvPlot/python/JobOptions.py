@@ -110,7 +110,7 @@ def getParser():
     # Options for plotEvent.py
     #
     p.add_option('-n','--nevent',  type='int',    dest='nevent',         default=0,         help='number of events')
-    p.add_option('--year',         type='int',    dest='year',           default=2012,      help='analysis year')
+    p.add_option('--year',         type='int',    dest='year',           default=2016,      help='analysis year')
     p.add_option('--TheorySystWeight',         type='int',    dest='TheorySystWeight',           default=0,      help='theory syst weight: 0 none, 10 both up, 4 both down, 8,6,5,9 other options')
 
     p.add_option('--int-lumi',     type='float',  default=36207.66,       dest='int_lumi',    help='int luminosity 2017: 44307.4, 2018: 58450.1')
