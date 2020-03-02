@@ -310,8 +310,8 @@ class HistClass(object):
             self.hist=HistClass.Irfile.Get(self.hname)
         if self.hist is None:
             print "Could not retrieve histogram!", self.hname, HistClass.Irfile
-        else:
-            print 'Hist: ',self.hname
+        #else:
+        #    print 'Hist: ',self.hname
         if not(self.syst in HistClass.systs):
             HistClass.systs.append(self.syst)
 
@@ -572,12 +572,12 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
         arrArray.append(tmpArr)
         if len(tmpAltArr)>0:
             altArray.append(tmpAltArr)
-    arrArray.append([" $%0.0f\\pm$ %0.0f"%((round(DataMC2.GetBinContent(dm),2)),round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
+    arrArray.append([" $%0.2f\\pm$ %0.2f"%((round(DataMC2.GetBinContent(dm),2)),round(DataMC2.GetBinError(dm),2)) for dm in [regionDict[i] for i in regionDict]])
     tmpAltArr=[]
     for i in regionDict:
         if i.count('SR'):
             dm=regionDict[i]
-            tmpAltArr.append("$%0.0f\\pm$ %0.0f"%((round(DataMC2.GetBinContent(dm),2)),(round(DataMC2.GetBinError(dm),2))) )
+            tmpAltArr.append("$%0.2f\\pm$ %0.2f"%((round(DataMC2.GetBinContent(dm),2)),(round(DataMC2.GetBinError(dm),2))) )
     altArray.append(tmpAltArr)
     texTable1=texTable(arrayArray=arrArray)
     colmNames=[reg for reg in regionDict]
@@ -1023,12 +1023,31 @@ def main(options):
         histKeys=[i.GetName() for i in rfile.GetListOfKeys()]
         print "process          reg              systematic              diff/central                 diff                  variation                     central"
         for k in histKeys:
+
+            if options.combinePlusMinus:
+                if 'oneElePosCR' in k:
+                    continue
+                elif 'oneEleNegCR' in k:
+                    continue
+                elif 'oneEleNegLowSigCR' in k:
+                    continue
+                elif 'oneElePosLowSigCR' in k:
+                    continue
+                elif 'oneMuNegCR' in k:
+                    continue
+                elif 'oneMuPosCR' in k:
+                    continue                
+                elif 'twoMuCR' in k:
+                    continue                
+                elif 'twoEleCR' in k:
+                    continue   
             if "theoFactors" in k or "NONEBlind" in k: continue
             tmpHist=HistClass(k)
 
             # check if this is a one sided systematic
-            if tmpHist.syst in one_sided_list:
-                tmpHist.onesided=True
+            for sy in tmpHist.systs:
+                if sy in one_sided_list:
+                    tmpHist.onesided=True
 
             # Check that this is not a sample to be skipped
             if skipThis(k): continue
@@ -1294,12 +1313,18 @@ def main(options):
 
     if not options.quite:
         raw_input("Press Enter to continue")
+
+    extraName=''
+    if options.cronly:
+        extraName='_cronly'
+    if not options.unBlindSR:
+        extraName+='_blind'
     if options.saveAs and options.postFitPickleDir!=None:
-        can.SaveAs("postFit."+options.saveAs)
-        can.SaveAs("postFit.root")
+        can.SaveAs("postFit"+extraName+"."+options.saveAs)
+        can.SaveAs("postFit"+extraName+".root")
     elif options.saveAs:
-        can.SaveAs("preFit."+options.saveAs)
-        can.SaveAs("preFit.root")        
+        can.SaveAs("preFit"+extraName+"."+options.saveAs)
+        can.SaveAs("preFit"+extraName+".root")        
 
     rfile.Close()
 
