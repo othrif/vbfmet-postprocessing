@@ -60,6 +60,7 @@ p.add_option('--syst-trkmet',   type='int',          default=0,       dest='syst
 p.add_option('--no-underflow',  action='store_true', default=False,   dest='no_underflow')
 p.add_option('--show-mc-stat-err',  action='store_true', default=False,   dest='show_mc_stat_err')
 
+p.add_option('--syst-type',     type='string', default='All',           dest='syst_type', help='SigTheory, All, or MJsyst')
 p.add_option('--draw-syst',       action='store_true', default=False,   dest='draw_syst')
 p.add_option('--make-syst-table', action='store_true', default=False,   dest='make_syst_table')
 
@@ -85,15 +86,12 @@ if not options.wait:
     ROOT.gROOT.SetBatch(True)
 
 log = config.getLog('drawStack.py', debug=options.debug)
-mysyst = import_syst.systematics('All')
-#mysyst = import_syst.systematics('WeightSyst')
-#mysyst = import_syst.systematics('SigTheory')
-mysystOneSided = import_syst.systematics('OneSidedDown')
-
-# or options.syst=='SigTheory'
+mysyst=None
 # List of plots to symmeterize
 symm_list=[]
 
+mysyst = import_syst.systematics(options.syst_type)
+mysystOneSided = import_syst.systematics('OneSidedDown')
 #add asymetric uncertainties
 for key,v in mysystOneSided.getsystematicsOneSidedMap().iteritems():
     if (v in mysyst.getsystematicsList()):
@@ -964,6 +962,7 @@ class DrawStack:
 
             for bkg in self.bkgs:
                 bhist = self.ReadSample(sfile, bkg, syst_key, DO_SYMM=DO_SYMM)
+                #if options.syst_type=='MJsyst' and bkg in ['zqcd','zewk','wqcd','z']
                 if bkg_ent == None:
                     bkg_ent = bhist
                 else:
@@ -1271,7 +1270,7 @@ class DrawStack:
                 max_bin = s.GetMaximum()
 
         bkg.GetYaxis().SetRangeUser(0.0, 0.35*max_bin)
-        self.UpdateHist(bkg, ignore_max=True)
+        self.UpdateHist(bkg, ignore_max=False)
         bkg.Draw('HIST E0')
         bkg.SetMarkerSize(0)
         if fillData:
@@ -1361,7 +1360,7 @@ class DrawStack:
                     if tmp_color==3:
                         self.UpdateHist(bkg_ratio)
                         bkg_ratio.GetYaxis().SetTitle('%s / Data' %'Syst')
-                        #bkg_ratio.GetYaxis().SetRangeUser(0.80, 1.20)
+                        bkg_ratio.GetYaxis().SetRangeUser(0.80, 1.20)
                         bkg_ratio.Draw('HIST')
                 else:
                     s.GetYaxis().SetTitle('%s / Nominal' %'Syst')

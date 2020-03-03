@@ -831,6 +831,7 @@ def main(options):
         Style.setStyles(hDict["signal"],[ROOT.kOrange,2,3,0,0,0,0,0])
     else:
         Style.setStyles(hDictSig["signal"],[ROOT.kOrange,2,3,0,0,0,0,0])
+
     Style.setStyles(hDict["Z_strong"],[1,1,1,46,1001,0,0,0])
     Style.setStyles(hDict["Z_EWK"],[1,1,1,8,1001,0,0,0])
     Style.setStyles(hDict["W_strong"],[1,1,1,9,1001,0,0,0])
@@ -885,8 +886,10 @@ def main(options):
         postFitPickles = LoadPickleFiles(options.postFitPickleDir)
         for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
             pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
-            print 'pickle_region_names:',pickle_region_names
+            #print 'pickle_region_names:',pickle_region_names
+            print 'pickle_region_names:',pickle_region_names,' %0.0f $\\pm$ %0.0f' %(fpickle['TOTAL_FITTED_bkg_events'][0],fpickle['TOTAL_FITTED_bkg_events_err'][0] )#
             for pickle_key in fpickle.keys():
+                print pickle_key,fpickle[pickle_key][0]#['TOTAL_FITTED_bkg_events'],'+/-',fpickle[pickle_key]['TOTAL_FITTED_bkg_events_err']
                 isError=False
                 if  ('Fitted_events_' in pickle_key): # only process the fitted events here
                     pickle_key_remFit = pickle_key[len('Fitted_events_'):]
@@ -903,8 +906,10 @@ def main(options):
                             ireg=0
                             for iname in pickle_region_names:
                                 if not isError:
+                                    print 'SIGGV',ireg,pickle_key,pickle_key_remFit[:pickle_key_remFit.find('_')],fpickle[pickle_key][ireg]
                                     hDictSig['signal'].SetBinContent(regDict[iname.rstrip('_cuts')],fpickle[pickle_key][ireg]+hDictSig['signal'].GetBinContent(regDict[iname.rstrip('_cuts')]))
                                 else:
+                                    print 'SIGGE',ireg,pickle_key,pickle_key_remFit[:pickle_key_remFit.find('_')],fpickle[pickle_key][ireg]                                    
                                     e1=hDictSig['signal'].GetBinError(regDict[iname.rstrip('_cuts')])
                                     if not options.show_mc_stat_err:
                                         hDictSig['signal'].SetBinError(regDict[iname.rstrip('_cuts')],math.sqrt((fpickle[pickle_key][ireg])**2+e1**2))
@@ -958,6 +963,8 @@ def main(options):
     dummyHist.SetMaximum(hStack.GetMaximum()*3.4)
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
+    hDictSig["signal"].Scale(0.13)
+    print 'scaling signal to 0.13'        
     if not options.stack_signal:
         hDictSig["signal"].Draw('HISTsame')
     # print the stat uncertainties:
