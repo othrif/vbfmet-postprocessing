@@ -12,6 +12,7 @@ import ROOT
 import math
 import pickle
 import math
+import copy
 import VBFAnalysis.ATLAS as ATLAS
 import VBFAnalysis.Style as Style
 from optparse import OptionParser
@@ -549,6 +550,9 @@ def get_THStack_sum(hstack):
 def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makePDF=False):
 
     DataMC2=histDict["data"].Clone()
+    if options.postFitPickleDir!=None:
+        for i in range(1,DataMC2.GetNbinsX()+1):
+            DataMC2.SetBinError(i,0.0)
     DataMC2.Divide(histDict["bkgs"])
 
     DataMC=OrderedDict()
@@ -745,6 +749,8 @@ def main(options):
     hDictSig=OrderedDict()
     histNames=[]
     histNamesSig=[]
+    totbkg=ROOT.TH1F("totbkg","",byNum*nbins,0,byNum*nbins)
+    totbkg.SetStats(0)
     if options.stack_signal:
        histNames=["signal"]
     else:
@@ -754,12 +760,14 @@ def main(options):
     regDict=OrderedDict()
     for n in range(1,nbins+1):
         if options.combinePlusMinus:
+            #if not options.cronly:
             regDict["SR{}".format(n)]=nbins*4+n
             regDict["oneMuCR{}".format(n)]=nbins*2+n
             regDict["oneEleCR{}".format(n)]=nbins+n
             regDict["twoLepCR{}".format(n)]=nbins*3+n
             regDict["oneEleLowSigCR{}".format(n)]=n
-        else:        
+        else:
+            #if not options.cronly:
             regDict["SR{}".format(n)]=nbins*8+n
             regDict["oneMuNegCR{}".format(n)]=nbins*4+n
             regDict["oneMuPosCR{}".format(n)]=nbins*5+n
@@ -886,8 +894,22 @@ def main(options):
         postFitPickles = LoadPickleFiles(options.postFitPickleDir)
         for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
             pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
-            #print 'pickle_region_names:',pickle_region_names
+            print 'pickle_region_names:',pickle_region_names
+            print 'pickle_region_names:',pickle_region_names,fpickle['TOTAL_FITTED_bkg_events']
             print 'pickle_region_names:',pickle_region_names,' %0.0f $\\pm$ %0.0f' %(fpickle['TOTAL_FITTED_bkg_events'][0],fpickle['TOTAL_FITTED_bkg_events_err'][0] )#
+            # set the total bkg to its fitted values
+            ireg=0
+            pickle_region_namestmp=copy.deepcopy(pickle_region_names)
+            if options.cronly and options.combinePlusMinus:
+                pickle_region_namestmp=pickle_region_namestmp[1:]
+            for iname in pickle_region_namestmp:
+                if iname.rstrip('_cuts') in regDict and  'TOTAL_FITTED_bkg_events' in fpickle and ireg<len(fpickle['TOTAL_FITTED_bkg_events']):
+                    totbkg.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle['TOTAL_FITTED_bkg_events'][ireg])
+                    totbkg.SetBinError  (regDict[iname.rstrip('_cuts')],fpickle['TOTAL_FITTED_bkg_events_err'][ireg])
+                else:
+                    print 'ERROR missing region: ',iname
+                ireg+=1
+            # set the signal and bkg individually
             for pickle_key in fpickle.keys():
                 print pickle_key,fpickle[pickle_key][0]#['TOTAL_FITTED_bkg_events'],'+/-',fpickle[pickle_key]['TOTAL_FITTED_bkg_events_err']
                 isError=False
@@ -1007,7 +1029,18 @@ def main(options):
         statFil.close()
 
     systHist=hDict["bkgs"]
+    systHist.SetName('bkgsCopy')
     systHistAsym = ROOT.TGraphAsymmErrors(systHist)
+    if postFitPickles!=None:
+        systHistAsym = ROOT.TGraphAsymmErrors(totbkg)
+        systHistAsym.SetName('bkgs')
+        totbkg.SetName('bkgs')
+        totbkg.SetTitle('bkgs')
+        for i in range(1,55):
+            print totbkg.GetBinContent(i),totbkg.GetBinError(i)
+        hDict["bkgs"]=totbkg.Clone()
+        hDict["bkgsStat"]=totbkg.Clone()
+        bkgs=totbkg.Clone()
     hDict["bkgsAsymErr"] = systHistAsym
 
     # collect the one-sided systematics
@@ -1056,7 +1089,7 @@ def main(options):
                 elif 'oneMuPosCR' in k:
                     continue                
                 elif 'twoMuCR' in k:
-                    continue                
+                    continue
                 elif 'twoEleCR' in k:
                     continue   
             if "theoFactors" in k or "NONEBlind" in k: continue
@@ -1131,33 +1164,33 @@ def main(options):
         systHist.SetTitle("MC stat")
 
     # adding the post fit errors. these should include the mc stat uncertainties
-    if postFitPickles!=None:
-        for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
-            pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
-            for pickle_key in fpickle.keys():
-                if not ('Fitted_err_' in pickle_key): # only process the fitted events here
-                    continue
-                pickle_key_remFit = pickle_key[len('Fitted_err_'):]
-                m=0
-                for i in hist_array_keys:
-                    if i in pickle_key_remFit:
-                        break
-                    m+=1
-                if m>=len(hists):
-                    print 'Post fit syst band - could not find (fine if signal): ',pickle_key
-                    continue
-                histToSet = hists[m]
-                ireg=0
-                #print fpickle[pickle_key]
-                for iname in pickle_region_names:
-                    ey_low=systHistAsym.GetErrorYlow(regDict[iname.rstrip('_cuts')]-1)
-                    ey_new = fpickle[pickle_key][ireg]
-                    e_new = math.sqrt(ey_low*ey_low+ey_new*ey_new)
-                    #print 'e_new:',e_new
-                    if not options.show_mc_stat_err:
-                        systHistAsym.SetPointEYlow(regDict[iname.rstrip('_cuts')]-1,e_new)
-                        systHistAsym.SetPointEYhigh(regDict[iname.rstrip('_cuts')]-1,e_new)
-                    ireg+=1
+    #if postFitPickles!=None:
+    #    for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
+    #        pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
+    #        for pickle_key in fpickle.keys():
+    #            if not ('Fitted_err_' in pickle_key): # only process the fitted events here
+    #                continue
+    #            pickle_key_remFit = pickle_key[len('Fitted_err_'):]
+    #            m=0
+    #            for i in hist_array_keys:
+    #                if i in pickle_key_remFit:
+    #                    break
+    #                m+=1
+    #            if m>=len(hists):
+    #                print 'Post fit syst band - could not find (fine if signal): ',pickle_key
+    #                continue
+    #            histToSet = hists[m]
+    #            ireg=0
+    #            #print fpickle[pickle_key]
+    #            for iname in pickle_region_names:
+    #                ey_low=systHistAsym.GetErrorYlow(regDict[iname.rstrip('_cuts')]-1)
+    #                ey_new = fpickle[pickle_key][ireg]
+    #                e_new = math.sqrt(ey_low*ey_low+ey_new*ey_new)
+    #                #print 'e_new:',e_new
+    #                if not options.show_mc_stat_err:
+    #                    systHistAsym.SetPointEYlow(regDict[iname.rstrip('_cuts')]-1,e_new)
+    #                    systHistAsym.SetPointEYhigh(regDict[iname.rstrip('_cuts')]-1,e_new)
+    #                ireg+=1
         
     ROOT.gStyle.SetErrorX(0.5)
     fillStyle = 3004 # was 3018
@@ -1184,7 +1217,7 @@ def main(options):
         can.cd(2)
         rHist=data.Clone("ratioHist")
         rbkgs = hDict["bkgsStat"].Clone()
-        if not options.show_mc_stat_err and options.postFitPickleDir!=None: # removing mc stat unc.
+        if (not options.show_mc_stat_err and options.postFitPickleDir!=None): # removing mc stat unc.
             for i in range(0,rbkgs.GetNbinsX()+1):
                 rbkgs.SetBinError(i,0.0)
         
@@ -1205,18 +1238,16 @@ def main(options):
         rHist.GetXaxis().SetLabelSize(0.1)
         rHist.GetYaxis().SetLabelSize(0.1)
 	
-	
-
         line1=data.Clone("line1")
         for i in range(1,line1.GetNbinsX()+1):
             line1.SetBinContent(i,1)
         Style.setLineAttr(line1,2,2,3)
 
-
         if options.cronly:
             rHist.GetXaxis().SetRangeUser(0,44)
         rHist.Draw()
         line1.Draw("histsame")
+        val=0
         if options.show_mc_stat_err or options.syst!="" or options.postFitPickleDir!=None:
             if options.show_mc_stat_err and options.postFitPickleDir==None: # the post fit already has the MC stat uncertainties included
                 bkgs = hDict["bkgsStat"].Clone() # this only holds the MC stat uncertainty
@@ -1236,9 +1267,9 @@ def main(options):
                 systHistAsymRatio.GetPoint(j-1,x1,y1)
                 systHistAsymRatio.SetPoint(j-1,x1,1.0)
                 val=bkgs.GetBinContent(j)
-		if val==0:#AMANDA - hack for bkgonly fits, final bin (99) is empty
-		    print "bin ",i," has no content"
-		    val=0.00001
+                if val==0:#AMANDA - hack for bkgonly fits, final bin (99) is empty
+                    print "bin ",i," has no content"
+                    val=0.00001
                 eyu=systHistAsym.GetErrorYhigh   (j-1)/val
                 eyd=systHistAsym.GetErrorYlow    (j-1)/val
                 systHistAsymRatio.SetPointEYhigh(j-1,eyu)
@@ -1524,6 +1555,8 @@ def compareMain(options):
             #    entry_name=NameDict[entry_name]
             if entry_name=='bkgs':
                 entry_name='Unc'
+            if entry_name=='bkgs' and options.postFitPickleDir!=None:
+                entry_name='Fit Unc'
             leg.AddEntry(histDict[k][p],entry_name,"l")
             histDict[k][p].Draw("Ehistsame")
         texts = ATLAS.getATLASLabels(c1, 0.54, 0.78, options.lumi, selkey="")
