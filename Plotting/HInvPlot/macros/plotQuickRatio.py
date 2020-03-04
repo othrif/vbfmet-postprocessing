@@ -464,7 +464,7 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=[''],extra=''):
     elif  hname.count('met_tst_nolep_et'):
         hratio.GetXaxis().SetTitle('MET (no leptons) [GeV]')
        
-    hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
+    hratio.GetYaxis().SetTitle(den_name +' / '+ num_name)
     hratio.GetYaxis().SetRangeUser(0.5,1.5)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);

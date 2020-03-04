@@ -922,6 +922,17 @@ def main(options):
                     continue
                 #if ('Fitted_events_VBFH' in pickle_key): # skip signal
                 #    continue
+                if ('Fitted_err_' in pickle_key and 'H125' in pickle_key) and options.stack_signal: # skip signal
+                    if pickle_key_remFit[:pickle_key_remFit.find('_')] in ['VBFH125','VH125','ggFH125']:
+                         if 'signal' in hDict:
+                            ireg=0
+                            for iname in pickle_region_names:
+                                if isError:
+                                    print 'SIGGE',ireg,pickle_key,pickle_key_remFit[:pickle_key_remFit.find('_')],fpickle[pickle_key][ireg]                                    
+                                    e1=hDict['signal'].GetBinError(regDict[iname.rstrip('_cuts')])
+                                    if not options.show_mc_stat_err:
+                                        hDict['signal'].SetBinError(regDict[iname.rstrip('_cuts')],math.sqrt((fpickle[pickle_key][ireg])**2+e1**2))
+                                ireg+=1
                 if pickle_key_remFit.find('_')>0 and options.scaleSig:
                     if pickle_key_remFit[:pickle_key_remFit.find('_')] in ['VBFH125','VH125','ggFH125']:
                         if 'signal' in hDictSig:
@@ -985,7 +996,11 @@ def main(options):
     dummyHist.SetMaximum(hStack.GetMaximum()*3.4)
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
-    hDictSig["signal"].Scale(0.13)
+    if options.stack_signal:
+        for ib in range(1,hDict["signal"].GetNbinsX()+1):
+            hDict["signal"].SetBinContent(ib,0.13*hDict["signal"].GetBinContent(ib))
+    else:
+        hDictSig["signal"].Scale(0.13)
     print 'scaling signal to 0.13'        
     if not options.stack_signal:
         hDictSig["signal"].Draw('HISTsame')
@@ -1603,6 +1618,7 @@ def plotVar(options):
     postFitPickles=None
     fittedSRVals={}
     fittedSRErrs={}
+    fittedSRTotErrs={}    
     fittedMCVals={}
     fittedMCErrs={}
     if options.postFitPickleDir!=None:
@@ -1611,6 +1627,8 @@ def plotVar(options):
             #['SR7', 'oneElePosCR7', 'oneEleNegCR7', 'oneElePosLowSigCR7', 'oneEleNegLowSigCR7', 'oneMuPosCR7', 'oneMuNegCR7', 'twoEleCR7', 'twoMuCR7']
             pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
             #print pickle_region_names #['SR8', 'oneEleCR8', 'oneEleLowSigCR8', 'oneMuCR8', 'twoLepCR8']
+            if 'TOTAL_FITTED_bkg_events_err' in fpickle:
+                fittedSRTotErrs[pickle_region_names[0][2:]]=fpickle['TOTAL_FITTED_bkg_events_err'][plotIndex]
             for pickle_key in fpickle.keys():
                 print pickle_key
                 if not options.scaleSig:
@@ -1684,7 +1702,7 @@ def plotVar(options):
         if postFitPickles:
             #print h[1:h.find('Nom')] #hZ_EWK_VBFjetSel_1Nom_SR1_obs_jj_mass need to map to VBFH125_VBFjetSel_8
             key_name=h[1:h.find('Nom')]
-            #print 'key_name:',key_name,hObj.hist.Integral()
+            print 'key_name:',key_name,hObj.hist.Integral()
             if key_name in fittedSRVals:
                 #hObj.hist.SetBinContent(int(hObj.mr)+1,float(fittedSRVals[key_name]))
                 total_err = ROOT.double(0.0)
@@ -1696,7 +1714,9 @@ def plotVar(options):
                 if totalInt>0.0:
                     error_fraction = fittedSRErrs[key_name]/totalInt
                     for ib in range(1,hObj.hist.GetNbinsX()+1):
-                        mc_stat_err = hObj.hist.GetBinError(ib)
+                        mc_stat_err=0.0
+                        if options.show_mc_stat_err:
+                            mc_stat_err = hObj.hist.GetBinError(ib)
                         hObj.hist.SetBinError(ib,math.sqrt(mc_stat_err**2+(error_fraction*hObj.hist.GetBinContent(ib))**2))
                         # need to spread these out bin by bin
                         systHistAsym.SetBinContent(ib,hObj.hist.GetBinContent(ib))
