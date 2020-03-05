@@ -43,12 +43,14 @@ for reg in ['oneEleCR','oneEleLowSigCR']:
             mjj.SetBinError(newmjjbin,mymj.GetBinError(1))
         if ibin==4 or ibin==9:
             newmjjbin=6
-            mjj.SetBinContent(newmjjbin,0.7*mymj.GetBinContent(1))
-            mjj.SetBinError(newmjjbin,0.7*mymj.GetBinError(1))
+            mjj.SetBinContent(newmjjbin,0.5*mymj.GetBinContent(1))
+            mjj.SetBinError(newmjjbin,0.5*mymj.GetBinError(1))
             mjj.SetBinContent(newmjjbin+1,0.3*mymj.GetBinContent(1))
-            mjj.SetBinError(newmjjbin+1,0.3*mymj.GetBinError(1))
+            mjj.SetBinError(newmjjbin+1,0.2*mymj.GetBinError(1))
+            mjj.SetBinContent(newmjjbin+2,0.2*mymj.GetBinContent(1))
+            mjj.SetBinError(newmjjbin+2,0.2*mymj.GetBinError(1))            
         if ibin==5 or ibin==10:
-            newmjjbin=8
+            newmjjbin=9
             mjj.SetBinContent(newmjjbin,0.7*mymj.GetBinContent(1))
             mjj.SetBinError(newmjjbin,0.7*mymj.GetBinError(1))
             mjj.SetBinContent(newmjjbin+1,0.3*mymj.GetBinContent(1))
@@ -57,9 +59,10 @@ for reg in ['oneEleCR','oneEleLowSigCR']:
             mjj.SetBinContent(3,0.38*mymj.GetBinContent(1))
             mjj.SetBinContent(4,0.25*mymj.GetBinContent(1))
             mjj.SetBinContent(5,0.18*mymj.GetBinContent(1))
-            mjj.SetBinContent(6,0.13*mymj.GetBinContent(1))
-            mjj.SetBinContent(7,0.05*mymj.GetBinContent(1))
-            mjj.SetBinContent(8,0.01*mymj.GetBinContent(1))  
+            mjj.SetBinContent(6,0.12*mymj.GetBinContent(1))
+            mjj.SetBinContent(7,0.04*mymj.GetBinContent(1))
+            mjj.SetBinContent(8,0.02*mymj.GetBinContent(1))
+            mjj.SetBinContent(9,0.01*mymj.GetBinContent(1))              
         if ibin in [1,2,3,4,5]:
             dphijj.SetBinContent(1,0.5*mymj.GetBinContent(1))
             dphijj.SetBinError(1,0.5*mymj.GetBinError(1))
@@ -104,12 +107,14 @@ for ibin in range(1,bins+1):
         mjj.SetBinError(newmjjbin,mymj.GetBinError(1))
     if ibin==4 or ibin==9:
         newmjjbin=6
-        mjj.SetBinContent(newmjjbin,0.7*mymj.GetBinContent(1))
-        mjj.SetBinError(newmjjbin,0.7*mymj.GetBinError(1))
+        mjj.SetBinContent(newmjjbin,0.6*mymj.GetBinContent(1))
+        mjj.SetBinError(newmjjbin,0.6*mymj.GetBinError(1))
         mjj.SetBinContent(newmjjbin+1,0.3*mymj.GetBinContent(1))
         mjj.SetBinError(newmjjbin+1,0.3*mymj.GetBinError(1))
+        mjj.SetBinContent(newmjjbin+2,0.1*mymj.GetBinContent(1))
+        mjj.SetBinError(newmjjbin+2,0.1*mymj.GetBinError(1))        
     if ibin==5 or ibin==10:
-        newmjjbin=8
+        newmjjbin=9
         mjj.SetBinContent(newmjjbin,0.7*mymj.GetBinContent(1))
         mjj.SetBinError(newmjjbin,0.7*mymj.GetBinError(1))
         mjj.SetBinContent(newmjjbin+1,0.3*mymj.GetBinContent(1))

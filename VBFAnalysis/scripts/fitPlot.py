@@ -309,12 +309,16 @@ class HistClass(object):
             self.hist=HistClass.Irfile.Get(hname)
         else:
             self.hist=HistClass.Irfile.Get(self.hname)
-        if self.hist and var:
+        if self.hist and var and False:
             maxNbin=self.hist.GetNbinsX()
             self.hist.SetBinContent(maxNbin,self.hist.GetBinContent(maxNbin)+self.hist.GetBinContent(maxNbin+1))
             self.hist.SetBinError(maxNbin,math.sqrt((self.hist.GetBinError(maxNbin))**2+(self.hist.GetBinContent(maxNbin+1))**2))
             self.hist.SetBinContent(1,self.hist.GetBinContent(0)+self.hist.GetBinContent(1))
             self.hist.SetBinError(1,math.sqrt((self.hist.GetBinError(0))**2+(self.hist.GetBinContent(1))**2))
+            self.hist.SetBinContent(0,0)
+            self.hist.SetBinError(0,0)
+            self.hist.SetBinContent(maxNbin,0)
+            self.hist.SetBinError(maxNbin,0)
         if self.hist is None:
             print "Could not retrieve histogram!", self.hname, HistClass.Irfile
         #else:
@@ -524,9 +528,7 @@ def make_legend(can,poskeys=[0.0,0.1,0.2,0.5],ncolumns=1):
         NameDict['signal']='#it{H}(B_{inv}=0.13)'
     listInputs=[]
     for i in leg.GetListOfPrimitives():
-        if 'Post-Fit' in i.GetLabel().strip():
-            i.GetObject().SetMarkerSize(0)
-            i.GetObject().SetLineWidth(0)
+        
         if i.GetLabel().strip() in NameDict and  NameDict[i.GetLabel().strip()] in listInputs:
             continue
         else:
@@ -537,6 +539,10 @@ def make_legend(can,poskeys=[0.0,0.1,0.2,0.5],ncolumns=1):
             i.GetObject().SetMarkerColor(i.GetObject().GetFillColor())
         if i.GetLabel() in NameDict:
             i.SetLabel(NameDict[i.GetLabel()])
+        if 'Post-Fit' in i.GetLabel().strip():
+            i.GetObject().SetMarkerSize(0)
+            i.GetObject().SetLineWidth(0)
+            i.GetObject().SetMarkerColor(0)
     removeLabel(leg, 'dummy')
     removeLabel(leg, 'Others')
     removeLabel(leg, 'multijet')
@@ -1606,7 +1612,7 @@ def compareMain(options):
 
 
 def setBinWidth(var, histList):
-
+    #return
     for h in histList: 
         if var=="jj_mass":
             for ib in range(2,h.GetNbinsX()+1):
@@ -1719,15 +1725,17 @@ def plotVar(options):
             setBinWidth(var,[hObj.hist])
         
         systHistAsym=hObj.hist.Clone()
+        setBinWidth(var,[systHistAsym])
         if hObj.isBkg() and (hObj.mr in mjjBins):
             bkgPreFitDict[hObj.proc]=hObj.hist.Clone()
+            setBinWidth(var,[bkgPreFitDict[hObj.proc]])
             if bkgPreFit==None:
                 #print 'prefit: ',h
                 bkgPreFit=hObj.hist.Clone()
                 setBinWidth(var,[bkgPreFit])
             else:
                 #print 'prefit: ',h
-                setBinWidth(var,[bkgPreFitDict[hObj.proc]])
+                #setBinWidth(var,[bkgPreFitDict[hObj.proc]])
                 bkgPreFit.Add(bkgPreFitDict[hObj.proc])
         #print h
         #if systHistAsym==None:
