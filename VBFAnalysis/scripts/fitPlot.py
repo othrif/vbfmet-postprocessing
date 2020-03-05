@@ -155,7 +155,7 @@ class texTable(object):
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
                    'W_strong':'#it{W} strong',
-                   'signal':'#it{H}(B_{inv}=0.13)',
+                   'signal':'#it{h}(B_{inv}=0.13)',
                    'data':'Data',
                    'bkgs':'Total Bkg',
                    'eleFakes':'e-fakes',
@@ -504,7 +504,7 @@ def removeLabel(leg, name):
         for prim in LOP:
             print prim.GetLabel()
 
-def make_legend(can,poskeys=[0.0,0.1,0.2,0.5],ncolumns=1):
+def make_legend(can,poskeys=[0.0,0.1,0.2,0.65],ncolumns=1):
     leg=can.BuildLegend(poskeys[0],poskeys[1],poskeys[2],poskeys[3])
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
@@ -518,14 +518,14 @@ def make_legend(can,poskeys=[0.0,0.1,0.2,0.5],ncolumns=1):
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
                    'W_strong':'#it{W} strong',
-                   'signal':'#it{H}(B_{inv}=0.13)',
+                   'signal':'#it{h}(B_{inv}=0.13)',
                    'data':'Data',
                    'bkgs':'Unc',
                    'eleFakes':'e-fakes',
                    'multijet':'Multijet',
                    }
     if not options.scaleSig:
-        NameDict['signal']='#it{H}(B_{inv}=0.13)'
+        NameDict['signal']='#it{h}(B_{inv}=0.13)'
     listInputs=[]
     for i in leg.GetListOfPrimitives():
         
@@ -828,7 +828,7 @@ def main(options):
     dummyHist.GetYaxis().SetTitle("Events")
     dummyHist.GetYaxis().SetTitleSize(1.4*dummyHist.GetYaxis().GetTitleSize())
     dummyHist.GetYaxis().SetTitleOffset(0.54*dummyHist.GetYaxis().GetTitleOffset())    
-    dummyHist.GetYaxis().SetRangeUser(1,2000)    
+    dummyHist.GetYaxis().SetRangeUser(1.001,2000)    
     if options.cronly:
         dummyHist.GetXaxis().SetRangeUser(0,44)
     dummyHist.Draw()
@@ -1246,7 +1246,7 @@ def main(options):
     leg=make_legend(ROOT.gPad)
     leg.Draw()
 
-    texts = ATLAS.getATLASLabels(can, 0.2, 0.86, options.lumi, selkey="")
+    texts = ATLAS.getATLASLabels(can, 0.2, 0.86, options.lumi, selkey="",preliminary=options.preliminary)
 
     for text in texts:
         text.Draw()
@@ -1407,6 +1407,8 @@ def main(options):
         extraName='_cronly'
     if not options.unBlindSR:
         extraName+='_blind'
+    if options.preliminary:
+        extraName+='_prelim'
     if options.saveAs and options.postFitPickleDir!=None:
         can.SaveAs("postFit"+extraName+"."+options.saveAs)
         can.SaveAs("postFit"+extraName+".root")
@@ -1598,7 +1600,7 @@ def compareMain(options):
                 entry_name='Fit Unc'
             leg.AddEntry(histDict[k][p],entry_name,"l")
             histDict[k][p].Draw("Ehistsame")
-        texts = ATLAS.getATLASLabels(c1, 0.54, 0.78, options.lumi, selkey="")
+        texts = ATLAS.getATLASLabels(c1, 0.54, 0.78, options.lumi, selkey="",preliminary=options.preliminary)
         for text in texts:
             text.Draw()
         leg.Draw()
@@ -1935,7 +1937,7 @@ def plotVar(options):
         poskeys=[0.7,0.53,0.9,0.93]
         ncolumns=1
     make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
-    texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="")
+    texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="",preliminary=options.preliminary)
     for text in texts:
         text.Draw()
 
@@ -2072,8 +2074,11 @@ def plotVar(options):
 
     if not options.quite:
         raw_input("Press Enter to continue")
+    extraName=''
+    if options.preliminary:
+        extraName+='_prelim'
     if options.saveAs:
-        can.SaveAs(options.plot.replace(",","_")+"."+options.saveAs)
+        can.SaveAs(options.plot.replace(",","_")+extraName+"."+options.saveAs)
     del can
 
 if __name__=='__main__':
@@ -2087,6 +2092,7 @@ if __name__=='__main__':
     p.add_option('-s', '--syst', type='string', default="", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
     p.add_option('-d', '--data', action='store_true', help='Draw data')
     p.add_option('--unBlindSR', action='store_true', help='Unblinds the SR bins')
+    p.add_option('--preliminary', action='store_true', help='Labels with preliminary')
     p.add_option('--scaleSig', action='store_true', help='scale the signal to the post fit values')    
     p.add_option('--stack-signal', action='store_true', help='Stack the signal')
     p.add_option('--cronly', action='store_true', help='Shows the CR only')    

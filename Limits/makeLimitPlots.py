@@ -77,7 +77,7 @@ if options.style == 'atlas':
 def getATLASLabels(pad, x, y, text=None, selkey=None):
     l = ROOT.TLatex(x, y, 'ATLAS')
     l.SetNDC()
-    l.SetTextFont(62)
+    l.SetTextFont(72)
     l.SetTextSize(0.07)
     l.SetTextAlign(11)
     l.SetTextColor(ROOT.kBlack)
@@ -87,7 +87,8 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
     labs = [l]
 
     if True:
-        p = ROOT.TLatex(x+0.14, y, ' Internal') #
+        p = ROOT.TLatex(x+0.11, y, ' Internal') #
+        #p = ROOT.TLatex(x+0.11, y, ' Preliminary') #
         p.SetNDC()
         p.SetTextFont(42)
         p.SetTextSize(0.065)
@@ -96,7 +97,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(139e3/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{#it{s}}=13 TeV, %.0f fb^{-1}' %(139e3/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -221,7 +222,9 @@ def GetLegend(name,wide=0.50):
     if name!=None:
         leg.SetHeader(name)
     leg.SetBorderSize(0)
-    leg.SetFillColor(-1)
+    leg.SetTextFont(42)
+    leg.SetFillColor(0)
+    #leg.SetTextSize(0)
     return leg
 
 #---------------------------------------------------------------------------------------------
