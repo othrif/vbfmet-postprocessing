@@ -1,5 +1,5 @@
 import ROOT
-
+import math
 from optparse import OptionParser
 
 p = OptionParser(usage="usage: <path:ROOT file directory>", version="0.1")
@@ -199,9 +199,68 @@ def Style():
     ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasUtils.C')
     ROOT.SetAtlasStyle()
 
-def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=[''],extra=''):
+#-----------------------------------------
+def GetHistsRatio(hname1,f1,hpath1all=[''],hpath2all=['']):
+
+    h1=None
+    hname=''
+    for hpath1 in hpath1all:
+        hname=hpath1+hname1
+        print hname
+        h1b = f1.Get(hname)
+        if h1:
+            h1.Add(h1b)
+        else:
+            h1 = h1b.Clone()
+    h2=None
+    hnamev2=''
+    for hpath2 in hpath2all:
+        hnamev2=hpath2+hname1
+        print hnamev2
+        h2b = f1.Get(hnamev2)
+        if h2:
+            h2.Add(h2b)
+        else:
+            h2 = h2b.Clone()
+    rebin=2
+    if hname=='ph_pt_lead':
+        h1.Rebin(5)
+        h2.Rebin(5)
+        h1.GetXaxis().SetRangeUser(5.0,1000.0)
+        h2.GetXaxis().SetRangeUser(5.0,1000.0)
+    if hname1=='jj_mass':
+        h1.Rebin(rebin)
+        h2.Rebin(rebin)
+    if  hname=='truth_jj_mass':
+        h1.Rebin(10)
+        h2.Rebin(10)
+    if hname1=='jj_deta':
+        h1.Rebin(rebin)
+        h2.Rebin(rebin)
+    if hname1=='met_tst_et':
+        h1.Rebin(rebin)
+        h2.Rebin(rebin) 
+    if hname1=='jj_dphi':
+        h1.Rebin(rebin)
+        h2.Rebin(rebin) 
+    if hname1=='met_tst_nolep_et':
+        h1.Rebin(5)
+        h2.Rebin(5) 
+    hratio = h2.Clone()
+    intden = h2.Integral()
+    if intden>0.0:
+        hratio.Scale(h1.Integral()/intden)
+    hratio.Divide(h1)
+    return hratio
+    
+def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],extra=''):
     can.Clear()
 
+    f1=f1les[0]
+    f1up=None
+    if len(f1les)>1:
+        f1up=f1les[1]
+        f1dw=f1les[2]
     h1=None
     hname=''
     for hpath1 in hpath1all:
@@ -394,11 +453,58 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=[''],extra=''):
     pad2.SetLogy(0)
     pad1.SetLogx(0)
     pad2.SetLogx(0)
+    hratioUp = GetHistsRatio(hname1,f1up,hpath1all=hpath1all,hpath2all=hpath2all)
+    hratioDw = GetHistsRatio(hname1,f1dw,hpath1all=hpath1all,hpath2all=hpath2all)
+    hsysr = hratio.Clone()
+    hsys=ROOT.TGraphAsymmErrors(hsysr)
+    for i in range(0,hsysr.GetNbinsX()+1):
+        hsys.SetPointEXhigh(i-1,hsysr.GetXaxis().GetBinWidth(i)/2.0)
+        hsys.SetPointEXlow(i-1,hsysr.GetXaxis().GetBinWidth(i)/2.0)    
+    if f1up:
+        x1a=ROOT.Double()
+        y1a=ROOT.Double()
+        for ib in range(1,hsysr.GetNbinsX()+2):
+            diff = hratioUp.GetBinContent(ib)-hratio.GetBinContent(ib)
+            diff2= hratioDw.GetBinContent(ib)-hratio.GetBinContent(ib)
+            #print diff,diff2
+            hsysr.SetBinError(ib,math.sqrt(diff**2+diff2**2))
+            if diff>0.0 and diff2>0.0:
+                if diff<diff2:
+                    diff=-0.001
+                if diff2<diff:
+                    diff2=-0.001
+            if diff<0.0 and diff2<0.0:
+                if diff>diff2:
+                    diff=0.001
+                if diff2>diff:
+                    diff2=0.001
+
+            # asymmetric unc.
+            if diff>0.0 and diff2>0.0:
+                hsys.SetPointEYhigh(ib-1,math.sqrt(diff**2+diff2**2))
+            elif diff<0.0 and diff2<0.0:
+                hsys.SetPointEYlow(ib-1,math.sqrt(diff**2+diff2**2))
+            elif diff<0.0 and diff2>0.0:
+                hsys.SetPointEYlow(ib-1,abs(diff))
+                hsys.SetPointEYhigh(ib-1,diff2)
+            elif diff>0.0 and diff2<0.0:
+                hsys.SetPointEYlow(ib-1,abs(diff2))
+                hsys.SetPointEYhigh(ib-1,diff)
+            else:
+                hsys.SetPointEYlow(ib-1,0.0)
+                hsys.SetPointEYhigh(ib-1,0.0)
+            
+        hsys.SetFillColor(1)
+        hsys.SetLineColor(1)
+        hsys.SetFillStyle(3018)
+        hsys.SetLineWidth(0)
+        hsys.SetMarkerSize(0)
+        hsys.SetMarkerColor(1)
     if hname=='ph_pt_lead':
         hratio.GetXaxis().SetTitle('Lead Photon p_{T} [GeV]')
         h1.GetXaxis().SetRangeUser(11.0,1000.0)
         h2.GetXaxis().SetRangeUser(11.0,1000.0)
-        hratio.GetXaxis().SetRangeUser(11.0,1000.0) 
+        hratio.GetXaxis().SetRangeUser(11.0,1000.0)
         if not GetError:
             pad1.SetLogy(1)
             #pad2.SetLogy(1)
@@ -428,7 +534,7 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=[''],extra=''):
     elif  hname=='boson_eta':
         hratio.GetXaxis().SetTitle('Boson #eta')        
     elif  hname=='boson_pt':
-        hratio.GetXaxis().SetTitle('Boson p_{T} [GeV]')        
+        hratio.GetXaxis().SetTitle('Boson p_{T} [GeV]')
     elif  hname=='njet' or hname.count('n_jet'):
         hratio.GetXaxis().SetTitle('N_{jet}')
     elif  hname=='dr_ph_el':
@@ -478,6 +584,14 @@ def Draw(hname1,f1,can,GetError=True, hpath1all=[''],hpath2all=[''],extra=''):
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);    
     hratio.Draw()
+    if f1up:
+        hsys.Draw('E2 same')
+        #hsys.Draw('HIST same')
+        legR = ROOT.TLegend(0.2,0.34,0.45,0.44)
+        legR.SetFillColor(0)
+        legR.SetBorderSize(0)
+        legR.AddEntry(hsys,'V+jets Scale variations')
+        legR.Draw()
     can.Update()
     if options.wait:
         can.WaitPrimitive()
@@ -492,6 +606,8 @@ def Fit(_suffix=''):
     can=ROOT.TCanvas('can',"can",600,600)
     Style();
     f1 = ROOT.TFile.Open(options.filename)
+    f1up = ROOT.TFile.Open('TheoryUnc/out_NominalUp.root')
+    f1dw = ROOT.TFile.Open('TheoryUnc/out_NominalDwn.root')
 
     h1_norm=1.0 #36.100
     h2_norm=1.0 #36.100 #hggf, hvh, hvbf
@@ -501,42 +617,42 @@ def Fit(_suffix=''):
     path1=['pass_zcr_allmjj_ee_Nominal/plotEvent_zqcd/']
     path2=['pass_zcr_allmjj_uu_Nominal/plotEvent_zqcd/']
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
     #sys.exit(0)
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
     path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
     
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/']
     path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/']
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
 
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/','pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
     path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/','pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)        
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)        
 
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
     path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
     
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/']
     path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/']
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
         
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/','pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
     path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/','pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2)
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
 
     # Ratio of wln to Znn
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/','pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
     path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/','pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
     for hname in hnames:
-        Draw(hname,f1,can,GetError=False, hpath1all=path1,hpath2all=path2,extra='_ZtoW')
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,extra='_ZtoW')
 setPlotDefaults(ROOT)
 Fit('90V')
