@@ -93,7 +93,7 @@ def getNF(histDict, nbins, signalKeys=[], NFOnly=False):
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=(dataV-bkgV)
     nferr=0
-    if sigV>0.0:
+    if sigV>0.0 and dataV>0.0:
         nf=(dataV-bkgV)/sigV
         nferr = nf*math.sqrt((dataV+bkgE)/(dataV**2)+sigE/(sigV**2))
     if NFOnly:
@@ -309,7 +309,7 @@ class HistClass(object):
             self.hist=HistClass.Irfile.Get(hname)
         else:
             self.hist=HistClass.Irfile.Get(self.hname)
-        if self.hist:
+        if self.hist and var:
             maxNbin=self.hist.GetNbinsX()
             self.hist.SetBinContent(maxNbin,self.hist.GetBinContent(maxNbin)+self.hist.GetBinContent(maxNbin+1))
             self.hist.SetBinError(maxNbin,math.sqrt((self.hist.GetBinError(maxNbin))**2+(self.hist.GetBinContent(maxNbin+1))**2))
@@ -521,7 +521,7 @@ def make_legend(can,poskeys=[0.0,0.1,0.2,0.5],ncolumns=1):
                    'multijet':'Multijet',
                    }
     if not options.scaleSig:
-        NameDict['signal']='H(B_{inv}=0.13)'
+        NameDict['signal']='#it{H}(B_{inv}=0.13)'
     listInputs=[]
     for i in leg.GetListOfPrimitives():
         if i.GetLabel().strip() in NameDict and  NameDict[i.GetLabel().strip()] in listInputs:
@@ -840,17 +840,25 @@ def main(options):
     #Styles
     Style.setStyles(data,[1,0,2,0,0,1,20,1.2])
     if options.stack_signal:
-        Style.setStyles(hDict["signal"],[ROOT.kOrange,2,3,0,0,0,0,0])
+        Style.setStyles(hDict["signal"],[2,2,3,0,0,0,0,0])
     else:
-        Style.setStyles(hDictSig["signal"],[ROOT.kOrange,2,3,0,0,0,0,0])
+        Style.setStyles(hDictSig["signal"],[2,2,3,0,0,0,0,0])
 
-    Style.setStyles(hDict["Z_strong"],[1,1,1,46,1001,0,0,0])
-    Style.setStyles(hDict["Z_EWK"],[1,1,1,8,1001,0,0,0])
-    Style.setStyles(hDict["W_strong"],[1,1,1,9,1001,0,0,0])
-    Style.setStyles(hDict["W_EWK"],[1,1,1,5,1001,0,0,0])
-    Style.setStyles(hDict["ttbar"],[1,1,1,0,1001,0,0,0])
-    Style.setStyles(hDict["eleFakes"],[1,1,1,11,1001,0,0,0])
-    Style.setStyles(hDict["multijet"],[1,1,1,12,1001,0,0,0])
+    #Style.setStyles(hDict["Z_strong"],[1,1,1,46,1001,0,0,0])
+    #Style.setStyles(hDict["Z_EWK"],[1,1,1,8,1001,0,0,0])
+    #Style.setStyles(hDict["W_strong"],[1,1,1,9,1001,0,0,0])
+    #Style.setStyles(hDict["W_EWK"],[1,1,1,5,1001,0,0,0])
+    #Style.setStyles(hDict["ttbar"],[1,1,1,0,1001,0,0,0])
+    #Style.setStyles(hDict["eleFakes"],[1,1,1,11,1001,0,0,0])
+    #Style.setStyles(hDict["multijet"],[1,1,1,12,1001,0,0,0])
+
+    Style.setStyles(hDict["Z_strong"],Style.styleDict["Z_strong"])
+    Style.setStyles(hDict["Z_EWK"],Style.styleDict["Z_EWK"])
+    Style.setStyles(hDict["W_strong"],Style.styleDict["W_strong"])
+    Style.setStyles(hDict["W_EWK"],Style.styleDict["W_EWK"])
+    Style.setStyles(hDict["ttbar"],Style.styleDict["ttbar"])
+    Style.setStyles(hDict["eleFakes"],Style.styleDict["eleFakes"])
+    Style.setStyles(hDict["multijet"],Style.styleDict["multijet"])
     if "Others" in hDict:
         Style.setStyles(hDict["Others"],[1,1,1,2,1001,0,0,0])
 
@@ -874,7 +882,9 @@ def main(options):
         if not checkRegion:
             continue
         histObj=HistClass(key)
+        
         if not histObj.hist: continue
+
         if histObj.isSignal():
             if options.stack_signal:
                 addContent(hDict["signal"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
@@ -1260,7 +1270,7 @@ def main(options):
         line1=data.Clone("line1")
         for i in range(1,line1.GetNbinsX()+1):
             line1.SetBinContent(i,1)
-        Style.setLineAttr(line1,2,2,3)
+        Style.setLineAttr(line1,1,2,1)
 
         if options.cronly:
             rHist.GetXaxis().SetRangeUser(0,44)
@@ -1296,9 +1306,10 @@ def main(options):
 
             #rbkgs.Draw('same e2') # divides (up-down)/2 for symmetric unc.
             systHistAsymRatio.Draw('same e2')
-            rHist.Draw('same')
             line1.Draw("histsame")
-        
+            rHist.Draw('same')
+            
+            
         can.GetPad(2).RedrawAxis()
         can.GetPad(2).Modified()
         can.GetPad(2).Update()
@@ -1832,7 +1843,8 @@ def plotVar(options):
             signal.SetTitle('signal')
         else:
             signal.Add(h)
-        
+    if var=='jj_mass':
+        signal.SetBinContent(2,signal.GetBinContent(3))
     can=ROOT.TCanvas("c1","c1",1600,1000)
     if options.ratio:
         can.Divide(1,2)
@@ -1885,8 +1897,8 @@ def plotVar(options):
         systHistAsymTotA.SetPointEXlow(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
     Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTotA.Draw("SAME E2")
-    systHistAsymTotA.SetName('Fit Syst')
-    systHistAsymTotA.SetTitle('Fit Syst')
+    systHistAsymTotA.SetName('Post-Fit Syst')
+    systHistAsymTotA.SetTitle('Post-Fit Syst')
 
     bkg.SetTitle(reg+" "+",".join(mjjBins))
 
@@ -1976,9 +1988,10 @@ def plotVar(options):
         rmultijet.Add(bkgR)
         rmultijet.Divide(bkgR)
         rmultijet.SetLineWidth(2)
+        rmultijet.SetLineStyle(7)
         rmultijet.SetFillColor(0)
         rmultijet.SetFillStyle(0)
-        rsignal.SetLineStyle(7)        
+        rsignal.SetLineStyle(1)        
         rsignal.SetLineWidth(2)        
         
         rbkgPreFit.SetLineColor(ROOT.kBlue)
@@ -2023,10 +2036,10 @@ def plotVar(options):
         legR.SetFillColor(0)
         legR.SetBorderSize(0)
         if reg=='SR':
-            legR.AddEntry(rsignal,'signal/Bkg')
-            legR.AddEntry(rmultijet,'multijet/Bkg')
-        legR.AddEntry(rbkgPreFit,'pre-fit/post-fit')
-        legR.AddEntry(systHistAsymTotRatioA,'Post fit syst')
+            legR.AddEntry(rsignal,'Signal/Bkg')
+            legR.AddEntry(rmultijet,'Multijet/Bkg')
+        legR.AddEntry(rbkgPreFit,'Pre-Fit/Post-Fit')
+        legR.AddEntry(systHistAsymTotRatioA,'Post-Fit syst')
         legR.SetNColumns(2)
         #if reg=='SR':
         legR.Draw()

@@ -27,20 +27,20 @@ styleDict={}
 #0:LColor, 1:LStyle, 2:LWidth, 3:FColor, 4:FStyle, 5:MColor, 6:MStyle, 7:MSize
 styleDict["bkgs"]=[1,1,2,0,0,0,0,0]
 styleDict["data"]=[1,0,2,0,0,1,20,1.2]
-styleDict["signal"]=[2,2,3,0,0,2,0,0]
+styleDict["signal"]=[2,2,3,0,0,2,0,0] #ROOT.kOrange
 styleDict["signalH"]=[2,2,2,0,0,0,0,0]
 
 styleDict["Znunu"]=[3,1,1,3,1001,0,0,0]
 styleDict["Wtaunu"]=[4,1,1,4,1001,0,0,0]
 styleDict["Wmunu"]=[5,1,1,5,1001,0,0,0]
 styleDict["ZnunuEWK"]=[6,1,1,6,1001,0,0,0]
-styleDict["WEWK"]=[7,1,1,7,1001,0,0,0]
+styleDict["WEWK"]=[ROOT.kCyan   -9,1,1,ROOT.kCyan   -9,1001,ROOT.kCyan   -9,0,0]
 styleDict["Wenu"]=[8,1,1,8,1001,0,0,0]
 styleDict["top"]=[9,1,1,9,1001,0,0,0]
 styleDict["Zmumu"]=[28,1,1,28,1001,0,0,0]
 styleDict["Ztautau"]=[30,1,1,30,1001,0,0,0]
 styleDict["VV"]=[34,1,1,34,1001,0,0,0]
-styleDict["ZEWK"]=[42,1,1,42,1001,0,0,0]
+styleDict["ZEWK"]=[ROOT.kBlue-9,1,1,ROOT.kBlue-9,1001,ROOT.kBlue-9,0,0]
 styleDict["Zee"]=[46,1,1,46,1001,0,0,0]
 styleDict["QCDw"]=[47,1,1,47,1001,0,0,0]
 styleDict["multijet"]=[ROOT.kOrange-5,1,1,ROOT.kOrange-5,1001,ROOT.kOrange-5,0,0]
@@ -61,6 +61,13 @@ styleDict["W_strong"]=[ROOT.kGreen  -7,1,1,ROOT.kGreen  -7,1001,ROOT.kGreen  -7,
 styleDict["Z_strong"]=[ROOT.kGreen  -3,1,1,ROOT.kGreen  -3,1001,ROOT.kGreen  -3,0,0]
 styleDict["Z_EWK"]=[ROOT.kBlue-9,1,1,ROOT.kBlue-9,1001,ROOT.kBlue-9,0,0]
 styleDict["W_EWK"]=[ROOT.kCyan   -9,1,1,ROOT.kCyan   -9,1001,ROOT.kCyan   -9,0,0]
+styleDict["W_strong"]=[ROOT.kGreen  -7,1,1,ROOT.kGreen  -7,1001,ROOT.kGreen  -7,0,0]
+styleDict["Z_strong"]=[1,1,1,46,1001,0,0,0]
+styleDict["Z_EWK"]=[1,1,1,8,1001,0,0,0]
+styleDict["W_EWK"]=[1,1,1,5,1001,0,0,0]
+styleDict["W_strong"]=[1,1,1,9,1001,0,0,0]
+styleDict["ttbar"]=[1,1,1,0,1001,0,0,0]
+styleDict["multijet"]=[1,1,1,12,1001,0,0,0]
 
 
 # Define the binning for each variable
