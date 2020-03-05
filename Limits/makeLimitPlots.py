@@ -96,7 +96,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(139e3/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(139e3/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -141,7 +141,7 @@ def GetLumi(name, lumi=options.lumi):
     if   name.count('BtoK') and not name.count('LtoM'): return '2.3'
     elif name.count('LtoM') and not name.count('BtoK'): return '2.4'
 
-    return lumi
+    return int(lumi)
 
 #---------------------------------------------------------------------------------------------
 def GetAnalysis(name): 
@@ -331,7 +331,7 @@ class LimitHists:
                     bins.append(float(mass[m])+width)
                 elif m == len(mass)-1:
                     width=(float(mass[m])-float(mass[m-1]))/2.0
-                    bins.append(float(mass[m])+width)                    
+                    bins.append(float(mass[m])+1.0)#+width)                    
                 else:
                     width=(float(mass[m+1])-float(mass[m]))/2.0
                     bins.append(float(mass[m])+width)
@@ -356,8 +356,9 @@ class LimitHists:
         self.name       = name
         self.points     = points
         self.mass       = mass
-        self.bins       = bins        
+        self.bins       = bins
         self.bins_array = array('d', bins)
+        self.bins_arrayone = array('d', bins+[float(mass[len(mass)-1])+1000.0])        
         self.mass_array = array('d', mass)
 
         self.color      = None
@@ -365,7 +366,7 @@ class LimitHists:
         
         self.obs = self.GetTH1('observ', self.bins_array)
         self.exp = self.GetTH1('expect', self.bins_array)
-        self.one = self.GetTH1('one',    self.bins_array)
+        self.one = self.GetTH1('one',    self.bins_arrayone)
     
         #
         # Filling histograms
@@ -383,6 +384,8 @@ class LimitHists:
             self.exp.Fill(fp.mass, fp.exp_mu)
             self.obs.Fill(fp.mass, fp.obs_mu)
             self.one.Fill(fp.mass, 1.0)
+            for ib in range(1,self.one.GetNbinsX()+2):
+                self.one.SetBinContent(ib,1.0)
             
             list_pos_1sig.append(fp.pos_1sig - fp.exp_mu)
             list_pos_2sig.append(fp.pos_2sig - fp.exp_mu)
@@ -424,9 +427,9 @@ class LimitHists:
         #
         # Formatting and Drawing Histograms
         #
-        self.exp.SetXTitle('Mediator Mass [GeV/c^2]')
+        self.exp.SetXTitle('Mediator Mass [GeV]')
         self.exp.SetYTitle('#sigma/#sigma_{SM}')
-        self.obs.SetXTitle('Mediator Mass [GeV/c^2]')
+        self.obs.SetXTitle('Mediator Mass [GeV]')
         self.obs.SetYTitle('#sigma/#sigma_{SM}')
         if options.scaleXS:
             self.obs.SetYTitle('#sigma_{SM}^{VBF} x  BR_{inv} [pb]') 
@@ -520,7 +523,12 @@ class LimitHists:
         if options.draw_obs:
             self.obs_graph.Draw('L P')
         self.exp_graph.Draw('L')
-        self.one.Draw('L SAME')
+        self.exp.Draw('AXIS SAME')
+        #self.one.Draw('L SAME')
+        #onelin=ROOT.TLine(0.0,1.0,300,1.0)
+        #onelin.SetLineColor(2)
+        #onelin.SetLineWidth(2)
+        #onelin.Draw()
 
         self.leg4 = GetLegend(None)
 
@@ -549,7 +557,7 @@ class LimitHists:
         for h in hists:
             h.Draw('L SAME')
         self.one.Draw('L SAME')
-
+        #self.exp.Draw('AXIS SAME')
         self.leg4 = GetLegend(None)
 
         self.leg4.SetHeader(GetTypeName(self.name)+'') #options.mva
@@ -590,7 +598,7 @@ def make_table(fit_points, exclusions, name, output):
     #
     name=name.rstrip('/')
     ifile = open(output.rstrip('/')+'/'+name+'.table','w')
-    ifile.write('Mediator Mass ($GeV/c^2$) & Significance & Observed & $+2\sigma$ & $+\sigma$ & Expected & $-\sigma$ & $-2\sigma$ \\\\ \n')
+    ifile.write('Mediator Mass ($GeV$) & Significance & Observed & $+2\sigma$ & $+\sigma$ & Expected & $-\sigma$ & $-2\sigma$ \\\\ \n')
     
     for fp in fit_points:
 
@@ -737,7 +745,7 @@ def readFitPoints(path):
         fp.pos_2sig = lim.GetBinContent(3)
         fp.pos_1sig = lim.GetBinContent(4)
         fp.neg_1sig = lim.GetBinContent(5)
-        fp.neg_2sig = lim.GetBinContent(6)        
+        fp.neg_2sig = lim.GetBinContent(6)
         fp.signif   = lim.GetBinContent(7) # TODO verify: May be status now.
         if options.scaleXS:
             fp.ScaleXS()
@@ -789,10 +797,17 @@ def make_limit(name, fit_points, output):
     labsA=getATLASLabels(None,0.2,0.86)
     for l in labsA:
         l.Draw()
-    c1.Update()
-    
+
+    if not options.scaleXS:
+        onelin=ROOT.TLine(50.0,1.0,300,1.0)
+        onelin.SetLineColor(23)
+        onelin.SetLineWidth(2)
+        onelin.SetLineStyle(2)
+        onelin.Draw()
+        c1.Update()
     if not options.no_wait:
         c1.WaitPrimitive()
+    raw_input('waiting...')
 
     if not c1 or c1.Closed():
         sys.exit(0)
@@ -975,7 +990,7 @@ if __name__=="__main__":
 
     c1=get_canvas('limit_combined')
     c1.cd()
-
+    
     #
     # Overlay limit plots
     #
@@ -1160,6 +1175,7 @@ if __name__=="__main__":
         c1.WaitPrimitive()
     else:
         c1.WaitPrimitive()
+    raw_input('waiting..')
     
     if output and len(limits)>1:
         if len(common_name)>40:

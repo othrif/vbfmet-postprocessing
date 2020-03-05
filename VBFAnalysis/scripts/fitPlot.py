@@ -12,6 +12,7 @@ import ROOT
 import math
 import pickle
 import math
+import copy
 import VBFAnalysis.ATLAS as ATLAS
 import VBFAnalysis.Style as Style
 from optparse import OptionParser
@@ -92,7 +93,7 @@ def getNF(histDict, nbins, signalKeys=[], NFOnly=False):
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=(dataV-bkgV)
     nferr=0
-    if sigV>0.0:
+    if sigV>0.0 and dataV>0.0:
         nf=(dataV-bkgV)/sigV
         nferr = nf*math.sqrt((dataV+bkgE)/(dataV**2)+sigE/(sigV**2))
     if NFOnly:
@@ -149,14 +150,14 @@ class texTable(object):
                        'WCRlnu':'W$\\rightarrow\\ell\\nu$ CR',
                        'ZCRll':'Z$\\rightarrow\\ell\\ell$ CR',
                        }
-        NameDict ={'ttbar':'Top$+$VV/VVV',
-                   'Z_EWK':'EWK Z',
-                   'W_EWK':'EWK W',
-                   'Z_strong':'QCD Z',
-                   'W_strong':'QCD W',
-                   'signal':'Higgs',
-                   'data':'Data',                   
-                   'bkgs':'Total Bkg',                   
+        NameDict ={'ttbar':'Top$+$#it{VV}/#it{VVV}',
+                   'Z_EWK':'#it{Z} EWK',
+                   'W_EWK':'#it{W} EWK',
+                   'Z_strong':'#it{Z} strong',
+                   'W_strong':'#it{W} strong',
+                   'signal':'#it{H}(B_{inv}=0.13)',
+                   'data':'Data',
+                   'bkgs':'Total Bkg',
                    'eleFakes':'e-fakes',
                    'multijet':'Multijet',
                    }
@@ -308,6 +309,12 @@ class HistClass(object):
             self.hist=HistClass.Irfile.Get(hname)
         else:
             self.hist=HistClass.Irfile.Get(self.hname)
+        if self.hist and var:
+            maxNbin=self.hist.GetNbinsX()
+            self.hist.SetBinContent(maxNbin,self.hist.GetBinContent(maxNbin)+self.hist.GetBinContent(maxNbin+1))
+            self.hist.SetBinError(maxNbin,math.sqrt((self.hist.GetBinError(maxNbin))**2+(self.hist.GetBinContent(maxNbin+1))**2))
+            self.hist.SetBinContent(1,self.hist.GetBinContent(0)+self.hist.GetBinContent(1))
+            self.hist.SetBinError(1,math.sqrt((self.hist.GetBinError(0))**2+(self.hist.GetBinContent(1))**2))
         if self.hist is None:
             print "Could not retrieve histogram!", self.hname, HistClass.Irfile
         #else:
@@ -498,23 +505,23 @@ def make_legend(can,poskeys=[0.0,0.1,0.2,0.5],ncolumns=1):
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
     leg.SetTextFont(42)
-    leg.SetNColumns(ncolumns)    
-    leg.SetTextSize(0.04)
+    leg.SetNColumns(ncolumns)
+    leg.SetTextSize(0.05)
     #leg.SetNColumns  (2)
-    NameDict ={'ttbar':'Top+VV/VVV',
-                   'Z_EWK':'EWK Z',
-                   'EWK W':'EWK W',
-                   'W_EWK':'EWK W',
-                   'Z_strong':'QCD Z',
-                   'W_strong':'QCD W',
-                   'signal':'Higgs',
+    NameDict ={'ttbar':'Top+#it{VV}/#it{VVV}',
+                   'Z_EWK':'#it{Z} EWK',
+                   'EWK W':'#it{W} EWK',
+                   'W_EWK':'#it{W} EWK',
+                   'Z_strong':'#it{Z} strong',
+                   'W_strong':'#it{W} strong',
+                   'signal':'#it{H}(B_{inv}=0.13)',
                    'data':'Data',
                    'bkgs':'Unc',
                    'eleFakes':'e-fakes',
                    'multijet':'Multijet',
                    }
     if not options.scaleSig:
-        NameDict['signal']='0.13#timesHiggs'
+        NameDict['signal']='#it{H}(B_{inv}=0.13)'
     listInputs=[]
     for i in leg.GetListOfPrimitives():
         if i.GetLabel().strip() in NameDict and  NameDict[i.GetLabel().strip()] in listInputs:
@@ -529,6 +536,7 @@ def make_legend(can,poskeys=[0.0,0.1,0.2,0.5],ncolumns=1):
             i.SetLabel(NameDict[i.GetLabel()])
     removeLabel(leg, 'dummy')
     removeLabel(leg, 'Others')
+    removeLabel(leg, 'multijet')
     removeLabel(leg, 'W_EWK')    
     nEntries=len(leg.GetListOfPrimitives())
     #leg.SetY1(0.9-nEntries*0.04)
@@ -549,6 +557,9 @@ def get_THStack_sum(hstack):
 def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makePDF=False):
 
     DataMC2=histDict["data"].Clone()
+    if options.postFitPickleDir!=None:
+        for i in range(1,DataMC2.GetNbinsX()+1):
+            DataMC2.SetBinError(i,0.0)
     DataMC2.Divide(histDict["bkgs"])
 
     DataMC=OrderedDict()
@@ -687,7 +698,6 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
         except:
             print "aW{mr}, aZ{mr} not defined. B_WCR, B_ZCR".format(mr=(i+5)),tmpB_WCR,tmpB_ZCR,tmpNF_WCR
 
-
 def getNumberOfBins(rfileInput):
     tmpIrfile=ROOT.TFile(rfileInput)
     nbins=0
@@ -705,8 +715,6 @@ def getNumberOfBins(rfileInput):
                     nbins=int(l.replace("Nom",""))
     print "getNumberOfBins() detected {} bins".format(nbins)
     return nbins
-
-
 
 def main(options):
     if options.quite:
@@ -745,6 +753,8 @@ def main(options):
     hDictSig=OrderedDict()
     histNames=[]
     histNamesSig=[]
+    totbkg=ROOT.TH1F("totbkg","",byNum*nbins,0,byNum*nbins)
+    totbkg.SetStats(0)
     if options.stack_signal:
        histNames=["signal"]
     else:
@@ -754,12 +764,14 @@ def main(options):
     regDict=OrderedDict()
     for n in range(1,nbins+1):
         if options.combinePlusMinus:
+            #if not options.cronly:
             regDict["SR{}".format(n)]=nbins*4+n
             regDict["oneMuCR{}".format(n)]=nbins*2+n
             regDict["oneEleCR{}".format(n)]=nbins+n
             regDict["twoLepCR{}".format(n)]=nbins*3+n
             regDict["oneEleLowSigCR{}".format(n)]=n
-        else:        
+        else:
+            #if not options.cronly:
             regDict["SR{}".format(n)]=nbins*8+n
             regDict["oneMuNegCR{}".format(n)]=nbins*4+n
             regDict["oneMuPosCR{}".format(n)]=nbins*5+n
@@ -828,17 +840,25 @@ def main(options):
     #Styles
     Style.setStyles(data,[1,0,2,0,0,1,20,1.2])
     if options.stack_signal:
-        Style.setStyles(hDict["signal"],[ROOT.kOrange,2,3,0,0,0,0,0])
+        Style.setStyles(hDict["signal"],[2,2,3,0,0,0,0,0])
     else:
-        Style.setStyles(hDictSig["signal"],[ROOT.kOrange,2,3,0,0,0,0,0])
+        Style.setStyles(hDictSig["signal"],[2,2,3,0,0,0,0,0])
 
-    Style.setStyles(hDict["Z_strong"],[1,1,1,46,1001,0,0,0])
-    Style.setStyles(hDict["Z_EWK"],[1,1,1,8,1001,0,0,0])
-    Style.setStyles(hDict["W_strong"],[1,1,1,9,1001,0,0,0])
-    Style.setStyles(hDict["W_EWK"],[1,1,1,5,1001,0,0,0])
-    Style.setStyles(hDict["ttbar"],[1,1,1,0,1001,0,0,0])
-    Style.setStyles(hDict["eleFakes"],[1,1,1,11,1001,0,0,0])
-    Style.setStyles(hDict["multijet"],[1,1,1,12,1001,0,0,0])
+    #Style.setStyles(hDict["Z_strong"],[1,1,1,46,1001,0,0,0])
+    #Style.setStyles(hDict["Z_EWK"],[1,1,1,8,1001,0,0,0])
+    #Style.setStyles(hDict["W_strong"],[1,1,1,9,1001,0,0,0])
+    #Style.setStyles(hDict["W_EWK"],[1,1,1,5,1001,0,0,0])
+    #Style.setStyles(hDict["ttbar"],[1,1,1,0,1001,0,0,0])
+    #Style.setStyles(hDict["eleFakes"],[1,1,1,11,1001,0,0,0])
+    #Style.setStyles(hDict["multijet"],[1,1,1,12,1001,0,0,0])
+
+    Style.setStyles(hDict["Z_strong"],Style.styleDict["Z_strong"])
+    Style.setStyles(hDict["Z_EWK"],Style.styleDict["Z_EWK"])
+    Style.setStyles(hDict["W_strong"],Style.styleDict["W_strong"])
+    Style.setStyles(hDict["W_EWK"],Style.styleDict["W_EWK"])
+    Style.setStyles(hDict["ttbar"],Style.styleDict["ttbar"])
+    Style.setStyles(hDict["eleFakes"],Style.styleDict["eleFakes"])
+    Style.setStyles(hDict["multijet"],Style.styleDict["multijet"])
     if "Others" in hDict:
         Style.setStyles(hDict["Others"],[1,1,1,2,1001,0,0,0])
 
@@ -862,7 +882,9 @@ def main(options):
         if not checkRegion:
             continue
         histObj=HistClass(key)
+        
         if not histObj.hist: continue
+
         if histObj.isSignal():
             if options.stack_signal:
                 addContent(hDict["signal"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
@@ -886,8 +908,22 @@ def main(options):
         postFitPickles = LoadPickleFiles(options.postFitPickleDir)
         for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
             pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
-            #print 'pickle_region_names:',pickle_region_names
+            print 'pickle_region_names:',pickle_region_names
+            print 'pickle_region_names:',pickle_region_names,fpickle['TOTAL_FITTED_bkg_events']
             print 'pickle_region_names:',pickle_region_names,' %0.0f $\\pm$ %0.0f' %(fpickle['TOTAL_FITTED_bkg_events'][0],fpickle['TOTAL_FITTED_bkg_events_err'][0] )#
+            # set the total bkg to its fitted values
+            ireg=0
+            pickle_region_namestmp=copy.deepcopy(pickle_region_names)
+            if options.cronly and options.combinePlusMinus:
+                pickle_region_namestmp=pickle_region_namestmp[1:]
+            for iname in pickle_region_namestmp:
+                if iname.rstrip('_cuts') in regDict and  'TOTAL_FITTED_bkg_events' in fpickle and ireg<len(fpickle['TOTAL_FITTED_bkg_events']):
+                    totbkg.SetBinContent(regDict[iname.rstrip('_cuts')],fpickle['TOTAL_FITTED_bkg_events'][ireg])
+                    totbkg.SetBinError  (regDict[iname.rstrip('_cuts')],fpickle['TOTAL_FITTED_bkg_events_err'][ireg])
+                else:
+                    print 'ERROR missing region: ',iname
+                ireg+=1
+            # set the signal and bkg individually
             for pickle_key in fpickle.keys():
                 print pickle_key,fpickle[pickle_key][0]#['TOTAL_FITTED_bkg_events'],'+/-',fpickle[pickle_key]['TOTAL_FITTED_bkg_events_err']
                 isError=False
@@ -900,6 +936,17 @@ def main(options):
                     continue
                 #if ('Fitted_events_VBFH' in pickle_key): # skip signal
                 #    continue
+                if ('Fitted_err_' in pickle_key and 'H125' in pickle_key) and options.stack_signal: # skip signal
+                    if pickle_key_remFit[:pickle_key_remFit.find('_')] in ['VBFH125','VH125','ggFH125']:
+                         if 'signal' in hDict:
+                            ireg=0
+                            for iname in pickle_region_names:
+                                if isError:
+                                    print 'SIGGE',ireg,pickle_key,pickle_key_remFit[:pickle_key_remFit.find('_')],fpickle[pickle_key][ireg]                                    
+                                    e1=hDict['signal'].GetBinError(regDict[iname.rstrip('_cuts')])
+                                    if not options.show_mc_stat_err:
+                                        hDict['signal'].SetBinError(regDict[iname.rstrip('_cuts')],math.sqrt((fpickle[pickle_key][ireg])**2+e1**2))
+                                ireg+=1
                 if pickle_key_remFit.find('_')>0 and options.scaleSig:
                     if pickle_key_remFit[:pickle_key_remFit.find('_')] in ['VBFH125','VH125','ggFH125']:
                         if 'signal' in hDictSig:
@@ -963,7 +1010,11 @@ def main(options):
     dummyHist.SetMaximum(hStack.GetMaximum()*3.4)
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
-    hDictSig["signal"].Scale(0.13)
+    if options.stack_signal:
+        for ib in range(1,hDict["signal"].GetNbinsX()+1):
+            hDict["signal"].SetBinContent(ib,0.13*hDict["signal"].GetBinContent(ib))
+    else:
+        hDictSig["signal"].Scale(0.13)
     print 'scaling signal to 0.13'        
     if not options.stack_signal:
         hDictSig["signal"].Draw('HISTsame')
@@ -1007,7 +1058,18 @@ def main(options):
         statFil.close()
 
     systHist=hDict["bkgs"]
+    systHist.SetName('bkgsCopy')
     systHistAsym = ROOT.TGraphAsymmErrors(systHist)
+    if postFitPickles!=None:
+        systHistAsym = ROOT.TGraphAsymmErrors(totbkg)
+        systHistAsym.SetName('bkgs')
+        totbkg.SetName('bkgs')
+        totbkg.SetTitle('bkgs')
+        for i in range(1,55):
+            print totbkg.GetBinContent(i),totbkg.GetBinError(i)
+        hDict["bkgs"]=totbkg.Clone()
+        hDict["bkgsStat"]=totbkg.Clone()
+        bkgs=totbkg.Clone()
     hDict["bkgsAsymErr"] = systHistAsym
 
     # collect the one-sided systematics
@@ -1056,7 +1118,7 @@ def main(options):
                 elif 'oneMuPosCR' in k:
                     continue                
                 elif 'twoMuCR' in k:
-                    continue                
+                    continue
                 elif 'twoEleCR' in k:
                     continue   
             if "theoFactors" in k or "NONEBlind" in k: continue
@@ -1131,33 +1193,33 @@ def main(options):
         systHist.SetTitle("MC stat")
 
     # adding the post fit errors. these should include the mc stat uncertainties
-    if postFitPickles!=None:
-        for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
-            pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
-            for pickle_key in fpickle.keys():
-                if not ('Fitted_err_' in pickle_key): # only process the fitted events here
-                    continue
-                pickle_key_remFit = pickle_key[len('Fitted_err_'):]
-                m=0
-                for i in hist_array_keys:
-                    if i in pickle_key_remFit:
-                        break
-                    m+=1
-                if m>=len(hists):
-                    print 'Post fit syst band - could not find (fine if signal): ',pickle_key
-                    continue
-                histToSet = hists[m]
-                ireg=0
-                #print fpickle[pickle_key]
-                for iname in pickle_region_names:
-                    ey_low=systHistAsym.GetErrorYlow(regDict[iname.rstrip('_cuts')]-1)
-                    ey_new = fpickle[pickle_key][ireg]
-                    e_new = math.sqrt(ey_low*ey_low+ey_new*ey_new)
-                    #print 'e_new:',e_new
-                    if not options.show_mc_stat_err:
-                        systHistAsym.SetPointEYlow(regDict[iname.rstrip('_cuts')]-1,e_new)
-                        systHistAsym.SetPointEYhigh(regDict[iname.rstrip('_cuts')]-1,e_new)
-                    ireg+=1
+    #if postFitPickles!=None:
+    #    for fpickle in postFitPickles: # example Fitted_events_VH125_VBFjetSel_2
+    #        pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
+    #        for pickle_key in fpickle.keys():
+    #            if not ('Fitted_err_' in pickle_key): # only process the fitted events here
+    #                continue
+    #            pickle_key_remFit = pickle_key[len('Fitted_err_'):]
+    #            m=0
+    #            for i in hist_array_keys:
+    #                if i in pickle_key_remFit:
+    #                    break
+    #                m+=1
+    #            if m>=len(hists):
+    #                print 'Post fit syst band - could not find (fine if signal): ',pickle_key
+    #                continue
+    #            histToSet = hists[m]
+    #            ireg=0
+    #            #print fpickle[pickle_key]
+    #            for iname in pickle_region_names:
+    #                ey_low=systHistAsym.GetErrorYlow(regDict[iname.rstrip('_cuts')]-1)
+    #                ey_new = fpickle[pickle_key][ireg]
+    #                e_new = math.sqrt(ey_low*ey_low+ey_new*ey_new)
+    #                #print 'e_new:',e_new
+    #                if not options.show_mc_stat_err:
+    #                    systHistAsym.SetPointEYlow(regDict[iname.rstrip('_cuts')]-1,e_new)
+    #                    systHistAsym.SetPointEYhigh(regDict[iname.rstrip('_cuts')]-1,e_new)
+    #                ireg+=1
         
     ROOT.gStyle.SetErrorX(0.5)
     fillStyle = 3004 # was 3018
@@ -1184,7 +1246,7 @@ def main(options):
         can.cd(2)
         rHist=data.Clone("ratioHist")
         rbkgs = hDict["bkgsStat"].Clone()
-        if not options.show_mc_stat_err and options.postFitPickleDir!=None: # removing mc stat unc.
+        if (not options.show_mc_stat_err and options.postFitPickleDir!=None): # removing mc stat unc.
             for i in range(0,rbkgs.GetNbinsX()+1):
                 rbkgs.SetBinError(i,0.0)
         
@@ -1205,18 +1267,16 @@ def main(options):
         rHist.GetXaxis().SetLabelSize(0.1)
         rHist.GetYaxis().SetLabelSize(0.1)
 	
-	
-
         line1=data.Clone("line1")
         for i in range(1,line1.GetNbinsX()+1):
             line1.SetBinContent(i,1)
-        Style.setLineAttr(line1,2,2,3)
-
+        Style.setLineAttr(line1,1,2,1)
 
         if options.cronly:
             rHist.GetXaxis().SetRangeUser(0,44)
         rHist.Draw()
         line1.Draw("histsame")
+        val=0
         if options.show_mc_stat_err or options.syst!="" or options.postFitPickleDir!=None:
             if options.show_mc_stat_err and options.postFitPickleDir==None: # the post fit already has the MC stat uncertainties included
                 bkgs = hDict["bkgsStat"].Clone() # this only holds the MC stat uncertainty
@@ -1236,9 +1296,9 @@ def main(options):
                 systHistAsymRatio.GetPoint(j-1,x1,y1)
                 systHistAsymRatio.SetPoint(j-1,x1,1.0)
                 val=bkgs.GetBinContent(j)
-		if val==0:#AMANDA - hack for bkgonly fits, final bin (99) is empty
-		    print "bin ",i," has no content"
-		    val=0.00001
+                if val==0:#AMANDA - hack for bkgonly fits, final bin (99) is empty
+                    print "bin ",i," has no content"
+                    val=0.00001
                 eyu=systHistAsym.GetErrorYhigh   (j-1)/val
                 eyd=systHistAsym.GetErrorYlow    (j-1)/val
                 systHistAsymRatio.SetPointEYhigh(j-1,eyu)
@@ -1246,9 +1306,10 @@ def main(options):
 
             #rbkgs.Draw('same e2') # divides (up-down)/2 for symmetric unc.
             systHistAsymRatio.Draw('same e2')
-            rHist.Draw('same')
             line1.Draw("histsame")
-        
+            rHist.Draw('same')
+            
+            
         can.GetPad(2).RedrawAxis()
         can.GetPad(2).Modified()
         can.GetPad(2).Update()
@@ -1524,6 +1585,8 @@ def compareMain(options):
             #    entry_name=NameDict[entry_name]
             if entry_name=='bkgs':
                 entry_name='Unc'
+            if entry_name=='bkgs' and options.postFitPickleDir!=None:
+                entry_name='Fit Unc'
             leg.AddEntry(histDict[k][p],entry_name,"l")
             histDict[k][p].Draw("Ehistsame")
         texts = ATLAS.getATLASLabels(c1, 0.54, 0.78, options.lumi, selkey="")
@@ -1538,6 +1601,19 @@ def compareMain(options):
         if options.saveAs:
             c1.SaveAs(("preFitCompare{}".format(p)+"."+options.saveAs).replace("/","_"))
 
+
+def setBinWidth(var, histList):
+
+    for h in histList: 
+        if var=="jj_mass":
+            for ib in range(2,h.GetNbinsX()+1):
+                wid=h.GetXaxis().GetBinWidth(ib)
+                #print 'wid',wid
+                if wid<500.0 and wid>100.0:
+                    expV=h.GetBinContent(ib)
+                    expE=h.GetBinError(ib)
+                    h.SetBinContent(ib,expV*500.0/wid)
+                    h.SetBinError(ib,expE*500.0/wid)
 
 def plotVar(options):
     if options.quite:
@@ -1570,6 +1646,7 @@ def plotVar(options):
     postFitPickles=None
     fittedSRVals={}
     fittedSRErrs={}
+    fittedSRTotErrs={}
     fittedMCVals={}
     fittedMCErrs={}
     if options.postFitPickleDir!=None:
@@ -1578,6 +1655,8 @@ def plotVar(options):
             #['SR7', 'oneElePosCR7', 'oneEleNegCR7', 'oneElePosLowSigCR7', 'oneEleNegLowSigCR7', 'oneMuPosCR7', 'oneMuNegCR7', 'twoEleCR7', 'twoMuCR7']
             pickle_region_names = fpickle['names'] # these are the CR and SR names as entered. just a description of the entries
             #print pickle_region_names #['SR8', 'oneEleCR8', 'oneEleLowSigCR8', 'oneMuCR8', 'twoLepCR8']
+            if 'TOTAL_FITTED_bkg_events_err' in fpickle:
+                fittedSRTotErrs[pickle_region_names[0][2:]]=fpickle['TOTAL_FITTED_bkg_events_err'][plotIndex]
             for pickle_key in fpickle.keys():
                 print pickle_key
                 if not options.scaleSig:
@@ -1632,15 +1711,21 @@ def plotVar(options):
         if h.count('Z_strongPTVExt'):
             continue
         hObj=HistClass(h, var)
+        # check the bin width
+        if not postFitPickles:
+            setBinWidth(var,[hObj.hist])
+        
         systHistAsym=hObj.hist.Clone()
         if hObj.isBkg() and (hObj.mr in mjjBins):
             bkgPreFitDict[hObj.proc]=hObj.hist.Clone()
             if bkgPreFit==None:
                 #print 'prefit: ',h
                 bkgPreFit=hObj.hist.Clone()
+                setBinWidth(var,[bkgPreFit])
             else:
-                #print 'prefit: ',h                
-                bkgPreFit.Add(hObj.hist)
+                #print 'prefit: ',h
+                setBinWidth(var,[bkgPreFitDict[hObj.proc]])
+                bkgPreFit.Add(bkgPreFitDict[hObj.proc])
         #print h
         #if systHistAsym==None:
             #systHistAsym=ROOT.TGraphAsymmErrors(hObj.hist.Clone())
@@ -1651,7 +1736,7 @@ def plotVar(options):
         if postFitPickles:
             #print h[1:h.find('Nom')] #hZ_EWK_VBFjetSel_1Nom_SR1_obs_jj_mass need to map to VBFH125_VBFjetSel_8
             key_name=h[1:h.find('Nom')]
-            #print 'key_name:',key_name,hObj.hist.Integral()
+            print 'key_name:',key_name,hObj.hist.Integral()
             if key_name in fittedSRVals:
                 #hObj.hist.SetBinContent(int(hObj.mr)+1,float(fittedSRVals[key_name]))
                 total_err = ROOT.double(0.0)
@@ -1660,14 +1745,19 @@ def plotVar(options):
                     hObj.hist.Scale(float(fittedSRVals[key_name])/totalInt)
                 else:
                     hObj.hist.Scale(0.0)
+                setBinWidth(var,[hObj.hist])
                 if totalInt>0.0:
                     error_fraction = fittedSRErrs[key_name]/totalInt
                     for ib in range(1,hObj.hist.GetNbinsX()+1):
-                        mc_stat_err = hObj.hist.GetBinError(ib)
+                        mc_stat_err=0.0
+                        if options.show_mc_stat_err:
+                            mc_stat_err = hObj.hist.GetBinError(ib)
                         hObj.hist.SetBinError(ib,math.sqrt(mc_stat_err**2+(error_fraction*hObj.hist.GetBinContent(ib))**2))
                         # need to spread these out bin by bin
                         systHistAsym.SetBinContent(ib,hObj.hist.GetBinContent(ib))
                         systHistAsym.SetBinError(ib,math.sqrt(mc_stat_err**2+(error_fraction*hObj.hist.GetBinContent(ib))**2))
+            else:
+                setBinWidth(var,[hObj.hist])
             if not (hObj.mr in mjjBins):
                 print 'skipping: ',hObj.mr,h
                 continue
@@ -1695,6 +1785,7 @@ def plotVar(options):
                 sigDict[key].SetTitle(key)
                 Style.setStyles(sigDict[key], Style.styleDict[key])
         signalS=ROOT.THStack()
+        #setBinWidth(var,sigDict.values())
         for h in sorted(sigDict.values()): #TODO this sorting does not work. implement lambda
             signalS.Add(h)
 
@@ -1715,11 +1806,23 @@ def plotVar(options):
                 Style.setStyles(bkgDict[key], Style.styleDict[key])
                 
         bkg=ROOT.THStack()
+        #setBinWidth(var,bkgDict.values())        
+        if 'multijet' in bkgDict:
+            bkg.Add(bkgDict['multijet'])
+        if 'ttbar' in bkgDict:
+            bkg.Add(bkgDict['ttbar'])
         for h in sorted(bkgDict.values()): #TODO this sorting does not work. implement lambda
+            if 'multijet' in bkgDict:
+                if h==bkgDict['multijet']:
+                    continue
+            if 'ttbar' in bkgDict:
+                if h==bkgDict['ttbar']:
+                    continue
             bkg.Add(h)
 
         if hObj.isData():
             key=hObj.proc
+            #setBinWidth(var,[hObj.hist])
             try:
                 dataH.Add(hObj.hist)
             except:
@@ -1740,27 +1843,33 @@ def plotVar(options):
             signal.SetTitle('signal')
         else:
             signal.Add(h)
-        
+    if var=='jj_mass':
+        signal.SetBinContent(2,signal.GetBinContent(3))
     can=ROOT.TCanvas("c1","c1",1600,1000)
     if options.ratio:
         can.Divide(1,2)
         can.cd(1)
         ROOT.gPad.SetBottomMargin(0)
         ROOT.gPad.SetRightMargin(0.1)
-        ROOT.gPad.SetPad(0,0.3,1,1)
+        ROOT.gPad.SetPad(0,0.4,1,1)
         can.cd(2)
         ROOT.gPad.SetTopMargin(0)
         ROOT.gPad.SetBottomMargin(0.35)
         ROOT.gPad.SetRightMargin(0.1)
-        ROOT.gPad.SetPad(0,0,1,0.3)
+        ROOT.gPad.SetPad(0,0,1,0.4)
         can.cd(1)
 
     bkgH=get_THStack_sum(bkg)
     bkgH.GetXaxis().SetTitle(var)
     bkgH.GetYaxis().SetTitle("Entries")
-    bkgH.GetYaxis().SetTitleOffset(0.85)
-    bkgH.GetYaxis().SetTitleSize(1.25*bkgH.GetYaxis().GetTitleSize())
+    bkgH.GetYaxis().SetTitleOffset(0.55)
+    
+    bkgH.GetYaxis().SetTitleSize(1.8*bkgH.GetYaxis().GetTitleSize())
     if var=='jj_mass':
+        ROOT.gPad.SetLogy(1)
+        bkgH.GetYaxis().SetLabelSize(1.5*bkgH.GetYaxis().GetLabelSize())
+        bkgH.GetXaxis().SetRangeUser(800,5000.0)
+        bkgH.GetYaxis().SetRangeUser(10,40000.0)
         bkgH.GetYaxis().SetTitle("Events / 500 [GeV]")
     if var=='jj_dphi':
         bkgH.GetYaxis().SetTitle("Events")
@@ -1769,8 +1878,9 @@ def plotVar(options):
     if var=='jj_deta':
         bkgH.GetYaxis().SetTitle("Events")
     bkg.Draw("hist ")
-    upperV=bkg.GetHistogram().GetMaximum()
-    bkgH.GetYaxis().SetRangeUser(0.1, 1.25*upperV)
+    if var!='jj_mass':
+        upperV=bkg.GetHistogram().GetMaximum()
+        bkgH.GetYaxis().SetRangeUser(0.1, 1.25*upperV)
     bkgH.Draw('AXIS')
     bkg.Draw("HIST same")
     signal.Draw("HIST same")
@@ -1787,8 +1897,8 @@ def plotVar(options):
         systHistAsymTotA.SetPointEXlow(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
     Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTotA.Draw("SAME E2")
-    systHistAsymTotA.SetName('Fit Syst')
-    systHistAsymTotA.SetTitle('Fit Syst')
+    systHistAsymTotA.SetName('Post-Fit Syst')
+    systHistAsymTotA.SetTitle('Post-Fit Syst')
 
     bkg.SetTitle(reg+" "+",".join(mjjBins))
 
@@ -1807,7 +1917,7 @@ def plotVar(options):
     #        leg.AddEntry(ik.GetObject(),ik.GetLabel())
     #    else:
     #        ik.Delete()
-    poskeys=[0.67,0.58,0.87,0.93]
+    poskeys=[0.6,0.58,0.87,0.93]
     ncolumns=2
     if var=='jj_dphi':
         poskeys=[0.7,0.53,0.9,0.93]
@@ -1822,10 +1932,10 @@ def plotVar(options):
         blindStr=", SR blinded"
     preFitLabel=ROOT.TLatex(.45,.88,"Pre-Fit"+blindStr)
     if options.postFitPickleDir!=None:
-        preFitLabel=ROOT.TLatex(.45,.88,"Post-Fit"+blindStr)        
+        preFitLabel=ROOT.TLatex(.45,.85,"Post-Fit"+blindStr)        
     preFitLabel.SetNDC()
     preFitLabel.SetTextFont(72)
-    preFitLabel.SetTextSize(0.055)
+    preFitLabel.SetTextSize(0.075)
     preFitLabel.SetTextAlign(11)    
     preFitLabel.SetTextColor(ROOT.kBlack)
     preFitLabel.Draw()
@@ -1835,7 +1945,8 @@ def plotVar(options):
         rHist=dataH.Clone("ratioHist")
         #sum_bkg=get_THStack_sum(bkg)
         rHist.GetYaxis().SetRangeUser(0.601,1.399)
-        rHist.GetYaxis().SetRangeUser(0.701,1.299)
+        rHist.GetYaxis().SetRangeUser(0.7501,1.2499)
+        rHist.GetYaxis().SetNdivisions(505)
         rHist.Divide(get_THStack_sum(bkg))
         rHist.GetYaxis().SetTitle("Data/MC")
         rHist.GetXaxis().SetTitle(var)
@@ -1846,11 +1957,14 @@ def plotVar(options):
         rHist.GetYaxis().CenterTitle()
         rHist.GetXaxis().SetLabelSize(0.12)
         rHist.GetYaxis().SetLabelSize(0.1)
-        rHist.GetXaxis().SetTitle('Dijet Invariant Mass m_{jj} [GeV]')
+        #rHist.GetXaxis().SetTitle('Dijet Invariant Mass m_{jj} [GeV]')
+        rHist.GetXaxis().SetTitle('#it{m}_{jj} [GeV]')
+        if var=='jj_mass':
+            rHist.GetXaxis().SetRangeUser(800,5000.0)
         if var=='jj_dphi':
             rHist.GetXaxis().SetTitle("#Delta#phi_{jj}")
         if var=='met_tst_et':
-            rHist.GetXaxis().SetTitle("Missing Transverse Momentum E_{T}^{miss} [GeV]")
+            rHist.GetXaxis().SetTitle("Missing Transverse Momentum #it{E}_{T}^{miss} [GeV]")
         if var=='jj_deta':
             rHist.GetXaxis().SetTitle("#Delta#eta_{jj}")        
         systHistAsymTotRatio=systHistAsymTot.Clone()
@@ -1874,9 +1988,10 @@ def plotVar(options):
         rmultijet.Add(bkgR)
         rmultijet.Divide(bkgR)
         rmultijet.SetLineWidth(2)
+        rmultijet.SetLineStyle(7)
         rmultijet.SetFillColor(0)
         rmultijet.SetFillStyle(0)
-        rsignal.SetLineStyle(7)        
+        rsignal.SetLineStyle(1)        
         rsignal.SetLineWidth(2)        
         
         rbkgPreFit.SetLineColor(ROOT.kBlue)
@@ -1914,14 +2029,17 @@ def plotVar(options):
         rHist.Draw('same')
 
         # legend
-        legR=ROOT.TLegend(0.2,0.8,0.4,1.0)
+        legR=ROOT.TLegend(0.18,0.78,0.45,1.0)
+        legR.SetTextFont(42)
+        #legR.SetNColumns(ncolumns)
+        legR.SetTextSize(0.07)
         legR.SetFillColor(0)
         legR.SetBorderSize(0)
         if reg=='SR':
-            legR.AddEntry(rsignal,'signal/Bkg')
-            legR.AddEntry(rmultijet,'multijet/Bkg')
-        legR.AddEntry(rbkgPreFit,'pre-fit/post-fit')
-        legR.AddEntry(systHistAsymTotRatioA,'Post fit syst')
+            legR.AddEntry(rsignal,'Signal/Bkg')
+            legR.AddEntry(rmultijet,'Multijet/Bkg')
+        legR.AddEntry(rbkgPreFit,'Pre-Fit/Post-Fit')
+        legR.AddEntry(systHistAsymTotRatioA,'Post-Fit syst')
         legR.SetNColumns(2)
         #if reg=='SR':
         legR.Draw()
