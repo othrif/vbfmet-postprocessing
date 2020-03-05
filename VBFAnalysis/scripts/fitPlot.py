@@ -524,6 +524,9 @@ def make_legend(can,poskeys=[0.0,0.1,0.2,0.5],ncolumns=1):
         NameDict['signal']='#it{H}(B_{inv}=0.13)'
     listInputs=[]
     for i in leg.GetListOfPrimitives():
+        if 'Post-Fit' in i.GetLabel().strip():
+            i.GetObject().SetMarkerSize(0)
+            i.GetObject().SetLineWidth(0)
         if i.GetLabel().strip() in NameDict and  NameDict[i.GetLabel().strip()] in listInputs:
             continue
         else:
@@ -1896,6 +1899,7 @@ def plotVar(options):
         systHistAsymTotA.SetPointEXhigh(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
         systHistAsymTotA.SetPointEXlow(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
     Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])
+    systHistAsymTotA.SetMarkerSize(0)
     systHistAsymTotA.Draw("SAME E2")
     systHistAsymTotA.SetName('Post-Fit Syst')
     systHistAsymTotA.SetTitle('Post-Fit Syst')

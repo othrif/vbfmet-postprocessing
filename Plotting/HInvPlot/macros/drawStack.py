@@ -120,22 +120,22 @@ def getSelKeyLabel(selkey):
     decay = 'Invis'
     if selkey != None: # and selkey.count('hww') or selkey.count('lowmet'):
         if True:
-            if selkey.count('_nn'): proc = 'VBF H#rightarrow%s' %decay
-            elif selkey.count('_ll'): proc = 'Z#rightarrow ll'
-            elif selkey.count('_ee'): proc = 'Z#rightarrow ee'
-            elif selkey.count('_eu'): proc = 'e#mu'
-            elif selkey.count('_em'): proc = 'W#rightarrow e^{-}#nu'
-            elif selkey.count('_ep'): proc = 'W#rightarrow e^{+}#nu'
+            if selkey.count('_nn'): proc = 'VBF #it{H}#rightarrow%s' %decay
+            elif selkey.count('_ll'): proc = '#it{Z}#rightarrow ll'
+            elif selkey.count('_ee'): proc = '#it{Z}#rightarrow ee'
+            elif selkey.count('_eu'): proc = '#it{e#mu}'
+            elif selkey.count('_em'): proc = '#it{W}_{#it{e^{+}#nu}}^{high}'#'W#rightarrow e^{-}#nu'
+            elif selkey.count('_ep'): proc = '#it{W}_{#it{e^{-}#nu}}^{high}'
             elif selkey.count('_uu'): proc = 'Z#rightarrow#mu#mu'
             elif selkey.count('_l'): proc = 'W#rightarrow l#nu'
-            elif selkey.count('_e'): proc = 'W#rightarrow e#nu'
-            elif selkey.count('_u'): proc = 'W#rightarrow#mu#nu'
+            elif selkey.count('_e'): proc = '#it{W}_{#it{#it{e#nu}}}^{high}'#'W#rightarrow e#nu'
+            elif selkey.count('_u'): proc = '#it{W}#rightarrow#it{#mu#nu}'
 
         if selkey.count('LowMETQCD_'):  proc += ', Low MET QCD'
         elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'
         elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'
         elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
-        elif selkey.count('mjjLow200_'):  proc += ', 0.2<M_{jj}<0.8TeV'
+        elif selkey.count('mjjLow200_'):  proc += ', 0.2<m_{jj}<0.8TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
         elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'
         elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'
@@ -175,7 +175,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(options.int_lumi/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{#it{s}}=13 TeV, %.0f fb^{-1}' %(options.int_lumi/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -209,13 +209,13 @@ def getHistPars(hist):
         #                         2 bin-by-bin significance
         #                         3 tried to combine bins to one value - use with care especially with many bins
         #                         4 adds every two bins together
-        'jetEta0': {'xtitle':'Leading jet #eta'  ,           'ytitle':'Events', 'rebin':5}, #5
-        'jet0Phi': {'xtitle':'Leading jet #phi'  ,           'ytitle':'Events', 'rebin':2},
-        'jetPt0' : {'xtitle':'p_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
+        'jetEta0': {'xtitle':'Leading jet #it{#eta}'  ,           'ytitle':'Events', 'rebin':5}, #5
+        'jet0Phi': {'xtitle':'Leading jet #it{#phi}'  ,           'ytitle':'Events', 'rebin':2},
+        'jetPt0' : {'xtitle':'#it{p}_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
         'jetHT' : {'xtitle':'H_{T} [GeV]',          'ytitle':'Events', 'rebin':2, 'logy':True, 'LtoRCut':0},
-        'jetEta1': {'xtitle':'Sub-Leading jet #eta'  ,       'ytitle':'Events', 'rebin':5},
-        'jet1Phi': {'xtitle':'Sub-Leading jet #phi'  ,       'ytitle':'Events', 'rebin':2},
-        'jetPt1' : {'xtitle':'p_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
+        'jetEta1': {'xtitle':'Sub-Leading jet #it{#eta}'  ,       'ytitle':'Events', 'rebin':5},
+        'jet1Phi': {'xtitle':'Sub-Leading jet #it{#phi}'  ,       'ytitle':'Events', 'rebin':2},
+        'jetPt1' : {'xtitle':'#it{p}_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
         'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
@@ -243,92 +243,92 @@ def getHistPars(hist):
         'averageIntPerXing'  : {'xtitle':'Average Interactions per Xing (#mu)',             'ytitle':'Events', 'rebin':4,'LtoRCut':1},
         'lb'  : {'xtitle':'Lumi block','ytitle':'Events', 'rebin':0,'LtoRCut':1}, 
         'n_vx'  : {'xtitle':'Recontructed Vertices (N_{PV})','ytitle':'Events', 'rebin':0,'LtoRCut':1},
-        'JetEtaPt25'  : {'xtitle':'Jet #eta wth 25<p_{T}<35 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},
-        'JetEtaPt35'  : {'xtitle':'Jet #eta wth 35<p_{T}<55 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},                 
-        'JetEtaPt55'  : {'xtitle':'Jet #eta wth 55<p_{T} GeV','ytitle':'Events', 'rebin':5,'LtoRCut':1},                 
-        'JetEMECvsBCIDPosPt25'  : {'xtitle':'Jet Number jets wth 25<p_{T}<35 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},
-        'JetEMECvsBCIDPosPt35'  : {'xtitle':'Jet #eta wth 35<p_{T}<55 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
-        'JetEMECvsBCIDPosPt55'  : {'xtitle':'Jet #eta wth 55<p_{T} GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
+        'JetEtaPt25'  : {'xtitle':'Jet #it{#eta} wth 25<#it{p}_{T}<35 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},
+        'JetEtaPt35'  : {'xtitle':'Jet #it{#eta} wth 35<#it{p}_{T}<55 GeV','ytitle':'Events', 'rebin':2,'LtoRCut':1},                 
+        'JetEtaPt55'  : {'xtitle':'Jet #it{#eta} wth 55<#it{p}_{T} GeV','ytitle':'Events', 'rebin':5,'LtoRCut':1},                 
+        'JetEMECvsBCIDPosPt25'  : {'xtitle':'Jet Number jets wth 25<#it{p}_{T}<35 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},
+        'JetEMECvsBCIDPosPt35'  : {'xtitle':'Jet #it{#eta} wth 35<#it{p}_{T}<55 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
+        'JetEMECvsBCIDPosPt55'  : {'xtitle':'Jet #it{#eta} wth 55<#it{p}_{T} GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
 
-        'lepPt0'   : {'xtitle':'Lepton p_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
-        'baseElPt'   : {'xtitle':'Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':4, 'xmax': 600, 'logy': True},
-        'elec_num_pt'   : {'xtitle':'Id Electron p_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
-        'muon_den_pt'   : {'xtitle':'Anti-Id Muon p_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
-        'lepEta' : {'xtitle':'Lepton #eta [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
-        'lepPhi' : {'xtitle':'Lepton #phi [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
-        'dphill' : {'xtitle':'#Delta #phi_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
-        'jj_dphi' : {'xtitle':'#Delta #phi_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
-        'met_soft_tst_et'    : {'xtitle':'E_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':0.1, 'logy':False, 'LtoRCut':1},
-        'met_tst_et'    : {'xtitle':'E_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':4,  'ymin':1.0, 'logy':True, 'LtoRCut':0},
-        'met_tst_phi'    : {'xtitle':'E_{T}^{miss} #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'E_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_phi'    : {'xtitle':'E_{T,miss} (remove leptons) #phi',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'mll'    : {'xtitle':'m_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
-        'jj_mass'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'m_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},
+        'lepPt0'   : {'xtitle':'Lepton #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
+        'baseElPt'   : {'xtitle':'Electron #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':4, 'xmax': 600, 'logy': True},
+        'elec_num_pt'   : {'xtitle':'Id Electron #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
+        'muon_den_pt'   : {'xtitle':'Anti-Id Muon #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
+        'lepEta' : {'xtitle':'Lepton #it{#eta} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
+        'lepPhi' : {'xtitle':'Lepton #it{#phi} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
+        'dphill' : {'xtitle':'#Delta #it{#phi}_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
+        'jj_dphi' : {'xtitle':'#Delta #it{#phi}_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
+        'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
+        'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':4,  'ymin':1.0, 'logy':True, 'LtoRCut':0},
+        'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
+        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':True},
+        'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
+        'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
+        'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'ymin':0.01,'logy':True, 'LtoRCut':2},
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
-        'jj_deta' : {'xtitle':'#Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
-        'jj_deta_signed' : {'xtitle':'Signed #Delta #eta_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
-        'jj_deta_diff' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
-        'jj_deta_abs' : {'xtitle':'|#eta_{j2}| - |#eta_{j1}|/#Delta#eta_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
-        'ptll'   : {'xtitle':'P_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
-        'mt'     : {'xtitle':'M_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
+        'jj_deta' : {'xtitle':'#Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
+        'jj_deta_signed' : {'xtitle':'Signed #Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
+        'jj_deta_diff' : {'xtitle':'|#it{#eta}_{j2}| - |#it{#eta}_{j1}|'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
+        'jj_deta_abs' : {'xtitle':'|#it{#eta}_{j2}| - |#it{#eta}_{j1}|/#Delta#it{#eta}_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
+        'ptll'   : {'xtitle':'#it{p}_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
+        'mt'     : {'xtitle':'#it{m}_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.1,'logy':True},
         'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
         'alljet_metsig'     : {'xtitle':'MET Significance (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
-    'met_cst_jet'     : {'xtitle':'E_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
+    'met_cst_jet'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
     'met_tenacious_tst_nolep_et'     : {'xtitle':'Tenacious MET (lepton removed) [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},    
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'truth_jj_mass'     : {'xtitle':'Truth m_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'truth_jj_deta'     : {'xtitle':'Truth #Delta#eta_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
-    'truth_jj_dphi'     : {'xtitle':'Truth #Delta#phi_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
-    'truth_j1_pt'     : {'xtitle':'Truth lead Jet p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'truth_j2_pt'     : {'xtitle':'Truth lead Jet p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'SherpaVTruthPt'     : {'xtitle':'Sherpa p_{T} V [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},                
-    'truthJet1Pt'     : {'xtitle':'Truth sub-lead Jet p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_jj_mass'     : {'xtitle':'Truth #it{m}_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_jj_deta'     : {'xtitle':'Truth #Delta#it{#eta}_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_jj_dphi'     : {'xtitle':'Truth #Delta#it{#phi}_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_j1_pt'     : {'xtitle':'Truth lead Jet #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_j2_pt'     : {'xtitle':'Truth lead Jet #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'SherpaVTruthPt'     : {'xtitle':'Sherpa #it{p}_{T} V [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},                
+    'truthJet1Pt'     : {'xtitle':'Truth sub-lead Jet #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'nTruthJetMatch'     : {'xtitle':'Number of Truth Matched Jets'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_baseel'     : {'xtitle':'Number of Base Electrons'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_tau'     : {'xtitle':'Number of Taus'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_basemu'     : {'xtitle':'Number of Base Muons'   ,         'ytitle':'Events',   'ymin':0.1},
     'n_truth_tau'     : {'xtitle':'Number of Truth taus'   ,         'ytitle':'Events',   'ymin':0.1},
-    'met_tst_j1_dphi'     : {'xtitle':'#Delta#phi(j1,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'met_tst_j2_dphi'     : {'xtitle':'#Delta#phi(j2,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'ptvarcone20'     : {'xtitle':'ptvarcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
-    'baselep_ptvarcone_0'     : {'xtitle':'ptvarcone20/p_{T}'   ,         'ytitle':'Events'},
-    'ptvarcone30'     : {'xtitle':'ptvarcone30/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
-    'topoetcone20'     : {'xtitle':'topoetcone20/p_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'met_tst_j1_dphi'     : {'xtitle':'#Delta#it{#phi}(j1,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'met_tst_j2_dphi'     : {'xtitle':'#Delta#it{#phi}(j2,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'ptvarcone20'     : {'xtitle':'ptvarcone20/#it{p}_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'baselep_ptvarcone_0'     : {'xtitle':'ptvarcone20/#it{p}_{T}'   ,         'ytitle':'Events'},
+    'ptvarcone30'     : {'xtitle':'ptvarcone30/#it{p}_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'topoetcone20'     : {'xtitle':'topoetcone20/#it{p}_{T}'   ,         'ytitle':'Events',   'ymin':0.1},
 
-    'mj34'     : {'xtitle':'m_{j3,j4} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'max_j_eta'     : {'xtitle':'max(#eta_{j1},#eta_{j2})'   ,         'ytitle':'Events',   'ymin':0.1},
-    'dRj1'     : {'xtitle':'#DeltaR(j1,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'dRj2'     : {'xtitle':'#DeltaR(j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'minDR'     : {'xtitle':'min #DeltaR(j1/j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'mj1'     : {'xtitle':'m_{j1,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'mj2'     : {'xtitle':'m_{j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'minDRmj2'     : {'xtitle':'minDR m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'min_mj3'     : {'xtitle':'min m_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'min_mj3_over_mjj'     : {'xtitle':'min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'mj34'     : {'xtitle':'#it{m}_{j3,j4} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'max_j_eta'     : {'xtitle':'max(#it{#eta}_{j1},#it{#eta}_{j2})'   ,         'ytitle':'Events',   'ymin':0.1},
+    'dRj1'     : {'xtitle':'#it{#DeltaR}(j1,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'dRj2'     : {'xtitle':'#it{#DeltaR}(j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'minDR'     : {'xtitle':'min #it{#DeltaR}(j1/j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'mj1'     : {'xtitle':'#it{m}_{j1,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'mj2'     : {'xtitle':'#it{m}_{j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'minDRmj2'     : {'xtitle':'minDR #it{m}_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'min_mj3'     : {'xtitle':'min #it{m}_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'min_mj3_over_mjj'     : {'xtitle':'min #it{m}_{j1/j2,j3} / #it{m}_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},
     'centrality'     : {'xtitle':'j3 Centrality',         'ytitle':'Events',   'ymin':0.1},
-    'phcentrality'     : {'xtitle':'#gamma Centrality'   ,         'ytitle':'Events',   'ymin':0.1,'rebin':5},
-    'phPt'     : {'xtitle':'#gamma p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'phEta'     : {'xtitle':'#gamma #eta'   ,         'ytitle':'Events',   'ymin':0.1},
-    'met_tst_ph_dphi'     : {'xtitle':'#Delta#phi(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'Mtt'     : {'xtitle':'m_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'minDRLep'     : {'xtitle':'min #DeltaR(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'j3Pt'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':0},
-    'j3Eta'     : {'xtitle':'j3 #eta'   ,         'ytitle':'Events',   'ymin':0.1},
+    'phcentrality'     : {'xtitle':'#it{#gamma} Centrality'   ,         'ytitle':'Events',   'ymin':0.1,'rebin':5},
+    'phPt'     : {'xtitle':'#it{#gamma} #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'phEta'     : {'xtitle':'#it{#gamma} #it{#eta}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'met_tst_ph_dphi'     : {'xtitle':'#Delta#it{#phi}(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'Mtt'     : {'xtitle':'#it{m}_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
+    'minDRLep'     : {'xtitle':'min #it{#DeltaR}(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'j3Pt'     : {'xtitle':'j3 #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':0},
+    'j3Eta'     : {'xtitle':'j3 #it{#eta}'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3Jvt'     : {'xtitle':'j3 Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3FJvt'     : {'xtitle':'j3 f-Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
-    'jetPt3'     : {'xtitle':'j3 p_{T} [GeV]'   ,         'ytitle':'Events / 10 GeV',   'ymin':0.1, 'LtoRCut':False},
+    'jetPt3'     : {'xtitle':'j3 #it{p}_{T} [GeV]'   ,         'ytitle':'Events / 10 GeV',   'ymin':0.1, 'LtoRCut':False},
     'avgCentrality'     : {'xtitle':'Average jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'maxCentrality'     : {'xtitle':'Max jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
-    'avgmj3_over_mjj'     : {'xtitle':'Average min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
-    'maxmj3_over_mjj'     : {'xtitle':'Max min m_{j1/j2,j3} / m_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
-    'max_j3_dr'     : {'xtitle':'Max min #Delta R_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
-    'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#phi_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
+    'avgmj3_over_mjj'     : {'xtitle':'Average min #it{m}_{j1/j2,j3} / #it{m}_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
+    'maxmj3_over_mjj'     : {'xtitle':'Max min #it{m}_{j1/j2,j3} / #it{m}_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
+    'max_j3_dr'     : {'xtitle':'Max min #Delta#it{R}_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
+    'met_tst_j3_dphi'     : {'xtitle':'Max #Delta#it{#phi}_{MET,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
         }
 
     try:
@@ -432,37 +432,39 @@ def getSampleLabel(sample):
         hlabel = options.hmass
 
     labels = {
-        'smww': 'WW/W#gamma',
-        'zjet': 'Z+jets',
+        'smww': '#it{WW/W#gamma}',
+        'zjet': '#it{Z}+jets',
         'qflip': 'Charge Flip',
-        'zqcd': 'Z+jets QCD',
-        'zqcdMad': 'Z+jets QCD',
-        'zewk': 'Z+jets EWK',
-        'mqcd': 'MJ',
-        'dqcd': 'MJ',
-        'wqcd': 'W+jets QCD',
-        'wqcdMad': 'W+jets QCD',
-        'wewk': 'W+jets EWK',
+        'zqcd': '#it{Z} QCD',
+        'zqcdMad': '#it{Z} QCD',
+        'zewk': '#it{Z} EWK',
+        'mqcd': 'Multijet',
+        'dqcd': 'Multijet',
+        'wqcd': '#it{W} QCD',
+        'wqcdMad': '#it{W} QCD',
+        'wewk': '#it{W} EWK',
         'top1': 'Single Top',
         'top2': 'Top', #'t#bar{t}',
-        'tall': 'Top+VV/VVV',
-        'vvv': 'VV/VVV',
-        'zldy': 'Z low m.',
-        'wzzz': 'ZV',#'WZ/ZZ',
-        'wz': 'WZ',
-        'zz': 'ZZ',
-        'wgam': 'W#gamma',
-        'wgas': 'W#gamma*',
-        'zgas': 'Z#gamma*',
-        'zgam': 'Z#gamma',        
-        'zgamewk': 'Z#gamma EWK',        
-        'wgamewk': 'W#gamma EWK',        
-        'ttg': 't#bar{t}#gamma',
-        'pho': '#gamma+j',
-        'htau':  '%s H#rightarrow#tau#tau'%options.hmass,
+        'tall': 'Top+#it{VV}/#it{VVV}',
+        'vvv': '#it{VV}/#it{VVV}',
+        'zldy': '#it{Z} low m.',
+        'wzzz': '#it{ZV}',#'WZ/ZZ',
+        'wz': '#it{WZ}',
+        'zz': '#it{ZZ}',
+        'wgam': '#it{W#gamma}',
+        'wgas': '#it{W#gamma*}',
+        'zgas': '#it{Z#gamma*}',
+        'zgam': '#it{Z#gamma}',
+        'zgamewk': '#it{Z#gamma} EWK',        
+        'wgamewk': '#it{W#gamma} EWK',        
+        'ttg': '#it{t#bar{t}#gamma}',
+        'pho': '#it{#gamma}+j',
+        'htau':  '%s #it{H}#rightarrow#tau#tau'%options.hmass,
         'hggf':  'ggF Higgs',
-        'higgs':  'Higgs',
-        'hvbf':  'Higgs',
+        #'higgs':  '#it{H}(B_{inv}=0.13)',
+        #'hvbf':  '#it{H}(B_{inv}=0.13)',
+        'higgs':  '#it{H} (B_{inv}=1.0)',
+        'hvbf':  '#it{H} (B_{inv}=1.0)',
         'ttv' : 't#bar{t}V+tV',
         'data': 'Data',
         'bkgs': 'Total SM',
