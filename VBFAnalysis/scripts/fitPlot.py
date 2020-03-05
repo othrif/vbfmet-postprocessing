@@ -1988,11 +1988,14 @@ def plotVar(options):
         rmultijet.Add(bkgR)
         rmultijet.Divide(bkgR)
         rmultijet.SetLineWidth(2)
+        rmultijet.SetLineColor(Style.styleDict["multijet"][3])
         rmultijet.SetLineStyle(7)
         rmultijet.SetFillColor(0)
         rmultijet.SetFillStyle(0)
         rsignal.SetLineStyle(1)        
-        rsignal.SetLineWidth(2)        
+        rsignal.SetLineWidth(2)
+        if var=='jj_mass':
+            rsignal.SetBinContent(2,rsignal.GetBinContent(3))
         
         rbkgPreFit.SetLineColor(ROOT.kBlue)
         rbkgPreFit.SetLineStyle(9)
@@ -2039,7 +2042,7 @@ def plotVar(options):
             legR.AddEntry(rsignal,'Signal/Bkg')
             legR.AddEntry(rmultijet,'Multijet/Bkg')
         legR.AddEntry(rbkgPreFit,'Pre-Fit/Post-Fit')
-        legR.AddEntry(systHistAsymTotRatioA,'Post-Fit syst')
+        legR.AddEntry(systHistAsymTotRatioA,'Post-Fit Syst')
         legR.SetNColumns(2)
         #if reg=='SR':
         legR.Draw()
