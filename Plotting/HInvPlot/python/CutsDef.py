@@ -626,6 +626,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
 
     cuts += [CutItem('CutPh',       'n_ph==1')]
+    cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
     cuts += getJetCuts(basic_cuts, options, isPh=True);
 
     # add the extra cuts...decide if we want these

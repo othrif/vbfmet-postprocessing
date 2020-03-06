@@ -623,7 +623,7 @@ if __name__=='__main__':
     p.add_option('--plot', default='', help='Plots a variable in a certain region. HFInputAlg.cxx produces these plots with the --doPlot flag . Only works with -i and not with -c. example: jj_mass,SR,1_2_3')
     (options, args) = p.parse_args()
 
-    histNames=["multijet"]#"W_strong", "Z_strong", "W_EWK", "Z_EWK", "ttbar"] # "multijet", "eleFakes"
+    histNames=["W_strong", "Z_strong", "W_EWK", "Z_EWK", "ttbar"] # "multijet", "eleFakes"
     regions=[
     'VBFjetSel_XNom_SRX_obs_cuts',
     'VBFjetSel_XNom_twoEleCRX_obs_cuts',
