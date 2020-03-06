@@ -149,7 +149,9 @@ def getSelKeyLabel(selkey):
             else:
                 proc += ' CR'
         elif selkey.count('zcr'): proc += ' CR'
-        #if selkey.count('FJVT_'):  proc += ',f-jvt'
+        if selkey.count('FJVT_'):  proc += ',f-jvt'
+        if selkey.count('LowMETQCDSR'): proc = 'Low #it{E}_{T}^{miss} CR' #proc += ', Low MET QCD, N_{jet}=2'
+        elif selkey.count('mjjLow200_'):  proc = 'Low #it{m}_{jj} CR' #proc += ', 0.2<m_{jj}<0.8TeV'        
     return proc
 
 #-------------------------------------------------------------------------
@@ -265,11 +267,11 @@ def getHistPars(hist):
         'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
         'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':200,'xmax':500, 'LtoRCut':0},
         'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
+        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (50 GeV)', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
         'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'jj_deta_signed' : {'xtitle':'Signed #Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
@@ -507,13 +509,22 @@ def getStyle(sample):
     #color_zqcd = ROOT.kGreen  -3
     #color_wqcd = ROOT.kGreen  -7
     #color_wewk = ROOT.kCyan   -9
-    color_zewk = ROOT.kCyan   -9
-    color_zqcd = ROOT.kBlue-9
-    color_wqcd = ROOT.kGreen  -3
-    color_wewk = ROOT.kGreen  -7
+    # version 2
+    #color_zewk = ROOT.kCyan   -9
+    #color_zqcd = ROOT.kBlue-9
+    #color_wqcd = ROOT.kGreen  -3
+    #color_wewk = ROOT.kGreen  -7
+    #color_tall = ROOT.kMagenta-9 #ROOT.kYellow +1 #ROOT.kRed+1
+    #color_wdpi = ROOT.kGray+1#ROOT.kOrange-5
+    # version cool 
+    color_zewk = ROOT.kSpring+8
+    color_zqcd = ROOT.kGreen-2
+    color_wqcd = ROOT.kCyan-3
+    color_wewk = ROOT.kTeal
+    color_tall = ROOT.kBlue-6
+    color_wdpi = ROOT.kMagenta-10
     color_top1 = ROOT.kYellow +2
     color_top2 = ROOT.kYellow +1
-    color_tall = ROOT.kMagenta-9 #ROOT.kYellow +1 #ROOT.kRed+1
     color_wzzz = ROOT.kMagenta-3
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
     color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3
@@ -525,7 +536,6 @@ def getStyle(sample):
     color_zgamewk = ROOT.kOrange-6    
     color_ttg = ROOT.kBlue   -9
     color_pho = ROOT.kGreen -3
-    color_wdpi = ROOT.kGray+1#ROOT.kOrange-5
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
     color_higgs = ROOT.kViolet-9 #ROOT.kRed    +0
@@ -1649,7 +1659,8 @@ class DrawStack:
             self.bkg_sum_alt.SetMarkerColor(ROOT.kRed)
             self.bkg_sum_alt.SetMarkerSize(0)
             self.bkg_sum_alt.SetFillColor(1)
-            self.bkg_sum_alt.SetFillStyle(3004)
+            self.bkg_sum_alt.SetFillStyle(3345) #3004
+            
         self.leg.Draw()
         self.leg1.Draw()
 
@@ -1676,7 +1687,7 @@ class DrawStack:
             self.stackeg = ROOT.TGraphAsymmErrors(bkg_herr)
 
             #self.stackeg.SetFillStyle(3005)
-            self.stackeg.SetFillStyle(3004)
+            self.stackeg.SetFillStyle(3345) # 3004
             self.stackeg.SetFillColor(1)
             self.stackeg.GetXaxis().SetLabelColor(0)
             #self.stackeg.Draw('2')
@@ -1704,14 +1715,14 @@ class DrawStack:
         syst_jes_ratio = self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
 
         # Setting the draw options
-        syst_hist_bkg.SetFillStyle(3004)
+        syst_hist_bkg.SetFillStyle(3345) #3004
         syst_hist_bkg.SetFillColor(12)
         syst_hist_bkg.SetMarkerColor(1)
         syst_hist_bkg.SetLineColor(1)
         syst_hist_bkg.GetXaxis().SetLabelColor(0)
         self.error_map['bkg']=syst_hist_bkg.Clone()
         self.error_map['bkg'].GetXaxis().SetLabelColor(0)
-        self.error_map['bkg'].SetFillStyle(3004)
+        self.error_map['bkg'].SetFillStyle(3345) #3004
         self.error_map['bkg'].SetFillColor(ROOT.kBlack)
         self.error_map['bkg'].SetMarkerColor(1)
         self.error_map['bkg'].SetMarkerSize(0)
@@ -2004,7 +2015,7 @@ class DrawStack:
             #
             self.error_map['bkg_ratio'] = syst_ratio.Clone()
             #self.error_map['bkg_ratio'].SetFillStyle(3354)
-            self.error_map['bkg_ratio'].SetFillStyle(3004)
+            self.error_map['bkg_ratio'].SetFillStyle(3345) # 3004
             self.error_map['bkg_ratio'].SetFillColor(ROOT.kBlack)
             self.error_map['bkg_ratio'].SetMarkerColor(1)
             self.error_map['bkg_ratio'].SetMarkerSize(0)
@@ -2176,7 +2187,7 @@ class DrawStack:
             self.bkg_sum_altb.SetMarkerSize(0)
             self.bkg_sum_altb.SetFillColor(1)
             #self.bkg_sum_altb.SetFillStyle(3005)
-            self.bkg_sum_altb.SetFillStyle(3004)
+            self.bkg_sum_altb.SetFillStyle(3345) #3004
 
         for bkg in sorted(self.bkgs.keys(), key=getLabelSortKey):
             he = self.bkgs[bkg]
@@ -2528,6 +2539,7 @@ def main():
 
     #config.setPlotDefaults(ROOT)
     Style()
+    ROOT.gStyle.SetHatchesLineWidth(1)
     can = ROOT.TCanvas('stack', 'stack', *options.canvas_size)
     can.Draw()
     can.cd()

@@ -8,6 +8,38 @@ import HInvPlot.JobOptions as config
 def HistName(histName, regionName, systName, binNum):
     return "h"+histName+"_"+(regionName.replace('X','%s' %binNum)).replace('Nom_',systName+'_')
 
+#-----------------------------------------
+def BinomialErr(n2, n1, err1=0.0):
+    err=0.0
+    if n1==0:
+        return err
+    total_num=n1
+    if err1>0.0:
+        total_num = (n1/err1)**2
+
+    eff = n2/n1
+    if eff>1.0 or eff<0.0:
+        print 'eff too high',eff
+        return 0
+    err = math.sqrt(eff*(1.0-eff)/total_num)
+    return err
+
+def SetBinomialErrorRatio(hsys,hnom):
+    for ib in range(1,hnom.GetNbinsX()+1):
+        ratio = 1.0
+        nomV=hnom.GetBinContent(ib)
+        sysV=hsys.GetBinContent(ib)
+        if nomV>0.0:
+            ratio=sysV/nomV
+        hsys.SetBinContent(ib,ratio)
+        if nomV>sysV and nomV>0.0: 
+            hsys.SetBinError(ib,BinomialErr(sysV,nomV,hnom.GetBinError(ib)))
+        elif sysV>0.0:
+            hsys.SetBinError(ib,BinomialErr(nomV,sysV,hnom.GetBinError(ib)))
+        else:
+            hsys.SetBinError(ib,0.0)                        
+        
+
 def DeclareCanvas(options):
 
     can=ROOT.TCanvas("c1","c1",1600,1000)
@@ -429,7 +461,7 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
             else:
                 nLoaded+=1
             h.SetBinContent(binOrder[ibin-1], nomBinH.GetBinContent(1))
-            h.SetBinError  (binOrder[ibin-1], 0.001*nomBinH.GetBinError  (1))
+            h.SetBinError  (binOrder[ibin-1], nomBinH.GetBinError  (1))
             #*nomBinH.GetBinError  (1)
             # up variation
             sysBinH=rfile.Get(HistName(histName, r, systName+'High', ibin))
@@ -464,8 +496,12 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
     totalMin=1.0    
     # create hists and divide
     for r in regions:
-        sysUpMap[r].Divide(nomMap[r])
-        sysDwMap[r].Divide(nomMap[r])
+        if True:
+            SetBinomialErrorRatio(sysUpMap[r],nomMap[r])
+            SetBinomialErrorRatio(sysDwMap[r],nomMap[r])
+        else:
+            sysUpMap[r].Divide(nomMap[r])
+            sysDwMap[r].Divide(nomMap[r])
         max1=sysUpMap[r].GetMaximum()
         max2=sysDwMap[r].GetMaximum()
         min1=1.0
@@ -587,7 +623,7 @@ if __name__=='__main__':
     p.add_option('--plot', default='', help='Plots a variable in a certain region. HFInputAlg.cxx produces these plots with the --doPlot flag . Only works with -i and not with -c. example: jj_mass,SR,1_2_3')
     (options, args) = p.parse_args()
 
-    histNames=["W_strong", "Z_strong", "W_EWK", "Z_EWK", "ttbar"] # "multijet", "eleFakes"
+    histNames=["multijet"]#"W_strong", "Z_strong", "W_EWK", "Z_EWK", "ttbar"] # "multijet", "eleFakes"
     regions=[
     'VBFjetSel_XNom_SRX_obs_cuts',
     'VBFjetSel_XNom_twoEleCRX_obs_cuts',

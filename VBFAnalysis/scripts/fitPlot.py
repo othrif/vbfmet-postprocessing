@@ -504,7 +504,7 @@ def removeLabel(leg, name):
         for prim in LOP:
             print prim.GetLabel()
 
-def make_legend(can,poskeys=[0.0,0.1,0.2,0.65],ncolumns=1):
+def make_legend(can,poskeys=[0.0,0.1,0.155,0.65],ncolumns=1):
     leg=can.BuildLegend(poskeys[0],poskeys[1],poskeys[2],poskeys[3])
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
@@ -1231,7 +1231,9 @@ def main(options):
     #                ireg+=1
         
     ROOT.gStyle.SetErrorX(0.5)
+    #fillStyle = 3345 #3004 # was 3018
     fillStyle = 3004 # was 3018
+    ROOT.gStyle.SetHatchesLineWidth(1)
     Style.setStyles(systHist,[0,0,0,1,fillStyle,0,0,0])
     Style.setStyles(hDict["bkgsStat"],[0,0,0,1,fillStyle,0,0,0])
     Style.setStyles(hDict["bkgsAsymErr"],[0,0,0,1,fillStyle,0,0,0])
@@ -1900,9 +1902,11 @@ def plotVar(options):
     if options.data:
         dataH.Draw("PEsame")
 
-    fillStyle = 3004
+    #fillStyle = 3004
+    fillStyle = 3345
     Style.setStyles(systHistAsymTot,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTot.SetFillColor(1)
+    systHistAsymTot.SetLineWidth(2)
     systHistAsymTot.SetFillStyle(fillStyle)
     systHistAsymTotA=ROOT.TGraphAsymmErrors(systHistAsymTot)
     for i in range(0,systHistAsymTot.GetNbinsX()+3):
@@ -1934,7 +1938,7 @@ def plotVar(options):
     poskeys=[0.6,0.58,0.87,0.93]
     ncolumns=2
     if var=='jj_dphi':
-        poskeys=[0.7,0.53,0.9,0.93]
+        poskeys=[0.7,0.44,0.9,0.93]
         ncolumns=1
     make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
     texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="",preliminary=options.preliminary)
@@ -2002,7 +2006,8 @@ def plotVar(options):
         rmultijet.Add(bkgR)
         rmultijet.Divide(bkgR)
         rmultijet.SetLineWidth(2)
-        rmultijet.SetLineColor(Style.styleDict["multijet"][3])
+        #rmultijet.SetLineColor(Style.styleDict["multijet"][3])
+        rmultijet.SetLineColor(Style.styleDict["eleFakes"][3])
         rmultijet.SetLineStyle(7)
         rmultijet.SetFillColor(0)
         rmultijet.SetFillStyle(0)
@@ -2028,8 +2033,10 @@ def plotVar(options):
             systHistAsymTotRatioA.SetPointEXhigh(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
             systHistAsymTotRatioA.SetPointEXlow(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
             #print i,systHistAsymTotRatio.GetBinContent(i)
-        Style.setStyles(systHistAsymTotRatioA,[0,0,0,1,fillStyle,0,0,0])    
+        Style.setStyles(systHistAsymTotRatioA,[0,0,0,ROOT.kGray+3,fillStyle,0,0,0])
+        #print ROOT.gStyle.GetHatchesLineWidth()
         
+        ROOT.gStyle.SetHatchesLineWidth(1)
         line1=dataH.Clone("line1")
         for i in range(1,line1.GetNbinsX()+1):
             line1.SetBinContent(i,1)
