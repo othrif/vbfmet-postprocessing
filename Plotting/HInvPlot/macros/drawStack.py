@@ -509,13 +509,22 @@ def getStyle(sample):
     #color_zqcd = ROOT.kGreen  -3
     #color_wqcd = ROOT.kGreen  -7
     #color_wewk = ROOT.kCyan   -9
-    color_zewk = ROOT.kCyan   -9
-    color_zqcd = ROOT.kBlue-9
-    color_wqcd = ROOT.kGreen  -3
-    color_wewk = ROOT.kGreen  -7
+    # version 2
+    #color_zewk = ROOT.kCyan   -9
+    #color_zqcd = ROOT.kBlue-9
+    #color_wqcd = ROOT.kGreen  -3
+    #color_wewk = ROOT.kGreen  -7
+    #color_tall = ROOT.kMagenta-9 #ROOT.kYellow +1 #ROOT.kRed+1
+    #color_wdpi = ROOT.kGray+1#ROOT.kOrange-5
+    # version cool 
+    color_zewk = ROOT.kSpring+8
+    color_zqcd = ROOT.kGreen-2
+    color_wqcd = ROOT.kCyan-3
+    color_wewk = ROOT.kTeal
+    color_tall = ROOT.kBlue-6
+    color_wdpi = ROOT.kMagenta-10
     color_top1 = ROOT.kYellow +2
     color_top2 = ROOT.kYellow +1
-    color_tall = ROOT.kMagenta-9 #ROOT.kYellow +1 #ROOT.kRed+1
     color_wzzz = ROOT.kMagenta-3
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
     color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3
@@ -527,7 +536,6 @@ def getStyle(sample):
     color_zgamewk = ROOT.kOrange-6    
     color_ttg = ROOT.kBlue   -9
     color_pho = ROOT.kGreen -3
-    color_wdpi = ROOT.kGray+1#ROOT.kOrange-5
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
     color_higgs = ROOT.kViolet-9 #ROOT.kRed    +0
@@ -1651,7 +1659,8 @@ class DrawStack:
             self.bkg_sum_alt.SetMarkerColor(ROOT.kRed)
             self.bkg_sum_alt.SetMarkerSize(0)
             self.bkg_sum_alt.SetFillColor(1)
-            self.bkg_sum_alt.SetFillStyle(3004)
+            self.bkg_sum_alt.SetFillStyle(3345) #3004
+            
         self.leg.Draw()
         self.leg1.Draw()
 
@@ -1678,7 +1687,7 @@ class DrawStack:
             self.stackeg = ROOT.TGraphAsymmErrors(bkg_herr)
 
             #self.stackeg.SetFillStyle(3005)
-            self.stackeg.SetFillStyle(3004)
+            self.stackeg.SetFillStyle(3345) # 3004
             self.stackeg.SetFillColor(1)
             self.stackeg.GetXaxis().SetLabelColor(0)
             #self.stackeg.Draw('2')
@@ -1706,14 +1715,14 @@ class DrawStack:
         syst_jes_ratio = self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
 
         # Setting the draw options
-        syst_hist_bkg.SetFillStyle(3004)
+        syst_hist_bkg.SetFillStyle(3345) #3004
         syst_hist_bkg.SetFillColor(12)
         syst_hist_bkg.SetMarkerColor(1)
         syst_hist_bkg.SetLineColor(1)
         syst_hist_bkg.GetXaxis().SetLabelColor(0)
         self.error_map['bkg']=syst_hist_bkg.Clone()
         self.error_map['bkg'].GetXaxis().SetLabelColor(0)
-        self.error_map['bkg'].SetFillStyle(3004)
+        self.error_map['bkg'].SetFillStyle(3345) #3004
         self.error_map['bkg'].SetFillColor(ROOT.kBlack)
         self.error_map['bkg'].SetMarkerColor(1)
         self.error_map['bkg'].SetMarkerSize(0)
@@ -2006,7 +2015,7 @@ class DrawStack:
             #
             self.error_map['bkg_ratio'] = syst_ratio.Clone()
             #self.error_map['bkg_ratio'].SetFillStyle(3354)
-            self.error_map['bkg_ratio'].SetFillStyle(3004)
+            self.error_map['bkg_ratio'].SetFillStyle(3345) # 3004
             self.error_map['bkg_ratio'].SetFillColor(ROOT.kBlack)
             self.error_map['bkg_ratio'].SetMarkerColor(1)
             self.error_map['bkg_ratio'].SetMarkerSize(0)
@@ -2178,7 +2187,7 @@ class DrawStack:
             self.bkg_sum_altb.SetMarkerSize(0)
             self.bkg_sum_altb.SetFillColor(1)
             #self.bkg_sum_altb.SetFillStyle(3005)
-            self.bkg_sum_altb.SetFillStyle(3004)
+            self.bkg_sum_altb.SetFillStyle(3345) #3004
 
         for bkg in sorted(self.bkgs.keys(), key=getLabelSortKey):
             he = self.bkgs[bkg]
@@ -2530,6 +2539,7 @@ def main():
 
     #config.setPlotDefaults(ROOT)
     Style()
+    ROOT.gStyle.SetHatchesLineWidth(1)
     can = ROOT.TCanvas('stack', 'stack', *options.canvas_size)
     can.Draw()
     can.cd()

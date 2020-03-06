@@ -1900,7 +1900,8 @@ def plotVar(options):
     if options.data:
         dataH.Draw("PEsame")
 
-    fillStyle = 3004
+    #fillStyle = 3004
+    fillStyle = 3345
     Style.setStyles(systHistAsymTot,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTot.SetFillColor(1)
     systHistAsymTot.SetLineWidth(2)
@@ -2029,8 +2030,10 @@ def plotVar(options):
             systHistAsymTotRatioA.SetPointEXhigh(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
             systHistAsymTotRatioA.SetPointEXlow(i-1,systHistAsymTot.GetXaxis().GetBinWidth(i)/2.0)
             #print i,systHistAsymTotRatio.GetBinContent(i)
-        Style.setStyles(systHistAsymTotRatioA,[0,0,0,1,fillStyle,0,0,0])    
+        Style.setStyles(systHistAsymTotRatioA,[0,0,0,ROOT.kGray+3,fillStyle,0,0,0])
+        #print ROOT.gStyle.GetHatchesLineWidth()
         
+        ROOT.gStyle.SetHatchesLineWidth(1)
         line1=dataH.Clone("line1")
         for i in range(1,line1.GetNbinsX()+1):
             line1.SetBinContent(i,1)
