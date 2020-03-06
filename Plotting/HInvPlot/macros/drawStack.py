@@ -149,7 +149,9 @@ def getSelKeyLabel(selkey):
             else:
                 proc += ' CR'
         elif selkey.count('zcr'): proc += ' CR'
-        #if selkey.count('FJVT_'):  proc += ',f-jvt'
+        if selkey.count('FJVT_'):  proc += ',f-jvt'
+        if selkey.count('LowMETQCDSR'): proc = 'Low #it{E}_{T}^{miss} CR' #proc += ', Low MET QCD, N_{jet}=2'
+        elif selkey.count('mjjLow200_'):  proc = 'Low #it{m}_{jj} CR' #proc += ', 0.2<m_{jj}<0.8TeV'        
     return proc
 
 #-------------------------------------------------------------------------

@@ -504,7 +504,7 @@ def removeLabel(leg, name):
         for prim in LOP:
             print prim.GetLabel()
 
-def make_legend(can,poskeys=[0.0,0.1,0.2,0.65],ncolumns=1):
+def make_legend(can,poskeys=[0.0,0.1,0.155,0.65],ncolumns=1):
     leg=can.BuildLegend(poskeys[0],poskeys[1],poskeys[2],poskeys[3])
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
@@ -1903,6 +1903,7 @@ def plotVar(options):
     fillStyle = 3004
     Style.setStyles(systHistAsymTot,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTot.SetFillColor(1)
+    systHistAsymTot.SetLineWidth(2)
     systHistAsymTot.SetFillStyle(fillStyle)
     systHistAsymTotA=ROOT.TGraphAsymmErrors(systHistAsymTot)
     for i in range(0,systHistAsymTot.GetNbinsX()+3):
