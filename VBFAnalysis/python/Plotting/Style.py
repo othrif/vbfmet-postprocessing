@@ -32,7 +32,7 @@ bold=[ROOT.kGreen+2,ROOT.kBlack,ROOT.kYellow,ROOT.kAzure-2,ROOT.kRed,ROOT.kBlue+
 pastels=[ROOT.kAzure-9,ROOT.kOrange-9,ROOT.kYellow-7,ROOT.kSpring+1,ROOT.kRed-7,ROOT.kGreen+3,ROOT.kRed-2]
 
 #cool
-colors=[ROOT.kViolet-4,ROOT.kBlue-6,ROOT.kYellow-7,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
+colors=[ROOT.kViolet-4,ROOT.kBlue-6,ROOT.kMagenta-10,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
 
 warm=[ROOT.kOrange-1,ROOT.kOrange-9,ROOT.kYellow-7,ROOT.kOrange-3,ROOT.kRed-7,ROOT.kOrange+10,ROOT.kRed-2]
 
