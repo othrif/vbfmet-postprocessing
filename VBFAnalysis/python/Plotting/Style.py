@@ -25,6 +25,17 @@ styleDict={}
     # "top1", "zewk", "data", "bkgs", "tall", "hvbf", "zldy", "dqcd", "zqcd", "wqcd"]
 
 #0:LColor, 1:LStyle, 2:LWidth, 3:FColor, 4:FStyle, 5:MColor, 6:MStyle, 7:MSize
+
+#channels [MJ, ttbar/VV/VVV, eFakes, Z EWK, W EWK, Z QCD, W QCD]
+bold=[ROOT.kGreen+2,ROOT.kBlack,ROOT.kYellow,ROOT.kAzure-2,ROOT.kRed,ROOT.kBlue+1,ROOT.kRed+2]
+
+pastels=[ROOT.kAzure-9,ROOT.kOrange-9,ROOT.kYellow-7,ROOT.kSpring+1,ROOT.kRed-7,ROOT.kGreen+3,ROOT.kRed-2]
+
+#cool
+colors=[ROOT.kViolet-4,ROOT.kBlue-6,ROOT.kMagenta-10,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
+
+warm=[ROOT.kOrange-1,ROOT.kOrange-9,ROOT.kYellow-7,ROOT.kOrange-3,ROOT.kRed-7,ROOT.kOrange+10,ROOT.kRed-2]
+
 styleDict["bkgs"]=[1,1,2,0,0,0,0,0]
 styleDict["data"]=[1,0,2,0,0,1,20,1.2]
 styleDict["signal"]=[2,2,3,0,0,2,0,0] #ROOT.kOrange
@@ -46,8 +57,10 @@ styleDict["QCDw"]=[47,1,1,47,1001,0,0,0]
 styleDict["multijet"]=[ROOT.kOrange-5,1,1,ROOT.kOrange-5,1001,ROOT.kOrange-5,0,0]
 styleDict["Others"]=[49,1,1,49,1001,49,0,0]
 styleDict["ttbar"]=[49,1,1,49,1001,49,0,0]
-styleDict["ttbar"]=[ROOT.kMagenta-9,1,1,ROOT.kMagenta-9,1001,ROOT.kMagenta-9,0,0]
-styleDict["eleFakes"]=[43,1,1,43,1001,43,0,0]
+#styleDict["ttbar"]=[ROOT.kMagenta-9,1,1,ROOT.kMagenta-9,1001,ROOT.kMagenta-9,0,0]
+styleDict["ttbar"]=[colors[1],1,1,colors[1],1001,colors[1],0,0]
+#styleDict["eleFakes"]=[43,1,1,43,1001,43,0,0]
+styleDict["eleFakes"]=[colors[2],1,1,colors[2],1001,colors[2],0,0]
 
 styleDict["Zjets"]=[4,1,1,4,1001,0,0,0]
 styleDict["Wjets"]=[5,1,1,5,1001,0,0,0]
@@ -58,10 +71,12 @@ styleDict["GGFH125"]=[2,2,3,0,0,2,0,0]
 styleDict["ggFH125"]=[2,2,3,0,0,2,0,0]
 styleDict["VH125"]=[2,3,3,0,0,2,0,0]
 
+
 styleDict["W_strong"]=[ROOT.kGreen  -7,1,1,ROOT.kGreen  -7,1001,ROOT.kGreen  -7,0,0]
 styleDict["Z_strong"]=[ROOT.kGreen  -3,1,1,ROOT.kGreen  -3,1001,ROOT.kGreen  -3,0,0]
 styleDict["Z_EWK"]=[ROOT.kBlue-9,1,1,ROOT.kBlue-9,1001,ROOT.kBlue-9,0,0]
 styleDict["W_EWK"]=[ROOT.kCyan   -9,1,1,ROOT.kCyan   -9,1001,ROOT.kCyan   -9,0,0]
+"""
 styleDict["W_EWK"]=[ROOT.kGreen  -7,1,1,ROOT.kGreen  -7,1001,ROOT.kGreen  -7,0,0]
 styleDict["W_strong"]=[ROOT.kGreen  -3,1,1,ROOT.kGreen  -3,1001,ROOT.kGreen  -3,0,0]
 styleDict["Z_strong"]=[ROOT.kBlue-9,1,1,ROOT.kBlue-9,1001,ROOT.kBlue-9,0,0]
@@ -72,6 +87,12 @@ styleDict["Z_EWK"]=[ROOT.kCyan   -9,1,1,ROOT.kCyan   -9,1001,ROOT.kCyan   -9,0,0
 #styleDict["W_strong"]=[1,1,1,9,1001,0,0,0]
 #styleDict["ttbar"]=[1,1,1,0,1001,0,0,0]
 styleDict["multijet"]=[ROOT.kGray+1,1,1,ROOT.kGray+1,1001,ROOT.kGray+1,0,0]
+"""
+styleDict["W_EWK"]=[colors[4],1,1,colors[4],1001,colors[4],0,0]
+styleDict["W_strong"]=[colors[6],1,1,colors[6],1001,colors[6],0,0]
+styleDict["Z_strong"]=[colors[5],1,1,colors[5],1001,colors[5],0,0]
+styleDict["Z_EWK"]=[colors[3],1,1,colors[3],1001,colors[3],0,0]
+styleDict["multijet"]=[colors[0],1,1,colors[0],1001,colors[0],0,0]
 
 
 # Define the binning for each variable
