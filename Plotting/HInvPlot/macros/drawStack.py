@@ -319,8 +319,8 @@ def getHistPars(hist):
     'min_mj3_over_mjj'     : {'xtitle':'min #it{m}_{j1/j2,j3} / #it{m}_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},
     'centrality'     : {'xtitle':'j3 Centrality',         'ytitle':'Events',   'ymin':0.1},
     'phcentrality'     : {'xtitle':'#it{#gamma} Centrality'   ,         'ytitle':'Events',   'ymin':0.1,'rebin':5},
-    'phPt'     : {'xtitle':'#it{#gamma} #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'phEta'     : {'xtitle':'#it{#gamma} #it{#eta}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'phPt'     : {'xtitle':'#it{#gamma} #it{p}_{T} [GeV]'   ,         'ytitle':'Events',  'rebin':2,'logy':True, 'ymin':0.1},
+    'phEta'     : {'xtitle':'#it{#gamma} #it{#eta}'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.1},
     'met_tst_ph_dphi'     : {'xtitle':'#Delta#it{#phi}(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'Mtt'     : {'xtitle':'#it{m}_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'minDRLep'     : {'xtitle':'min #DeltaR(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -561,8 +561,8 @@ def getStyle(sample):
         'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'wgam':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'zgamewk':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
-        'wgamewk':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'zgamewk':{'color':color_zgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'wgamewk':{'color':color_wgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
@@ -1999,6 +1999,8 @@ class DrawStack:
             #by.SetRangeUser(0.501, 1.499);
             #by.SetRangeUser(0.751, 1.249);
             by.SetRangeUser(0.601, 1.399);
+            if options.ph_ana:
+                by.SetRangeUser(0.501, 1.499);
             if options.blind:
                 by.SetRangeUser(0,0.799);
                 by.SetRangeUser(0,1.7999);
