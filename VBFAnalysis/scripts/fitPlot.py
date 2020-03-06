@@ -1231,7 +1231,9 @@ def main(options):
     #                ireg+=1
         
     ROOT.gStyle.SetErrorX(0.5)
+    #fillStyle = 3345 #3004 # was 3018
     fillStyle = 3004 # was 3018
+    ROOT.gStyle.SetHatchesLineWidth(1)
     Style.setStyles(systHist,[0,0,0,1,fillStyle,0,0,0])
     Style.setStyles(hDict["bkgsStat"],[0,0,0,1,fillStyle,0,0,0])
     Style.setStyles(hDict["bkgsAsymErr"],[0,0,0,1,fillStyle,0,0,0])
@@ -1936,7 +1938,7 @@ def plotVar(options):
     poskeys=[0.6,0.58,0.87,0.93]
     ncolumns=2
     if var=='jj_dphi':
-        poskeys=[0.7,0.53,0.9,0.93]
+        poskeys=[0.7,0.44,0.9,0.93]
         ncolumns=1
     make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
     texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="",preliminary=options.preliminary)
@@ -2004,7 +2006,8 @@ def plotVar(options):
         rmultijet.Add(bkgR)
         rmultijet.Divide(bkgR)
         rmultijet.SetLineWidth(2)
-        rmultijet.SetLineColor(Style.styleDict["multijet"][3])
+        #rmultijet.SetLineColor(Style.styleDict["multijet"][3])
+        rmultijet.SetLineColor(Style.styleDict["eleFakes"][3])
         rmultijet.SetLineStyle(7)
         rmultijet.SetFillColor(0)
         rmultijet.SetFillStyle(0)
