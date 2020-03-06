@@ -11,7 +11,7 @@ from optparse import OptionParser
 p = OptionParser(usage="usage: <path:ROOT file directory>", version="0.1")
 
 p.add_option('-n',             type='int',    default=0,             dest='nevent')
-p.add_option('--hscale',       type='int',    default=None,          dest='hscale')
+p.add_option('--hscale',       type='float',    default=0.13,          dest='hscale')
 p.add_option('--year',         type='int',    default=2016,          dest='year')
 p.add_option('--hmass',        type='string', default='125',         dest='hmass')
 
@@ -36,6 +36,7 @@ p.add_option('--xmax',         type='float',  default=None,          dest='xmax'
 p.add_option('--xmin',         type='float',  default=None,          dest='xmin')
 
 p.add_option('--blind',         action='store_true', default=False,   dest='blind')
+p.add_option('--preliminary',   action='store_true', default=False,   dest='preliminary')
 p.add_option('--normalizeBkg',  action='store_true', default=False,   dest='normalizeBkg')
 p.add_option('--madgraph',      action='store_true', default=False,   dest='madgraph')
 p.add_option('--do-eps',        action='store_true', default=False,   dest='do_eps')
@@ -67,7 +68,7 @@ p.add_option('--make-syst-table', action='store_true', default=False,   dest='ma
 p.add_option('--atlas-style', dest='atlas_style_path', default="/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/")
 
 # Allow canvas size and legend coords to be overriden on the command line.
-p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.64, 0.5, 0.99, 0.89), type=float)
+p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.66, 0.5, 0.99, 0.89), type=float)
 p.add_option('--canvas-size', dest="canvas_size", nargs=2, default=(500, 500), type=int)
 
 (options, args) = p.parse_args()
@@ -120,35 +121,35 @@ def getSelKeyLabel(selkey):
     decay = 'Invis'
     if selkey != None: # and selkey.count('hww') or selkey.count('lowmet'):
         if True:
-            if selkey.count('_nn'): proc = 'VBF #it{H}#rightarrow%s' %decay
-            elif selkey.count('_ll'): proc = '#it{Z}#rightarrow ll'
-            elif selkey.count('_ee'): proc = '#it{Z}#rightarrow ee'
+            if selkey.count('_nn'): proc = 'VBF #it{h}#rightarrow%s' %decay
+            elif selkey.count('_ll'): proc = '#it{Z}_{ll}'#'#it{Z}#rightarrow ll'
+            elif selkey.count('_ee'): proc = '#it{Z}_{#it{ee}}' #'#it{Z}#rightarrow ee'
             elif selkey.count('_eu'): proc = '#it{e#mu}'
             elif selkey.count('_em'): proc = '#it{W}_{#it{e^{+}#nu}}^{high}'#'W#rightarrow e^{-}#nu'
             elif selkey.count('_ep'): proc = '#it{W}_{#it{e^{-}#nu}}^{high}'
-            elif selkey.count('_uu'): proc = 'Z#rightarrow#mu#mu'
+            elif selkey.count('_uu'): proc = '#it{Z}_{#it{#mu#mu}}' #'Z#rightarrow#mu#mu'
             elif selkey.count('_l'): proc = 'W#rightarrow l#nu'
-            elif selkey.count('_e'): proc = '#it{W}_{#it{#it{e#nu}}}^{high}'#'W#rightarrow e#nu'
-            elif selkey.count('_u'): proc = '#it{W}#rightarrow#it{#mu#nu}'
+            elif selkey.count('_e'): proc = '#it{W}_{#it{e#nu}}^{high}'#'W#rightarrow e#nu'
+            elif selkey.count('_u'): proc = '#it{W}_{#it{#mu#nu}}'#it{W}#rightarrow#it{#mu#nu}'
 
         if selkey.count('LowMETQCD_'):  proc += ', Low MET QCD'
         elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'
         elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'
-        elif selkey.count('LowMETQCDSR'):  proc += ', Low MET QCD, N_{jet}=2'
-        elif selkey.count('mjjLow200_'):  proc += ', 0.2<m_{jj}<0.8TeV'
+        elif selkey.count('LowMETQCDSR'): proc = 'Low #it{E}_{T}^{miss}' #proc += ', Low MET QCD, N_{jet}=2'
+        elif selkey.count('mjjLow200_'):  proc = 'Low #it{m}_{jj}' #proc += ', 0.2<m_{jj}<0.8TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
         elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'
         elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'
         elif selkey.count('njgt2_'):  proc += ',2<N_{jet}'
         elif selkey.count('njgt3_'):  proc += ',3<N_{jet}'
-        if selkey.count('sr_'):  proc += ', SR'
+        if selkey.count('sr_'):  proc += ' SR'
         elif selkey.count('wcr'):
             if 'anti' in selkey:
                 proc += ', Anti-ID'
             else:
-                proc += ', WCR'
-        elif selkey.count('zcr'): proc += ', ZCR'
-        if selkey.count('FJVT_'):  proc += ',f-jvt'
+                proc += ' CR'
+        elif selkey.count('zcr'): proc += ' CR'
+        #if selkey.count('FJVT_'):  proc += ',f-jvt'
     return proc
 
 #-------------------------------------------------------------------------
@@ -166,7 +167,10 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
     labs = [l]
 
     if True:
-        p = ROOT.TLatex(x+0.15, y, ' Internal') #
+        typeN='Internal'
+        if options.preliminary:
+            typeN='Preliminary'
+        p = ROOT.TLatex(x+0.15, y, ' '+typeN) #
         p.SetNDC()
         p.SetTextFont(42)
         p.SetTextSize(0.065)
@@ -256,16 +260,16 @@ def getHistPars(hist):
         'muon_den_pt'   : {'xtitle':'Anti-Id Muon #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'lepEta' : {'xtitle':'Lepton #it{#eta} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'lepPhi' : {'xtitle':'Lepton #it{#phi} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
-        'dphill' : {'xtitle':'#Delta #it{#phi}_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
-        'jj_dphi' : {'xtitle':'#Delta #it{#phi}_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
+        'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
+        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
         'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
-        'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':4,  'ymin':1.0, 'logy':True, 'LtoRCut':0},
+        'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':200,'xmax':500, 'LtoRCut':0},
         'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.01, 'logy':True},
+        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
         'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'ymin':0.01,'logy':True, 'LtoRCut':2},
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'jj_deta_signed' : {'xtitle':'Signed #Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
@@ -273,9 +277,9 @@ def getHistPars(hist):
         'jj_deta_abs' : {'xtitle':'|#it{#eta}_{j2}| - |#it{#eta}_{j1}|/#Delta#it{#eta}_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
         'ptll'   : {'xtitle':'#it{p}_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'#it{m}_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
-        'met_significance'     : {'xtitle':'MET Significance [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.1,'logy':True},
-        'metsig_tst'     : {'xtitle':'MET Significance (new) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
-        'alljet_metsig'     : {'xtitle':'MET Significance (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
+        'met_significance'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.1,'logy':True},
+        'metsig_tst'     : {'xtitle':'#it{S}_{MET}^{TST} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
+        'alljet_metsig'     : {'xtitle':'#it{S}_{MET} (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
     'met_cst_jet'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
@@ -303,9 +307,9 @@ def getHistPars(hist):
 
     'mj34'     : {'xtitle':'#it{m}_{j3,j4} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'max_j_eta'     : {'xtitle':'max(#it{#eta}_{j1},#it{#eta}_{j2})'   ,         'ytitle':'Events',   'ymin':0.1},
-    'dRj1'     : {'xtitle':'#it{#DeltaR}(j1,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'dRj2'     : {'xtitle':'#it{#DeltaR}(j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
-    'minDR'     : {'xtitle':'min #it{#DeltaR}(j1/j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'dRj1'     : {'xtitle':'#DeltaR(j1,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'dRj2'     : {'xtitle':'#DeltaR(j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'minDR'     : {'xtitle':'min #DeltaR(j1/j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
     'mj1'     : {'xtitle':'#it{m}_{j1,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'mj2'     : {'xtitle':'#it{m}_{j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'minDRmj2'     : {'xtitle':'minDR #it{m}_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -317,7 +321,7 @@ def getHistPars(hist):
     'phEta'     : {'xtitle':'#it{#gamma} #it{#eta}'   ,         'ytitle':'Events',   'ymin':0.1},
     'met_tst_ph_dphi'     : {'xtitle':'#Delta#it{#phi}(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'Mtt'     : {'xtitle':'#it{m}_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'minDRLep'     : {'xtitle':'min #it{#DeltaR}(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'minDRLep'     : {'xtitle':'min #DeltaR(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3Pt'     : {'xtitle':'j3 #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':0},
     'j3Eta'     : {'xtitle':'j3 #it{#eta}'   ,         'ytitle':'Events',   'ymin':0.1},
     'j3Jvt'     : {'xtitle':'j3 Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -347,7 +351,7 @@ def getLabelSortKey(sample):
     elif sample == 'zz': return 4
     elif sample == 'smww': return 1 # was 3
     elif sample == 'top1': return 4
-    elif sample == 'tall': return 5
+    elif sample == 'tall': return -5
     elif sample == 'mqcd': return 5
     elif sample == 'dqcd': return 5
     elif sample == 'vvv': return 6
@@ -403,9 +407,9 @@ def getSampleSortKey(sample):
     elif sample == 'wewk': return -1
     elif sample == 'top2': return 4
     elif sample == 'top1': return 5
-    elif sample == 'tall': return 5
+    elif sample == 'tall': return -5
     elif sample == 'mqcd': return 5
-    elif sample == 'dqcd': return 5
+    elif sample == 'dqcd': return -5
     elif sample == 'vvv': return 6
     elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
@@ -459,12 +463,12 @@ def getSampleLabel(sample):
         'wgamewk': '#it{W#gamma} EWK',        
         'ttg': '#it{t#bar{t}#gamma}',
         'pho': '#it{#gamma}+j',
-        'htau':  '%s #it{H}#rightarrow#tau#tau'%options.hmass,
+        'htau':  '%s #it{h}#rightarrow#tau#tau'%options.hmass,
         'hggf':  'ggF Higgs',
-        #'higgs':  '#it{H}(B_{inv}=0.13)',
-        #'hvbf':  '#it{H}(B_{inv}=0.13)',
-        'higgs':  '#it{H} (B_{inv}=1.0)',
-        'hvbf':  '#it{H} (B_{inv}=1.0)',
+        #'higgs':  '#it{h}(B_{inv}=0.13)',
+        #'hvbf':  '#it{h}(B_{inv}=0.13)',
+        'higgs':  '#it{h} (B_{inv}=%0.2f)' %options.hscale,
+        'hvbf':  '#it{h} (B_{inv}=%0.2f)' %options.hscale,
         'ttv' : 't#bar{t}V+tV',
         'data': 'Data',
         'bkgs': 'Total SM',
@@ -499,13 +503,17 @@ def getStyle(sample):
     #
     # Read mini dilep ntuple
     #
-    color_zewk = ROOT.kBlue   -9
-    color_zqcd = ROOT.kGreen  -3
-    color_wqcd = ROOT.kGreen  -7
-    color_wewk = ROOT.kCyan   -9
+    #color_zewk = ROOT.kBlue   -9
+    #color_zqcd = ROOT.kGreen  -3
+    #color_wqcd = ROOT.kGreen  -7
+    #color_wewk = ROOT.kCyan   -9
+    color_zewk = ROOT.kCyan   -9
+    color_zqcd = ROOT.kBlue-9
+    color_wqcd = ROOT.kGreen  -3
+    color_wewk = ROOT.kGreen  -7
     color_top1 = ROOT.kYellow +2
     color_top2 = ROOT.kYellow +1
-    color_tall = ROOT.kYellow +1 #ROOT.kRed+1
+    color_tall = ROOT.kMagenta-9 #ROOT.kYellow +1 #ROOT.kRed+1
     color_wzzz = ROOT.kMagenta-3
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
     color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3
@@ -517,7 +525,7 @@ def getStyle(sample):
     color_zgamewk = ROOT.kOrange-6    
     color_ttg = ROOT.kBlue   -9
     color_pho = ROOT.kGreen -3
-    color_wdpi = ROOT.kOrange-5
+    color_wdpi = ROOT.kGray+1#ROOT.kOrange-5
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
     color_higgs = ROOT.kViolet-9 #ROOT.kRed    +0
@@ -614,7 +622,8 @@ def updateCanvas(can, name=None, leg=None, option = '', data_hist=None, bkg_sum_
             name+='_logy'
         if options.pref != None:
             name = '%s_%s' %(options.pref, name)
-
+        if options.preliminary:
+            name+='_prelim'
         if options.outdir != None:
             if not os.path.exists(options.outdir): os.system('mkdir %s' %(options.outdir))
             name = '%s/%s' %(options.outdir.rstrip(), name)
@@ -858,6 +867,7 @@ class DrawStack:
         self.sign.hist.SetLineWidth(2)
         log.info('DrawStack  - integral=%5.2f sample=%s' %(self.data.hist.Integral(), 'data'))
         log.info('DrawStack  - integral=%5.2f sample=%s' %(self.sign.hist.Integral(), 'signal'))
+
         for bkg in bkgs:
             self.bkgs[bkg] = self.ReadSample(file, bkg)
 
@@ -909,22 +919,38 @@ class DrawStack:
             return (datav-bkgtotal)/signtotal
         return 1.0
 
+    def DivideByBinWidth(self,hist):
+
+        if self.name=='jj_mass_variableBin':
+            for ib in range(2,hist.GetNbinsX()+1):
+                wid=hist.GetXaxis().GetBinWidth(ib)
+                if (wid<500.0 and wid>100.0) or wid>500.0:
+                    expV=hist.GetBinContent(ib)
+                    expE=hist.GetBinError(ib)
+                    hist.SetBinContent(ib,expV*500.0/wid)
+                    hist.SetBinError(ib,expE*500.0/wid)
+    
     def ReadSample(self, file, sample, syst=None, DO_SYMM=False):
 
         path = self.GetHistPath(sample, syst)
         #print path
         hist = file.Get(path)
-
+        #hist
+        #if var=="jj_mass":
+        
         if not hist:
             file.ls()
             raise KeyError('DrawStack - missing histogram: file=%s hist=%s' %(file.GetPath(), path))
 
         log.debug('ReadSample - integral=%5.1f sample=%s, syst=%s' %(hist.Integral(), sample, syst))
-
+        hist=hist.Clone()
+        self.DivideByBinWidth(hist)
         if DO_SYMM:
-            nom_path = self.GetHistPath(sample, 'Nominal')
+            nom_path = self.GetHistPath(sample, 'Nominal')            
             #print 'COMPUTING systematic',nom_path
             hist_central_value = self.file_pointer.Get(nom_path)
+            hist_central_value=hist_central_value.Clone()
+            self.DivideByBinWidth(hist_central_value)
             self.Symmeterize(hist_central_value, hist)
 
         return HistEntry(hist, sample, self.name, self.nf_map, self.zcr_stack, self.wcr_stack)
@@ -1297,7 +1323,7 @@ class DrawStack:
         for text in self.texts:
             text.Draw()
 
-        self.leg = ROOT.TLegend(0.51, 0.55, 0.93, 0.89)
+        self.leg = ROOT.TLegend(0.58, 0.55, 0.93, 0.89)
         self.leg.SetBorderSize(0)
         self.leg.SetFillStyle (0)
         #self.leg.SetNColumns  (2)
@@ -1485,7 +1511,7 @@ class DrawStack:
         self.leg.SetFillStyle (0)
         self.leg.SetTextFont(42);
         self.leg.SetTextSize(0.04);
-        self.leg1= ROOT.TLegend(0.51, 0.52, 0.83, 0.67)
+        self.leg1= ROOT.TLegend(0.59, 0.52, 0.85, 0.67)
         self.leg1.SetBorderSize(0)
         self.leg1.SetFillStyle (0)
         self.leg1.SetTextFont(42);
@@ -1613,6 +1639,7 @@ class DrawStack:
 
         if True:
             self.bkg_sum.SetLineColor(ROOT.kRed)
+            self.bkg_sum.SetLineWidth(0)
             self.bkg_sum.SetFillColor(0)
             self.bkg_sum.GetXaxis().SetLabelColor(0)
             if options.draw_norm: self.bkg_sum.DrawNormalized('HIST SAME')
@@ -1626,7 +1653,7 @@ class DrawStack:
         self.leg.Draw()
         self.leg1.Draw()
 
-        self.texts = getATLASLabels(can, 0.19, 0.85+0.02, selkey=self.selkey)
+        self.texts = getATLASLabels(can, 0.19, 0.83+0.02, selkey=self.selkey)
         for text in self.texts:
             text.Draw()
 
@@ -1958,7 +1985,9 @@ class DrawStack:
             bx.SetTitleSize(0.14);
             bx.SetTitleOffset(1.2);
 
-            by.SetRangeUser(0.501, 1.499);
+            #by.SetRangeUser(0.501, 1.499);
+            #by.SetRangeUser(0.751, 1.249);
+            by.SetRangeUser(0.601, 1.399);
             if options.blind:
                 by.SetRangeUser(0,0.799);
                 by.SetRangeUser(0,1.7999);
@@ -2214,10 +2243,10 @@ class DrawStack:
             ymax = self.GetYaxisMax()
         if ymax > 0.0:
             if self.IsLogy():
-                h.SetMaximum(15.0*ymax)
+                h.SetMaximum(5.0*ymax)
                 h.SetMinimum(0.1)
             else:
-                h.SetMaximum( 1.3*ymax)
+                h.SetMaximum( 1.1*ymax)
                 h.SetMinimum(0.0)
 
         if 'ymin' in pars:
