@@ -4,7 +4,7 @@ To get started, copy the inputs from eos `/eos/atlas/atlascerngroupdisk/phys-exo
 
 Run the following:
 ``` bash
-python calculateOTFYields_allvars.py Z_strong SR # as an example
+python calculateOTFYields.py Z_strong SR # as an example
 python runAllSystematics.py # runs all regions in one go
 root interpolate.cxx # example on how to perform a linear fit
 root plot_ckkw_resum.cxx # visualize the ckkw/resummation variations
