@@ -155,7 +155,7 @@ class texTable(object):
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
                    'W_strong':'#it{W} strong',
-                   'signal':'#it{h}(B_{inv}=0.13)',
+                   'signal':'#it{H}(B_{inv}=0.13)',
                    'data':'Data',
                    'bkgs':'Total Bkg',
                    'eleFakes':'e-fakes',
@@ -518,14 +518,14 @@ def make_legend(can,poskeys=[0.0,0.1,0.155,0.65],ncolumns=1):
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
                    'W_strong':'#it{W} strong',
-                   'signal':'#it{h}(B_{inv}=0.13)',
+                   'signal':'#it{H}(B_{inv}=0.13)',
                    'data':'Data',
                    'bkgs':'Unc',
                    'eleFakes':'e-fakes',
                    'multijet':'Multijet',
                    }
     if not options.scaleSig:
-        NameDict['signal']='#it{h}(B_{inv}=0.13)'
+        NameDict['signal']='#it{H}(B_{inv}=0.13)'
     listInputs=[]
     for i in leg.GetListOfPrimitives():
         

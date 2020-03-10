@@ -434,6 +434,7 @@ class LimitHists:
         self.exp.SetYTitle('#sigma/#sigma_{SM}')
         self.obs.SetXTitle('Mediator Mass [GeV]')
         self.obs.SetYTitle('#sigma/#sigma_{SM}')
+        self.obs.SetMarkerSize(0)
         if options.scaleXS:
             self.obs.SetYTitle('#sigma_{SM}^{VBF} x  BR_{inv} [pb]') 
             self.exp.SetYTitle('#sigma_{SM}^{VBF} x  BR_{inv} [pb]') 
