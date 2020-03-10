@@ -263,7 +263,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
     #f_multijet.Write()
     f_multijet.Close()
  
-def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
+def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, METCut=150):
 
     f_fakeele = ROOT.TFile("fakeele.root", "recreate")
     fakeelesp = [10.7, 11.6, 5.0]
@@ -293,10 +293,14 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
         fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
         fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
     if Binning==11: # set for all years
-        #fakeelesp = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1]
-        #fakeelesm = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1] # met>150 numbers
-        fakeelesp = [8.4, 11.0, 6.6, 3.9, 4.0, 8.4, 11.0, 6.6, 3.9, 4.0, 7.0]
-        fakeelesm = [8.4, 11.0, 6.6, 3.9, 4.0, 8.4, 11.0, 6.6, 3.9, 4.0, 7.0]
+        fakeelesp = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1]
+        fakeelesm = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1] # met>150 numbers
+        if METCut==160:
+            fakeelesp = [8.4, 11.0, 6.6, 3.9, 4.0, 8.4, 11.0, 6.6, 3.9, 4.0, 7.0]
+            fakeelesm = [8.4, 11.0, 6.6, 3.9, 4.0, 8.4, 11.0, 6.6, 3.9, 4.0, 7.0]
+        if METCut==200:
+            fakeelesp = [4.3, 6.4, 10.6, 5.1, 5.7, 4.3, 6.4, 10.6, 5.1, 5.8, 4.9]
+            fakeelesm = [4.3, 6.4, 10.6, 5.1, 5.7, 4.3, 6.4, 10.6, 5.1, 5.8, 4.9]
     fakeInit = [9.0238,7.4043,3.1402,3.5567,1.5765,8.6259,7.2854,3.5912,5.6147,0.8996,8.44]
     if doDoubleRatio:
         fakeelesp+=[12.5]
@@ -425,4 +429,4 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False):
 #writeMultiJet(11, 2017, 150)
 #os.chdir('../v34E')
 #writeMultiJet(11, 2018, 150)
-#writeFakeEle(11,  2018)
+#writeFakeEle(11,  2018, METCut=200)
