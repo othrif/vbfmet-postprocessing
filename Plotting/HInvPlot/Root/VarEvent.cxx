@@ -57,6 +57,8 @@ std::string Msl::Mva::Convert2Str(Var var)
     case met_soft_tst_phi:	  return "met_soft_tst_phi";
     case met_soft_tst_sumet:	  return "met_soft_tst_sumet";
     case met_cst_jet:	          return "met_cst_jet";
+    case met_cst_tst_ratio:	  return "met_cst_tst_ratio";
+    case met_cst_tst_sub:	  return "met_cst_tst_sub";
     case n_jet:	                  return "n_jet";
     case n_bjet:	          return "n_bjet";
     case n_jet_fwd:	          return "n_jet_fwd";
@@ -217,6 +219,8 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "met_soft_tst_phi")     return met_soft_tst_phi;
   if(var == "met_soft_tst_sumet")  return met_soft_tst_sumet;
   if(var == "met_cst_jet")         return met_cst_jet;
+  if(var == "met_cst_tst_ratio")   return met_cst_tst_ratio;
+  if(var == "met_cst_tst_sub")     return met_cst_tst_sub;
   if(var == "n_jet")             return n_jet;
   if(var == "n_bjet")             return n_bjet;
   if(var == "n_jet_fwd")         return n_jet_fwd;
@@ -464,6 +468,8 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(met_soft_tst_phi);
     vars.push_back(met_soft_tst_sumet);
     vars.push_back(met_cst_jet);
+    vars.push_back(met_cst_tst_ratio);
+    vars.push_back(met_cst_tst_sub);
     vars.push_back(n_jet);
     vars.push_back(n_bjet);
     vars.push_back(n_jet_fwd);

@@ -75,6 +75,8 @@ namespace Msl
       met_soft_tst_phi,
       met_soft_tst_sumet,
       met_cst_jet,
+      met_cst_tst_ratio,
+      met_cst_tst_sub,
       n_jet,
       n_bjet,
       n_jet_fwd,
