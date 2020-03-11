@@ -504,13 +504,15 @@ def removeLabel(leg, name):
         for prim in LOP:
             print prim.GetLabel()
 
-def make_legend(can,poskeys=[0.0,0.1,0.155,0.65],ncolumns=1):
+def make_legend(can,poskeys=[0.0,0.04,0.155,0.59],ncolumns=1):
     leg=can.BuildLegend(poskeys[0],poskeys[1],poskeys[2],poskeys[3])
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
     leg.SetTextFont(42)
     leg.SetNColumns(ncolumns)
     leg.SetTextSize(0.05)
+    legNew=leg.Clone()
+    legNew.Clear()
     #leg.SetNColumns  (2)
     NameDict ={'ttbar':'Top+#it{VV}/#it{VVV}',
                    'Z_EWK':'#it{Z} EWK',
@@ -524,9 +526,13 @@ def make_legend(can,poskeys=[0.0,0.1,0.155,0.65],ncolumns=1):
                    'eleFakes':'#it{e}-fakes',
                    'multijet':'Multijet',
                    }
+    if options.postFitPickleDir:
+        NameDict['bkgs']='Post-Fit Unc'
+    
     if not options.scaleSig:
         NameDict['signal']='#it{H}(#it{B}_{inv} = 0.13)'
     listInputs=[]
+    legOrder=[]
     for i in leg.GetListOfPrimitives():
         
         if i.GetLabel().strip() in NameDict and  NameDict[i.GetLabel().strip()] in listInputs:
@@ -543,13 +549,40 @@ def make_legend(can,poskeys=[0.0,0.1,0.155,0.65],ncolumns=1):
             i.GetObject().SetMarkerSize(0)
             i.GetObject().SetLineWidth(0)
             i.GetObject().SetMarkerColor(0)
+        
     removeLabel(leg, 'dummy')
     removeLabel(leg, 'Others')
     removeLabel(leg, 'multijet')
-    removeLabel(leg, 'W_EWK')    
+    removeLabel(leg, 'W_EWK')
+    for i in leg.GetListOfPrimitives():
+        legOrder+=[[i.GetLabel(),i.GetObject()]]
+        
+    for en in legOrder:
+        if en[0]=='Data':
+            legNew.AddEntry(en[1],en[0])
+            break
+    for en in legOrder:
+        if 'Post-Fit' in en[0]:
+            legNew.AddEntry(en[1],en[0])
+            break
+    for ita in range(0,len(legOrder)):
+        it=len(legOrder)-ita-1
+        if 'Data' in legOrder[it][0]:
+            continue
+        if 'Post-Fit' in legOrder[it][0]:
+            continue
+        if '#it{H}' in legOrder[it][0]:
+            continue
+        legNew.AddEntry(legOrder[it][1],legOrder[it][0])
+    for en in legOrder:
+        if '#it{H}' in en[0]:
+            legNew.AddEntry(en[1],en[0])
+            break
+        
     nEntries=len(leg.GetListOfPrimitives())
     #leg.SetY1(0.9-nEntries*0.04)
-    return leg
+    leg.Clear()
+    return legNew
 
 
 def get_THStack_sum(hstack):
@@ -1885,11 +1918,11 @@ def plotVar(options):
         bkgH.GetYaxis().SetLabelSize(1.5*bkgH.GetYaxis().GetLabelSize())
         bkgH.GetXaxis().SetRangeUser(800,5000.0)
         bkgH.GetYaxis().SetRangeUser(10,40000.0)
-        bkgH.GetYaxis().SetTitle("Events / 500 [GeV]")
+        bkgH.GetYaxis().SetTitle("Events / 500 GeV")
     if var=='jj_dphi':
         bkgH.GetYaxis().SetTitle("Events / 0.2 rad")
     if var=='met_tst_et':
-        bkgH.GetYaxis().SetTitle("Events / 50 [GeV]")
+        bkgH.GetYaxis().SetTitle("Events / 50 GeV")
     if var=='jj_deta':
         bkgH.GetYaxis().SetTitle("Events / 0.2")
     bkg.Draw("hist ")
@@ -1915,8 +1948,8 @@ def plotVar(options):
     Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTotA.SetMarkerSize(0)
     systHistAsymTotA.Draw("SAME E2")
-    systHistAsymTotA.SetName('Post-Fit Syst')
-    systHistAsymTotA.SetTitle('Post-Fit Syst')
+    systHistAsymTotA.SetName('Post-Fit Unc')
+    systHistAsymTotA.SetTitle('Post-Fit Unc')
 
     bkg.SetTitle(reg+" "+",".join(mjjBins))
 
@@ -1940,7 +1973,8 @@ def plotVar(options):
     if var=='jj_dphi':
         poskeys=[0.7,0.44,0.9,0.93]
         ncolumns=1
-    make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
+    legP=make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
+    legP.Draw()
     texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="",preliminary=options.preliminary)
     for text in texts:
         text.Draw()
@@ -2063,7 +2097,7 @@ def plotVar(options):
             legR.AddEntry(rsignal,'Signal/Bkg')
             legR.AddEntry(rmultijet,'Multijet/Bkg')
         legR.AddEntry(rbkgPreFit,'Pre-Fit/Post-Fit')
-        legR.AddEntry(systHistAsymTotRatioA,'Post-Fit Syst')
+        legR.AddEntry(systHistAsymTotRatioA,'Post-Fit Unc')
         legR.SetNColumns(2)
         #if reg=='SR':
         legR.Draw()
