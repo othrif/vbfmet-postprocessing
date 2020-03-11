@@ -181,7 +181,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{#it{s}}=13 TeV, %.0f fb^{-1}' %(options.int_lumi/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{#it{s}} = 13 TeV, %.0f fb^{-1}' %(options.int_lumi/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -217,11 +217,11 @@ def getHistPars(hist):
         #                         4 adds every two bins together
         'jetEta0': {'xtitle':'Leading jet #it{#eta}'  ,           'ytitle':'Events', 'rebin':5}, #5
         'jet0Phi': {'xtitle':'Leading jet #it{#phi}'  ,           'ytitle':'Events', 'rebin':2},
-        'jetPt0' : {'xtitle':'#it{p}_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
+        'jetPt0' : {'xtitle':'#it{p}_{T}^{jet 1} [GeV]',          'ytitle':'Events / 10 GeV', 'rebin':10, 'LtoRCut':0},
         'jetHT' : {'xtitle':'H_{T} [GeV]',          'ytitle':'Events', 'rebin':2, 'logy':True, 'LtoRCut':0},
         'jetEta1': {'xtitle':'Sub-Leading jet #it{#eta}'  ,       'ytitle':'Events', 'rebin':5},
         'jet1Phi': {'xtitle':'Sub-Leading jet #it{#phi}'  ,       'ytitle':'Events', 'rebin':2},
-        'jetPt1' : {'xtitle':'#it{p}_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
+        'jetPt1' : {'xtitle':'#it{p}_{T}^{jet 2} [GeV]',          'ytitle':'Events / 10 GeV', 'rebin':10, 'LtoRCut':0},
         'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
@@ -262,16 +262,16 @@ def getHistPars(hist):
         'muon_den_pt'   : {'xtitle':'Anti-Id Muon #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'lepEta' : {'xtitle':'Lepton #it{#eta} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'lepPhi' : {'xtitle':'Lepton #it{#phi} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
-        'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
-        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
-        'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
-        'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':200,'xmax':500, 'LtoRCut':0},
+        'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events / 0.2 rad', 'rebin':5,  'ymin':0.01},
+        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01},
+        'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / 5 GeV', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
+        'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / 25 GeV', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':100,'LtoRCut':0},#'xmax':500, 
         'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T,miss} (without leptons) [GeV]',             'xmin':200,  'ymin':5.1,'ymax':3000, 'xmax':500,    'ytitle':'Events / (50 GeV)', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
-        'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T,miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
-        'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':800.0, 'xmax':5000.0, 'ymin':5.1,'ymax':3000,           'ytitle':'Events / (500 GeV)', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
+        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':100,  'ymin':5.1,'ymax':3000, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
+        'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
+        'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
+        'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / 500 GeV', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':200.0, 'xmax':5000.0, 'ymin':5.1,'ymax':3000,           'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'jj_deta_signed' : {'xtitle':'Signed #Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
@@ -279,8 +279,8 @@ def getHistPars(hist):
         'jj_deta_abs' : {'xtitle':'|#it{#eta}_{j2}| - |#it{#eta}_{j1}|/#Delta#it{#eta}_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
         'ptll'   : {'xtitle':'#it{p}_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'#it{m}_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
-        'met_significance'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.1,'logy':True},
-        'metsig_tst'     : {'xtitle':'#it{S}_{MET}^{TST} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
+        'met_significance'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':2,  'ymin':0.1,'logy':True},
+        'metsig_tst'     : {'xtitle':'#it{S}_{MET}^{TST} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.01,'logy':True},
         'alljet_metsig'     : {'xtitle':'#it{S}_{MET} (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
     'met_cst_jet'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
     'met_cst_tst_sub'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT}-#it{E}_{T}^{miss} [GeV]'   ,         'ytitle':'Events',   'ymin':5.1},
@@ -292,7 +292,7 @@ def getHistPars(hist):
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_mass'     : {'xtitle':'Truth #it{m}_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_deta'     : {'xtitle':'Truth #Delta#it{#eta}_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
-    'truth_jj_dphi'     : {'xtitle':'Truth #Delta#it{#phi}_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_jj_dphi'     : {'xtitle':'Truth #Delta#it{#phi}_{jj}'   ,         'ytitle':'Events / 0.2 rad',   'ymin':0.1},
     'truth_j1_pt'     : {'xtitle':'Truth lead Jet #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_j2_pt'     : {'xtitle':'Truth lead Jet #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'SherpaVTruthPt'     : {'xtitle':'Sherpa #it{p}_{T} V [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},                
@@ -469,10 +469,10 @@ def getSampleLabel(sample):
         'pho': '#it{#gamma}+j',
         'htau':  '%s #it{H}#rightarrow#tau#tau'%options.hmass,
         'hggf':  'ggF Higgs',
-        #'higgs':  '#it{h}(B_{inv}=0.13)',
-        #'hvbf':  '#it{h}(B_{inv}=0.13)',
-        'higgs':  '#it{H} (B_{inv}=%0.2f)' %options.hscale,
-        'hvbf':  '#it{H} (B_{inv}=%0.2f)' %options.hscale,
+        #'higgs':  '#it{h}(#it{B}_{inv} = 0.13)',
+        #'hvbf':  '#it{h}(#it{B}_{inv} = 0.13)',
+        'higgs':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
+        'hvbf':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
         'ttv' : 't#bar{t}V+tV',
         'data': 'Data',
         'bkgs': 'Total SM',
@@ -1949,9 +1949,9 @@ class DrawStack:
             if 'xtitle' in pars and self.bkg_sum.GetXaxis() != None:
                 self.ratio.GetXaxis().SetTitle(pars['xtitle'])
             if options.blind:
-                self.ratio.GetYaxis().SetTitle('Sig. / SM ')
+                self.ratio.GetYaxis().SetTitle('Sig./Bkg ')
             else:
-                self.ratio.GetYaxis().SetTitle('Data / SM ')
+                self.ratio.GetYaxis().SetTitle('Data / Bkg ')
             #if options.blind:
             #    for i in range(0,self.ratio.GetNbinsX()+1):
             #        self.ratio.SetBinError(i,0.0)
@@ -1992,7 +1992,7 @@ class DrawStack:
             bx.SetTickLength(ROOT.gStyle.GetTickLength() * ratioPadScaling);
 
             #bx.SetTitle("Observable");
-            #bx.SetTitle("Data/SM");
+            #bx.SetTitle("Data/Bkg");
             bx.SetLabelSize(0.13);
             bx.SetLabelOffset(0.02);
             bx.SetTitleSize(0.14);
