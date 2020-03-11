@@ -2,8 +2,6 @@ import ROOT
 import sys,os
 import math
 from optparse import OptionParser
-import HInvPlot.systematics as vbf_syst
-import HInvPlot.JobOptions as config
 
 def HistName(histName, regionName, systName, binNum):
     return "h"+histName+"_"+(regionName.replace('X','%s' %binNum)).replace('Nom_',systName+'_')
@@ -379,6 +377,16 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 updateHist+=[sysBinH] 
     elif options.smooth==10:
         print 'smoothing option 10...symmeterize'
+        # looked up the max variation for the systematics pre smoothing. the parabolic smoothing can inflate the systematics. reduced this to the max
+        maxvariation=-1.0
+        if systName=='JET_Flavor_Composition': maxvariation=0.08
+        if systName=='JET_JER_EffectiveNP_7restTerm': maxvariation=0.03
+        if systName=='JET_JER_EffectiveNP_3': maxvariation=0.08
+        if systName=='JET_JER_EffectiveNP_2': maxvariation=0.08
+        if systName=='JET_JER_EffectiveNP_4': maxvariation=0.08
+        if systName=='JET_Pileup_OffsetMu': maxvariation=0.05
+        print systName,' max variation: ',maxvariation
+        
         for r in regions:
             scaleUpVarFlat=1.0
             scaleDwVarFlat=1.0
@@ -411,8 +419,21 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
                 if not sysBinH:
                     continue
+                isModified=False
                 if scaleUpVarFlat!=1.0:
                     sysBinH.SetBinContent(1,currentNomV*scaleUpVarFlat)
+                    isModified=True
+                upVariation=1.0
+                if currentNomV>0.0:
+                    upVariation=sysBinH.GetBinContent(1)/currentNomV
+                if maxvariation>0.0 and abs(1.0-upVariation)>maxvariation:
+                    if (upVariation-1.0)>0.0:
+                        upVariation=1.0+maxvariation
+                    else:
+                        upVariation=1.0-maxvariation
+                    sysBinH.SetBinContent(1,currentNomV*upVariation)
+                    isModified=True
+                if isModified:
                     updateHist+=[sysBinH]
                 sysbef=sysBinH.GetBinContent(1)
                 sysBinL=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
@@ -650,7 +671,9 @@ if __name__=='__main__':
         import VBFAnalysis.Style as Style
 
     # Load libraries
-    config.loadLibs(ROOT)
+    if options.smooth<7:
+        import HInvPlot.JobOptions as config
+        config.loadLibs(ROOT)
     can=DeclareCanvas(options)
     if options.ZeroCheck:
         ZeroCheck()    
@@ -725,6 +748,7 @@ if __name__=='__main__':
 
     allSyst=[]
     if options.syst=='All':
+        import HInvPlot.systematics as vbf_syst
         allSystUpAndDown=vbf_syst.systematics('All').getsystematicsList()
         for s in allSystUpAndDown:
             sSystName=s.rstrip('__1up').rstrip('__1down')

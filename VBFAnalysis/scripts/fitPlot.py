@@ -146,19 +146,19 @@ class texTable(object):
         titleKeys={'SR':'SR',
                        'WCRenu':'W$\\rightarrow$e$\\nu$ CR',
                        'WCRmunu':'W$\\rightarrow\\mu\\nu$ CR',
-                       'lowsigWCRen':'Fake e CR',
+                       'lowsigWCRen':'Fake #it{e} CR',
                        'WCRlnu':'W$\\rightarrow\\ell\\nu$ CR',
                        'ZCRll':'Z$\\rightarrow\\ell\\ell$ CR',
                        }
         NameDict ={'ttbar':'Top$+$#it{VV}/#it{VVV}',
+                       'eleFakes':'#it{e}-fakes',
                    'Z_EWK':'#it{Z} EWK',
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
                    'W_strong':'#it{W} strong',
-                   'signal':'#it{h}(B_{inv}=0.13)',
+                   'signal':'#it{H}(#it{B}_{inv} = 0.13)',
                    'data':'Data',
                    'bkgs':'Total Bkg',
-                   'eleFakes':'e-fakes',
                    'multijet':'Multijet',
                    }
         cString = ("c|"*self.colms)[:-1]
@@ -504,29 +504,35 @@ def removeLabel(leg, name):
         for prim in LOP:
             print prim.GetLabel()
 
-def make_legend(can,poskeys=[0.0,0.1,0.155,0.65],ncolumns=1):
+def make_legend(can,poskeys=[0.0,0.04,0.155,0.59],ncolumns=1):
     leg=can.BuildLegend(poskeys[0],poskeys[1],poskeys[2],poskeys[3])
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
     leg.SetTextFont(42)
     leg.SetNColumns(ncolumns)
     leg.SetTextSize(0.05)
+    legNew=leg.Clone()
+    legNew.Clear()
     #leg.SetNColumns  (2)
     NameDict ={'ttbar':'Top+#it{VV}/#it{VVV}',
+                   'eleFakes':'#it{e}-fakes',
                    'Z_EWK':'#it{Z} EWK',
                    'EWK W':'#it{W} EWK',
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
                    'W_strong':'#it{W} strong',
-                   'signal':'#it{h}(B_{inv}=0.13)',
+                   'signal':'#it{H}(#it{B}_{inv} = 0.13)',
                    'data':'Data',
                    'bkgs':'Unc',
-                   'eleFakes':'e-fakes',
                    'multijet':'Multijet',
                    }
+    if options.postFitPickleDir:
+        NameDict['bkgs']='Post-Fit Unc'
+    
     if not options.scaleSig:
-        NameDict['signal']='#it{h}(B_{inv}=0.13)'
+        NameDict['signal']='#it{H}(#it{B}_{inv} = 0.13)'
     listInputs=[]
+    legOrder=[]
     for i in leg.GetListOfPrimitives():
         
         if i.GetLabel().strip() in NameDict and  NameDict[i.GetLabel().strip()] in listInputs:
@@ -543,13 +549,41 @@ def make_legend(can,poskeys=[0.0,0.1,0.155,0.65],ncolumns=1):
             i.GetObject().SetMarkerSize(0)
             i.GetObject().SetLineWidth(0)
             i.GetObject().SetMarkerColor(0)
+        
     removeLabel(leg, 'dummy')
     removeLabel(leg, 'Others')
     removeLabel(leg, 'multijet')
-    removeLabel(leg, 'W_EWK')    
+    removeLabel(leg, 'W_EWK')
+    removeLabel(leg, 'eleFakes')    
+    for i in leg.GetListOfPrimitives():
+        legOrder+=[[i.GetLabel(),i.GetObject()]]
+        
+    for en in legOrder:
+        if en[0]=='Data':
+            legNew.AddEntry(en[1],en[0])
+            break
+    for en in legOrder:
+        if 'Post-Fit' in en[0]:
+            legNew.AddEntry(en[1],en[0])
+            break
+    for ita in range(0,len(legOrder)):
+        it=len(legOrder)-ita-1
+        if 'Data' in legOrder[it][0]:
+            continue
+        if 'Post-Fit' in legOrder[it][0]:
+            continue
+        if '#it{H}' in legOrder[it][0]:
+            continue
+        legNew.AddEntry(legOrder[it][1],legOrder[it][0])
+    for en in legOrder:
+        if '#it{H}' in en[0]:
+            legNew.AddEntry(en[1],en[0])
+            break
+        
     nEntries=len(leg.GetListOfPrimitives())
     #leg.SetY1(0.9-nEntries*0.04)
-    return leg
+    leg.Clear()
+    return legNew
 
 
 def get_THStack_sum(hstack):
@@ -612,7 +646,7 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
     altArray.append(tmpAltArr)
     texTable1=texTable(arrayArray=arrArray)
     colmNames=[reg for reg in regionDict]
-    rowNames=[hkey.replace("_"," ") for hkey in histDict]+["Data/MC"]
+    rowNames=[hkey.replace("_"," ") for hkey in histDict]+["Data/Bkg"]
     texTable1.setNames(rowNames, colmNames)
     print texTable1.getTableString()
     print "\n###########\n"
@@ -629,7 +663,7 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
     arrArray2.append([str(round(DataMC[f],3)) for f in DataMC])
     texTable2=texTable(arrayArray=arrArray2)
     colmNames2=[reg for reg in regionBinsDict]
-    rowNames2=[hkey.replace("_"," ") for hkey in histDict]+["Data/MC"]
+    rowNames2=[hkey.replace("_"," ") for hkey in histDict]+["Data/Bkg"]
     texTable2.setNames(rowNames2, colmNames2)
     print texTable2.getTableString()
     print "\n###########\n"
@@ -643,7 +677,7 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
     for hkey in histDict:
         if not (hkey.count('bkgsStat') or hkey.count('bkgsAsymErr')):
             rowNames+=[hkey.replace("_"," ")]
-    rowNames+=["Data/MC"]
+    rowNames+=["Data/Bkg"]
     texTable3.setNames(rowNames, colmNames)
     print texTable3.getTableString()
     print "\n###########\n"
@@ -768,7 +802,7 @@ def main(options):
        histNames=["signal"]
     else:
         histNamesSig+=["signal"]#,"VBFH125","ggFH125","VH125"]
-    histNames+=["W_strong", "Z_strong", "W_EWK", "Z_EWK", "eleFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
+    histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
@@ -825,7 +859,7 @@ def main(options):
         dummyHist.GetXaxis().SetBinLabel(regDict[k],k)
     dummyHist.SetMaximum(2000)
     dummyHist.SetMinimum(1)
-    dummyHist.GetYaxis().SetTitle("Events")
+    dummyHist.GetYaxis().SetTitle("Events / Bin")
     dummyHist.GetYaxis().SetTitleSize(1.4*dummyHist.GetYaxis().GetTitleSize())
     dummyHist.GetYaxis().SetTitleOffset(0.54*dummyHist.GetYaxis().GetTitleOffset())    
     dummyHist.GetYaxis().SetRangeUser(1.001,2000)    
@@ -995,7 +1029,7 @@ def main(options):
                     ireg+=1
                 
     #defining bkg hist
-    bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","eleFakes","multijet"] #+["Others"]
+    bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","ttbar","multijet"] #+["Others"]
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
     hDict["bkgs"]=bkgs
     hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
@@ -1262,7 +1296,7 @@ def main(options):
                 rbkgs.SetBinError(i,0.0)
         
         rHist.Divide(rbkgs)
-        rHist.GetYaxis().SetTitle("Data/MC")
+        rHist.GetYaxis().SetTitle("Data / Bkg")
         rHist.GetYaxis().SetTitleOffset(.35)
         rHist.GetYaxis().SetTitleSize(0.15)
         rHist.GetYaxis().CenterTitle()
@@ -1360,16 +1394,16 @@ def main(options):
             labelTxt.SetTextSize(0.04)
         line00=ROOT.TLine(0.16,0.02,0.16,0.11)
         line00.Draw()
-        labelTxt.DrawLatex(0.19,0.035,"Fake e CR")
+        labelTxt.DrawLatex(0.19,0.035,"Fake #it{e} CR")
         line0=ROOT.TLine(0.31,0.02,0.31,0.11)
         line0.Draw()
-        labelTxt.DrawLatex(0.33,0.035,"W#rightarrowe#nu CR")
+        labelTxt.DrawLatex(0.33,0.035,"it{W}#rightarrowit{e#nu} CR")
         line2=ROOT.TLine(0.458,0.02,0.458,0.11)
         line2.Draw()
-        labelTxt.DrawLatex(0.48,0.035,"W#rightarrow#mu#nu CR")
+        labelTxt.DrawLatex(0.48,0.035,"it{W}#rightarrowit{#mu#nu} CR")
         line3=ROOT.TLine(0.605,0.02,0.605,0.11)
         line3.Draw()
-        labelTxt.DrawLatex(0.645,0.035,"Z#rightarrowll CR")
+        labelTxt.DrawLatex(0.645,0.035,"it{Z}#rightarrowit{ll} CR")
         line4=ROOT.TLine(0.752,0.02,0.752,0.11)
         line4.Draw()        
         labelTxt.DrawLatex(0.81,0.035,"SR")
@@ -1384,16 +1418,16 @@ def main(options):
             labelTxt.SetTextSize(0.045)
         line00=ROOT.TLine(0.16,0.02,0.16,0.11)
         line00.Draw()
-        labelTxt.DrawLatex(0.21,0.035,"Fake e CR")
+        labelTxt.DrawLatex(0.21,0.035,"Fake #it{e} CR")
         line0=ROOT.TLine(0.345,0.02,0.345,0.11)
         line0.Draw()
-        labelTxt.DrawLatex(0.395,0.035,"W#rightarrowe#nu CR")
+        labelTxt.DrawLatex(0.395,0.035,"#it{W}#rightarrowit{e#nu} CR")
         line2=ROOT.TLine(0.53,0.02,0.53,0.11)
         line2.Draw()
-        labelTxt.DrawLatex(0.58,0.035,"W#rightarrow#mu#nu CR")
+        labelTxt.DrawLatex(0.58,0.035,"it{W}#rightarrowit{#mu#nu} CR")
         line3=ROOT.TLine(0.715,0.02,0.715,0.11)
         line3.Draw()
-        labelTxt.DrawLatex(0.765,0.035,"Z#rightarrowll CR")
+        labelTxt.DrawLatex(0.765,0.035,"it{Z}#rightarrowit{ll} CR")
         line5=ROOT.TLine(0.9,0.02,0.9,0.11)
         line5.Draw()
         hline=ROOT.TLine(0.16,0.08,0.9,0.08)
@@ -1440,7 +1474,7 @@ def compareMain(options):
         histDict[i]={"bkg":None}
         if options.data:
             histDict[i]["data"]=None
-            histDict[i]["data/MC"]=None
+            histDict[i]["Data/Bkg"]=None
         HistClass.Irfile=openRfiles[i]
         if mjjBins is None:
             mjjBins=HistClass.getNumberOfBins()# This should be 3 in normal analysis
@@ -1469,8 +1503,8 @@ def compareMain(options):
                     addContent(histDict[i]["data"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
 
         if options.data:
-            histDict[i]["data/MC"]=histDict[i]["data"].Clone("data/MC{}".format(i))
-            histDict[i]["data/MC"].Divide(histDict[i]["bkg"])
+            histDict[i]["Data/Bkg"]=histDict[i]["data"].Clone("Data/Bkg{}".format(i))
+            histDict[i]["Data/Bkg"].Divide(histDict[i]["bkg"])
 
         for k in histDict:
             for r in histDict[k]:
@@ -1532,14 +1566,14 @@ def compareMain(options):
                 for n in colmNames2:
                     var=getBinsYield(histDict[r][p], HistClass.regionBins[n])
                     varE=getBinsError(histDict[r][p], HistClass.regionBins[n])
-                    if p=="data/MC":
+                    if p=="Data/Bkg":
                         var=var/len(HistClass.regionBins[n])
                         varE=varE/len(HistClass.regionBins[n])
                     tmpForRatioVals.append(var)
                     colmVals.append(str(round(var,2))+" $\\pm$ "+str(round(varE,2)))
                 tmpForRatio.append(tmpForRatioVals)
                 rowVals.append(colmVals)
-            if options.ratio and not(p=="data/MC"): #TODO add this also for data/MC summary table
+            if options.ratio and not(p=="Data/Bkg"): #TODO add this also for Data/Bkg summary table
                 for nFile in histDict:
                     if nFile==0: continue
                     ratioH=histDict[0][p].Clone("ratioH{}".format(nFile))
@@ -1569,11 +1603,11 @@ def compareMain(options):
 
 
         dummyHist.SetTitle(str(p))
-        if p=="data/MC":
+        if p=="Data/Bkg":
             c1.SetLogy(0)
             dummyHist.SetMaximum(3)
             dummyHist.SetMinimum(0)
-            dummyHist.GetYaxis().SetTitle("Data/MC")
+            dummyHist.GetYaxis().SetTitle("Data / Bkg")
             line1=dummyHist.Clone("line1")
             for i in range(1,line1.GetNbinsX()+1):
                 line1.SetBinContent(i,1)
@@ -1821,9 +1855,11 @@ def plotVar(options):
                 Style.setStyles(bkgDict[key], Style.styleDict[key])
                 
         bkg=ROOT.THStack()
-        #setBinWidth(var,bkgDict.values())        
+        #setBinWidth(var,bkgDict.values())
         if 'multijet' in bkgDict:
             bkg.Add(bkgDict['multijet'])
+        if 'eleFakes' in bkgDict:
+            bkg.Add(bkgDict['eleFakes'])
         if 'ttbar' in bkgDict:
             bkg.Add(bkgDict['ttbar'])
         for h in sorted(bkgDict.values()): #TODO this sorting does not work. implement lambda
@@ -1833,8 +1869,20 @@ def plotVar(options):
             if 'ttbar' in bkgDict:
                 if h==bkgDict['ttbar']:
                     continue
+            if 'eleFakes' in bkgDict:
+                if h==bkgDict['eleFakes']:
+                    continue
+            if 'W_EWK' in bkgDict:
+                if h==bkgDict['W_EWK']:
+                    continue
+            if 'W_strong' in bkgDict:
+                if h==bkgDict['W_strong']:
+                    continue                                
             bkg.Add(h)
-
+        if 'W_EWK' in bkgDict:
+            bkg.Add(bkgDict['W_EWK'])
+        if 'W_strong' in bkgDict:
+            bkg.Add(bkgDict['W_strong'])
         if hObj.isData():
             key=hObj.proc
             #setBinWidth(var,[hObj.hist])
@@ -1885,13 +1933,13 @@ def plotVar(options):
         bkgH.GetYaxis().SetLabelSize(1.5*bkgH.GetYaxis().GetLabelSize())
         bkgH.GetXaxis().SetRangeUser(800,5000.0)
         bkgH.GetYaxis().SetRangeUser(10,40000.0)
-        bkgH.GetYaxis().SetTitle("Events / 500 [GeV]")
+        bkgH.GetYaxis().SetTitle("Events / 500 GeV")
     if var=='jj_dphi':
-        bkgH.GetYaxis().SetTitle("Events")
+        bkgH.GetYaxis().SetTitle("Events / 0.2 rad")
     if var=='met_tst_et':
-        bkgH.GetYaxis().SetTitle("Events / 50 [GeV]")
+        bkgH.GetYaxis().SetTitle("Events / 50 GeV")
     if var=='jj_deta':
-        bkgH.GetYaxis().SetTitle("Events")
+        bkgH.GetYaxis().SetTitle("Events / 0.2")
     bkg.Draw("hist ")
     if var!='jj_mass':
         upperV=bkg.GetHistogram().GetMaximum()
@@ -1915,8 +1963,8 @@ def plotVar(options):
     Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTotA.SetMarkerSize(0)
     systHistAsymTotA.Draw("SAME E2")
-    systHistAsymTotA.SetName('Post-Fit Syst')
-    systHistAsymTotA.SetTitle('Post-Fit Syst')
+    systHistAsymTotA.SetName('Post-Fit Unc')
+    systHistAsymTotA.SetTitle('Post-Fit Unc')
 
     bkg.SetTitle(reg+" "+",".join(mjjBins))
 
@@ -1940,7 +1988,8 @@ def plotVar(options):
     if var=='jj_dphi':
         poskeys=[0.7,0.44,0.9,0.93]
         ncolumns=1
-    make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
+    legP=make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
+    legP.Draw()
     texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="",preliminary=options.preliminary)
     for text in texts:
         text.Draw()
@@ -1966,7 +2015,7 @@ def plotVar(options):
         rHist.GetYaxis().SetRangeUser(0.7501,1.2499)
         rHist.GetYaxis().SetNdivisions(505)
         rHist.Divide(get_THStack_sum(bkg))
-        rHist.GetYaxis().SetTitle("Data/MC")
+        rHist.GetYaxis().SetTitle("Data / Bkg")
         rHist.GetXaxis().SetTitle(var)
         rHist.GetYaxis().SetTitleOffset(.33)
         rHist.GetYaxis().SetTitleSize(0.15)
@@ -2011,7 +2060,7 @@ def plotVar(options):
         rmultijet.SetLineStyle(7)
         rmultijet.SetFillColor(0)
         rmultijet.SetFillStyle(0)
-        rsignal.SetLineStyle(1)        
+        rsignal.SetLineStyle(1)
         rsignal.SetLineWidth(2)
         if var=='jj_mass':
             rsignal.SetBinContent(2,rsignal.GetBinContent(3))
@@ -2063,7 +2112,7 @@ def plotVar(options):
             legR.AddEntry(rsignal,'Signal/Bkg')
             legR.AddEntry(rmultijet,'Multijet/Bkg')
         legR.AddEntry(rbkgPreFit,'Pre-Fit/Post-Fit')
-        legR.AddEntry(systHistAsymTotRatioA,'Post-Fit Syst')
+        legR.AddEntry(systHistAsymTotRatioA,'Post-Fit Unc')
         legR.SetNColumns(2)
         #if reg=='SR':
         legR.Draw()
@@ -2105,7 +2154,7 @@ if __name__=='__main__':
     p.add_option('--cronly', action='store_true', help='Shows the CR only')    
     p.add_option('--debug', action='store_true', help='Print in debug mode')
     p.add_option('--combinePlusMinus', action='store_true', help='Combine the plus and minus')
-    p.add_option('-r', '--ratio', action='store_true', help='Draw data/MC ratio in case of -i and adds ratios to tables for both -i and -c')
+    p.add_option('-r', '--ratio', action='store_true', help='Draw Data/Bkg ratio in case of -i and adds ratios to tables for both -i and -c')
     p.add_option('--yieldTable', action='store_true', help='Produces yield table')
     p.add_option('--saveAs', type='string', help='Saves the canvas in a given format. example argument: pdf')
     p.add_option('-q', '--quite', action='store_true', help='activates Batch mode')

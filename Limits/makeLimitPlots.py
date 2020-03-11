@@ -97,7 +97,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{#it{s}}=13 TeV, %.0f fb^{-1}' %(139e3/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{#it{s}} = 13 TeV, %.0f fb^{-1}' %(139e3/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -430,13 +430,14 @@ class LimitHists:
         #
         # Formatting and Drawing Histograms
         #
-        self.exp.SetXTitle('Mediator Mass [GeV]')
+        self.exp.SetXTitle('Mediator mass [GeV]')
         self.exp.SetYTitle('#sigma/#sigma_{SM}')
-        self.obs.SetXTitle('Mediator Mass [GeV]')
+        self.obs.SetXTitle('Mediator mass [GeV]')
         self.obs.SetYTitle('#sigma/#sigma_{SM}')
+        self.obs.SetMarkerSize(0)
         if options.scaleXS:
-            self.obs.SetYTitle('#sigma_{SM}^{VBF} x  BR_{inv} [pb]') 
-            self.exp.SetYTitle('#sigma_{SM}^{VBF} x  BR_{inv} [pb]') 
+            self.obs.SetYTitle('#sigma_{SM}^{VBF} x  #it{B}_{inv} [pb]') 
+            self.exp.SetYTitle('#sigma_{SM}^{VBF} x  #it{B}_{inv} [pb]') 
         self.sig2_err      .SetName('TwoSigmaBand')
         self.sig1_err      .SetName('OneSigmaBand')
         self.ratio_sig2_err.SetName('TwoSigmaBand')
@@ -601,7 +602,7 @@ def make_table(fit_points, exclusions, name, output):
     #
     name=name.rstrip('/')
     ifile = open(output.rstrip('/')+'/'+name+'.table','w')
-    ifile.write('Mediator Mass ($GeV$) & Significance & Observed & $+2\sigma$ & $+\sigma$ & Expected & $-\sigma$ & $-2\sigma$ \\\\ \n')
+    ifile.write('Mediator mass ($GeV$) & Significance & Observed & $+2\sigma$ & $+\sigma$ & Expected & $-\sigma$ & $-2\sigma$ \\\\ \n')
     
     for fp in fit_points:
 
@@ -1124,7 +1125,7 @@ if __name__=="__main__":
         num_hist.GetYaxis().SetRangeUser(0.5, 1.1*max_bin)
         num_hist.SetYTitle('Ratio #sigma/#sigma_{SM}')
         if options.scaleXS:
-            num_hist.SetYTitle('#sigma_{SM}^{VBF} x  BR_{inv} [pb]')            
+            num_hist.SetYTitle('#sigma_{SM}^{VBF} x  #it{B}_{inv} [pb]')            
         if draw_opt=='':
             draw_opt = 'C SAME'
             num_hist.Draw('AXIS')
