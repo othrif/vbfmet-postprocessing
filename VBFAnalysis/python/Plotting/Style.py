@@ -33,7 +33,8 @@ pastels=[ROOT.kAzure-9,ROOT.kOrange-9,ROOT.kYellow-7,ROOT.kSpring+1,ROOT.kRed-7,
 
 #cool
 #colors=[ROOT.kViolet-4,ROOT.kBlue-6,ROOT.kMagenta-10,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
-colors=[ROOT.kMagenta-10,ROOT.kBlue-6,ROOT.kViolet-4,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
+#colors=[ROOT.kMagenta-10,ROOT.kBlue-6,ROOT.kViolet-4,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
+colors=[ROOT.kMagenta-10,ROOT.kBlue-6,ROOT.kViolet-4,ROOT.kSpring+8,ROOT.kOrange+1,ROOT.kGreen-2,ROOT.kOrange+2]
 #colors=[ROOT.kGray+1,ROOT.kBlue-6,ROOT.kMagenta-10,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
 
 warm=[ROOT.kOrange-1,ROOT.kOrange-9,ROOT.kYellow-7,ROOT.kOrange-3,ROOT.kRed-7,ROOT.kOrange+10,ROOT.kRed-2]

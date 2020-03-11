@@ -263,15 +263,15 @@ def getHistPars(hist):
         'lepEta' : {'xtitle':'Lepton #it{#eta} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'lepPhi' : {'xtitle':'Lepton #it{#phi} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events / 0.2 rad', 'rebin':5,  'ymin':0.01},
-        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01},
+        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01, 'ymax':2000.01}, #, 'ymax':4200.01
         'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / 5 GeV', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
         'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / 25 GeV', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':100,'LtoRCut':0},#'xmax':500, 
         'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':100,  'ymin':5.1,'ymax':3000, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
+        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
         'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / 500 GeV', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':200.0, 'xmax':5000.0, 'ymin':5.1,'ymax':3000,           'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,           'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'jj_deta_signed' : {'xtitle':'Signed #Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
@@ -379,15 +379,15 @@ def getLabelSortKey(sample):
     #elif sample == 'data': return 11
     elif sample == 'bkgs': return 12
     elif sample == 'zewk': return -7
-    elif sample == 'ttg': return 13        
+    elif sample == 'ttg': return 13
     elif sample == 'zgamewk': return 15        
     elif sample == 'wgamewk': return 15
     elif sample == 'zgam': return 13
     elif sample == 'wgam': return 13        
     elif sample == 'pho': return 13
-    elif sample == 'wqcd': return -5
+    elif sample == 'wqcd': return -10
     elif sample == 'wqcdMad': return 14
-    elif sample == 'wewk': return -6
+    elif sample == 'wewk': return -9
     elif sample == 'wdpi': return 16
     elif sample == 'wgas': return 17
     elif sample == 'vvv': return 6
@@ -403,12 +403,12 @@ def getLabelSortKey(sample):
 def getSampleSortKey(sample):
 
     if   sample == 'smww': return 1
-    elif sample == 'zqcd': return 3
-    elif sample == 'zqcdMad': return 3
-    elif sample == 'zewk': return 1
-    elif sample == 'wqcd': return -2
+    elif sample == 'zqcd': return 8
+    elif sample == 'zqcdMad': return -8
+    elif sample == 'zewk': return 7
+    elif sample == 'wqcd': return 10
     elif sample == 'wqcdMad': return -2
-    elif sample == 'wewk': return -1
+    elif sample == 'wewk': return 9
     elif sample == 'top2': return 4
     elif sample == 'top1': return 5
     elif sample == 'tall': return -5
@@ -521,8 +521,10 @@ def getStyle(sample):
     # version cool 
     color_zewk = ROOT.kSpring+8
     color_zqcd = ROOT.kGreen-2
-    color_wqcd = ROOT.kCyan-3
-    color_wewk = ROOT.kTeal
+    #color_wqcd = ROOT.kCyan-3
+    #color_wewk = ROOT.kTeal
+    color_wqcd = ROOT.kOrange+2
+    color_wewk = ROOT.kOrange+1
     color_tall = ROOT.kBlue-6
     color_wdpi = ROOT.kMagenta-10
     color_top1 = ROOT.kYellow +2

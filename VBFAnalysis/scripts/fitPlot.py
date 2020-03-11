@@ -802,7 +802,7 @@ def main(options):
        histNames=["signal"]
     else:
         histNamesSig+=["signal"]#,"VBFH125","ggFH125","VH125"]
-    histNames+=["W_strong", "Z_strong", "W_EWK", "Z_EWK", "eleFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
+    histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
@@ -1872,8 +1872,17 @@ def plotVar(options):
             if 'eleFakes' in bkgDict:
                 if h==bkgDict['eleFakes']:
                     continue
+            if 'W_EWK' in bkgDict:
+                if h==bkgDict['W_EWK']:
+                    continue
+            if 'W_strong' in bkgDict:
+                if h==bkgDict['W_strong']:
+                    continue                                
             bkg.Add(h)
-
+        if 'W_EWK' in bkgDict:
+            bkg.Add(bkgDict['W_EWK'])
+        if 'W_strong' in bkgDict:
+            bkg.Add(bkgDict['W_strong'])
         if hObj.isData():
             key=hObj.proc
             #setBinWidth(var,[hObj.hist])
