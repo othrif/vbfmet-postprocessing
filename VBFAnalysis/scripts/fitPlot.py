@@ -151,6 +151,7 @@ class texTable(object):
                        'ZCRll':'Z$\\rightarrow\\ell\\ell$ CR',
                        }
         NameDict ={'ttbar':'Top$+$#it{VV}/#it{VVV}',
+                       'eleFakes':'#it{e}-fakes',
                    'Z_EWK':'#it{Z} EWK',
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
@@ -158,7 +159,6 @@ class texTable(object):
                    'signal':'#it{H}(#it{B}_{inv} = 0.13)',
                    'data':'Data',
                    'bkgs':'Total Bkg',
-                   'eleFakes':'#it{e}-fakes',
                    'multijet':'Multijet',
                    }
         cString = ("c|"*self.colms)[:-1]
@@ -515,6 +515,7 @@ def make_legend(can,poskeys=[0.0,0.04,0.155,0.59],ncolumns=1):
     legNew.Clear()
     #leg.SetNColumns  (2)
     NameDict ={'ttbar':'Top+#it{VV}/#it{VVV}',
+                   'eleFakes':'#it{e}-fakes',
                    'Z_EWK':'#it{Z} EWK',
                    'EWK W':'#it{W} EWK',
                    'W_EWK':'#it{W} EWK',
@@ -523,7 +524,6 @@ def make_legend(can,poskeys=[0.0,0.04,0.155,0.59],ncolumns=1):
                    'signal':'#it{H}(#it{B}_{inv} = 0.13)',
                    'data':'Data',
                    'bkgs':'Unc',
-                   'eleFakes':'#it{e}-fakes',
                    'multijet':'Multijet',
                    }
     if options.postFitPickleDir:
@@ -554,6 +554,7 @@ def make_legend(can,poskeys=[0.0,0.04,0.155,0.59],ncolumns=1):
     removeLabel(leg, 'Others')
     removeLabel(leg, 'multijet')
     removeLabel(leg, 'W_EWK')
+    removeLabel(leg, 'eleFakes')    
     for i in leg.GetListOfPrimitives():
         legOrder+=[[i.GetLabel(),i.GetObject()]]
         
@@ -1028,7 +1029,7 @@ def main(options):
                     ireg+=1
                 
     #defining bkg hist
-    bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","eleFakes","multijet"] #+["Others"]
+    bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","ttbar","multijet"] #+["Others"]
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
     hDict["bkgs"]=bkgs
     hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
@@ -1854,9 +1855,11 @@ def plotVar(options):
                 Style.setStyles(bkgDict[key], Style.styleDict[key])
                 
         bkg=ROOT.THStack()
-        #setBinWidth(var,bkgDict.values())        
+        #setBinWidth(var,bkgDict.values())
         if 'multijet' in bkgDict:
             bkg.Add(bkgDict['multijet'])
+        if 'eleFakes' in bkgDict:
+            bkg.Add(bkgDict['eleFakes'])
         if 'ttbar' in bkgDict:
             bkg.Add(bkgDict['ttbar'])
         for h in sorted(bkgDict.values()): #TODO this sorting does not work. implement lambda
@@ -1865,6 +1868,9 @@ def plotVar(options):
                     continue
             if 'ttbar' in bkgDict:
                 if h==bkgDict['ttbar']:
+                    continue
+            if 'eleFakes' in bkgDict:
+                if h==bkgDict['eleFakes']:
                     continue
             bkg.Add(h)
 
@@ -2045,7 +2051,7 @@ def plotVar(options):
         rmultijet.SetLineStyle(7)
         rmultijet.SetFillColor(0)
         rmultijet.SetFillStyle(0)
-        rsignal.SetLineStyle(1)        
+        rsignal.SetLineStyle(1)
         rsignal.SetLineWidth(2)
         if var=='jj_mass':
             rsignal.SetBinContent(2,rsignal.GetBinContent(3))

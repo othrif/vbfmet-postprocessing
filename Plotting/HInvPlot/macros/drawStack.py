@@ -355,7 +355,7 @@ def getLabelSortKey(sample):
     elif sample == 'zz': return 4
     elif sample == 'smww': return 1 # was 3
     elif sample == 'top1': return 4
-    elif sample == 'tall': return -5
+    elif sample == 'tall': return 20
     elif sample == 'mqcd': return 5
     elif sample == 'dqcd': return 5
     elif sample == 'vvv': return 6
@@ -372,22 +372,22 @@ def getLabelSortKey(sample):
     elif sample == 'dqcd': return 18
     elif sample == 'wjdte': return 16
     elif sample == 'wjdtm': return 17
-    elif sample == 'zqcd': return 8
+    elif sample == 'zqcd': return -8
     elif sample == 'zqcdMad': return 8
     elif sample == 'hggf': return 9
     elif sample == 'hvbf': return 10
     #elif sample == 'data': return 11
     elif sample == 'bkgs': return 12
-    elif sample == 'zewk': return 13
+    elif sample == 'zewk': return -7
     elif sample == 'ttg': return 13        
     elif sample == 'zgamewk': return 15        
     elif sample == 'wgamewk': return 15
-    elif sample == 'zgam': return 13        
+    elif sample == 'zgam': return 13
     elif sample == 'wgam': return 13        
-    elif sample == 'pho': return 13        
-    elif sample == 'wqcd': return 14
+    elif sample == 'pho': return 13
+    elif sample == 'wqcd': return -5
     elif sample == 'wqcdMad': return 14
-    elif sample == 'wewk': return 15
+    elif sample == 'wewk': return -6
     elif sample == 'wdpi': return 16
     elif sample == 'wgas': return 17
     elif sample == 'vvv': return 6
@@ -2192,9 +2192,14 @@ class DrawStack:
             self.bkg_sum_altb.SetFillColor(1)
             #self.bkg_sum_altb.SetFillStyle(3005)
             self.bkg_sum_altb.SetFillStyle(3345) #3004
+            self.bkg_sum_altb.SetLineColor(1)
+            self.bkg_sum_altb.SetLineWidth(0)
+            self.leg.AddEntry(self.bkg_sum_altb,'Unc')
 
         for bkg in sorted(self.bkgs.keys(), key=getLabelSortKey):
             he = self.bkgs[bkg]
+            if he.hist.Integral()==0:
+                continue
             he.DrawHist(None, self.leg)
 
     #---------------------
