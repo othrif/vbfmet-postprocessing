@@ -1935,11 +1935,11 @@ def plotVar(options):
         bkgH.GetYaxis().SetRangeUser(10,40000.0)
         bkgH.GetYaxis().SetTitle("Events / 500 GeV")
     if var=='jj_dphi':
-        bkgH.GetYaxis().SetTitle("Events / 0.2 rad")
+        bkgH.GetYaxis().SetTitle("Events / 0.5 rad")
     if var=='met_tst_et':
         bkgH.GetYaxis().SetTitle("Events / 50 GeV")
     if var=='jj_deta':
-        bkgH.GetYaxis().SetTitle("Events / 0.2")
+        bkgH.GetYaxis().SetTitle("Events / 0.5")
     bkg.Draw("hist ")
     if var!='jj_mass':
         upperV=bkg.GetHistogram().GetMaximum()
