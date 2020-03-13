@@ -186,16 +186,25 @@ def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110',input_er
 #
 if __name__ == "__main__":
 
+    from optparse  import OptionParser
+    p = OptionParser()
+
+    p.add_option( '--ipath1',     type='string',      default='/tmp/dipole.root',                 dest='ipath1',      help='Input path 1')
+    p.add_option( '--ipath2',     type='string',      default='/tmp/AOWmunuNom.root',        dest='ipath2',      help='Input path 2')
+    p.add_option( '--var',      type='string',      default='jj_mass',                 dest='var',       help='jj_mass,jet_pt2,njets,njets25,jj_dphi,jj_deta,bosonpt')
+
+    (options, args) = p.parse_args()
+    
     Style()
     fout = ROOT.TFile.Open('myplt_W.root','RECREATE')
     can = ROOT.TCanvas('stack', 'stack', 800, 500)
 
     sampleName='H7r207'
     tpye = 'Sig'
-    fIncl = ROOT.TFile.Open('/tmp/dipole.root')
-    #fVBFFilt = ROOT.TFile.Open('/tmp/dipoleMuUp.root')
+    fIncl = ROOT.TFile.Open(options.ipath1)
+    #fVBFFilt = ROOT.TFile.Open('/tmp/dipoleMuUp.root')/tmp/wmunudipoleR207.root
     #fVBFFilt = ROOT.TFile.Open('/tmp/AOWmunuNom.root')
-    fVBFFilt = ROOT.TFile.Open('/tmp/wmunudipoleR207.root')
+    fVBFFilt = ROOT.TFile.Open(options.ipath2)
     treeName1 = 'MiniNtuple'
     treeNamePow = 'MiniNtuple'
     plt=None
@@ -212,24 +221,32 @@ if __name__ == "__main__":
     h2n = fVBFFilt.Get("NumberEvents")
     runCutH7='/%s' %(h2n.GetBinContent(2))
     runCutSh='/%s' %(h1n.GetBinContent(2))
+    
     pvar='truth_jj_mass/1.0e3'
     xaxis='Truth m_{jj} [GeV]'
-    #pvar='exp(-4.0/pow(truth_jj_deta,2)) * pow(jet_eta[2] - (jet_eta[0]+jet_eta[1])/2.0,2)'
-    #xaxis='Third jet centrality'
-    #pvar='jet_pt[2]/1.0e3'
-    #xaxis='Third Jet p_{T} [GeV]'
-    #pvar='njets'
-    #xaxis='Truth N_{jets}'
-    pvar='njets25'
-    xaxis='Truth N_{jets,25}'    
-    #pvar='truth_jj_dphi'
-    #xaxis='Truth #Delta#phi_{jj}'    
-    #pvar='truth_jj_deta'
-    #xaxis='Truth #Delta#eta_{jj}'
+    if options.var=="centrality":
+        pvar='exp(-4.0/pow(truth_jj_deta,2)) * pow(jet_eta[2] - (jet_eta[0]+jet_eta[1])/2.0,2)'
+        xaxis='Third jet centrality'
+    elif options.var=="jet_pt2":
+        pvar='jet_pt[2]/1.0e3'
+        xaxis='Third Jet p_{T} [GeV]'
+    elif options.var=="njets":        
+        pvar='njets'
+        xaxis='Truth N_{jets}'
+    elif options.var=="njets25":        
+        pvar='njets25'
+        xaxis='Truth N_{jets,25}'
+    elif options.var=="jj_dphi":  
+        pvar='truth_jj_dphi'
+        xaxis='Truth #Delta#phi_{jj}'
+    elif options.var=="jj_deta": 
+        pvar='truth_jj_deta'
+        xaxis='Truth #Delta#eta_{jj}'
     #pvar='jet_phi[0]-jet_phi[1]'
     #xaxis='Truth #Delta#phi_{jj}'
-    #pvar='boson_pt[0]/1.0e3'
-    #xaxis='boson p_{T} [GeV]'
+    elif options.var=="bosonpt": 
+        pvar='boson_pt[0]/1.0e3'
+        xaxis='boson p_{T} [GeV]'
     #pvar='jj_dphi'
     #xaxis='#Delta#phi_{jj}'
     #pvar='met_truth_et/1.0e3'
@@ -353,8 +370,8 @@ if __name__ == "__main__":
     leg.SetTextFont(42);
     leg.SetTextSize(0.04);
     leg.AddEntry(plt,'Dipole Recoil')
-    leg.AddEntry(vbfplt,'Rel 20.7')
-    #leg.AddEntry(vbfplt,'AO Shower')
+    #leg.AddEntry(vbfplt,'Rel 20.7')
+    leg.AddEntry(vbfplt,'AO Shower')
     #leg.AddEntry(implt,'Incl for Merging')
     #leg.AddEntry(sumed,'Merged')
     leg.Draw()
