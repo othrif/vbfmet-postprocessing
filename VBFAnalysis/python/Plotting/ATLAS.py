@@ -31,12 +31,12 @@ def getSelKeyLabel(selkey):
 
     return proc
 
-def getATLASLabels(pad, x, y, lumi, text=None, selkey=None, preliminary=False):
+def getATLASLabels(pad, x, y, lumi, text=None, selkey=None, preliminary=False, scaling=1.0):
     tsize=0.075
     l = ROOT.TLatex(x, y, 'ATLAS')
     l.SetNDC()
     l.SetTextFont(72)
-    l.SetTextSize(tsize)
+    l.SetTextSize(tsize*scaling)
     l.SetTextAlign(11)    
     l.SetTextColor(ROOT.kBlack)
     l.Draw()    
@@ -50,16 +50,16 @@ def getATLASLabels(pad, x, y, lumi, text=None, selkey=None, preliminary=False):
             p = ROOT.TLatex(x+0.085, y, '  Preliminary') #
         p.SetNDC()
         p.SetTextFont(42)
-        p.SetTextSize(tsize)
+        p.SetTextSize(tsize*scaling)
         p.SetTextAlign(11)
-        p.SetTextColor(ROOT.kBlack)        
+        p.SetTextColor(ROOT.kBlack)
         p.Draw()
         labs += [p]
 
         a = ROOT.TLatex(x, y-0.04, '#sqrt{#it{s}} = 13 TeV, %.0f fb^{-1}' %(lumi))
         a.SetNDC()
         a.SetTextFont(42)
-        a.SetTextSize(0.04)
+        a.SetTextSize(0.055*scaling)
         a.SetTextAlign(12)
         a.SetTextColor(ROOT.kBlack)
         a.Draw()
@@ -71,7 +71,7 @@ def getATLASLabels(pad, x, y, lumi, text=None, selkey=None, preliminary=False):
         c = ROOT.TLatex(x, y-0.08, proc)
         c.SetNDC()
         c.SetTextFont(42)
-        c.SetTextSize(0.04)
+        c.SetTextSize(0.055*scaling)
         c.SetTextAlign(12)
         c.SetTextColor(ROOT.kBlack)
         labs += [c]

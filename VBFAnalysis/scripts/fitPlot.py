@@ -1928,9 +1928,9 @@ def plotVar(options):
     bkgH.GetYaxis().SetTitleOffset(0.55)
     
     bkgH.GetYaxis().SetTitleSize(1.8*bkgH.GetYaxis().GetTitleSize())
+    bkgH.GetYaxis().SetLabelSize(1.5*bkgH.GetYaxis().GetLabelSize())    
     if var=='jj_mass':
         ROOT.gPad.SetLogy(1)
-        bkgH.GetYaxis().SetLabelSize(1.5*bkgH.GetYaxis().GetLabelSize())
         bkgH.GetXaxis().SetRangeUser(800,5000.0)
         bkgH.GetYaxis().SetRangeUser(10,40000.0)
         bkgH.GetYaxis().SetTitle("Events / 500 GeV")
@@ -1983,14 +1983,14 @@ def plotVar(options):
     #        leg.AddEntry(ik.GetObject(),ik.GetLabel())
     #    else:
     #        ik.Delete()
-    poskeys=[0.6,0.58,0.87,0.93]
+    poskeys=[0.6,0.5,0.87,0.93]
     ncolumns=2
     if var=='jj_dphi':
-        poskeys=[0.7,0.44,0.9,0.93]
+        poskeys=[0.7,0.35,0.9,0.93]
         ncolumns=1
     legP=make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
     legP.Draw()
-    texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="",preliminary=options.preliminary)
+    texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="",preliminary=options.preliminary,scaling=1.1)
     for text in texts:
         text.Draw()
 
@@ -2029,7 +2029,7 @@ def plotVar(options):
         if var=='jj_mass':
             rHist.GetXaxis().SetRangeUser(800,5000.0)
         if var=='jj_dphi':
-            rHist.GetXaxis().SetTitle("#Delta#phi_{jj}")
+            rHist.GetXaxis().SetTitle("#Delta#it{#phi}_{jj}")
         if var=='met_tst_et':
             rHist.GetXaxis().SetTitle("Missing Transverse Momentum #it{E}_{T}^{miss} [GeV]")
         if var=='jj_deta':
@@ -2064,6 +2064,8 @@ def plotVar(options):
         rsignal.SetLineWidth(2)
         if var=='jj_mass':
             rsignal.SetBinContent(2,rsignal.GetBinContent(3))
+            rbkgPreFit.SetBinContent(2,rbkgPreFit.GetBinContent(3))
+            bkgR.SetBinContent(2,bkgR.GetBinContent(3))
         
         rbkgPreFit.SetLineColor(ROOT.kBlue)
         rbkgPreFit.SetLineStyle(9)
@@ -2102,7 +2104,9 @@ def plotVar(options):
         rHist.Draw('same')
 
         # legend
-        legR=ROOT.TLegend(0.18,0.78,0.45,1.0)
+        legR=ROOT.TLegend(0.1752,0.79,0.4554,1.0)
+        if var=="jj_dphi":
+            legR=ROOT.TLegend(0.6565,0.69,0.87,1.0)
         legR.SetTextFont(42)
         #legR.SetNColumns(ncolumns)
         legR.SetTextSize(0.07)
@@ -2111,7 +2115,7 @@ def plotVar(options):
         if reg=='SR':
             legR.AddEntry(rsignal,'Signal/Bkg')
             legR.AddEntry(rmultijet,'Multijet/Bkg')
-        legR.AddEntry(rbkgPreFit,'Pre-Fit/Post-Fit')
+        legR.AddEntry(rbkgPreFit,'Pre-/Post-Fit')
         legR.AddEntry(systHistAsymTotRatioA,'Post-Fit Unc')
         legR.SetNColumns(2)
         #if reg=='SR':
