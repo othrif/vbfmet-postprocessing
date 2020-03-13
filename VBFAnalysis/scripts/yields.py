@@ -289,7 +289,7 @@ for b in range(0,len(region_cf[0])+1): # bins
             else:
                 cline+=' - \t& ' #%(region_cf[r][b])
         else:
-            cline+='%0.1f\t& ' %(region_cf[r][b] )
+            cline+='%0.3f\t& ' %(region_cf[r][b] )
             if b==len(region_cf[0])-3:# mj
                 extra='\\hline\\hline'
             if b==len(region_cf[0])-1:# total bkg
