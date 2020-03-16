@@ -96,10 +96,6 @@ styleDict["W_strong"]=[colors[6],1,1,colors[6],1001,colors[6],0,0]
 styleDict["Z_strong"]=[colors[5],1,1,colors[5],1001,colors[5],0,0]
 styleDict["Z_EWK"]=[colors[3],1,1,colors[3],1001,colors[3],0,0]
 styleDict["multijet"]=[colors[0],1,1,colors[0],1001,colors[0],0,0]
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
 
 # Define the binning for each variable
 varBinning={}
