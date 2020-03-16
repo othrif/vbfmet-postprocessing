@@ -125,11 +125,11 @@ def getSelKeyLabel(selkey):
             elif selkey.count('_ll'): proc = '#it{Z}_{ll}'#'#it{Z}#rightarrow ll'
             elif selkey.count('_ee'): proc = '#it{Z}_{#it{ee}}' #'#it{Z}#rightarrow ee'
             elif selkey.count('_eu'): proc = '#it{e#mu}'
-            elif selkey.count('_em'): proc = '#it{W}_{#it{e^{+}#nu}}^{high}'#'W#rightarrow e^{-}#nu'
-            elif selkey.count('_ep'): proc = '#it{W}_{#it{e^{-}#nu}}^{high}'
+            elif selkey.count('_em'): proc = '#it{W}_{#it{e^{+}#nu}}'#'W#rightarrow e^{-}#nu'^{high}
+            elif selkey.count('_ep'): proc = '#it{W}_{#it{e^{-}#nu}}' #^{high}
             elif selkey.count('_uu'): proc = '#it{Z}_{#it{#mu#mu}}' #'Z#rightarrow#mu#mu'
             elif selkey.count('_l'): proc = 'W#rightarrow l#nu'
-            elif selkey.count('_e'): proc = '#it{W}_{#it{e#nu}}^{high}'#'W#rightarrow e#nu'
+            elif selkey.count('_e'): proc = '#it{W}_{#it{e#nu}}'#'W#rightarrow e#nu'^{high}
             elif selkey.count('_u'): proc = '#it{W}_{#it{#mu#nu}}'#it{W}#rightarrow#it{#mu#nu}'
 
         if selkey.count('LowMETQCD_'):  proc += ', Low MET QCD'
@@ -263,15 +263,15 @@ def getHistPars(hist):
         'lepEta' : {'xtitle':'Lepton #it{#eta} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'lepPhi' : {'xtitle':'Lepton #it{#phi} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events / 0.2 rad', 'rebin':5,  'ymin':0.01},
-        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01, 'ymax':2000.01}, #, 'ymax':4200.01
+        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01, 'xmax':2.0}, #,'ymax':2000.01,'ymax':5500.01, 'ymax':4200.01 , 'ymax':239.99
         'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / 5 GeV', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
         'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / 25 GeV', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':100,'LtoRCut':0},#'xmax':500, 
         'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
+        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':200,  'ymin':5.1,'ymax':3000, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
         'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / 500 GeV', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,           'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':800.0, 'xmax':5000.0, 'ymin':5.1,'ymax':2000,           'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'jj_deta_signed' : {'xtitle':'Signed #Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
@@ -1340,7 +1340,7 @@ class DrawStack:
         self.leg = ROOT.TLegend(0.58, 0.55, 0.93, 0.89)
         self.leg.SetBorderSize(0)
         self.leg.SetFillStyle (0)
-        #self.leg.SetNColumns  (2)
+        #if var=="jj_mass":
         self.leg.SetTextFont(42);
         self.leg.SetTextSize(0.04);
         if fillData:
@@ -1521,6 +1521,10 @@ class DrawStack:
 
         # Allow legend location to be overriden on the command line.
         self.leg = ROOT.TLegend(*options.legend_coords)
+        if True:
+            self.leg = ROOT.TLegend(0.51, 0.60, 0.915, 0.855)
+            #self.leg = ROOT.TLegend(0.50, 0.60, 0.92, 0.84)
+            self.leg.SetNColumns  (2)           
         self.leg.SetBorderSize(0)
         self.leg.SetFillStyle (0)
         self.leg.SetTextFont(42);

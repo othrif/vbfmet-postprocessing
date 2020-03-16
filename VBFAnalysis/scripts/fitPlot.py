@@ -504,7 +504,7 @@ def removeLabel(leg, name):
         for prim in LOP:
             print prim.GetLabel()
 
-def make_legend(can,poskeys=[0.0,0.04,0.155,0.59],ncolumns=1):
+def make_legend(can,poskeys=[0.0,0.04,0.155,0.6],ncolumns=1):
     leg=can.BuildLegend(poskeys[0],poskeys[1],poskeys[2],poskeys[3])
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
@@ -862,7 +862,8 @@ def main(options):
     dummyHist.GetYaxis().SetTitle("Events / Bin")
     dummyHist.GetYaxis().SetTitleSize(1.4*dummyHist.GetYaxis().GetTitleSize())
     dummyHist.GetYaxis().SetTitleOffset(0.54*dummyHist.GetYaxis().GetTitleOffset())    
-    dummyHist.GetYaxis().SetRangeUser(1.001,2000)    
+    dummyHist.GetYaxis().SetRangeUser(1.001,2000)
+    #dummyHist.GetYaxis().SetRangeUser(1.73,5000)
     if options.cronly:
         dummyHist.GetXaxis().SetRangeUser(0,44)
     dummyHist.Draw()
@@ -1319,6 +1320,7 @@ def main(options):
 
         if options.cronly:
             rHist.GetXaxis().SetRangeUser(0,44)
+        rHist.GetYaxis().SetRangeUser(0.801,1.1999)
         rHist.Draw()
         line1.Draw("histsame")
         val=0
@@ -1389,24 +1391,34 @@ def main(options):
     can.cd()
     labelTxt = ROOT.TLatex()
     labelTxt.SetTextAlign(11)
+
+    nameMap={#'FakeE':'#it{W}_{#it{e#nu}}^{low} CR',#Fake #it{e} CR
+              #   'Wenu':'#it{W}_{#it{e#nu}}^{high} CR',##it{W}#rightarrow#it{e#nu} CR
+              'FakeE':'Fake #it{e} CR',#Fake #it{e} CR
+                 'Wenu':'#it{W}_{#it{e#nu}} CR',##it{W}#rightarrow#it{e#nu} CR
+                 'Wmunu':'#it{W}_{#it{#mu#nu}} CR', ##it{W}#rightarrow#it{#mu#nu}
+                 'Zll':'#it{Z}_{#it{ll}} CR',##it{Z}#rightarrow#it{ll}
+                 }
+    yvallab=0.0345
+    shift=0.01
     if not options.cronly:
         if options.combinePlusMinus:
             labelTxt.SetTextSize(0.04)
         line00=ROOT.TLine(0.16,0.02,0.16,0.11)
         line00.Draw()
-        labelTxt.DrawLatex(0.19,0.035,"Fake #it{e} CR")
+        labelTxt.DrawLatex(0.19+shift-0.01,yvallab,nameMap['FakeE'])
         line0=ROOT.TLine(0.31,0.02,0.31,0.11)
         line0.Draw()
-        labelTxt.DrawLatex(0.33,0.035,"#it{W}#rightarrow#it{e#nu} CR")
+        labelTxt.DrawLatex(0.33+shift+0.005,yvallab,nameMap['Wenu'])
         line2=ROOT.TLine(0.458,0.02,0.458,0.11)
         line2.Draw()
-        labelTxt.DrawLatex(0.48,0.035,"#it{W}#rightarrow#it{#mu#nu} CR")
+        labelTxt.DrawLatex(0.48+shift+0.005,yvallab,nameMap['Wmunu'])
         line3=ROOT.TLine(0.605,0.02,0.605,0.11)
         line3.Draw()
-        labelTxt.DrawLatex(0.645,0.035,"#it{Z}#rightarrow#it{ll} CR")
+        labelTxt.DrawLatex(0.645+shift,yvallab,nameMap['Zll'])
         line4=ROOT.TLine(0.752,0.02,0.752,0.11)
         line4.Draw()        
-        labelTxt.DrawLatex(0.81,0.035,"SR")
+        labelTxt.DrawLatex(0.81,yvallab,"SR")
         line5=ROOT.TLine(0.9,0.02,0.9,0.11)
         line5.Draw()
         hline=ROOT.TLine(0.16,0.08,0.9,0.08)
@@ -1418,16 +1430,16 @@ def main(options):
             labelTxt.SetTextSize(0.045)
         line00=ROOT.TLine(0.16,0.02,0.16,0.11)
         line00.Draw()
-        labelTxt.DrawLatex(0.21,0.035,"Fake #it{e} CR")
+        labelTxt.DrawLatex(0.21+shift,yvallab,nameMap['FakeE'])
         line0=ROOT.TLine(0.345,0.02,0.345,0.11)
         line0.Draw()
-        labelTxt.DrawLatex(0.395,0.035,"#it{W}#rightarrow#it{e#nu} CR")
+        labelTxt.DrawLatex(0.395+shift,yvallab,nameMap['Wenu'])
         line2=ROOT.TLine(0.53,0.02,0.53,0.11)
         line2.Draw()
-        labelTxt.DrawLatex(0.58,0.035,"#it{W}#rightarrow#it{#mu#nu} CR")
+        labelTxt.DrawLatex(0.58+shift,yvallab,nameMap['Wmunu'])
         line3=ROOT.TLine(0.715,0.02,0.715,0.11)
         line3.Draw()
-        labelTxt.DrawLatex(0.765,0.035,"#it{Z}#rightarrow#it{ll} CR")
+        labelTxt.DrawLatex(0.765+shift,yvallab,nameMap['Zll'])
         line5=ROOT.TLine(0.9,0.02,0.9,0.11)
         line5.Draw()
         hline=ROOT.TLine(0.16,0.08,0.9,0.08)
