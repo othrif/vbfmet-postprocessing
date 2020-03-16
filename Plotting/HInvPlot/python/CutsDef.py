@@ -497,8 +497,8 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
             cuts += metCuts(basic_cuts,options,metCut=130.0, cstCut=100.0)#, maxMET=150.0)
         else:
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
-            #cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0)
-            cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
+            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0)
+            #cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
             #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
 
@@ -626,6 +626,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
 
     cuts += [CutItem('CutPh',       'n_ph==1')]
+    cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
     cuts += getJetCuts(basic_cuts, options, isPh=True);
 
     # add the extra cuts...decide if we want these

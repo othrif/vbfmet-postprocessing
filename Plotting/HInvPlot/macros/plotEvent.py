@@ -216,6 +216,10 @@ def main():
     #
     anas    = ['allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3500']
     chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']
+    if options.OverlapPh:
+        anas    = ['allmjj']
+        chans   = ['nn','ee','uu','ll','l','e','u']
+    
     if options.analysis!='all' and options.analysis.count(','):
         anas = options.analysis.split(',')
     elif options.analysis!='all':
@@ -350,21 +354,21 @@ def main():
                             read_alg.AddNormalAlg(name_zcr_gam,  alg_zcr_gam)
                             (name_wcr_gam,  alg_wcr_gam)  = prepareSeqGamWCR (basic_cuts, alg_take=input_cut, syst=syst)
                             read_alg.AddNormalAlg(name_wcr_gam,  alg_wcr_gam)
+                        else:
+                            #
+                            # ZCR Cut based regions and algorithms
+                            #
+                            (name_zcr,  alg_zcr)  = prepareSeqZCR (basic_cuts, a, alg_take=input_cut, syst=syst)
+                            read_alg.AddNormalAlg(name_zcr,  alg_zcr)
 
-                        #
-                        # ZCR Cut based regions and algorithms
-                        #
-                        (name_zcr,  alg_zcr)  = prepareSeqZCR (basic_cuts, a, alg_take=input_cut, syst=syst)
-                        read_alg.AddNormalAlg(name_zcr,  alg_zcr)
+                            #
+                            # WCR Cut based regions and algorithms
+                            #
+                            (name_wcr,  alg_wcr)  = prepareSeqWCR (basic_cuts, a, alg_take=input_cut, syst=syst)
+                            read_alg.AddNormalAlg(name_wcr,  alg_wcr)
 
-                        #
-                        # WCR Cut based regions and algorithms
-                        #
-                        (name_wcr,  alg_wcr)  = prepareSeqWCR (basic_cuts, a, alg_take=input_cut, syst=syst)
-                        read_alg.AddNormalAlg(name_wcr,  alg_wcr)
-
-                        (name_wcranti, alg_wcranti) = prepareSeqWCRAntiID(basic_cuts, a, alg_take=input_cut, syst=syst)
-                        read_alg.AddNormalAlg(name_wcranti, alg_wcranti)
+                            (name_wcranti, alg_wcranti) = prepareSeqWCRAntiID(basic_cuts, a, alg_take=input_cut, syst=syst)
+                            read_alg.AddNormalAlg(name_wcranti, alg_wcranti)
 
         read_alg.RunConfForAlgs()
 

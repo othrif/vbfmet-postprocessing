@@ -2,11 +2,41 @@ import ROOT
 import sys,os
 import math
 from optparse import OptionParser
-import HInvPlot.systematics as vbf_syst
-import HInvPlot.JobOptions as config
 
 def HistName(histName, regionName, systName, binNum):
     return "h"+histName+"_"+(regionName.replace('X','%s' %binNum)).replace('Nom_',systName+'_')
+
+#-----------------------------------------
+def BinomialErr(n2, n1, err1=0.0):
+    err=0.0
+    if n1==0:
+        return err
+    total_num=n1
+    if err1>0.0:
+        total_num = (n1/err1)**2
+
+    eff = n2/n1
+    if eff>1.0 or eff<0.0:
+        print 'eff too high',eff
+        return 0
+    err = math.sqrt(eff*(1.0-eff)/total_num)
+    return err
+
+def SetBinomialErrorRatio(hsys,hnom):
+    for ib in range(1,hnom.GetNbinsX()+1):
+        ratio = 1.0
+        nomV=hnom.GetBinContent(ib)
+        sysV=hsys.GetBinContent(ib)
+        if nomV>0.0:
+            ratio=sysV/nomV
+        hsys.SetBinContent(ib,ratio)
+        if nomV>sysV and nomV>0.0: 
+            hsys.SetBinError(ib,BinomialErr(sysV,nomV,hnom.GetBinError(ib)))
+        elif sysV>0.0:
+            hsys.SetBinError(ib,BinomialErr(nomV,sysV,hnom.GetBinError(ib)))
+        else:
+            hsys.SetBinError(ib,0.0)                        
+        
 
 def DeclareCanvas(options):
 
@@ -347,6 +377,16 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 updateHist+=[sysBinH] 
     elif options.smooth==10:
         print 'smoothing option 10...symmeterize'
+        # looked up the max variation for the systematics pre smoothing. the parabolic smoothing can inflate the systematics. reduced this to the max
+        maxvariation=-1.0
+        if systName=='JET_Flavor_Composition': maxvariation=0.08
+        if systName=='JET_JER_EffectiveNP_7restTerm': maxvariation=0.03
+        if systName=='JET_JER_EffectiveNP_3': maxvariation=0.08
+        if systName=='JET_JER_EffectiveNP_2': maxvariation=0.08
+        if systName=='JET_JER_EffectiveNP_4': maxvariation=0.08
+        if systName=='JET_Pileup_OffsetMu': maxvariation=0.05
+        print systName,' max variation: ',maxvariation
+        
         for r in regions:
             scaleUpVarFlat=1.0
             scaleDwVarFlat=1.0
@@ -379,8 +419,21 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
                 sysBinH=rNewfile.Get(HistName(histName, r, systName+'High', ibin))
                 if not sysBinH:
                     continue
+                isModified=False
                 if scaleUpVarFlat!=1.0:
                     sysBinH.SetBinContent(1,currentNomV*scaleUpVarFlat)
+                    isModified=True
+                upVariation=1.0
+                if currentNomV>0.0:
+                    upVariation=sysBinH.GetBinContent(1)/currentNomV
+                if maxvariation>0.0 and abs(1.0-upVariation)>maxvariation:
+                    if (upVariation-1.0)>0.0:
+                        upVariation=1.0+maxvariation
+                    else:
+                        upVariation=1.0-maxvariation
+                    sysBinH.SetBinContent(1,currentNomV*upVariation)
+                    isModified=True
+                if isModified:
                     updateHist+=[sysBinH]
                 sysbef=sysBinH.GetBinContent(1)
                 sysBinL=rNewfile.Get(HistName(histName, r, systName+'Low', ibin))
@@ -429,7 +482,7 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
             else:
                 nLoaded+=1
             h.SetBinContent(binOrder[ibin-1], nomBinH.GetBinContent(1))
-            h.SetBinError  (binOrder[ibin-1], 0.001*nomBinH.GetBinError  (1))
+            h.SetBinError  (binOrder[ibin-1], nomBinH.GetBinError  (1))
             #*nomBinH.GetBinError  (1)
             # up variation
             sysBinH=rfile.Get(HistName(histName, r, systName+'High', ibin))
@@ -464,8 +517,12 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
     totalMin=1.0    
     # create hists and divide
     for r in regions:
-        sysUpMap[r].Divide(nomMap[r])
-        sysDwMap[r].Divide(nomMap[r])
+        if True:
+            SetBinomialErrorRatio(sysUpMap[r],nomMap[r])
+            SetBinomialErrorRatio(sysDwMap[r],nomMap[r])
+        else:
+            sysUpMap[r].Divide(nomMap[r])
+            sysDwMap[r].Divide(nomMap[r])
         max1=sysUpMap[r].GetMaximum()
         max2=sysDwMap[r].GetMaximum()
         min1=1.0
@@ -614,7 +671,9 @@ if __name__=='__main__':
         import VBFAnalysis.Style as Style
 
     # Load libraries
-    config.loadLibs(ROOT)
+    if options.smooth<7:
+        import HInvPlot.JobOptions as config
+        config.loadLibs(ROOT)
     can=DeclareCanvas(options)
     if options.ZeroCheck:
         ZeroCheck()    
@@ -689,6 +748,7 @@ if __name__=='__main__':
 
     allSyst=[]
     if options.syst=='All':
+        import HInvPlot.systematics as vbf_syst
         allSystUpAndDown=vbf_syst.systematics('All').getsystematicsList()
         for s in allSystUpAndDown:
             sSystName=s.rstrip('__1up').rstrip('__1down')

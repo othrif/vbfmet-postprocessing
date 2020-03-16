@@ -32,7 +32,10 @@ bold=[ROOT.kGreen+2,ROOT.kBlack,ROOT.kYellow,ROOT.kAzure-2,ROOT.kRed,ROOT.kBlue+
 pastels=[ROOT.kAzure-9,ROOT.kOrange-9,ROOT.kYellow-7,ROOT.kSpring+1,ROOT.kRed-7,ROOT.kGreen+3,ROOT.kRed-2]
 
 #cool
-colors=[ROOT.kViolet-4,ROOT.kBlue-6,ROOT.kMagenta-10,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
+#colors=[ROOT.kViolet-4,ROOT.kBlue-6,ROOT.kMagenta-10,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
+#colors=[ROOT.kMagenta-10,ROOT.kBlue-6,ROOT.kViolet-4,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
+colors=[ROOT.kMagenta-10,ROOT.kBlue-6,ROOT.kViolet-4,ROOT.kSpring+8,ROOT.kOrange+1,ROOT.kGreen-2,ROOT.kOrange+2]
+#colors=[ROOT.kGray+1,ROOT.kBlue-6,ROOT.kMagenta-10,ROOT.kSpring+8,ROOT.kTeal,ROOT.kGreen-2,ROOT.kCyan-3]
 
 warm=[ROOT.kOrange-1,ROOT.kOrange-9,ROOT.kYellow-7,ROOT.kOrange-3,ROOT.kRed-7,ROOT.kOrange+10,ROOT.kRed-2]
 
@@ -93,7 +96,10 @@ styleDict["W_strong"]=[colors[6],1,1,colors[6],1001,colors[6],0,0]
 styleDict["Z_strong"]=[colors[5],1,1,colors[5],1001,colors[5],0,0]
 styleDict["Z_EWK"]=[colors[3],1,1,colors[3],1001,colors[3],0,0]
 styleDict["multijet"]=[colors[0],1,1,colors[0],1001,colors[0],0,0]
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 
 # Define the binning for each variable
 varBinning={}

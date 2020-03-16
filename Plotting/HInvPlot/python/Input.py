@@ -382,6 +382,14 @@ def prepareBkgRuns(keys,options=None):
                #'308281':'VBF125 - H1000', 
                '308282':'VBF125 - H2000',
                #'308283':'VBF125 - H3000',
+               '313134':'VBFH50',
+               '313135':'VBFH75',
+               '313136':'VBFH100',
+               '313137':'VBFH300',
+               '313138':'VBFH750',
+               '313139':'VBFH1000',
+               '313140':'VBFH2000',
+               '313141':'VBFH3000',
                    }
     alt_VBFext = {'308279':'VBF125 - H500',
                   '308281':'VBF125 - H1000', 
@@ -1117,6 +1125,7 @@ def prepareBkgRuns(keys,options=None):
                           '364584':'taunugammagamma_pty_140_E_CMS',
                           }
     bkg_ttg = {'410082':'ttgamma_noallhad',
+                   '410087':'ttgamma_allhad'
                    }
     bkg_pho = {'364541':'SinglePhoton_pty_17_35',
                '364542':'SinglePhoton_pty_35_70',

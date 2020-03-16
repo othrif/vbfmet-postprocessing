@@ -899,7 +899,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Store jet HT!
     // Happily, this is also the variable we need to recompute met significance.
     event->AddVar(Mva::jetHT, jetht);
-
+    
     TLorentzVector tmp;
     const TLorentzVector j1v = event->jets.at(0).GetLVec();
     const TLorentzVector j2v = event->jets.at(1).GetLVec();
@@ -1179,6 +1179,13 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       }
       new_metsig = event->met.Pt() / sqrt(jetht + basept0);
     }
+    // computing variatibles for QCD rejection
+    float met_cst_tst_sub = event->GetVar(Mva::met_tst_nolep_et) - event->GetVar(Mva::met_cst_jet);
+    if(event->GetVar(Mva::met_tst_nolep_et)!=0.0)
+      event->RepVar(Mva::met_cst_tst_ratio, fabs(met_cst_tst_sub)/event->GetVar(Mva::met_tst_nolep_et));
+    else
+      event->RepVar(Mva::met_cst_tst_ratio,0.0);
+    event->RepVar(Mva::met_cst_tst_sub, met_cst_tst_sub);
 
     //if (event->GetVar(Mva::n_jet) == 2) {
     //  if (new_metsig != event->GetVar(Mva::met_significance)) {

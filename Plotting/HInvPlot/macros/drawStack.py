@@ -149,7 +149,9 @@ def getSelKeyLabel(selkey):
             else:
                 proc += ' CR'
         elif selkey.count('zcr'): proc += ' CR'
-        #if selkey.count('FJVT_'):  proc += ',f-jvt'
+        if selkey.count('FJVT_'):  proc += ',f-jvt'
+        if selkey.count('LowMETQCDSR'): proc = 'Low #it{E}_{T}^{miss} CR' #proc += ', Low MET QCD, N_{jet}=2'
+        elif selkey.count('mjjLow200_'):  proc = 'Low #it{m}_{jj} CR' #proc += ', 0.2<m_{jj}<0.8TeV'        
     return proc
 
 #-------------------------------------------------------------------------
@@ -179,7 +181,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{#it{s}}=13 TeV, %.0f fb^{-1}' %(options.int_lumi/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{#it{s}} = 13 TeV, %.0f fb^{-1}' %(options.int_lumi/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -215,11 +217,11 @@ def getHistPars(hist):
         #                         4 adds every two bins together
         'jetEta0': {'xtitle':'Leading jet #it{#eta}'  ,           'ytitle':'Events', 'rebin':5}, #5
         'jet0Phi': {'xtitle':'Leading jet #it{#phi}'  ,           'ytitle':'Events', 'rebin':2},
-        'jetPt0' : {'xtitle':'#it{p}_{T}^{jet 1} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
+        'jetPt0' : {'xtitle':'#it{p}_{T}^{jet 1} [GeV]',          'ytitle':'Events / 10 GeV', 'rebin':10, 'LtoRCut':0},
         'jetHT' : {'xtitle':'H_{T} [GeV]',          'ytitle':'Events', 'rebin':2, 'logy':True, 'LtoRCut':0},
         'jetEta1': {'xtitle':'Sub-Leading jet #it{#eta}'  ,       'ytitle':'Events', 'rebin':5},
         'jet1Phi': {'xtitle':'Sub-Leading jet #it{#phi}'  ,       'ytitle':'Events', 'rebin':2},
-        'jetPt1' : {'xtitle':'#it{p}_{T}^{jet 2} [GeV]',          'ytitle':'Events / (10 GeV)', 'rebin':10, 'LtoRCut':0},
+        'jetPt1' : {'xtitle':'#it{p}_{T}^{jet 2} [GeV]',          'ytitle':'Events / 10 GeV', 'rebin':10, 'LtoRCut':0},
         'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
@@ -260,16 +262,16 @@ def getHistPars(hist):
         'muon_den_pt'   : {'xtitle':'Anti-Id Muon #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
         'lepEta' : {'xtitle':'Lepton #it{#eta} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'lepPhi' : {'xtitle':'Lepton #it{#phi} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
-        'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events', 'rebin':5,  'ymin':0.01},
-        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events', 'rebin':2,  'ymin':0.01},
-        'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / (5 GeV)', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
-        'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':200,'xmax':500, 'LtoRCut':0},
+        'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events / 0.2 rad', 'rebin':5,  'ymin':0.01},
+        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01, 'ymax':2000.01}, #, 'ymax':4200.01
+        'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / 5 GeV', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
+        'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / 25 GeV', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':100,'LtoRCut':0},#'xmax':500, 
         'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) [GeV]',                 'ytitle':'Events / (25 GeV)', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
-        'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T,miss} (remove leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / (5 GeV)', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
-        'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / (500 GeV)', 'rebin':0,  'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
+        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
+        'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
+        'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
+        'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / 500 GeV', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,           'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'jj_deta_signed' : {'xtitle':'Signed #Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
@@ -277,18 +279,20 @@ def getHistPars(hist):
         'jj_deta_abs' : {'xtitle':'|#it{#eta}_{j2}| - |#it{#eta}_{j1}|/#Delta#it{#eta}_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
         'ptll'   : {'xtitle':'#it{p}_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'#it{m}_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
-        'met_significance'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.1,'logy':True},
-        'metsig_tst'     : {'xtitle':'#it{S}_{MET}^{TST} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.01,'logy':True},
+        'met_significance'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':2,  'ymin':0.1,'logy':True},
+        'metsig_tst'     : {'xtitle':'#it{S}_{MET}^{TST} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.01,'logy':True},
         'alljet_metsig'     : {'xtitle':'#it{S}_{MET} (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
     'met_cst_jet'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
+    'met_cst_tst_sub'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT}-#it{E}_{T}^{miss} [GeV]'   ,         'ytitle':'Events',   'ymin':5.1},
+    'met_cst_tst_ratio'     : {'xtitle':'|1-#it{E}_{T}^{jet,no-JVT}/#it{E}_{T}^{miss}|'   ,         'ytitle':'Events', 'ymin':5.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
     'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
-    'met_tenacious_tst_nolep_et'     : {'xtitle':'Tenacious MET (lepton removed) [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},    
+    'met_tenacious_tst_nolep_et'     : {'xtitle':'Tenacious MET (without leptons) [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},    
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_mass'     : {'xtitle':'Truth #it{m}_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_deta'     : {'xtitle':'Truth #Delta#it{#eta}_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
-    'truth_jj_dphi'     : {'xtitle':'Truth #Delta#it{#phi}_{jj}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'truth_jj_dphi'     : {'xtitle':'Truth #Delta#it{#phi}_{jj}'   ,         'ytitle':'Events / 0.2 rad',   'ymin':0.1},
     'truth_j1_pt'     : {'xtitle':'Truth lead Jet #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_j2_pt'     : {'xtitle':'Truth lead Jet #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'SherpaVTruthPt'     : {'xtitle':'Sherpa #it{p}_{T} V [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},                
@@ -317,8 +321,8 @@ def getHistPars(hist):
     'min_mj3_over_mjj'     : {'xtitle':'min #it{m}_{j1/j2,j3} / #it{m}_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},
     'centrality'     : {'xtitle':'j3 Centrality',         'ytitle':'Events',   'ymin':0.1},
     'phcentrality'     : {'xtitle':'#it{#gamma} Centrality'   ,         'ytitle':'Events',   'ymin':0.1,'rebin':5},
-    'phPt'     : {'xtitle':'#it{#gamma} #it{p}_{T} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
-    'phEta'     : {'xtitle':'#it{#gamma} #it{#eta}'   ,         'ytitle':'Events',   'ymin':0.1},
+    'phPt'     : {'xtitle':'#it{#gamma} #it{p}_{T} [GeV]'   ,         'ytitle':'Events',  'rebin':2,'logy':True, 'ymin':0.1},
+    'phEta'     : {'xtitle':'#it{#gamma} #it{#eta}'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.1},
     'met_tst_ph_dphi'     : {'xtitle':'#Delta#it{#phi}(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'Mtt'     : {'xtitle':'#it{m}_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'minDRLep'     : {'xtitle':'min #DeltaR(j,lep)'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -351,7 +355,7 @@ def getLabelSortKey(sample):
     elif sample == 'zz': return 4
     elif sample == 'smww': return 1 # was 3
     elif sample == 'top1': return 4
-    elif sample == 'tall': return -5
+    elif sample == 'tall': return 20
     elif sample == 'mqcd': return 5
     elif sample == 'dqcd': return 5
     elif sample == 'vvv': return 6
@@ -368,22 +372,22 @@ def getLabelSortKey(sample):
     elif sample == 'dqcd': return 18
     elif sample == 'wjdte': return 16
     elif sample == 'wjdtm': return 17
-    elif sample == 'zqcd': return 8
+    elif sample == 'zqcd': return -8
     elif sample == 'zqcdMad': return 8
     elif sample == 'hggf': return 9
     elif sample == 'hvbf': return 10
     #elif sample == 'data': return 11
     elif sample == 'bkgs': return 12
-    elif sample == 'zewk': return 13
-    elif sample == 'ttg': return 13        
+    elif sample == 'zewk': return -7
+    elif sample == 'ttg': return 13
     elif sample == 'zgamewk': return 15        
     elif sample == 'wgamewk': return 15
-    elif sample == 'zgam': return 13        
+    elif sample == 'zgam': return 13
     elif sample == 'wgam': return 13        
-    elif sample == 'pho': return 13        
-    elif sample == 'wqcd': return 14
+    elif sample == 'pho': return 13
+    elif sample == 'wqcd': return -10
     elif sample == 'wqcdMad': return 14
-    elif sample == 'wewk': return 15
+    elif sample == 'wewk': return -9
     elif sample == 'wdpi': return 16
     elif sample == 'wgas': return 17
     elif sample == 'vvv': return 6
@@ -399,12 +403,12 @@ def getLabelSortKey(sample):
 def getSampleSortKey(sample):
 
     if   sample == 'smww': return 1
-    elif sample == 'zqcd': return 3
-    elif sample == 'zqcdMad': return 3
-    elif sample == 'zewk': return 1
-    elif sample == 'wqcd': return -2
+    elif sample == 'zqcd': return 8
+    elif sample == 'zqcdMad': return -8
+    elif sample == 'zewk': return 7
+    elif sample == 'wqcd': return 10
     elif sample == 'wqcdMad': return -2
-    elif sample == 'wewk': return -1
+    elif sample == 'wewk': return 9
     elif sample == 'top2': return 4
     elif sample == 'top1': return 5
     elif sample == 'tall': return -5
@@ -459,16 +463,16 @@ def getSampleLabel(sample):
         'wgas': '#it{W#gamma*}',
         'zgas': '#it{Z#gamma*}',
         'zgam': '#it{Z#gamma}',
-        'zgamewk': '#it{Z#gamma} EWK',        
-        'wgamewk': '#it{W#gamma} EWK',        
+        'zgamewk': '#it{Z#gamma} EWK',
+        'wgamewk': '#it{W#gamma} EWK',
         'ttg': '#it{t#bar{t}#gamma}',
         'pho': '#it{#gamma}+j',
-        'htau':  '%s #it{h}#rightarrow#tau#tau'%options.hmass,
+        'htau':  '%s #it{H}#rightarrow#tau#tau'%options.hmass,
         'hggf':  'ggF Higgs',
-        #'higgs':  '#it{h}(B_{inv}=0.13)',
-        #'hvbf':  '#it{h}(B_{inv}=0.13)',
-        'higgs':  '#it{h} (B_{inv}=%0.2f)' %options.hscale,
-        'hvbf':  '#it{h} (B_{inv}=%0.2f)' %options.hscale,
+        #'higgs':  '#it{h}(#it{B}_{inv} = 0.13)',
+        #'hvbf':  '#it{h}(#it{B}_{inv} = 0.13)',
+        'higgs':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
+        'hvbf':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
         'ttv' : 't#bar{t}V+tV',
         'data': 'Data',
         'bkgs': 'Total SM',
@@ -507,13 +511,24 @@ def getStyle(sample):
     #color_zqcd = ROOT.kGreen  -3
     #color_wqcd = ROOT.kGreen  -7
     #color_wewk = ROOT.kCyan   -9
-    color_zewk = ROOT.kCyan   -9
-    color_zqcd = ROOT.kBlue-9
-    color_wqcd = ROOT.kGreen  -3
-    color_wewk = ROOT.kGreen  -7
+    # version 2
+    #color_zewk = ROOT.kCyan   -9
+    #color_zqcd = ROOT.kBlue-9
+    #color_wqcd = ROOT.kGreen  -3
+    #color_wewk = ROOT.kGreen  -7
+    #color_tall = ROOT.kMagenta-9 #ROOT.kYellow +1 #ROOT.kRed+1
+    #color_wdpi = ROOT.kGray+1#ROOT.kOrange-5
+    # version cool 
+    color_zewk = ROOT.kSpring+8
+    color_zqcd = ROOT.kGreen-2
+    #color_wqcd = ROOT.kCyan-3
+    #color_wewk = ROOT.kTeal
+    color_wqcd = ROOT.kOrange+2
+    color_wewk = ROOT.kOrange+1
+    color_tall = ROOT.kBlue-6
+    color_wdpi = ROOT.kMagenta-10
     color_top1 = ROOT.kYellow +2
     color_top2 = ROOT.kYellow +1
-    color_tall = ROOT.kMagenta-9 #ROOT.kYellow +1 #ROOT.kRed+1
     color_wzzz = ROOT.kMagenta-3
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
     color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3
@@ -525,7 +540,6 @@ def getStyle(sample):
     color_zgamewk = ROOT.kOrange-6    
     color_ttg = ROOT.kBlue   -9
     color_pho = ROOT.kGreen -3
-    color_wdpi = ROOT.kGray+1#ROOT.kOrange-5
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
     color_higgs = ROOT.kViolet-9 #ROOT.kRed    +0
@@ -551,8 +565,8 @@ def getStyle(sample):
         'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'wgam':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'zgamewk':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
-        'wgamewk':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'zgamewk':{'color':color_zgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'wgamewk':{'color':color_wgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
@@ -1649,7 +1663,8 @@ class DrawStack:
             self.bkg_sum_alt.SetMarkerColor(ROOT.kRed)
             self.bkg_sum_alt.SetMarkerSize(0)
             self.bkg_sum_alt.SetFillColor(1)
-            self.bkg_sum_alt.SetFillStyle(3004)
+            self.bkg_sum_alt.SetFillStyle(3345) #3004
+            
         self.leg.Draw()
         self.leg1.Draw()
 
@@ -1676,7 +1691,7 @@ class DrawStack:
             self.stackeg = ROOT.TGraphAsymmErrors(bkg_herr)
 
             #self.stackeg.SetFillStyle(3005)
-            self.stackeg.SetFillStyle(3004)
+            self.stackeg.SetFillStyle(3345) # 3004
             self.stackeg.SetFillColor(1)
             self.stackeg.GetXaxis().SetLabelColor(0)
             #self.stackeg.Draw('2')
@@ -1704,14 +1719,14 @@ class DrawStack:
         syst_jes_ratio = self.SystBand(norm_hists_bkg, syst=syst_hist_bkg, syst_ratio=syst_ratio, linestyle=0, tot_bkg=self.bkg_sum, other_syst=None) #other_syst=self.stackeg
 
         # Setting the draw options
-        syst_hist_bkg.SetFillStyle(3004)
+        syst_hist_bkg.SetFillStyle(3345) #3004
         syst_hist_bkg.SetFillColor(12)
         syst_hist_bkg.SetMarkerColor(1)
         syst_hist_bkg.SetLineColor(1)
         syst_hist_bkg.GetXaxis().SetLabelColor(0)
         self.error_map['bkg']=syst_hist_bkg.Clone()
         self.error_map['bkg'].GetXaxis().SetLabelColor(0)
-        self.error_map['bkg'].SetFillStyle(3004)
+        self.error_map['bkg'].SetFillStyle(3345) #3004
         self.error_map['bkg'].SetFillColor(ROOT.kBlack)
         self.error_map['bkg'].SetMarkerColor(1)
         self.error_map['bkg'].SetMarkerSize(0)
@@ -1936,9 +1951,9 @@ class DrawStack:
             if 'xtitle' in pars and self.bkg_sum.GetXaxis() != None:
                 self.ratio.GetXaxis().SetTitle(pars['xtitle'])
             if options.blind:
-                self.ratio.GetYaxis().SetTitle('Sig. / SM ')
+                self.ratio.GetYaxis().SetTitle('Sig./Bkg ')
             else:
-                self.ratio.GetYaxis().SetTitle('Data / SM ')
+                self.ratio.GetYaxis().SetTitle('Data / Bkg ')
             #if options.blind:
             #    for i in range(0,self.ratio.GetNbinsX()+1):
             #        self.ratio.SetBinError(i,0.0)
@@ -1979,7 +1994,7 @@ class DrawStack:
             bx.SetTickLength(ROOT.gStyle.GetTickLength() * ratioPadScaling);
 
             #bx.SetTitle("Observable");
-            #bx.SetTitle("Data/SM");
+            #bx.SetTitle("Data/Bkg");
             bx.SetLabelSize(0.13);
             bx.SetLabelOffset(0.02);
             bx.SetTitleSize(0.14);
@@ -1988,6 +2003,8 @@ class DrawStack:
             #by.SetRangeUser(0.501, 1.499);
             #by.SetRangeUser(0.751, 1.249);
             by.SetRangeUser(0.601, 1.399);
+            if options.ph_ana:
+                by.SetRangeUser(0.501, 1.499);
             if options.blind:
                 by.SetRangeUser(0,0.799);
                 by.SetRangeUser(0,1.7999);
@@ -2004,7 +2021,7 @@ class DrawStack:
             #
             self.error_map['bkg_ratio'] = syst_ratio.Clone()
             #self.error_map['bkg_ratio'].SetFillStyle(3354)
-            self.error_map['bkg_ratio'].SetFillStyle(3004)
+            self.error_map['bkg_ratio'].SetFillStyle(3345) # 3004
             self.error_map['bkg_ratio'].SetFillColor(ROOT.kBlack)
             self.error_map['bkg_ratio'].SetMarkerColor(1)
             self.error_map['bkg_ratio'].SetMarkerSize(0)
@@ -2176,10 +2193,15 @@ class DrawStack:
             self.bkg_sum_altb.SetMarkerSize(0)
             self.bkg_sum_altb.SetFillColor(1)
             #self.bkg_sum_altb.SetFillStyle(3005)
-            self.bkg_sum_altb.SetFillStyle(3004)
+            self.bkg_sum_altb.SetFillStyle(3345) #3004
+            self.bkg_sum_altb.SetLineColor(1)
+            self.bkg_sum_altb.SetLineWidth(0)
+            self.leg.AddEntry(self.bkg_sum_altb,'Unc')
 
         for bkg in sorted(self.bkgs.keys(), key=getLabelSortKey):
             he = self.bkgs[bkg]
+            if he.hist.Integral()==0:
+                continue
             he.DrawHist(None, self.leg)
 
     #---------------------
@@ -2528,6 +2550,7 @@ def main():
 
     #config.setPlotDefaults(ROOT)
     Style()
+    ROOT.gStyle.SetHatchesLineWidth(1)
     can = ROOT.TCanvas('stack', 'stack', *options.canvas_size)
     can.Draw()
     can.cd()
