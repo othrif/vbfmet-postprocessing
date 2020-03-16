@@ -1298,7 +1298,7 @@ def main(options):
         rHist.Divide(rbkgs)
         rHist.GetYaxis().SetTitle("Data / Bkg")
         rHist.GetYaxis().SetTitleOffset(.35)
-        rHist.GetYaxis().SetTitleSize(0.15)
+        rHist.GetYaxis().SetTitleSize(0.145)
         rHist.GetYaxis().CenterTitle()
 
 	#Set x axis labels
@@ -1689,7 +1689,7 @@ def plotVar(options):
         if reg=='oneEleLowSigCR':
             plotIndex=2
     rfile=ROOT.TFile(options.input)
-
+    AltDphi=True
     postFitPickles=None
     fittedSRVals={}
     fittedSRErrs={}
@@ -1928,7 +1928,11 @@ def plotVar(options):
     bkgH.GetYaxis().SetTitleOffset(0.55)
     
     bkgH.GetYaxis().SetTitleSize(1.8*bkgH.GetYaxis().GetTitleSize())
-    bkgH.GetYaxis().SetLabelSize(1.5*bkgH.GetYaxis().GetLabelSize())    
+    bkgH.GetYaxis().SetLabelSize(1.5*bkgH.GetYaxis().GetLabelSize())
+    bkgH.GetYaxis().SetTickLength(0.0135)
+    bkgH.GetXaxis().SetTickLength(0.03)
+    dataH.GetYaxis().SetTickLength(0.02)
+    dataH.GetXaxis().SetTickLength(0.05)    
     if var=='jj_mass':
         ROOT.gPad.SetLogy(1)
         bkgH.GetXaxis().SetRangeUser(800,5000.0)
@@ -1944,6 +1948,9 @@ def plotVar(options):
     if var!='jj_mass':
         upperV=bkg.GetHistogram().GetMaximum()
         bkgH.GetYaxis().SetRangeUser(0.1, 1.25*upperV)
+        if AltDphi and var=='jj_dphi':
+            bkgH.GetXaxis().SetRangeUser(0,2.0)
+            bkgH.GetYaxis().SetRangeUser(0.1, 1.45*upperV)            
     bkgH.Draw('AXIS')
     bkg.Draw("HIST same")
     signal.Draw("HIST same")
@@ -1988,6 +1995,9 @@ def plotVar(options):
     if var=='jj_dphi':
         poskeys=[0.7,0.35,0.9,0.93]
         ncolumns=1
+        if AltDphi:
+            poskeys=[0.6,0.65,0.9,0.91]
+            ncolumns=2
     legP=make_legend(ROOT.gPad,poskeys,ncolumns=ncolumns)
     legP.Draw()
     texts = ATLAS.getATLASLabels(can, 0.2, 0.85, options.lumi, selkey="",preliminary=options.preliminary,scaling=1.1)
@@ -2017,8 +2027,8 @@ def plotVar(options):
         rHist.Divide(get_THStack_sum(bkg))
         rHist.GetYaxis().SetTitle("Data / Bkg")
         rHist.GetXaxis().SetTitle(var)
-        rHist.GetYaxis().SetTitleOffset(.33)
-        rHist.GetYaxis().SetTitleSize(0.15)
+        rHist.GetYaxis().SetTitleOffset(.338)
+        rHist.GetYaxis().SetTitleSize(0.14)
         rHist.GetXaxis().SetTitleOffset(1.0)
         rHist.GetXaxis().SetTitleSize(0.15)
         rHist.GetYaxis().CenterTitle()
@@ -2030,6 +2040,8 @@ def plotVar(options):
             rHist.GetXaxis().SetRangeUser(800,5000.0)
         if var=='jj_dphi':
             rHist.GetXaxis().SetTitle("#Delta#it{#phi}_{jj}")
+            if AltDphi:
+                rHist.GetXaxis().SetRangeUser(0,2.0)
         if var=='met_tst_et':
             rHist.GetXaxis().SetTitle("Missing Transverse Momentum #it{E}_{T}^{miss} [GeV]")
         if var=='jj_deta':
@@ -2054,14 +2066,14 @@ def plotVar(options):
         #bkgR.Add(multijet,-1.0)
         rmultijet.Add(bkgR)
         rmultijet.Divide(bkgR)
-        rmultijet.SetLineWidth(2)
+        rmultijet.SetLineWidth(1)
         #rmultijet.SetLineColor(Style.styleDict["multijet"][3])
         rmultijet.SetLineColor(Style.styleDict["eleFakes"][3])
         rmultijet.SetLineStyle(7)
         rmultijet.SetFillColor(0)
         rmultijet.SetFillStyle(0)
         rsignal.SetLineStyle(1)
-        rsignal.SetLineWidth(2)
+        rsignal.SetLineWidth(1)
         if var=='jj_mass':
             rsignal.SetBinContent(2,rsignal.GetBinContent(3))
             rbkgPreFit.SetBinContent(2,rbkgPreFit.GetBinContent(3))
@@ -2069,9 +2081,9 @@ def plotVar(options):
         
         rbkgPreFit.SetLineColor(ROOT.kBlue)
         rbkgPreFit.SetLineStyle(9)
-        rbkgPreFit.SetMarkerSize(0)        
+        rbkgPreFit.SetMarkerSize(0)
         rbkgPreFit.SetMarkerColor(ROOT.kBlue)
-        rbkgPreFit.SetLineWidth(2)
+        rbkgPreFit.SetLineWidth(1)
         rbkgPreFit.SetFillColor(0)
         rbkgPreFit.SetFillStyle(0)
         rbkgPreFit.Divide(bkgR)
@@ -2106,7 +2118,10 @@ def plotVar(options):
         # legend
         legR=ROOT.TLegend(0.1752,0.79,0.4554,1.0)
         if var=="jj_dphi":
-            legR=ROOT.TLegend(0.6565,0.69,0.87,1.0)
+            if AltDphi:
+                legR=ROOT.TLegend(0.60,0.745,0.87,1.0)
+            else:
+                legR=ROOT.TLegend(0.6565,0.69,0.87,1.0)
         legR.SetTextFont(42)
         #legR.SetNColumns(ncolumns)
         legR.SetTextSize(0.07)

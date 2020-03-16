@@ -199,7 +199,7 @@ if __name__ == "__main__":
     fout = ROOT.TFile.Open('myplt_W.root','RECREATE')
     can = ROOT.TCanvas('stack', 'stack', 800, 500)
 
-    sampleName='H7r207'
+    sampleName='H7MuUp'
     tpye = 'Sig'
     fIncl = ROOT.TFile.Open(options.ipath1)
     #fVBFFilt = ROOT.TFile.Open('/tmp/dipoleMuUp.root')/tmp/wmunudipoleR207.root
@@ -371,7 +371,8 @@ if __name__ == "__main__":
     leg.SetTextSize(0.04);
     leg.AddEntry(plt,'Dipole Recoil')
     #leg.AddEntry(vbfplt,'Rel 20.7')
-    leg.AddEntry(vbfplt,'AO Shower')
+    #leg.AddEntry(vbfplt,'AO Shower')
+    leg.AddEntry(vbfplt,'MuUp')
     #leg.AddEntry(implt,'Incl for Merging')
     #leg.AddEntry(sumed,'Merged')
     leg.Draw()
@@ -387,7 +388,8 @@ if __name__ == "__main__":
     hratio = vbfplt.Clone()
     hratio.Divide(plt)
     #hratio.GetYaxis().SetTitle('AO/DipoleRec')
-    hratio.GetYaxis().SetTitle('R20p7/DipoleRec')    
+    hratio.GetYaxis().SetTitle('MuUp/Nom')
+    #hratio.GetYaxis().SetTitle('R20p7/DipoleRec')    
     hratio.GetYaxis().SetRangeUser(0.8,1.2)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
