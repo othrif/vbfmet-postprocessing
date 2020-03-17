@@ -705,7 +705,7 @@ StatusCode VBFAnalysisAlg::execute() {
       //truth_mu
       float muon_veto_sf=1.0;
       for(unsigned imuo=0; imuo<truth_mu_pt->size(); ++imuo){
-	if(truth_mu_pt->at(imuo)>4.0e3 && abs(truth_mu_eta->at(imuon))<2.7) muon_veto_sf*=1.2;
+	if(truth_mu_pt->at(imuo)>4.0e3 && abs(truth_mu_eta->at(imuo))<2.7) muon_veto_sf*=1.2;
       }
       tMapFloat["muoANTISFEL_EFF_ID__1down"]=muon_veto_sf;
       tMapFloat["muoANTISFEL_EFF_ID__1up"]=muon_veto_sf-1.0;
@@ -1338,11 +1338,10 @@ StatusCode VBFAnalysisAlg::execute() {
 	if(!(n_baseel==0 && n_basemu==0)) tmp_muoANTISF=1.0;
       }else{ tmp_muoANTISF=1.0; }
     }
-
+    
     if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
     ATH_MSG_DEBUG("VBFAnalysisAlg Looping weight Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight << " muoANTISF: " << tmp_muoANTISF);
-
-
+    
     tMapFloatW[it->first]=weight*mcEventWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_muoANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst total: : " << tMapFloatW[it->first] );
     if(m_doPUWeight) tMapFloatW[it->first]*=tmp_puWeight;
@@ -1446,7 +1445,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	if(tMapFloat.find(newSystNames.at(iSys))==tMapFloat.end()){
 	  tMapFloat [newSystNames.at(iSys)]=1.0;
 	  tMapFloatW[newSystNames.at(iSys)]=1.0;
-	  m_tree_out->Branch("w"+newSystNames.at(iSys),&(tMapFloatW[newSystNames.at(iSys)]));
+	  m_tree_out->Branch((std::string("w")+newSystNames.at(iSys)).c_str(),&(tMapFloatW[newSystNames.at(iSys)]));
+	}
       }
       // QG inputs
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
