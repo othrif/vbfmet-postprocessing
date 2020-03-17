@@ -693,6 +693,24 @@ StatusCode VBFAnalysisAlg::execute() {
       tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
     }
   }
+  // muon veto systematic
+  if(m_isMC && m_currentVariation=="Nominal"){
+    tMapFloat["muoANTISFEL_EFF_ID__1down"]=1.0;
+    tMapFloat["muoANTISFEL_EFF_ID__1up"]=1.0;
+    // if no leptons are found, then let's apply the veto systematic uncertainty
+    if((n_baseel==0 && n_basemu==0)){
+      tMapFloat["muoANTISFEL_EFF_ID__1down"]=1.0;
+      tMapFloat["muoANTISFEL_EFF_ID__1up"]=1.0;
+    }else{
+      //truth_mu
+      float muon_veto_sf=1.0;
+      for(unsigned imuo=0; imuo<truth_mu_pt->size(); ++imuo){
+	if(truth_mu_pt->at(imuo)>4.0e3 && abs(truth_mu_eta->at(imuon))<2.7) muon_veto_sf*=1.2;
+      }
+      tMapFloat["muoANTISFEL_EFF_ID__1down"]=muon_veto_sf;
+      tMapFloat["muoANTISFEL_EFF_ID__1up"]=muon_veto_sf-1.0;
+    }
+  }
 
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
@@ -1208,7 +1226,8 @@ StatusCode VBFAnalysisAlg::execute() {
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt"); // this allows the baseline>=2 to pass
 
   // reset the electron anti-ID SF to only affect W events. To be fixed. kind of a hack
-  bool isWenu = ((runNumber>=364170 && runNumber<=364183) || (runNumber>=363600 && runNumber<=363623) || (runNumber==363359 || runNumber==363360 || runNumber==363489));
+  bool isWenu = ((runNumber>=364170 && runNumber<=364183) || (runNumber>=363600 && runNumber<=363623) || (runNumber>=312496 && runNumber<=312507) || (runNumber==363359 || runNumber==363360 || runNumber==363489 || runNumber==308096 || runNumber==363237));
+  bool isWmnu = ((runNumber>=364156 && runNumber<=364169) || (runNumber>=363624 && runNumber<=363647) || (runNumber>=312508 && runNumber<=312519) || (runNumber==363359 || runNumber==363360 || runNumber==363489 || runNumber==308097 || runNumber==363238));
   eleANTISF=std::min<float>(eleANTISF,1.5);
   eleANTISF=std::max<float>(eleANTISF,0.6);
   if(isWenu){
@@ -1263,6 +1282,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_muSFTrigWeight = muSFTrigWeight;
   float tmp_phSFWeight = phSFWeight;
   float tmp_eleANTISF = eleANTISF;
+  float tmp_muoANTISF = 1.0;
   float tmp_nloEWKWeight = nloEWKWeight;
   float tmp_puSyst2018Weight = puSyst2018Weight;
   float tmp_qgTagWeight = 1.0; // assuming the default weight is 1.0 for qg tagging
@@ -1281,6 +1301,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_muSFTrigWeight = muSFTrigWeight;
     tmp_phSFWeight = phSFWeight;
     tmp_eleANTISF = eleANTISF;
+    tmp_muoANTISF = 1.0;
     tmp_nloEWKWeight = nloEWKWeight;
     tmp_puSyst2018Weight = puSyst2018Weight;
     tmp_qgTagWeight = 1.0; // default value is 1
@@ -1309,13 +1330,20 @@ StatusCode VBFAnalysisAlg::execute() {
       if(isWenu){
 	if(!(n_baseel==0 && n_basemu==0)) tmp_eleANTISF=1.0;
       }else{ tmp_eleANTISF=1.0; }
+    }else if(it->first.Contains("muoANTISF")){
+      tmp_muoANTISF=tMapFloat[it->first];
+      tmp_muoANTISF=std::min<float>(tmp_muoANTISF,1.5);
+      tmp_muoANTISF=std::max<float>(tmp_muoANTISF,0.6);
+      if(isWmnu){
+	if(!(n_baseel==0 && n_basemu==0)) tmp_muoANTISF=1.0;
+      }else{ tmp_muoANTISF=1.0; }
     }
 
     if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
-    ATH_MSG_DEBUG("VBFAnalysisAlg Looping weight Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight);
+    ATH_MSG_DEBUG("VBFAnalysisAlg Looping weight Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight << " muoANTISF: " << tmp_muoANTISF);
 
 
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_muoANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst total: : " << tMapFloatW[it->first] );
     if(m_doPUWeight) tMapFloatW[it->first]*=tmp_puWeight;
     if(m_doVjetRW) tMapFloatW[it->first] *= tmp_vjWeight;
@@ -1413,20 +1441,12 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	  m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
 	}
       }
-      if(tMapFloat.find("puSyst2018Weight__1up")==tMapFloat.end()){
-	tMapFloat ["puSyst2018Weight__1up"]=1.0;
-	tMapFloatW["puSyst2018Weight__1up"]=1.0;
-	m_tree_out->Branch("wpuSyst2018Weight__1up",&(tMapFloatW["puSyst2018Weight__1up"]));
-      }
-      if(tMapFloat.find("puSyst2018Weight__1down")==tMapFloat.end()){
-	tMapFloat ["puSyst2018Weight__1down"]=1.0;
-	tMapFloatW["puSyst2018Weight__1down"]=1.0;
-	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
-      }
-      if(tMapFloat.find("puSyst2018Weight__1down")==tMapFloat.end()){
-	tMapFloat ["puSyst2018Weight__1down"]=1.0;
-	tMapFloatW["puSyst2018Weight__1down"]=1.0;
-	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
+      std::vector<std::string> newSystNames={"muoANTISFEL_EFF_ID__1down","muoANTISFEL_EFF_ID__1up","puSyst2018Weight__1up","puSyst2018Weight__1down"};
+      for(unsigned iSys=0; iSys<newSystNames.size(); ++iSys){
+	if(tMapFloat.find(newSystNames.at(iSys))==tMapFloat.end()){
+	  tMapFloat [newSystNames.at(iSys)]=1.0;
+	  tMapFloatW[newSystNames.at(iSys)]=1.0;
+	  m_tree_out->Branch("w"+newSystNames.at(iSys),&(tMapFloatW[newSystNames.at(iSys)]));
       }
       // QG inputs
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
