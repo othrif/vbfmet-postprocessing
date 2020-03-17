@@ -698,17 +698,25 @@ StatusCode VBFAnalysisAlg::execute() {
     tMapFloat["muoANTISFEL_EFF_ID__1down"]=1.0;
     tMapFloat["muoANTISFEL_EFF_ID__1up"]=1.0;
     // if no leptons are found, then let's apply the veto systematic uncertainty
-    if((n_baseel==0 && n_basemu==0)){
+    if(!(n_baseel==0 && n_basemu==0)){
       tMapFloat["muoANTISFEL_EFF_ID__1down"]=1.0;
       tMapFloat["muoANTISFEL_EFF_ID__1up"]=1.0;
     }else{
       //truth_mu
       float muon_veto_sf=1.0;
-      for(unsigned imuo=0; imuo<truth_mu_pt->size(); ++imuo){
-	if(truth_mu_pt->at(imuo)>4.0e3 && abs(truth_mu_eta->at(imuo))<2.7) muon_veto_sf*=1.2;
+      TVector3 tmp,mtmp;
+      for(unsigned imuo=0; imuo<std::min<unsigned>(1,imuo<truth_mu_pt->size()); ++imuo){ //for(unsigned imuo=0; imuo<truth_mu_pt->size(); ++imuo){
+	mtmp.SetPtEtaPhi(truth_mu_pt->at(imuo), truth_mu_eta->at(imuo), truth_mu_phi->at(imuo));
+	bool jetOverlap=false;
+	for(unsigned iJet=0; iJet<jet_pt->size(); ++iJet){
+	  tmp.SetPtEtaPhi(jet_pt->at(iJet), jet_eta->at(iJet), jet_phi->at(iJet));
+	  if(tmp.DeltaR(mtmp)<0.3){ jetOverlap=true; break; }
+	}
+	if(jetOverlap) continue;
+	if(truth_mu_pt->at(imuo)>4.0e3 && abs(truth_mu_eta->at(imuo))<2.5) muon_veto_sf*=1.2;
       }
-      tMapFloat["muoANTISFEL_EFF_ID__1down"]=muon_veto_sf;
-      tMapFloat["muoANTISFEL_EFF_ID__1up"]=muon_veto_sf-1.0;
+      tMapFloat["muoANTISFEL_EFF_ID__1up"]=muon_veto_sf;
+      tMapFloat["muoANTISFEL_EFF_ID__1down"]=2.0-muon_veto_sf;
     }
   }
 
