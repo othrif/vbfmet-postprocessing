@@ -146,7 +146,7 @@ class BasicCuts:
 
         # By default: no special metsig cut.
         # Apply one if running a 'msgt4' or 'mslt4' analysis.
-        self.MetsigLowerCut = 0.0
+        self.MetsigLowerCut = -0.0001
         self.MetsigUpperCut = -1.0
         if Analysis.count('msgt4'):
             self.MetsigLowerCut = 4.0
@@ -818,7 +818,8 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, 
             new_cuts.append(cutobj)
 
     # Add a cut to veto signal leptons.
-    new_cuts.append(CutItem("CutNoSigLeps", "n_lep_w == 0"))
+    #new_cuts.append(CutItem("CutNoSigLeps", "n_lep_w == 0"))
+    new_cuts.append(CutItem("CutNoSigLeps", "n_siglep == 0"))
 
     # Add the trigger isolation: ptvarcone30/pt < 0.07 for mu, ptvarcone20/pt<0.1
     # Only do for muons. For now, do for none!
