@@ -138,20 +138,20 @@ def getSelKeyLabel(selkey):
         elif selkey.count('LowMETQCDSR'): proc = 'Low #it{E}_{T}^{miss}' #proc += ', Low MET QCD, N_{jet}=2'
         elif selkey.count('mjjLow200_'):  proc = 'Low #it{m}_{jj}' #proc += ', 0.2<m_{jj}<0.8TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
-        elif selkey.count('njgt2lt5_'):  proc += ',2<N_{jet}<5'
-        elif selkey.count('njgt3lt5_'):  proc += ',3<N_{jet}<5'
-        elif selkey.count('njgt2_'):  proc += ',2<N_{jet}'
-        elif selkey.count('njgt3_'):  proc += ',3<N_{jet}'
+        elif selkey.count('njgt2lt5_'):  proc += ',2<#it{N}_{jet}<5'
+        elif selkey.count('njgt3lt5_'):  proc += ',3<#it{N}_{jet}<5'
+        elif selkey.count('njgt2_'):  proc += ',#it{N}_{jet} #geq 3'
+        elif selkey.count('njgt3_'):  proc += ',#it{N}_{jet} #geq 4'
         if selkey.count('sr_'):  proc += ' SR'
         elif selkey.count('wcr'):
             if 'anti' in selkey:
-                proc += ', Anti-ID'
+                proc += ', anti-ID'
             else:
                 proc += ' CR'
         elif selkey.count('zcr'): proc += ' CR'
         if selkey.count('FJVT_'):  proc += ',f-jvt'
         if selkey.count('LowMETQCDSR'): proc = 'Low #it{E}_{T}^{miss} CR' #proc += ', Low MET QCD, N_{jet}=2'
-        elif selkey.count('mjjLow200_'):  proc = 'Low #it{m}_{jj} CR' #proc += ', 0.2<m_{jj}<0.8TeV'        
+        elif selkey.count('mjjLow200_'):  proc = 'Low #it{m}_{jj} CR' #proc += ', 0.2<m_{jj}<0.8TeV'
     return proc
 
 #-------------------------------------------------------------------------
@@ -257,6 +257,8 @@ def getHistPars(hist):
         'JetEMECvsBCIDPosPt55'  : {'xtitle':'Jet #it{#eta} wth 55<#it{p}_{T} GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
 
         'lepPt0'   : {'xtitle':'Lepton #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':20},
+        'baseMuPt'   : {'xtitle':'Base #it{p}_{T}^{#mu} [GeV]', 'ytitle':'Events', 'rebin':5},
+        'baseMuEta'   : {'xtitle':'Base #it{#eta}_{#mu}', 'ytitle':'Events', 'rebin':5},
         'baseElPt'   : {'xtitle':'Electron #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':4, 'xmax': 600, 'logy': True},
         'elec_num_pt'   : {'xtitle':'Id Electron #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':5},
         'muon_den_pt'   : {'xtitle':'Anti-Id Muon #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
@@ -443,13 +445,13 @@ def getSampleLabel(sample):
         'smww': '#it{WW/W#gamma}',
         'zjet': '#it{Z}+jets',
         'qflip': 'Charge Flip',
-        'zqcd': '#it{Z} QCD',
-        'zqcdMad': '#it{Z} QCD',
+        'zqcd': '#it{Z} strong',
+        'zqcdMad': '#it{Z} strong',
         'zewk': '#it{Z} EWK',
         'mqcd': 'Multijet',
         'dqcd': 'Multijet',
-        'wqcd': '#it{W} QCD',
-        'wqcdMad': '#it{W} QCD',
+        'wqcd': '#it{W} strong',
+        'wqcdMad': '#it{W} strong',
         'wewk': '#it{W} EWK',
         'top1': 'Single Top',
         'top2': 'Top', #'t#bar{t}',

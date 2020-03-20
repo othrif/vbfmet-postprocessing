@@ -200,6 +200,8 @@ if __name__ == "__main__":
     can = ROOT.TCanvas('stack', 'stack', 800, 500)
 
     sampleName='H7MuUp'
+    #sampleName='H7R207'
+    #sampleName='H7AO'
     tpye = 'Sig'
     fIncl = ROOT.TFile.Open(options.ipath1)
     #fVBFFilt = ROOT.TFile.Open('/tmp/dipoleMuUp.root')/tmp/wmunudipoleR207.root
@@ -389,8 +391,8 @@ if __name__ == "__main__":
     hratio.Divide(plt)
     #hratio.GetYaxis().SetTitle('AO/DipoleRec')
     hratio.GetYaxis().SetTitle('MuUp/Nom')
-    #hratio.GetYaxis().SetTitle('R20p7/DipoleRec')    
-    hratio.GetYaxis().SetRangeUser(0.8,1.2)       
+    #hratio.GetYaxis().SetTitle('R20p7/Rel21')    
+    hratio.GetYaxis().SetRangeUser(0.9,1.1)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);

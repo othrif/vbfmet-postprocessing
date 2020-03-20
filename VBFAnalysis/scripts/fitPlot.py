@@ -146,7 +146,7 @@ class texTable(object):
         titleKeys={'SR':'SR',
                        'WCRenu':'W$\\rightarrow$e$\\nu$ CR',
                        'WCRmunu':'W$\\rightarrow\\mu\\nu$ CR',
-                       'lowsigWCRen':'Fake #it{e} CR',
+                       'lowsigWCRen':'Fake-#it{e} CR',
                        'WCRlnu':'W$\\rightarrow\\ell\\nu$ CR',
                        'ZCRll':'Z$\\rightarrow\\ell\\ell$ CR',
                        }
@@ -527,7 +527,7 @@ def make_legend(can,poskeys=[0.0,0.04,0.155,0.6],ncolumns=1):
                    'multijet':'Multijet',
                    }
     if options.postFitPickleDir:
-        NameDict['bkgs']='Post-Fit Unc'
+        NameDict['bkgs']='Unc'
     
     if not options.scaleSig:
         NameDict['signal']='#it{H}(#it{B}_{inv} = 0.13)'
@@ -545,7 +545,7 @@ def make_legend(can,poskeys=[0.0,0.04,0.155,0.6],ncolumns=1):
             i.GetObject().SetMarkerColor(i.GetObject().GetFillColor())
         if i.GetLabel() in NameDict:
             i.SetLabel(NameDict[i.GetLabel()])
-        if 'Post-Fit' in i.GetLabel().strip():
+        if 'Unc' in i.GetLabel().strip():
             i.GetObject().SetMarkerSize(0)
             i.GetObject().SetLineWidth(0)
             i.GetObject().SetMarkerColor(0)
@@ -563,14 +563,14 @@ def make_legend(can,poskeys=[0.0,0.04,0.155,0.6],ncolumns=1):
             legNew.AddEntry(en[1],en[0])
             break
     for en in legOrder:
-        if 'Post-Fit' in en[0]:
+        if 'Unc' in en[0]:
             legNew.AddEntry(en[1],en[0])
             break
     for ita in range(0,len(legOrder)):
         it=len(legOrder)-ita-1
         if 'Data' in legOrder[it][0]:
             continue
-        if 'Post-Fit' in legOrder[it][0]:
+        if 'Unc' in legOrder[it][0]:
             continue
         if '#it{H}' in legOrder[it][0]:
             continue
@@ -1372,9 +1372,9 @@ def main(options):
         blindStr=", SR blinded"
     if options.cronly:
         blindStr=", CR only"
-    namingScheme="Pre-Fit"
+    namingScheme="Pre-fit"
     if options.postFitPickleDir!=None:
-        namingScheme="Post-Fit"
+        namingScheme="Post-fit"
 
     preFitLabel=ROOT.TLatex(.5,.86,namingScheme+blindStr)
     preFitLabel.SetNDC()
@@ -1392,9 +1392,9 @@ def main(options):
     labelTxt = ROOT.TLatex()
     labelTxt.SetTextAlign(11)
 
-    nameMap={#'FakeE':'#it{W}_{#it{e#nu}}^{low} CR',#Fake #it{e} CR
+    nameMap={#'FakeE':'#it{W}_{#it{e#nu}}^{low} CR',#Fake-#it{e} CR
               #   'Wenu':'#it{W}_{#it{e#nu}}^{high} CR',##it{W}#rightarrow#it{e#nu} CR
-              'FakeE':'Fake #it{e} CR',#Fake #it{e} CR
+              'FakeE':'Fake-#it{e} CR',#Fake-#it{e} CR
                  'Wenu':'#it{W}_{#it{e#nu}} CR',##it{W}#rightarrow#it{e#nu} CR
                  'Wmunu':'#it{W}_{#it{#mu#nu}} CR', ##it{W}#rightarrow#it{#mu#nu}
                  'Zll':'#it{Z}_{#it{ll}} CR',##it{Z}#rightarrow#it{ll}
@@ -1982,8 +1982,8 @@ def plotVar(options):
     Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTotA.SetMarkerSize(0)
     systHistAsymTotA.Draw("SAME E2")
-    systHistAsymTotA.SetName('Post-Fit Unc')
-    systHistAsymTotA.SetTitle('Post-Fit Unc')
+    systHistAsymTotA.SetName('Unc')
+    systHistAsymTotA.SetTitle('Unc')
 
     bkg.SetTitle(reg+" "+",".join(mjjBins))
 
@@ -2019,9 +2019,9 @@ def plotVar(options):
     blindStr=""
     if not options.unBlindSR and reg=="SR":
         blindStr=", SR blinded"
-    preFitLabel=ROOT.TLatex(.45,.88,"Pre-Fit"+blindStr)
+    preFitLabel=ROOT.TLatex(.45,.88,"Pre-fit"+blindStr)
     if options.postFitPickleDir!=None:
-        preFitLabel=ROOT.TLatex(.45,.85,"Post-Fit"+blindStr)        
+        preFitLabel=ROOT.TLatex(.45,.85,"Post-fit"+blindStr)        
     preFitLabel.SetNDC()
     preFitLabel.SetTextFont(72)
     preFitLabel.SetTextSize(0.075)
@@ -2128,7 +2128,7 @@ def plotVar(options):
         rHist.Draw('same')
 
         # legend
-        legR=ROOT.TLegend(0.1752,0.79,0.4554,1.0)
+        legR=ROOT.TLegend(0.1747,0.79,0.4554,1.0)
         if var=="jj_dphi":
             if AltDphi:
                 legR=ROOT.TLegend(0.60,0.745,0.87,1.0)
@@ -2140,10 +2140,10 @@ def plotVar(options):
         legR.SetFillColor(0)
         legR.SetBorderSize(0)
         if reg=='SR':
-            legR.AddEntry(rsignal,'Signal/Bkg')
-            legR.AddEntry(rmultijet,'Multijet/Bkg')
-        legR.AddEntry(rbkgPreFit,'Pre-/Post-Fit')
-        legR.AddEntry(systHistAsymTotRatioA,'Post-Fit Unc')
+            legR.AddEntry(rsignal,'1+Signal/Bkg')
+            legR.AddEntry(rmultijet,'1+Multijet/Bkg')
+        legR.AddEntry(rbkgPreFit,'Pre-/Post-fit')
+        legR.AddEntry(systHistAsymTotRatioA,'Unc')
         legR.SetNColumns(2)
         #if reg=='SR':
         legR.Draw()
