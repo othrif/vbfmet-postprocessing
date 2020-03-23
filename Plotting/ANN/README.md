@@ -9,8 +9,12 @@ source /cvmfs/sft.cern.ch/lcg/views/LCG_94python3/x86_64-centos7-gcc8-opt/setup.
 // some basic instructions
 https://keras.io/getting-started/sequential-model-guide/#multilayer-perceptron-mlp-for-multi-class-softmax-classification
 
-// dumping a pickle file to be read in
+// dumping a pickle file to be read in. This is OLD. Sid implemented a
+faster version to write to numpy arrays
 python dumpTree.py
+
+//This is the faster code writing to numpy arrays
+python getData.py
 
 // running a binomial classifier and to save the model
 python MLP2.py
