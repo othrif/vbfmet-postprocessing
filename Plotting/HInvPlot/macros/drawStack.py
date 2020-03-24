@@ -68,8 +68,14 @@ p.add_option('--make-syst-table', action='store_true', default=False,   dest='ma
 p.add_option('--atlas-style', dest='atlas_style_path', default="/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/")
 
 # Allow canvas size and legend coords to be overriden on the command line.
-p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.66, 0.5, 0.99, 0.89), type=float)
+p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.51, 0.60, 0.915, 0.855), type=float)
 p.add_option('--canvas-size', dest="canvas_size", nargs=2, default=(500, 500), type=int)
+
+# Allow a vertical dashed line to be drawn over the plot.
+p.add_option('--vertical-line', dest='vertical_line', default=None, type=float, help='Draw a vertical line on the plot.')
+
+# Number of legend columns; defaults to two. Set to one to restore old legend format.
+p.add_option('--legend-cols', dest='legend_cols', default=2, type=int, help='Number of columns to split the legend.')
 
 (options, args) = p.parse_args()
 
@@ -145,7 +151,7 @@ def getSelKeyLabel(selkey):
         if selkey.count('sr_'):  proc += ' SR'
         elif selkey.count('wcr'):
             if 'anti' in selkey:
-                proc += ', anti-ID'
+                proc += ' anti-ID'
             else:
                 proc += ' CR'
         elif selkey.count('zcr'): proc += ' CR'
@@ -282,6 +288,7 @@ def getHistPars(hist):
         'ptll'   : {'xtitle':'#it{p}_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'#it{m}_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':2,  'ymin':0.1,'logy':True},
+        'metsig_variableBin'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':1,  'ymin':2,'logy':True},
         'metsig_tst'     : {'xtitle':'#it{S}_{MET}^{TST} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.01,'logy':True},
         'alljet_metsig'     : {'xtitle':'#it{S}_{MET} (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
     'met_cst_jet'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
@@ -1522,11 +1529,10 @@ class DrawStack:
         log.info('DrawStack - draw: %s' %self.name)
 
         # Allow legend location to be overriden on the command line.
+        # To change defaults; edit option parser arguments above.
         self.leg = ROOT.TLegend(*options.legend_coords)
-        if True:
-            self.leg = ROOT.TLegend(0.51, 0.60, 0.915, 0.855)
-            #self.leg = ROOT.TLegend(0.50, 0.60, 0.92, 0.84)
-            self.leg.SetNColumns  (2)           
+        # Also allow the user to switch back to one column for some plots.
+        self.leg.SetNColumns(options.legend_cols)
         self.leg.SetBorderSize(0)
         self.leg.SetFillStyle (0)
         self.leg.SetTextFont(42);
@@ -2068,6 +2074,19 @@ class DrawStack:
                 self.ratio.Draw('same')
             self.pads[ipad].RedrawAxis()
             self.pads[ipad].Update()
+
+        # Draw a vertical line. If this option is set, it gets set to an x-coordinate.
+        if options.vertical_line is not None:
+            # How do we figure this out? TODO: fix...
+            line_ymin = self.data.hist.GetYaxis().GetBinLowEdge(1)
+            line_ymax = self.data.hist.GetMaximum() * 1.75
+            # Draw the line.
+            self.vline = ROOT.TLine(options.vertical_line, line_ymin, options.vertical_line, line_ymax)
+            self.vline.SetLineStyle(9)
+            self.vline.SetLineWidth(3)
+            self.vline.SetLineColor(ROOT.kBlue)
+            self.vline.Draw("same")
+            log.info('Drawing vertical line at x = ' + str(options.vertical_line))
 
     #-----------------------------
     def SystBand(self, hists=[], syst=None, syst_ratio=None, linestyle=0, tot_bkg=None,other_syst=None):
