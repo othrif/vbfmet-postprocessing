@@ -504,7 +504,7 @@ def removeLabel(leg, name):
         for prim in LOP:
             print prim.GetLabel()
 
-def make_legend(can,poskeys=[0.0,0.04,0.155,0.6],ncolumns=1):
+def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155,0.6]
     leg=can.BuildLegend(poskeys[0],poskeys[1],poskeys[2],poskeys[3])
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
@@ -514,7 +514,7 @@ def make_legend(can,poskeys=[0.0,0.04,0.155,0.6],ncolumns=1):
     legNew=leg.Clone()
     legNew.Clear()
     #leg.SetNColumns  (2)
-    NameDict ={'ttbar':'Top+#it{VV}/#it{VVV}',
+    NameDict ={'ttbar':'Other',#'Top+#it{VV}/#it{VVV}',
                    'eleFakes':'#it{e}-fakes',
                    'Z_EWK':'#it{Z} EWK',
                    'EWK W':'#it{W} EWK',
@@ -523,11 +523,11 @@ def make_legend(can,poskeys=[0.0,0.04,0.155,0.6],ncolumns=1):
                    'W_strong':'#it{W} strong',
                    'signal':'#it{H}(#it{B}_{inv} = 0.13)',
                    'data':'Data',
-                   'bkgs':'Unc',
+                   'bkgs':'Uncertainty',
                    'multijet':'Multijet',
                    }
     if options.postFitPickleDir:
-        NameDict['bkgs']='Unc'
+        NameDict['bkgs']='Uncertainty'
     
     if not options.scaleSig:
         NameDict['signal']='#it{H}(#it{B}_{inv} = 0.13)'
@@ -577,6 +577,7 @@ def make_legend(can,poskeys=[0.0,0.04,0.155,0.6],ncolumns=1):
         legNew.AddEntry(legOrder[it][1],legOrder[it][0])
     for en in legOrder:
         if '#it{H}' in en[0]:
+            en[1].SetMarkerColor(en[1].GetLineColor())
             legNew.AddEntry(en[1],en[0])
             break
         
@@ -775,13 +776,15 @@ def main(options):
         can.Divide(1,2)
         can.cd(1)
         ROOT.gPad.SetBottomMargin(0)
-        ROOT.gPad.SetRightMargin(0.1)
+        ROOT.gPad.SetRightMargin(0.16)
+        ROOT.gPad.SetLeftMargin(0.1)
         ROOT.gPad.SetPad(0,0.3,1,1)
         ROOT.gPad.SetLogy()
         can.cd(2)
         ROOT.gPad.SetTopMargin(0)
         ROOT.gPad.SetBottomMargin(0.35)
-        ROOT.gPad.SetRightMargin(0.1)
+        ROOT.gPad.SetLeftMargin(0.1)
+        ROOT.gPad.SetRightMargin(0.16)
         ROOT.gPad.SetPad(0,0,1,0.3)
         can.cd(1)
     else:
@@ -861,7 +864,7 @@ def main(options):
     dummyHist.SetMinimum(1)
     dummyHist.GetYaxis().SetTitle("Events / Bin")
     dummyHist.GetYaxis().SetTitleSize(1.4*dummyHist.GetYaxis().GetTitleSize())
-    dummyHist.GetYaxis().SetTitleOffset(0.54*dummyHist.GetYaxis().GetTitleOffset())    
+    dummyHist.GetYaxis().SetTitleOffset(0.45*dummyHist.GetYaxis().GetTitleOffset())    
     dummyHist.GetYaxis().SetRangeUser(1.001,2000)
     #dummyHist.GetYaxis().SetRangeUser(1.73,5000)
     if options.cronly:
@@ -1283,7 +1286,7 @@ def main(options):
     leg=make_legend(ROOT.gPad)
     leg.Draw()
 
-    texts = ATLAS.getATLASLabels(can, 0.2, 0.86, options.lumi, selkey="",preliminary=options.preliminary)
+    texts = ATLAS.getATLASLabels(can, 0.125, 0.86, options.lumi, selkey="",preliminary=options.preliminary)
 
     for text in texts:
         text.Draw()
@@ -1298,7 +1301,7 @@ def main(options):
         
         rHist.Divide(rbkgs)
         rHist.GetYaxis().SetTitle("Data / Bkg")
-        rHist.GetYaxis().SetTitleOffset(.35)
+        rHist.GetYaxis().SetTitleOffset(.3)
         rHist.GetYaxis().SetTitleSize(0.145)
         rHist.GetYaxis().CenterTitle()
 
@@ -1376,7 +1379,7 @@ def main(options):
     if options.postFitPickleDir!=None:
         namingScheme="Post-fit"
 
-    preFitLabel=ROOT.TLatex(.5,.86,namingScheme+blindStr)
+    preFitLabel=ROOT.TLatex(.43,.86,namingScheme+blindStr)
     preFitLabel.SetNDC()
     preFitLabel.SetTextFont(72)
     preFitLabel.SetTextSize(0.055)
@@ -1401,29 +1404,30 @@ def main(options):
                  }
     yvallab=0.0345
     shift=0.01
+    newShift=-0.06
     if not options.cronly:
         if options.combinePlusMinus:
             labelTxt.SetTextSize(0.04)
-        line00=ROOT.TLine(0.16,0.02,0.16,0.11)
+        line00=ROOT.TLine(0.16+newShift,0.02,0.16+newShift,0.11)
         line00.Draw()
-        labelTxt.DrawLatex(0.19+shift-0.01,yvallab,nameMap['FakeE'])
-        line0=ROOT.TLine(0.31,0.02,0.31,0.11)
+        labelTxt.DrawLatex(0.19+shift-0.01+newShift,yvallab,nameMap['FakeE'])
+        line0=ROOT.TLine(0.31+newShift-0.002,0.02,0.31+newShift-0.002,0.11)
         line0.Draw()
-        labelTxt.DrawLatex(0.33+shift+0.005,yvallab,nameMap['Wenu'])
-        line2=ROOT.TLine(0.458,0.02,0.458,0.11)
+        labelTxt.DrawLatex(0.33+shift+0.005+newShift,yvallab,nameMap['Wenu'])
+        line2=ROOT.TLine(0.458+newShift-0.002,0.02,0.458+newShift-0.002,0.11)
         line2.Draw()
-        labelTxt.DrawLatex(0.48+shift+0.005,yvallab,nameMap['Wmunu'])
-        line3=ROOT.TLine(0.605,0.02,0.605,0.11)
+        labelTxt.DrawLatex(0.48+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
+        line3=ROOT.TLine(0.605+newShift-0.001,0.02,0.605+newShift-0.001,0.11)
         line3.Draw()
-        labelTxt.DrawLatex(0.645+shift,yvallab,nameMap['Zll'])
-        line4=ROOT.TLine(0.752,0.02,0.752,0.11)
+        labelTxt.DrawLatex(0.645+shift+newShift,yvallab,nameMap['Zll'])
+        line4=ROOT.TLine(0.752+newShift,0.02,0.752+newShift,0.11)
         line4.Draw()        
-        labelTxt.DrawLatex(0.81,yvallab,"SR")
-        line5=ROOT.TLine(0.9,0.02,0.9,0.11)
+        labelTxt.DrawLatex(0.81+newShift,yvallab,"SR")
+        line5=ROOT.TLine(0.9+newShift,0.02,0.9+newShift,0.11)
         line5.Draw()
-        hline=ROOT.TLine(0.16,0.08,0.9,0.08)
+        hline=ROOT.TLine(0.16+newShift,0.08,0.9+newShift,0.08)
         hline.Draw()
-        hline0=ROOT.TLine(0.16,0.02,0.9,0.02)
+        hline0=ROOT.TLine(0.16+newShift,0.02,0.9+newShift,0.02)
         hline0.Draw()
     else:
         if options.combinePlusMinus:
@@ -1643,9 +1647,9 @@ def compareMain(options):
             #if entry_name in NameDict:
             #    entry_name=NameDict[entry_name]
             if entry_name=='bkgs':
-                entry_name='Unc'
+                entry_name='Uncertainty'
             if entry_name=='bkgs' and options.postFitPickleDir!=None:
-                entry_name='Fit Unc'
+                entry_name='Fit Uncertainty'
             leg.AddEntry(histDict[k][p],entry_name,"l")
             histDict[k][p].Draw("Ehistsame")
         texts = ATLAS.getATLASLabels(c1, 0.54, 0.78, options.lumi, selkey="",preliminary=options.preliminary)
@@ -1982,8 +1986,8 @@ def plotVar(options):
     Style.setStyles(systHistAsymTotA,[0,0,0,1,fillStyle,0,0,0])
     systHistAsymTotA.SetMarkerSize(0)
     systHistAsymTotA.Draw("SAME E2")
-    systHistAsymTotA.SetName('Unc')
-    systHistAsymTotA.SetTitle('Unc')
+    systHistAsymTotA.SetName('Uncertainty')
+    systHistAsymTotA.SetTitle('Uncertainty')
 
     bkg.SetTitle(reg+" "+",".join(mjjBins))
 
@@ -2039,6 +2043,7 @@ def plotVar(options):
         rHist.Divide(get_THStack_sum(bkg))
         rHist.GetYaxis().SetTitle("Data / Bkg")
         rHist.GetXaxis().SetTitle(var)
+        #rHist.GetYaxis().SetTitleOffset(.338)
         rHist.GetYaxis().SetTitleOffset(.338)
         rHist.GetYaxis().SetTitleSize(0.14)
         rHist.GetXaxis().SetTitleOffset(1.0)
@@ -2143,7 +2148,7 @@ def plotVar(options):
             legR.AddEntry(rsignal,'1+Signal/Bkg')
             legR.AddEntry(rmultijet,'1+Multijet/Bkg')
         legR.AddEntry(rbkgPreFit,'Pre-/Post-fit')
-        legR.AddEntry(systHistAsymTotRatioA,'Unc')
+        legR.AddEntry(systHistAsymTotRatioA,'Uncertainty')
         legR.SetNColumns(2)
         #if reg=='SR':
         legR.Draw()
