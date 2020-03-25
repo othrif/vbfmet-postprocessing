@@ -378,7 +378,7 @@ bool CRWNjet = false;
 bool CRZNjet = false;
 
 // Definiing a loose skimming
-float METCut = 200.0e3;
+float METCut = 150.0e3;
 float LeadJetPtCut = 80.0e3;
 float subLeadJetPtCut = 50.0e3;
 float MjjCut =2e5;
