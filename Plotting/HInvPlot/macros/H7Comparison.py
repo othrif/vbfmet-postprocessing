@@ -199,7 +199,9 @@ if __name__ == "__main__":
     fout = ROOT.TFile.Open('myplt_W.root','RECREATE')
     can = ROOT.TCanvas('stack', 'stack', 800, 500)
 
-    sampleName='H7MuUp'
+    sampleName='H7HFact'
+    sampleName='H7PT10'
+    sampleName='H7Pow'
     #sampleName='H7R207'
     #sampleName='H7AO'
     tpye = 'Sig'
@@ -374,7 +376,9 @@ if __name__ == "__main__":
     leg.AddEntry(plt,'Dipole Recoil')
     #leg.AddEntry(vbfplt,'Rel 20.7')
     #leg.AddEntry(vbfplt,'AO Shower')
-    leg.AddEntry(vbfplt,'MuUp')
+    #leg.AddEntry(vbfplt,'HFact')
+    #leg.AddEntry(vbfplt,'PT10')
+    leg.AddEntry(vbfplt,'Powheg')
     #leg.AddEntry(implt,'Incl for Merging')
     #leg.AddEntry(sumed,'Merged')
     leg.Draw()
@@ -390,7 +394,7 @@ if __name__ == "__main__":
     hratio = vbfplt.Clone()
     hratio.Divide(plt)
     #hratio.GetYaxis().SetTitle('AO/DipoleRec')
-    hratio.GetYaxis().SetTitle('MuUp/Nom')
+    hratio.GetYaxis().SetTitle('Pow/Nom')
     #hratio.GetYaxis().SetTitle('R20p7/Rel21')    
     hratio.GetYaxis().SetRangeUser(0.9,1.1)       
     hratio.GetYaxis().SetNdivisions(505);

@@ -223,13 +223,13 @@ def getHistPars(hist):
         #                         4 adds every two bins together
         'jetEta0': {'xtitle':'Leading jet #it{#eta}'  ,           'ytitle':'Events', 'rebin':5}, #5
         'jet0Phi': {'xtitle':'Leading jet #it{#phi}'  ,           'ytitle':'Events', 'rebin':2},
-        'jetPt0' : {'xtitle':'#it{p}_{T}^{jet 1} [GeV]',          'ytitle':'Events / 10 GeV', 'rebin':10, 'LtoRCut':0},
+        'jetPt0' : {'xtitle':'#it{p}_{T}^{jet 1} [GeV]',          'ytitle':'Events / 10 GeV', 'rebin':5, 'LtoRCut':0},
         'jetHT' : {'xtitle':'H_{T} [GeV]',          'ytitle':'Events', 'rebin':2, 'logy':True, 'LtoRCut':0},
         'jetEta1': {'xtitle':'Sub-Leading jet #it{#eta}'  ,       'ytitle':'Events', 'rebin':5},
         'jet1Phi': {'xtitle':'Sub-Leading jet #it{#phi}'  ,       'ytitle':'Events', 'rebin':2},
-        'jetPt1' : {'xtitle':'#it{p}_{T}^{jet 2} [GeV]',          'ytitle':'Events / 10 GeV', 'rebin':10, 'LtoRCut':0},
-        'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
-        'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
+        'jetPt1' : {'xtitle':'#it{p}_{T}^{jet 2} [GeV]',          'ytitle':'Events / 10 GeV', 'rebin':5, 'LtoRCut':0},
+        'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'rebin':5, 'logy':True},
+        'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'rebin':5, 'logy':True},
         'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
         'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
         'j0timing' : {'xtitle':'Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
@@ -271,15 +271,15 @@ def getHistPars(hist):
         'lepEta' : {'xtitle':'Lepton #it{#eta} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'lepPhi' : {'xtitle':'Lepton #it{#phi} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events / 0.2 rad', 'rebin':5,  'ymin':0.01},
-        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2, 'ymax':2000.01, 'ymin':0.01, 'xmax':2.0}, #,'ymax':2000.01,'ymax':5500.01, 'ymax':4200.01 , 'ymax':239.99
+        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01, 'xmax':2.0,'ymax':239.99}, #,'ymax':2000.01,'ymax':5500.01, 'ymax':4200.01 , 'ymax':239.99 'ymax':2000.01,
         'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / 5 GeV', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
         'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / 25 GeV', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':100,'LtoRCut':0},#'xmax':500, 
         'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':200,  'ymin':50.1,'ymax':25000, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
+        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':200,  'ymin':5.1,'ymax':2500, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
         'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / 500 GeV', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':20000,           'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000,
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':800.0, 'xmax':5000.0,    'ymin':5.1,'ymax':2000,      'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000, 'ymin':50.1,'ymax':20000, 
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'jj_deta_signed' : {'xtitle':'Signed #Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
@@ -296,7 +296,7 @@ def getHistPars(hist):
     'met_cst_tst_ratio'     : {'xtitle':'|1-#it{E}_{T}^{jet,no-JVT}/#it{E}_{T}^{miss}|'   ,         'ytitle':'Events', 'ymin':5.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
     'met_tighter_tst_et'     : {'xtitle':'Tighter MET [GeV]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1},
-    'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},
+    'met_tenacious_tst_et'     : {'xtitle':'Tenacious MET [GeV]'   ,         'ytitle':'Events',  'rebin':5, 'ymin':0.1},
     'met_tenacious_tst_nolep_et'     : {'xtitle':'Tenacious MET (without leptons) [GeV]'   ,         'ytitle':'Events',  'rebin':10, 'ymin':0.1},    
     'FilterMet'     : {'xtitle':'Filter MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'truth_jj_mass'     : {'xtitle':'Truth #it{m}_{jj} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -462,16 +462,16 @@ def getSampleLabel(sample):
         'wewk': '#it{W} EWK',
         'top1': 'Single Top',
         'top2': 'Top', #'t#bar{t}',
-        'tall': 'Top+#it{VV}/#it{VVV}',
+        'tall': 'Other',#'Top+#it{VV}/#it{VVV}',
         'vvv': '#it{VV}/#it{VVV}',
         'zldy': '#it{Z} low m.',
         'wzzz': '#it{ZV}',#'WZ/ZZ',
         'wz': '#it{WZ}',
         'zz': '#it{ZZ}',
-        'wgam': '#it{W#gamma}',
+        'wgam': '#it{W#gamma} strong',
         'wgas': '#it{W#gamma*}',
         'zgas': '#it{Z#gamma*}',
-        'zgam': '#it{Z#gamma}',
+        'zgam': '#it{Z#gamma} strong',
         'zgamewk': '#it{Z#gamma} EWK',
         'wgamewk': '#it{W#gamma} EWK',
         'ttg': '#it{t#bar{t}#gamma}',
@@ -1531,6 +1531,11 @@ class DrawStack:
         # Allow legend location to be overriden on the command line.
         # To change defaults; edit option parser arguments above.
         self.leg = ROOT.TLegend(*options.legend_coords)
+        if False:
+            #self.leg = ROOT.TLegend(0.51, 0.60, 0.915, 0.855)
+            self.leg = ROOT.TLegend(0.55, 0.60, 0.94, 0.9)
+            #self.leg = ROOT.TLegend(0.50, 0.60, 0.92, 0.84)
+            self.leg.SetNColumns  (2)           
         # Also allow the user to switch back to one column for some plots.
         self.leg.SetNColumns(options.legend_cols)
         self.leg.SetBorderSize(0)
@@ -2221,7 +2226,7 @@ class DrawStack:
             self.bkg_sum_altb.SetFillStyle(3345) #3004
             self.bkg_sum_altb.SetLineColor(1)
             self.bkg_sum_altb.SetLineWidth(0)
-            self.leg.AddEntry(self.bkg_sum_altb,'Unc')
+            self.leg.AddEntry(self.bkg_sum_altb,'Uncertainty')
 
         for bkg in sorted(self.bkgs.keys(), key=getLabelSortKey):
             he = self.bkgs[bkg]
