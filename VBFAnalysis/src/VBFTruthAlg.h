@@ -59,6 +59,7 @@ private:
     ULong64_t       EventNumber;
     UInt_t          RunNumber;
     Double_t        crossSection;
+    Double_t        new_crossSection;
     Float_t         EventWeight;
     UInt_t          ChannelNumber;
     vector<float>   *EventWeightSys;
@@ -215,6 +216,7 @@ private:
    vector<float>   *new_nu_eta;
    vector<float>   *new_nu_phi;
    vector<int>     *new_nu_pdgid;
+   vector<float>   *new_nu_charge;
    Float_t         new_met_et;
    Float_t         new_met_phi;
    Float_t         new_met_nolep_et;
