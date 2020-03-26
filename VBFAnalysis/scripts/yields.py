@@ -298,13 +298,200 @@ for b in range(0,len(region_cf[0])+1): # bins
     cline=''
 print '\\end{tabular}'
 print '}'
+
+sys.exit(0)
+# Collect systematics
+tobj = f.GetListOfKeys()
+mye=ROOT.Double(0.0)
+#sum signal together
+nomHists=[]
+diffMap={}
+for ibin in range(1,12):
+    for sample in ['hVBFH125_','hggFH125_','hVH125_']:
+        nomHist=f.Get(sample+'VBFjetSel_%sNom_SR%s_obs_cuts' %(ibin,ibin))
+        if len(nomHists)<ibin:
+            nomHists+=[nomHist.Clone()]
+        else:
+            nomHists[ibin-1].Add(nomHist)
+
+listAllSyst=[]
+for sample in ['hVBFH125_']:
+    ibin=1
+    for i in tobj:
+        vname=i.GetName()
+        if vname.count('VBFjetSel') and vname.count('_SR%s_obs_cuts' %ibin) and vname.count(sample):
+            if vname not in listAllSyst:
+                listAllSyst+=[vname]
+corrSignBins=[]
+
+for ibin in range(1,12):
+    corrSignBin=[0.0,0.0]
+    for sHistName in listAllSyst:
+        nomHist=None
+        sHistSamples=None
+        for sample in ['hVBFH125_','hggFH125_','hVH125_']:
+            hname=((sHistName.replace('hVBFH125_',sample)).replace('VBFjetSel_1','VBFjetSel_%s' %ibin)).replace('SR1_','SR%s_' %ibin)
+            sHist=f.Get(hname)
+            if not sHist:
+                #print 'missed: ',hname
+                continue
+            if sHistSamples==None:
+                sHistSamples=sHist.Clone()
+            else:
+                sHistSamples.Add(sHist)
+            if nomHist==None:
+                nomHist=(f.Get(sample+'VBFjetSel_%sNom_SR%s_obs_cuts' %(ibin,ibin))).Clone()
+            else:
+                nomHist.Add(f.Get(sample+'VBFjetSel_%sNom_SR%s_obs_cuts' %(ibin,ibin)))
+        if nomHist and sHistSamples:
+            qDiff=(nomHist.GetBinContent(1)-sHistSamples.GetBinContent(1))
+            if qDiff>0.0:
+                corrSignBin[0]+=qDiff**2
+            else:
+                corrSignBin[1]+=qDiff**2
+    corrSignBins+=[corrSignBin]
+printline='Signal'
+printlineN='Signal'
+for ibin in range(1,12):
+    corrSignBins[ibin-1][0]+=(nomHists[ibin-1].GetBinError(1))**2
+    corrSignBins[ibin-1][1]+=(nomHists[ibin-1].GetBinError(1))**2
+    nomHistGGF=f.Get('hggFH125_VBFjetSel_%sNom_SR%s_obs_cuts' %(ibin,ibin))
+    corrSignBins[ibin-1][0]+=(nomHistGGF.GetBinContent(1)*0.44)**2
+    corrSignBins[ibin-1][1]+=(nomHistGGF.GetBinContent(1)*0.44)**2
+    avgcorrSignBins=0.13*(math.sqrt(corrSignBins[ibin-1][0])+math.sqrt(corrSignBins[ibin-1][1]))/2.0
+    print 'Bin: ',ibin,' %0.2f $\\pm$ %0.2f' %(0.13*nomHists[ibin-1].GetBinContent(1),avgcorrSignBins)
+    printline+=' & %0.2f $\\pm$ %0.2f' %(0.13*nomHists[ibin-1].GetBinContent(1),avgcorrSignBins)
+    printlineN+=' & %0.0f $\\pm$ %0.0f' %(0.13*nomHists[ibin-1].GetBinContent(1),avgcorrSignBins)
+print printline
+print printlineN
+#for ibin in range(1,12):
+#    for sample in ['hVBFH125_','hggFH125_','hVH125_']:
+#        nomHist=f.Get(sample+'VBFjetSel_%sNom_SR%s_obs_cuts' %(ibin,ibin))
+#        if len(nomHists)<ibin:
+#            nomHists+=[nomHist.Clone()]
+#        else:
+#            nomHists[ibin-1].Add(nomHist)
+#    
+#        diffMap[ibin]=[0.0,0.0]
+#        for i in tobj:
+#            vname=i.GetName()
+#            vname=''
+#            if vname.count('VBFjetSel') and vname.count('_SR%s_obs_cuts' %ibin) and vname.count(sample):
+#                h=f.Get(vname)
+#                
+#                intBkg=h.IntegralAndError(0,1001,mye)
+#                if (nomV-intBkg)<0.0:
+#                    diffMap[ibin][0]+=(nomV-intBkg)**2
+#                else:
+#                    diffMap[ibin][1]+=(nomV-intBkg)**2
+
+# sum individual samples
+sampleOutMap={}
+for sample in ['hVBFH125_','hggFH125_','hVH125_']:
+    # collected summed nominal
+    sumNomHist=None
+    for ibin in range(1,12):
+        nomHist=f.Get(sample+'VBFjetSel_%sNom_SR%s_obs_cuts' %(ibin,ibin))
+        if sumNomHist==None:
+            sumNomHist=nomHist.Clone()
+        else:
+            sumNomHist.Add(nomHist)
+    #collect the summed systematics
+    summedSyst=[0.0,0.0]
+    listAllSyst=[]
+    ibin=1
+    for i in tobj:
+        vname=i.GetName()
+        if vname.count('VBFjetSel') and vname.count('_SR%s_obs_cuts' %ibin) and vname.count(sample):
+            if vname not in listAllSyst:
+                listAllSyst+=[vname]
+    SystMapHist={}
+    for sHistName in listAllSyst:
+        for ibin in range(1,12):
+            sHist=f.Get((sHistName.replace('VBFjetSel_1','VBFjetSel_%s' %ibin)).replace('SR1_','SR%s_' %ibin))
+            #if sHistName.count('VBF_qqH_MjjPSVarWeightsLow'):
+            #    print 'ibin: ',ibin,' ',sHist.GetBinContent(1),sHistName
+            if sHistName in SystMapHist:
+                SystMapHist[sHistName].Add(sHist)
+            else:
+                SystMapHist[sHistName]=sHist.Clone()
+    nomV=sumNomHist.GetBinContent(1)
+    for sHistName,sHist in SystMapHist.iteritems():
+        sysV=sHist.GetBinContent(1)
+        #if sHistName.count('VBF_qqH_MjjPSVarWeightsLow'):
+        #    continue
+        #if abs(nomV-sysV)>50.0:
+        #    print 'sysV: ',sHistName,' nom: ',nomV,sysV
+        if (nomV-sysV)<0.0:
+            summedSyst[0]+=(nomV-sysV)**2
+        else:
+            summedSyst[1]+=(nomV-sysV)**2
+    #print 'stat:',sumNomHist.GetBinError(1)
+    summedSyst[0]+=(sumNomHist.GetBinError(1))**2
+    summedSyst[1]+=(sumNomHist.GetBinError(1))**2
+    if sample =='hggFH125_':
+        summedSyst[0]+=(0.44*sumNomHist.GetBinContent(1))**2
+        summedSyst[1]+=(0.44*sumNomHist.GetBinContent(1))**2
+    avgsummedSyst=(math.sqrt(summedSyst[0])+math.sqrt(summedSyst[1]))/2.0
+    nomSummedV=sumNomHist.GetBinContent(1)
+    # collect nominal
+    nomHists=[]
+    diffMap={}
+    for ibin in range(1,12):
+        nomHist=f.Get(sample+'VBFjetSel_%sNom_SR%s_obs_cuts' %(ibin,ibin))
+        nomV=nomHist.GetBinContent(1)
+        nomHists+=[nomHist]
+        diffMap[ibin]=[0.0,0.0]
+        for i in tobj:
+            vname=i.GetName()
+            if vname.count('VBFjetSel') and vname.count('_SR%s_obs_cuts' %ibin) and vname.count(sample):
+                h=f.Get(vname)
+                intBkg=h.IntegralAndError(0,1001,mye)
+                #print '%0.2f ' %(intBkg)+vname 
+                #print '%0.2f +/- %0.2f ' %(intBkg,mye)+vname
+                if (nomV-intBkg)<0.0:
+                    diffMap[ibin][0]+=(nomV-intBkg)**2
+                else:
+                    diffMap[ibin][1]+=(nomV-intBkg)**2
+    print '---------'
+    print sample
+    print '---------'
+    sumE=0.0
+    sumV=0.0
+    linePrint=sample
+    sampleOutMap[sample]={}
+    for ibin in range(1,12):
+        if sample =='hggFH125_':
+            diffMap[ibin][0]+=(0.44*nomHists[ibin-1].GetBinContent(1))**2
+            diffMap[ibin][1]+=(0.44*nomHists[ibin-1].GetBinContent(1))**2
+        diffMap[ibin][0]+=(nomHists[ibin-1].GetBinError(1))**2
+        diffMap[ibin][1]+=(nomHists[ibin-1].GetBinError(1))**2
+        avgE=0.13*(math.sqrt(diffMap[ibin][0])+math.sqrt(diffMap[ibin][1]))/2.0
+        binC=0.13*nomHists[ibin-1].GetBinContent(1)
+        sumV+=binC
+        sumE+=avgE**2
+        #print 'Bin: ',ibin,nomHists[ibin-1].GetBinContent(1),' +/- ',math.sqrt(diffMap[ibin][0]),' ',math.sqrt(diffMap[ibin][1])
+        print 'Bin: ',ibin,' %0.2f $\\pm$ %0.2f' %(binC,avgE)
+        linePrint+=' & %0.2f $\\pm$ %0.2f' %(binC,avgE)
+        sampleOutMap[sample][ibin]=[binC,avgE]
+    print linePrint
+    print 'Sum uncorrelated unc: ',' %0.2f $\\pm$ %0.2f' %(sumV,math.sqrt(sumE))
+    print 'Sum proper correlation: ',' %0.2f $\\pm$ %0.2f' %(0.13*nomSummedV,0.13*avgsummedSyst) #,summedSyst[0],summedSyst[1])
+linePrint='Signal'
+for ibin in range(1,12):
+    sumV=0.0
+    sumE=0.0
+    for s,info in sampleOutMap.iteritems():
+        sumV+=info[ibin][0]
+        sumE+=(info[ibin][1])**2
+    linePrint+=' & %0.0f $\\pm$ %0.0f' %(sumV,math.sqrt(sumE))
+print linePrint
 sys.exit(0)
 # Collect systematics
 tobj = f.GetListOfKeys()
 mye=ROOT.Double(0.0)
 for sample in samples:
     for i in tobj:
-    
         vname=i.GetName()
         #print vname
         #if vname.count('VBFjetSel') and vname.count('_SR1_obs_cuts') and vname.count(sample):
