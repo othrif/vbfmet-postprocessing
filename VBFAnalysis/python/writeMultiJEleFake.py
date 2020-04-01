@@ -31,7 +31,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
     if Binning==10:
         multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
         multijets += [5.0]
-    if Binning==11:
+    if Binning==11 or Binning==12:
         #multijets=[88.1, 102.9, 32.3, 21.3, 1.6, 69.5, 127.1, 35.7, 23.1, 0.0,56.4]
         #multijets_statunc=[12.2, 13.2, 4.7, 5.3, 0.9, 7.0, 12.8, 5.2, 5.2, 0.2,11.1]
         multijets=[83.0,99.6,30.7,21.4,2.4,71.2,132.0,36.97,23.8,0.0,56.5]
@@ -44,6 +44,15 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             # these are scaled:
             tmpmj=[99.7867063926122, 119.74404767113464, 36.90905887052042, 25.72813875664941, 2.8853987390634854, 58.26565689050047, 108.02059985317503, 30.253951337665768, 19.47644148867853, 0.0, 56.5]
             tmpmj_statunc=[29.57533707540073, 35.22590960606672, 10.700020324027092, 12.262944641019812, 2.8853987390634854, 11.047561348620174, 17.96251641497873, 8.592547715593469, 6.874038172474776, 0.1636675755351137, 11.0]
+            if Binning==12:
+                scaleMETAngle=[0.121065412554,0.338276163341,0.52910552342,0.903512478309,1.0,0.4107]
+                for i in range(0,5):
+                    tmpmj[i]=tmpmj[i]*scaleMETAngle[i]
+                    tmpmj[i+5]=tmpmj[i+5]*scaleMETAngle[i]
+                    tmpmj_statunc[i]=tmpmj_statunc[i]*scaleMETAngle[i]
+                    tmpmj_statunc[i+5]=tmpmj_statunc[i+5]*scaleMETAngle[i]
+                tmpmj[10]=tmpmj[10]*scaleMETAngle[5]
+                tmpmj_statunc[10]=tmpmj_statunc[10]*scaleMETAngle[5]
             multijets=[]; multijets_statunc=[];
             MJSF=0.659
             if METCut==160: 
@@ -65,7 +74,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
     # MJ for other years
     if year==2017:
-        if Binning==11:
+        if Binning==11 or Binning==12:
             #multijets=[166.1, 194.1, 61.0, 40.2, 3.1, 131.1, 239.7, 67.3, 43.5, 0.0,188.5]
             #multijets_statunc=[23.0, 24.9, 8.8, 10.0, 1.6, 13.2, 24.2, 9.9, 9.9, 0.2,31.2]
             multijets=[161.3,193.6,59.9,41.5,4.6,132.7,245.7,68.8,44.2,0,182.2]
@@ -77,6 +86,15 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             # these are scaled
             tmpmj=[193.12220019968197, 231.79453167178195, 71.71741966497798, 49.687360869725985, 5.507514698813001, 108.14509178504075, 200.23548644750952, 56.06919604228187, 36.0211986201869, 0.0, 182.2]
             tmpmj_statunc=[39.27097437414488, 65.73099064452907, 16.283086935621043, 18.198744222164695, 5.507514698813001, 22.16689145857655, 36.999149713947624, 12.957851992329676, 15.15824195329132, 0.0, 32.0]
+            if Binning==12:
+                scaleMETAngle=[0.147241433143,0.309987184443,0.708798656468,0.970501756401,1.0,0.5944]
+                for i in range(0,5):
+                    tmpmj[i]=tmpmj[i]*scaleMETAngle[i]
+                    tmpmj[i+5]=tmpmj[i+5]*scaleMETAngle[i]
+                    tmpmj_statunc[i]=tmpmj_statunc[i]*scaleMETAngle[i]
+                    tmpmj_statunc[i+5]=tmpmj_statunc[i+5]*scaleMETAngle[i]
+                tmpmj[10]=tmpmj[10]*scaleMETAngle[5]
+                tmpmj_statunc[10]=tmpmj_statunc[10]*scaleMETAngle[5]
             if METCut>150:
                 multijets=[]; multijets_statunc=[];
                 MJSF=0.6991
@@ -100,7 +118,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
         else:
             print 'MJ is not defined for binning: ',Binning
     elif year==2018:
-        if Binning==11:
+        if Binning==11 or Binning==12:
             #multijets=[210.7, 246.2, 77.3, 51.0, 3.9, 166.3, 304.0, 85.3, 55.2, 0.0, 331.0]
             #multijets_stat=[29.2, 31.6, 11.2, 12.6, 2.1, 16.7, 30.6, 12.5, 12.5, 0.2, 58.7]
             multijets=[182.1,218.5,67.6,46.8,5.2,174.5,323.1,90.5,58.2,0.0,364.3]
@@ -112,6 +130,15 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             # these are scaled:
             tmpmj=[221.24316195217506, 265.4674952583759, 82.13090471151584, 56.8598571079725, 6.317761900885834, 144.3089941630104, 267.19906025254244, 74.84220041118877, 48.130564242333556, 0.0, 364.3]
             tmpmj_statunc=[43.25236993683379, 52.00004026113725, 24.66357049768893, 20.53272617787896, 6.317761900885834, 26.380841912894166, 62.602812940629725, 20.42654530559517, 15.630028594159864, 0.1653971279805277, 71.6]
+            if Binning==12:
+                scaleMETAngle=[0.204859872988,0.494068121587,0.560479833879,0.814771265068,1.0,0.734375]
+                for i in range(0,5):
+                    tmpmj[i]=tmpmj[i]*scaleMETAngle[i]
+                    tmpmj[i+5]=tmpmj[i+5]*scaleMETAngle[i]
+                    tmpmj_statunc[i]=tmpmj_statunc[i]*scaleMETAngle[i]
+                    tmpmj_statunc[i+5]=tmpmj_statunc[i+5]*scaleMETAngle[i]
+                tmpmj[10]=tmpmj[10]*scaleMETAngle[5]
+                tmpmj_statunc[10]=tmpmj_statunc[10]*scaleMETAngle[5]
             if METCut>150:
                 multijets=[]; multijets_statunc=[];
                 MJSF=0.7655
@@ -292,7 +319,7 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, ME
     if Binning==10:
         fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
         fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
-    if Binning==11: # set for all years
+    if Binning==11 or Binning==12: # set for all years
         fakeelesp = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1]
         fakeelesm = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1] # met>150 numbers
         if METCut==160:

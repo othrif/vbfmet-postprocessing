@@ -39,6 +39,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case met_truth_et:	          return "met_truth_et";
     case met_truth_phi:	          return "met_truth_phi";
     case met_tst_et:	          return "met_tst_et";
+    case met_tst_cut:	          return "met_tst_cut";
     case met_tst_phi:	          return "met_tst_phi";
     case met_tst_nolep_et:	  return "met_tst_nolep_et";
     case met_tst_nolep_phi:	  return "met_tst_nolep_phi";
@@ -201,6 +202,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "met_truth_et")    return met_truth_et;
   if(var == "met_truth_phi")    return met_truth_phi;
   if(var == "met_tst_et")    return met_tst_et;
+  if(var == "met_tst_cut")    return met_tst_cut;
   if(var == "met_tst_phi")    return met_tst_phi;
   if(var == "met_tst_nolep_et")  return met_tst_nolep_et;
   if(var == "met_tst_nolep_phi")  return met_tst_nolep_phi;
@@ -450,6 +452,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(met_truth_et);
     vars.push_back(met_truth_phi);
     vars.push_back(met_tst_et);
+    vars.push_back(met_tst_cut);
     vars.push_back(met_tst_phi);
     vars.push_back(met_tst_nolep_et);
     vars.push_back(met_tst_nolep_phi);

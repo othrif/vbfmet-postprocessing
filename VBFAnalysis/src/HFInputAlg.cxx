@@ -117,6 +117,7 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==9)  bins=9; // mjj binning + mjj>800 + No njet bin
   else if(m_binning==10) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==11) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
+  else if(m_binning==12) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   totalBins = bins-1;
 
   // merging the sherpa kt samples
@@ -312,7 +313,7 @@ StatusCode HFInputAlg::execute() {
   float METCSTJetCut = 150.0e3; // 120.0e3
   float jj_detaCut = 4.8; // 4.0
   float jj_massCut = 1000.0e3; // 1000.0e3
-  if(m_binning>=7 && m_binning<=11){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
+  if(m_binning>=7 && m_binning<=12){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
   if(doDoubleRatio) jj_massCut=500.0e3;
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
   bool nbjetCut = (n_bjet < 2); 
@@ -411,6 +412,10 @@ StatusCode HFInputAlg::execute() {
     if(m_extraVars>1){
       METCut=160.0e3; // try 160
       METCSTJetCut=140.0e3; // try 140
+      if(m_binning==12){ // this sets a met cut linearly from 150 to 200 for 800-2500 GeV in mjj
+	METCut=200.0e3;
+	if(jj_mass<2.5e6) METCut-=(jj_mass-800.0e3)*(0.0294118);
+      }
       jj_detaCut=3.8;
       jetCut = (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05);
     }
@@ -648,7 +653,7 @@ StatusCode HFInputAlg::execute() {
       else if (jj_mass < 2e6)   bin = 2;
       else if (jj_mass < 3e6)   bin = 3;
       else bin = 4;
-    }else if(m_binning==11){
+    }else if(m_binning==11 || m_binning==12){
       if      (jj_mass < 1.0e6) bin = 0;
       else if (jj_mass < 1.5e6) bin = 1;
       else if (jj_mass < 2e6)   bin = 2;
@@ -673,9 +678,12 @@ StatusCode HFInputAlg::execute() {
     if(m_binning==10 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
     if(m_binning==11 && (jj_dphi>1))  bin+=5; // separate dphijj, mjj binning
     if(m_binning==11 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
+    if(m_binning==12 && (jj_dphi>1))  bin+=5; // separate dphijj, mjj binning
+    if(m_binning==12 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
 
     if(doDoubleRatio){
       if(m_binning==11 && (jj_mass < 800.0e3)){ bin=11; } 
+      if(m_binning==12 && (jj_mass < 800.0e3)){ bin=11; } 
       if(m_binning==0  && (jj_mass < 1000.0e3)){ bin=4; } 
       if(m_binning==6  && (jj_mass < 1000.0e3)){ bin=7; } 
     }

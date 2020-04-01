@@ -403,7 +403,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
     return cuts
 
 #-------------------------------------------------------------------------
-def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET=-1):
+def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET=-1):
 
     highMET=180.0
     if metCut>180.0:
@@ -446,6 +446,9 @@ def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET
     if maxMET>0.0:
         cuts +=  [CutItem('CutMetMaxMET', '%s < %s' %(met_choice,maxMET))]
 
+    # cuts met angular
+    #cuts +=  [CutItem('CutMetAngle', 'met_tst_cut > 0.5')]
+    #cuts +=  [CutItem('CutMetmax', 'met_tst_cut > 0.5')]
     return cuts
 
 #-------------------------------------------------------------------------
@@ -497,7 +500,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
             cuts += metCuts(basic_cuts,options,metCut=130.0, cstCut=100.0)#, maxMET=150.0)
         else:
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
-            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0)
+            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0,maxMET=200.0)
             #cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
             #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
@@ -818,8 +821,8 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, 
             new_cuts.append(cutobj)
 
     # Add a cut to veto signal leptons.
-    new_cuts.append(CutItem("CutNoSigLeps", "n_lep_w == 0"))
-
+    #new_cuts.append(CutItem("CutNoSigLeps", "n_lep_w == 0"))
+    new_cuts.append(CutItem("CutNoSigLeps", "n_siglep == 0"))
     # Add the trigger isolation: ptvarcone30/pt < 0.07 for mu, ptvarcone20/pt<0.1
     # Only do for muons. For now, do for none!
     #if basic_cuts.chan[0] != 'e':
