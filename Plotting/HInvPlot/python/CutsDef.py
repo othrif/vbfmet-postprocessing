@@ -28,7 +28,7 @@ class BasicCuts:
                             'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2',
 
                             'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2',
-                                'njgt2','njgt2lt5','njgt3lt5','nj3',
+                                'njgt2','njgt2lt5','njgt3lt5','nj3','lowmet','revfjvt',
                                 'LowMETQCDRevFJVT',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
                             'metsfVBFTopo','metsfxe110XE70','metsfxe110XE65',
@@ -626,7 +626,8 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
 
     cuts += [CutItem('CutPh',       'n_ph==1')]
-    cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
+    if basic_cuts.analysis not in ['lowmet']:
+        cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
     cuts += getJetCuts(basic_cuts, options, isPh=True);
 
     # add the extra cuts...decide if we want these
@@ -634,7 +635,10 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     if options.ReverseFJVT:
         cuts += [CutItem('CutFJVT','j0fjvt > 0.4 || j1fjvt > 0.4')]
     else:
-        cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]
+        if basic_cuts.analysis in ['revfjvt']:
+            cuts += [CutItem('CutFJVT','j0fjvt > 0.4 || j1fjvt > 0.4')]
+        else:
+            cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]            
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
 
@@ -645,7 +649,10 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             met_choice=options.met_choice
         elif Region=='WCR' or Region=='ZCR':
             met_choice=options.met_choice.replace('_tst','_tst_nolep')
-        cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
+        if basic_cuts.analysis in ['lowmet']:
+            cuts += [CutItem('CutMet',       '%s > 110.0 && %s < 150.0' %(met_choice,met_choice))]
+        else:
+            cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
 
     cuts += [CutItem('CutDPhiMetPh','met_tst_ph_dphi > 1.8')]
     cuts += [CutItem('CutPhCentrality','phcentrality > 0.4')]
