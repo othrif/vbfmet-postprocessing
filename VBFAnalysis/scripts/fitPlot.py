@@ -1297,6 +1297,7 @@ def main(options):
         rbkgs = hDict["bkgsStat"].Clone()
         if (not options.show_mc_stat_err and options.postFitPickleDir!=None): # removing mc stat unc.
             for i in range(0,rbkgs.GetNbinsX()+1):
+                #print 'stats are set to zero!'
                 rbkgs.SetBinError(i,0.0)
         
         rHist.Divide(rbkgs)

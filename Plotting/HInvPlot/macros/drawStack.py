@@ -60,6 +60,7 @@ p.add_option('--syst-fakes',    type='int',          default=0,       dest='syst
 p.add_option('--syst-trkmet',   type='int',          default=0,       dest='syst_trkmet')
 p.add_option('--no-underflow',  action='store_true', default=False,   dest='no_underflow')
 p.add_option('--show-mc-stat-err',  action='store_true', default=False,   dest='show_mc_stat_err')
+p.add_option('--add-fakeE',  action='store_true', default=False,   dest='add_fakeE')
 
 p.add_option('--syst-type',     type='string', default='All',           dest='syst_type', help='SigTheory, All, or MJsyst')
 p.add_option('--draw-syst',       action='store_true', default=False,   dest='draw_syst')
@@ -67,8 +68,8 @@ p.add_option('--make-syst-table', action='store_true', default=False,   dest='ma
 
 p.add_option('--atlas-style', dest='atlas_style_path', default="/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/")
 
-# Allow canvas size and legend coords to be overriden on the command line.
-p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.51, 0.60, 0.915, 0.855), type=float)
+# Allow canvas size and legend coords to be overriden on the command line.  0.51, 0.60, 0.915, 0.855)
+p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.55, 0.60, 0.94, 0.9), type=float)
 p.add_option('--canvas-size', dest="canvas_size", nargs=2, default=(500, 500), type=int)
 
 # Allow a vertical dashed line to be drawn over the plot.
@@ -144,6 +145,8 @@ def getSelKeyLabel(selkey):
         elif selkey.count('LowMETQCDSR'): proc = 'Low #it{E}_{T}^{miss}' #proc += ', Low MET QCD, N_{jet}=2'
         elif selkey.count('mjjLow200_'):  proc = 'Low #it{m}_{jj}' #proc += ', 0.2<m_{jj}<0.8TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
+        elif selkey.count('lowmet_'):  proc += ', Low #it{E}_{T}^{miss}'
+        elif selkey.count('revfjvt_'):  proc += ', Reverse FJVT'
         elif selkey.count('njgt2lt5_'):  proc += ',2<#it{N}_{jet}<5'
         elif selkey.count('njgt3lt5_'):  proc += ',3<#it{N}_{jet}<5'
         elif selkey.count('njgt2_'):  proc += ',#it{N}_{jet} #geq 3'
@@ -271,15 +274,15 @@ def getHistPars(hist):
         'lepEta' : {'xtitle':'Lepton #it{#eta} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'lepPhi' : {'xtitle':'Lepton #it{#phi} [GeV]',              'ytitle':'Events', 'rebin':0,    'ymin':0.0},
         'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events / 0.2 rad', 'rebin':5,  'ymin':0.01},
-        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01, 'xmax':2.0,'ymax':239.99}, #,'ymax':2000.01,'ymax':5500.01, 'ymax':4200.01 , 'ymax':239.99 'ymax':2000.01,
+        'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01, 'xmax':2.0,'ymax':2000.01}, #,'ymax':2000.01,'ymax':5500.01, 'ymax':4200.01 , 'ymax':239.99 'ymax':2000.01,
         'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / 5 GeV', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
         'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / 25 GeV', 'rebin':4,  'ymin':1.0, 'logy':True,'xmin':100,'LtoRCut':0},#'xmax':500, 
         'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
-        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':200,  'ymin':5.1,'ymax':2500, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
+        'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',             'xmin':200,  'ymin':50.1,'ymax':25000, 'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,
         'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / 500 GeV', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':800.0, 'xmax':5000.0,    'ymin':5.1,'ymax':2000,      'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000, 'ymin':50.1,'ymax':20000, 
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':800.0, 'xmax':5000.0,    'ymin':50.1,'ymax':20000,      'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000, 'ymin':50.1,'ymax':20000, 
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':0.01,'logy':False, 'LtoRCut':2},        
         'jj_deta' : {'xtitle':'#Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':2,  'ymin':0.001, 'LtoRCut':0},
         'jj_deta_signed' : {'xtitle':'Signed #Delta #it{#eta}_{jj}'  ,               'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},
@@ -360,6 +363,7 @@ def getLabelSortKey(sample):
     if   sample == 'top2': return 1
     elif sample == 'data': return 0    # 11
     elif sample == 'wzzz': return 2
+    elif sample == 'tth': return -5        
     elif sample == 'wz': return 2
     elif sample == 'zz': return 4
     elif sample == 'smww': return 1 # was 3
@@ -414,7 +418,8 @@ def getSampleSortKey(sample):
     if   sample == 'smww': return 1
     elif sample == 'zqcd': return 8
     elif sample == 'zqcdMad': return -8
-    elif sample == 'zewk': return 7
+    elif sample == 'tth': return -4.5
+    elif sample == 'zewk': return 7        
     elif sample == 'wqcd': return 10
     elif sample == 'wqcdMad': return -2
     elif sample == 'wewk': return 9
@@ -454,7 +459,8 @@ def getSampleLabel(sample):
         'qflip': 'Charge Flip',
         'zqcd': '#it{Z} strong',
         'zqcdMad': '#it{Z} strong',
-        'zewk': '#it{Z} EWK',
+        'tth': 'Fake-#it{e}',
+        'zewk': '#it{Z} EWK',        
         'mqcd': 'Multijet',
         'dqcd': 'Multijet',
         'wqcd': '#it{W} strong',
@@ -527,7 +533,8 @@ def getStyle(sample):
     #color_wewk = ROOT.kGreen  -7
     #color_tall = ROOT.kMagenta-9 #ROOT.kYellow +1 #ROOT.kRed+1
     #color_wdpi = ROOT.kGray+1#ROOT.kOrange-5
-    # version cool 
+    # version cool
+    color_fake = ROOT.kViolet-4
     color_zewk = ROOT.kSpring+8
     color_zqcd = ROOT.kGreen-2
     #color_wqcd = ROOT.kCyan-3
@@ -559,6 +566,7 @@ def getStyle(sample):
     color_data = ROOT.kBlack
 
     styles = {
+        'tth':{'color':color_fake, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zewk':{'color':color_zewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zqcd':{'color':color_zqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zqcdMad':{'color':color_zqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
@@ -744,7 +752,7 @@ class HistEntry:
             for mbin in range(last_bin+1,self.hist.GetNbinsX()+2):
                 self.hist.SetBinContent(mbin,0.0)
                 self.hist.SetBinError(mbin,0.0)
-
+                
         if self.sample in self.nf_map:
             self.hist.Scale(self.nf_map[self.sample])
             log.info('Scaling Sample %s by %s ' %(self.sample,self.nf_map[self.sample]))
@@ -893,7 +901,7 @@ class DrawStack:
 
         for bkg in bkgs:
             self.bkgs[bkg] = self.ReadSample(file, bkg)
-
+            
         for extract_s in extract_sig:
             self.extract_sig[extract_s] = self.ReadSample(file, extract_s)
         sum_err_total = 0.0
@@ -967,8 +975,29 @@ class DrawStack:
 
         log.debug('ReadSample - integral=%5.1f sample=%s, syst=%s' %(hist.Integral(), sample, syst))
         hist=hist.Clone()
+        # adding post fit electron fakes
+        if options.add_fakeE and sample=='tth':
+            if 'jj_mass_variableBin' in self.name:
+                hist.SetBinContent(4,44.4+38.4+28.); hist.SetBinError(4,25.0)
+                hist.SetBinContent(5,32.2+34.4+12.); hist.SetBinError(5,22.0)
+                hist.SetBinContent(6,7.4+8.5); hist.SetBinError(4,6.0)
+                hist.SetBinContent(7,9.2+19.5); hist.SetBinError(4,15.0)
+                hist.SetBinContent(8,2.8+0.6); hist.SetBinError(4,2.0)
+            if 'jj_dphi' in self.name:
+                for  ij in range(1,11):
+                    hist.SetBinContent(ij,23.0/2.0); hist.SetBinError(ij,4.0)
+                    hist.SetBinContent(ij+10,24.9/2.0); hist.SetBinError(ij+10,4.0)
+            if 'met_tst_nolep_et' in self.name:
+                for  ij in range(21,26):
+                    hist.SetBinContent(ij,100.0/5.0); hist.SetBinError(ij,20.0/5.0)
+                    hist.SetBinContent(ij+5,60.0/5.0); hist.SetBinError(ij+4,20.0/5.0)
+                    hist.SetBinContent(ij+10,45.0/5.0); hist.SetBinError(ij+10,10.0/5.0)
+                    hist.SetBinContent(ij+15,20/5.0); hist.SetBinError(ij+15,8.0/5.0)
+                    hist.SetBinContent(ij+20,13/5.0); hist.SetBinError(ij+20,5.0/5.0)
+                    hist.SetBinContent(ij+25,1/5.0); hist.SetBinError(ij+25,0.5/5.0)
+                
         self.DivideByBinWidth(hist)
-        if DO_SYMM:
+        if DO_SYMM and not ( options.add_fakeE and sample=='tth'):
             nom_path = self.GetHistPath(sample, 'Nominal')            
             #print 'COMPUTING systematic',nom_path
             hist_central_value = self.file_pointer.Get(nom_path)
@@ -2549,7 +2578,9 @@ def main():
         bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
-            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk'] #,'mqcd','zldy','vvv' 
+            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk'] #,'mqcd','zldy','vvv'
+    if options.add_fakeE:
+        bkgs+=['tth']
     if options.stack_signal:
         if not 'higgs' in bkgs: bkgs+=['higgs']
 

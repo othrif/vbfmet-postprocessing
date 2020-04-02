@@ -1164,6 +1164,18 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       }
     }
 
+    // fill the other met cut...should be in GeV
+    float jj_mass = event->GetVar(Mva::jj_mass);
+    float met_nolep = event->GetVar(Mva::met_tst_nolep_et);
+    event->RepVar(Mva::met_tst_cut,0);
+    if(jj_mass<=800.0)  event->RepVar(Mva::met_tst_cut,1);
+    else if(jj_mass>800.0){
+      bool metCutBool = jj_mass>2.5e3 ? true: (200.0-(jj_mass-800.0)*(0.0294118))<met_nolep;
+      if(met_nolep<150.0) metCutBool=true;// allow to pass for low met to avoid CR problems
+      if(metCutBool) event->RepVar(Mva::met_tst_cut,1);
+      //std::cout << "jj_mass: " << jj_mass << " met: " << met_nolep << " pass: " << metCutBool << std::endl;
+    }
+
     // Compute a new (non-object-based) MET significance:
     // * only look at base lepton pt.
     // * use all jets (i.e. jetHT as computed above).
@@ -1366,7 +1378,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // apply the overlap
     if(fOverlapPh && fisMC){
-      bool in_vy_overlap = event->GetVar(Mva::in_vy_overlap);
+      bool in_vy_overlap = event->GetVar(Mva::in_vy_overlap)>0.5;
       bool isVjets =(event->sample==Mva::kWqcdMad) || (event->sample==Mva::kWqcd) || (event->sample==Mva::kZqcd) || (event->sample==Mva::kZqcdMad) || (event->sample==Mva::kZewk) || (event->sample==Mva::kWewk) || (event->sample==Mva::kZqcdPow);
       bool isTop = (event->sample==Mva::ktop2);
       bool isVgjets = (event->sample==Mva::kttg) || (event->sample==Mva::kZgam) || (event->sample==Mva::kWgam) || (event->sample==Mva::kZgamEWK) || (event->sample==Mva::kWgamEWK);
