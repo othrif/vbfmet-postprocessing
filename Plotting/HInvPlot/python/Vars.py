@@ -53,6 +53,7 @@ myvars_notplotted = [['trigger_met_encoded', '2', '0.0', '1.0'],
               ['passVjetsFilterTauEl', '2', '0.0', '1.0'],              
               ['passVjetsPTV', '2', '0.0', '1.0'],
                          ['passJetCleanTight', '2', '-0.5', '1.5'],
+                         ['in_vy_overlap', '2', '-0.5', '1.5'],                         
         ]
 
 # These MET variables are plotted too, but if DETAIL_LEVEL_MET

@@ -660,6 +660,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::bcid);
   fSkipVarsQCD.insert(Mva::BCIDDistanceFromFront);
   fSkipVarsQCD.insert(Mva::passVjetsFilterTauEl);
+  fSkipVarsQCD.insert(Mva::in_vy_overlap);  
   fSkipVarsQCD.insert(Mva::lb);
   fSkipVarsQCD.insert(Mva::n_mu_w);
   fSkipVarsQCD.insert(Mva::n_el_w);
@@ -693,7 +694,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->RepVar(Mva::n_mu_w, 0);
       event->RepVar(Mva::n_el_w, 0);
       event->RepVar(Mva::n_mu_baseline_noOR, 0);
-      event->RepVar(Mva::passVjetsFilterTauEl, 1);      
+      event->RepVar(Mva::passVjetsFilterTauEl, 1);
+      event->RepVar(Mva::in_vy_overlap, 1);
       event->RepVar(Mva::lep_trig_match, 0);
     }
 
@@ -1378,7 +1380,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // apply the overlap
     if(fOverlapPh && fisMC){
-      bool in_vy_overlap = event->GetVar(Mva::in_vy_overlap)>0.5;
+      bool in_vy_overlap = event->GetVar(Mva::in_vy_overlap);
+      //std::cout << "in_vy_overlap: " << in_vy_overlap << " " << event->GetVar(Mva::in_vy_overlap) << std::endl;
       bool isVjets =(event->sample==Mva::kWqcdMad) || (event->sample==Mva::kWqcd) || (event->sample==Mva::kZqcd) || (event->sample==Mva::kZqcdMad) || (event->sample==Mva::kZewk) || (event->sample==Mva::kWewk) || (event->sample==Mva::kZqcdPow);
       bool isTop = (event->sample==Mva::ktop2);
       bool isVgjets = (event->sample==Mva::kttg) || (event->sample==Mva::kZgam) || (event->sample==Mva::kWgam) || (event->sample==Mva::kZgamEWK) || (event->sample==Mva::kWgamEWK);

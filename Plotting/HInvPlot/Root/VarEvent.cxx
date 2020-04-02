@@ -329,7 +329,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "tmva")                   return tmva;
   if(var == "bcid")                   return bcid;
   if(var == "bcidPos")                return bcidPos;
-  if(var == "in_vy_overlap")          return bcidPos;
+  if(var == "in_vy_overlap")          return in_vy_overlap;
   if(var == "in_vy_overlapCut")       return in_vy_overlapCut;
 
   cout << "Msl::Mva::Convert2Var - unknown enum: " << var << endl;
