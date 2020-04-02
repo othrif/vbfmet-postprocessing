@@ -230,6 +230,17 @@ StatusCode VBFAnalysisAlg::initialize() {
   ph_pt = new std::vector<float>(0);
   ph_phi = new std::vector<float>(0);
   ph_eta = new std::vector<float>(0);
+  ph_ptcone20 = new std::vector<float>(0);
+  ph_topoetcone40 = new std::vector<float>(0);
+  ph_truthOrigin  = new std::vector<int>(0);
+  baseph_pt = new std::vector<float>(0);
+  baseph_phi = new std::vector<float>(0);
+  baseph_eta = new std::vector<float>(0);
+  baseph_ptcone20 = new std::vector<float>(0);
+  baseph_topoetcone40 = new std::vector<float>(0);
+  baseph_truthOrigin  = new std::vector<int>(0);
+  baseph_isEM  = new std::vector<unsigned>(0);
+  baseph_iso  = new std::vector<bool>(0);
   tau_pt = new std::vector<float>(0);
   tau_phi = new std::vector<float>(0);
   tau_eta = new std::vector<float>(0);
@@ -294,6 +305,9 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("met_tst_phi",&met_tst_phi);
   m_tree_out->Branch("met_tst_nolep_phi",&met_tst_nolep_phi);
   m_tree_out->Branch("met_cst_jet",&met_cst_jet);
+  m_tree_out->Branch("met_cst_phi",&met_cst_phi);
+  m_tree_out->Branch("met_cst_em_jet",&met_cst_em_jet);
+  m_tree_out->Branch("met_cst_em_phi",&met_cst_em_phi);
   m_tree_out->Branch("met_soft_tst_et",        &met_soft_tst_et);
   m_tree_out->Branch("mu_charge",&mu_charge);
   m_tree_out->Branch("mu_pt",&mu_pt);
@@ -399,6 +413,19 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("ph_phi",&ph_phi);
     m_tree_out->Branch("ph_eta",&ph_eta);
     if(m_currentVariation=="Nominal"){
+
+      m_tree_out->Branch("ph_ptcone20", &ph_ptcone20);
+      m_tree_out->Branch("ph_topoetcone40",&ph_topoetcone40);
+      m_tree_out->Branch("ph_truthOrigin",&ph_truthOrigin);
+      m_tree_out->Branch("baseph_pt", &baseph_pt);
+      m_tree_out->Branch("baseph_phi",&baseph_phi);
+      m_tree_out->Branch("baseph_eta",&baseph_eta);
+      m_tree_out->Branch("baseph_ptcone20", &baseph_ptcone20);
+      m_tree_out->Branch("baseph_topoetcone40",&baseph_topoetcone40);
+      m_tree_out->Branch("baseph_truthOrigin",&baseph_truthOrigin);
+      m_tree_out->Branch("baseph_isEM",&baseph_isEM);
+      m_tree_out->Branch("baseph_iso",&baseph_iso);
+
       m_tree_out->Branch("tau_pt",&outtau_pt);
       m_tree_out->Branch("tau_phi",&outtau_phi);
       m_tree_out->Branch("tau_eta",&outtau_eta);
@@ -1557,6 +1584,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("met_tst_nolep_j1_dphi",1);
   m_tree->SetBranchStatus("met_tst_nolep_j2_dphi",1);
   m_tree->SetBranchStatus("met_cst_jet",1);
+  m_tree->SetBranchStatus("met_cst_phi",1);
+  m_tree->SetBranchStatus("met_cst_em_jet",1);
+  m_tree->SetBranchStatus("met_cst_em_phi",1);
   m_tree->SetBranchStatus("met_tst_et",1);
   m_tree->SetBranchStatus("met_tst_nolep_et",1);
   m_tree->SetBranchStatus("met_tst_phi",1);
@@ -1600,10 +1630,23 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("ph_pt",1);
     m_tree->SetBranchStatus("ph_phi",1);
     m_tree->SetBranchStatus("ph_eta",1);
-    m_tree->SetBranchStatus("tau_pt",1);
-    m_tree->SetBranchStatus("tau_phi",1);
-    m_tree->SetBranchStatus("tau_eta",1);
 
+    if(m_currentVariation=="Nominal"){
+      m_tree->SetBranchStatus("ph_ptcone20",1);
+      m_tree->SetBranchStatus("ph_topoetcone40",1);
+      m_tree->SetBranchStatus("ph_truthOrigin",1);
+      m_tree->SetBranchStatus("baseph_pt",1);
+      m_tree->SetBranchStatus("baseph_phi",1);
+      m_tree->SetBranchStatus("baseph_eta",1);
+      m_tree->SetBranchStatus("baseph_ptcone20",1);
+      m_tree->SetBranchStatus("baseph_topoetcone40",1);
+      m_tree->SetBranchStatus("baseph_truthOrigin",1);
+      m_tree->SetBranchStatus("baseph_isEM",1);
+      m_tree->SetBranchStatus("baseph_iso",1);
+      m_tree->SetBranchStatus("tau_pt",1);
+      m_tree->SetBranchStatus("tau_phi",1);
+      m_tree->SetBranchStatus("tau_eta",1);
+    }
     m_tree->SetBranchStatus("jet_fjvt",1);
     m_tree->SetBranchStatus("basemu_pt",1);
     m_tree->SetBranchStatus("basemu_eta",1);
@@ -1760,6 +1803,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("met_tst_nolep_j1_dphi",&met_tst_nolep_j1_dphi);
   m_tree->SetBranchAddress("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);
   m_tree->SetBranchAddress("met_cst_jet",&met_cst_jet);
+  m_tree->SetBranchAddress("met_cst_phi",&met_cst_phi);
+  m_tree->SetBranchAddress("met_cst_em_jet",&met_cst_em_jet);
+  m_tree->SetBranchAddress("met_cst_em_phi",&met_cst_em_phi);
   m_tree->SetBranchAddress("met_tst_et",&met_tst_et);
   m_tree->SetBranchAddress("met_tst_nolep_et",&met_tst_nolep_et);
   m_tree->SetBranchAddress("met_tst_phi",&met_tst_phi);
@@ -1851,6 +1897,19 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("ph_phi",          &ph_phi);
     m_tree->SetBranchAddress("ph_eta",          &ph_eta);
     if(m_currentVariation=="Nominal" && m_isMC){
+      m_tree->SetBranchAddress("ph_ptcone20",      &ph_ptcone20);
+      m_tree->SetBranchAddress("ph_topoetcone40",  &ph_topoetcone40);
+      m_tree->SetBranchAddress("ph_truthOrigin",   &ph_truthOrigin);
+
+      m_tree->SetBranchAddress("baseph_pt",           &baseph_pt);
+      m_tree->SetBranchAddress("baseph_phi",          &baseph_phi);
+      m_tree->SetBranchAddress("baseph_eta",          &baseph_eta);
+      m_tree->SetBranchAddress("baseph_ptcone20",     &baseph_ptcone20);
+      m_tree->SetBranchAddress("baseph_topoetcone40", &baseph_topoetcone40);
+      m_tree->SetBranchAddress("baseph_truthOrigin",  &baseph_truthOrigin);
+      m_tree->SetBranchAddress("baseph_isEM",         &baseph_isEM);
+      m_tree->SetBranchAddress("baseph_iso",          &baseph_iso);
+
       m_tree->SetBranchAddress("tau_pt",           &tau_pt);
       m_tree->SetBranchAddress("tau_phi",          &tau_phi);
       m_tree->SetBranchAddress("tau_eta",          &tau_eta);
