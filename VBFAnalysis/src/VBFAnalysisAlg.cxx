@@ -155,6 +155,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   basemu_type= new std::vector<int>(0);
   basemu_truthType= new std::vector<int>(0);
   basemu_truthOrigin= new std::vector<int>(0);
+  mu_truthType= new std::vector<int>(0);
+  mu_truthOrigin= new std::vector<int>(0);
 
   baseel_pt= new std::vector<float>(0);
   baseel_eta= new std::vector<float>(0);
@@ -385,6 +387,8 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("basemu_type",         &basemu_type);
       if(m_isMC) m_tree_out->Branch("basemu_truthOrigin",  &basemu_truthOrigin);
       if(m_isMC) m_tree_out->Branch("basemu_truthType",    &basemu_truthType);
+      if(m_isMC) m_tree_out->Branch("mu_truthOrigin",  &mu_truthOrigin);
+      if(m_isMC) m_tree_out->Branch("mu_truthType",    &mu_truthType);
       m_tree_out->Branch("baseel_z0",           &baseel_z0);
       m_tree_out->Branch("baseel_d0sig",        &baseel_d0sig);
       m_tree_out->Branch("baseel_topoetcone20",  &baseel_topoetcone20);
@@ -731,6 +735,13 @@ StatusCode VBFAnalysisAlg::execute() {
     if((!mcEventWeights || mcEventWeights->size()<120) && (runNumber==346600 || runNumber==346588)) std::cout << "ERROR the mcEvent Weights are missing!!!" << std::endl;
     if(runNumber==346588) mcEventWeight = mcEventWeights->at(111); // ggF
     if(runNumber==346600) mcEventWeight = mcEventWeights->at(109); // VBF
+  }
+  if(m_isMC){
+    if(((runNumber>=364541 && runNumber<=364547) || (runNumber>=361040 && runNumber<=361062) || (runNumber>=305435 && runNumber<=305444) || (runNumber>=364500 && runNumber<=364535))
+       && abs(mcEventWeight)>100.0) mcEventWeight=1.0;
+    // the event weights seem wrong for these three samples. this is a HACK to fix it
+    if( metRunNumber>=348197 && runNumber==364542) mcEventWeight*=-1.0;
+    if( metRunNumber>=325713 && metRunNumber<348197 && (runNumber==364541 || runNumber==364542)) mcEventWeight*=-1.0;
   }
 
   // applying a pileup weight for 2018 data
@@ -1607,6 +1618,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("basemu_type",1);
     if(m_isMC) m_tree->SetBranchStatus("basemu_truthOrigin",1);
     if(m_isMC) m_tree->SetBranchStatus("basemu_truthType",1);
+    if(m_isMC) m_tree->SetBranchStatus("mu_truthOrigin",1);
+    if(m_isMC) m_tree->SetBranchStatus("mu_truthType",1);
     m_tree->SetBranchStatus("baseel_pt",1);
     m_tree->SetBranchStatus("baseel_eta",1);
     m_tree->SetBranchStatus("baseel_phi",1);
@@ -1821,6 +1834,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("basemu_type",         &basemu_type);
     if(m_isMC) m_tree->SetBranchAddress("basemu_truthOrigin",  &basemu_truthOrigin);
     if(m_isMC) m_tree->SetBranchAddress("basemu_truthType",    &basemu_truthType);
+    if(m_isMC) m_tree->SetBranchAddress("mu_truthOrigin",  &mu_truthOrigin);
+    if(m_isMC) m_tree->SetBranchAddress("mu_truthType",    &mu_truthType);
     m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
     m_tree->SetBranchAddress("baseel_eta",          &baseel_eta);
     m_tree->SetBranchAddress("baseel_phi",          &baseel_phi);

@@ -282,10 +282,7 @@ def main():
             ratio, ratio_error, low, low_error, high, high_error = compute_ratio(args, tfile, region)
             lows[region] = (low, low_error)
             highs[region] = (high, high_error)
-            if not (low <= 0 or high <= 0):
-                ratios[region] = (ratio, ratio_error)
-            else:
-                ratios[region] = (-1, -1)
+            ratios[region] = (ratio, ratio_error)
 
             print("")
             if len(region) >= maxlen:

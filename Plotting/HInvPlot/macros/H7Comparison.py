@@ -120,7 +120,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         p.Draw()
         labs += [p]
 
-        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.1f fb^{-1}' %(139e3/1.0e3))
+        a = ROOT.TLatex(x, y-0.04, '#sqrt{s}=13 TeV, %.0f fb^{-1}' %(139e3/1.0e3))
         a.SetNDC()
         a.SetTextFont(42)
         a.SetTextSize(0.05)
@@ -186,14 +186,29 @@ def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110',input_er
 #
 if __name__ == "__main__":
 
+    from optparse  import OptionParser
+    p = OptionParser()
+
+    p.add_option( '--ipath1',     type='string',      default='/tmp/dipole.root',                 dest='ipath1',      help='Input path 1')
+    p.add_option( '--ipath2',     type='string',      default='/tmp/AOWmunuNom.root',        dest='ipath2',      help='Input path 2')
+    p.add_option( '--var',      type='string',      default='jj_mass',                 dest='var',       help='jj_mass,jet_pt2,njets,njets25,jj_dphi,jj_deta,bosonpt')
+
+    (options, args) = p.parse_args()
+    
     Style()
     fout = ROOT.TFile.Open('myplt_W.root','RECREATE')
     can = ROOT.TCanvas('stack', 'stack', 800, 500)
 
-    sampleName='H7'
+    sampleName='H7HFact'
+    sampleName='H7PT10'
+    sampleName='H7Pow'
+    #sampleName='H7R207'
+    #sampleName='H7AO'
     tpye = 'Sig'
-    fIncl = ROOT.TFile.Open('/tmp/H7/wmuNom.root')
-    fVBFFilt = ROOT.TFile.Open('/tmp/H7/wmuMuDown.root')
+    fIncl = ROOT.TFile.Open(options.ipath1)
+    #fVBFFilt = ROOT.TFile.Open('/tmp/dipoleMuUp.root')/tmp/wmunudipoleR207.root
+    #fVBFFilt = ROOT.TFile.Open('/tmp/AOWmunuNom.root')
+    fVBFFilt = ROOT.TFile.Open(options.ipath2)
     treeName1 = 'MiniNtuple'
     treeNamePow = 'MiniNtuple'
     plt=None
@@ -203,23 +218,39 @@ if __name__ == "__main__":
     #cuts = '*(jj_mass>1.0e6 && jj_dphi<1.8 && jj_deta>3.8 && met_cst_jet>120.0e3 && met_tst_et>150.0e3 && jet_pt[0]>80.0e3 && jet_pt[1]>50e3 && n_jet<5 )'    
     #cuts = '*( truth_jj_mass>200e3 && boson_pt[0]>150e3 && truth_jj_deta>3.0 && truth_jj_dphi<2.5 && jet_pt[1]>40e3)'
     #cuts = '*( truth_jj_mass>200e3 && boson_pt[0]>150e3 && truth_jj_deta>3.0 && truth_jj_dphi<2.5 && jet_pt[1]>40e3)'
-    cuts = '*( truth_jj_mass>100e3 && jet_pt[1]>15e3)'
-    cuts = '*( truth_jj_mass>100e3  && jet_pt[1]>15e3)'    
+    cuts = '*( truth_jj_mass>100e3 && jet_pt[1]>30e3 && truth_jj_dphi<2.5 && boson_pt[0]>90e3)'
+    cuts = '*( truth_jj_mass>100e3  && jet_pt[1]>30e3 && truth_jj_dphi<2.5 && boson_pt[0]>90e3)'
     #cuts = '*(jj_mass>0.2e6 && met_truth_et>150e3)'
     h1n = fIncl.Get("NumberEvents")
     h2n = fVBFFilt.Get("NumberEvents")
     runCutH7='/%s' %(h2n.GetBinContent(2))
     runCutSh='/%s' %(h1n.GetBinContent(2))
+    
     pvar='truth_jj_mass/1.0e3'
     xaxis='Truth m_{jj} [GeV]'
-    #pvar='truth_jj_dphi'
-    #xaxis='Truth #Delta#phi_{jj}'
-    #pvar='truth_jj_deta'
-    #xaxis='Truth #Delta#eta_{jj}'
+    if options.var=="centrality":
+        pvar='exp(-4.0/pow(truth_jj_deta,2)) * pow(jet_eta[2] - (jet_eta[0]+jet_eta[1])/2.0,2)'
+        xaxis='Third jet centrality'
+    elif options.var=="jet_pt2":
+        pvar='jet_pt[2]/1.0e3'
+        xaxis='Third Jet p_{T} [GeV]'
+    elif options.var=="njets":        
+        pvar='njets'
+        xaxis='Truth N_{jets}'
+    elif options.var=="njets25":        
+        pvar='njets25'
+        xaxis='Truth N_{jets,25}'
+    elif options.var=="jj_dphi":  
+        pvar='truth_jj_dphi'
+        xaxis='Truth #Delta#phi_{jj}'
+    elif options.var=="jj_deta": 
+        pvar='truth_jj_deta'
+        xaxis='Truth #Delta#eta_{jj}'
     #pvar='jet_phi[0]-jet_phi[1]'
-    #xaxis='Truth #Delta#phi_{jj}'    
-    #pvar='boson_pt[0]/1.0e3'
-    #xaxis='boson p_{T} [GeV]'
+    #xaxis='Truth #Delta#phi_{jj}'
+    elif options.var=="bosonpt": 
+        pvar='boson_pt[0]/1.0e3'
+        xaxis='boson p_{T} [GeV]'
     #pvar='jj_dphi'
     #xaxis='#Delta#phi_{jj}'
     #pvar='met_truth_et/1.0e3'
@@ -233,14 +264,20 @@ if __name__ == "__main__":
     n1 = 'Iptruth_jj_mass'
     if pvar.count('jj_mass'):
         plt = ROOT.TH1F(n1,n1,10,0.0,5000.0)
+    elif pvar.count('pow(truth_jj_deta,2)'):
+        plt = ROOT.TH1F(n1,n1,25,0.0,5.0)        
     elif pvar=='jet_phi[0]-jet_phi[1]':
         plt = ROOT.TH1F(n1,n1,50,-7.0,7.0)
+    elif pvar.count('njets'):
+        plt = ROOT.TH1F(n1,n1,10,-0.5,9.5)
     elif pvar.count('jj_dphi') or pvar.count('truth_jet_phi[0]-truth_jet_phi[1]'):
         plt = ROOT.TH1F(n1,n1,10,0.0,3.0)
     elif pvar.count('jj_deta'):
         plt = ROOT.TH1F(n1,n1,30,0.0,10.0)
     elif pvar=='truth_jet_phi[0]-truth_jet_phi[1]':
         plt = ROOT.TH1F(n1,n1,50,-7.0,7.0)
+    elif pvar=='jet_pt[2]/1.0e3':
+        plt = ROOT.TH1F(n1,n1,50,0.0,500.0)
     else:
         plt = ROOT.TH1F(n1,n1,25,0.0,500.0)
     plt.GetYaxis().SetTitle('Arb. Normalisation')
@@ -255,14 +292,20 @@ if __name__ == "__main__":
     n2='vbfptruth_jj_mass'
     if pvar.count('jj_mass'):
         vbfplt = ROOT.TH1F(n2,n2,10,0.0,5000.0)
+    elif pvar.count('pow(truth_jj_deta,2)'):
+        vbfplt = ROOT.TH1F(n2,n2,25,0.0,5.0)        
     elif pvar=='jet_phi[0]-jet_phi[1]':
         vbfplt = ROOT.TH1F(n2,n2,50,-7.0,7.0)
+    elif pvar.count('njets'):
+        vbfplt = ROOT.TH1F(n2,n2,10,-0.5,9.5)
     elif pvar.count('jj_dphi') or pvar.count('jet_phi[0]-jet_phi[1]'):
         vbfplt = ROOT.TH1F(n2,n2,10,0.0,3.0)
     elif pvar.count('jj_deta'):
         vbfplt = ROOT.TH1F(n2,n2,30,0.0,10.0)
     elif pvar=='truth_jet_phi[0]-truth_jet_phi[1]':
-        vbfplt = ROOT.TH1F(n2,n2,50,-7.0,7.0)        
+        vbfplt = ROOT.TH1F(n2,n2,50,-7.0,7.0)
+    elif pvar=='jet_pt[2]/1.0e3':
+        vbfplt = ROOT.TH1F(n2,n2,50,0.0,500.0)
     else:
         vbfplt = ROOT.TH1F(n2,n2,25,0.0,500.0)
     vbfplt.GetYaxis().SetTitle('Events')
@@ -321,7 +364,7 @@ if __name__ == "__main__":
     #tot=implt.IntegralAndError(0,10001,e)
     #print 'Incl to be merged: ',tot,'+/-',e        
     
-    texts = getATLASLabels(can, 0.2, 0.88,'')
+    texts = getATLASLabels(can, 0.65, 0.88,'')
     for t in texts:
         t.Draw()
 
@@ -330,8 +373,12 @@ if __name__ == "__main__":
     leg.SetFillStyle (0)
     leg.SetTextFont(42);
     leg.SetTextSize(0.04);
-    leg.AddEntry(plt,'Nominal')
-    leg.AddEntry(vbfplt,'ME MuDown')
+    leg.AddEntry(plt,'Dipole Recoil')
+    #leg.AddEntry(vbfplt,'Rel 20.7')
+    #leg.AddEntry(vbfplt,'AO Shower')
+    #leg.AddEntry(vbfplt,'HFact')
+    #leg.AddEntry(vbfplt,'PT10')
+    leg.AddEntry(vbfplt,'Powheg')
     #leg.AddEntry(implt,'Incl for Merging')
     #leg.AddEntry(sumed,'Merged')
     leg.Draw()
@@ -346,8 +393,10 @@ if __name__ == "__main__":
 
     hratio = vbfplt.Clone()
     hratio.Divide(plt)
-    hratio.GetYaxis().SetTitle('MuDown/Nominal')
-    hratio.GetYaxis().SetRangeUser(0.8,1.2)       
+    #hratio.GetYaxis().SetTitle('AO/DipoleRec')
+    hratio.GetYaxis().SetTitle('Pow/Nom')
+    #hratio.GetYaxis().SetTitle('R20p7/Rel21')    
+    hratio.GetYaxis().SetRangeUser(0.9,1.1)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -364,13 +413,19 @@ if __name__ == "__main__":
     for i in range(1,hratio.GetNbinsX()+1):
         print hratio.GetBinContent(i)
     if pvar.count('jj_mass'):
-        hratio.Fit('pol1',"","",800.0,5000.0)
-    if pvar.count('jj_dphi'):
+        hratio.Fit('pol1',"","",500.0,5000.0)
+    elif pvar.count('pow(truth_jj_deta,2)'):
+        hratio.Fit('pol1',"","",0.0,5.0)        
+    elif pvar.count('jj_dphi'):
         hratio.Fit('pol1',"","",0.3,2.5)
-    if pvar.count('jj_deta'):
+    elif pvar.count('jj_deta'):
         hratio.Fit('pol1',"","",2.5,6.5)
-    if pvar.count('boson_pt'):
-        hratio.Fit('pol1',"","",150.0,350.0)
+    elif pvar.count('boson_pt'):
+        hratio.Fit('pol1',"","",90.0,500.0)
+    elif pvar.count('jet_pt'):
+        hratio.Fit('pol1',"","",10.0,300.0)
+    elif pvar.count('njets'):
+        hratio.Fit('pol1',"","",0.0,9.0)
     can.Update()
     can.WaitPrimitive()
     pvar_out=pvar
@@ -378,4 +433,8 @@ if __name__ == "__main__":
         pvar_out=pvar.split('/')[0]
     if pvar=='boson_pt[0]/1.0e3':
         pvar_out='boson_pt'
+    if pvar.count('pow(truth_jj_deta,2)'):
+        pvar_out='centrality'
+    if pvar=='jet_pt[2]/1.0e3':
+        pvar_out='jet_pt2'
     can.SaveAs(sampleName+'_'+tpye+'_'+pvar_out+'.pdf')

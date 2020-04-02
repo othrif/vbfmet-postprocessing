@@ -64,6 +64,7 @@ if args.pickle==None:
                 hnew.SetName('skim_%s' %(dsid_string))
                 hmap[dsid_string]=hnew
         h_total.Fill(dsid_string,nevent)
+        #0.64783097
 else:
     # run pickle file list
     list_file = pickle.load( open( args.pickle, "rb" ) )
@@ -79,6 +80,7 @@ else:
         #dsid_string='308276'
         print 'dsid: ',dsid_string
         nevent = ROOT.Double(0.0)
+        neventraw = ROOT.Double(0.0)
         for line in contFileList:
             filepath = line.strip()
             print filepath
@@ -94,6 +96,7 @@ else:
 		print 'ERROR - histogram invalid',filepath
 		continue
 	    nevent += h.GetBinContent(args.event_count)
+            neventraw += h.GetBinContent(1)
             print 'total events: ',nevent
             if dsid_string in hmap:
                 hmap[dsid_string].Add(h)
@@ -103,8 +106,18 @@ else:
                 hnew.SetName('skim_%s' %(dsid_string))
                 hmap[dsid_string]=hnew
             f.Close()
-        h_total.Fill(dsid_string,nevent)
-        
+        isSet=False
+        if args.event_count==2:
+            dsid=int(dsid_string)
+            if dsid>=364541 and dsid<=364547:
+                if nevent<0.0 or (neventraw>0.0 and nevent/neventraw>40.0):
+                    print 'Problem with sum of weights: ',nevent,' raw: ',neventraw
+                    #sign=1.0
+                    #if dsid==364542:
+                    h_total.Fill(dsid_string,0.64783097*neventraw)
+                    isSet=True
+        if not isSet:
+            h_total.Fill(dsid_string,nevent)            
     
 fout.cd()
 for dsid_string,hnew in hmap.iteritems():

@@ -285,6 +285,8 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Int_t>* basemu_type;
   std::vector<Int_t>* basemu_truthType;
   std::vector<Int_t>* basemu_truthOrigin;
+  std::vector<Int_t>* mu_truthType;
+  std::vector<Int_t>* mu_truthOrigin;
 
   std::vector<Float_t>* baseel_pt;
   std::vector<Float_t>* baseel_eta;

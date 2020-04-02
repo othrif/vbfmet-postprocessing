@@ -464,7 +464,7 @@ StatusCode HFInputAlg::execute() {
   if(doVBFMETGam){
     jj_detaCut=3.0;
     jj_massCut=250.0e3;
-    phSelectionCut=(n_ph==1);
+    phSelectionCut=(n_ph==1 && ph_pt->at(0)<110e3);
     if(n_ph>0) phcentrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(ph_eta->at(0) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
     met_tst_ph_dphi = fabs(GetDPhi(met_tst_phi, ph_phi->at(0)));
     // if this is a vjets sample and it has a photon overlap, then remove it
