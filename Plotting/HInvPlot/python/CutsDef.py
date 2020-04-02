@@ -656,6 +656,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutMet',       '%s > 110.0 && %s < 150.0' %(met_choice,met_choice))]
         else:
             cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
+            cuts += [CutItem('CutMetCST',    'met_cst_jet > 120.0')]
 
     cuts += [CutItem('CutDPhiMetPh','met_tst_ph_dphi > 1.8')]
     cuts += [CutItem('CutPhCentrality','phcentrality > 0.4')]
