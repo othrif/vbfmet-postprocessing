@@ -68,8 +68,8 @@ p.add_option('--make-syst-table', action='store_true', default=False,   dest='ma
 
 p.add_option('--atlas-style', dest='atlas_style_path', default="/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/")
 
-# Allow canvas size and legend coords to be overriden on the command line.
-p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.51, 0.60, 0.915, 0.855), type=float)
+# Allow canvas size and legend coords to be overriden on the command line.  0.51, 0.60, 0.915, 0.855)
+p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.55, 0.60, 0.94, 0.9), type=float)
 p.add_option('--canvas-size', dest="canvas_size", nargs=2, default=(500, 500), type=int)
 
 # Allow a vertical dashed line to be drawn over the plot.
@@ -145,6 +145,8 @@ def getSelKeyLabel(selkey):
         elif selkey.count('LowMETQCDSR'): proc = 'Low #it{E}_{T}^{miss}' #proc += ', Low MET QCD, N_{jet}=2'
         elif selkey.count('mjjLow200_'):  proc = 'Low #it{m}_{jj}' #proc += ', 0.2<m_{jj}<0.8TeV'
         elif selkey.count('deta25_'):  proc += ', 2.5<#Delta#eta<3.8'
+        elif selkey.count('lowmet_'):  proc += ', Low #it{E}_{T}^{miss}'
+        elif selkey.count('revfjvt_'):  proc += ', Reverse FJVT'
         elif selkey.count('njgt2lt5_'):  proc += ',2<#it{N}_{jet}<5'
         elif selkey.count('njgt3lt5_'):  proc += ',3<#it{N}_{jet}<5'
         elif selkey.count('njgt2_'):  proc += ',#it{N}_{jet} #geq 3'

@@ -1366,7 +1366,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // apply the overlap
     if(fOverlapPh && fisMC){
-      bool in_vy_overlap = event->GetVar(Mva::in_vy_overlap);
+      bool in_vy_overlap = event->GetVar(Mva::in_vy_overlap)>0.5;
       bool isVjets =(event->sample==Mva::kWqcdMad) || (event->sample==Mva::kWqcd) || (event->sample==Mva::kZqcd) || (event->sample==Mva::kZqcdMad) || (event->sample==Mva::kZewk) || (event->sample==Mva::kWewk) || (event->sample==Mva::kZqcdPow);
       bool isTop = (event->sample==Mva::ktop2);
       bool isVgjets = (event->sample==Mva::kttg) || (event->sample==Mva::kZgam) || (event->sample==Mva::kWgam) || (event->sample==Mva::kZgamEWK) || (event->sample==Mva::kWgamEWK);
