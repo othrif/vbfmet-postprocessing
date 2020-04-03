@@ -176,6 +176,7 @@ git clone ssh://git@gitlab.cern.ch:7999/VBFInv/STPostProcessing.git source/
 mkdir build;cd build
 acmSetup AthAnalysis,21.2.101
 acm compile
+cd ..
 cd source/Plotting
 source setup.sh
 rc find_packages
@@ -184,3 +185,28 @@ rc find_packages
 rc compile
 ls /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37Egam/*root &> /tmp/v37Egam.txt
 python HInvPlot/macros/plotEvent.py -i /tmp/v37Egam.txt -r /tmp/v37e.root --year 2018 --OverlapPh &>/tmp/eph.log & tail -f /tmp/eph.log
+
+=======
+if you have trouble with acm, then use these instructions
+export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase # use your path
+alias setupATLAS='source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh'
+setupATLAS
+mkdir /tmp/try2
+cd /tmp/try2
+git clone https://gitlab.cern.ch/VBFInv/STPostProcessing.git source/
+mkdir build;cd build
+asetup AthAnalysis,21.2.114,here
+cmake ../source/
+cd ..
+cmake --build build/
+cd source/Plotting
+source setup.sh
+rc find_packages
+rc clean
+rc compile
+ls /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37Egam/*root &> /tmp/v37Egam.txt
+python HInvPlot/macros/plotEvent.py -i /tmp/v37Egam.txt -r
+/tmp/v37e.root --year 2018 --OverlapPh &>/tmp/eph2.log & tail -f
+/tmp/eph2.log
+
+python HInvPlot/macros/drawStack.py  /tmp/v37e.root     --vars jj_mass_variableBin      --do-ratio     --year 2019  --int-lumi=139e3   --selkey pass_gamwcr_allmjj_l_Nominal --ph-ana  --wait --hscale 1

@@ -72,8 +72,7 @@ samplesPrint =['Samples','VBFH125',
 ]
 
 if args.ph_ana:    
-    samples =['hVBFHgam125_',
-                  'hVBFH125_',
+    samples =['hVBFH125_','hVBFHgam125_',
           'hggFH125_',
           'hVH125_',
           'hZ_strong_',
@@ -125,18 +124,19 @@ for s in samples:
 print line
 
 bins=[1,2,3,4,5,6,7,8,9,10,11,12,13]
-if args.ph_ana:
-    bins=[1,2,3,4,5]
+#if args.ph_ana:
+#    bins=[1,2,3,4,5]
 nRegion=0
 sTot=0
 for bin_num in bins:
     r=regions[0].replace('X','%s' %bin_num)
+    print r
     histname=samples[0]+r
     h=f.Get(histname)
     if not h:
         sTot=bin_num-1
         break
-
+print 'Number of bins found: ',sTot
 table_per_bin={}
 for b in bins: table_per_bin[b]={}
 region_cf=[]
@@ -213,6 +213,7 @@ for rmy in regions:
         elif r.count('oneEleC'):  region_name=['Wenu']
         elif r.count('oneMuC'):  region_name=['Wmunu']
         elif r.count('_SR'):  region_name=['SR']
+        print region_name
         table_per_bin[bin_num][region_name[0]]=[lineData,lineSig,lineBkg,'%0.3f $\\pm$ %0.3f\t' %(lineData/lineBkg, math.sqrt(1./lineData+bkgFracErr**2)*(lineData/lineBkg))]
         #[[sreg,totalData,totalBkg,'%0.3f\t%0.3f +/- %0.3f\t' %(totalBkgFracErr, totalData/totalBkg, math.sqrt(totalBkgFracErr**2+1./totalData)*(totalData/totalBkg))]]        
         nRegion+=1
@@ -281,7 +282,7 @@ for keyn in keys_regions:
         table_per_bin_line+=' & %s'  %keyn        
 print table_per_bin_line,' \\\\\\hline\\hline'
 for b in bins:
-    if b>11:
+    if b>11 or b>sTot:
         continue
     for v in [0,1,2,3]:
         table_per_bin_line='%s ' %b

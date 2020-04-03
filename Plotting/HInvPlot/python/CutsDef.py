@@ -604,9 +604,9 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
 
     if basic_cuts.chan in ['nn']:
-        cuts += getMETTriggerCut(cut, options, basic_cuts, syst)
+        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst)
     elif basic_cuts.chan in ['uu','u','up','um']:
-        cuts += getMETTriggerCut(cut, options, basic_cuts, None, ORTrig=' || trigger_lep > 0')
+        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
     elif basic_cuts.chan in ['ee','ll','eu']:
         cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     else:
@@ -640,6 +640,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     else:
         if basic_cuts.analysis in ['revfjvt']:
             cuts += [CutItem('CutFJVT','j0fjvt > 0.4 || j1fjvt > 0.4')]
+            cuts += [CutItem('CutMjjLow','jj_mass < 1000.0')]
         else:
             cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]            
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
@@ -653,6 +654,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         elif Region=='WCR' or Region=='ZCR':
             met_choice=options.met_choice.replace('_tst','_tst_nolep')
         if basic_cuts.analysis in ['lowmet']:
+            cuts += [CutItem('CutMjjLow','jj_mass < 1000.0')]
             cuts += [CutItem('CutMet',       '%s > 110.0 && %s < 150.0' %(met_choice,met_choice))]
         else:
             cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]

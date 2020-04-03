@@ -138,7 +138,10 @@ def getSelKeyLabel(selkey):
             elif selkey.count('_l'): proc = 'W#rightarrow l#nu'
             elif selkey.count('_e'): proc = '#it{W}_{#it{e#nu}}'#'W#rightarrow e#nu'^{high}
             elif selkey.count('_u'): proc = '#it{W}_{#it{#mu#nu}}'#it{W}#rightarrow#it{#mu#nu}'
-
+        if selkey.count('gam'):
+            proc+='+#gamma'
+            if selkey.count('_nn'): proc = 'VBF #gamma #it{h}#rightarrow%s' %decay
+            
         if selkey.count('LowMETQCD_'):  proc += ', Low MET QCD'
         elif selkey.count('LowMETQCDFJVT_'):  proc += ', Low MET QCD'
         elif selkey.count('LowMETQCDVR'):  proc += ', Low MET,2.5<#Delta#eta<3.8 QCD'
@@ -1860,7 +1863,7 @@ class DrawStack:
                         den_tmp.SetBinError(i,0.0)
                 self.ratio.Divide(den_tmp)
                 # compute the mu-error
-                if options.blind:
+                if options.blind and not options.ph_ana:
                     leftToRight=1
                     CUTRANGE = range(0,self.signif.GetNbinsX()+1)
                     if 'LtoRCut' in getHistPars(self.name):
