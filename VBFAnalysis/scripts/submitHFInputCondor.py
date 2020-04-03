@@ -33,8 +33,9 @@ parser.add_argument("--METCut", type=int, dest='METCut', default=160e3, help="ME
 parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
 
-writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=int(args.METCut/1e3), singleHist=args.singleHist)
-writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist,METCut=int(args.METCut/1e3))
+if not args.doVBFMETGam:
+    writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=int(args.METCut/1e3), singleHist=args.singleHist)
+    writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist,METCut=int(args.METCut/1e3))
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:
