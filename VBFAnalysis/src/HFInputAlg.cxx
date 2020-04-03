@@ -118,7 +118,7 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==10) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==11) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==12) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
-  else if(m_binning==13) bins=5; // mjj binning mjj>250
+  else if(m_binning==13) bins=6; // mjj binning mjj>250
   totalBins = bins-1;
 
   // merging the sherpa kt samples
@@ -347,7 +347,8 @@ StatusCode HFInputAlg::execute() {
   /// register the vjets samples
   bool isVjets =(currentSample=="W_strong") || (currentSample=="Z_strong") || (currentSample=="Z_EWK") || (currentSample=="W_EWK") || (currentSample=="Z_strongPTVExt") || (currentSample=="Z_strongExt") || (currentSample=="Z_strong_VBFFilt") || (currentSample=="W_strongExt");
   bool isTop = (currentSample=="ttbar");
-  bool isVgjets = (currentSample=="ttg") || (currentSample=="Zg_strong") || (currentSample=="Wg_strong") || (currentSample=="Zg_EWK") || (currentSample=="Wg_EWK");
+  bool isVBFH = (currentSample=="VBFH125");
+  bool isVgjets = (currentSample=="ttg") || (currentSample=="Zg_strong") || (currentSample=="Wg_strong") || (currentSample=="Zg_EWK") || (currentSample=="Wg_EWK") || (currentSample=="VBFHgam125");
 
   // removed extra top samples:
   //std::cout << "runNumber:"<<runNumber << std::endl;
@@ -480,7 +481,10 @@ StatusCode HFInputAlg::execute() {
   float met_tst_ph_dphi = 10.0;
   float met_tst_ph_dphiCut = 1.8;
   bool in_vy_overlapCut=true;
+  bool jetPtCuts=(n_jet>1 && (jet_pt->at(0) > 80e3) && (jet_pt->at(1) > 50e3));
   if(doVBFMETGam){
+    jetCut = (n_jet ==2);
+    jetPtCuts=(n_jet>1 && (jet_pt->at(0) > 60e3) && (jet_pt->at(1) > 50e3));
     jj_detaCut=3.0;
     jj_massCut=250.0e3;
     phSelectionCut=(n_ph==1 && ph_pt->at(0)<110e3);
@@ -489,12 +493,13 @@ StatusCode HFInputAlg::execute() {
     // if this is a vjets sample and it has a photon overlap, then remove it
     if(isVjets && in_vy_overlap) in_vy_overlapCut=false;
     if(isTop   && in_vy_overlap) in_vy_overlapCut=false;
+    if(isVBFH  && in_vy_overlap) in_vy_overlapCut=false;
     if(isVgjets && !in_vy_overlap) in_vy_overlapCut=false;
     // need to remove the signal, apply this to the Vgamma samples
   }
 
   // basic selection.
-  if (!((passJetCleanTight == 1) & nbjetCut & jetCut & (jet_pt->at(0) > 80e3) & (jet_pt->at(1) > 50e3) & (jj_dphi < jj_DPHICut) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (phSelectionCut) & (phcentrality>phcentralityCut) & (met_tst_ph_dphi>met_tst_ph_dphiCut) & (in_vy_overlapCut))) return StatusCode::SUCCESS; 
+  if (!((passJetCleanTight == 1) & nbjetCut & jetCut & jetPtCuts & (jj_dphi < jj_DPHICut) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (phSelectionCut) & (phcentrality>phcentralityCut) & (met_tst_ph_dphi>met_tst_ph_dphiCut) & (in_vy_overlapCut))) return StatusCode::SUCCESS; 
 
   if(n_el==1) { met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0); } else {  met_significance = 0; }
 
