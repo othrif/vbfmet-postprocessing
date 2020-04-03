@@ -2042,7 +2042,8 @@ def plotVar(options):
         rHist.GetYaxis().SetRangeUser(0.7501,1.2499)
         rHist.GetYaxis().SetNdivisions(505)
         rHist.Divide(get_THStack_sum(bkg))
-        rHist.GetYaxis().SetTitle("Data / Bkg")
+        #rHist.GetYaxis().SetTitle("Data / Bkg")
+        rHist.GetYaxis().SetTitle("Ratio")
         rHist.GetXaxis().SetTitle(var)
         #rHist.GetYaxis().SetTitleOffset(.338)
         rHist.GetYaxis().SetTitleOffset(.338)
@@ -2134,25 +2135,51 @@ def plotVar(options):
         rHist.Draw('same')
 
         # legend
-        legR=ROOT.TLegend(0.1747,0.79,0.4554,1.0)
+        #legR=ROOT.TLegend(0.1747,0.79,0.4554,1.0)
+        #legR=ROOT.TLegend(0.18,0.805,0.545,0.99)
+        legR=ROOT.TLegend(0.18,0.78,0.545,0.99)
         if var=="jj_dphi":
             if AltDphi:
-                legR=ROOT.TLegend(0.60,0.745,0.87,1.0)
+                #legR=ROOT.TLegend(0.60,0.745,0.87,1.0)
+                legR=ROOT.TLegend(0.50,0.735,0.87,1.0)
             else:
+                #legR=ROOT.TLegend(0.6565,0.69,0.87,1.0)
                 legR=ROOT.TLegend(0.6565,0.69,0.87,1.0)
         legR.SetTextFont(42)
         #legR.SetNColumns(ncolumns)
         legR.SetTextSize(0.07)
         legR.SetFillColor(0)
         legR.SetBorderSize(0)
+        legR.AddEntry(rHist,'Data/Bkg')
+        systHistAsymTotRatioA.SetMarkerColor(0)
+        systHistAsymTotRatioA.SetLineWidth(0)
+        systHistAsymTotRatioA.SetMarkerSize(0)
+        systHistAsymTotRatioAR=systHistAsymTotRatioA.Clone()
+        systHistAsymTotRatioAR.SetMarkerSize(0)
+        legR.AddEntry(systHistAsymTotRatioA,'Uncertainty',"f")
+        legR.AddEntry(rbkgPreFit,'Pre-/Post-fit')
         if reg=='SR':
             legR.AddEntry(rsignal,'1+Signal/Bkg')
             legR.AddEntry(rmultijet,'1+Multijet/Bkg')
-        legR.AddEntry(rbkgPreFit,'Pre-/Post-fit')
-        legR.AddEntry(systHistAsymTotRatioA,'Uncertainty')
-        legR.SetNColumns(2)
+        
+        legR.SetNColumns(3)
         #if reg=='SR':
+        for ik in legR.GetListOfPrimitives():
+            if ik.GetLabel() =='Uncertainty':
+                #ik.GetObject().SetMarkerSize(0.1)
+                ik.GetObject().SetMarkerColor(0)
+                ik.GetObject().SetLineWidth(0)
+                ik.GetObject().SetLineColor(0)
+                #ik.GetObject().SetMarkerStyle(1)                
+                #ik.GetObject().SetMarkerSize(0.1)
+
         legR.Draw()
+        systHistAsymTotRatioA.Draw("SAME E2")
+        if reg=='SR':
+            rsignal.Draw('same HIST')
+            rmultijet.Draw('same HIST')
+        rbkgPreFit.Draw('same HIST')
+        rHist.Draw('same')
         can.GetPad(2).RedrawAxis()
         can.GetPad(2).Modified()
         can.GetPad(2).Update()

@@ -31,7 +31,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
     if Binning==10:
         multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
         multijets += [5.0]
-    if Binning==11 or Binning==12:
+    if Binning==11 or Binning==12 or Binning==13:
         #multijets=[88.1, 102.9, 32.3, 21.3, 1.6, 69.5, 127.1, 35.7, 23.1, 0.0,56.4]
         #multijets_statunc=[12.2, 13.2, 4.7, 5.3, 0.9, 7.0, 12.8, 5.2, 5.2, 0.2,11.1]
         multijets=[83.0,99.6,30.7,21.4,2.4,71.2,132.0,36.97,23.8,0.0,56.5]
@@ -74,7 +74,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
     # MJ for other years
     if year==2017:
-        if Binning==11 or Binning==12:
+        if Binning==11 or Binning==12 or Binning==13:
             #multijets=[166.1, 194.1, 61.0, 40.2, 3.1, 131.1, 239.7, 67.3, 43.5, 0.0,188.5]
             #multijets_statunc=[23.0, 24.9, 8.8, 10.0, 1.6, 13.2, 24.2, 9.9, 9.9, 0.2,31.2]
             multijets=[161.3,193.6,59.9,41.5,4.6,132.7,245.7,68.8,44.2,0,182.2]
@@ -118,7 +118,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
         else:
             print 'MJ is not defined for binning: ',Binning
     elif year==2018:
-        if Binning==11 or Binning==12:
+        if Binning==11 or Binning==12 or Binning==13:
             #multijets=[210.7, 246.2, 77.3, 51.0, 3.9, 166.3, 304.0, 85.3, 55.2, 0.0, 331.0]
             #multijets_stat=[29.2, 31.6, 11.2, 12.6, 2.1, 16.7, 30.6, 12.5, 12.5, 0.2, 58.7]
             multijets=[182.1,218.5,67.6,46.8,5.2,174.5,323.1,90.5,58.2,0.0,364.3]
@@ -319,7 +319,7 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, ME
     if Binning==10:
         fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
         fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
-    if Binning==11 or Binning==12: # set for all years
+    if Binning==11 or Binning==12 or Binning==13: # set for all years
         fakeelesp = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1]
         fakeelesm = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1] # met>150 numbers
         if METCut==160:

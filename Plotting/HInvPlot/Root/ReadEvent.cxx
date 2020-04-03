@@ -1384,9 +1384,12 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       //std::cout << "in_vy_overlap: " << in_vy_overlap << " " << event->GetVar(Mva::in_vy_overlap) << std::endl;
       bool isVjets =(event->sample==Mva::kWqcdMad) || (event->sample==Mva::kWqcd) || (event->sample==Mva::kZqcd) || (event->sample==Mva::kZqcdMad) || (event->sample==Mva::kZewk) || (event->sample==Mva::kWewk) || (event->sample==Mva::kZqcdPow);
       bool isTop = (event->sample==Mva::ktop2);
-      bool isVgjets = (event->sample==Mva::kttg) || (event->sample==Mva::kZgam) || (event->sample==Mva::kWgam) || (event->sample==Mva::kZgamEWK) || (event->sample==Mva::kWgamEWK);
+      bool isVgjets = (event->sample==Mva::kttg) || (event->sample==Mva::kZgam) || (event->sample==Mva::kWgam) || (event->sample==Mva::kZgamEWK) || (event->sample==Mva::kWgamEWK) ||  (event->sample==Mva::kVbfg);
+      bool isH = (event->sample==Mva::kHvbf);
+      
       event->RepVar(Mva::in_vy_overlapCut,1.0);
       if(isVjets && in_vy_overlap)   event->RepVar(Mva::in_vy_overlapCut,0.0);
+      if(isH     && in_vy_overlap)   event->RepVar(Mva::in_vy_overlapCut,0.0);// removing overlap in the signal
       if(isTop   && in_vy_overlap)   event->RepVar(Mva::in_vy_overlapCut,0.0);
       if(isVgjets && !in_vy_overlap) event->RepVar(Mva::in_vy_overlapCut,0.0);
     }else{

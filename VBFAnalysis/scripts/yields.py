@@ -9,6 +9,7 @@ import sys
 parser = argparse.ArgumentParser( description = "Looping over sys and samples for HF Input Alg", add_help=True , fromfile_prefix_chars='@')
 parser.add_argument( "-i", "--input", type = str, dest = "input", default = "/tmp/HFALL_nom_v37.root", help = "input file name" )
 parser.add_argument( "-t", "--unblind", action = "store_true", dest = "unblind", default = False, help = "unblind the tables");
+parser.add_argument( "--ph-ana", action = "store_true", dest = "ph_ana", default = False, help = "photon analysis tables");
 parser.add_argument( "--combinePlusMinus", action = "store_true", dest = "combinePlusMinus", default = False, help = "combine the pos and neg CRs");
 args, unknown = parser.parse_known_args()
 
@@ -30,6 +31,13 @@ if args.combinePlusMinus:
     'VBFjetSel_XNom_oneEleCRX_obs_cuts',
     'VBFjetSel_XNom_oneMuCRX_obs_cuts',
     'VBFjetSel_XNom_oneEleLowSigCRX_obs_cuts',
+    ]
+if args.ph_ana:
+    regions=[
+        'VBFjetSel_XNom_SRX_obs_cuts',
+    'VBFjetSel_XNom_twoLepCRX_obs_cuts',
+    'VBFjetSel_XNom_oneEleCRX_obs_cuts',
+    'VBFjetSel_XNom_oneMuCRX_obs_cuts',
     ]
 unblind=args.unblind
 #hdata_NONE_twoEleCR3_obs_cuts
@@ -63,6 +71,43 @@ samplesPrint =['Samples','VBFH125',
           'total bkg','data/bkg'
 ]
 
+if args.ph_ana:    
+    samples =['hVBFH125_','hVBFHgam125_',
+          'hggFH125_',
+          'hVH125_',
+          'hZ_strong_',
+          'hZ_EWK_',
+          'hW_strong_',
+          'hW_EWK_',
+          'hZg_strong_',
+          'hZg_EWK_',
+          'hWg_strong_',
+          'hWg_EWK_',
+          'httbar_',
+          'httg_',
+          'hSinglePhoton_',
+          #'heleFakes_',
+          #'hmultijet_',
+          'hdata_',
+    ]
+    samplesPrint =['Samples','VBFH125','VBFgamH125',
+          'ggFH125',
+          'VH125',
+          'Z QCD',
+          'Z EWK',
+          'W QCD',
+          'W EWK',
+          'Zg QCD',
+          'Zg EWK',
+          'Wg QCD',
+          'Wg EWK',
+          'Top/VV/VVV/VBFWW',
+          'ttg',
+          'g+jet',
+          'data',
+          #'Signal',
+          'total bkg','data/bkg'
+]
 if not os.path.exists(args.input):
     print 'input file does not exist: ',args.input
     sys.exit(0)
@@ -79,16 +124,19 @@ for s in samples:
 print line
 
 bins=[1,2,3,4,5,6,7,8,9,10,11,12,13]
+#if args.ph_ana:
+#    bins=[1,2,3,4,5]
 nRegion=0
 sTot=0
 for bin_num in bins:
     r=regions[0].replace('X','%s' %bin_num)
+    print r
     histname=samples[0]+r
     h=f.Get(histname)
     if not h:
         sTot=bin_num-1
         break
-
+print 'Number of bins found: ',sTot
 table_per_bin={}
 for b in bins: table_per_bin[b]={}
 region_cf=[]
@@ -126,7 +174,7 @@ for rmy in regions:
                 #line+='%0.2f\t' %(integral)
                 SumList[su]+=integral
                 SumErrList[su]+=e**2
-                if s=='hVBFH125_' or s=='hggFH125_' or s=='hVH125_':
+                if s=='hVBFH125_' or s=='hggFH125_' or s=='hVH125_' or s=='hVBFHgam125_':
                     line+=''
                     lineSig+=integral
                 elif s!='hdata_':
@@ -139,7 +187,9 @@ for rmy in regions:
             su+=1
 
         # add stat/MC and data/MC
-        bkgFracErr= math.sqrt(lineBkgErr)/lineBkg
+        bkgFracErr=0.0
+        if lineBkg>0.0:
+            bkgFracErr= math.sqrt(lineBkgErr)/lineBkg
         line +='%0.3f\t' %(bkgFracErr)
         #line +='%0.2f\t' %(lineData/lineBkg)
         if lineData<1.0:
@@ -163,6 +213,7 @@ for rmy in regions:
         elif r.count('oneEleC'):  region_name=['Wenu']
         elif r.count('oneMuC'):  region_name=['Wmunu']
         elif r.count('_SR'):  region_name=['SR']
+        print region_name
         table_per_bin[bin_num][region_name[0]]=[lineData,lineSig,lineBkg,'%0.3f $\\pm$ %0.3f\t' %(lineData/lineBkg, math.sqrt(1./lineData+bkgFracErr**2)*(lineData/lineBkg))]
         #[[sreg,totalData,totalBkg,'%0.3f\t%0.3f +/- %0.3f\t' %(totalBkgFracErr, totalData/totalBkg, math.sqrt(totalBkgFracErr**2+1./totalData)*(totalData/totalBkg))]]        
         nRegion+=1
@@ -215,6 +266,8 @@ keys_regions_map={'SR':'SR','Zll':'$Z\\rightarrow\ell\ell$ CR','Wmunu':'$W\\righ
 keys_regions = ['SR','Zee','Zmm','Wmnminus','Wmnplus','Wenminus','Wenplus']
 if args.combinePlusMinus:
     keys_regions = ['SR','Zll','Wmunu','Wenu']
+if args.ph_ana:
+    keys_regions = ['SR','Zll','Wmunu','Wenu']    
 print ''
 print '\\resizebox{\\textwidth}{!}{ '
 if args.combinePlusMinus:
@@ -229,7 +282,7 @@ for keyn in keys_regions:
         table_per_bin_line+=' & %s'  %keyn        
 print table_per_bin_line,' \\\\\\hline\\hline'
 for b in bins:
-    if b>11:
+    if b>11 or b>sTot:
         continue
     for v in [0,1,2,3]:
         table_per_bin_line='%s ' %b
