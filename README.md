@@ -103,3 +103,8 @@ fitPlot.py --compare HFoutput1.root,HFoutput2.root,HFoutput3.root --data --ratio
 ```
 
 python VBFAnalysis/scripts/sysPlotv2.py -i  /tmp/HFALL_feb17d_sysNew_smooth5.New.root  --inputUpdate /tmp/HFALL_feb17d_sysNew_smooth5.New.root       --saveAs png   --syst weird  --smooth 5 --ZeroCheck --combinePlusMinus
+
+```bash
+# run on condor over all the contributions and nominal only for photon analysis
+submitHFInputCondor.py --mergeKTPTV --extraVars 7 --Binning 13 -d submitTest -i /home/schae/testarea/HInv/runSherpa227/v34ATight120/ -n --slc7 --doVBFMETGam
+```

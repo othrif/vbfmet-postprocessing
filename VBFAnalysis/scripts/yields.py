@@ -243,7 +243,7 @@ for rmy in regions:
                 sreg+=[SumList[su]]
                 #rline+='%0.2f\t' %(SumList[su])
                 rline+='%0.2f +/- %0.2f\t' %(SumList[su],math.sqrt(SumErrList[su]))
-                if samples[su]=='hVBFH125_' or samples[su]=='hggFH125_' or samples[su]=='hVH125_':
+                if samples[su]=='hVBFH125_' or samples[su]=='hggFH125_' or samples[su]=='hVH125_' or samples[su]=='hVBFHgam125_':
                     totalSig+=SumList[su]
                     totalSigErr+=SumErrList[su]
                 elif samples[su]!='hdata_':
@@ -360,7 +360,7 @@ mye=ROOT.Double(0.0)
 nomHists=[]
 diffMap={}
 for ibin in range(1,12):
-    for sample in ['hVBFH125_','hggFH125_','hVH125_']:
+    for sample in ['hVBFH125_','hggFH125_','hVH125_','hVBFHgam125_']:
         nomHist=f.Get(sample+'VBFjetSel_%sNom_SR%s_obs_cuts' %(ibin,ibin))
         if len(nomHists)<ibin:
             nomHists+=[nomHist.Clone()]
@@ -382,7 +382,7 @@ for ibin in range(1,12):
     for sHistName in listAllSyst:
         nomHist=None
         sHistSamples=None
-        for sample in ['hVBFH125_','hggFH125_','hVH125_']:
+        for sample in ['hVBFH125_','hggFH125_','hVH125_','hVBFHgam125_']:
             hname=((sHistName.replace('hVBFH125_',sample)).replace('VBFjetSel_1','VBFjetSel_%s' %ibin)).replace('SR1_','SR%s_' %ibin)
             sHist=f.Get(hname)
             if not sHist:
@@ -440,7 +440,7 @@ print printlineN
 
 # sum individual samples
 sampleOutMap={}
-for sample in ['hVBFH125_','hggFH125_','hVH125_']:
+for sample in ['hVBFH125_','hggFH125_','hVH125_','hVBFHgam125_']:
     # collected summed nominal
     sumNomHist=None
     for ibin in range(1,12):

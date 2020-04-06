@@ -26,7 +26,7 @@ parser.add_argument( "--doTMVA", dest = "doTMVA", action="store_true", default =
 parser.add_argument( "--doDoubleRatio", dest = "doDoubleRatio", action="store_true", default = False, help = "Use this variable to run the double ratio inputs")
 parser.add_argument( "--doPlot", dest = "doPlot", action="store_true", default = False, help = "Generate additional histograms for postfit plots")
 parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
-parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis")
+parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis, set --Binning=13")
 parser.add_argument( "--singleHist", dest = "singleHist", action="store_true", default = False, help = "Runs VBF + MET in one histogram when true")
 parser.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
 parser.add_argument("--METCut", type=int, dest='METCut', default=160e3, help="METCut, default: 160 MeV")
