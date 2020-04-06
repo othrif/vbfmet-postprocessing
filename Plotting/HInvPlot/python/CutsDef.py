@@ -372,7 +372,11 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
-        cuts = [CutItem('CutNjet',  'n_jet == 2')]        
+        
+        #cuts = [CutItem('CutNjet',  'n_jet > 1 && n_jet<5')]        
+        #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
+        #cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
+        cuts = [CutItem('CutNjet',  'n_jet == 2')]
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 60.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
 
@@ -604,9 +608,10 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
 
     if basic_cuts.chan in ['nn']:
-        cuts += getMETTriggerCut(cut, options, basic_cuts, syst)
+        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst)
+        cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     elif basic_cuts.chan in ['uu','u','up','um']:
-        cuts += getMETTriggerCut(cut, options, basic_cuts, None, ORTrig=' || trigger_lep > 0')
+        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
     elif basic_cuts.chan in ['ee','ll','eu']:
         cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     else:
@@ -621,13 +626,14 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         if basic_cuts.chan=='uu':
             cuts += [CutItem('CutMu','n_mu == 2')]
         cuts += [CutItem('CutSignalZLep','n_siglep == 2')]
+        cuts += [CutItem('CutBaseLep','n_baselep == 2')]
     elif Region=='WCR':
         if basic_cuts.chan=='e':
             cuts += [CutItem('CutEl','n_el == 1')]
         if basic_cuts.chan=='u':
             cuts += [CutItem('CutMu','n_mu == 1')]
         cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
-
+        cuts += [CutItem('CutBaseLep','n_baselep == 1')]
     cuts += [CutItem('CutPh',       'n_ph==1')]
     if basic_cuts.analysis not in ['lowmet']:
         cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
@@ -640,11 +646,13 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     else:
         if basic_cuts.analysis in ['revfjvt']:
             cuts += [CutItem('CutFJVT','j0fjvt > 0.4 || j1fjvt > 0.4')]
+            cuts += [CutItem('CutMjjLow','jj_mass < 1000.0')]
         else:
             cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]            
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
-
+    cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
+    
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
@@ -653,6 +661,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         elif Region=='WCR' or Region=='ZCR':
             met_choice=options.met_choice.replace('_tst','_tst_nolep')
         if basic_cuts.analysis in ['lowmet']:
+            cuts += [CutItem('CutMjjLow','jj_mass < 1000.0')]
             cuts += [CutItem('CutMet',       '%s > 110.0 && %s < 150.0' %(met_choice,met_choice))]
         else:
             cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
@@ -909,7 +918,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
         bkgs['pho']  = ['pho']
         bkgs['phoAlt']  = ['phoAlt']
         bkgs['wgam'] = ['wgam']
-        bkgs['zgam'] = ['zgam']
+        bkgs['zgam'] = ['zgam','vgg']
         bkgs['wgamewk'] = ['wgamewk']
         bkgs['zgamewk'] = ['zgamewk']
 
