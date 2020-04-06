@@ -341,6 +341,8 @@ StatusCode HFInputAlg::execute() {
       else passSample=true;
     } else passSample=true;
   }
+  // remove the mg Zgam samples
+  if(isMC && runNumber>=345775 && runNumber<=345784)  passSample=false;
   if(!passSample)  return StatusCode::SUCCESS;
   // if merging the sherpa sample from kt filtered, then require passVjetsFilter
   if(mergeKTPTV && passVjetsFilterTauEl<0.5) return  StatusCode::SUCCESS;
@@ -487,6 +489,7 @@ StatusCode HFInputAlg::execute() {
     jetPtCuts=(n_jet>1 && (jet_pt->at(0) > 60e3) && (jet_pt->at(1) > 50e3));
     jj_detaCut=3.0;
     jj_massCut=250.0e3;
+    jj_DPHICut=2.0;
     phSelectionCut=(n_ph==1 && ph_pt->at(0)<110e3);
     if(n_ph>0) phcentrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(ph_eta->at(0) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
     met_tst_ph_dphi = fabs(GetDPhi(met_tst_phi, ph_phi->at(0)));
