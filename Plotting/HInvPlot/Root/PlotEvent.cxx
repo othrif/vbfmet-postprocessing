@@ -160,10 +160,10 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
 
   // jj_mass limits
   float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 };
-  float binsjjmassGam [7] = { 0.0, 250.0, 500.0, 1000.0, 1500.0, 2000.0, 3500.0 };  
+  float binsjjmassGam [6] = { 0.0, 250.0, 500.0, 1000.0, 1500.0, 3000.0};
   float binsdphi [4] = { 0.0, 1.0, 2.0, 3.2 };
   hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  8,  binsjjmass);
-  hjj_mass_variableBinGam = GetTH1("jj_mass_variableBinGam",  6,  binsjjmassGam);  
+  hjj_mass_variableBinGam = GetTH1("jj_mass_variableBinGam",  5,  binsjjmassGam);  
   htruth_jj_mass_variableBin = GetTH1("truth_jj_mass_variableBin",  8,  binsjjmass);
   hjj_mass_dphi_variableBin = GetTH2("jj_mass_dphi_variableBin",  8,  binsjjmass, 3, binsdphi);
 
