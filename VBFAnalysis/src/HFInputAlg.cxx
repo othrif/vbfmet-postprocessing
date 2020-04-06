@@ -118,7 +118,7 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==10) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==11) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==12) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
-  else if(m_binning==13) bins=6; // mjj binning mjj>250
+  else if(m_binning==13) bins=5; // mjj binning mjj>250
   totalBins = bins-1;
 
   // merging the sherpa kt samples
@@ -216,8 +216,8 @@ vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR, 
     if (doPlot) {
       //h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
       if(doVBFMETGam){
-	float binsjjmass [7] = { 0.0, 250.0, 500.0, 1000.0, 1500.0, 2000.0, 3000.0 };
-	h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 6,  binsjjmass));
+	float binsjjmass [6] = { 0.0, 250.0, 500.0, 1000.0, 1500.0, 3000.0 };
+	h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 5,  binsjjmass));
       }else{
 	float binsjjmass [12] = { 0.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 2500.0, 3000.0, 3500.0, 4000.0, 4500.0, 5000.0 };
 	h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 11,  binsjjmass));
@@ -351,6 +351,7 @@ StatusCode HFInputAlg::execute() {
   bool isTop = (currentSample=="ttbar");
   bool isVBFH = (currentSample=="VBFH125");
   bool isVgjets = (currentSample=="ttg") || (currentSample=="Zg_strong") || (currentSample=="Wg_strong") || (currentSample=="Zg_EWK") || (currentSample=="Wg_EWK") || (currentSample=="VBFHgam125");
+  if(isMC && runNumber>=364550 && runNumber<=364584) isVgjets=true; // vgg events. used for overlap
 
   // removed extra top samples:
   //std::cout << "runNumber:"<<runNumber << std::endl;
@@ -417,6 +418,7 @@ StatusCode HFInputAlg::execute() {
   
     // setting fjvt for photon analysis
     if(doVBFMETGam){
+      metSoftVeto=false; // turn off the veto for gamma analysis
       if(jet_fjvt->size()>1)
 	fJVTVeto = fabs(jet_fjvt->at(0))>0.4 || fabs(jet_fjvt->at(1))>0.4;
     }
@@ -485,7 +487,7 @@ StatusCode HFInputAlg::execute() {
   bool in_vy_overlapCut=true;
   bool jetPtCuts=(n_jet>1 && (jet_pt->at(0) > 80e3) && (jet_pt->at(1) > 50e3));
   if(doVBFMETGam){
-    jetCut = (n_jet ==2);
+    jetCut = (n_jet ==2 || n_jet==3);
     jetPtCuts=(n_jet>1 && (jet_pt->at(0) > 60e3) && (jet_pt->at(1) > 50e3));
     jj_detaCut=3.0;
     jj_massCut=250.0e3;
@@ -597,10 +599,10 @@ StatusCode HFInputAlg::execute() {
   SRDPHIJETMET=true;// remove these cuts as there is no impact
   CRDPHIJETMET=true;// remove these cuts as there is no impact 
   if ((passMETTrig) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) SR = true;
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (met_significance > 4.0)) CRWep = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance > 4.0)) CRWen = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (met_significance <= 4.0)) CRWepLowSig = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (met_significance <= 4.0)) CRWenLowSig = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?true:(met_significance > 4.0))) CRWep = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?true:(met_significance > 4.0))) CRWen = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) CRWepLowSig = true;}
+  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) CRWenLowSig = true;}
   if ((trigger_lep_Wmu_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
   if ((trigger_lep_Wmu_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
   if ((trigger_lep_Zee_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
@@ -632,6 +634,8 @@ StatusCode HFInputAlg::execute() {
     if(currentVariation=="vvUnc__1up") w_final*=(1.44);
     if(currentVariation=="vvUnc__1down") w_final/=1.44;
   }
+  // hack for low pT w in 2016 that has a huge netative weight
+  if(isMC && doVBFMETGam && runNumber==364170) w_final=5.0; // this is the average weight ~4 for 2016, 5 for 2017 and 10 for 2018
 
   int bin = 0;
   if(doTMVA){
@@ -690,8 +694,8 @@ StatusCode HFInputAlg::execute() {
       if      (jj_mass < 0.5e6) bin = 0;
       else if (jj_mass < 1.0e6) bin = 1;
       else if (jj_mass < 1.5e6)   bin = 2;
-      else if (jj_mass < 2.0e6) bin = 3;
-      else bin = 4;
+      //else if (jj_mass < 2.0e6) bin = 3;
+      else bin = 3;
     }
 
     // alternative binning approaches
