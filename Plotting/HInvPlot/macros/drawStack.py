@@ -349,7 +349,7 @@ def getHistPars(hist):
     'j3FJvt'     : {'xtitle':'j3 f-Jvt'   ,         'ytitle':'Events',   'ymin':0.1},
     'jetPt3'     : {'xtitle':'j3 #it{p}_{T} [GeV]'   ,         'ytitle':'Events / 10 GeV',   'ymin':0.1, 'LtoRCut':False},
     'avgCentrality'     : {'xtitle':'Average jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
-    'maxCentrality'     : {'xtitle':'Max jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
+    'maxCentrality'     : {'xtitle':'Max jet Centrality'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True,'rebin':5},
     'avgmj3_over_mjj'     : {'xtitle':'Average min #it{m}_{j1/j2,j3} / #it{m}_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'maxmj3_over_mjj'     : {'xtitle':'Max min #it{m}_{j1/j2,j3} / #it{m}_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1, 'LtoRCut':True},
     'max_j3_dr'     : {'xtitle':'Max min #Delta#it{R}_{j1/j2,j3}'   ,'ytitle':'Events',   'ymin':0.1, 'LtoRCut':False},
