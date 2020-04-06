@@ -19,6 +19,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hTruthTauPt(0), hTruthTauDR(0), hTruthTauEta(0),
 				  hminDRLep(0),
 				  hjj_mass_variableBin(0),
+				  hjj_mass_variableBinGam(0),
 				  htruth_jj_mass_variableBin(0),
 				  hjj_mass_dphi_variableBin(0),
 				  hmetsig_variableBin(0),
@@ -159,8 +160,10 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
 
   // jj_mass limits
   float binsjjmass [9] = { 0.0, 200.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 3500.0, 5000.0 };
+  float binsjjmassGam [6] = { 0.0, 250.0, 500.0, 1000.0, 1500.0, 3000.0};
   float binsdphi [4] = { 0.0, 1.0, 2.0, 3.2 };
   hjj_mass_variableBin = GetTH1("jj_mass_variableBin",  8,  binsjjmass);
+  hjj_mass_variableBinGam = GetTH1("jj_mass_variableBinGam",  5,  binsjjmassGam);  
   htruth_jj_mass_variableBin = GetTH1("truth_jj_mass_variableBin",  8,  binsjjmass);
   hjj_mass_dphi_variableBin = GetTH2("jj_mass_dphi_variableBin",  8,  binsjjmass, 3, binsdphi);
 
@@ -226,6 +229,7 @@ bool Msl::PlotEvent::DoExec(Event &event)
   if(hjj_deta_diff) hjj_deta_diff->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1))), weight);
   if(hjj_deta_abs) hjj_deta_abs->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1)))/jj_deta, weight);
   FillHist(hjj_mass_variableBin,   Mva::jj_mass, event, weight);
+  FillHist(hjj_mass_variableBinGam,   Mva::jj_mass, event, weight);
   FillHist(htruth_jj_mass_variableBin,   Mva::truth_jj_mass, event, weight);  
   FillHist(htmva_variableBin,      Mva::tmva,    event, weight);
 

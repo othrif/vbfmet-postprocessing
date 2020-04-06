@@ -373,10 +373,10 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
         
-        #cuts = [CutItem('CutNjet',  'n_jet > 1 && n_jet<5')]        
+        cuts = [CutItem('CutNjet',  'n_jet > 1 && n_jet<4')]        
         #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
         #cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
-        cuts = [CutItem('CutNjet',  'n_jet == 2')]
+        #cuts = [CutItem('CutNjet',  'n_jet == 2')]
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 60.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
 
@@ -664,7 +664,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]            
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
-    cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
+    #cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
     
     if cut == 'BeforeMET':
         return GetCuts(cuts)

@@ -1380,6 +1380,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // apply the overlap
     if(fOverlapPh && fisMC){
+      // hack for large negative weights
+      if(event->RunNumber==364170)  event->SetWeight(5.0); // this is the average weight ~4 for 2016, 5 for 2017 and 10 for 2018
+      
       bool in_vy_overlap = event->GetVar(Mva::in_vy_overlap);
       //std::cout << "in_vy_overlap: " << in_vy_overlap << " " << event->GetVar(Mva::in_vy_overlap) << std::endl;
       bool isVjets =(event->sample==Mva::kWqcdMad) || (event->sample==Mva::kWqcd) || (event->sample==Mva::kZqcd) || (event->sample==Mva::kZqcdMad) || (event->sample==Mva::kZewk) || (event->sample==Mva::kWewk) || (event->sample==Mva::kZqcdPow);
