@@ -166,6 +166,7 @@ averageIntPerXing,centrality,j3Pt,jetEta0,jetEta1,jj_deta,jj_dphi,jj_mass,jj_mas
 ========
 
 example on lxplus:
+```
 ssh -Y lxplus770.cern.ch
 export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase # use your path
 alias setupATLAS='source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh'
@@ -185,9 +186,11 @@ rc find_packages
 rc compile
 ls /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37Egam/*root &> /tmp/v37Egam.txt
 python HInvPlot/macros/plotEvent.py -i /tmp/v37Egam.txt -r /tmp/v37e.root --year 2018 --OverlapPh &>/tmp/eph.log & tail -f /tmp/eph.log
+```
 
 =======
 if you have trouble with acm, then use these instructions
+```
 export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase # use your path
 alias setupATLAS='source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh'
 setupATLAS
@@ -206,7 +209,7 @@ rc clean
 rc compile
 ls /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37Egam/*root &> /tmp/v37Egam.txt
 python HInvPlot/macros/plotEvent.py -i /tmp/v37Egam.txt -r
-/tmp/v37e.root --year 2018 --OverlapPh &>/tmp/eph2.log & tail -f
-/tmp/eph2.log
+/tmp/v37e.root --year 2018 --OverlapPh &>/tmp/eph2.log & tail -f /tmp/eph2.log
 
 python HInvPlot/macros/drawStack.py  /tmp/v37e.root     --vars jj_mass_variableBin      --do-ratio     --year 2019  --int-lumi=139e3   --selkey pass_gamwcr_allmjj_l_Nominal --ph-ana  --wait --hscale 1
+```
