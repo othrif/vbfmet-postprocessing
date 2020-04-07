@@ -9,7 +9,7 @@
 
 #define LINE std::cerr << __FILE__ << "::" << __FUNCTION__ << "::" << __LINE__ << std::endl;
 
-const std::string regions[] = {"Incl","SRPhi", "CRWPhi", "CRZPhi", "SRPhiHigh","CRWPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet"};
+const std::string regions[] = {"Incl","SRPhi", "CRWPhi", "CRZPhi", "SRPhiHigh","CRWPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet","CRZll"};
 const std::string variations[] = {"fac_up","fac_down","renorm_up","renorm_down","both_up","both_down"};
 
 
@@ -223,7 +223,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   if(362192 <= RunNumber && RunNumber <= 362575) crossSection *= 1; // this should be *3, but keep just the e-channel for now
   if(nFileEvtTot>0)  weight = crossSection/nFileEvtTot;
   else ATH_MSG_WARNING("Ngen " << nFileEvtTot << " dsid " << RunNumber );
-  ATH_MSG_INFO("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << nFileEvtTot);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << nFileEvtTot);
 
 // Prepare variables
 
@@ -406,7 +406,7 @@ if(new_nels==1 && new_nmus==0) {
 }
 
 // Define regions
-
+bool CRZll = false;
 bool SRPhiHigh = false;
 bool CRWPhiHigh = false;
 bool CRZPhiHigh = false;
@@ -444,6 +444,12 @@ if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWNjet = true;
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
 
+
+if(362192 <= RunNumber && RunNumber <= 362383){
+if ((new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZll = true;
+if ((new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZll = true;
+}
+
 std::map<TString,bool> regDecision;
 regDecision["Incl"]=true;
 regDecision["SRPhi"]=(SRPhiHigh || SRPhiLow);
@@ -458,6 +464,7 @@ regDecision["CRWPhiLow"]=CRWPhiLow;
 regDecision["SRNjet"]=SRNjet;
 regDecision["CRZNjet"]=CRZNjet;
 regDecision["CRWNjet"]=CRWNjet;
+regDecision["CRZll"]=(CRZll);
 
 
 new_w = weight*EventWeight;
