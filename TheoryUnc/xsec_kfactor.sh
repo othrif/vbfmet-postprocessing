@@ -1,5 +1,6 @@
 #!/bin/bash                                                                                                                                              
-export xsec_Path=/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/PMGxsecDB_mc15.txt
+#export xsec_Path=/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/PMGxsecDB_mc15.txt
+export xsec_Path=../VBFAnalysis/data/PMGxsecDB_mc16.txt
 
 
 echo "      ckkw15 ckkw30 qsf025 qsf4"
@@ -16,8 +17,8 @@ done
 
 for i in Znunu Zee Zmumu Ztautau Wenu Wmunu Wtaunu
 do
-    count=`cat ${xsec_Path} | grep Sherpa_221_NNPDF30NNLO_${i}_MAXHTPTV | grep -v Hinv  | grep -v e5340_e4083 | grep -v e5679 | grep -v e5750 | grep -v e5750 | grep -v e6405 | grep -v e6779 | grep -v e5585 | sort | wc -l`
-    proc=`cat ${xsec_Path} | grep Sherpa_221_NNPDF30NNLO_${i}_MAXHTPTV | grep -v Hinv  | grep -v e5340_e4083 | grep -v e5679 | grep -v e5750 | grep -v e5750 | grep -v e6405 | grep -v e6779 | grep -v e5585 | sort | awk '{sum += $5*$4*$3} END {print sum}'`
+    count=`cat ${xsec_Path} | grep Sherpa_221_NNPDF30NNLO_${i}_MAXHTPTV | grep -v Hinv  | grep -v e5340_e4083 | grep -v e5679 | grep -v e5750 | grep -v e5750 | grep -v e6405 | grep -v e6779 | grep -v e5585 | grep -v VBFfilt | grep -v Mll | grep -v noHadMPI | grep -v hpsmode0  | grep -v _l | grep -v _h | sort | wc -l`
+    proc=`cat ${xsec_Path} | grep Sherpa_221_NNPDF30NNLO_${i}_MAXHTPTV | grep -v Hinv  | grep -v e5340_e4083 | grep -v e5679 | grep -v e5750 | grep -v e5750 | grep -v e6405 | grep -v e6779 | grep -v e5585 | grep -v VBFfilt | grep -v Mll | grep -v noHadMPI | grep -v hpsmode0 | grep -v _l | grep -v _h | sort | awk '{sum += $5*$4*$3} END {print sum}'`
     echo "$i $proc"
 done
 
