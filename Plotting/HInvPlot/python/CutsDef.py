@@ -648,8 +648,8 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
         #cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
         cuts += [CutItem('CutBaseLep','n_baselep == 1')]
-        #cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
-        cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
+        cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+        #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
     cuts += [CutItem('CutPh',       'n_ph==1')]
     if basic_cuts.analysis not in ['lowmet']:
         cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
