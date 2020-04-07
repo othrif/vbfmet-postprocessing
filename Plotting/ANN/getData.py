@@ -13,7 +13,7 @@ branches += ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', '
 branches += ['jet_pt[2]', 'j3_centrality[0]', 'j3_centrality[1]', 'j3_min_mj_over_mjj'] # for n_jet >= 2
 branches += ['maxCentrality', 'max_mj_over_mjj']
 
-selection = 'n_jet >= 2 && n_jet <= 3 && met_tst_et > 150.0e3 && (n_basemu == 0 && n_baseel == 0 && n_ph == 0) && abs(met_tst_j1_dphi) > 1.0 && abs(met_tst_j2_dphi) > 1.0'
+selection = 'n_jet >= 2 && n_jet <= 3 && met_tst_et > 150.0e3 && (n_basemu == 0 && n_baseel == 0 && n_ph == 1)'# && abs(met_tst_j1_dphi) > 1.0 && abs(met_tst_j2_dphi) > 1.0'
 
 for f in fs:
     fname = os.path.basename(os.path.normpath(f))

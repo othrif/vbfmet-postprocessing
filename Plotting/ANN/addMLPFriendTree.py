@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import numpy as np
 import numpy.lib.recfunctions as recfn
 import os,sys
@@ -8,42 +9,61 @@ import ROOT
 from keras.models import Sequential
 from sklearn import preprocessing
 import pickle
-import ROOT
 from array import array
-from custom_loss import focal_loss
-#ann_score = array( 'f', [ 0.0 ] )
 
-# input directory
-name_model='_test'
-idir=''
-odir='/tmp/v26Loose_BTAGW_TightSkim_7var'+name_model+'/'
+###
+### the below block should be the only changes that are required
+###
+model_dir='./training_set/' # directory with the keras model
+name_model='_test' # model partial name
+idir='/tmp/v37Egam/' # input directory
+odir='/tmp/v26Loose_BTAGW_TightSkim_7var'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
+#variables used for training:
+COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
+###
+### the above block should be the only changes that are required
+###
+
+# create the output directory
 if not os.path.exists(odir):
     os.mkdir(odir)
-#dlist = os.listdir(idir)
 
 # returns a compiled model
 from keras.models import load_model
-# identical to the previous one
-model_dir='./training_set/'
+
+# load the keras model
 model = load_model(model_dir+'model'+name_model+'.hf')
 # load the scaler
 from sklearn.externals import joblib
 scaler = joblib.load(model_dir+'scaler'+name_model+'.save') 
 
-fs =['/tmp/v37Egam/VBFHgam125.root']
+if not os.path.exists(idir):
+    print('path does not exist: %s' %(idir))
+listdir = os.listdir(idir)
+print(listdir)
+
+# copy the inputs to a new directory because we will overwrite
+for i in listdir:
+    cpcmd='cp '+idir.rstrip('/')+'/'+i+' '+odir.rstrip('/')+'/'+i
+    print(cpcmd)
+    os.system(cpcmd)
+
+#prepare the list of files
+fs=[] #fs =['/tmp/v37Egam/VBFHgam125.root']
+for i in listdir:
+    fs+=[odir.rstrip('/')+'/'+i]
+print(fs)
 
 #branches =  ['w', 'runNumber', 'n_jet']
 branches = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
 #branches += ['jet_pt[2]', 'j3_centrality[0]', 'j3_centrality[1]', 'j3_min_mj_over_mjj'] # for n_jet >= 2
 #branches += ['maxCentrality', 'max_mj_over_mjj']
 
-#variables used for training:
-COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
-
+# cross checking we have all of the variables. probably could just merge them in if not, but for now killing the job.
 for C in COLS:
     if C not in branches:
-        print('all variables must be in the branches!!! Missing... %s' %C)
-        sys.exit(0)
+        print('all variables must be in the branches!!! Missing... %s. it will be added for you' %C)
+        branches+=[C]
 
 # no selection here. we want to make a friend tree
 selection = '1'
@@ -63,6 +83,7 @@ for f in fs:
         if key.GetClassName()=='TTree':
             print(key.GetName())
             TreeList+=[key.GetName()]
+    myfile.Close()
     # iterate through the trees
     for treeName in TreeList:
         print('Loading {}/{}'.format(f, treeName))
@@ -87,7 +108,9 @@ for f in fs:
         #y_pred.dtype.names = ('tmva')
         
         # Convert the NumPy array into a TTree
-        tree = array2tree(y_pred, name=treeName+'TMVA')
+        #tree = array2tree(y_pred, name=treeName+'TMVA')
+        tree = array2tree(y_pred, name=treeName)
         
         # Or write directly into a ROOT file without using PyROOT
-        array2root(y_pred, name+'TMVA.root', treeName+'TMVA')
+        #array2root(y_pred, name+'TMVA.root', treeName+'TMVA')
+        array2root(y_pred, f, treeName)
