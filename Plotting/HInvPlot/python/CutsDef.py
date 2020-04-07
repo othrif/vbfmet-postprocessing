@@ -640,13 +640,16 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutMETForTop',  'met_tst_et < 70.0')]
     elif Region=='WCR':
         if basic_cuts.chan=='e':
-            cuts += [CutItem('CutEl','n_el_w == 1')]
+            #cuts += [CutItem('CutEl','n_el_w == 1')]
+            cuts += [CutItem('CutEl','n_el == 1')]
         if basic_cuts.chan=='u':
-            cuts += [CutItem('CutMu','n_mu_w == 1')]
-        #cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
-        cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
+            #cuts += [CutItem('CutMu','n_mu_w == 1')]
+            cuts += [CutItem('CutMu','n_mu == 1')]
+        cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
+        #cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
         cuts += [CutItem('CutBaseLep','n_baselep == 1')]
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+        #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
     cuts += [CutItem('CutPh',       'n_ph==1')]
     if basic_cuts.analysis not in ['lowmet']:
         cuts += [CutItem('CutPhPt', 'phPt<110.0')] 

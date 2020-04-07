@@ -268,7 +268,7 @@ def getHistPars(hist):
         'JetEMECvsBCIDPosPt35'  : {'xtitle':'Jet #it{#eta} wth 35<#it{p}_{T}<55 GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
         'JetEMECvsBCIDPosPt55'  : {'xtitle':'Jet #it{#eta} wth 55<#it{p}_{T} GeV','ytitle':'Events', 'rebin':0,'LtoRCut':1},                 
 
-        'lepPt0'   : {'xtitle':'Lepton #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':0},
+        'lepPt0'   : {'xtitle':'Lepton #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':5,},#'xmax': 200,
         'baseMuPt'   : {'xtitle':'Base #it{p}_{T}^{#mu} [GeV]', 'ytitle':'Events', 'rebin':5},
         'baseMuEta'   : {'xtitle':'Base #it{#eta}_{#mu}', 'ytitle':'Events', 'rebin':5},
         'baseElPt'   : {'xtitle':'Electron #it{p}_{T} [GeV]', 'ytitle':'Events', 'rebin':4, 'xmax': 600, 'logy': True},
