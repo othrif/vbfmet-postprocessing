@@ -29,7 +29,9 @@ StatusCode VBFTruthAlg::initialize() {
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
 
-  std::string xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+  //xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+  //xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
+  std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt"; // run from local file
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
 
@@ -218,10 +220,10 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   crossSection = my_XsecDB->xsectTimesEff(RunNumber);//xs in pb
   // Multiply electron cross section by 3 to get all leptonic decay modes covered - ONLY for varied samples
   // 362192-362575 for zee and wenu
-  if(362192 <= RunNumber && RunNumber <= 362575) crossSection *= 3;
+  if(362192 <= RunNumber && RunNumber <= 362575) crossSection *= 1; // this should be *3, but keep just the e-channel for now
   if(nFileEvtTot>0)  weight = crossSection/nFileEvtTot;
   else ATH_MSG_WARNING("Ngen " << nFileEvtTot << " dsid " << RunNumber );
-  ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << nFileEvtTot);
+  ATH_MSG_INFO("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << nFileEvtTot);
 
 // Prepare variables
 
