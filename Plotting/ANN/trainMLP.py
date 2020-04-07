@@ -7,7 +7,7 @@ __author__ = "Sid Mau, Doug Schaefer"
 ###############################################################################
 # Import libraries
 ##################
-training_name='_zstrong'
+training_name='_test'
 
 # Tensorflow and Keras
 import tensorflow as tf
