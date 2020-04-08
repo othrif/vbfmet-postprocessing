@@ -93,6 +93,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   vector <vector <TH1F*>> hCRWepLowSig;
   vector <vector <TH1F*>> hCRWenLowSig;
   vector <vector <TH1F*>> hCRWm;
+  vector <vector <TH1F*>> hCRWmMT;
   vector <vector <TH1F*>> hCRWmp;
   vector <vector <TH1F*>> hCRWmn;
   vector <vector <TH1F*>> hCRZll;
