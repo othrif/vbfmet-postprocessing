@@ -42,31 +42,49 @@ import matplotlib.pyplot as plt
 # Load data
 ###########
 
-# VBFH125 (signal)
-VBFH125 = np.load('VBFH125.npy')
+# VBFH125 (signal) note i am setting it as Wg_EWK signal because i just want to make plots for now
+#VBFH125 = np.load('VBFH125.npy')
+VBFH125 = np.load('VBFHgam125.npy')
 label_VBFH125 = np.ones(len(VBFH125))
 VBFH125_labelled = recfn.rec_append_fields(VBFH125, 'label', label_VBFH125)
 VBFH125_labelled['w']*=10.0 # adding weight to center the distribution
 
 # Z_strong (background)
-Z_strong = np.load('Z_strong.npy')
+Z_strong = np.load('Zg_strong.npy')
 label_Z_strong = np.zeros(len(Z_strong))
 Z_strong_labelled = recfn.rec_append_fields(Z_strong, 'label', label_Z_strong)
 
 # Z_EWK (background)
-Z_EWK = np.load('Z_EWK.npy')
+Z_EWK = np.load('Zg_EWK.npy')
 label_Z_EWK = np.zeros(len(Z_EWK))
 Z_EWK_labelled = recfn.rec_append_fields(Z_EWK, 'label', label_Z_EWK)
 
 # ttbar (background)
-ttbar = np.load('ttbar.npy')
+ttbar = np.load('ttg.npy')
 label_ttbar = np.zeros(len(ttbar))
 ttbar_labelled = recfn.rec_append_fields(ttbar, 'label', label_ttbar)
 
 # W_strong (background)
-W_strong = np.load('W_strong.npy')
+W_strong = np.load('Wg_strong.npy')
 label_W_strong = np.zeros(len(W_strong))
 W_strong_labelled = recfn.rec_append_fields(W_strong, 'label', label_W_strong)
+
+# W_EWK (background)
+W_EWK = np.load('Wg_EWK.npy')
+label_W_EWK = np.zeros(len(W_EWK))
+W_EWK_labelled = recfn.rec_append_fields(W_EWK, 'label', label_W_EWK)
+
+# SinglePhoton (background ?? signal ?? what am i doing)
+SinglePhoton = np.load('SinglePhoton.npy')
+label_SinglePhoton = np.zeros(len(SinglePhoton))
+SinglePhoton_labelled = recfn.rec_append_fields(SinglePhoton, 'label', label_SinglePhoton)
+
+
+print("single photon weights")
+print(SinglePhoton_labelled['w'])
+
+print("W_EWK weights")
+print(W_EWK_labelled['w'])
 
 ###############################################################################
 
@@ -74,10 +92,10 @@ W_strong_labelled = recfn.rec_append_fields(W_strong, 'label', label_W_strong)
 # Concatenate and shuffle data
 ##############################
 
-data = np.concatenate([VBFH125_labelled, Z_strong_labelled])
+data = np.concatenate([VBFH125_labelled, Z_strong_labelled, Z_EWK_labelled, W_strong_labelled, W_EWK_labelled, ttbar_labelled])
 #data = np.concatenate([VBFH125_labelled, Z_strong_labelled, ttbar_labelled, W_strong_labelled])
 np.random.shuffle(data) # shuffle data
-
+print("THIS MANY EVENTS: ", len(data))
 ###############################################################################
 
 ###############################################################################
@@ -93,15 +111,29 @@ np.random.shuffle(data) # shuffle data
 #X_train = X_train.astype([(name, '<f8') for name in X_train.dtype.names]).view(('<f8', len(X_train.dtype.names))) # convert from recarray to array
 #X_test = X_test.astype([(name, '<f8') for name in X_test.dtype.names]).view(('<f8', len(X_test.dtype.names))) # convert from recarray to array
 
-COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
-COLS += ['n_jet', 'maxCentrality', 'max_mj_over_mjj']
-COLS_nj2 = COLS
-COLS_j3 = COLS + ['j3_centrality[0]', 'j3_min_mj_over_mjj', 'jet_pt[2]'] #'j3_centrality[1]', 
+#COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
+#COLS += ['n_jet', 'maxCentrality', 'max_mj_over_mjj']
+#COLS_nj2 = COLS
+#COLS_j3 = COLS + ['j3_centrality[0]', 'j3_min_mj_over_mjj', 'jet_pt[2]'] #'j3_centrality[1]', 
 #COLS = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'jet_pt[0]', 'jet_pt[1]']
 #COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]','n_jet']
 COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
 
+#COLS += ['jet_pt[2]',
+#COLS = ['j3_centrality[0]' ,'j3_centrality[1]']
+#COLS = ['j3_min_mj_over_mjj'] # for n_jet >= 2
+
+#COLS += ['n_jet']
+#COLS += ['maxCentrality']
+#COLS += ['max_mj_over_mjj']
+
+#COLS += ['ph_pt[0]']
+#COLS += ['exp(-4.0/pow(jj_deta,2))*pow(ph_eta[0]-(jet_eta[0]+jet_eta[1])/2.0,2)']
+#COLS += ['3.141592653589793-abs(abs(ph_phi[0]-met_tst_nolep_phi)-3.141592653589793)']
+
 print('cols = {}'.format(COLS))
+
+N_EPOCHS = 20
 
 ###############################################################################
 
@@ -110,7 +142,19 @@ print('cols = {}'.format(COLS))
 #######################
 
 data_train, data_test, label_train, label_test = train_test_split(data, data['label'], test_size=0.2, random_state=0) # 80%/20% train/test split
-X_train = data_train[COLS] # use only COLS
+"""
+np.save('data_train.npy', data_train)
+np.save('data_test.npy', data_test)
+np.save('label_train.npy', label_train)
+np.save('label_test.npy', label_test)
+
+data_train = np.load('data_train.npy')
+data_test = np.load('data_test.npy')
+label_train = np.load('label_train.npy')
+label_test = np.load('label_test.npy')
+"""
+X_train = data_train[COLS] 
+# use only COLS
 #X_train_j3 = data_train[data_train['n_jet'] == 3][COLS + COLS_j3]
 X_test = data_test[COLS] # use only COLS
 #X_test_j3 = data_test[data_test['n_jet'] == 3][COLS + COLS_j3]
@@ -123,12 +167,12 @@ X_train = X_train.astype([(name, '<f8') for name in X_train.dtype.names]).view((
 X_test = X_test.astype([(name, '<f8') for name in X_test.dtype.names]).view(('<f8', len(X_test.dtype.names))) # convert from recarray to array
 #X_test_j3 = X_test_j3.astype([(name, '<f8') for name in X_test_j3.dtype.names]).view(('<f8', len(X_test_j3.dtype.names))) # convert from recarray to array
 
+
 ###############################################################################
 
 ###############################################################################
 # Preprocess data
 #################
-
 # Make scaler for train data
 scaler = preprocessing.RobustScaler(with_centering=True, with_scaling=True, quantile_range=(25, 75)).fit(X_train) # scaler to standardize data
 X_train = scaler.transform(X_train) # apply to train data
@@ -176,7 +220,7 @@ print(model.summary())
 ############################
 
 # Fit the model
-model.fit(X_train, y_train, validation_split=0.1, epochs=10, batch_size=32, class_weight=class_weight, sample_weight=w_train)
+history = model.fit(X_train, y_train, validation_split=0.1, epochs=N_EPOCHS, batch_size=32, class_weight=class_weight, sample_weight=w_train)
 
 # Save the model
 model_filename = 'model'+training_name+'.hf'
@@ -187,6 +231,14 @@ model.save(model_filename)
 ###############################################################################
 # Performance Plots
 ###################
+
+## save the accuracy vs epoch data so u can make a nice plot
+textfile_name = "input32_dense4_dense2_10epochs" + ".txt"
+f = open(textfile_name, "w+")
+for acc in history.history["acc"]:
+    f.write(str(acc))
+    f.write("\n")
+f.close
 
 ## quick metrics
 y_pred = model.predict(np.array(X_test))
@@ -214,22 +266,29 @@ plt.title('Receiver Operating Characteristic (ROC)')
 plt.savefig('ROC'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
 plt.close()
 
-## plot PR curve
-#average_precision = average_precision_score(y_test, y_pred)
-#print('Average precision-recall score: {0:0.2f}'.format(average_precision))
-#
-#precision, recall, _ = precision_recall_curve(y_test, y_pred)
-#
-#plt.figure()
-#plt.fill_between(recall, precision, alpha=0.2, color='b')
-#plt.xlabel('Recall')
-#plt.ylabel('Precision')
-#plt.ylim([0.0, 1.05])
-#plt.xlim([0.0, 1.0])
-#plt.title('2-class Precision-Recall curve: AP={0:0.2f}'.format(average_precision))
-#plt.savefig('PR'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
-#plt.close()
+## saving the auc data to make dem plots
+auc_file = "auc_epoch_32units_dense4_dense2.txt"
+af = open(auc_file, "a")
+af.write(str(N_EPOCHS) + " " + str(roc_auc) + "\n")
 
+## plot PR curve
+
+"""
+average_precision = average_precision_score(y_test, y_pred)
+print('Average precision-recall score: {0:0.2f}'.format(average_precision))
+#
+precision, recall, _ = precision_recall_curve(y_test, y_pred)
+#
+plt.figure()
+plt.fill_between(recall, precision, alpha=0.2, color='b')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.ylim([0.0, 1.05])
+plt.xlim([0.0, 1.0])
+plt.title('2-class Precision-Recall curve: AP={0:0.2f}'.format(average_precision))
+plt.savefig('PR'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
+plt.close()
+"""
 # score predictions
 score_train = np.concatenate(model.predict(np.array(X_train)))
 score_test = np.concatenate(model.predict(np.array(X_test)))
@@ -288,5 +347,4 @@ plt.ylabel('Events (Normalized)')
 plt.title('Classifier Overtraining Check')
 plt.savefig('overtrain'+training_name+'.pdf', bbox_inches='tight', rasterized=False)
 plt.close()
-
 ###############################################################################
