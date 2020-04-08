@@ -146,6 +146,7 @@ class systematics(object):
                                        'PRW_DATASF__1down','PRW_DATASF__1up',
                                        'xeSFTrigWeight__1up','xeSFTrigWeight__1down','puSyst2018Weight__1up','puSyst2018Weight__1down','vvUnc__1up','vvUnc__1down',
                                         'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up',
+                                    'muoANTISFEL_EFF_ID__1down','muoANTISFEL_EFF_ID__1up'
                                         #'JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff'
                                         ]
             # add the theory systematics
@@ -177,7 +178,7 @@ class systematics(object):
             self.systematicsList = ['EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1up',
 'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_TriggerEff_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_TriggerEff_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1up','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','JET_JvtEfficiency__1down','JET_JvtEfficiency__1up','JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up','MUON_EFF_BADMUON_SYS__1down','MUON_EFF_BADMUON_SYS__1up','MUON_EFF_ISO_STAT__1down','MUON_EFF_ISO_STAT__1up','MUON_EFF_ISO_SYS__1down','MUON_EFF_ISO_SYS__1up','MUON_EFF_RECO_STAT__1down','MUON_EFF_RECO_STAT__1up','MUON_EFF_RECO_STAT_LOWPT__1down','MUON_EFF_RECO_STAT_LOWPT__1up','MUON_EFF_RECO_SYS__1down','MUON_EFF_RECO_SYS__1up','MUON_EFF_RECO_SYS_LOWPT__1down','MUON_EFF_RECO_SYS_LOWPT__1up','MUON_EFF_TTVA_STAT__1down','MUON_EFF_TTVA_STAT__1up','MUON_EFF_TTVA_SYS__1down','MUON_EFF_TTVA_SYS__1up','MUON_EFF_TrigStatUncertainty__1down','MUON_EFF_TrigStatUncertainty__1up','MUON_EFF_TrigSystUncertainty__1down','MUON_EFF_TrigSystUncertainty__1up',
 'PH_EFF_ID_Uncertainty__1down','PH_EFF_ID_Uncertainty__1up','PH_EFF_ISO_Uncertainty__1down','PH_EFF_ISO_Uncertainty__1up','PH_EFF_TRIGGER_Uncertainty__1down','PH_EFF_TRIGGER_Uncertainty__1up',
-                                    'PRW_DATASF__1down','PRW_DATASF__1up','xeSFTrigWeight__1up','xeSFTrigWeight__1down','JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff','puSyst2018Weight__1up','puSyst2018Weight__1down','vvUnc__1up','vvUnc__1down']
+                                    'PRW_DATASF__1down','PRW_DATASF__1up','xeSFTrigWeight__1up','xeSFTrigWeight__1down','JET_QG_nchargedExp__1down','JET_QG_nchargedExp__1up','JET_QG_nchargedME__1down','JET_QG_nchargedME__1up','JET_QG_nchargedPDF__1down','JET_QG_nchargedPDF__1up','JET_QG_trackEfficiency','JET_QG_trackFakes','JET_QG_trackeff','puSyst2018Weight__1up','puSyst2018Weight__1down','vvUnc__1up','vvUnc__1down','muoANTISFEL_EFF_ID__1down','muoANTISFEL_EFF_ID__1up']
             self.systematicsList+=self.systematicsVBFSignal+self.systematicsSignalPDF + self.systematicsGGFSignal
             # add the V+jets theory uncertainties
             self.systematicsList += self.systematicsZewkTheory
@@ -209,7 +210,7 @@ class systematics(object):
                                        'JET_Pileup_OffsetMu__1down','JET_Pileup_OffsetMu__1up','JET_Pileup_OffsetNPV__1down','JET_Pileup_OffsetNPV__1up','JET_Pileup_PtTerm__1down','JET_Pileup_PtTerm__1up','JET_Pileup_RhoTopology__1down','JET_Pileup_RhoTopology__1up','JET_PunchThrough_MC16__1down','JET_PunchThrough_MC16__1up','JET_SingleParticle_HighPt__1down','JET_SingleParticle_HighPt__1up',
                                        'JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up','JET_JvtEfficiency__1down','JET_JvtEfficiency__1up', ]
         elif mode == "ANTISF":
-            self.systematicsList = ['Nominal','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up',]
+            self.systematicsList = ['Nominal','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','muoANTISFEL_EFF_ID__1down','muoANTISFEL_EFF_ID__1up']
         elif mode == "JER":
             self.systematicsList = ['Nominal', 'JET_JER_DataVsMC_MC16__1up', 'JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up']
         elif mode == "Pileup":

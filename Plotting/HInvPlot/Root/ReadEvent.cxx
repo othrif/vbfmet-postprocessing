@@ -660,6 +660,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::bcid);
   fSkipVarsQCD.insert(Mva::BCIDDistanceFromFront);
   fSkipVarsQCD.insert(Mva::passVjetsFilterTauEl);
+  fSkipVarsQCD.insert(Mva::in_vy_overlap);  
   fSkipVarsQCD.insert(Mva::lb);
   fSkipVarsQCD.insert(Mva::n_mu_w);
   fSkipVarsQCD.insert(Mva::n_el_w);
@@ -693,7 +694,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->RepVar(Mva::n_mu_w, 0);
       event->RepVar(Mva::n_el_w, 0);
       event->RepVar(Mva::n_mu_baseline_noOR, 0);
-      event->RepVar(Mva::passVjetsFilterTauEl, 1);      
+      event->RepVar(Mva::passVjetsFilterTauEl, 1);
+      event->RepVar(Mva::in_vy_overlap, 1);
       event->RepVar(Mva::lep_trig_match, 0);
     }
 
@@ -1164,6 +1166,18 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       }
     }
 
+    // fill the other met cut...should be in GeV
+    float jj_mass = event->GetVar(Mva::jj_mass);
+    float met_nolep = event->GetVar(Mva::met_tst_nolep_et);
+    event->RepVar(Mva::met_tst_cut,0);
+    if(jj_mass<=800.0)  event->RepVar(Mva::met_tst_cut,1);
+    else if(jj_mass>800.0){
+      bool metCutBool = jj_mass>2.5e3 ? true: (200.0-(jj_mass-800.0)*(0.0294118))<met_nolep;
+      if(met_nolep<150.0) metCutBool=true;// allow to pass for low met to avoid CR problems
+      if(metCutBool) event->RepVar(Mva::met_tst_cut,1);
+      //std::cout << "jj_mass: " << jj_mass << " met: " << met_nolep << " pass: " << metCutBool << std::endl;
+    }
+
     // Compute a new (non-object-based) MET significance:
     // * only look at base lepton pt.
     // * use all jets (i.e. jetHT as computed above).
@@ -1366,12 +1380,19 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // apply the overlap
     if(fOverlapPh && fisMC){
+      // hack for large negative weights
+      if(event->RunNumber==364170)  event->SetWeight(5.0); // this is the average weight ~4 for 2016, 5 for 2017 and 10 for 2018
+      
       bool in_vy_overlap = event->GetVar(Mva::in_vy_overlap);
+      //std::cout << "in_vy_overlap: " << in_vy_overlap << " " << event->GetVar(Mva::in_vy_overlap) << std::endl;
       bool isVjets =(event->sample==Mva::kWqcdMad) || (event->sample==Mva::kWqcd) || (event->sample==Mva::kZqcd) || (event->sample==Mva::kZqcdMad) || (event->sample==Mva::kZewk) || (event->sample==Mva::kWewk) || (event->sample==Mva::kZqcdPow);
       bool isTop = (event->sample==Mva::ktop2);
-      bool isVgjets = (event->sample==Mva::kttg) || (event->sample==Mva::kZgam) || (event->sample==Mva::kWgam) || (event->sample==Mva::kZgamEWK) || (event->sample==Mva::kWgamEWK);
+      bool isVgjets = (event->sample==Mva::kttg) || (event->sample==Mva::kZgam) || (event->sample==Mva::kWgam) || (event->sample==Mva::kZgamEWK) || (event->sample==Mva::kWgamEWK) ||  (event->sample==Mva::kVbfg) || (event->sample==Mva::kvgg);
+      bool isH = (event->sample==Mva::kHvbf);
+      
       event->RepVar(Mva::in_vy_overlapCut,1.0);
       if(isVjets && in_vy_overlap)   event->RepVar(Mva::in_vy_overlapCut,0.0);
+      if(isH     && in_vy_overlap)   event->RepVar(Mva::in_vy_overlapCut,0.0);// removing overlap in the signal
       if(isTop   && in_vy_overlap)   event->RepVar(Mva::in_vy_overlapCut,0.0);
       if(isVgjets && !in_vy_overlap) event->RepVar(Mva::in_vy_overlapCut,0.0);
     }else{
@@ -1518,7 +1539,13 @@ void Msl::ReadEvent::FillEvent(Event &event)
     TLorentzVector Z = (event.electrons.at(0).GetLVec()+event.muons.at(0).GetLVec());
     event.RepVar(Mva::mll,  Z.M());
     event.RepVar(Mva::ptll, Z.Pt());
-
+    event.RepVar(Mva::mllg,  Z.M());
+    event.RepVar(Mva::ptllg, Z.Pt());
+    if(event.photons.size()>0){
+      TLorentzVector Zg = (event.electrons.at(0).GetLVec()+event.muons.at(0).GetLVec()+event.photons.at(0).GetLVec());
+      event.RepVar(Mva::mllg,  Zg.M());
+      event.RepVar(Mva::ptllg, Zg.Pt());
+    }
   }else{
     // electrons
     if(event.electrons.size()>0){
@@ -1533,6 +1560,13 @@ void Msl::ReadEvent::FillEvent(Event &event)
       TLorentzVector Z = (event.electrons.at(1).GetLVec()+event.electrons.at(0).GetLVec());
       event.RepVar(Mva::mll,  Z.M());
       event.RepVar(Mva::ptll, Z.Pt());
+      event.RepVar(Mva::mllg,  Z.M());
+      event.RepVar(Mva::ptllg, Z.Pt());
+      if(event.photons.size()>0){
+	TLorentzVector Zg = (event.electrons.at(1).GetLVec()+event.electrons.at(0).GetLVec()+event.photons.at(0).GetLVec());
+	event.RepVar(Mva::mllg,  Zg.M());
+	event.RepVar(Mva::ptllg, Zg.Pt());
+      }
     }
 
     // muons
@@ -1548,6 +1582,13 @@ void Msl::ReadEvent::FillEvent(Event &event)
       TLorentzVector Z = (event.muons.at(1).GetLVec()+event.muons.at(0).GetLVec());
       event.RepVar(Mva::mll,  Z.M());
       event.RepVar(Mva::ptll, Z.Pt());
+      event.RepVar(Mva::mllg,  Z.M());
+      event.RepVar(Mva::ptllg, Z.Pt());
+      if(event.photons.size()>0){
+	TLorentzVector Zg = (event.muons.at(1).GetLVec()+event.muons.at(0).GetLVec()+event.photons.at(0).GetLVec());
+	event.RepVar(Mva::mllg,  Zg.M());
+	event.RepVar(Mva::ptllg, Zg.Pt());
+      }
     }
   }
 
@@ -1682,6 +1723,13 @@ void Msl::ReadEvent::ComputeLepVars(Event &event)
     TLorentzVector Z = (my_leps.at(1)+my_leps.at(0));
     event.AddVar(Mva::mll,  Z.M());
     event.AddVar(Mva::ptll, Z.Pt());
+    event.AddVar(Mva::mllg,  Z.M());
+    event.AddVar(Mva::ptllg, Z.Pt());
+    if(event.photons.size()>0){
+      TLorentzVector Zg = (Z+event.photons.at(0).GetLVec());
+      event.RepVar(Mva::mllg,  Zg.M());
+      event.RepVar(Mva::ptllg, Zg.Pt());
+    }
     event.GetX1X2(my_leps.at(0), my_leps.at(1),
     make_pair<float,float>(met_beforeRemove.Px(), met_beforeRemove.Py()),
     x1, x2);

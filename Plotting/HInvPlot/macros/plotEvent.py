@@ -216,14 +216,14 @@ def main():
     #
     anas    = ['allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3500']
     chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']
-    if options.OverlapPh:
-        anas    = ['allmjj']
-        chans   = ['nn','ee','uu','ll','l','e','u']
-    
+
     if options.analysis!='all' and options.analysis.count(','):
         anas = options.analysis.split(',')
     elif options.analysis!='all':
         anas = [options.analysis]
+    if options.OverlapPh:
+        anas    = ['allmjj','lowmet','revfjvt']
+        chans   = ['nn','ee','uu','ll','l','e','u']
     if options.analysis.count('RedChan'):
         anas    = ['allmjj']#,'mjj1000','mjj1500','mjj2000']
     if options.analysis=='metsf':
@@ -347,7 +347,7 @@ def main():
                         #
                         # SR Cut based regions and algorithms with photon
                         #
-                        if a=='allmjj' and options.OverlapPh:
+                        if a in ['allmjj','lowmet','revfjvt'] and options.OverlapPh:
                             (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
                             read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)
                             (name_zcr_gam,  alg_zcr_gam)  = prepareSeqGamZCR (basic_cuts, alg_take=input_cut, syst=syst)

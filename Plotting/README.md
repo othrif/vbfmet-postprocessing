@@ -157,4 +157,59 @@ python HInvPlot/macros/submitPlotEventCondor.py -i
 
 python HInvPlot/macros/submitPlotEventCondor.py -i /home/schae/testarea/HInv/source/Plotting/v34ALooseSYSTJan7.txt --extraCommand=" --chan nn,e,u,l,ee,uu,ll --DetailLvl 10 --mergeKTPTV " -d v34PlotsAJan7
 
-python HInvPlot/macros/drawStack.py out_all_v37febALL.root --vars averageIntPerXing,centrality,j3Pt,jetEta0,jetEta1,jj_deta,jj_dphi,jj_mass,jj_mass_variableBin,met_cst_jet,met_soft_tst_et,met_tst_nolep_et,metsig_tst,min_mj3_over_mjj,n_jet,met_tst_et --do-ratio --save --do-pdf --do-eps --outdir /tmp/ZCR/ --year 2019 --int-lumi=139e3 --draw-syst --selkey pass_zcr_allmjj_uu_Nominal >&/tmp/a1u.log
+python HInvPlot/macros/drawStack.py out_all_v37febALL.root --vars
+averageIntPerXing,centrality,j3Pt,jetEta0,jetEta1,jj_deta,jj_dphi,jj_mass,jj_mass_variableBin,met_cst_jet,met_soft_tst_et,met_tst_nolep_et,metsig_tst,min_mj3_over_mjj,n_jet,met_tst_et
+--do-ratio --save --do-pdf --do-eps --outdir /tmp/ZCR/ --year 2019
+--int-lumi=139e3 --draw-syst --selkey pass_zcr_allmjj_uu_Nominal
+>&/tmp/a1u.log
+
+========
+
+example on lxplus:
+```
+ssh -Y lxplus770.cern.ch
+export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase # use your path
+alias setupATLAS='source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh'
+setupATLAS
+mkdir /tmp/try
+cd /tmp/try
+git clone ssh://git@gitlab.cern.ch:7999/VBFInv/STPostProcessing.git source/
+mkdir build;cd build
+acmSetup AthAnalysis,21.2.101
+acm compile
+cd ..
+cd source/Plotting
+source setup.sh
+rc find_packages
+rc clean
+rc find_packages
+rc compile
+ls /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37Egam/*root &> /tmp/v37Egam.txt
+python HInvPlot/macros/plotEvent.py -i /tmp/v37Egam.txt -r /tmp/v37e.root --year 2018 --OverlapPh &>/tmp/eph.log & tail -f /tmp/eph.log
+```
+
+=======
+if you have trouble with acm, then use these instructions
+```
+export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase # use your path
+alias setupATLAS='source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh'
+setupATLAS
+mkdir /tmp/try2
+cd /tmp/try2
+git clone https://gitlab.cern.ch/VBFInv/STPostProcessing.git source/
+mkdir build;cd build
+asetup AthAnalysis,21.2.114,here
+cmake ../source/
+cd ..
+cmake --build build/
+cd source/Plotting
+source setup.sh
+rc find_packages
+rc clean
+rc compile
+ls /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37Egam/*root &> /tmp/v37Egam.txt
+python HInvPlot/macros/plotEvent.py -i /tmp/v37Egam.txt -r
+/tmp/v37e.root --year 2018 --OverlapPh &>/tmp/eph2.log & tail -f /tmp/eph2.log
+
+python HInvPlot/macros/drawStack.py  /tmp/v37e.root     --vars jj_mass_variableBin      --do-ratio     --year 2019  --int-lumi=139e3   --selkey pass_gamwcr_allmjj_l_Nominal --ph-ana  --wait --hscale 1
+```

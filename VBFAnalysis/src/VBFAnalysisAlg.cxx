@@ -155,6 +155,8 @@ StatusCode VBFAnalysisAlg::initialize() {
   basemu_type= new std::vector<int>(0);
   basemu_truthType= new std::vector<int>(0);
   basemu_truthOrigin= new std::vector<int>(0);
+  mu_truthType= new std::vector<int>(0);
+  mu_truthOrigin= new std::vector<int>(0);
 
   baseel_pt= new std::vector<float>(0);
   baseel_eta= new std::vector<float>(0);
@@ -228,6 +230,17 @@ StatusCode VBFAnalysisAlg::initialize() {
   ph_pt = new std::vector<float>(0);
   ph_phi = new std::vector<float>(0);
   ph_eta = new std::vector<float>(0);
+  ph_ptcone20 = new std::vector<float>(0);
+  ph_topoetcone40 = new std::vector<float>(0);
+  ph_truthOrigin  = new std::vector<int>(0);
+  baseph_pt = new std::vector<float>(0);
+  baseph_phi = new std::vector<float>(0);
+  baseph_eta = new std::vector<float>(0);
+  baseph_ptcone20 = new std::vector<float>(0);
+  baseph_topoetcone40 = new std::vector<float>(0);
+  baseph_truthOrigin  = new std::vector<int>(0);
+  baseph_isEM  = new std::vector<unsigned>(0);
+  baseph_iso  = new std::vector<bool>(0);
   tau_pt = new std::vector<float>(0);
   tau_phi = new std::vector<float>(0);
   tau_eta = new std::vector<float>(0);
@@ -292,6 +305,9 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("met_tst_phi",&met_tst_phi);
   m_tree_out->Branch("met_tst_nolep_phi",&met_tst_nolep_phi);
   m_tree_out->Branch("met_cst_jet",&met_cst_jet);
+  m_tree_out->Branch("met_cst_phi",&met_cst_phi);
+  m_tree_out->Branch("met_cst_em_jet",&met_cst_em_jet);
+  m_tree_out->Branch("met_cst_em_phi",&met_cst_em_phi);
   m_tree_out->Branch("met_soft_tst_et",        &met_soft_tst_et);
   m_tree_out->Branch("mu_charge",&mu_charge);
   m_tree_out->Branch("mu_pt",&mu_pt);
@@ -385,6 +401,8 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("basemu_type",         &basemu_type);
       if(m_isMC) m_tree_out->Branch("basemu_truthOrigin",  &basemu_truthOrigin);
       if(m_isMC) m_tree_out->Branch("basemu_truthType",    &basemu_truthType);
+      if(m_isMC) m_tree_out->Branch("mu_truthOrigin",  &mu_truthOrigin);
+      if(m_isMC) m_tree_out->Branch("mu_truthType",    &mu_truthType);
       m_tree_out->Branch("baseel_z0",           &baseel_z0);
       m_tree_out->Branch("baseel_d0sig",        &baseel_d0sig);
       m_tree_out->Branch("baseel_topoetcone20",  &baseel_topoetcone20);
@@ -395,6 +413,19 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("ph_phi",&ph_phi);
     m_tree_out->Branch("ph_eta",&ph_eta);
     if(m_currentVariation=="Nominal"){
+
+      m_tree_out->Branch("ph_ptcone20", &ph_ptcone20);
+      m_tree_out->Branch("ph_topoetcone40",&ph_topoetcone40);
+      m_tree_out->Branch("ph_truthOrigin",&ph_truthOrigin);
+      m_tree_out->Branch("baseph_pt", &baseph_pt);
+      m_tree_out->Branch("baseph_phi",&baseph_phi);
+      m_tree_out->Branch("baseph_eta",&baseph_eta);
+      m_tree_out->Branch("baseph_ptcone20", &baseph_ptcone20);
+      m_tree_out->Branch("baseph_topoetcone40",&baseph_topoetcone40);
+      m_tree_out->Branch("baseph_truthOrigin",&baseph_truthOrigin);
+      m_tree_out->Branch("baseph_isEM",&baseph_isEM);
+      m_tree_out->Branch("baseph_iso",&baseph_iso);
+
       m_tree_out->Branch("tau_pt",&outtau_pt);
       m_tree_out->Branch("tau_phi",&outtau_phi);
       m_tree_out->Branch("tau_eta",&outtau_eta);
@@ -693,6 +724,32 @@ StatusCode VBFAnalysisAlg::execute() {
       tMapFloat["nloEWKWeight__1up"]=nloEWKWeight + syst;
     }
   }
+  // muon veto systematic
+  if(m_isMC && m_currentVariation=="Nominal"){
+    tMapFloat["muoANTISFEL_EFF_ID__1down"]=1.0;
+    tMapFloat["muoANTISFEL_EFF_ID__1up"]=1.0;
+    // if no leptons are found, then let's apply the veto systematic uncertainty
+    if(!(n_baseel==0 && n_basemu==0)){
+      tMapFloat["muoANTISFEL_EFF_ID__1down"]=1.0;
+      tMapFloat["muoANTISFEL_EFF_ID__1up"]=1.0;
+    }else{
+      //truth_mu
+      float muon_veto_sf=1.0;
+      TVector3 tmp,mtmp;
+      for(unsigned imuo=0; imuo<std::min<unsigned>(1,imuo<truth_mu_pt->size()); ++imuo){ //for(unsigned imuo=0; imuo<truth_mu_pt->size(); ++imuo){
+	mtmp.SetPtEtaPhi(truth_mu_pt->at(imuo), truth_mu_eta->at(imuo), truth_mu_phi->at(imuo));
+	bool jetOverlap=false;
+	for(unsigned iJet=0; iJet<jet_pt->size(); ++iJet){
+	  tmp.SetPtEtaPhi(jet_pt->at(iJet), jet_eta->at(iJet), jet_phi->at(iJet));
+	  if(tmp.DeltaR(mtmp)<0.3){ jetOverlap=true; break; }
+	}
+	if(jetOverlap) continue;
+	if(truth_mu_pt->at(imuo)>4.0e3 && abs(truth_mu_eta->at(imuo))<2.5) muon_veto_sf*=1.2;
+      }
+      tMapFloat["muoANTISFEL_EFF_ID__1up"]=muon_veto_sf;
+      tMapFloat["muoANTISFEL_EFF_ID__1down"]=2.0-muon_veto_sf;
+    }
+  }
 
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
@@ -705,6 +762,13 @@ StatusCode VBFAnalysisAlg::execute() {
     if((!mcEventWeights || mcEventWeights->size()<120) && (runNumber==346600 || runNumber==346588)) std::cout << "ERROR the mcEvent Weights are missing!!!" << std::endl;
     if(runNumber==346588) mcEventWeight = mcEventWeights->at(111); // ggF
     if(runNumber==346600) mcEventWeight = mcEventWeights->at(109); // VBF
+  }
+  if(m_isMC){
+    if(((runNumber>=364541 && runNumber<=364547) || (runNumber>=361040 && runNumber<=361062) || (runNumber>=305435 && runNumber<=305444) || (runNumber>=364500 && runNumber<=364535))
+       && abs(mcEventWeight)>100.0) mcEventWeight=1.0;
+    // the event weights seem wrong for these three samples. this is a HACK to fix it
+    if( metRunNumber>=348197 && runNumber==364542) mcEventWeight*=-1.0;
+    if( metRunNumber>=325713 && metRunNumber<348197 && (runNumber==364541 || runNumber==364542)) mcEventWeight*=-1.0;
   }
 
   // applying a pileup weight for 2018 data
@@ -1208,7 +1272,8 @@ StatusCode VBFAnalysisAlg::execute() {
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt"); // this allows the baseline>=2 to pass
 
   // reset the electron anti-ID SF to only affect W events. To be fixed. kind of a hack
-  bool isWenu = ((runNumber>=364170 && runNumber<=364183) || (runNumber>=363600 && runNumber<=363623) || (runNumber==363359 || runNumber==363360 || runNumber==363489));
+  bool isWenu = ((runNumber>=364170 && runNumber<=364183) || (runNumber>=363600 && runNumber<=363623) || (runNumber>=312496 && runNumber<=312507) || (runNumber==363359 || runNumber==363360 || runNumber==363489 || runNumber==308096 || runNumber==363237));
+  bool isWmnu = ((runNumber>=364156 && runNumber<=364169) || (runNumber>=363624 && runNumber<=363647) || (runNumber>=312508 && runNumber<=312519) || (runNumber==363359 || runNumber==363360 || runNumber==363489 || runNumber==308097 || runNumber==363238));
   eleANTISF=std::min<float>(eleANTISF,1.5);
   eleANTISF=std::max<float>(eleANTISF,0.6);
   if(isWenu){
@@ -1263,6 +1328,7 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmp_muSFTrigWeight = muSFTrigWeight;
   float tmp_phSFWeight = phSFWeight;
   float tmp_eleANTISF = eleANTISF;
+  float tmp_muoANTISF = 1.0;
   float tmp_nloEWKWeight = nloEWKWeight;
   float tmp_puSyst2018Weight = puSyst2018Weight;
   float tmp_qgTagWeight = 1.0; // assuming the default weight is 1.0 for qg tagging
@@ -1281,6 +1347,7 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_muSFTrigWeight = muSFTrigWeight;
     tmp_phSFWeight = phSFWeight;
     tmp_eleANTISF = eleANTISF;
+    tmp_muoANTISF = 1.0;
     tmp_nloEWKWeight = nloEWKWeight;
     tmp_puSyst2018Weight = puSyst2018Weight;
     tmp_qgTagWeight = 1.0; // default value is 1
@@ -1309,13 +1376,19 @@ StatusCode VBFAnalysisAlg::execute() {
       if(isWenu){
 	if(!(n_baseel==0 && n_basemu==0)) tmp_eleANTISF=1.0;
       }else{ tmp_eleANTISF=1.0; }
+    }else if(it->first.Contains("muoANTISF")){
+      tmp_muoANTISF=tMapFloat[it->first];
+      tmp_muoANTISF=std::min<float>(tmp_muoANTISF,1.5);
+      tmp_muoANTISF=std::max<float>(tmp_muoANTISF,0.6);
+      if(isWmnu){
+	if(!(n_baseel==0 && n_basemu==0)) tmp_muoANTISF=1.0;
+      }else{ tmp_muoANTISF=1.0; }
     }
-
+    
     if(m_oneTrigMuon && passMETTrig) tmp_muSFTrigWeight=1.0;
-    ATH_MSG_DEBUG("VBFAnalysisAlg Looping weight Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight);
-
-
-    tMapFloatW[it->first]=weight*mcEventWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
+    ATH_MSG_DEBUG("VBFAnalysisAlg Looping weight Syst: " << it->first << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << tmp_puWeight << " jvtSFWeight: " << tmp_jvtSFWeight << " elSFWeight: " << tmp_elSFWeight << " muSFWeight: " << tmp_muSFWeight << " elSFTrigWeight: " << tmp_elSFTrigWeight << " muSFTrigWeight: " << tmp_muSFTrigWeight << " phSFWeight: " << tmp_phSFWeight << " eleANTISF: " << tmp_eleANTISF << " nloEWKWeight: " << tmp_nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " truth sig syst: " << tmp_signalTruthSyst<< " truth sig syst: " << " Vjets syst: " << tmp_vjWeight << " muoANTISF: " << tmp_muoANTISF);
+    
+    tMapFloatW[it->first]=weight*mcEventWeight*tmp_jvtSFWeight*tmp_fjvtSFWeight*tmp_elSFWeight*tmp_muSFWeight*tmp_elSFTrigWeight*tmp_muSFTrigWeight*tmp_eleANTISF*tmp_muoANTISF*tmp_nloEWKWeight*tmp_qgTagWeight*tmp_phSFWeight*tmp_puSyst2018Weight*tmp_signalTruthSyst;
     ATH_MSG_DEBUG("VBFAnalysisAlg Syst total: : " << tMapFloatW[it->first] );
     if(m_doPUWeight) tMapFloatW[it->first]*=tmp_puWeight;
     if(m_doVjetRW) tMapFloatW[it->first] *= tmp_vjWeight;
@@ -1413,20 +1486,13 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 	  m_tree_out->Branch("wnloEWKWeight__1down",&(tMapFloatW["nloEWKWeight__1down"]));
 	}
       }
-      if(tMapFloat.find("puSyst2018Weight__1up")==tMapFloat.end()){
-	tMapFloat ["puSyst2018Weight__1up"]=1.0;
-	tMapFloatW["puSyst2018Weight__1up"]=1.0;
-	m_tree_out->Branch("wpuSyst2018Weight__1up",&(tMapFloatW["puSyst2018Weight__1up"]));
-      }
-      if(tMapFloat.find("puSyst2018Weight__1down")==tMapFloat.end()){
-	tMapFloat ["puSyst2018Weight__1down"]=1.0;
-	tMapFloatW["puSyst2018Weight__1down"]=1.0;
-	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
-      }
-      if(tMapFloat.find("puSyst2018Weight__1down")==tMapFloat.end()){
-	tMapFloat ["puSyst2018Weight__1down"]=1.0;
-	tMapFloatW["puSyst2018Weight__1down"]=1.0;
-	m_tree_out->Branch("wpuSyst2018Weight__1down",&(tMapFloatW["puSyst2018Weight__1down"]));
+      std::vector<std::string> newSystNames={"muoANTISFEL_EFF_ID__1down","muoANTISFEL_EFF_ID__1up","puSyst2018Weight__1up","puSyst2018Weight__1down"};
+      for(unsigned iSys=0; iSys<newSystNames.size(); ++iSys){
+	if(tMapFloat.find(newSystNames.at(iSys))==tMapFloat.end()){
+	  tMapFloat [newSystNames.at(iSys)]=1.0;
+	  tMapFloatW[newSystNames.at(iSys)]=1.0;
+	  m_tree_out->Branch((std::string("w")+newSystNames.at(iSys)).c_str(),&(tMapFloatW[newSystNames.at(iSys)]));
+	}
       }
       // QG inputs
       for(unsigned iQG=0; iQG<m_qgVars.size(); ++iQG){
@@ -1518,6 +1584,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("met_tst_nolep_j1_dphi",1);
   m_tree->SetBranchStatus("met_tst_nolep_j2_dphi",1);
   m_tree->SetBranchStatus("met_cst_jet",1);
+  m_tree->SetBranchStatus("met_cst_phi",1);
+  m_tree->SetBranchStatus("met_cst_em_jet",1);
+  m_tree->SetBranchStatus("met_cst_em_phi",1);
   m_tree->SetBranchStatus("met_tst_et",1);
   m_tree->SetBranchStatus("met_tst_nolep_et",1);
   m_tree->SetBranchStatus("met_tst_phi",1);
@@ -1561,10 +1630,23 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("ph_pt",1);
     m_tree->SetBranchStatus("ph_phi",1);
     m_tree->SetBranchStatus("ph_eta",1);
-    m_tree->SetBranchStatus("tau_pt",1);
-    m_tree->SetBranchStatus("tau_phi",1);
-    m_tree->SetBranchStatus("tau_eta",1);
 
+    if(m_currentVariation=="Nominal"){
+      m_tree->SetBranchStatus("ph_ptcone20",1);
+      m_tree->SetBranchStatus("ph_topoetcone40",1);
+      m_tree->SetBranchStatus("ph_truthOrigin",1);
+      m_tree->SetBranchStatus("baseph_pt",1);
+      m_tree->SetBranchStatus("baseph_phi",1);
+      m_tree->SetBranchStatus("baseph_eta",1);
+      m_tree->SetBranchStatus("baseph_ptcone20",1);
+      m_tree->SetBranchStatus("baseph_topoetcone40",1);
+      m_tree->SetBranchStatus("baseph_truthOrigin",1);
+      m_tree->SetBranchStatus("baseph_isEM",1);
+      m_tree->SetBranchStatus("baseph_iso",1);
+      m_tree->SetBranchStatus("tau_pt",1);
+      m_tree->SetBranchStatus("tau_phi",1);
+      m_tree->SetBranchStatus("tau_eta",1);
+    }
     m_tree->SetBranchStatus("jet_fjvt",1);
     m_tree->SetBranchStatus("basemu_pt",1);
     m_tree->SetBranchStatus("basemu_eta",1);
@@ -1579,6 +1661,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("basemu_type",1);
     if(m_isMC) m_tree->SetBranchStatus("basemu_truthOrigin",1);
     if(m_isMC) m_tree->SetBranchStatus("basemu_truthType",1);
+    if(m_isMC) m_tree->SetBranchStatus("mu_truthOrigin",1);
+    if(m_isMC) m_tree->SetBranchStatus("mu_truthType",1);
     m_tree->SetBranchStatus("baseel_pt",1);
     m_tree->SetBranchStatus("baseel_eta",1);
     m_tree->SetBranchStatus("baseel_phi",1);
@@ -1719,6 +1803,9 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("met_tst_nolep_j1_dphi",&met_tst_nolep_j1_dphi);
   m_tree->SetBranchAddress("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);
   m_tree->SetBranchAddress("met_cst_jet",&met_cst_jet);
+  m_tree->SetBranchAddress("met_cst_phi",&met_cst_phi);
+  m_tree->SetBranchAddress("met_cst_em_jet",&met_cst_em_jet);
+  m_tree->SetBranchAddress("met_cst_em_phi",&met_cst_em_phi);
   m_tree->SetBranchAddress("met_tst_et",&met_tst_et);
   m_tree->SetBranchAddress("met_tst_nolep_et",&met_tst_nolep_et);
   m_tree->SetBranchAddress("met_tst_phi",&met_tst_phi);
@@ -1793,6 +1880,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("basemu_type",         &basemu_type);
     if(m_isMC) m_tree->SetBranchAddress("basemu_truthOrigin",  &basemu_truthOrigin);
     if(m_isMC) m_tree->SetBranchAddress("basemu_truthType",    &basemu_truthType);
+    if(m_isMC) m_tree->SetBranchAddress("mu_truthOrigin",  &mu_truthOrigin);
+    if(m_isMC) m_tree->SetBranchAddress("mu_truthType",    &mu_truthType);
     m_tree->SetBranchAddress("baseel_pt",           &baseel_pt);
     m_tree->SetBranchAddress("baseel_eta",          &baseel_eta);
     m_tree->SetBranchAddress("baseel_phi",          &baseel_phi);
@@ -1808,6 +1897,19 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("ph_phi",          &ph_phi);
     m_tree->SetBranchAddress("ph_eta",          &ph_eta);
     if(m_currentVariation=="Nominal" && m_isMC){
+      m_tree->SetBranchAddress("ph_ptcone20",      &ph_ptcone20);
+      m_tree->SetBranchAddress("ph_topoetcone40",  &ph_topoetcone40);
+      m_tree->SetBranchAddress("ph_truthOrigin",   &ph_truthOrigin);
+
+      m_tree->SetBranchAddress("baseph_pt",           &baseph_pt);
+      m_tree->SetBranchAddress("baseph_phi",          &baseph_phi);
+      m_tree->SetBranchAddress("baseph_eta",          &baseph_eta);
+      m_tree->SetBranchAddress("baseph_ptcone20",     &baseph_ptcone20);
+      m_tree->SetBranchAddress("baseph_topoetcone40", &baseph_topoetcone40);
+      m_tree->SetBranchAddress("baseph_truthOrigin",  &baseph_truthOrigin);
+      m_tree->SetBranchAddress("baseph_isEM",         &baseph_isEM);
+      m_tree->SetBranchAddress("baseph_iso",          &baseph_iso);
+
       m_tree->SetBranchAddress("tau_pt",           &tau_pt);
       m_tree->SetBranchAddress("tau_phi",          &tau_phi);
       m_tree->SetBranchAddress("tau_eta",          &tau_eta);

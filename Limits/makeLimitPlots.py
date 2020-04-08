@@ -87,8 +87,8 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
     labs = [l]
 
     if True:
-        p = ROOT.TLatex(x+0.11, y, ' Internal') #
-        #p = ROOT.TLatex(x+0.11, y, ' Preliminary') #
+        #p = ROOT.TLatex(x+0.11, y, ' Internal') #
+        p = ROOT.TLatex(x+0.11, y, ' Preliminary') #
         p.SetNDC()
         p.SetTextFont(42)
         p.SetTextSize(0.065)
@@ -105,6 +105,15 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         a.SetTextColor(ROOT.kBlack)
         a.Draw()
         labs += [a]
+
+        
+        d = ROOT.TLatex(x, y-0.1, 'Limits at 95% CL')
+        d.SetNDC()
+        d.SetTextFont(42)
+        d.SetTextSize(0.05)
+        d.SetTextAlign(12)
+        d.SetTextColor(ROOT.kBlack)
+        labs += [d]
         
     if text != None:
 
@@ -115,6 +124,8 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         c.SetTextAlign(12)
         c.SetTextColor(ROOT.kBlack)
         labs += [c]
+        
+        
     for l in labs:
         l.Draw()
     return labs

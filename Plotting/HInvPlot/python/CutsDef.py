@@ -28,7 +28,7 @@ class BasicCuts:
                             'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2',
 
                             'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2',
-                                'njgt2','njgt2lt5','njgt3lt5','nj3',
+                                'njgt2','njgt2lt5','njgt3lt5','nj3','lowmet','revfjvt',
                                 'LowMETQCDRevFJVT',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
                             'metsfVBFTopo','metsfxe110XE70','metsfxe110XE65',
@@ -146,7 +146,7 @@ class BasicCuts:
 
         # By default: no special metsig cut.
         # Apply one if running a 'msgt4' or 'mslt4' analysis.
-        self.MetsigLowerCut = 0.0
+        self.MetsigLowerCut = -0.0001
         self.MetsigUpperCut = -1.0
         if Analysis.count('msgt4'):
             self.MetsigLowerCut = 4.0
@@ -372,7 +372,11 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
-        cuts = [CutItem('CutNjet',  'n_jet == 2')]        
+        
+        cuts = [CutItem('CutNjet',  'n_jet > 1 && n_jet<4')]        
+        #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
+        #cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
+        #cuts = [CutItem('CutNjet',  'n_jet == 2')]
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 60.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
 
@@ -403,7 +407,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
     return cuts
 
 #-------------------------------------------------------------------------
-def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET=-1):
+def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET=-1):
 
     highMET=180.0
     if metCut>180.0:
@@ -446,6 +450,9 @@ def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET
     if maxMET>0.0:
         cuts +=  [CutItem('CutMetMaxMET', '%s < %s' %(met_choice,maxMET))]
 
+    # cuts met angular
+    #cuts +=  [CutItem('CutMetAngle', 'met_tst_cut > 0.5')]
+    #cuts +=  [CutItem('CutMetmax', 'met_tst_cut > 0.5')]
     return cuts
 
 #-------------------------------------------------------------------------
@@ -497,7 +504,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
             cuts += metCuts(basic_cuts,options,metCut=130.0, cstCut=100.0)#, maxMET=150.0)
         else:
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
-            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0)
+            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0,maxMET=200.0)
             #cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
             #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
@@ -599,34 +606,53 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     cuts = FilterCuts(options)
     if options.OverlapPh:
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
-
+        
     if basic_cuts.chan in ['nn']:
-        cuts += getMETTriggerCut(cut, options, basic_cuts, syst)
-    elif basic_cuts.chan in ['uu','u','up','um']:
-        cuts += getMETTriggerCut(cut, options, basic_cuts, None, ORTrig=' || trigger_lep > 0')
+        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst)
+    elif basic_cuts.chan in ['uu','u','up','um','l']:
+        cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
+        # trigger fix for electron channel
+        cutElTrig = CutItem('CutElTrig')
+        cutElTrig.AddCut(CutItem('Electron',  'n_el_w > 0 && trigger_lep==1'), 'OR')
+        cutElTrig.AddCut(CutItem('Muon', 'n_mu>0 || n_mu_w>0'), 'OR')
+        cuts += [cutElTrig]
     elif basic_cuts.chan in ['ee','ll','eu']:
         cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     else:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
     if Region=='SR':
-    #    cuts += getLepChannelCuts(basic_cuts)
-        print ''
+        cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     elif Region=='ZCR':
         if basic_cuts.chan=='ee':
             cuts += [CutItem('CutEl','n_el == 2')]
         if basic_cuts.chan=='uu':
             cuts += [CutItem('CutMu','n_mu == 2')]
         cuts += [CutItem('CutSignalZLep','n_siglep == 2')]
+        cuts += [CutItem('CutBaseLep','n_baselep == 2')]
+        cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+        cuts += [CutItem('CutL1Pt',  'lepPt1 > 7.0')]
+        cutMass = CutItem('CutMass')
+        cutMass.AddCut(CutItem('Mll',  'mll < 116.0 && mll > 66.0'), 'OR')
+        #cutMass.AddCut(CutItem('Mtt', 'Mtt < 116.0 && Mtt > 76.0'), 'OR')
+        cuts += [cutMass]
+        cuts += [CutItem('CutMETForTop',  'met_tst_et < 70.0')]
     elif Region=='WCR':
         if basic_cuts.chan=='e':
+            #cuts += [CutItem('CutEl','n_el_w == 1')]
             cuts += [CutItem('CutEl','n_el == 1')]
         if basic_cuts.chan=='u':
+            #cuts += [CutItem('CutMu','n_mu_w == 1')]
             cuts += [CutItem('CutMu','n_mu == 1')]
         cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
-
+        #cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
+        cuts += [CutItem('CutBaseLep','n_baselep == 1')]
+        cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+        #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
     cuts += [CutItem('CutPh',       'n_ph==1')]
-    cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
+    if basic_cuts.analysis not in ['lowmet']:
+        cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
     cuts += getJetCuts(basic_cuts, options, isPh=True);
 
     # add the extra cuts...decide if we want these
@@ -634,10 +660,15 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     if options.ReverseFJVT:
         cuts += [CutItem('CutFJVT','j0fjvt > 0.4 || j1fjvt > 0.4')]
     else:
-        cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]
+        if basic_cuts.analysis in ['revfjvt']:
+            cuts += [CutItem('CutFJVT','j0fjvt > 0.4 || j1fjvt > 0.4')]
+            cuts += [CutItem('CutMjjLow','jj_mass < 1000.0')]
+        else:
+            cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]            
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
-
+    #cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
+    
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
@@ -645,7 +676,12 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             met_choice=options.met_choice
         elif Region=='WCR' or Region=='ZCR':
             met_choice=options.met_choice.replace('_tst','_tst_nolep')
-        cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
+        if basic_cuts.analysis in ['lowmet']:
+            cuts += [CutItem('CutMjjLow','jj_mass < 1000.0')]
+            cuts += [CutItem('CutMet',       '%s > 110.0 && %s < 150.0' %(met_choice,met_choice))]
+        else:
+            cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
+            cuts += [CutItem('CutMetCST',    'met_cst_jet > 120.0')]
 
     cuts += [CutItem('CutDPhiMetPh','met_tst_ph_dphi > 1.8')]
     cuts += [CutItem('CutPhCentrality','phcentrality > 0.4')]
@@ -818,8 +854,8 @@ def getWCRAntiIDCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, 
             new_cuts.append(cutobj)
 
     # Add a cut to veto signal leptons.
-    new_cuts.append(CutItem("CutNoSigLeps", "n_lep_w == 0"))
-
+    #new_cuts.append(CutItem("CutNoSigLeps", "n_lep_w == 0"))
+    new_cuts.append(CutItem("CutNoSigLeps", "n_siglep == 0"))
     # Add the trigger isolation: ptvarcone30/pt < 0.07 for mu, ptvarcone20/pt<0.1
     # Only do for muons. For now, do for none!
     #if basic_cuts.chan[0] != 'e':
@@ -877,9 +913,9 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
     sigs['tth']  = ['tth']
-    #sigs['hvbf500']  = ['hvbf500']    
-    #sigs['hvbf1k']  = ['hvbf1k']    
-    #sigs['hvbf3k']  = ['hvbf3k']    
+    #sigs['hvbf500']  = ['hvbf500']
+    #sigs['hvbf1k']  = ['hvbf1k']
+    #sigs['hvbf3k']  = ['hvbf3k']
 
     bkgs = {}
 
@@ -898,7 +934,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
         bkgs['pho']  = ['pho']
         bkgs['phoAlt']  = ['phoAlt']
         bkgs['wgam'] = ['wgam']
-        bkgs['zgam'] = ['zgam']
+        bkgs['zgam'] = ['zgam','vgg']
         bkgs['wgamewk'] = ['wgamewk']
         bkgs['zgamewk'] = ['zgamewk']
 
@@ -933,7 +969,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     #
     if reg != None and key != None:
         if options.OverlapPh:
-            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamEWK,wgamEWK,bkgs,data')
+            reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamewk,wgamewk,bkgs,data')
         else:
             if options.mergeMGExt:                            
                 reg.SetVal(key, 'higgs,tall,wqcdMad,wewk,zqcdMad,zewk,dqcd,bkgs,data')

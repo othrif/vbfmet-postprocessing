@@ -155,6 +155,7 @@ class systematics(object):
                                        'xeSFTrigWeight__1up','xeSFTrigWeight__1down',
                                        'puSyst2018Weight__1up','puSyst2018Weight__1down',
                                         'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up',
+                                    'muoANTISFEL_EFF_ID__1down','muoANTISFEL_EFF_ID__1up',
     'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','MJClosHDPhi2016__1up','MJClosHDPhi2017__1up','MJClosHDPhi2018__1up',
                                      'MJClosLDPhi2016__1up','MJClosLDPhi2017__1up','MJClosLDPhi2018__1up',#MJ
                                     'vvUnc__1up',
@@ -189,7 +190,8 @@ class systematics(object):
             self.systematicsList = ['FT_EFF_B_systematics__1down','FT_EFF_B_systematics__1up','FT_EFF_C_systematics__1down','FT_EFF_C_systematics__1up','FT_EFF_Light_systematics__1down','FT_EFF_Light_systematics__1up','FT_EFF_extrapolation__1down','FT_EFF_extrapolation__1up','FT_EFF_extrapolation_from_charm__1down','FT_EFF_extrapolation_from_charm__1up','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1up','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','eleANTISFEL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down','eleANTISFEL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up','JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up','JET_JvtEfficiency__1down','JET_JvtEfficiency__1up','MUON_EFF_TrigStatUncertainty__1down','MUON_EFF_TrigStatUncertainty__1up','MUON_EFF_TrigSystUncertainty__1down','MUON_EFF_TrigSystUncertainty__1up','MUON_EFF_BADMUON_SYS__1down','MUON_EFF_BADMUON_SYS__1up','MUON_EFF_ISO_STAT__1down','MUON_EFF_ISO_STAT__1up','MUON_EFF_ISO_SYS__1down','MUON_EFF_ISO_SYS__1up','MUON_EFF_RECO_STAT_LOWPT__1down','MUON_EFF_RECO_STAT_LOWPT__1up','MUON_EFF_RECO_STAT__1down','MUON_EFF_RECO_STAT__1up','MUON_EFF_RECO_SYS_LOWPT__1down','MUON_EFF_RECO_SYS_LOWPT__1up','MUON_EFF_RECO_SYS__1down','MUON_EFF_RECO_SYS__1up','MUON_EFF_TTVA_STAT__1down','MUON_EFF_TTVA_STAT__1up','MUON_EFF_TTVA_SYS__1down','MUON_EFF_TTVA_SYS__1up','PRW_DATASF__1down','PRW_DATASF__1up','xeSFTrigWeight__1up','xeSFTrigWeight__1down','puSyst2018Weight__1up','puSyst2018Weight__1down',
                                     'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','MJClosHDPhi2016__1up','MJClosHDPhi2017__1up','MJClosHDPhi2018__1up',
                                      'MJClosLDPhi2016__1up','MJClosLDPhi2017__1up','MJClosLDPhi2018__1up','vvUnc__1up',
-                                        'vvUnc__1down']
+                                        'vvUnc__1down',
+                                    'muoANTISFEL_EFF_ID__1down','muoANTISFEL_EFF_ID__1up']
             self.systematicsList = ['EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ChargeIDSel_TOTAL_1NPCOR_PLUS_UNCOR__1up',
 'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_TriggerEff_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_TriggerEff_TOTAL_1NPCOR_PLUS_UNCOR__1up','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1down','EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR__1up','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','JET_JvtEfficiency__1down','JET_JvtEfficiency__1up','JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up','MUON_EFF_BADMUON_SYS__1down','MUON_EFF_BADMUON_SYS__1up','MUON_EFF_ISO_STAT__1down','MUON_EFF_ISO_STAT__1up','MUON_EFF_ISO_SYS__1down','MUON_EFF_ISO_SYS__1up','MUON_EFF_RECO_STAT__1down','MUON_EFF_RECO_STAT__1up','MUON_EFF_RECO_STAT_LOWPT__1down','MUON_EFF_RECO_STAT_LOWPT__1up','MUON_EFF_RECO_SYS__1down','MUON_EFF_RECO_SYS__1up','MUON_EFF_RECO_SYS_LOWPT__1down','MUON_EFF_RECO_SYS_LOWPT__1up','MUON_EFF_TTVA_STAT__1down','MUON_EFF_TTVA_STAT__1up','MUON_EFF_TTVA_SYS__1down','MUON_EFF_TTVA_SYS__1up','MUON_EFF_TrigStatUncertainty__1down','MUON_EFF_TrigStatUncertainty__1up','MUON_EFF_TrigSystUncertainty__1down','MUON_EFF_TrigSystUncertainty__1up',
 'PH_EFF_ID_Uncertainty__1down','PH_EFF_ID_Uncertainty__1up','PH_EFF_ISO_Uncertainty__1down','PH_EFF_ISO_Uncertainty__1up','PH_EFF_TRIGGER_Uncertainty__1down','PH_EFF_TRIGGER_Uncertainty__1up',
@@ -197,7 +199,8 @@ class systematics(object):
                                     'puSyst2018Weight__1up','puSyst2018Weight__1down',
                                     'MJUnc__1up','MJClos2016__1up','MJClos2017__1up','MJClos2018__1up','MJClosHDPhi2016__1up','MJClosHDPhi2017__1up','MJClosHDPhi2018__1up',
                                      'MJClosLDPhi2016__1up','MJClosLDPhi2017__1up','MJClosLDPhi2018__1up','vvUnc__1up',
-                                        'vvUnc__1down']
+                                        'vvUnc__1down',
+                                    'muoANTISFEL_EFF_ID__1down','muoANTISFEL_EFF_ID__1up']
             self.systematicsList += ['ATLAS_PDF4LHC_NLO_30_EV30__1up','ATLAS_PDF4LHC_NLO_30_EV29__1up',
                                      'ATLAS_PDF4LHC_NLO_30_EV28__1up','ATLAS_PDF4LHC_NLO_30_EV27__1up',
                                      'ATLAS_PDF4LHC_NLO_30_EV26__1up','ATLAS_PDF4LHC_NLO_30_EV25__1up',
@@ -281,7 +284,7 @@ class systematics(object):
                                     'VBF_qqH_Mjj120__1up','VBF_qqH_Mjj60__1up',
                                      'VBF_qqH_200__1up','VBF_qqH_tot__1up',]
         elif mode == "ANTISF":            
-            self.systematicsList = ['Nominal','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up',]
+            self.systematicsList = ['Nominal','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','muoANTISFEL_EFF_ID__1down','muoANTISFEL_EFF_ID__1up']
         elif mode == "JER":
             self.systematicsList = ['Nominal', 'JET_JER_DataVsMC_MC16__1up', 'JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up']
         elif mode == "Pileup":
