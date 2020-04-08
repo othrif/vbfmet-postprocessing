@@ -450,6 +450,32 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, ME
         histm.Write()
     #f_fakeele.Write()
     f_fakeele.Close()
+
+def writeFakeMuo(Binning=0, year=2016, METCut=150):
+    f_fakemuo = ROOT.TFile("fakemuo.root", "recreate")
+    fakemuos=[]
+    fakemuos = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.0, 3.0, 3.0, 3.0]
+    if Binning==11 or Binning==12 or Binning==13: # set for all years
+        fakemuos = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.0, 3.0, 3.0, 3.0]
+        if METCut==160:
+            fakemuos = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.0, 3.0, 3.0, 3.0]
+    a=1
+    hists=[]
+    histcr=None
+    hist=None
+    for fakemuo in fakemuos:
+        histcr = ROOT.TH1F("hmuoFakes_VBFjetSel_"+str(a)+"Nom_oneMuMTCR"+str(a)+"_obs_cuts", "hmuoFakes_VBFjetSel_"+str(a)+"Nom_oneMuMTCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        hist = ROOT.TH1F("hmuoFakes_VBFjetSel_"+str(a)+"Nom_oneMuCR"+str(a)+"_obs_cuts", "hmuoFakes_VBFjetSel_"+str(a)+"Nom_oneMuCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histcr.SetBinContent(1,fakemuo)
+        histcr.SetBinError(1,fakemuo*0.3)
+        hist.SetBinContent(1,1.0)
+        hist.SetBinError(1,0.2)
+        hists+=[histcr,hist]
+        a += 1
+    f_fakemuo.cd()
+    for h in hists:
+        h.Write()
+    f_fakemuo.Close()
 #writeMultiJet(11, 2016, 150)
 #writeMultiJet(11, 2018, 160)
 #os.chdir('../v34D')
@@ -457,3 +483,4 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, ME
 #os.chdir('../v34E')
 #writeMultiJet(11, 2018, 150)
 #writeFakeEle(11,  2018, METCut=200)
+#writeFakeMuo(11)

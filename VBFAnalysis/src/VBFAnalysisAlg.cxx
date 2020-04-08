@@ -767,8 +767,8 @@ StatusCode VBFAnalysisAlg::execute() {
     if(((runNumber>=364541 && runNumber<=364547) || (runNumber>=361040 && runNumber<=361062) || (runNumber>=305435 && runNumber<=305444) || (runNumber>=364500 && runNumber<=364535))
        && abs(mcEventWeight)>100.0) mcEventWeight=1.0;
     // the event weights seem wrong for these three samples. this is a HACK to fix it
-    if( metRunNumber>=348197 && runNumber==364542) mcEventWeight*=-1.0;
-    if( metRunNumber>=325713 && metRunNumber<348197 && (runNumber==364541 || runNumber==364542)) mcEventWeight*=-1.0;
+    //if( metRunNumber>=348197 && runNumber==364542) mcEventWeight*=-1.0;
+    //if( metRunNumber>=325713 && metRunNumber<348197 && (runNumber==364541 || runNumber==364542)) mcEventWeight*=-1.0;
   }
 
   // applying a pileup weight for 2018 data
@@ -886,6 +886,8 @@ StatusCode VBFAnalysisAlg::execute() {
     //correct the LO SHERPA to H7 EWK
     //if(m_isMC && runNumber>=308092 && runNumber<=308098 && truth_jj_mass>200.0e3) weight*=0.000047991*truth_jj_mass/1.0e3+0.8659;
     if(m_isMC && runNumber>=308092 && runNumber<=308098 && truthF_jj_mass>200.0e3) weight*=0.000047991*truthF_jj_mass/1.0e3+0.8659;
+
+    //std::cout << "crossSection: " << crossSection << " NgenCorrected: " << NgenCorrected << " weight: " << weight << std::endl;
   } else {
     weight = 1;
   }
@@ -1283,6 +1285,8 @@ StatusCode VBFAnalysisAlg::execute() {
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
   w = weight*mcEventWeight*(met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
+  if(m_isMC && runNumber>=364541 && runNumber<=364545 && fabs(puWeight)>10.0 ) puWeight=1.0;
+  if(m_isMC && runNumber>=364541 && runNumber<=364542) puWeight=1.0;
   if(m_doPUWeight) w *= puWeight;
   if(m_doVjetRW) w *= vjWeight;
 

@@ -137,6 +137,7 @@ StatusCode HFInputAlg::initialize() {
       hCRWepLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneElePosLowSigCR"+to_string(c))));
       hCRWenLowSig.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC), string("oneEleNegLowSigCR"+to_string(c))));
       hCRWm.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuCR"+to_string(c))));
+      hCRWmMT.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuMTCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuMTCR"+to_string(c))));
       hCRWmp.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuPosCR"+to_string(c))));
       hCRWmn.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuNegCR"+to_string(c))));
       hCRZll.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoLepCR"+to_string(c)),to_string(c), syst, isMC), string("twoLepCR"+to_string(c))));
@@ -151,6 +152,7 @@ StatusCode HFInputAlg::initialize() {
       hnames.push_back(std::make_pair(hCRWepLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneElePosLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWenLowSig.back(), HistoNameMaker(currentSamplePlot,string("oneEleNegLowSigCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWm.back(), HistoNameMaker(currentSamplePlot,string("oneMuCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRWmMT.back(), HistoNameMaker(currentSamplePlot,string("oneMuMTCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWmp.back(), HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWmn.back(), HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRZll.back(), HistoNameMaker(currentSamplePlot,string("twoLepCR"+to_string(c)),to_string(c), syst, isMC)));
@@ -506,7 +508,13 @@ StatusCode HFInputAlg::execute() {
   // basic selection.
   if (!((passJetCleanTight == 1) & nbjetCut & jetCut & jetPtCuts & (jj_dphi < jj_DPHICut) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (phSelectionCut) & (phcentrality>phcentralityCut) & (met_tst_ph_dphi>met_tst_ph_dphiCut) & (in_vy_overlapCut))) return StatusCode::SUCCESS; 
 
+  int passMTCut=0;
   if(n_el==1) { met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0); } else {  met_significance = 0; }
+  if(n_mu==1) { 
+    double MT = sqrt(2. * mu_pt->at(0) * met_tst_et * (1. - cos(mu_phi->at(0) - met_tst_phi)));
+    passMTCut=(MT>20e3) ? 1 : 2;
+  }
+  if(doVBFMETGam) passMTCut=0;
 
   if(v26Ntuples) lep_trig_match=1;
   bool trigger_lep_bool = ((trigger_lep & 0x1)==0x1) && lep_trig_match>0; // note that lep_trig_match is only computed for signal lepton triggers. We assume it is perfect for dilepton triggers.
@@ -736,7 +744,8 @@ StatusCode HFInputAlg::execute() {
     if (CRWepLowSig){ HistoFill(hCRWepLowSig[bin],w_final); HistoFill(hCRWeLowSig[bin],w_final); }
     if (CRWenLowSig){ HistoFill(hCRWenLowSig[bin],w_final); HistoFill(hCRWeLowSig[bin],w_final); }
     if (CRWmp){ HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu); HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu); }
-    if (CRWmn){ HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu); HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu); }
+    if (CRWmn && (passMTCut==0 || passMTCut==1)){ HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu); HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu); }
+    if((CRWmn || CRWmp) && passMTCut==2){ HistoFill(hCRWmMT[bin],w_final*xeSFTrigWeight_nomu); }// low MT
     if (CRZee){ HistoFill(hCRZee[bin],w_final); HistoFill(hCRZll[bin],w_final); }
     if (CRZmm){ HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu);   HistoFill(hCRZll[bin],w_final*xeSFTrigWeight_nomu);  }
   }else{// one histogram, so need to find the real bin number
