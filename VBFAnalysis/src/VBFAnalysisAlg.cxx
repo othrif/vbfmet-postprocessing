@@ -230,20 +230,20 @@ StatusCode VBFAnalysisAlg::initialize() {
   ph_pt = new std::vector<float>(0);
   ph_phi = new std::vector<float>(0);
   ph_eta = new std::vector<float>(0);
-  ph_ptcone20 = new std::vector<float>(0);
-  ph_topoetcone40 = new std::vector<float>(0);
-  ph_truthOrigin  = new std::vector<int>(0);
-  baseph_pt = new std::vector<float>(0);
-  baseph_phi = new std::vector<float>(0);
-  baseph_eta = new std::vector<float>(0);
-  baseph_ptcone20 = new std::vector<float>(0);
-  baseph_topoetcone40 = new std::vector<float>(0);
-  baseph_truthOrigin  = new std::vector<int>(0);
-  baseph_isEM  = new std::vector<unsigned>(0);
-  baseph_iso  = new std::vector<bool>(0);
-  tau_pt = new std::vector<float>(0);
-  tau_phi = new std::vector<float>(0);
-  tau_eta = new std::vector<float>(0);
+  // ph_ptcone20 = new std::vector<float>(0);
+  // ph_topoetcone40 = new std::vector<float>(0);
+  // ph_truthOrigin  = new std::vector<int>(0);
+  // baseph_pt = new std::vector<float>(0);
+  // baseph_phi = new std::vector<float>(0);
+  // baseph_eta = new std::vector<float>(0);
+  // baseph_ptcone20 = new std::vector<float>(0);
+  // baseph_topoetcone40 = new std::vector<float>(0);
+  // baseph_truthOrigin  = new std::vector<int>(0);
+  // baseph_isEM  = new std::vector<unsigned>(0);
+  // baseph_iso  = new std::vector<bool>(0);
+  // tau_pt = new std::vector<float>(0);
+  // tau_phi = new std::vector<float>(0);
+  // tau_eta = new std::vector<float>(0);
 
   mcEventWeights = new std::vector<float>(0);
 
@@ -304,10 +304,10 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("met_tst_nolep_et",&met_tst_nolep_et);
   m_tree_out->Branch("met_tst_phi",&met_tst_phi);
   m_tree_out->Branch("met_tst_nolep_phi",&met_tst_nolep_phi);
-  m_tree_out->Branch("met_cst_jet",&met_cst_jet);
-  m_tree_out->Branch("met_cst_phi",&met_cst_phi);
-  m_tree_out->Branch("met_cst_em_jet",&met_cst_em_jet);
-  m_tree_out->Branch("met_cst_em_phi",&met_cst_em_phi);
+  // m_tree_out->Branch("met_cst_jet",&met_cst_jet);
+  // m_tree_out->Branch("met_cst_phi",&met_cst_phi);
+  // m_tree_out->Branch("met_cst_em_jet",&met_cst_em_jet);
+  // m_tree_out->Branch("met_cst_em_phi",&met_cst_em_phi);
   m_tree_out->Branch("met_soft_tst_et",        &met_soft_tst_et);
   m_tree_out->Branch("mu_charge",&mu_charge);
   m_tree_out->Branch("mu_pt",&mu_pt);
@@ -412,6 +412,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("ph_pt", &ph_pt);
     m_tree_out->Branch("ph_phi",&ph_phi);
     m_tree_out->Branch("ph_eta",&ph_eta);
+    /*
     if(m_currentVariation=="Nominal"){
 
       m_tree_out->Branch("ph_ptcone20", &ph_ptcone20);
@@ -434,6 +435,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     }else{
       tau_pt=0; tau_phi=0; tau_eta=0;
     }
+    */
     // Tenacious MET
     m_tree_out->Branch("met_tenacious_tst_et",   &met_tenacious_tst_et);
     m_tree_out->Branch("met_tenacious_tst_phi",  &met_tenacious_tst_phi);
@@ -895,6 +897,7 @@ StatusCode VBFAnalysisAlg::execute() {
   outtau_pt->clear();
   outtau_eta->clear();
   outtau_phi->clear();
+  /*
   if(m_extraVars || true){
 
     // overlap remove with the photons
@@ -928,8 +931,9 @@ StatusCode VBFAnalysisAlg::execute() {
       }// end tau loop
     }// end tau overlap removal
   }// end extra variables
+    */
   // fill extra jet variables for 3rd jets
-  if(m_extraVars && jet_pt){
+  if(m_extraVars && jet_pt && jet_pt->size()>1){
     maxCentrality=0;
     max_mj_over_mjj=0.0;
     mj34=-9999.0;
@@ -1159,25 +1163,25 @@ StatusCode VBFAnalysisAlg::execute() {
     DPhijjCut=2.0; 
     MHTCut=100e3;
     passMJSkim=false;
-    if((jj_mass>2e5 && jj_mass<800e5) && (met_cst_jet>120e3) && jj_dphi<DPhijjCut && jj_deta>DEtajjCut && n_jet>1 && n_jet<5 && (jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut)) passMJSkim=true;  // low mjj
-    if((jj_mass>800e5) && (met_cst_jet>100e3) && (met_tst_nolep_et > 100e3 && met_tst_nolep_et<160e3) && (n_baseel==0 && n_basemu==0) && jj_dphi<DPhijjCut && jj_deta>DEtajjCut && n_jet>1 && n_jet<4 && (jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut)) passMJSkim=true;  // low met
+    // if((jj_mass>2e5 && jj_mass<800e5) && (met_cst_jet>120e3) && jj_dphi<DPhijjCut && jj_deta>DEtajjCut && n_jet>1 && n_jet<5 && (jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut)) passMJSkim=true;  // low mjj
+    // if((jj_mass>800e5) && (met_cst_jet>100e3) && (met_tst_nolep_et > 100e3 && met_tst_nolep_et<160e3) && (n_baseel==0 && n_basemu==0) && jj_dphi<DPhijjCut && jj_deta>DEtajjCut && n_jet>1 && n_jet<4 && (jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut)) passMJSkim=true;  // low met
   }
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
   if(!passMJSkim) return StatusCode::SUCCESS;
   bool GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
-  if (n_jet < 2) return StatusCode::SUCCESS;
+  // if (n_jet < 2) return StatusCode::SUCCESS;
   if (!(n_jet < 5) && !(m_LooseSkim || m_AltSkim)) return StatusCode::SUCCESS;
   if (!(n_jet < 5) &&  (m_AltSkim)) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("n_jet = 2!");
   if (!(unsigned(n_jet) == jet_pt->size())) ATH_MSG_WARNING("n_jet != jet_pt->size()! n_jet: " <<n_jet << " jet_pt->size(): " << jet_pt->size());
   if (!(unsigned(n_jet) == jet_eta->size())) ATH_MSG_WARNING("n_jet != jet_eta->size()! n_jet: " <<n_jet << " jet_eta->size(): " << jet_eta->size());
-  if(!m_LooseSkim){
-    if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (met_cst_jet>MHTCut) & (jj_dphi < DPhijjCut) & (minDPhijjCut<jj_dphi) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
-  }else{
-    if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (met_cst_jet>MHTCut) & (jj_dphi < DPhijjCut) & (minDPhijjCut<jj_dphi) & (jj_deta > DEtajjCut) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
-  }
+  // if(!m_LooseSkim){
+    // if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (met_cst_jet>MHTCut) & (jj_dphi < DPhijjCut) & (minDPhijjCut<jj_dphi) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+  // }else{
+    // if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (met_cst_jet>MHTCut) & (jj_dphi < DPhijjCut) & (minDPhijjCut<jj_dphi) & (jj_deta > DEtajjCut) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+  // }
   // skim on the photon plus jet events
   if(m_PhotonSkim && !GammaMETSR) return StatusCode::SUCCESS;
 
@@ -1215,7 +1219,8 @@ StatusCode VBFAnalysisAlg::execute() {
   bool passMETTrig = trigger_met_encodedv2>0 || trigger_met>0 || trigger_met_encoded>0;
   if(m_METTrigPassThru) passMETTrig=true;
   ATH_MSG_DEBUG ("Assign trigger_met value");
-  float jet_pt_sum = jet_pt->at(0) + jet_pt->at(1);
+  float jet_pt_sum = 0;
+  if(n_jet>1) jet_pt_sum = jet_pt->at(0) + jet_pt->at(1);
   if(n_jet>2) jet_pt_sum+=jet_pt->at(2);
   if(n_jet>3) jet_pt_sum+=jet_pt->at(3);
   if(n_el== 1) {
@@ -1418,8 +1423,8 @@ StatusCode VBFAnalysisAlg::execute() {
 
 void VBFAnalysisAlg::computeMETj( Float_t met_phi,  std::vector<Float_t>* jet_phi, double &e_met_j1_dphi, double &e_met_j2_dphi)
 {
-  e_met_j1_dphi = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(0)));
-  e_met_j2_dphi = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(1)));
+  if(jet_phi->size()>0) e_met_j1_dphi = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(0)));
+  if(jet_phi->size()>1) e_met_j2_dphi = abs(TVector2::Phi_mpi_pi(met_phi-jet_phi->at(1)));
 }
 
 StatusCode VBFAnalysisAlg::beginInputFile() {
@@ -1583,10 +1588,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("met_tst_j2_dphi",1);
   m_tree->SetBranchStatus("met_tst_nolep_j1_dphi",1);
   m_tree->SetBranchStatus("met_tst_nolep_j2_dphi",1);
-  m_tree->SetBranchStatus("met_cst_jet",1);
-  m_tree->SetBranchStatus("met_cst_phi",1);
-  m_tree->SetBranchStatus("met_cst_em_jet",1);
-  m_tree->SetBranchStatus("met_cst_em_phi",1);
+  // m_tree->SetBranchStatus("met_cst_jet",1);
+  // m_tree->SetBranchStatus("met_cst_phi",1);
+  // m_tree->SetBranchStatus("met_cst_em_jet",1);
+  // m_tree->SetBranchStatus("met_cst_em_phi",1);
   m_tree->SetBranchStatus("met_tst_et",1);
   m_tree->SetBranchStatus("met_tst_nolep_et",1);
   m_tree->SetBranchStatus("met_tst_phi",1);
@@ -1631,22 +1636,6 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("ph_phi",1);
     m_tree->SetBranchStatus("ph_eta",1);
 
-    if(m_currentVariation=="Nominal"){
-      m_tree->SetBranchStatus("ph_ptcone20",1);
-      m_tree->SetBranchStatus("ph_topoetcone40",1);
-      m_tree->SetBranchStatus("ph_truthOrigin",1);
-      m_tree->SetBranchStatus("baseph_pt",1);
-      m_tree->SetBranchStatus("baseph_phi",1);
-      m_tree->SetBranchStatus("baseph_eta",1);
-      m_tree->SetBranchStatus("baseph_ptcone20",1);
-      m_tree->SetBranchStatus("baseph_topoetcone40",1);
-      m_tree->SetBranchStatus("baseph_truthOrigin",1);
-      m_tree->SetBranchStatus("baseph_isEM",1);
-      m_tree->SetBranchStatus("baseph_iso",1);
-      m_tree->SetBranchStatus("tau_pt",1);
-      m_tree->SetBranchStatus("tau_phi",1);
-      m_tree->SetBranchStatus("tau_eta",1);
-    }
     m_tree->SetBranchStatus("jet_fjvt",1);
     m_tree->SetBranchStatus("basemu_pt",1);
     m_tree->SetBranchStatus("basemu_eta",1);
@@ -1802,10 +1791,10 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("met_tst_j2_dphi",&met_tst_j2_dphi);
   m_tree->SetBranchAddress("met_tst_nolep_j1_dphi",&met_tst_nolep_j1_dphi);
   m_tree->SetBranchAddress("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);
-  m_tree->SetBranchAddress("met_cst_jet",&met_cst_jet);
-  m_tree->SetBranchAddress("met_cst_phi",&met_cst_phi);
-  m_tree->SetBranchAddress("met_cst_em_jet",&met_cst_em_jet);
-  m_tree->SetBranchAddress("met_cst_em_phi",&met_cst_em_phi);
+  // m_tree->SetBranchAddress("met_cst_jet",&met_cst_jet);
+  // m_tree->SetBranchAddress("met_cst_phi",&met_cst_phi);
+  // m_tree->SetBranchAddress("met_cst_em_jet",&met_cst_em_jet);
+  // m_tree->SetBranchAddress("met_cst_em_phi",&met_cst_em_phi);
   m_tree->SetBranchAddress("met_tst_et",&met_tst_et);
   m_tree->SetBranchAddress("met_tst_nolep_et",&met_tst_nolep_et);
   m_tree->SetBranchAddress("met_tst_phi",&met_tst_phi);
@@ -1896,24 +1885,24 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("ph_pt",           &ph_pt);
     m_tree->SetBranchAddress("ph_phi",          &ph_phi);
     m_tree->SetBranchAddress("ph_eta",          &ph_eta);
-    if(m_currentVariation=="Nominal" && m_isMC){
-      m_tree->SetBranchAddress("ph_ptcone20",      &ph_ptcone20);
-      m_tree->SetBranchAddress("ph_topoetcone40",  &ph_topoetcone40);
-      m_tree->SetBranchAddress("ph_truthOrigin",   &ph_truthOrigin);
+    // if(m_currentVariation=="Nominal" && m_isMC){
+      // m_tree->SetBranchAddress("ph_ptcone20",      &ph_ptcone20);
+      // m_tree->SetBranchAddress("ph_topoetcone40",  &ph_topoetcone40);
+      // m_tree->SetBranchAddress("ph_truthOrigin",   &ph_truthOrigin);
 
-      m_tree->SetBranchAddress("baseph_pt",           &baseph_pt);
-      m_tree->SetBranchAddress("baseph_phi",          &baseph_phi);
-      m_tree->SetBranchAddress("baseph_eta",          &baseph_eta);
-      m_tree->SetBranchAddress("baseph_ptcone20",     &baseph_ptcone20);
-      m_tree->SetBranchAddress("baseph_topoetcone40", &baseph_topoetcone40);
-      m_tree->SetBranchAddress("baseph_truthOrigin",  &baseph_truthOrigin);
-      m_tree->SetBranchAddress("baseph_isEM",         &baseph_isEM);
-      m_tree->SetBranchAddress("baseph_iso",          &baseph_iso);
+      // m_tree->SetBranchAddress("baseph_pt",           &baseph_pt);
+      // m_tree->SetBranchAddress("baseph_phi",          &baseph_phi);
+      // m_tree->SetBranchAddress("baseph_eta",          &baseph_eta);
+      // m_tree->SetBranchAddress("baseph_ptcone20",     &baseph_ptcone20);
+      // m_tree->SetBranchAddress("baseph_topoetcone40", &baseph_topoetcone40);
+      // m_tree->SetBranchAddress("baseph_truthOrigin",  &baseph_truthOrigin);
+      // m_tree->SetBranchAddress("baseph_isEM",         &baseph_isEM);
+      // m_tree->SetBranchAddress("baseph_iso",          &baseph_iso);
 
-      m_tree->SetBranchAddress("tau_pt",           &tau_pt);
-      m_tree->SetBranchAddress("tau_phi",          &tau_phi);
-      m_tree->SetBranchAddress("tau_eta",          &tau_eta);
-    }else{ tau_pt=0; tau_phi=0; tau_eta=0; }
+      // m_tree->SetBranchAddress("tau_pt",           &tau_pt);
+      // m_tree->SetBranchAddress("tau_phi",          &tau_phi);
+      // m_tree->SetBranchAddress("tau_eta",          &tau_eta);
+    // tau_pt=0; tau_phi=0; tau_eta=0;
 
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
     m_tree->SetBranchAddress("met_soft_tst_phi",       &met_soft_tst_phi);

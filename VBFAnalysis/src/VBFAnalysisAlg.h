@@ -201,10 +201,10 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Double_t met_tst_j2_dphi;
   Double_t met_tst_nolep_j1_dphi;
   Double_t met_tst_nolep_j2_dphi;
-  Double_t met_cst_jet;
-  Float_t met_cst_phi;
-  Float_t met_cst_em_jet;
-  Float_t met_cst_em_phi;
+  /* Double_t met_cst_jet; */
+  /* Float_t met_cst_phi; */
+  /* Float_t met_cst_em_jet; */
+  /* Float_t met_cst_em_phi; */
   Float_t met_tst_et;
   Float_t met_tst_nolep_et;
   Float_t met_tst_phi;
@@ -365,17 +365,17 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* ph_ptcone20;
   std::vector<Float_t>* ph_topoetcone40;
   std::vector<Int_t>*   ph_truthOrigin;
-  std::vector<Float_t>* baseph_pt;
-  std::vector<Float_t>* baseph_phi;
-  std::vector<Float_t>* baseph_eta;
-  std::vector<Float_t>* baseph_ptcone20;
-  std::vector<Float_t>* baseph_topoetcone40;
-  std::vector<Int_t>*   baseph_truthOrigin;
-  std::vector<unsigned>* baseph_isEM;
-  std::vector<bool>*    baseph_iso;
-  std::vector<Float_t>* tau_pt;
-  std::vector<Float_t>* tau_phi;
-  std::vector<Float_t>* tau_eta;
+  /* std::vector<Float_t>* baseph_pt; */
+  /* std::vector<Float_t>* baseph_phi; */
+  /* std::vector<Float_t>* baseph_eta; */
+  /* std::vector<Float_t>* baseph_ptcone20; */
+  /* std::vector<Float_t>* baseph_topoetcone40; */
+  /* std::vector<Int_t>*   baseph_truthOrigin; */
+  /* std::vector<unsigned>* baseph_isEM; */
+  /* std::vector<bool>*    baseph_iso; */
+  /* std::vector<Float_t>* tau_pt; */
+  /* std::vector<Float_t>* tau_phi; */
+  /* std::vector<Float_t>* tau_eta; */
 
   std::vector<Float_t>* mcEventWeights;
 

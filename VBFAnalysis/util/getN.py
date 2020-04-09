@@ -75,7 +75,7 @@ else:
 	#if not "physics_Main" in container:
 	#    continue
         for p,s in enumerate(samplesplit):
-            if s[0]=="v":
+            if s[0]=="Z":
                     dsid_string = samplesplit[p+1]
         #dsid_string='308276'
         print 'dsid: ',dsid_string

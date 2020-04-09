@@ -53,7 +53,8 @@ class sample(object):
         if syst == "":
             samplesplit = samplename.split(".")
             for p,s in enumerate(samplesplit):
-                if s[0]=="v":
+                #if s[0]=="v":
+                if s[0]=="Z":
                     self.runNumber = int(samplesplit[p+1])
                     self.runNumberS = samplesplit[p+1]
                     break
