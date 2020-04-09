@@ -88,7 +88,7 @@ def getNF(histDict, nbins, signalKeys=[], NFOnly=False):
         if hkey in signalKeys:
             sigV+=getBinsYield(histDict[hkey], nbins)
             sigE+=(getBinsError(histDict[hkey], nbins))**2
-        elif hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet"]:
+        elif hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet"]:
             bkgV+=getBinsYield(histDict[hkey], nbins)
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=(dataV-bkgV)
@@ -107,7 +107,7 @@ def getDataMC(histDict, nbins):
     for hkey,hist in histDict.iteritems():
         if hkey=="signal":
             continue
-        if hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet"]:
+        if hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet"]:
             bkgV+=getBinsYield(histDict[hkey], nbins)
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=dataV
@@ -147,11 +147,13 @@ class texTable(object):
                        'WCRenu':'W$\\rightarrow$e$\\nu$ CR',
                        'WCRmunu':'W$\\rightarrow\\mu\\nu$ CR',
                        'lowsigWCRen':'Fake-#it{e} CR',
+                       'fakeMu':'Fake-#it{#mu} CR',                       
                        'WCRlnu':'W$\\rightarrow\\ell\\nu$ CR',
                        'ZCRll':'Z$\\rightarrow\\ell\\ell$ CR',
                        }
         NameDict ={'ttbar':'Top$+$#it{VV}/#it{VVV}',
                        'eleFakes':'#it{e}-fakes',
+                       'muoFakes':'#it{#mu}-fakes',
                    'Z_EWK':'#it{Z} EWK',
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
@@ -348,12 +350,12 @@ class HistClass(object):
 
 
     def isSystDict(self):
-        for j in ["eleFakes", "multijet", "NONE", "Nom"]:
+        for j in ["eleFakes", "muoFakes", "multijet", "NONE", "Nom"]:
             if j in self.hname: return False
         return True
 
     def isBkg(self):
-        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet","VV","VVV","QCDw"]:
+        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","VV","VVV","QCDw"]:
             return True
         return False
 
@@ -405,7 +407,10 @@ class HistClass(object):
     def getNumberOfBins(cls):
         nbins=0
         LOK=None
-        for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet","data"]:
+        mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet","data"]
+        if options.fakeMu:
+            mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","data"]
+        for p in mysamples:
             LOK=[k.GetName() for k in cls.Irfile.GetListOfKeys() if p in k.GetName()]
             if len(LOK)==0:
                 continue
@@ -434,6 +439,13 @@ class HistClass(object):
                     cls.regDict["oneEleCR{}".format(n)]=cls.nBins+n
                     cls.regDict["twoLepCR{}".format(n)]=cls.nBins*3+n
                     cls.regDict["oneEleLowSigCR{}".format(n)]=n
+                    if options.fakeMu:
+                        cls.regDict["SR{}".format(n)]=cls.nBins*5+n
+                        cls.regDict["oneMuCR{}".format(n)]=cls.nBins*3+n
+                        cls.regDict["oneEleCR{}".format(n)]=cls.nBins*2+n
+                        cls.regDict["twoLepCR{}".format(n)]=cls.nBins*4+n
+                        cls.regDict["oneEleLowSigCR{}".format(n)]=cls.nBins+n
+                        cls.regDict["oneMuMTCR{}".format(n)]=n                        
                 else:
                     cls.regDict["SR{}".format(n)]=cls.nBins*8+n
                     cls.regDict["oneMuNegCR{}".format(n)]=cls.nBins*4+n
@@ -452,6 +464,8 @@ class HistClass(object):
                 cls.regionBins["WCRenu"]=[cls.regDict[k] for k in cls.regDict if "oneEleCR" in k]
                 cls.regionBins["WCRmunu"]=[cls.regDict[k] for k in cls.regDict if "oneMuCR" in k]
                 cls.regionBins["lowsigWCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleLowSigCR" in k]
+                if options.fakeMu:
+                    cls.regionBins["fakeMu"]=[cls.regDict[k] for k in cls.regDict if "oneMuMTCR" in k]
                 #cls.regionBins["WCRlnu"]=cls.regionBins["WCRenu"]+cls.regionBins["WCRmunu"]
                 #cls.regionBins["lowsigWCRenu"]=cls.regionBins["lowsigWCRen"]
             else:
@@ -516,6 +530,7 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
     #leg.SetNColumns  (2)
     NameDict ={'ttbar':'Other',#'Top+#it{VV}/#it{VVV}',
                    'eleFakes':'#it{e}-fakes',
+                   'muoFakes':'#it{#mu}-fakes',                   
                    'Z_EWK':'#it{Z} EWK',
                    'EWK W':'#it{W} EWK',
                    'W_EWK':'#it{W} EWK',
@@ -536,7 +551,9 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
     for i in leg.GetListOfPrimitives():
         
         if i.GetLabel().strip() in NameDict and  NameDict[i.GetLabel().strip()] in listInputs:
+            removeLabel(leg, i.GetLabel())
             continue
+            #print 'lab: ',i.GetLabel()
         else:
             if i.GetLabel().strip() in NameDict:
                 listInputs+=[NameDict[i.GetLabel().strip()]]
@@ -549,13 +566,16 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
             i.GetObject().SetMarkerSize(0)
             i.GetObject().SetLineWidth(0)
             i.GetObject().SetMarkerColor(0)
-        
-    removeLabel(leg, 'dummy')
-    removeLabel(leg, 'Others')
-    removeLabel(leg, 'multijet')
-    removeLabel(leg, 'W_EWK')
-    removeLabel(leg, 'eleFakes')    
+
+    if not options.fakeMu:
+        removeLabel(leg, 'dummy')
+        removeLabel(leg, 'Others')
+        removeLabel(leg, 'multijet')
+        removeLabel(leg, 'W_EWK')
+        removeLabel(leg, 'eleFakes')
+
     for i in leg.GetListOfPrimitives():
+        print 'leg: ',i.GetLabel(),i.GetObject()
         legOrder+=[[i.GetLabel(),i.GetObject()]]
         
     for en in legOrder:
@@ -746,7 +766,7 @@ def getNumberOfBins(rfileInput):
     tmpIrfile=ROOT.TFile(rfileInput)
     nbins=0
     LOK=None
-    for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet","data"]:
+    for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","data"]:
         LOK=[k.GetName() for k in tmpIrfile.GetListOfKeys() if p in k.GetName()]
         if len(LOK)==0:
             continue
@@ -772,6 +792,8 @@ def main(options):
     byNum=9
     if options.combinePlusMinus:
         byNum=5
+        if options.fakeMu:
+            byNum=6
     if options.ratio:
         can.Divide(1,2)
         can.cd(1)
@@ -806,6 +828,8 @@ def main(options):
     else:
         histNamesSig+=["signal"]#,"VBFH125","ggFH125","VH125"]
     histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
+    if options.fakeMu:
+        histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes","muoFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"    
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
@@ -816,6 +840,13 @@ def main(options):
             regDict["oneEleCR{}".format(n)]=nbins+n
             regDict["twoLepCR{}".format(n)]=nbins*3+n
             regDict["oneEleLowSigCR{}".format(n)]=n
+            if options.fakeMu:
+                regDict["SR{}".format(n)]=nbins*5+n
+                regDict["oneMuCR{}".format(n)]=nbins*3+n
+                regDict["oneEleCR{}".format(n)]=nbins*2+n
+                regDict["twoLepCR{}".format(n)]=nbins*4+n
+                regDict["oneEleLowSigCR{}".format(n)]=nbins+n
+                regDict["oneMuMTCR{}".format(n)]=n                
         else:
             #if not options.cronly:
             regDict["SR{}".format(n)]=nbins*8+n
@@ -839,6 +870,9 @@ def main(options):
         regionBins["WCRmunu"]=[regDict[k] for k in regDict if "oneMuCR" in k]
         regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]        
         regionBins["lowsigWCRen"]=[regDict[k] for k in regDict if "oneEleLowSigCR" in k]
+        if options.fakeMu:
+            byNum=6
+            regionBins["fakeMu"]=[regDict[k] for k in regDict if "oneMuMTCR" in k]
         #regionBins["lowsigWCRenu"]=regionBins["lowsigWCRen"]
     else:
         regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
@@ -905,6 +939,8 @@ def main(options):
     Style.setStyles(hDict["W_EWK"],Style.styleDict["W_EWK"])
     Style.setStyles(hDict["ttbar"],Style.styleDict["ttbar"])
     Style.setStyles(hDict["eleFakes"],Style.styleDict["eleFakes"])
+    if options.fakeMu:
+        Style.setStyles(hDict["muoFakes"],Style.styleDict["muoFakes"])    
     Style.setStyles(hDict["multijet"],Style.styleDict["multijet"])
     if "Others" in hDict:
         Style.setStyles(hDict["Others"],[1,1,1,2,1001,0,0,0])
@@ -1034,6 +1070,8 @@ def main(options):
                 
     #defining bkg hist
     bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","ttbar","multijet"] #+["Others"]
+    if options.fakeMu:
+        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","muoFakes","ttbar","multijet"] #+["Others"]
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
     hDict["bkgs"]=bkgs
     hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
@@ -1068,7 +1106,10 @@ def main(options):
     # print the stat uncertainties:
     if options.show_mc_stat_err:
         if options.combinePlusMinus:
-            regionsList=[
+            regionsList=[]
+            if options.fakeMu:
+                regionsList=['gamma_stat_oneMuMTCRX_obs_cuts_bin_0',]
+            regionsList+=[
             'gamma_stat_oneEleLowSigCRX_obs_cuts_bin_0',
             'gamma_stat_oneEleCRX_obs_cuts_bin_0',
             'gamma_stat_oneMuCRX_obs_cuts_bin_0',
@@ -1167,7 +1208,7 @@ def main(options):
                 elif 'twoMuCR' in k:
                     continue
                 elif 'twoEleCR' in k:
-                    continue   
+                    continue
             if "theoFactors" in k or "NONEBlind" in k: continue
             tmpHist=HistClass(k)
 
@@ -1399,6 +1440,7 @@ def main(options):
     nameMap={#'FakeE':'#it{W}_{#it{e#nu}}^{low} CR',#Fake-#it{e} CR
               #   'Wenu':'#it{W}_{#it{e#nu}}^{high} CR',##it{W}#rightarrow#it{e#nu} CR
               'FakeE':'Fake-#it{e} CR',#Fake-#it{e} CR
+              'FakeM':'Fake-#it{#mu} CR',#Fake-#it{e} CR
                  'Wenu':'#it{W}_{#it{e#nu}} CR',##it{W}#rightarrow#it{e#nu} CR
                  'Wmunu':'#it{W}_{#it{#mu#nu}} CR', ##it{W}#rightarrow#it{#mu#nu}
                  'Zll':'#it{Z}_{#it{ll}} CR',##it{Z}#rightarrow#it{ll}
@@ -1705,6 +1747,17 @@ def plotVar(options):
             plotIndex=1
         if reg=='oneEleLowSigCR':
             plotIndex=2
+        if options.fakeMu:
+            if reg=='twoLepCR':
+                plotIndex=5
+            if reg=='oneMuCR':
+                plotIndex=3
+            if reg=='oneMuMTCR':
+                plotIndex=1
+            if reg=='oneEleCR':
+                plotIndex=2
+            if reg=='oneEleLowSigCR':
+                plotIndex=3
     rfile=ROOT.TFile(options.input)
     AltDphi=True
     postFitPickles=None
@@ -1862,6 +1915,8 @@ def plotVar(options):
                     key='multijet'
                 elif 'eleFakes' in key:
                     key='eleFakes'
+                elif 'muoFakes' in key:
+                    key='muoFakes'
                 else:
                     key="ttbar"
             try:
@@ -1877,6 +1932,8 @@ def plotVar(options):
             bkg.Add(bkgDict['multijet'])
         if 'eleFakes' in bkgDict:
             bkg.Add(bkgDict['eleFakes'])
+        if 'muoFakes' in bkgDict:
+            bkg.Add(bkgDict['muoFakes'])            
         if 'ttbar' in bkgDict:
             bkg.Add(bkgDict['ttbar'])
         for h in sorted(bkgDict.values()): #TODO this sorting does not work. implement lambda
@@ -1888,6 +1945,9 @@ def plotVar(options):
                     continue
             if 'eleFakes' in bkgDict:
                 if h==bkgDict['eleFakes']:
+                    continue
+            if 'muoFakes' in bkgDict:
+                if h==bkgDict['muoFakes']:
                     continue
             if 'W_EWK' in bkgDict:
                 if h==bkgDict['W_EWK']:
@@ -2213,7 +2273,8 @@ if __name__=='__main__':
     p.add_option('-d', '--data', action='store_true', help='Draw data')
     p.add_option('--unBlindSR', action='store_true', help='Unblinds the SR bins')
     p.add_option('--preliminary', action='store_true', help='Labels with preliminary')
-    p.add_option('--scaleSig', action='store_true', help='scale the signal to the post fit values')    
+    p.add_option('--scaleSig', action='store_true', help='scale the signal to the post fit values')
+    p.add_option('--fakeMu', action='store_true', help='Add Fake muon CR')        
     p.add_option('--stack-signal', action='store_true', help='Stack the signal')
     p.add_option('--cronly', action='store_true', help='Shows the CR only')    
     p.add_option('--debug', action='store_true', help='Print in debug mode')
