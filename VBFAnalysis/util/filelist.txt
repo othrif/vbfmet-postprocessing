@@ -1,0 +1,9 @@
+/gpfs/slac/atlas/fs1/d/ssevova/dark-photon-atlas/ntuples/v00/user.ssevova.ZHdarkPhoton_v00.364242.Sherpa_222_NNPDF30NNLO_WWW_3l3v_EW6.e5887_s3126_r9364_p3870_MiniNtuple.root
+/gpfs/slac/atlas/fs1/d/ssevova/dark-photon-atlas/ntuples/v00/user.ssevova.ZHdarkPhoton_v00.364243.Sherpa_222_NNPDF30NNLO_WWZ_4l2v_EW6.e5887_s3126_r9364_p3872_MiniNtuple.root
+/gpfs/slac/atlas/fs1/d/ssevova/dark-photon-atlas/ntuples/v00/user.ssevova.ZHdarkPhoton_v00.364244.Sherpa_222_NNPDF30NNLO_WWZ_2l4v_EW6.e5887_s3126_r9364_p3870_MiniNtuple.root
+/gpfs/slac/atlas/fs1/d/ssevova/dark-photon-atlas/ntuples/v00/user.ssevova.ZHdarkPhoton_v00.364245.Sherpa_222_NNPDF30NNLO_WZZ_5l1v_EW6.e5887_s3126_r9364_p3872_MiniNtuple.root
+/gpfs/slac/atlas/fs1/d/ssevova/dark-photon-atlas/ntuples/v00/user.ssevova.ZHdarkPhoton_v00.364246.Sherpa_222_NNPDF30NNLO_WZZ_3l3v_EW6.e5887_s3126_r9364_p3870_MiniNtuple.root
+/gpfs/slac/atlas/fs1/d/ssevova/dark-photon-atlas/ntuples/v00/user.ssevova.ZHdarkPhoton_v00.364247.Sherpa_222_NNPDF30NNLO_ZZZ_6l0v_EW6.e5887_s3126_r9364_p3872_MiniNtuple.root
+/gpfs/slac/atlas/fs1/d/ssevova/dark-photon-atlas/ntuples/v00/user.ssevova.ZHdarkPhoton_v00.364248.Sherpa_222_NNPDF30NNLO_ZZZ_4l2v_EW6.e5887_s3126_r9364_p3872_MiniNtuple.root
+/gpfs/slac/atlas/fs1/d/ssevova/dark-photon-atlas/ntuples/v00/user.ssevova.ZHdarkPhoton_v00.364285.Sherpa_222_NNPDF30NNLO_llvvjj_EW6.e6055_s3126_r9364_p3870_MiniNtuple.root
+/gpfs/slac/atlas/fs1/d/ssevova/dark-photon-atlas/ntuples/v00/user.ssevova.ZHdarkPhoton_v00.364507.Sherpa_222_NNPDF30NNLO_mumugamma_pty_35_70.e5928_s3126_r9364_p3872_MiniNtuple.root

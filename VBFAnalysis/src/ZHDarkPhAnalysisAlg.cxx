@@ -775,7 +775,7 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   float METCut = 50.0e3;
   
   if(m_LooseSkim && m_currentVariation=="Nominal"){
-    METCut = 100.0e3;
+    METCut = 50.0e3;
   }
 
   if (!((passGRL == 1) 
@@ -784,17 +784,14 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
 	& (passJetCleanLoose == 1))) 
     return StatusCode::SUCCESS;
 
-  bool GammaMETSR = (n_ph>0);
+
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
-  if (!(n_ph < 1) && !(m_LooseSkim)) return StatusCode::SUCCESS;
-  ATH_MSG_DEBUG ("n_photon > 0");
+  bool OneOrMorePhoton = (n_ph>0);
+  if (!(OneOrMorePhoton) && !(m_LooseSkim)) return StatusCode::SUCCESS;
+  ATH_MSG_DEBUG ("Pass n_photon > 0");
 
   if (!(unsigned(n_ph) == ph_pt->size())) ATH_MSG_WARNING("n_ph != ph_pt->size()! n_ph: " <<n_ph << " ph_pt->size(): " << ph_pt->size());
   if (!(unsigned(n_ph) == ph_eta->size())) ATH_MSG_WARNING("n_ph != ph_eta->size()! n_ph: " <<n_ph << " ph_eta->size(): " << ph_eta->size());
-
-  // skim on the photon events (redundant for now)
-  if(m_PhotonSkim && !GammaMETSR) return StatusCode::SUCCESS;
-  ATH_MSG_DEBUG ("Pass ZH cuts!");
 
   bool TwoElec = (n_el == 2); // n_el should be a subset of baseel
   bool TwoMuon = (n_mu == 2); // n_mu should be a subset of basemu
@@ -802,38 +799,31 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   bool OneMuon = (n_mu == 1);
   bool VetoLooseElec = (n_baseel == 0);
   bool VetoLooseMuon = (n_basemu == 0);
-  bool passMETCut      = (met_tst_et > METCut);
   bool passMETNoLepCut = (met_tst_nolep_et > METCut);
   bool passLepTrig = trigger_lep > 0;
   bool passMaxNjet = n_jet <= 2;
   
-  if(!m_LooseSkim){
-    if ((passLepTrig) && 
-	(passMETNoLepCut) && 
-	(passMaxNjet) &&
-	(TwoMuon) &&
-	(VetoLooseElec)) SRmm = true;
-
-    if ((passLepTrig) && 
-	(passMETNoLepCut) && 
-	(passMaxNjet) &&
-	(TwoElec) &&
-	(VetoLooseMuon)) SRee = true;
-    
-    if ((passLepTrig) && 
-	(passMETNoLepCut) && 
-	(passMaxNjet) &&
-	(OneElec) &&
-	(OneMuon))       SRem = true;
-    
-  }else{
-    passMETCut = (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut); 
+  if(m_LooseSkim){
     passMETNoLepCut = (met_tst_nolep_et > METCut || met_tenacious_tst_nolep_et > METCut || met_tight_tst_nolep_et > METCut);
-
+    passMaxNjet = n_jet <=3;
     // saving the base leptons for the fake lepton estimate. This is done in the loose skimming
-    OneElec = (n_el == 1 || n_baseel==1); // n_el should be a subset of baseel ... will need to modify for the systematics in v27Loose
-    OneMuon = (n_mu == 1 || n_basemu==1);// n_mu should be a subset of basemu
+    TwoElec = (n_el == 2 || n_baseel==2); // n_el should be a subset of baseel 
+    TwoMuon = (n_mu == 2 || n_basemu==2);// n_mu should be a subset of basemu
+    VetoLooseElec = true;
+    VetoLooseMuon = true;
   }
+  bool passPresel=false;
+
+  if ((passLepTrig) && (passMETNoLepCut) && (passMaxNjet)) passPresel = true;
+  if (!passPresel) return StatusCode::SUCCESS;
+  ATH_MSG_DEBUG ("Pass lep trig, MET > " << METCut << ", n_jets <= 2");
+  
+  if (passPresel){
+    if      (TwoMuon && VetoLooseElec && (mu_charge->at(0)*mu_charge->at(1) < 0)) SRmm = true;
+    else if (TwoElec && VetoLooseMuon && (el_charge->at(0)*el_charge->at(1) < 0)) SRee = true;
+    else if (OneElec && OneMuon)       SRem = true;
+  } 
+
   // protect the systematic variations from crashing
   if(n_baseel==1 && n_el==0 && baseel_charge->size()==0) baseel_charge->push_back(-999);
   if(n_basemu==1 && n_mu==0 && basemu_charge->size()==0) basemu_charge->push_back(-999);
@@ -995,7 +985,7 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   // ---------------------------------------------
   // Only save events that pass any of the regions
   // ---------------------------------------------
-  if (!(SRee || SRmm || SRem || GammaMETSR)) return StatusCode::SUCCESS;
+  if (!(SRee || SRmm || SRem)) return StatusCode::SUCCESS;
   
   double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
   computeMETj(met_tenacious_tst_phi, jet_phi, m_met_tenacious_tst_j1_dphi,m_met_tenacious_tst_j2_dphi);
