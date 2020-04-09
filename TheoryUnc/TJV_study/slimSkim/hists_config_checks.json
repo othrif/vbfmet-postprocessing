@@ -1,0 +1,56 @@
+{
+    "cuts": [
+     {"cut": "n_el==2 && (n_mu==0 && n_nu==0)", "name": "Zee"},
+     {"cut": "n_mu==2 && (n_el==0 && n_nu==0)", "name": "Zmumu"},
+     {"cut": "n_nu==2 && (n_el==0 && n_mu==0)", "name": "Znunu"},
+ ],
+    "draw": [
+        {
+            "draw": "jj_mass*1e-3",
+            "edges": [200,400,600,800,1000,1500,2000,3500,5000],
+            "name": "jj_mass"
+        },
+                {
+            "draw": "el_pt*1e-3",
+            "max": 600.0,
+            "min": 0.0,
+            "name": "el_pt",
+            "nbins": 24
+        },
+        {
+            "draw": "mu_pt*1e-3",
+            "max": 600.0,
+            "min": 0.0,
+            "name": "mu_pt",
+            "nbins": 24
+        },
+        {
+            "draw": "nu_pt*1e-3",
+            "max": 600.0,
+            "min": 0.0,
+            "name": "nu_pt",
+            "nbins": 24
+        },
+        {
+            "draw": "el_eta",
+            "max": 2.5,
+            "min": -2.5,
+            "name": "el_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "mu_eta",
+            "max": 2.5,
+            "min": -2.5,
+            "name": "mu_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "nu_eta",
+            "max": 2.5,
+            "min": -2.5,
+            "name": "nu_eta",
+            "nbins": 25
+        }
+    ]
+}
