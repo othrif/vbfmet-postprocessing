@@ -1,6 +1,8 @@
 
 #include "GaudiKernel/LoadFactoryEntries.h"
+
 LOAD_FACTORY_ENTRIES(VBFAnalysis)
+LOAD_FACTORY_ENTRIES(ZHDarkPhAnalysis)
 LOAD_FACTORY_ENTRIES(HFInput)
 LOAD_FACTORY_ENTRIES(VBFTruth)
 LOAD_FACTORY_ENTRIES(SignalSystHelper)
