@@ -1,0 +1,84 @@
+{
+    "cuts": [
+     {"cut": "w*( n_jet>=2  && 200e3<jj_mass && jj_mass<800e3)", "name": "Mjj1"},
+     {"cut": "w*( n_jet>=2  && 800e3<jj_mass && jj_mass<1000e3)", "name": "Mjj2"},
+     {"cut": "w*( n_jet>=2  && 1000e3<jj_mass && jj_mass<1500e3)", "name": "Mjj3"},
+     {"cut": "w*( n_jet>=2  && 1500e3<jj_mass && jj_mass<2000e3)", "name": "Mjj4"},
+     {"cut": "w*( n_jet>=2  && 2000e3<jj_mass)", "name": "Mjj5"}
+ ],
+    "draw": [
+        {
+            "draw": "jj_mass*1e-3",
+            "edges": [200,400,600,800,1000,1200,1500,2000,2750,3500,5000],
+            "name": "jj_mass_new"
+        },
+        {
+            "draw": "jj_mass*1e-3",
+            "edges": [1000,1500,2000,3000],
+            "name": "jj_mass_old"
+        },
+        {
+            "draw": "jet_pt[2]*1e-3",
+            "max": 300,
+            "min": 0,
+            "name": "j3_pt",
+            "nbins": 60
+        },
+        {
+            "draw": "el_pt*1e-3",
+            "max": 600.0,
+            "min": 0.0,
+            "name": "el_pt",
+            "nbins": 24
+        },
+        {
+            "draw": "mu_pt*1e-3",
+            "max": 600.0,
+            "min": 0.0,
+            "name": "mu_pt",
+            "nbins": 24
+        },
+        {
+            "draw": "nu_pt*1e-3",
+            "max": 600.0,
+            "min": 0.0,
+            "name": "nu_pt",
+            "nbins": 24
+        },
+        {
+            "draw": "el_eta",
+            "max": 2.5,
+            "min": -2.5,
+            "name": "el_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "mu_eta",
+            "max": 2.5,
+            "min": -2.5,
+            "name": "mu_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "nu_eta",
+            "max": 2.5,
+            "min": -2.5,
+            "name": "nu_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "met_et*1e-3",
+            "max": 600.0,
+            "min": 0.0,
+            "name": "met_et",
+            "nbins": 24
+        },
+        {
+            "draw": "met_nolep_et*1e-3",
+            "max": 600.0,
+            "min": 0.0,
+            "name": "met_nolep_et",
+            "nbins": 24
+        }
+    ]
+}
