@@ -22,7 +22,7 @@ class sample(object):
                           'Z_strongExt':['Z_strongExt'],
                           'Z_strongPTVExt':['Z_strongPTVExt'],
                           'Z_strongmVBFFilt':['Z_strongmVBFFilt'],
-                          'VV_VVV':['VV','VVV'],
+                          'VV_VVV':['VV','VVV','VV_ewk','gg_ZZ','gg_WW','WW_PhPy8','ZZ_llvv'],
                           'Zg_strong':['Zg_strong'],
                           'Wg_strong':['Wg_strong'],
                           'Wg_EWK':['Wg_EWK'],
@@ -78,7 +78,7 @@ class sample(object):
             else:
                 self.isMC = True
         if (self.isMC):
-            print "runNumebr::: ",self.runNumber
+            print "runNumber::: ",self.runNumber
             if (self.runNumber >= 308096 and self.runNumber <= 308098):
                 self.sampleType = "W_EWK"
             elif (self.runNumber >= 364500 and self.runNumber <= 364519) or (self.runNumber>=345775 and self.runNumber<=345784) or (self.runNumber>=364550 and self.runNumber<=364584):
@@ -158,9 +158,9 @@ class sample(object):
             elif (self.runNumber >= 426001 and self.runNumber <= 426009):
                 self.sampleType = "QCDunw"
             elif (self.runNumber >= 364250 and self.runNumber <= 364255) or (self.runNumber >= 363355 and self.runNumber <= 363360) or self.runNumber==363489 or self.runNumber==363494:
-                self.sampleType = "ttbar" # VV moved to ttbar+other
+                self.sampleType = "VV" 
             elif ((self.runNumber >= 364242 and self.runNumber <= 364249) or self.runNumber==364253):
-                self.sampleType = "ttbar" # VVV moved to ttbar+other
+                self.sampleType = "VVV" 
             elif ((self.runNumber >= 346190 and self.runNumber <= 346193) or self.runNumber==345948):
                 self.sampleType = "ttbar" # VBF H->WW,tautau moved to ttbar+other
             elif (self.runNumber == 410658 or self.runNumber == 410659):
@@ -189,6 +189,18 @@ class sample(object):
                 self.sampleType = "Z_strongPTVExt" #other?
             elif (self.runNumber >= 363147 and self.runNumber <= 363170) or (self.runNumber >= 363123 and self.runNumber <= 363146) or (self.runNumber>=361510 and self.runNumber<=361519):
                 self.sampleType = "Z_strong" #madgraph
+            elif(self.runNumber == 364284 or self.runNumber==364285):
+                self.sampleType = "VV_ewk" #364284 includes VVV where where one bosons decays to V->jj, also VH and VBFH; 364285 excludes ssWWjj
+            elif(self.runNumber == 345718):
+                self.sampleType = "gg_WW" #gg->WW sherpa
+            elif(self.runNumber == 345723):
+                self.sampleType = "gg_ZZ" #gg->ZZ sherpa
+            elif(self.runNumber == 361600):
+                self.sampleType = "WW_PhPy8" #PhPy8 WW 0j @NLO
+            elif(self.runNumber == 345666): 
+                self.sampleType = "ZZ_llvv" #Special sample, should not be combined with 364254. 
+
+            
             else:
                 print "python/sample.py: runNumber "+str(self.runNumber)+" could not be identified as a valid MC :o"
                 self.sampleType = "ERROR"
@@ -212,7 +224,7 @@ class sample(object):
   # we assume the samplename has the format user.**.v**.runNumber.
   #
   # Signal:  VBF: 308276,308567, ggF: 308284, VH: 308071,308072
-  # Diboson: W: 363359-363360, 363489, Z: 363355-363358
+  # Diboson: W: 363359-363360, 363489, Z: 363355-363358 WZ: 364284,364285
   # Wenu:    strong 364170-364183, EWK 308096
   # Wmunu:   strong 364156-364169, EWK 308097
   # Wtaunu:  strong 364184-364197, EWK 308098

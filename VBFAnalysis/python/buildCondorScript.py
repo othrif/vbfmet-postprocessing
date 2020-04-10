@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 
-def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="VBFAnalysisCondorSub", proxyName='/home/schae/testarea/HInv/run/x509up_u20186', slc7=False):
+def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="VBFAnalysisCondorSub", proxyName='/afs/cern.ch/work/s/ssevova/public/dark-photon-atlas/x509up_u39129', slc7=False):
     os.system('''echo "#!/bin/bash" > '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system("echo 'export HOME=$(pwd)' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase' >> "+subDir+"/"+scriptName+syst+".sh")
@@ -9,7 +9,7 @@ def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="VBFAnalysis
     os.system("echo 'setupATLAS' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'lsetup rucio'  >> "+subDir+"/"+scriptName+syst+".sh")
-    os.system("echo 'asetup AthAnalysis,21.2.83,here' >> "+subDir+"/"+scriptName+syst+".sh")
+    os.system("echo 'asetup AthAnalysis,21.2.101,here' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'voms-proxy-info'  >> "+subDir+"/"+scriptName+syst+".sh")
     #os.system("echo 'cd "+buildDir+"; acmSetup; cd -;' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
@@ -32,7 +32,7 @@ def writeCondorSub(workDir, syst="Nominal", scriptName="VBFAnalysisCondorSub", f
     os.system("echo 'error                   = "+workDir+"/error$(ClusterId).$(ProcId)' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'log                     = "+workDir+"/log$(ClusterId)' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'max_retries = 5' >> "+workDir+"/submit_this_python"+syst+".sh")
-    os.system('''echo "+JobFlavour = 'tomorrow'" >> '''+workDir+'''/submit_this_python'''+syst+'''.sh''')
+    os.system('''echo "+JobFlavour = 'microcentury'" >> '''+workDir+'''/submit_this_python'''+syst+'''.sh''')
     os.system("echo '' >> "+workDir+"/submit_this_python"+syst+".sh")
     if syst == "Nominal":
         os.system("echo 'queue arguments from '"+fileForArguments+" >> "+workDir+"/submit_this_python"+syst+".sh")

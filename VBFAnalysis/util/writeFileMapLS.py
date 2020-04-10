@@ -2,7 +2,7 @@ import ROOT
 import subprocess
 import pickle
 
-l = open('filelist.txt','r')
+l = open('filelist_mc16a_v00_CERN.txt','r')
 
 #for i in `cat /tmp/files.txt`; do rucio list-file-replicas --pfns --protocol root --rse MWT2_UC_LOCALGROUPDISK  $i/ ; done &> /tmp/all.txt
 myMap = {}
