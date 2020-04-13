@@ -374,10 +374,10 @@ def getLabelSortKey(sample):
     elif sample == 'zz': return 4
     elif sample == 'smww': return 1 # was 3
     elif sample == 'top1': return 4
+    elif sample == 'top': return 6
     elif sample == 'tall': return 20
     elif sample == 'mqcd': return 5
     elif sample == 'dqcd': return 5
-    elif sample == 'vvv': return 6
     elif sample == 'zldy': return 7
     elif sample == 'zjet': return 18
     elif sample == 'qflip': return 3
@@ -391,17 +391,17 @@ def getLabelSortKey(sample):
     elif sample == 'dqcd': return 18
     elif sample == 'wjdte': return 16
     elif sample == 'wjdtm': return 17
-    elif sample == 'zqcd': return -8
+    elif sample == 'zqcd': return 7
     elif sample == 'zqcdMad': return 8
     elif sample == 'hggf': return 9
     elif sample == 'hvbf': return 10
     #elif sample == 'data': return 11
     elif sample == 'bkgs': return 12
-    elif sample == 'zewk': return -7
+    elif sample == 'zewk': return 4
     elif sample == 'ttg': return 13
     elif sample == 'zgamewk': return 15        
     elif sample == 'wgamewk': return 15
-    elif sample == 'zgam': return 13
+    elif sample == 'zgam': return 8
     elif sample == 'wgam': return 13        
     elif sample == 'pho': return 13
     elif sample == 'wqcd': return -10
@@ -409,10 +409,10 @@ def getLabelSortKey(sample):
     elif sample == 'wewk': return -9
     elif sample == 'wdpi': return 16
     elif sample == 'wgas': return 17
-    elif sample == 'vvv': return 6
-    elif sample == 'vv': return 6
-    elif sample == 'vvjj': return 5
-    elif sample == 'ggvv': return 5
+    elif sample == 'vvv': return 2
+    elif sample == 'vv': return 5
+    elif sample == 'vvjj': return 3
+    elif sample == 'ggvv': return 1
     elif sample == 'ttv': return 7
     elif sample == 'higgs': return 20
     elif sample == 'jpsi': return 21
@@ -425,22 +425,23 @@ def getLabelSortKey(sample):
 def getSampleSortKey(sample):
 
     if   sample == 'smww': return 1
-    elif sample == 'zqcd': return 8
+    elif sample == 'zqcd': return 7
     elif sample == 'zqcdMad': return -8
     elif sample == 'tth': return -4.5
-    elif sample == 'zewk': return 7        
+    elif sample == 'zewk': return 4        
     elif sample == 'wqcd': return 10
     elif sample == 'wqcdMad': return -2
     elif sample == 'wewk': return 9
     elif sample == 'top2': return 4
     elif sample == 'top1': return 5
+    elif sample == 'top': return 6
     elif sample == 'tall': return -5
     elif sample == 'mqcd': return 5
     elif sample == 'dqcd': return -5
-    elif sample == 'vvv': return 6
-    elif sample == 'vv': return 6
-    elif sample == 'vvjj': return 5
-    elif sample == 'ggvv': return 5
+    elif sample == 'vvv': return 2
+    elif sample == 'vv': return 5
+    elif sample == 'vvjj': return 3
+    elif sample == 'ggvv': return 1
     elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
     elif sample == 'hggf': return 8
@@ -448,7 +449,7 @@ def getSampleSortKey(sample):
     elif sample == 'data': return -10
     elif sample == 'bkgs': return 11
     elif sample == 'ttg': return 13        
-    elif sample == 'zgam': return 13        
+    elif sample == 'zgam': return 8        
     elif sample == 'wgam': return 13
     elif sample == 'zgamewk': return 15
     elif sample == 'wgamewk': return 15
@@ -478,6 +479,7 @@ def getSampleLabel(sample):
         'wqcd': '#it{W} strong',
         'wqcdMad': '#it{W} strong',
         'wewk': '#it{W} EWK',
+        'top': 't#bar{t}/Single Top',
         'top1': 'Single Top',
         'top2': 'Top', #'t#bar{t}',
         'tall': 'Other',#'Top+#it{VV}/#it{VVV}',
@@ -559,6 +561,7 @@ def getStyle(sample):
     color_tall = ROOT.kBlue-6
     color_wdpi = ROOT.kMagenta-10
     color_top1 = ROOT.kYellow +2
+    color_top = ROOT.kYellow +2
     color_top2 = ROOT.kYellow +1
     color_wzzz = ROOT.kMagenta-3
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
@@ -591,6 +594,7 @@ def getStyle(sample):
         'wqcd':{'color':color_wqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'wqcdMad':{'color':color_wqcd, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'wewk':{'color':color_wewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'top':{'color':color_top, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top1':{'color':color_top1, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'top2':{'color':color_top2, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'mqcd':{'color':color_wdpi, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
@@ -2600,7 +2604,7 @@ def main():
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
             #bkgs = ['ttg', 'zgam','wgam','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','vvv','vv','ggvv','vvjj'] #,'mqcd','zldy','vvv'
-            bkgs = ['zgam','zewk', 'zqcd','vvv','vv','ggvv','vvjj'] #,'mqcd','zldy','vvv'
+            bkgs = ['zgam','zewk', 'zqcd','vvv','vv','ggvv','vvjj','top'] #,'mqcd','zldy','vvv'
     if options.add_fakeE:
         bkgs+=['tth']
     if options.stack_signal:
