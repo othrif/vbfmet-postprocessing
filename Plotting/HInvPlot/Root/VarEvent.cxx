@@ -139,7 +139,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case truth_j1_pt:	          return "truth_j1_pt";
     case truth_j2_pt:	          return "truth_j2_pt";
     case SherpaVTruthPt:	  return "SherpaVTruthPt";
-    case truthJet1Pt:	          return "truthJet1Pt";
+    case truthJet1Pt:	  return "truthJet1Pt";
     case nTruthJetMatch:	  return "nTruthJetMatch";
     case jetPt3:	          return "jetPt3";
     case maxCentrality:	          return "maxCentrality";

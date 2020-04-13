@@ -1,6 +1,6 @@
 from AthenaCommon.AppMgr import ServiceMgr
 ServiceMgr.MessageSvc.defaultLimit = 9999999  # all messages
-ServiceMgr.MessageSvc.OutputLevel = DEBUG
+ServiceMgr.MessageSvc.OutputLevel = INFO
 
 #---- Import job config for customized command line inputs ----
 from VBFAnalysis.job_configuration import JobConfigurationBase

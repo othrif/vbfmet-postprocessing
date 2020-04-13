@@ -77,6 +77,9 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kpho:   return "pho";
     case kphoAlt:   return "phoAlt";
     case kvvv:   return "vvv";
+    case kvv:    return "vv";
+    case kvvjj:  return "vvjj";
+    case kggvv:  return "ggvv";
     case kJPsi:  return "jpsi";
     case kUpsl:  return "upsl";
     case kZqcdPow:  return "zqcdPow";
@@ -158,6 +161,9 @@ std::string Msl::Mva::Convert2Std(Sample s)
     case kpho:  return "pho";
     case kphoAlt:  return "phoAlt";
     case kvvv:  return "vvv";
+    case kvv:   return "vv";
+    case kvvjj:   return "vvjj";
+    case kggvv:   return "ggvv";
     case kJPsi: return "jpsi";
     case kUpsl: return "upsl";
     case kZqcdPow: return "zqcdPow";
@@ -216,6 +222,9 @@ std::string Msl::Mva::Convert2Tex(const SampleSet &s)
   if(s.GetName() == "pho")   return "$\\gamma$";
   if(s.GetName() == "phoAlt")   return "$\\gamma$";
   if(s.GetName() == "vvv")   return "VVV";
+  if(s.GetName() == "vv")    return "VV";
+  if(s.GetName() == "vvjj")  return "VVjj EWK";
+  if(s.GetName() == "ggvv")  return "gg->VV"; 
   if(s.GetName() == "jpsi")  return "$J/\\psi$";
   if(s.GetName() == "upsl")  return "$\\upsilon$";
 
@@ -290,6 +299,9 @@ Msl::Mva::Sample Msl::Mva::Convert2Sample(const std::string &s)
   if(s == "pho")  return kpho;
   if(s == "phoAlt")  return kphoAlt;
   if(s == "vvv")  return kvvv;
+  if(s == "vv")   return kvv;
+  if(s == "vvjj") return kvvjj;
+  if(s == "ggvv") return kggvv;
   if(s == "jpsi") return kJPsi;
   if(s == "upsl") return kUpsl;
   if(s == "zqcdPow") return kZqcdPow;
@@ -374,6 +386,9 @@ const std::vector<Msl::Mva::Sample>& Msl::Mva::GetAllSamples()
     vars.push_back(kpho);
     vars.push_back(kphoAlt);
     vars.push_back(kvvv);
+    vars.push_back(kvv);
+    vars.push_back(kvvjj);
+    vars.push_back(kggvv);
     vars.push_back(kJPsi);
     vars.push_back(kUpsl);
     vars.push_back(kZqcdPow);

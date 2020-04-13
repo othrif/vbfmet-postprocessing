@@ -67,8 +67,8 @@ def prepareSeqSR(basic_cuts, alg_take=None, syst='Nominal'):
     selkey = basic_cuts.GetSelKey()
     region = 'sr'
 
-    if basic_cuts.chan !='nn' or not passRegion(region):
-        return ('', [])
+#    if basic_cuts.chan !='nn' or not passRegion(region):
+#        return ('', [])
 
     pass_alg = hstudy.preparePassEventForSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
@@ -86,99 +86,6 @@ def prepareSeqMETSF(basic_cuts, alg_take=None, syst='Nominal'):
         return ('', [])
 
     pass_alg = hstudy.preparePassEventForMETSF('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
-    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-
-    # return normal plotting
-    return (pass_alg.GetName(), [pass_alg] + plot_alg)
-
-#-----------------------------------------------------------------------------------------
-def prepareSeqGamSR(basic_cuts, alg_take=None, syst='Nominal'):
-
-    selkey = basic_cuts.GetSelKey()
-    region = 'gamsr'
-
-    if basic_cuts.chan !='nn' or not passRegion(region):
-        return ('', [])
-
-    pass_alg = hstudy.preparePassEventForGamSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut,syst=syst)
-    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-    # return normal plotting
-    return (pass_alg.GetName(), [pass_alg] + plot_alg)
-
-#-----------------------------------------------------------------------------------------
-def prepareSeqGamZCR(basic_cuts, alg_take=None, syst='Nominal'):
-
-    selkey = basic_cuts.GetSelKey()
-    region = 'gamzcr'
-
-    if (basic_cuts.chan not in ['ll','ee','uu']) or not passRegion(region):
-        return ('', [])
-
-    pass_alg = hstudy.preparePassEventForGamZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
-    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-
-    # return normal plotting
-    return (pass_alg.GetName(), [pass_alg] + plot_alg)
-
-#-----------------------------------------------------------------------------------------
-def prepareSeqGamWCR(basic_cuts, alg_take=None, syst='Nominal'):
-
-    selkey = basic_cuts.GetSelKey()
-    region = 'gamwcr'
-
-    if not( basic_cuts.chan in ['l','e','u']) or not passRegion(region):
-        return ('', [])
-
-    pass_alg = hstudy.preparePassEventForGamWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut)
-    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-
-    # return normal plotting
-    return (pass_alg.GetName(), [pass_alg] + plot_alg)
-
-#-----------------------------------------------------------------------------------------
-def prepareSeqWCR(basic_cuts, region, alg_take=None, syst='Nominal'):
-
-    selkey = basic_cuts.GetSelKey()
-    region = 'wcr'
-
-    do_met_signif=False
-    if basic_cuts.chan in ['ep','em','e','l']:
-        do_met_signif=True
-
-    if basic_cuts.chan in ['ee','uu','ll','nn','eu'] or not passRegion(region):
-        return ('', [])
-
-    pass_alg = hstudy.preparePassEventForWCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif,syst=syst)
-    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
-
-    # return normal plotting
-    return (pass_alg.GetName(), [pass_alg] + plot_alg)
-
-def prepareSeqWCRAntiID(basic_cuts, region, alg_take=None, syst='Nominal'):
-
-    selkey = basic_cuts.GetSelKey()
-    region = 'wcranti'
-
-    # The anti-ID region should always be e *or* mu; we don't want an
-    # inclusive lepton region.
-    if basic_cuts.chan in ['ee','uu','ll','nn','eu', 'l'] or not passRegion(region):
-        return ('', [])
-
-    # XXX make configurable?
-    do_met_signif=False
-    pass_alg = hstudy.preparePassEventForWCRAntiID('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, do_met_signif=do_met_signif)
-    plot_alg = prepareListPlot(selkey, alg_take, region=region, syst=syst)
-    return (pass_alg.GetName(), [pass_alg] + plot_alg)
-
-#-----------------------------------------------------------------------------------------
-def prepareSeqZCR(basic_cuts, region, alg_take=None, syst='Nominal'):
-
-    selkey = basic_cuts.GetSelKey()
-    region = 'zcr'
-    if basic_cuts.chan in ['ep','em','um','up','l','e','u','nn'] or not passRegion(region):
-        return ('', [])
-
-    pass_alg = hstudy.preparePassEventForZCR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut,syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
@@ -214,74 +121,8 @@ def main():
     #-----------------------------------------------------------------------------------------
     # Prepare selection keys
     #
-    anas    = ['allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3500']
-    chans   = ['nn','ep','em','up','um','ee','uu','ll','l','e','u','eu']
-
-    if options.analysis!='all' and options.analysis.count(','):
-        anas = options.analysis.split(',')
-    elif options.analysis!='all':
-        anas = [options.analysis]
-    if options.OverlapPh:
-        anas    = ['allmjj','lowmet','revfjvt']
-        chans   = ['nn','ee','uu','ll','l','e','u']
-    if options.analysis.count('RedChan'):
-        anas    = ['allmjj']#,'mjj1000','mjj1500','mjj2000']
-    if options.analysis=='metsf':
-        anas = ['metsf','metsfxe70','metsfxe90','metsfxe110',#'metsftrigxe70','metsftrigxe90','metsftrigxe110',
-                    'metsftrigxe70J400','metsftrigxe110J400','metsftrigxe90J400',]
-        if options.year==2018:
-                anas = ['metsf','metsfVBFTopo','metsfxe110XE70','metsfVBFTopotrigOR','metsfxe110XE70trig',] #'metsfxe110XE65trig','metsfxe110XE65',
-        if options.year==2017:
-                anas = ['metsf','metsfxe90','metsfxe100','metsfxe110L155','metsfxe100L150',
-                        'metsfxe90trig','metsfxe100trig','metsfxe110L155trig','metsfxe100L150trig',]
-    if options.analysis.count('allmjjdphijj'):
-        anas = ['allmjj','mjj800dphijj1','mjj800dphijj2','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj3500dphijj2','mjj3500dphijj1']
-    if options.analysis.count('allmjjdphijjnj'):
-        anas = ['allmjj','mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2','njgt2']
-    if options.analysis.count('allmjjnj'):
-        anas = ['allmjj', 'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2', 'njgt2']
-
-    # All mjj + njet bins with metsig < 4 and metsig > 4 bins added in.
-    if options.analysis == "metsig":
-        anas = ['allmjj', 'allmjjmslt4', 'allmjjmsgt4']
-    if options.analysis == "metsigjj":
-        anas = ['allmjj', 'allmjjmslt4', 'allmjjmsgt4', 'mjj800nj2', 'mjj800nj2mslt4', 'mjj800nj2msgt4',
-                'mjj1000nj2', 'mjj1000nj2mslt4', 'mjj1000nj2msgt4', 'mjj1500nj2', 'mjj1500nj2mslt4', 'mjj1500nj2msgt4',
-                'mjj2000nj2', 'mjj2000nj2mslt4', 'mjj2000nj2msgt4', 'mjj3500nj2', 'mjj3500nj2mslt4', 'mjj3500nj2msgt4',
-                'njgt2', 'njgt2mslt4', 'njgt2msgt4']
-
-    if options.analysis == "metsiglep":
-        anas = ['allmjj', 'allmjjlepptlow', 'allmjjleppthigh']
-    if options.analysis == "metsiglepjj":
-        anas = ['allmjj', 'allmjjlepptlow', 'allmjjleppthigh', 'mjj800nj2', 'mjj800nj2lepptlow', 'mjj800nj2leppthigh',
-                'mjj1000nj2', 'mjj1000nj2lepptlow', 'mjj1000nj2leppthigh', 'mjj1500nj2', 'mjj1500nj2lepptlow',
-                'mjj1500nj2leppthigh', 'mjj2000nj2', 'mjj2000nj2lepptlow', 'mjj2000nj2leppthigh', 'mjj3500nj2',
-                'mjj3500nj2lepptlow', 'mjj3500nj2leppthigh', 'njgt2', 'njgt2lepptlow', 'njgt2leppthigh']
-
-    if options.analysis=='qcd':
-        anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','LowMETQCDRevFJVT','nj3']
-        chans   = ['nn']
-    if options.analysis=='qcdA':
-        anas = ['allmjj','mjjLow200','LowMETQCDSRFJVT']
-        chans   = ['nn']        
-
-    # dphijj > 2 analysis: run with or without binning.
-    if options.analysis == "dphijj3":
-        anas = ['allmjjdphijj3']
-    if options.analysis == "dphijj3all":
-        anas = ['allmjjdphijj3', 'mjj800dphijj3nj2', 'mjj1000dphijj3nj2', 'mjj1500dphijj3nj2', 'mjj2000dphijj3nj2', 'mjj3500dphijj3nj2', 'dphijj3njgt2']
-    if options.analysis == "dphijj3qcd":
-        anas = ['allmjjdphijj3', 'mjjLow200dphijj3', 'LowMETQCDSRdphijj3', 'LowMETQCDVRdphijj3', 'LowMETQCDdphijj3', 'LowMETQCDSRFJVTdphijj3', 'LowMETQCDVRFJVTdphijj3', 'LowMETQCDFJVTdphijj3']
-        chans = ['nn']
-
-    if options.analysis.count('RedChan'):
-        chans   = ['nn','ee','uu','ll','l','e','u']
-    if options.chan=='short':
-        chans   = ['nn','ee','uu','ll','l','e','u']
-    elif options.chan=='veryshort':
-        chans   = ['nn','ll','l']
-    elif options.chan != None:
-        chans = options.chan.split(',')
+    anas    = ['all']
+    chans   = ['ee','uu','ll','eu']
 
     try:
         tmp_signs=options.lep_sign.split(','); signs=[]
@@ -289,6 +130,7 @@ def main():
             if not sign in ['0','1']: raise NameError('Unknown Lepton sign: %s...needs to be 0 0,1 or 1' %options.lep_sign)
             signs+=[int(sign)]
     except: raise NameError('Unknown Lepton sign: %s...needs to be 0 0,1 or 1' %options.lep_sign)
+
 
     writeStyle='RECREATE'
     syst_list=[options.syst]
@@ -300,7 +142,7 @@ def main():
 
     timeStart = time.time()
 
-    print 'Running These systematics'
+    print 'Running the following systematics:'
     for syst in syst_list:
         print syst
 
@@ -332,43 +174,11 @@ def main():
                 for c in chans:
                     basic_cuts = hstudy.BasicCuts(Analysis=a, Chan=c, options=options, SameSign=sign)
                     #
-                    # MET trigger SF
+                    # SR Cut based regions and algorithms
                     #
-                    if a.count('metsf'):
-                        (name_metsf,  alg_metsf)  = prepareSeqMETSF(basic_cuts, alg_take=input_cut, syst=syst)
-                        read_alg.AddNormalAlg(name_metsf,  alg_metsf)
-                    else:
-                        #
-                        # SR Cut based regions and algorithms
-                        #
-                        (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
-                        read_alg.AddNormalAlg(name_sr,  alg_sr)
+                    (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_sr,  alg_sr)
 
-                        #
-                        # SR Cut based regions and algorithms with photon
-                        #
-                        if a in ['allmjj','lowmet','revfjvt'] and options.OverlapPh:
-                            (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
-                            read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)
-                            (name_zcr_gam,  alg_zcr_gam)  = prepareSeqGamZCR (basic_cuts, alg_take=input_cut, syst=syst)
-                            read_alg.AddNormalAlg(name_zcr_gam,  alg_zcr_gam)
-                            (name_wcr_gam,  alg_wcr_gam)  = prepareSeqGamWCR (basic_cuts, alg_take=input_cut, syst=syst)
-                            read_alg.AddNormalAlg(name_wcr_gam,  alg_wcr_gam)
-                        else:
-                            #
-                            # ZCR Cut based regions and algorithms
-                            #
-                            (name_zcr,  alg_zcr)  = prepareSeqZCR (basic_cuts, a, alg_take=input_cut, syst=syst)
-                            read_alg.AddNormalAlg(name_zcr,  alg_zcr)
-
-                            #
-                            # WCR Cut based regions and algorithms
-                            #
-                            (name_wcr,  alg_wcr)  = prepareSeqWCR (basic_cuts, a, alg_take=input_cut, syst=syst)
-                            read_alg.AddNormalAlg(name_wcr,  alg_wcr)
-
-                            (name_wcranti, alg_wcranti) = prepareSeqWCRAntiID(basic_cuts, a, alg_take=input_cut, syst=syst)
-                            read_alg.AddNormalAlg(name_wcranti, alg_wcranti)
 
         read_alg.RunConfForAlgs()
 

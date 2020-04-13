@@ -712,39 +712,6 @@ def prepareBkgRuns(keys,options=None):
     else:
         bkg_zqcd.update(bkg_zqcd_znn)
 
-    bkg_top1 = {
-        '117360':'tchan->e',
-        '117361':'tchan->mu',
-        '117362':'tchan->tau',
-        '108343':'schan->e',
-        '108344':'schan->mu',
-        '108345':'schan->tau',
-        '108346':'Wt',
-        }
-    bkg_top2 = {
-        '410470':'ttbar(w/oFullHad)',
-        '410471':'ttbar(w/FullHad)',
-        #'410472':'ttbar(w/dil)',                remove dilepton
-        }
-    bkg_top1 = {
-        '410011':'tchan_top',
-        '410012':'tchan_antitop',
-        '410013':'Wt_top',
-        '410014':'Wt_top',
-        '410025':'schan_top',
-        '410026':'schan_antitop',
-        }
-    bkg_top1 = {
-        '410642':'tchan_lept_top',
-        '410643':'tchan_lept_antitop',
-        '410644':'schan_top_lept',
-        '410645':'schan_antitop_lept',
-        '410646':'Wt_top_incl',
-        '410647':'Wt_antitop_incl',
-        #'410648':'Wt_DR_dilepton_top',
-        #'410649':'Wt_DR_dilepton_antitop',
-        }
-
     # default!!! Powheg+Pythia 8
     bkg_top1 = {
         '410658':'tchan_top', #lepton filtered
@@ -753,19 +720,14 @@ def prepareBkgRuns(keys,options=None):
         '410645':'schan_antitop',
         '410646':'Wt_top',
         '410647':'Wt_top',
+        '410472':'ttbar(2l)',
         } #410643,410642,410648,410649
+    bkg_top_other = {
+        '410648':'Wt_DR_dilepton_top',
+        '410649':'Wt_DR_dilepton_antitop',
+        '410642':'tchan_lept_top',
+        '410643':'tchan_lept_antitop',}
 
-    bkg_top2.update(bkg_top1)
-    bkg_top_other = {'410472':'ttbar(w/dil)',#                remove dilepton
-                     '410648':'Wt_DR_dilepton_top',
-                     '410649':'Wt_DR_dilepton_antitop',
-                     '410642':'tchan_lept_top',
-                     '410643':'tchan_lept_antitop',
-                     #'410644':'schan_top_lept',
-                     #'410645':'schan_antitop_lept',
-                     #'410646':'Wt_top_incl',
-                     #'410647':'Wt_antitop_incl',
-        }
     bkg_z_strong_madgraph_znn = {'361515':'Znn_Np0',
                       '361516':'Znn_Np1',
                       '361517':'Znn_Np2',
@@ -957,20 +919,23 @@ def prepareBkgRuns(keys,options=None):
                    '361031':'JZ11W',
                    '361032':'JZ12W',
                    }
-    bkg_vv = {'364242':'3l3v_EWK6',
-                  '364243':'4l2v_EWK6',
+    bkg_vvv = {
+                  '364242':'WWW_3l3v_EWK6',
+                  '364243':'WWZ_4l2v_EWK6',
                   '364244':'WWZ_2l4v_EW6',
                   '364245':'WZZ_5l1v_EW6',
                   '364246':'WZZ_3l3v_EW6',
                   '364247':'ZZZ_6l0v_EW6',
                   '364248':'ZZZ_4l2v_EW6',
                   '364249':'ZZZ_2l4v_EW6',
+                  }
+    bkg_vv = {
                   # VV
-                  '364253':'lllv',
-                  '363494':'vvvv',
                   '364250':'llll',
+                  '364253':'lllv',
                   '364254':'llvv',
                   '364255':'lvvv',
+                  '363494':'vvvv',
                   # possible samples to correlate with W/Z EWK?
                   '363359':'W+W-->qqln',
                   '363360':'W+W-->lnqq',
@@ -979,13 +944,27 @@ def prepareBkgRuns(keys,options=None):
                   '363356':'ZZ->qqll',
                   '363357':'WZ->qqnn',
                   '363358':'WZ->qqll',
-                  # adding the VBFHWW tautau samples
-                  '345948':'VBFHWW',
-                  '346190':'VBFHtautaull',
-                  '346191':'VBFHtautaulph',
-                  '346192':'VBFHtautaulmh',
-                  '346193':'VBFHtautauhh',
-                  }
+                    }
+    bkg_vvjj_ewk = {
+        '364284':'lllvjj_ewk',
+        '364285':'llvvjj_ewk',
+    }
+    bkg_gg_zz = {
+        '345723':'gg->ZZ',
+    }
+    bkg_gg_ww = {
+        '345718':'gg->WW',
+    }
+    bkg_gg_vv = {}
+    bkg_gg_vv.update(bkg_gg_zz)
+    bkg_gg_vv.update(bkg_gg_ww)
+
+    bkg_zz_llvv = {
+        '345666':'ZZ_llvv',
+    }
+    bkg_ww_PhPy8 = {
+        '361600':'WWlvlv_PhPy8'
+    }
 
     bkg_vbfExt = {'309662':'Wenu_MAXHTPTV70_140',
                   '309663':'Wmunu_MAXHTPTV70_140',
@@ -1205,8 +1184,8 @@ def prepareBkgRuns(keys,options=None):
                 #'zewk':bkg_zewkpow,
                 #'top2':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
-                'top2':bkg_top2, # all top
-                #'top2':bkg_zqcd_sh_ktExtalt, # all top
+                'top1':bkg_top1, # all top
+               #'top2':bkg_zqcd_sh_ktExtalt, # all top
                 #'top2':{'345323':'hww'}, # all top
                 #'top2':bkg_zewkpow,
                 #'top2':{'312487':'Znunu_PTV100_140_MJJ0_500_KtMerging','312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',}, # all top
@@ -1218,31 +1197,17 @@ def prepareBkgRuns(keys,options=None):
                 ##'zqcd':bkg_zqcd_zee,
                 ##'top2':bkg_zqcd_ztt,
                 ##'top1':bkg_zqcd_znn,
-                'vvv':bkg_vv,
+                'vvv':bkg_vvv,
+                'vv':bkg_vv,
+                'vvjj':bkg_vvjj_ewk,
+                'ggvv':bkg_gg_vv,
                 'mqcd':bkg_qcdw,
                 'dqcd':bkg_datadriveqcd,
                 #'mqcd':bkg_qcdunw,
                 'zqcdMad':bkg_z_strong_madgraph,
                 'wqcdMad':bkg_w_strong_madgraph,
                 'wdpi':bkg_top_other,
-                #'wgam':bkg_sherpa_wg,
-                #'zgam':bkg_sherpa_zg,
-                #'wgamewk':bkg_wgewk,
-                #'zgamewk':bkg_zgewk,
-                #'ttg':bkg_ttg,
-                #'pho':bkg_pho,
-                #'phoAlt':bkg_pho_v2,
-                #'vgg':bkg_sherpa_vgg,
-                #'zqcdMad':bkg_zqcd,
-                #'wqcdMad':bkg_wqcd,
-                #'hvbf':bkg_w_strong_madgraph_wmnu,
-                #'wewk':bkg_w_strong_madgraph_wenu,
-                #'wqcd':bkg_w_strong_madgraph_wtnu,
-                #'zewk':bkg_z_strong_madgraph_zmm,
-                #'zqcd':bkg_z_strong_madgraph_zee,
-                #'top2':bkg_z_strong_madgraph_ztt,
-                #'top1':bkg_z_strong_madgraph_znn,
-                }
+               }
     if options.OverlapPh:
         bkg_keys['wgam']=bkg_sherpa_wg
         bkg_keys['zgam']=bkg_sherpa_zg

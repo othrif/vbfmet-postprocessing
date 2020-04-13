@@ -159,7 +159,7 @@ def getParser():
     p.add_option('--ignore-njet',  action='store_true', default=False,   dest='ignore_njet',        help='Ignore Njet')
     p.add_option('--ignore-met',   action='store_true', default=False,   dest='ignore_met',         help='Ignore MET')
     p.add_option('--LoadBaseLep',  action='store_true', default=False,   dest='LoadBaseLep',        help='Use looser leptons')
-    p.add_option('--OverlapPh',    action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')
+    p.add_option('--OverlapPh',    action='store_true', default=True,   dest='OverlapPh',          help='Overlap remove photons')
     p.add_option('--ReverseFJVT',  action='store_true', default=False,   dest='ReverseFJVT',        help='Reverse the FJVT cuts')    
     p.add_option('--debug',        action='store_true', default=False,   dest='debug',      help='')
     p.add_option('--print',        action='store_true', default=False,   dest='print',      help='')

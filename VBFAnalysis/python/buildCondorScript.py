@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 
-def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="VBFAnalysisCondorSub", proxyName='/afs/cern.ch/work/s/ssevova/public/dark-photon-atlas/x509up_u39129', slc7=False):
+def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="ZHDarkPhAnalysisCondorSub", proxyName='/afs/cern.ch/work/s/ssevova/public/dark-photon-atlas/x509up_u39129', slc7=False):
     os.system('''echo "#!/bin/bash" > '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system("echo 'export HOME=$(pwd)' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase' >> "+subDir+"/"+scriptName+syst+".sh")
@@ -18,14 +18,14 @@ def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="VBFAnalysis
         #os.system("echo 'export CMTCONFIG=x86_64-slc7-gcc62-opt'  >> "+subDir+"/"+scriptName+syst+".sh")
     if slc7:
         os.system("echo 'export CMTCONFIG=x86_64-slc7-gcc8-opt'  >> "+subDir+"/"+scriptName+syst+".sh")
-    os.system("echo 'source "+buildDir+"/${CMTCONFIG}/setup.sh' >> "+subDir+"/"+scriptName+syst+".sh")
+    os.system("echo 'source "+buildDir+"/x86_64-centos7-gcc8-opt/setup.sh' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system('''echo ' echo INPUT:$1 $2' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system('''echo ' echo '''+runCommand+'''' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system('''echo ' '''+runCommand+'''' >> '''+subDir+'''/'''+scriptName+syst+'''.sh''')
     os.system("chmod 777 "+subDir+"/"+scriptName+syst+".sh")
 
-def writeCondorSub(workDir, syst="Nominal", scriptName="VBFAnalysisCondorSub", fileForArguments="filelist",fileForArgumentsSys=""):
+def writeCondorSub(workDir, syst="Nominal", scriptName="ZHDarkPhAnalysisCondorSub", fileForArguments="filelist",fileForArgumentsSys=""):
     os.system("echo 'universe                = vanilla' > "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'executable              = "+workDir+"/"+scriptName+syst+".sh' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'output                  = "+workDir+"/output$(ClusterId).$(ProcId)' >> "+workDir+"/submit_this_python"+syst+".sh")

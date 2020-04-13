@@ -255,7 +255,7 @@ void Msl::ReadEvent::Init(TTree* tree)
     //if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);        
     //if(fIsDDQCD && fMJTriggerEff=="TriggerEffWeightBDT") tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);    
     //if(fIsDDQCD && fMJTriggerEff=="TriggerEffWeight") tree->SetBranchAddress("TriggerEffWeight", &fTriggerEffWeight);
-    std::cout << "QCD Trigger Weight name: " << fMJTriggerEff << std::endl;
+    //std::cout << "QCD Trigger Weight name: " << fMJTriggerEff << std::endl;
     //TriggerEffWeight, TriggerEffWeightBDT
     // xe SF runs with the weight syst set to Nominal
     if(fSystName=="Nominal"){
@@ -717,46 +717,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         else event->SetWeight(fWeight*fLumi*extraTheoryWeight);
       }
       else  event->SetWeight(1.0);
+
       float MJDDScaling=1.0;
-
-      // Multijet normalization.
-      // There are currently three legal options:
-      // "off" (no normalization!), "sr" (normalization for SR), "dphijj3" (normalization for high-dphijj).
-      if (fMJNormStrategy == "sr") {
-	float scaledphimj = event->GetVar(Mva::jj_dphi)<1.0 ? 1.22 : 0.82;
-        if(fYear==2016) MJDDScaling=0.8815*scaledphimj; //0.82109;
-        else if(fYear==2017) MJDDScaling=2.6895*scaledphimj;
-        else if(fYear==2018) MJDDScaling=2.10302*scaledphimj;
-        // MJ systematics (MJClos2016__1up MJClos2017__1up MJClos2018__1up)
-        if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.54;
-        if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.24;
-        if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.19;
-
-        if(fWeightSystName=="MJClosHDPhi2016__1up" && fYear==2016) MJDDScaling*=1.8;
-        if(fWeightSystName=="MJClosHDPhi2017__1up" && fYear==2017) MJDDScaling*=1.47;
-        if(fWeightSystName=="MJClosHDPhi2018__1up" && fYear==2018) MJDDScaling*=1.43;
-        if(fWeightSystName=="MJClosLDPhi2016__1up" && fYear==2016) MJDDScaling*=1.32;
-        if(fWeightSystName=="MJClosLDPhi2017__1up" && fYear==2017) MJDDScaling*=1.72;
-        if(fWeightSystName=="MJClosLDPhi2018__1up" && fYear==2018) MJDDScaling*=1.62;
-	
-      } else if (fMJNormStrategy == "dphijj3") {
-        if (fYear == 2016) MJDDScaling = 0.3878;
-        else if (fYear == 2017) MJDDScaling = 0.7424;
-        else if (fYear == 2018) MJDDScaling = 0.5073;
-
-        // MJ systematics for high-dphijj (MJClos2016__1up MJClos2017__1up MJClos2018__1up
-        if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.26;
-        if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.75;
-        if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.18;
-      }
-
-      // Applies the MJ systematics (MJUnc__1up)
-      // These seem to be the core/tail systematics-- keep them the same in high-dphijj.
-      if(fWeightSystName=="MJUnc__1up"){
-        if(fYear==2016) MJDDScaling*=1.387;
-        if(fYear==2017) MJDDScaling*=1.189;
-        if(fYear==2018) MJDDScaling*=1.226;
-      }
       if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight*MJDDScaling);
 
       // define the vv uncertainty
@@ -841,6 +803,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_muo.AddVar(Mva::charge,mu_charge->at(iMuo));
 	event->muons.push_back(new_muo);
       }
+     
     }
 
     // Fill Taus
@@ -853,6 +816,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       //new_tau.AddVar(Mva::charge,tau_charge->at(iTau));
       event->taus.push_back(new_tau);
     }
+
     event->AddVar(Mva::n_tau,event->taus.size());
 
     // Fill Jets
@@ -871,6 +835,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     //unsigned nJet40=0;
     float jetht = 0.0;
     float jetht_over_threshold = 0.0;
+    
     for(unsigned iJet=0; iJet<jet_pt->size(); ++iJet){
       RecParticle new_jet;
       new_jet.pt  = jet_pt->at(iJet)/1.0e3;
@@ -880,7 +845,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));
       if(jet_btag_weight && jet_btag_weight->size()>iJet) new_jet.AddVar(Mva::jetBtagWeight,jet_btag_weight->at(iJet));
-      if(jet_TrackWidth && jet_TrackWidth->size()>iJet) new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));
+      if(jet_TrackWidth && jet_TrackWidth->size()>iJet) new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));      
       if(jet_NTracks && jet_NTracks->size()>iJet) new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));
       if(jet_PartonTruthLabelID && jet_PartonTruthLabelID->size()>iJet) new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));
 
@@ -901,77 +866,79 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Store jet HT!
     // Happily, this is also the variable we need to recompute met significance.
     event->AddVar(Mva::jetHT, jetht);
-    
-    TLorentzVector tmp;
-    const TLorentzVector j1v = event->jets.at(0).GetLVec();
-    const TLorentzVector j2v = event->jets.at(1).GetLVec();
-    float maxCentrality = -9999.0;
-    float avgCentrality = 0.0;
-    float maxmj3_over_mjj = -9999.0;
-    float avgmj3_over_mjj = 0.0;
-    for(unsigned iJet=2; iJet<event->jets.size(); ++iJet){
-      tmp=event->jets.at(iJet).GetLVec();
-      float centrality = exp(-4.0/std::pow(event->GetVar(Mva::jj_deta),2) * std::pow(tmp.Eta() - (j1v.Eta()+j2v.Eta())/2.0,2));
-      if(centrality>maxCentrality) maxCentrality = centrality;
-      avgCentrality+=centrality;
 
-      float mj1 =  (tmp+j1v).M();
-      float mj2 =  (tmp+j2v).M();
-      float tmp_maxmj3_over_mjj = (1000.0*std::min(mj1,mj2)/event->GetVar(Mva::jj_mass));
-      if(maxmj3_over_mjj<tmp_maxmj3_over_mjj) maxmj3_over_mjj = tmp_maxmj3_over_mjj;
-      avgmj3_over_mjj+=tmp_maxmj3_over_mjj;
-    }
-    event->AddVar(Mva::maxCentrality, maxCentrality);
-    if(event->jets.size()-2>0) avgCentrality/=float(event->jets.size()-2);
-    event->AddVar(Mva::avgCentrality, avgCentrality);
-    float jetPt3=-9999.0; if(event->jets.size()>2) jetPt3 = event->jets.at(2).pt;
-    event->AddVar(Mva::jetPt3, jetPt3);
-    event->AddVar(Mva::maxmj3_over_mjj, maxmj3_over_mjj);
-    if(event->jets.size()-2>0) avgmj3_over_mjj/=float(event->jets.size()-2);
-    event->AddVar(Mva::avgmj3_over_mjj, avgmj3_over_mjj);
-
-    // forward jets relative to the leading two jets
-    float maxPosEta=0.0, maxNegEta=0.0;
-    unsigned nBjet=0;
     if(event->jets.size()>1){
-      maxPosEta=std::max(event->jets.at(0).eta,event->jets.at(1).eta);
-      maxNegEta=std::min(event->jets.at(0).eta,event->jets.at(1).eta);
-    }
-    for(unsigned iJet=2; iJet<event->jets.size(); ++iJet){
-      if((event->jets.at(iJet).eta>maxPosEta) || (event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj;
-      if(event->jets.at(iJet).pt>30.0 && (event->jets.at(iJet).eta>maxPosEta || event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj30;
-      if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta>maxPosEta || event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj40;
-      if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta>maxPosEta || event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj50;
-      if(fabs(event->jets.at(iJet).eta)>2.5) ++nJet_fwd;
-      else  ++nJet_cen;
-      if((event->jets.at(iJet).eta<maxPosEta) && (event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj;
-      if(event->jets.at(iJet).pt>30.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj30;
-      if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj40;
-      if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj50;
-    }
-    // recompute the number of b-tagged jets
-    if(fBTagCut>-5.0){
-      for(unsigned iJet=0; iJet<event->jets.size(); ++iJet){
-	if(fabs(event->jets.at(iJet).eta)<2.5 && event->jets.at(iJet).HasVar(Mva::jetBtagWeight) && fBTagCut<event->jets.at(iJet).GetVar(Mva::jetBtagWeight)) ++nBjet;
+      TLorentzVector tmp;
+      const TLorentzVector j1v = event->jets.at(0).GetLVec();
+      const TLorentzVector j2v = event->jets.at(1).GetLVec();
+      float maxCentrality = -9999.0;
+      float avgCentrality = 0.0;
+      float maxmj3_over_mjj = -9999.0;
+      float avgmj3_over_mjj = 0.0;
+      for(unsigned iJet=2; iJet<event->jets.size(); ++iJet){
+	tmp=event->jets.at(iJet).GetLVec();
+	float centrality = exp(-4.0/std::pow(event->GetVar(Mva::jj_deta),2) * std::pow(tmp.Eta() - (j1v.Eta()+j2v.Eta())/2.0,2));
+	if(centrality>maxCentrality) maxCentrality = centrality;
+	avgCentrality+=centrality;
+	
+	float mj1 =  (tmp+j1v).M();
+	float mj2 =  (tmp+j2v).M();
+	float tmp_maxmj3_over_mjj = (1000.0*std::min(mj1,mj2)/event->GetVar(Mva::jj_mass));
+	if(maxmj3_over_mjj<tmp_maxmj3_over_mjj) maxmj3_over_mjj = tmp_maxmj3_over_mjj;
+	avgmj3_over_mjj+=tmp_maxmj3_over_mjj;
       }
-      event->RepVar(Mva::n_bjet, nBjet);
+      event->AddVar(Mva::maxCentrality, maxCentrality);
+      if(event->jets.size()-2>0) avgCentrality/=float(event->jets.size()-2);
+      event->AddVar(Mva::avgCentrality, avgCentrality);
+      float jetPt3=-9999.0; if(event->jets.size()>2) jetPt3 = event->jets.at(2).pt;
+      event->AddVar(Mva::jetPt3, jetPt3);
+      event->AddVar(Mva::maxmj3_over_mjj, maxmj3_over_mjj);
+      if(event->jets.size()-2>0) avgmj3_over_mjj/=float(event->jets.size()-2);
+      event->AddVar(Mva::avgmj3_over_mjj, avgmj3_over_mjj);
+      
+      // forward jets relative to the leading two jets
+      float maxPosEta=0.0, maxNegEta=0.0;
+      unsigned nBjet=0;
+      if(event->jets.size()>1){
+	maxPosEta=std::max(event->jets.at(0).eta,event->jets.at(1).eta);
+	maxNegEta=std::min(event->jets.at(0).eta,event->jets.at(1).eta);
+      }
+      for(unsigned iJet=2; iJet<event->jets.size(); ++iJet){
+	if((event->jets.at(iJet).eta>maxPosEta) || (event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj;
+	if(event->jets.at(iJet).pt>30.0 && (event->jets.at(iJet).eta>maxPosEta || event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj30;
+	if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta>maxPosEta || event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj40;
+	if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta>maxPosEta || event->jets.at(iJet).eta<maxNegEta)) ++nJet_fwdj50;
+	if(fabs(event->jets.at(iJet).eta)>2.5) ++nJet_fwd;
+	else  ++nJet_cen;
+	if((event->jets.at(iJet).eta<maxPosEta) && (event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj;
+	if(event->jets.at(iJet).pt>30.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj30;
+	if(event->jets.at(iJet).pt>40.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj40;
+	if(event->jets.at(iJet).pt>50.0 && (event->jets.at(iJet).eta<maxPosEta && event->jets.at(iJet).eta>maxNegEta)) ++nJet_cenj50;
+      }
+    
+      // recompute the number of b-tagged jets
+      if(fBTagCut>-5.0){
+	for(unsigned iJet=0; iJet<event->jets.size(); ++iJet){
+	  if(fabs(event->jets.at(iJet).eta)<2.5 && event->jets.at(iJet).HasVar(Mva::jetBtagWeight) && fBTagCut<event->jets.at(iJet).GetVar(Mva::jetBtagWeight)) ++nBjet;
+	}
+	event->RepVar(Mva::n_bjet, nBjet);
+      }
+      if(fJetVetoPt>0.0)
+	event->RepVar(Mva::n_jet, nJet);
+      //if(nJet25!=event->GetVar(Mva::n_jet)) std::cout << "error in jet counting" << nJet25 << " "  << event->GetVar(Mva::n_jet) << std::endl;
+      
+      // other jet calculations
+      event->AddVar(Mva::n_jet_fwd, nJet_fwd);
+      event->AddVar(Mva::n_jet_fwdj, nJet_fwdj);
+      event->AddVar(Mva::n_jet_fwdj30, nJet_fwdj30);
+      event->AddVar(Mva::n_jet_fwdj40, nJet_fwdj40);
+      event->AddVar(Mva::n_jet_fwdj50, nJet_fwdj50);
+      event->AddVar(Mva::n_jet_cen, nJet_cen);
+      event->AddVar(Mva::n_jet_cenj, nJet_cenj);
+      event->AddVar(Mva::n_jet_cenj30, nJet_cenj30);
+      event->AddVar(Mva::n_jet_cenj40, nJet_cenj40);
+      event->AddVar(Mva::n_jet_cenj50, nJet_cenj50);
     }
-    if(fJetVetoPt>0.0)
-      event->RepVar(Mva::n_jet, nJet);
-    //if(nJet25!=event->GetVar(Mva::n_jet)) std::cout << "error in jet counting" << nJet25 << " "  << event->GetVar(Mva::n_jet) << std::endl;
-
-    // other jet calculations
-    event->AddVar(Mva::n_jet_fwd, nJet_fwd);
-    event->AddVar(Mva::n_jet_fwdj, nJet_fwdj);
-    event->AddVar(Mva::n_jet_fwdj30, nJet_fwdj30);
-    event->AddVar(Mva::n_jet_fwdj40, nJet_fwdj40);
-    event->AddVar(Mva::n_jet_fwdj50, nJet_fwdj50);
-    event->AddVar(Mva::n_jet_cen, nJet_cen);
-    event->AddVar(Mva::n_jet_cenj, nJet_cenj);
-    event->AddVar(Mva::n_jet_cenj30, nJet_cenj30);
-    event->AddVar(Mva::n_jet_cenj40, nJet_cenj40);
-    event->AddVar(Mva::n_jet_cenj50, nJet_cenj50);
-
 
     // Fill Truth Els
     if(truth_el_pt && fisMC){

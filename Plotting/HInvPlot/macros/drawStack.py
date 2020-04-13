@@ -49,7 +49,7 @@ p.add_option('--draw-norm',     action='store_true', default=False,   dest='draw
 p.add_option('--do-ratio',      action='store_true', default=False,   dest='do_ratio')
 p.add_option('--force-ratio',   action='store_true', default=False,   dest='force_ratio')
 p.add_option('--stack-signal',  action='store_true', default=False,   dest='stack_signal')
-p.add_option('--ph-ana',        action='store_true', default=False,   dest='ph_ana')
+p.add_option('--ph-ana',        action='store_true', default=True,   dest='ph_ana')
 p.add_option('--no-signal',     action='store_true', default=False,   dest='no_signal')
 
 p.add_option('--debug',         action='store_true', default=False,   dest='debug')
@@ -66,7 +66,7 @@ p.add_option('--syst-type',     type='string', default='All',           dest='sy
 p.add_option('--draw-syst',       action='store_true', default=False,   dest='draw_syst')
 p.add_option('--make-syst-table', action='store_true', default=False,   dest='make_syst_table')
 
-p.add_option('--atlas-style', dest='atlas_style_path', default="/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/")
+p.add_option('--atlas-style', dest='atlas_style_path', default="../VBFAnalysis/python/Plotting/AtlasStyle/")
 
 # Allow canvas size and legend coords to be overriden on the command line.  0.51, 0.60, 0.915, 0.855)
 p.add_option('--legend-coords', dest='legend_coords', nargs=4, default=(0.55, 0.60, 0.94, 0.9), type=float)
@@ -134,7 +134,7 @@ def getSelKeyLabel(selkey):
             elif selkey.count('_eu'): proc = '#it{e#mu}'
             elif selkey.count('_em'): proc = '#it{W}_{#it{e^{+}#nu}}'#'W#rightarrow e^{-}#nu'^{high}
             elif selkey.count('_ep'): proc = '#it{W}_{#it{e^{-}#nu}}' #^{high}
-            elif selkey.count('_uu'): proc = '#it{Z}_{#it{#mu#mu}}' #'Z#rightarrow#mu#mu'
+            elif selkey.count('_uu'): proc = '#it{Z}_{#it{#mu#mu}}+#gamma' #'Z#rightarrow#mu#mu'
             elif selkey.count('_l'): proc = 'W#rightarrow l#nu'
             elif selkey.count('_e'): proc = '#it{W}_{#it{e#nu}}'#'W#rightarrow e#nu'^{high}
             elif selkey.count('_u'): proc = '#it{W}_{#it{#mu#nu}}'#it{W}#rightarrow#it{#mu#nu}'
@@ -410,6 +410,9 @@ def getLabelSortKey(sample):
     elif sample == 'wdpi': return 16
     elif sample == 'wgas': return 17
     elif sample == 'vvv': return 6
+    elif sample == 'vv': return 6
+    elif sample == 'vvjj': return 5
+    elif sample == 'ggvv': return 5
     elif sample == 'ttv': return 7
     elif sample == 'higgs': return 20
     elif sample == 'jpsi': return 21
@@ -435,6 +438,9 @@ def getSampleSortKey(sample):
     elif sample == 'mqcd': return 5
     elif sample == 'dqcd': return -5
     elif sample == 'vvv': return 6
+    elif sample == 'vv': return 6
+    elif sample == 'vvjj': return 5
+    elif sample == 'ggvv': return 5
     elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
     elif sample == 'hggf': return 8
@@ -475,7 +481,10 @@ def getSampleLabel(sample):
         'top1': 'Single Top',
         'top2': 'Top', #'t#bar{t}',
         'tall': 'Other',#'Top+#it{VV}/#it{VVV}',
-        'vvv': '#it{VV}/#it{VVV}',
+        'vvv': '#it{VVV}',
+        'vv': '#it{VV}',
+        'vvjj': '#it{VVjj} EWK',
+        'ggvv': 'gg#rightarrow#it{VV}',
         'zldy': '#it{Z} low m.',
         'wzzz': '#it{ZV}',#'WZ/ZZ',
         'wz': '#it{WZ}',
@@ -555,6 +564,9 @@ def getStyle(sample):
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
     color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3
     color_vvv = ROOT.kOrange
+    color_vv = ROOT.kOrange+2
+    color_vvjj = ROOT.kOrange+3
+    color_ggvv = ROOT.kOrange+4
     color_zldy = ROOT.kOrange-3
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
@@ -591,6 +603,9 @@ def getStyle(sample):
         'zgamewk':{'color':color_zgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'wgamewk':{'color':color_wgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'vv':{'color':color_vv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'vvjj':{'color':color_vvjj, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'ggvv':{'color':color_ggvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
         'hggf':{'color':color_hggf, 'fill_style':0, 'marker_style': 0, 'line_width':5, 'leg_opt':'f'},
@@ -2584,7 +2599,8 @@ def main():
         bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
-            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','tall'] #,'mqcd','zldy','vvv'
+            #bkgs = ['ttg', 'zgam','wgam','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','vvv','vv','ggvv','vvjj'] #,'mqcd','zldy','vvv'
+            bkgs = ['zgam','zewk', 'zqcd','vvv','vv','ggvv','vvjj'] #,'mqcd','zldy','vvv'
     if options.add_fakeE:
         bkgs+=['tth']
     if options.stack_signal:
