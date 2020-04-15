@@ -64,6 +64,7 @@ styleDict["ttbar"]=[49,1,1,49,1001,49,0,0]
 styleDict["ttbar"]=[colors[1],1,1,colors[1],1001,colors[1],0,0]
 #styleDict["eleFakes"]=[43,1,1,43,1001,43,0,0]
 styleDict["eleFakes"]=[colors[2],1,1,colors[2],1001,colors[2],0,0]
+styleDict["muoFakes"]=[colors[2],1,1,colors[2],1001,colors[2],0,0]
 
 styleDict["Zjets"]=[4,1,1,4,1001,0,0,0]
 styleDict["Wjets"]=[5,1,1,5,1001,0,0,0]

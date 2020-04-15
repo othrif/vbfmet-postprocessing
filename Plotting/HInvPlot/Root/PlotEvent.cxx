@@ -24,6 +24,9 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hjj_mass_dphi_variableBin(0),
 				  hmetsig_variableBin(0),
 				  htmva_variableBin(0),
+				  htmva_variableBin11(0),
+				  htmva_wmj_variableBin(0),
+				  htmva_wmj_variableBin11(0),
 				  hmj34(0),
 				  hmax_j_eta(0),
 				  hdRj1(0),
@@ -172,8 +175,15 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   hmetsig_variableBin = GetTH1("metsig_variableBin", 16, binsmetsig);
 
   // TMVA variable binned
-  float binstmva[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
+  //float binstmva[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
+  float binstmva[8] = {0.0,0.80690000, 0.85710000, 0.88910000, 0.91370000, 0.93310000, 0.9526, 1.0};
   htmva_variableBin =  GetTH1("tmva_variableBin",  7,  binstmva);
+  float binstmva12[12] = {0.0, 0.77280000, 0.82340000, 0.85320000, 0.87660000, 0.89370000, 0.90910000, 0.92290000, 0.93480000, 0.94700000, 0.9602, 1.0};
+  htmva_variableBin11 =  GetTH1("tmva_variableBin11",  11,  binstmva12);
+  float binstmvamj[8] = {0.0,0.80480000, 0.83740000, 0.87190000, 0.91070000, 0.93410000, 0.9508,1.0};
+  htmva_wmj_variableBin =  GetTH1("tmva_wmj_variableBin",  7,  binstmvamj);
+  float binstmvamj12[12] = {0.0, 0.77910000, 0.81730000, 0.83540000, 0.85340000, 0.87840000, 0.90440000, 0.92230000, 0.93580000, 0.94670000, 0.956, 1.0};
+  htmva_wmj_variableBin11 =  GetTH1("tmva_wmj_variableBin11",  11,  binstmvamj12);  
 
   // creating histograms
   for(unsigned a=0; a<fVarVec.size(); ++a){
@@ -232,6 +242,9 @@ bool Msl::PlotEvent::DoExec(Event &event)
   FillHist(hjj_mass_variableBinGam,   Mva::jj_mass, event, weight);
   FillHist(htruth_jj_mass_variableBin,   Mva::truth_jj_mass, event, weight);  
   FillHist(htmva_variableBin,      Mva::tmva,    event, weight);
+  FillHist(htmva_variableBin11,    Mva::tmva,    event, weight);
+  FillHist(htmva_wmj_variableBin,      Mva::tmva,    event, weight);
+  FillHist(htmva_wmj_variableBin11,    Mva::tmva,    event, weight);
 
   FillHist(hmetsig_variableBin, Mva::met_significance, event, weight);
 
