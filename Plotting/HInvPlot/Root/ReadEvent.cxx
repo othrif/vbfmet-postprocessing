@@ -1486,6 +1486,12 @@ void Msl::ReadEvent::FillEvent(Event &event)
     event.AddVar(Mva::jetPartonTruthLabelID1,  event.jets.at(1).GetVar(Mva::jetPartonTruthLabelID));
   }
 
+  if(event.photons.size()>0){
+    TLorentzVector leadPh = event.photons.at(0).GetLVec();
+    double MT_METy = sqrt(2. * leadPh.Pt() * event.met.Pt() * (1. - cos(leadPh.Phi() - event.met.Phi())));
+    event.AddVar(Mva::mt_mety, MT_METy);
+  }
+
   if(event.electrons.size()>0 && event.muons.size()>0){
 
     TLorentzVector leadL = event.electrons.at(0).GetLVec();

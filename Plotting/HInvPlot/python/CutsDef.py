@@ -337,6 +337,9 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutL1Pt', 'lepPt1 > 7.0')]
 
         cuts += [CutItem('CutMass', 'mll < 116.0 && mll > 66.0')]
+        cuts += [CutItem('CutNumBjets','n_bjet <= 1')]
+#    elif Region=='CR':
+#        cuts += getJetCuts(basic_cuts,options) 
 
     return GetCuts(cuts)
 

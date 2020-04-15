@@ -296,6 +296,7 @@ def getHistPars(hist):
         'ptll'   : {'xtitle':'#it{p}_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'ptllg'   : {'xtitle':'#it{p}_{T,ll#gamma} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'mt'     : {'xtitle':'#it{m}_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
+        'mt_mety'     : {'xtitle':'#it{m}_{T}(#it{E}_{T}^{miss},#gamma#it{p}_{T}) [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':2,  'ymin':0.1,'logy':True},
         'metsig_variableBin'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':1,  'ymin':2,'logy':True},
         'metsig_tst'     : {'xtitle':'#it{S}_{MET}^{TST} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.01,'logy':True},
