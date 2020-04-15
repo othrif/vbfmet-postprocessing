@@ -29,9 +29,9 @@ StatusCode VBFTruthAlg::initialize() {
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
 
-  //xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+  //std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
   //xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
-  std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt"; // run from local file
+  std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
 
@@ -445,7 +445,7 @@ if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
 
 
-if(362192 <= RunNumber && RunNumber <= 362383){
+if(362192 <= RunNumber && RunNumber <= 362383 || 364114 <= RunNumber && RunNumber <= 364127 ){
 if ((new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZll = true;
 if ((new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZll = true;
 }
