@@ -28,10 +28,9 @@ StatusCode VBFTruthAlg::initialize() {
 
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
-
-  //std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+  std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
   //xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
-  std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
+  //std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
 
@@ -114,12 +113,15 @@ StatusCode VBFTruthAlg::initialize() {
   new_nu_charge = new std::vector<float>(0);
   new_lep_jet_dR = new std::vector<float>(0);
 
- //Create new output TTree
+  //Create new output TTree
   treeTitleOut = m_currentSample+m_currentVariation;
   treeNameOut = m_currentSample+m_currentVariation;
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&new_w);
+  m_tree_out->Branch("w_noxsec",&new_w_noxsec);
+  m_tree_out->Branch("xsec",&new_xsec);
+  m_tree_out->Branch("sumw", &new_sumw);
   m_tree_out->Branch("runNumber",&RunNumber);
   m_tree_out->Branch("eventNumber",&EventNumber);
   m_tree_out->Branch("njets",&new_njets);
@@ -224,6 +226,8 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   if(nFileEvtTot>0)  weight = crossSection/nFileEvtTot;
   else ATH_MSG_WARNING("Ngen " << nFileEvtTot << " dsid " << RunNumber );
   ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << nFileEvtTot);
+  new_xsec = crossSection;
+  new_sumw = nFileEvtTot;
 
 // Prepare variables
 
@@ -422,9 +426,10 @@ float METCut = 150.0e3;
 float LeadJetPtCut = 80.0e3;
 float subLeadJetPtCut = 50.0e3;
 float MjjCut =2e5;
-float DEtajjCut =3.8;
+float DEtajjCut =2.5;
 
 bool vbfSkim = (new_jet_pt->at(0) > LeadJetPtCut) & (new_jet_pt->at(1) > subLeadJetPtCut) & (new_jj_deta > DEtajjCut) & ((new_jet_eta->at(0) * new_jet_eta->at(1))<0) & (new_jj_mass > MjjCut);
+bool vbfSkimloose = (new_jet_pt->at(0) > 50.0e3) & (new_jet_pt->at(1) > 50.0e3) & (new_met_et > 100e3 || new_met_nolep_et > 100e3) & (new_jj_deta > 2.5) & (new_jj_mass > 200e3);
 
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
@@ -445,7 +450,7 @@ if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
 
 
-if(362192 <= RunNumber && RunNumber <= 362383 || 364114 <= RunNumber && RunNumber <= 364127 ){
+if(vbfSkimloose && 362192 <= RunNumber && RunNumber <= 362383 || 364114 <= RunNumber && RunNumber <= 364127 ){
 if ((new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZll = true;
 if ((new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZll = true;
 }
@@ -468,6 +473,7 @@ regDecision["CRZll"]=(CRZll);
 
 
 new_w = weight*EventWeight;
+new_w_noxsec = EventWeight;
 
 for(auto reg : regions){
     if(regDecision[reg]){
@@ -496,7 +502,11 @@ for(auto reg : regions){
         }
       }
     }
-m_tree_out->Fill();
+
+
+if (vbfSkimloose){
+  m_tree_out->Fill();
+}
 
 return StatusCode::SUCCESS;
 }
