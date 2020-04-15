@@ -9,13 +9,13 @@ p.add_option('--wait',          action='store_true', default=False,   dest='wait
 p.add_option('--name','-n', type='string', default='', dest='name')
 p.add_option('--logscale', '-l',         action='store_true', default=False,   dest='logscale')
 p.add_option('--corr','-c', type='string', default='1.', dest='corr')
-#p.add_option('--filename','-f', type='string', default='pass_sr_hipt_1j_eu', dest='filename')
+p.add_option('--atlasrootstyle','-s', type='string', default='/afs/desy.de/user/o/othrif/atlasrootstyle', dest='atlasrootstyle')
 (options, args) = p.parse_args()
 
 #-----------------------------------------
 def Style():
-    ROOT.gROOT.LoadMacro('/afs/desy.de/user/o/othrif/atlasrootstyle/AtlasStyle.C')
-    ROOT.gROOT.LoadMacro('/afs/desy.de/user/o/othrif/atlasrootstyle/AtlasUtils.C')
+    ROOT.gROOT.LoadMacro(options.atlasrootstyle+'/AtlasStyle.C')
+    ROOT.gROOT.LoadMacro(options.atlasrootstyle+'/AtlasUtils.C')
     ROOT.SetAtlasStyle()
 #-----------------------------------------------------------------------------
 # Load necessary shared libraries

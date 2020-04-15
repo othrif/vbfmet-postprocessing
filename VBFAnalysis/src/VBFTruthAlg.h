@@ -53,6 +53,9 @@ private:
 
     Int_t runNumber;
     Float_t new_w;
+    Float_t new_w_noxsec;
+    Float_t new_xsec;
+    Float_t new_sumw;
 
     //  TRUTH Ntuples
   // Declaration of leaf types
