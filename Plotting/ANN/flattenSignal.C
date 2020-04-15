@@ -1,13 +1,17 @@
 
 {
-TH1F *stf = new TH1F("stf","stf",1000,0.0,1.0);
+  const unsigned nBins=11;
+TH1F *stf = new TH1F("stf","stf",10000,0.0,1.0);
 VBFH125Nominal->Draw("tmva>>stf","w*36000*(n_jet==2 && jj_mass>1.0e6 && jj_deta>3.8 && jj_dphi<1.8 && jet_pt[0]>80.0e3 && jet_pt[1]>50.0e3 && met_tst_et>150.0e3 && met_soft_tst_et<20.0e3)")
-double tot = stf->Integral(0,10001);
-double bin[7];
- double boundary[7];
- for(unsigned j=0; j<7; ++j){ for(unsigned i=1000; i>0; i--){ bin[j]+=stf->GetBinContent(i); if(bin[j]>(tot*((1.0)/7.0))){++j; boundary[j]=stf->GetXaxis()->GetBinLowEdge(i); } } }
+double tot = stf->Integral(0,1000001);
+double bin[nBins];
+ double boundary[nBins];
+ double boundaryr[nBins]; 
+ for(unsigned j=0; j<nBins; ++j){ for(unsigned i=10000; i>0; i--){ bin[j]+=stf->GetBinContent(i); if(bin[j]>(tot*((1.0)/float(nBins)))){++j; boundary[j]=stf->GetXaxis()->GetBinLowEdge(i); } } }
  bin;
  boundary;
+ for(unsigned j=0; j<nBins; ++j){ boundaryr[j]=boundary[nBins-j-1]; }
+ boundaryr
 }
 
 //double nbins[8] = {0.0, 0.75300000, 0.81700000, 0.86100000, 0.89500000, 0.92200000, 0.94600000, 1.0};
@@ -74,4 +78,10 @@ double bin[7];
 // var9_noNjetCST
 { 0.0000000, 0.66800000, 0.76700000, 0.82300000, 0.86250000, 0.89500000, 0.92800000, 1.0 }
 
+// var11 - w/mj
+{ 0.0,0.80480000, 0.83740000, 0.87190000, 0.91070000, 0.93410000, 0.9508,1.0 }
+{0.0, 0.77910000, 0.81730000, 0.83540000, 0.85340000, 0.87840000, 0.90440000, 0.92230000, 0.93580000, 0.94670000, 0.956, 1.0000000 }
 
+// var11 - no/mj
+{0.0, 0.80690000, 0.85710000, 0.88910000, 0.91370000, 0.93310000, 0.9526, 1.0000000 }
+{ 0.0, 0.74800000, 0.81300000, 0.84600000, 0.87200000, 0.89100000, 0.90700000, 0.92100000, 0.93300000, 0.94600000, 0.96000000, 1.0000000 }
