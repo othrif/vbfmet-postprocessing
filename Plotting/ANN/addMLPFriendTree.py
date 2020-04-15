@@ -14,12 +14,25 @@ from array import array
 ###
 ### the below block should be the only changes that are required
 ###
-model_dir='./training_set/' # directory with the keras model
-name_model='_test' # model partial name
-idir='/tmp/v37Egam/' # input directory
-odir='/tmp/v26Loose_BTAGW_TightSkim_7var'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
+RegN='A'
+model_dir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/MVA/models/April15_trainAE/' # directory with the keras model
+name_model='_v37syst' # model partial name
+#name_model='_v37syst_noMJ' # model partial name
+#idir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37ESyst/' # input directory
+idir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37/v37'+RegN+'Tight/' # input directory
+#idir='/tmp/v37Esyst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
+#idir='/tmp/mj_noMJ/'
+#idir='/tmp/mj/'
+#idir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37/v37DTight/'
+#odir='/tmp/v37Esyst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
+#odir='/tmp/mj_noMJ/'
+#odir='/tmp/mj/'
+#odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37Esyst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
+odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37TightApr15b/v37'+RegN+'syst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
 #variables used for training:
-COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
+#COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
+#COLS= ['jj_mass', 'jj_dphi', 'jj_deta', 'jet_pt[0]', 'jet_pt[1]',  'met_tst_et', 'met_tenacious_tst_et',  'met_soft_tst_et', 'met_cst_jet',  'n_jet', 'maxCentrality']
+COLS = ['jj_mass', 'jj_deta','maxCentrality', 'jj_dphi', 'met_soft_tst_et', 'n_jet', 'met_tst_nolep_et', 'met_cst_jet', 'jet_pt[0]', 'jet_pt[1]', 'met_tenacious_tst_nolep_et']
 ###
 ### the above block should be the only changes that are required
 ###
@@ -90,7 +103,16 @@ for f in fs:
         print('branches = {}'.format(branches))
         print('selection = {}'.format(selection))
         arr = root2array(f, treeName, branches=branches, selection=selection)
-        
+
+        if 'maxCentrality' in arr.dtype.names and ('QCDDD' in treeName):
+            print('correcting maxcentrality %s' %(treeName))
+            loadCen = arr['maxCentrality']
+            loadCen[loadCen <-0.1]=0.0
+        if 'max_mj_over_mjj' in arr.dtype.names and ('QCDDD' in treeName):
+            print('correcting max_mj_over_mjjy %s' %(treeName))
+            loadCen = arr['max_mj_over_mjj']
+            loadCen[loadCen <-0.1]=0.0
+
         print('Loaded numpy array {}.npy'.format(name))
         #Loading array
         label_arr = np.ones(len(arr))
@@ -114,3 +136,5 @@ for f in fs:
         # Or write directly into a ROOT file without using PyROOT
         #array2root(y_pred, name+'TMVA.root', treeName+'TMVA')
         array2root(y_pred, f, treeName)
+
+print('Done')
