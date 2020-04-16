@@ -157,6 +157,6 @@ for syst in systlist:
     runCommand = '''athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --filesInput "'''+samplePatternGlobal+'''$1" - --currentVariation '''+syst+''' --normFile '''+args.normFile+UseExtMC
     if isFileMap:
         runCommand+=''' --containerName $2'''
-    writeCondorShell(workDir, buildDir, runCommand, syst, "VBFAnalysisCondorSub", proxyName=args.proxyName, slc7=args.slc7) #writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="VBFAnalysisCondorSub")
+    writeCondorShell(workDir, buildDir, runCommand, syst, "VBFAnalysisCondorSub", proxyName=args.proxyName, slc7=args.slc7, CMTCONFIG=CMTCONFIG) #writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="VBFAnalysisCondorSub")
     print listofrunN
     writeCondorSub(workDir, syst, "VBFAnalysisCondorSub", listofrunN, listofrunNMC)

@@ -173,7 +173,7 @@ for syst in systlist:
     runCommand = '''athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation '''+syst+isLow+extraCommand
     print runCommand
     if not args.noSubmit:
-        writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub", slc7=args.slc7)
+        writeCondorShell(workDir, buildDir, runCommand, syst, "HFInputCondorSub", slc7=args.slc7,CMTCONFIG=CMTCONFIG)
         writeCondorSub(workDir, syst, "HFInputCondorSub", listoffiles, MCFileListToUse)
 
 
