@@ -119,6 +119,13 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==11) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==12) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==13) bins=5; // mjj binning mjj>250
+
+  // multivariate number of bins
+  if(doTMVA &&  doVBFMETGam) bins=6;
+  if(doTMVA && !doVBFMETGam){
+    if(m_binning==11) bins=7;
+    bins=11;
+  }
   totalBins = bins-1;
 
   // merging the sherpa kt samples
@@ -657,13 +664,19 @@ StatusCode HFInputAlg::execute() {
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.69700000, 0.76800000, 0.81100000, 0.84500000, 0.87600000, 0.90950000,1.0 };// var8 - new tenacious cut
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.90250000, 0.93700000, 0.95100000, 0.95850000, 0.96400000, 0.96900000, 1.0 }; // var9 MG
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.66800000, 0.76700000, 0.82300000, 0.86250000, 0.89500000, 0.92800000, 1.0 }; // var9_noNjetCST
-    float tmvaBinBoundaries[8] = { 0.0000000, 0.67050000, 0.74600000, 0.79600000, 0.83300000, 0.86450000, 0.89500000, 1.0 }; // var10_noNjet
+
+    if(doVBFMETGam){
+      float tmvaBinBoundaries[7] = { 0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+      for(unsigned i=0; i<6; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } }
+    }else{
+      float tmvaBinBoundaries[8] = { 0.0000000, 0.67050000, 0.74600000, 0.79600000, 0.83300000, 0.86450000, 0.89500000, 1.0 }; // var10_noNjet
+      for(unsigned i=0; i<7; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } } 
+    }
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.71250000, 0.80000000, 0.84850000, 0.88300000, 0.91150000, 0.93800000,1.0 };// var 9 - new tenacious cut
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.74300000, 0.80700000, 0.84550000, 0.87400000, 0.89850000, 0.92500000,1.0 };// var 11 - new tenacious cut
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.70050000, 0.77450000, 0.81800000, 0.85200000, 0.88100000, 0.91050000,1.0 }; //var8
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.73100000, 0.80450000, 0.84200000, 0.87050000, 0.89400000, 0.91800000,1.0 }; //var6
     // find the right bin
-    for(unsigned i=0; i<7; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } } 
     //if(n_jet>2) bin=1; // test
     //std::cout << "tmva: " << tmva << " bin: " << bin << std::endl;
   }else{
