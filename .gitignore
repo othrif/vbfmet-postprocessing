@@ -18,5 +18,5 @@ Plotting/*.pdf
 *.d
 *.so
 *.pcm
-TheoryUnc/TJV_study/input/*.root
-TheoryUnc/TJV_study/processed/*.root
+TheoryUnc/TJV_study/input/*
+TheoryUnc/TJV_study/processed/*
