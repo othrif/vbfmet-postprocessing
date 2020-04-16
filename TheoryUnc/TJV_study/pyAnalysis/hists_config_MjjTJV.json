@@ -1,10 +1,9 @@
 {
     "cuts": [
-     {"cut": "w*( n_jet>=2  && 200e3<jj_mass && jj_mass<800e3)", "name": "Mjj1"},
-     {"cut": "w*( n_jet>=2  && 800e3<jj_mass && jj_mass<1000e3)", "name": "Mjj2"},
-     {"cut": "w*( n_jet>=2  && 1000e3<jj_mass && jj_mass<1500e3)", "name": "Mjj3"},
-     {"cut": "w*( n_jet>=2  && 1500e3<jj_mass && jj_mass<2000e3)", "name": "Mjj4"},
-     {"cut": "w*( n_jet>=2  && 2000e3<jj_mass)", "name": "Mjj5"}
+     {"cut": "( n_jet>=2  && 200e3<jj_mass && jj_mass<1000e3)", "name": "Mjj1"},
+     {"cut": "( n_jet>=2  && 1000e3<jj_mass && jj_mass<1500e3)", "name": "Mjj2"},
+     {"cut": "( n_jet>=2  && 1500e3<jj_mass && jj_mass<2000e3)", "name": "Mjj3"},
+     {"cut": "( n_jet>=2  && 2000e3<jj_mass)", "name": "Mjj4"}
  ],
     "draw": [
         {
@@ -14,7 +13,7 @@
         },
         {
             "draw": "jj_mass*1e-3",
-            "edges": [1000,1500,2000,3000],
+            "edges": [500,1000,1500,2000,3500,5000],
             "name": "jj_mass_old"
         },
         {
@@ -47,22 +46,22 @@
         },
         {
             "draw": "el_eta",
-            "max": 2.5,
-            "min": -2.5,
+            "max": 5,
+            "min": -5,
             "name": "el_eta",
             "nbins": 25
         },
         {
             "draw": "mu_eta",
-            "max": 2.5,
-            "min": -2.5,
+            "max": 5,
+            "min": -5,
             "name": "mu_eta",
             "nbins": 25
         },
         {
             "draw": "nu_eta",
-            "max": 2.5,
-            "min": -2.5,
+            "max": 5,
+            "min": -5,
             "name": "nu_eta",
             "nbins": 25
         },
