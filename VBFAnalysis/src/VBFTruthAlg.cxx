@@ -484,11 +484,13 @@ for(auto reg : regions){
       hist( "boson_mass_"+reg+"_nominal" )->Fill(boson_m->at(0)/1e3, new_w);
     }
   }
-    if (m_theoVariation){
+
+    if (m_theoVariation && (362192 <= RunNumber && RunNumber <= 362383 || 364114 <= RunNumber && RunNumber <= 364127) ){
       for(int i=0; i<115; i++){
         if(regDecision[reg])
           hist("jj_mass_"+reg+"_index_"+to_string(i))->Fill(new_jj_mass/1e6, weight*EventWeightSys->at(i));
       }
+
       if(regDecision[reg])
 	{
           hist( "scales/jj_mass_"+reg+"_fac_up" )->Fill(new_jj_mass/1e6, weight*EventWeightSys->at(8));
@@ -502,7 +504,6 @@ for(auto reg : regions){
         }
       }
     }
-
 
 if (vbfSkimloose){
   m_tree_out->Fill();
