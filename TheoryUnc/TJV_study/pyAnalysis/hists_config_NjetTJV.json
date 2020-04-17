@@ -1,9 +1,11 @@
 {
     "cuts": [
-     {"cut": "( n_jet>=2  && 200e3<jj_mass && jj_mass<1000e3)", "name": "Mjj1"},
-     {"cut": "( n_jet>=2  && 1000e3<jj_mass && jj_mass<1500e3)", "name": "Mjj2"},
-     {"cut": "( n_jet>=2  && 1500e3<jj_mass && jj_mass<2000e3)", "name": "Mjj3"},
-     {"cut": "( n_jet>=2  && 2000e3<jj_mass)", "name": "Mjj4"}
+     {"cut": "( n_jet>=0 )", "name": "SRmTJV"},
+     {"cut": "( n_jet25==2 )", "name": "SR25"},
+     {"cut": "( n_jet30==2 )", "name": "SR30"},
+     {"cut": "( n_jet35==2 )", "name": "SR35"},
+     {"cut": "( n_jet40==2 )", "name": "SR40"},
+     {"cut": "( n_jet50==2 )", "name": "SR50"}
  ],
     "draw": [
         {

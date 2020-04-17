@@ -13,3 +13,14 @@ Plotting/*.pdf
 # Ignore the asetup save files.
 *.asetup*
 .envBefore_asetup*
+
+# ignore build files
+*.d
+*.so
+*.pcm
+TheoryUnc/TJV_study/input*/*
+TheoryUnc/TJV_study/processed*/*
+
+# tmp file
+._*
+*~

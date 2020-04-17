@@ -17,7 +17,7 @@
 #define N_CUT 4
 #define N_HIST 1
 
-void plotTJVCutMjj(TString outAREA = "/Users/othmanerifki/vbf/161219/"){
+void plotTJVCutMjj(TString outAREA = "./processed"){
 
   gSystem->Exec("mkdir -p "+outAREA+"/plots/Mjj");
   gSystem->Exec("mkdir -p "+outAREA+"/plots/Ratio");
@@ -27,20 +27,20 @@ void plotTJVCutMjj(TString outAREA = "/Users/othmanerifki/vbf/161219/"){
   std::map<TString,TString> processname;
   //processname["VBF_SR"]="VBF H(125 ) #rightarrow inv., SR";
   //processname["ggF_SR"]="ggF H(125 ) #rightarrow inv., SR";
-  processname["Zvv_EWK_SR"]="Z #rightarrow #nu#nu EWK, SR";
+  //processname["Zvv_EWK_SR"]="Z #rightarrow #nu#nu EWK, SR";
   processname["Zvv_QCD_SR"]="Z #rightarrow #nu#nu QCD, SR";
   //processname["Zll_EWK_SR"]="Z #rightarrow ll EWK, SR";
-  //processname["Zll_QCD_SR"]="Z #rightarrow ll QCD, SR";
+  processname["Zll_QCD_SR"]="Z #rightarrow ll QCD, SR";
   //processname["Wlv_EWK_SR"]="W #rightarrow #slash{l}#nu EWK, SR";
-  //processname["Wlv_QCD_SR"]="W #rightarrow #slash{l}#nu QCD, SR";
+  processname["Wlv_QCD_SR"]="W #rightarrow #slash{l}#nu QCD, SR";
   //processname["Wlv_EWK_CR"]="W #rightarrow l#nu EWK, CRW";
-  //processname["Wlv_QCD_CR"]="W #rightarrow l#nu QCD, CRW";
-  processname["Zll_EWK_CR"]="Z #rightarrow ll EWK, CRZ";
+  processname["Wlv_QCD_CR"]="W #rightarrow l#nu QCD, CRW";
+  //processname["Zll_EWK_CR"]="Z #rightarrow ll EWK, CRZ";
   processname["Zll_QCD_CR"]="Z #rightarrow ll QCD, CRZ";
 
 // naming of cuts and histograms
-  TString cuts[] = {"Mjj2", "Mjj3","Mjj4", "Mjj5"}; // "Mjj1",
-  TString names_cut[]   = {"0.8 < m_{jj} < 1 TeV", "1 < m_{jj} < 1.5 TeV", "1.5 < m_{jj} < 2 TeV", "m_{jj} > 2 TeV"};  // {"0.2 < m_{jj} < 0.8 TeV",
+  TString cuts[] = {"Mjj1", "Mjj2","Mjj3", "Mjj4"}; // "Mjj1",
+  TString names_cut[]   = {"0.5 < m_{jj} < 1 TeV", "1 < m_{jj} < 1.5 TeV", "1.5 < m_{jj} < 2 TeV", "m_{jj} > 2 TeV"};  // {"0.2 < m_{jj} < 0.8 TeV",
   //TString cuts[] = {"Mjj1", "Mjj2", "Mjj3"};
   //TString names_cut[]   = {"1 < m_{jj} < 1.5 TeV", "1.5 < m_{jj} < 2 TeV", "m_{jj} > 2 TeV"};
   TString histos[]      = {"j3_pt"};

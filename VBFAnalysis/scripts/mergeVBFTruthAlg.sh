@@ -34,3 +34,20 @@ hadd theoryVariation/Z_strong_ckkw15.root Z_strong_ckkw15*root
 hadd theoryVariation/Z_strong_ckkw30.root Z_strong_ckkw30*root
 hadd theoryVariation/Z_strong_qsf025.root Z_strong_qsf025*root
 hadd theoryVariation/Z_strong_qsf4.root Z_strong_qsf4*root
+
+hadd theoryVariation/W_strong.root W_strongNominal*root
+hadd theoryVariation/W_strong_ckkw15.root W_strong_ckkw15*root
+hadd theoryVariation/W_strong_ckkw30.root W_strong_ckkw30*root
+hadd theoryVariation/W_strong_qsf025.root W_strong_qsf025*root
+hadd theoryVariation/W_strong_qsf4.root W_strong_qsf4*root
+
+
+
+
+
+
+hadd theoryVariation/Z_strong.root Z_strongNominal*root
+hadd theoryVariation/Z_strong_ckkw15.root Z_strong_ckkw15*root
+hadd theoryVariation/Z_strong_ckkw30.root Z_strong_ckkw30*root
+hadd theoryVariation/Z_strong_qsf025.root Z_strong_qsf025*root
+hadd theoryVariation/Z_strong_qsf4.root Z_strong_qsf4*root
