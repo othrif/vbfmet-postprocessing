@@ -1,6 +1,6 @@
 {
     "cuts": [
-     {"cut": "xsec/sumw* (jj_mass>0)", "name": "Incl"}
+     {"cut": "(w/w_noxsec)* (jj_mass>0)", "name": "Incl"}
  ],
     "draw": [
         {
@@ -14,6 +14,13 @@
             "min": -10.0,
             "name": "w_noxsec",
             "nbins": 20
+        },
+        {
+            "draw": "boson_m*1e-3",
+           "max": 116.0,
+            "min": 75.0,
+            "name": "boson_m",
+            "nbins": 50
         }
     ]
 }

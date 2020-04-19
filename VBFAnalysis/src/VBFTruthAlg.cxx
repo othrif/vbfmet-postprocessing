@@ -229,7 +229,7 @@ StatusCode VBFTruthAlg::MapNgen(){
     int dsid = tmp.Atoi();
     double N = h_Gen->GetBinContent(i);
     Ngen[dsid]=N;
-    std::cout << "input: " << dsid << " " << N << std::endl;
+    //std::cout << "input: " << dsid << " " << N << std::endl;
    }
   return StatusCode::SUCCESS;
 
@@ -277,7 +277,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   else ATH_MSG_WARNING("Ngen " << nFileEvtTot << " dsid " << RunNumber );
   ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << NgenCorrected);
   new_xsec = crossSection;
-  new_sumw = nFileEvtTot;
+  new_sumw = NgenCorrected;
 
 // Prepare variables
 

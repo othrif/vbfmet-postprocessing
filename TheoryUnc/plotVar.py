@@ -252,7 +252,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     pad2.SetLogx(0)
 
     hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
-    hratio.GetYaxis().SetRangeUser(-0.5,1)
+    hratio.GetYaxis().SetRangeUser(-0.5,1.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);

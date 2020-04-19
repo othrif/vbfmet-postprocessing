@@ -5,15 +5,14 @@ from optparse import OptionParser
 from helper import HistEntry
 from array import array
 
-p = OptionParser(usage="python plotTree.py -p <path> -v <variables, comma seperated> --wait -n <suffix>", version="0.1")
+p = OptionParser(usage="python plotTree.py -p <path>--wait -n <suffix>", version="0.1")
 p.add_option('--file','-f',           type='string', default='Z_strong,Z_strong_ckkw15', dest='file')
-p.add_option('--var','-v',           type='string', default='jj_mass', dest='var')
 p.add_option('--path','-p', type='string', default='.', dest='path')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
 p.add_option('--name','-n', type='string', default='', dest='name')
 p.add_option('--logscale', '-l',         action='store_true', default=False,   dest='logscale')
 p.add_option('--atlasrootstyle','-s', type='string', default='/afs/desy.de/user/o/othrif/atlasrootstyle', dest='atlasrootstyle')
-p.add_option('--config', type=str, default='../source/TheoryUnc/TJV_study/pyAnalysis/hists_config_tree.json', dest='config', help='json file containing configurations for making histograms')
+p.add_option('--config', type=str, default='/nfs/dust/atlas/user/othrif/vbf/myPP/source/TheoryUnc/TJV_study/pyAnalysis/hists_config_tree.json', dest='config', help='json file containing configurations for making histograms')
 
 (options, args) = p.parse_args()
 config = json.load(file(options.config))
@@ -261,7 +260,7 @@ def Draw(h1, h2,f1, f2,can,GetError=True):
     pad2.SetLogx(0)
 
     hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
-    hratio.GetYaxis().SetRangeUser(-0.5,1.5)
+    hratio.GetYaxis().SetRangeUser(-0.5,2.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -296,7 +295,6 @@ def Fit(_suffix=''):
     path=options.path
 
     files=options.file.split(',')
-    hnames=options.var.split(',')
 
     if len(files) != 2:
         print("WARNING: number of files is not 2!")
@@ -340,7 +338,7 @@ def Fit(_suffix=''):
                 hists.append(hnew)
 
     for i in range(len(config['draw'])):
-        Draw(hists[i],hists[i+2],files[0],files[1],can,GetError=False)
+        Draw(hists[i],hists[i+len(config['draw'])],files[0],files[1],can,GetError=False)
 
 
 
