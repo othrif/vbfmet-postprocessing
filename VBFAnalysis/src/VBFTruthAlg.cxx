@@ -19,6 +19,7 @@ VBFTruthAlg::VBFTruthAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
+  declareProperty( "normFile", m_normFile = "fout.root", "path to a file with the number of events processed" );
 }
 
 VBFTruthAlg::~VBFTruthAlg() {}
@@ -215,6 +216,23 @@ StatusCode VBFTruthAlg::finalize() {
 
   return StatusCode::SUCCESS;}
 
+StatusCode VBFTruthAlg::MapNgen(){
+  TFile *f = TFile::Open(m_normFile.c_str(),"READ");
+  if(!f or f->IsZombie()) std::cout << "ERROR normFile. Could not open " << m_normFile << std::endl;
+  h_Gen = (TH1D*) f->Get("h_total");
+  if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
+
+  for(int i=1; i<=h_Gen->GetNbinsX();i++){
+    TString tmp = h_Gen->GetXaxis()->GetBinLabel(i);
+    int dsid = tmp.Atoi();
+    double N = h_Gen->GetBinContent(i);
+    Ngen[dsid]=N;
+    std::cout << "input: " << dsid << " " << N << std::endl;
+   }
+  return StatusCode::SUCCESS;
+
+}
+
   StatusCode VBFTruthAlg::execute() {
       ATH_MSG_DEBUG ("\n\nExecuting " << name() << "...");
 
@@ -242,14 +260,20 @@ for (int i = 0; i < 9; i++) {
 }
 if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
 
+
+ // Number of generated events
+ double NgenCorrected = 0.;
+ NgenCorrected = Ngen[runNumber];
+
   // Apply proper xsec
   crossSection = my_XsecDB->xsectTimesEff(RunNumber);//xs in pb
   // Multiply electron cross section by 3 to get all leptonic decay modes covered - ONLY for varied samples
   // 362192-362575 for zee and wenu
   if(362192 <= RunNumber && RunNumber <= 362575) crossSection *= 1; // this should be *3, but keep just the e-channel for now
-  if(nFileEvtTot>0)  weight = crossSection/nFileEvtTot;
+  // Apply proper nomalization
+  if(NgenCorrected>0)  weight = crossSection/NgenCorrected;
   else ATH_MSG_WARNING("Ngen " << nFileEvtTot << " dsid " << RunNumber );
-  ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << nFileEvtTot);
+  ATH_MSG_INFO("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << NgenCorrected);
   new_xsec = crossSection;
   new_sumw = nFileEvtTot;
 

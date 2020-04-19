@@ -29,6 +29,7 @@ public:
     virtual StatusCode  beginInputFile(); //start of each input file, only metadata loaded
     virtual StatusCode  execute();
     virtual StatusCode  finalize();       //once, after all events processed
+    virtual StatusCode  MapNgen();
 
 private:
     bool m_theoVariation;
@@ -43,6 +44,8 @@ private:
     TString m_treeName = "MiniNtuple";
     TString outputFileName = "ntuple";
 
+  TH1D *h_Gen;
+  std::map<int,double> Ngen;
 
     //output tree
     std::string outputName;

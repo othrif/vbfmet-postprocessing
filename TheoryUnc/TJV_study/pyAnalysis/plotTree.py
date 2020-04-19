@@ -6,7 +6,7 @@ from helper import HistEntry
 from array import array
 
 p = OptionParser(usage="python plotTree.py -p <path> -v <variables, comma seperated> --wait -n <suffix>", version="0.1")
-p.add_option('--file','-f',           type='string', default='Z_strongNominal364120_000005,Z_strong_ckkw15Nominal362240_000003', dest='file')
+p.add_option('--file','-f',           type='string', default='Z_strong,Z_strong_ckkw15', dest='file')
 p.add_option('--var','-v',           type='string', default='jj_mass', dest='var')
 p.add_option('--path','-p', type='string', default='.', dest='path')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
