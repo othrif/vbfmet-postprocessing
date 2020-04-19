@@ -41,8 +41,8 @@ for f in args.files:
     treelist_r21 = ROOT.TList()
     in_f_r21 = ROOT.TFile.Open(f, "READ")
     keyList = in_f_r21.GetListOfKeys()
-    for key in keyList:
-      inputTreeName=key.GetName()
+    for keyName in keyList:
+      inputTreeName=keyName.GetName()
     in_t_r21 = in_f_r21.Get(inputTreeName)
     print "Old tree: ", in_t_r21.GetEntries()
     outfilename = os.path.join(os.path.dirname(f), "extract_{0:s}.root".format(key))

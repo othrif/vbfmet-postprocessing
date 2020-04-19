@@ -607,6 +607,7 @@ StatusCode VBFTruthAlg::beginInputFile() {
   if(!m_tree) ATH_MSG_ERROR("VBFAnaysisAlg::beginInputFile - tree is invalid " << m_tree);
 
   nFileEvtTot=m_tree->GetEntries();
+  ATH_MSG_INFO(">>> Processing " << nFileEvtTot << " events!");
   m_tree->SetBranchStatus("*",0);
 
   m_tree->SetBranchStatus("EventNumber", 1);

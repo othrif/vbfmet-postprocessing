@@ -1,16 +1,22 @@
 import ROOT
 import math
+import json
 from optparse import OptionParser
+from helper import HistEntry
+from array import array
 
-p = OptionParser(usage="python plotVar.py -p <path> -v <variables, comma seperated> --wait -n <suffix>", version="0.1")
-p.add_option('--file','-f',           type='string', default='hists_extract_Zll_QCD_CR,hists_extract_Zvv_QCD_SR', dest='file')
-p.add_option('--var','-v',           type='string', default='all/Mjj1/el_eta,all/Mjj1/nu_eta', dest='var')
-p.add_option('--path','-p', type='string', default='./processed', dest='path')
+p = OptionParser(usage="python plotTree.py -p <path> -v <variables, comma seperated> --wait -n <suffix>", version="0.1")
+p.add_option('--file','-f',           type='string', default='Z_strongNominal364120_000005,Z_strong_ckkw15Nominal362240_000003', dest='file')
+p.add_option('--var','-v',           type='string', default='jj_mass', dest='var')
+p.add_option('--path','-p', type='string', default='.', dest='path')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
 p.add_option('--name','-n', type='string', default='', dest='name')
 p.add_option('--logscale', '-l',         action='store_true', default=False,   dest='logscale')
 p.add_option('--atlasrootstyle','-s', type='string', default='/afs/desy.de/user/o/othrif/atlasrootstyle', dest='atlasrootstyle')
+p.add_option('--config', type=str, default='../source/TheoryUnc/TJV_study/pyAnalysis/hists_config_tree.json', dest='config', help='json file containing configurations for making histograms')
+
 (options, args) = p.parse_args()
+config = json.load(file(options.config))
 
 #-----------------------------------------
 def Style():
@@ -181,13 +187,16 @@ def PlotError(h):
         hnew.SetBinError(i,0.0)
     return hnew
 
-def Draw(hname1, hname2,f1, f2,can,GetError=True):
+def Draw(h1, h2,f1, f2,can,GetError=True):
     can.Clear()
 
-    h1 = f1.Get(hname1)
-    h2 = f2.Get(hname2)
+    #h1 = f1.Get(hname1)
+    #h2 = f2.Get(hname2)
     #h1.Scale(h1_norm)
     #h2.Scale(h2_norm)
+    hname1=h1.GetName()
+    hname2=h2.GetName()
+
     h1.SetStats(0)
     h2.SetStats(0)
     h1.SetLineColor(1)
@@ -252,7 +261,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     pad2.SetLogx(0)
 
     hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
-    hratio.GetYaxis().SetRangeUser(-0.5,1)
+    hratio.GetYaxis().SetRangeUser(-0.5,1.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -289,14 +298,49 @@ def Fit(_suffix=''):
     files=options.file.split(',')
     hnames=options.var.split(',')
 
-    if len(files) != len(hnames):
-        print("WARNING: number of files does not match number of histogram names, insure they are the same!")
+    if len(files) != 2:
+        print("WARNING: number of files is not 2!")
         return
 
-    for i in range(len(files)/2):
-        f1=ROOT.TFile.Open(path+'/'+files[2*i]+'.root')
-        f2=ROOT.TFile.Open(path+'/'+files[2*i+1]+'.root')
-        Draw(hnames[0],hnames[1],f1,f2,can,GetError=False)
+
+    files = [ROOT.TFile.Open(path+'/'+files[0]+'.root'), ROOT.TFile.Open(path+'/'+files[1]+'.root')]
+    hists = []
+    for f in files:
+        keyList = f.GetListOfKeys()
+        for keyName in keyList:
+            inputTreeName=keyName.GetName()
+        tree = f.Get(inputTreeName)
+        for cut in config['cuts']:
+            for toDraw in config['draw']:
+                histName = toDraw['name']+inputTreeName
+                histDimension = len(toDraw['draw'].split(':'))
+                if "nbins" in toDraw:
+                  print "\tTree "+inputTreeName+": making {4}D histogram with {1} bins from {2} to {3}".format(toDraw['name'], toDraw['nbins'], toDraw['min'], toDraw['max'], histDimension)
+                  if histDimension == 1:
+                    h = ROOT.TH1F(histName,histName,toDraw['nbins'], toDraw['min'], toDraw['max'])
+                  else:
+                    raise ValueError('Not handling higher dim for now {0}'.format(toDraw))
+                elif "edges" in toDraw:
+                  print "\tTree "+inputTreeName+": making {1}D histogram with bin edges: {0}".format(toDraw['edges'], histDimension)
+                  if histDimension == 1:
+                    h = ROOT.TH1F(histName,histName,len(toDraw['edges'])-1,array('d',toDraw['edges']))
+                  else:
+                    raise ValueError('Not handling higher dim for now {0}'.format(toDraw))
+                else:
+                  print "ERROR: problem configuring the binning of the histograms..."
+                  exit()
+                # things look ok, so we draw to the histogram
+                print "\t\tdrawing {0}\n\t\twith cut ({1})".format(toDraw['draw'], cut['name'])
+                tree.Draw(toDraw['draw'] + ' >> ' + histName, '({0:s})'.format( cut['cut']) )
+                print "\t\t Integral = {0:.4f}".format(h.Integral())
+                samename=h.GetName()
+                hnew = HistEntry(h, histName)
+                hnew=hnew.merge_bins() # merge upper overflow bin
+                hnew.SetName(samename)
+                hists.append(hnew)
+
+    for i in range(len(config['draw'])):
+        Draw(hists[i],hists[i+2],files[0],files[1],can,GetError=False)
 
 
 

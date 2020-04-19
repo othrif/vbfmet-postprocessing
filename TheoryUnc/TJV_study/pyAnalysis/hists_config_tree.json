@@ -1,0 +1,19 @@
+{
+    "cuts": [
+     {"cut": "xsec/sumw* (jj_mass>0)", "name": "Incl"}
+ ],
+    "draw": [
+        {
+            "draw": "jj_mass*1e-3",
+            "edges": [500,1000,1500,2000,3500,5000],
+            "name": "jj_mass_new"
+        },
+        {
+            "draw": "w_noxsec",
+           "max": 10.0,
+            "min": -10.0,
+            "name": "w_noxsec",
+            "nbins": 20
+        }
+    ]
+}
