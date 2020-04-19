@@ -16,6 +16,7 @@ parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", defau
 parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", default = "/eos/user/r/rzou/v04/list", help = "list of ntuples to run over" )
 parser.add_argument( "-p", "--proxyName", type = str, dest = "proxyName", default = "/home/schae/testarea/HInv/run/x509up_u20186", help = "proxy file for grid")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
+parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/f_out_total_v42.root", help = "file with the total number of event processed" )
 args, unknown = parser.parse_known_args()
 
 ### Load Nominal from VBFAnalysis/python/systematics.py ###
@@ -85,7 +86,7 @@ for syst in systlist:
     print listofrunN
     if args.noSubmit:
         break
-    runCommand = '''athena VBFAnalysis/VBFTruthAlgJobOptions.py --filesInput "'''+samplePatternGlobal+'''$1" - --currentVariation '''+syst
+    runCommand = '''athena VBFAnalysis/VBFTruthAlgJobOptions.py --filesInput "'''+samplePatternGlobal+'''$1" - --currentVariation '''+syst+''' --normFile '''+args.normFile
     if isFileMap:
         runCommand+=''' --containerName $2'''
     writeCondorShell(workDir, buildDir, runCommand, syst, "VBFAnalysisCondorSub", proxyName=args.proxyName) #writeCondorShell(subDir, buildDir, syst, runCommand, scriptName="VBFAnalysisCondorSub")

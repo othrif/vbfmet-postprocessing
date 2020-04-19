@@ -18,7 +18,7 @@ arg_group = config.parser.add_argument_group("JobOptions", "Extra arguments spec
 arg_group.add_argument("--currentVariation", dest='currentVariation', default="Nominal", help="current systematics, default: Nominal")
 arg_group.add_argument("--containerName", dest='containerName', default="", help="container name used to look up the sample ID if not in the file path")
 arg_group.add_argument("--noVariation", dest='theoVariation', action="store_false", default=True, help="do theory systematic variations, default: False")
-
+arg_group.add_argument("--normFile", dest='normFile', default="fout.root", help="file with the total number of event processed")
 
 # parse the commandline options
 args = config.parse_args()
@@ -50,6 +50,7 @@ athAlgSeq += CfgMgr.VBFTruthAlg("VBFTruthAlg",
                                    currentVariation = args.currentVariation,
                                    currentSample = currentSample,
                                    runNumberInput = runNumber,
-                                   theoVariation = args.theoVariation and not isVariedSamples); #args.theoVariation and isSherpaVjets);
+                                   theoVariation = args.theoVariation and not isVariedSamples,
+                                   normFile = args.normFile); #args.theoVariation and isSherpaVjets);
 
 include("AthAnalysisBaseComps/SuppressLogging.py") #optional line

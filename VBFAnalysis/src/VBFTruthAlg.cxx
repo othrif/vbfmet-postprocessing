@@ -187,6 +187,8 @@ StatusCode VBFTruthAlg::initialize() {
 
   //Register the output TTree
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
+
+  MapNgen(); //fill std::map with dsid->Ngen
   ATH_MSG_DEBUG ("Done Initializing");
 
   std::ostringstream runNumberss;
@@ -218,7 +220,7 @@ StatusCode VBFTruthAlg::finalize() {
 
 StatusCode VBFTruthAlg::MapNgen(){
   TFile *f = TFile::Open(m_normFile.c_str(),"READ");
-  if(!f or f->IsZombie()) std::cout << "ERROR normFile. Could not open " << m_normFile << std::endl;
+  if(!f or f->IsZombie()) std::cout << "\n\n\nERROR normFile. Could not open " << m_normFile << std::endl;
   h_Gen = (TH1D*) f->Get("h_total");
   if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
 
@@ -263,7 +265,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
 
  // Number of generated events
  double NgenCorrected = 0.;
- NgenCorrected = Ngen[runNumber];
+ NgenCorrected = Ngen[RunNumber];
 
   // Apply proper xsec
   crossSection = my_XsecDB->xsectTimesEff(RunNumber);//xs in pb
@@ -273,7 +275,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   // Apply proper nomalization
   if(NgenCorrected>0)  weight = crossSection/NgenCorrected;
   else ATH_MSG_WARNING("Ngen " << nFileEvtTot << " dsid " << RunNumber );
-  ATH_MSG_INFO("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << NgenCorrected);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << NgenCorrected);
   new_xsec = crossSection;
   new_sumw = nFileEvtTot;
 
