@@ -285,8 +285,8 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   // if Nominal Sherpa_221 MAXHTPTV, do not merge or change anything in the workflow
   // if Sherpa_227 PTV_MJJ kt merged OR Sherpa_221 PTV, merge the two based on PTV
   //      - Only valid in phase space: passVjetsFilter(Mjj>800GeV,DPhijj<2.5) and PTV > 120GeV
-  if ( 364100 <= RunNumber && RunNumber <= 364197)
-    {useMerged = 0;
+  if (passVjetsFilter && (boson_pt->at(0) > 500.e3 || boson_pt->at(0) < 100.0e3 ) &&  364100 <= RunNumber && RunNumber <= 364197)
+    {useMerged = 1; // useMerged = 0;
       if (fabs(EventWeight) > 100 ) {std::cout << "RunNumber=" << RunNumber<< "Event " << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; EventWeight=1.; }
     }
   else if (passVjetsFilter && 120.e3 < boson_pt->at(0) && boson_pt->at(0) < 500.e3 && 312448 <= RunNumber && RunNumber <= 312531)
