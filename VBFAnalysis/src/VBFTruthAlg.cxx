@@ -19,6 +19,7 @@ VBFTruthAlg::VBFTruthAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
+  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", "path to a file with the number of events processed" );
 }
 
 VBFTruthAlg::~VBFTruthAlg() {}
@@ -183,9 +184,12 @@ StatusCode VBFTruthAlg::initialize() {
   m_tree_out->Branch("nunu_phi",&new_nunu_phi);
   m_tree_out->Branch("nunu_m",  &new_nunu_m);
 
+  m_tree_out->Branch("useMerged",  &useMerged);
 
   //Register the output TTree
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
+
+  MapNgen(); //fill std::map with dsid->Ngen
   ATH_MSG_DEBUG ("Done Initializing");
 
   std::ostringstream runNumberss;
@@ -215,6 +219,23 @@ StatusCode VBFTruthAlg::finalize() {
 
   return StatusCode::SUCCESS;}
 
+StatusCode VBFTruthAlg::MapNgen(){
+  TFile *f = TFile::Open(m_normFile.c_str(),"READ");
+  if(!f or f->IsZombie()) std::cout << "\n\n\nERROR normFile. Could not open " << m_normFile << std::endl;
+  h_Gen = (TH1D*) f->Get("h_total");
+  if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
+
+  for(int i=1; i<=h_Gen->GetNbinsX();i++){
+    TString tmp = h_Gen->GetXaxis()->GetBinLabel(i);
+    int dsid = tmp.Atoi();
+    double N = h_Gen->GetBinContent(i);
+    Ngen[dsid]=N;
+    //std::cout << "input: " << dsid << " " << N << std::endl;
+   }
+  return StatusCode::SUCCESS;
+
+}
+
   StatusCode VBFTruthAlg::execute() {
       ATH_MSG_DEBUG ("\n\nExecuting " << name() << "...");
 
@@ -242,16 +263,39 @@ for (int i = 0; i < 9; i++) {
 }
 if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
 
+
+ // Number of generated events
+ double NgenCorrected = 0.;
+ NgenCorrected = Ngen[RunNumber];
+
   // Apply proper xsec
   crossSection = my_XsecDB->xsectTimesEff(RunNumber);//xs in pb
   // Multiply electron cross section by 3 to get all leptonic decay modes covered - ONLY for varied samples
   // 362192-362575 for zee and wenu
   if(362192 <= RunNumber && RunNumber <= 362575) crossSection *= 1; // this should be *3, but keep just the e-channel for now
-  if(nFileEvtTot>0)  weight = crossSection/nFileEvtTot;
+  // Apply proper nomalization
+  if(NgenCorrected>0)  weight = crossSection/NgenCorrected;
   else ATH_MSG_WARNING("Ngen " << nFileEvtTot << " dsid " << RunNumber );
-  ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << nFileEvtTot);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << NgenCorrected);
   new_xsec = crossSection;
-  new_sumw = nFileEvtTot;
+  new_sumw = NgenCorrected;
+
+  // Decide which samples to use:
+
+  // if Nominal Sherpa_221 MAXHTPTV, do not merge or change anything in the workflow
+  // if Sherpa_227 PTV_MJJ kt merged OR Sherpa_221 PTV, merge the two based on PTV
+  //      - Only valid in phase space: passVjetsFilter(Mjj>800GeV,DPhijj<2.5) and PTV > 120GeV
+  if (364100 <= RunNumber && RunNumber <= 364197)
+    {useMerged = 0;
+      if (fabs(EventWeight) > 100 ) {std::cout << "RunNumber=" << RunNumber<< "Event " << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; EventWeight=1.; }
+    }
+  else if (passVjetsFilter && 120.e3 < boson_pt->at(0) && boson_pt->at(0) < 500.e3 && 312448 <= RunNumber && RunNumber <= 312531)
+    {useMerged = 1;}
+  else if (passVjetsFilter && boson_pt->at(0) > 500.e3 && 364216 <= RunNumber && RunNumber <= 364229)
+  {useMerged = 1;}
+else
+   {useMerged = 2;}
+
 
 // Prepare variables
 
@@ -512,7 +556,7 @@ float MjjCut =2e5;
 float DEtajjCut =2.5;
 
 bool vbfSkim = (new_jet_pt->at(0) > LeadJetPtCut) & (new_jet_pt->at(1) > subLeadJetPtCut) & (new_jj_deta > DEtajjCut) & ((new_jet_eta->at(0) * new_jet_eta->at(1))<0) & (new_jj_mass > MjjCut);
-bool vbfSkimloose = (new_jet_pt->at(0) > 80.0e3) & (new_jet_pt->at(1) > 50.0e3) & (new_met_et > 100e3 || new_met_nolep_et > 100e3) & (new_jj_deta > 2.5) & (new_jj_mass > 500e3);
+bool vbfSkimloose = (new_jet_pt->at(0) > 80.0e3) & (new_jet_pt->at(1) > 50.0e3) & ( boson_pt->at(0) > 150e3) & (new_jj_deta > 2.5) & (new_jj_mass > 500e3);
 
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
@@ -588,7 +632,10 @@ for(auto reg : regions){
       }
     }
 
-if (vbfSkimloose){
+
+// useMerged = 1 for nominal MAXHTPTV
+// useMerged = 2 for kt-merged + PTV
+if (vbfSkimloose && new_jj_mass>800.e3 && new_jj_dphi<2.5 && (useMerged == 1 || useMerged == 2) ){ // and boson_pt->at(0) > 120.e3
   m_tree_out->Fill();
 }
 
@@ -607,6 +654,7 @@ StatusCode VBFTruthAlg::beginInputFile() {
   if(!m_tree) ATH_MSG_ERROR("VBFAnaysisAlg::beginInputFile - tree is invalid " << m_tree);
 
   nFileEvtTot=m_tree->GetEntries();
+  ATH_MSG_INFO(">>> Processing " << nFileEvtTot << " events!");
   m_tree->SetBranchStatus("*",0);
 
   m_tree->SetBranchStatus("EventNumber", 1);
@@ -730,6 +778,11 @@ StatusCode VBFTruthAlg::beginInputFile() {
   m_tree->SetBranchAddress("parton_pdfid1", &parton_pdfid1);
   m_tree->SetBranchAddress("parton_pdfid2", &parton_pdfid2);
   m_tree->SetBranchAddress("parton_pp", &parton_pp);
+
+  m_tree->SetBranchAddress("truthF_jj_mass", &truthF_jj_mass);
+  m_tree->SetBranchAddress("truthF_jj_deta", &truthF_jj_deta);
+  m_tree->SetBranchAddress("truthF_jj_dphi", &truthF_jj_dphi);
+  m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
 
   return StatusCode::SUCCESS;
 }

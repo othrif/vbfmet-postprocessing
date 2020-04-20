@@ -29,6 +29,7 @@ public:
     virtual StatusCode  beginInputFile(); //start of each input file, only metadata loaded
     virtual StatusCode  execute();
     virtual StatusCode  finalize();       //once, after all events processed
+    virtual StatusCode  MapNgen();
 
 private:
     bool m_theoVariation;
@@ -43,6 +44,8 @@ private:
     TString m_treeName = "MiniNtuple";
     TString outputFileName = "ntuple";
 
+  TH1D *h_Gen;
+  std::map<int,double> Ngen;
 
     //output tree
     std::string outputName;
@@ -122,6 +125,11 @@ private:
     vector<int>     *parton_pdfid1;
     vector<int>     *parton_pdfid2;
     vector<int>     *parton_pp;
+
+    Bool_t passVjetsFilter;
+    Float_t truthF_jj_mass=-9999;
+    Float_t truthF_jj_deta=-9999;
+    Float_t truthF_jj_dphi=-9999;
 
    // List of branches
    TBranch        *b_EventNumber;   //!
@@ -255,6 +263,8 @@ private:
    Int_t   new_n_jet35;
    Int_t   new_n_jet40;
    Int_t   new_n_jet50;
+
+   Int_t  useMerged=-1;
 
 
 };

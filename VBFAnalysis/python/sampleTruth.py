@@ -93,46 +93,18 @@ class sample(object):
                 self.sampleType = "Z_strong_qsf025"
             elif (self.runNumber in Zee_qsf4 or self.runNumber in Znunu_qsf4):
                 self.sampleType = "Z_strong_qsf4"
-            elif ((self.runNumber >= 308096 and self.runNumber <= 308098) or (self.runNumber == 363359) or (self.runNumber == 363360) or (self.runNumber == 363489)):
-                self.sampleType = "W_EWK"
-            elif (self.runNumber >= 364156 and self.runNumber <= 364197):
+            elif ((self.runNumber >= 364100 and self.runNumber <= 364155)):
+#                self.sampleType = "Z_strong_MAXHTPTV"
+                self.sampleType = "Z_strong"
+            elif ((self.runNumber >= 364156 and self.runNumber <= 364197)):
+                #self.sampleType = "W_strong_MAXHTPTV"
                 self.sampleType = "W_strong"
-            elif (self.runNumber >= 309662 and self.runNumber <= 309664) or (self.runNumber >= 309674 and self.runNumber <= 309679) or (self.runNumber >= 364310 and self.runNumber <= 364312):
-                self.sampleType = "W_strong" # extension
-            elif (self.runNumber >= 363600 and self.runNumber <= 363671):
-                self.sampleType = "W_strongMG" # madgraph
-            elif (self.runNumber >= 308092 and self.runNumber <= 308095) or (self.runNumber >= 363355 and self.runNumber <= 363358):
-                self.sampleType = "Z_EWK"
-            elif (self.runNumber >= 345099 and self.runNumber <= 345102):
-                self.sampleType = "Z_strong_VBFFilt"
-            elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515):
+            elif ((self.runNumber >= 312448 and self.runNumber <= 312495) or (self.runNumber >= 364216 and self.runNumber <= 364223)):
+                #self.sampleType = "Z_strong_KTPTV"
                 self.sampleType = "Z_strong"
-            elif (self.runNumber >= 309665 and self.runNumber <= 309673):
-                self.sampleType = "Z_strong"
-            elif (self.runNumber <= 361519 and self.runNumber >= 361515):
-                self.sampleType = "Z_strongMG"
-            elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471)):
-                self.sampleType = "ttbar"
-            elif ((self.runNumber == 308276) or (self.runNumber == 308567)):
-                self.sampleType = "VBFH125"
-            elif (self.runNumber == 308284):
-                self.sampleType = "ggFH125"
-            elif ((self.runNumber == 308071) or (self.runNumber == 308072)):
-                self.sampleType = "VH125"
-            elif (self.runNumber >= 361020 and self.runNumber <= 361032):
-                self.sampleType = "QCDw"
-            elif (self.runNumber >= 426001 and self.runNumber <= 426009):
-                self.sampleType = "QCDunw"
-            elif (self.runNumber == 363494 or self.runNumber == 364250 or self.runNumber == 364254 or self.runNumber == 364255):
-                self.sampleType = "VV"
-            elif (self.runNumber >= 364242 and self.runNumber <= 364249):
-                self.sampleType = "VVV"
-            elif (self.runNumber >= 364198 and self.runNumber <= 364215):
-                self.sampleType = "Z_strong_LowMass"
-            elif (self.runNumber >= 301020 and self.runNumber <= 361669):
-                self.sampleType = "Z_strongPowheg" #powheg
-            elif (self.runNumber >= 363147 and self.runNumber <= 363170) or (self.runNumber >= 363123 and self.runNumber <= 363146):
-                self.sampleType = "Z_strong" #madgraph
+            elif ((self.runNumber >= 312496 and self.runNumber <= 312531) or (self.runNumber >= 364224 and self.runNumber <= 364229)):
+                #self.sampleType = "W_strong_KTPTV"
+                self.sampleType = "W_strong"
             else:
                 print "python/sample.py: runNumber "+str(self.runNumber)+" could not be identified as a valid MC :o"
                 self.sampleType = "ERROR"

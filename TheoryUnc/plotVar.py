@@ -3,12 +3,12 @@ import math
 from optparse import OptionParser
 
 p = OptionParser(usage="python plotVar.py -p <path> -v <variables, comma seperated> --wait -n <suffix>", version="0.1")
-p.add_option('--var','-v',           type='string', default='boson_mass_CRZPhi_nominal', dest='var')
-p.add_option('--path','-p', type='string', default='run_090420_old/theoryVariation/', dest='path')
+p.add_option('--file','-f',           type='string', default='hists_extract_Zll_QCD_CR,hists_extract_Zvv_QCD_SR', dest='file')
+p.add_option('--var','-v',           type='string', default='all/Mjj1/el_eta,all/Mjj1/nu_eta', dest='var')
+p.add_option('--path','-p', type='string', default='./processed', dest='path')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
 p.add_option('--name','-n', type='string', default='', dest='name')
 p.add_option('--logscale', '-l',         action='store_true', default=False,   dest='logscale')
-p.add_option('--corr','-c', type='string', default='1.', dest='corr')
 p.add_option('--atlasrootstyle','-s', type='string', default='/afs/desy.de/user/o/othrif/atlasrootstyle', dest='atlasrootstyle')
 (options, args) = p.parse_args()
 
@@ -181,22 +181,21 @@ def PlotError(h):
         hnew.SetBinError(i,0.0)
     return hnew
 
-def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
+def Draw(hname1, hname2,f1, f2,can,GetError=True):
     can.Clear()
 
-
-    h1 = f1.Get(hname)
-    h2 = f2.Get(hname)
-    h1.Scale(h1_norm)
-    h2.Scale(h2_norm)
+    h1 = f1.Get(hname1)
+    h2 = f2.Get(hname2)
+    #h1.Scale(h1_norm)
+    #h2.Scale(h2_norm)
     h1.SetStats(0)
     h2.SetStats(0)
     h1.SetLineColor(1)
     h1.SetMarkerColor(1)
     h2.SetLineColor(2)
     h2.SetMarkerColor(2)
-    h1.SetMarkerSize(0.5)
-    h2.SetMarkerSize(0.5)
+    h1.SetMarkerSize(1)
+    h2.SetMarkerSize(1)
 
 
     # pads
@@ -216,9 +215,9 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
         h2 = PlotError(h2)
 
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
-    h1.GetYaxis().SetRangeUser(0.001, max_bin*1.2)
+    h1.GetYaxis().SetRangeUser(0.001, max_bin*1.7)
     if options.logscale:
-        h1.GetYaxis().SetRangeUser(0.001, max_bin*1.7)
+        h1.GetYaxis().SetRangeUser(0.001, max_bin*2.5)
 
     h1.Draw()
     h2.Draw('same')
@@ -226,8 +225,8 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     leg = ROOT.TLegend(0.6,0.7,0.8,0.8)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
-    leg.AddEntry(h1,'Varied')
-    leg.AddEntry(h2,'Nominal')
+    leg.AddEntry(h1,hname1)
+    leg.AddEntry(h2,hname2)
 
     leg.Draw()
 
@@ -252,8 +251,8 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     pad1.SetLogx(0)
     pad2.SetLogx(0)
 
-    hratio.GetYaxis().SetTitle('Varied / Nominal')
-    hratio.GetYaxis().SetRangeUser(0,2)
+    hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
+    hratio.GetYaxis().SetRangeUser(-0.5,1.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -268,19 +267,6 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     hratio.Draw()
 
 
-    if "boson_pT" not in hname:
-        for i in range(1,hratio.GetNbinsX()+1):
-            if 66.0 < hratio.GetBinCenter(i) and hratio.GetBinCenter(i) < 116:
-                print hratio.GetBinCenter(i), round(hratio.GetBinContent(i),4)
-        hratio.Fit('pol1',"R","",66.0,116.0)
-        myfunc = hratio.GetFunction('pol1')
-        par0 = myfunc.GetParameter(0)
-        err0 = myfunc.GetParError(0)
-        l = ROOT.TLatex(0.6,0.8, 'par0='+str(round(par0,4))+'\pm'+str(round(err0,4)))
-        l.SetNDC()
-        l.SetTextSize(0.1)
-        l.Draw()
-
     can.Update()
 
     if options.wait:
@@ -290,23 +276,29 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
         log_label='_log'
 
     if GetError:
-        can.SaveAs(hname+'_'+options.name+log_label+'_err.pdf')
+        can.SaveAs(options.path+'/'+hname1.split("/")[-1]+'_'+hname1.split("/")[-1]+'_'+options.name+log_label+'_err.pdf')
     else:
-        can.SaveAs(hname+'_'+options.name+log_label+'.pdf')
+        can.SaveAs(options.path+'/'+hname2.split("/")[-1]+'_'+hname2.split("/")[-1]+'_'+options.name+log_label+'.pdf')
 
 def Fit(_suffix=''):
 
     can=ROOT.TCanvas('can',"can",600,600)
     Style();
     path=options.path
-    f1 = ROOT.TFile.Open(path+'/theoVariation_Z_strong_ckkw15.root') # varied
-    f2 = ROOT.TFile.Open(path+'/theoVariation_Z_strong.root') # nominal
-    h1_norm = 1/float(options.corr) #1./0.3757#1/0.387725#replace #1/0.344131#nominal
-    h2_norm = 1.
 
+    files=options.file.split(',')
     hnames=options.var.split(',')
-    for hname in hnames:
-        Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=False)
+
+    if len(files) != len(hnames):
+        print("WARNING: number of files does not match number of histogram names, insure they are the same!")
+        return
+
+    for i in range(len(files)/2):
+        f1=ROOT.TFile.Open(path+'/'+files[2*i]+'.root')
+        f2=ROOT.TFile.Open(path+'/'+files[2*i+1]+'.root')
+        Draw(hnames[0],hnames[1],f1,f2,can,GetError=False)
+
+
 
 setPlotDefaults(ROOT)
 Fit('test')

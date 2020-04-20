@@ -1,8 +1,6 @@
 {
     "cuts": [
-     {"cut": "n_el==2 && (n_mu==0 && n_nu==0)", "name": "Zee"},
-     {"cut": "n_mu==2 && (n_el==0 && n_nu==0)", "name": "Zmumu"},
-     {"cut": "n_nu==2 && (n_el==0 && n_mu==0)", "name": "Znunu"},
+     {"cut": "jj_mass > 800e3", "name": "Incl"}
  ],
     "draw": [
         {
@@ -10,7 +8,7 @@
             "edges": [200,400,600,800,1000,1500,2000,3500,5000],
             "name": "jj_mass"
         },
-                {
+        {
             "draw": "el_pt*1e-3",
             "max": 600.0,
             "min": 0.0,
@@ -51,6 +49,13 @@
             "min": -2.5,
             "name": "nu_eta",
             "nbins": 25
+        },
+        {
+            "draw": "boson_pt*1e-3",
+            "max": 1000.0,
+            "min": 0.0,
+            "name": "boson_pt",
+            "nbins": 24
         }
     ]
 }

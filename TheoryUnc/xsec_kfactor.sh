@@ -1,6 +1,6 @@
 #!/bin/bash
-#export xsec_Path=/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/PMGxsecDB_mc15.txt
-export xsec_Path=../VBFAnalysis/data/PMGxsecDB_mc16.txt
+export xsec_Path=/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/PMGxsecDB_mc15.txt
+#export xsec_Path=../VBFAnalysis/data/PMGxsecDB_mc16.txt
 
 echo " All samples:"
 for i in Znunu Zee Wenu_
