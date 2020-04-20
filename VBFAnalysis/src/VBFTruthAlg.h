@@ -126,6 +126,11 @@ private:
     vector<int>     *parton_pdfid2;
     vector<int>     *parton_pp;
 
+    Bool_t passVjetsFilter;
+    Float_t truthF_jj_mass=-9999;
+    Float_t truthF_jj_deta=-9999;
+    Float_t truthF_jj_dphi=-9999;
+
    // List of branches
    TBranch        *b_EventNumber;   //!
    TBranch        *b_RunNumber;   //!
@@ -258,6 +263,8 @@ private:
    Int_t   new_n_jet35;
    Int_t   new_n_jet40;
    Int_t   new_n_jet50;
+
+   Int_t  useMerged=-1;
 
 
 };

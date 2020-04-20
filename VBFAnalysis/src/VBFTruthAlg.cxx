@@ -19,7 +19,7 @@ VBFTruthAlg::VBFTruthAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
-  declareProperty( "normFile", m_normFile = "fout.root", "path to a file with the number of events processed" );
+  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", "path to a file with the number of events processed" );
 }
 
 VBFTruthAlg::~VBFTruthAlg() {}
@@ -184,6 +184,7 @@ StatusCode VBFTruthAlg::initialize() {
   m_tree_out->Branch("nunu_phi",&new_nunu_phi);
   m_tree_out->Branch("nunu_m",  &new_nunu_m);
 
+  m_tree_out->Branch("useMerged",  &useMerged);
 
   //Register the output TTree
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
@@ -278,6 +279,23 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << NgenCorrected);
   new_xsec = crossSection;
   new_sumw = NgenCorrected;
+
+  // Decide which samples to use:
+
+  // if Nominal Sherpa_221 MAXHTPTV, do not merge or change anything in the workflow
+  // if Sherpa_227 PTV_MJJ kt merged OR Sherpa_221 PTV, merge the two based on PTV
+  //      - Only valid in phase space: passVjetsFilter(Mjj>800GeV,DPhijj<2.5) and PTV > 120GeV
+  if ( 364100 <= RunNumber && RunNumber <= 364197)
+    {useMerged = 0;
+      if (fabs(EventWeight) > 100 ) {std::cout << "RunNumber=" << RunNumber<< "Event " << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; EventWeight=1.; }
+    }
+  else if (passVjetsFilter && 120.e3 < boson_pt->at(0) && boson_pt->at(0) < 500.e3 && 312448 <= RunNumber && RunNumber <= 312531)
+    {useMerged = 1;}
+  else if (passVjetsFilter && boson_pt->at(0) > 500.e3 && 364216 <= RunNumber && RunNumber <= 364229)
+  {useMerged = 1;}
+else
+   {useMerged = 2;}
+
 
 // Prepare variables
 
@@ -614,7 +632,10 @@ for(auto reg : regions){
       }
     }
 
-if (vbfSkimloose){
+
+// useMerged = 1 for nominal MAXHTPTV
+// useMerged = 2 for kt-merged + PTV
+if (vbfSkimloose && new_jj_mass>800.e3 && new_jj_dphi<2.5 and boson_pt->at(0) > 120.e3 && (useMerged == 1 || useMerged == 2) ){
   m_tree_out->Fill();
 }
 
@@ -757,6 +778,11 @@ StatusCode VBFTruthAlg::beginInputFile() {
   m_tree->SetBranchAddress("parton_pdfid1", &parton_pdfid1);
   m_tree->SetBranchAddress("parton_pdfid2", &parton_pdfid2);
   m_tree->SetBranchAddress("parton_pp", &parton_pp);
+
+  m_tree->SetBranchAddress("truthF_jj_mass", &truthF_jj_mass);
+  m_tree->SetBranchAddress("truthF_jj_deta", &truthF_jj_deta);
+  m_tree->SetBranchAddress("truthF_jj_dphi", &truthF_jj_dphi);
+  m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
 
   return StatusCode::SUCCESS;
 }
