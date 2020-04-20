@@ -110,11 +110,12 @@ else:
         if args.event_count==2:
             dsid=int(dsid_string)
             if dsid>=364541 and dsid<=364547:
+                print 'dsid: ',dsid,' raw: ',neventraw,' ',nevent
                 if nevent<0.0 or (neventraw>0.0 and nevent/neventraw>40.0):
                     print 'Problem with sum of weights: ',nevent,' raw: ',neventraw
                     #sign=1.0
                     #if dsid==364542:
-                    h_total.Fill(dsid_string,0.64783097*neventraw)
+                    h_total.Fill(dsid_string,(0.64783097*neventraw))
                     isSet=True
         if not isSet:
             h_total.Fill(dsid_string,nevent)            
