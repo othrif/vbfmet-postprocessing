@@ -373,10 +373,10 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
         
-        #cuts = [CutItem('CutNjet',  'n_jet > 1 && n_jet<5')]        
+        cuts = [CutItem('CutNjet',  'n_jet > 1 && n_jet<4')]        
         #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
         #cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
-        cuts = [CutItem('CutNjet',  'n_jet == 2')]
+        #cuts = [CutItem('CutNjet',  'n_jet == 2')]
         cuts += [CutItem('CutJ0Pt',  'jetPt0 > 60.0')]
         cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')]
 
@@ -606,20 +606,24 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     cuts = FilterCuts(options)
     if options.OverlapPh:
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
-
+        
     if basic_cuts.chan in ['nn']:
         cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst)
-        cuts += [CutItem('CutBaseLep','n_baselep == 0')]
-    elif basic_cuts.chan in ['uu','u','up','um']:
+    elif basic_cuts.chan in ['uu','u','up','um','l']:
         cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
+        # trigger fix for electron channel
+        cutElTrig = CutItem('CutElTrig')
+        cutElTrig.AddCut(CutItem('Electron',  'n_el_w > 0 && trigger_lep==1'), 'OR')
+        cutElTrig.AddCut(CutItem('Muon', 'n_mu>0 || n_mu_w>0'), 'OR')
+        cuts += [cutElTrig]
     elif basic_cuts.chan in ['ee','ll','eu']:
         cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     else:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
+    cuts += getLepChannelCuts(basic_cuts)
     if Region=='SR':
-    #    cuts += getLepChannelCuts(basic_cuts)
-        print ''
+        cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     elif Region=='ZCR':
         if basic_cuts.chan=='ee':
             cuts += [CutItem('CutEl','n_el == 2')]
@@ -627,13 +631,25 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutMu','n_mu == 2')]
         cuts += [CutItem('CutSignalZLep','n_siglep == 2')]
         cuts += [CutItem('CutBaseLep','n_baselep == 2')]
+        cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+        cuts += [CutItem('CutL1Pt',  'lepPt1 > 7.0')]
+        cutMass = CutItem('CutMass')
+        cutMass.AddCut(CutItem('Mll',  'mll < 116.0 && mll > 66.0'), 'OR')
+        #cutMass.AddCut(CutItem('Mtt', 'Mtt < 116.0 && Mtt > 76.0'), 'OR')
+        cuts += [cutMass]
+        cuts += [CutItem('CutMETForTop',  'met_tst_et < 70.0')]
     elif Region=='WCR':
         if basic_cuts.chan=='e':
+            #cuts += [CutItem('CutEl','n_el_w == 1')]
             cuts += [CutItem('CutEl','n_el == 1')]
         if basic_cuts.chan=='u':
+            #cuts += [CutItem('CutMu','n_mu_w == 1')]
             cuts += [CutItem('CutMu','n_mu == 1')]
         cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
+        #cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
         cuts += [CutItem('CutBaseLep','n_baselep == 1')]
+        cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+        #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
     cuts += [CutItem('CutPh',       'n_ph==1')]
     if basic_cuts.analysis not in ['lowmet']:
         cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
@@ -651,7 +667,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]            
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
-    cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
+    #cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
     
     if cut == 'BeforeMET':
         return GetCuts(cuts)
@@ -897,9 +913,9 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
     sigs['tth']  = ['tth']
-    #sigs['hvbf500']  = ['hvbf500']    
-    #sigs['hvbf1k']  = ['hvbf1k']    
-    #sigs['hvbf3k']  = ['hvbf3k']    
+    #sigs['hvbf500']  = ['hvbf500']
+    #sigs['hvbf1k']  = ['hvbf1k']
+    #sigs['hvbf3k']  = ['hvbf3k']
 
     bkgs = {}
 

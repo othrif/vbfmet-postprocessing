@@ -127,6 +127,8 @@ namespace Msl
       chanFlavor,
       mll,
       ptll,
+      mllg,
+      ptllg,
       mt,
       averageIntPerXing,
       lb,

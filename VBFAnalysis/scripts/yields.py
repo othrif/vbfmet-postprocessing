@@ -11,6 +11,7 @@ parser.add_argument( "-i", "--input", type = str, dest = "input", default = "/tm
 parser.add_argument( "-t", "--unblind", action = "store_true", dest = "unblind", default = False, help = "unblind the tables");
 parser.add_argument( "--ph-ana", action = "store_true", dest = "ph_ana", default = False, help = "photon analysis tables");
 parser.add_argument( "--combinePlusMinus", action = "store_true", dest = "combinePlusMinus", default = False, help = "combine the pos and neg CRs");
+parser.add_argument( "--fakeMu", action = "store_true", dest = "fakeMu", default = False, help = "add fake muon CRs");
 args, unknown = parser.parse_known_args()
 
 regions=[
@@ -32,6 +33,8 @@ if args.combinePlusMinus:
     'VBFjetSel_XNom_oneMuCRX_obs_cuts',
     'VBFjetSel_XNom_oneEleLowSigCRX_obs_cuts',
     ]
+    if args.fakeMu:
+        regions+=['VBFjetSel_XNom_oneMuMTCRX_obs_cuts']
 if args.ph_ana:
     regions=[
         'VBFjetSel_XNom_SRX_obs_cuts',
@@ -51,9 +54,12 @@ samples =['hVBFH125_',
           'httbar_',
           #'hQCDw_',
           'heleFakes_',
-          'hmultijet_',
+          ]
+if args.fakeMu:
+    samples+=['hmuoFakes_']
+samples+=['hmultijet_',
           'hdata_',
-]
+              ]
 
 samplesPrint =['Samples','VBFH125',
           'ggFH125',
@@ -64,8 +70,10 @@ samplesPrint =['Samples','VBFH125',
           'W EWK',
           'Top/VV/VVV/VBFWW',
           #'QCD',
-          'eleFakes',
-          'multijet',
+          'eleFakes',]
+if args.fakeMu:
+    samplesPrint +=['muoFakes']
+samplesPrint+=['multijet',
           'data',
           #'Signal',
           'total bkg','data/bkg'
@@ -203,6 +211,7 @@ for rmy in regions:
         if r.count('twoEle'):  region_name=['Zee']
         elif r.count('twoMu'):  region_name=['Zmm']
         elif r.count('twoLep'):  region_name=['Zll']
+        elif r.count('oneMuMTC'):  region_name=['WmunuMT']            
         elif r.count('oneEleLowSigC'):  region_name=['WenuLowMetSig']
         elif r.count('oneEleNegLowSigC'):  region_name=['WenminusLowMetSig']            
         elif r.count('oneElePosLowSigC'):  region_name=['WenplusLowMetSig']
@@ -229,7 +238,8 @@ for rmy in regions:
             if r.count('twoEle'):  sreg=['Zee']
             elif r.count('twoMu'):  sreg=['Zmm']
             elif r.count('twoLep'):  sreg=['Zll']
-            elif r.count('oneEleNegLowSigC'):  sreg=['WenminusLowMetSig']
+            elif r.count('oneMuMTC'):  sreg=['WmunuMT']
+            elif r.count('oneEleNegLowSigC'):  sreg=['WenminusLowMetSig']                
             elif r.count('oneElePosLowSigC'):  sreg=['WenplusLowMetSig']
             elif r.count('oneEleLowSigC'):  sreg=['WenuLowMetSig']
             elif r.count('oneEleNeg'):  sreg=['Wenminus']
@@ -262,7 +272,7 @@ for rmy in regions:
 print 'done'
 
 print table_per_bin
-keys_regions_map={'SR':'SR','Zll':'$Z\\rightarrow\ell\ell$ CR','Wmunu':'$W\\rightarrow\\mu\\nu$ CR','Wenu':'$W\\rightarrow$e$\\nu$ CR','WenuLowMetSig':'Fake e CR'}
+keys_regions_map={'SR':'SR','Zll':'$Z\\rightarrow\ell\ell$ CR','Wmunu':'$W\\rightarrow\\mu\\nu$ CR','Wenu':'$W\\rightarrow$e$\\nu$ CR','WenuLowMetSig':'Fake e CR','WmunuMT':'Fake $\\mu$ CR'}
 keys_regions = ['SR','Zee','Zmm','Wmnminus','Wmnplus','Wenminus','Wenplus']
 if args.combinePlusMinus:
     keys_regions = ['SR','Zll','Wmunu','Wenu']

@@ -107,9 +107,13 @@ namespace Msl
 
     TH2                        *hjj_mass_dphi_variableBin;
     TH1                        *hjj_mass_variableBin;
+    TH1                        *hjj_mass_variableBinGam;
     TH1                        *htruth_jj_mass_variableBin;
     TH1                        *hmetsig_variableBin;
     TH1                        *htmva_variableBin;
+    TH1                        *htmva_variableBin11;
+    TH1                        *htmva_wmj_variableBin;
+    TH1                        *htmva_wmj_variableBin11;
     TH1                        *hmj34;
     TH1                        *hmax_j_eta;
     TH1                        *hdRj1;

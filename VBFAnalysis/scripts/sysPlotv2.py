@@ -381,10 +381,18 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
         maxvariation=-1.0
         if systName=='JET_Flavor_Composition': maxvariation=0.08
         if systName=='JET_JER_EffectiveNP_7restTerm': maxvariation=0.03
-        if systName=='JET_JER_EffectiveNP_3': maxvariation=0.08
-        if systName=='JET_JER_EffectiveNP_2': maxvariation=0.08
-        if systName=='JET_JER_EffectiveNP_4': maxvariation=0.08
+        if systName=='JET_JER_EffectiveNP_3': maxvariation=0.06
+        if systName=='JET_JER_EffectiveNP_2': maxvariation=0.03
+        if systName=='JET_JER_EffectiveNP_4': maxvariation=0.04
+        if systName=='JET_JER_EffectiveNP_5': maxvariation=0.04
+        if systName=='JET_JER_EffectiveNP_6': maxvariation=0.04
+        if systName=='JET_JER_EffectiveNP_1': maxvariation=0.04
+        if systName=='MET_SoftTrk_ResoPara': maxvariation=0.05
+        if systName=='MET_SoftTrk_ResoPerp': maxvariation=0.05
+        if systName=='MET_SoftTrk_Scale': maxvariation=0.05
         if systName=='JET_Pileup_OffsetMu': maxvariation=0.05
+        if systName=='EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR': maxvariation=0.013
+        if systName=='EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR': maxvariation=0.013
         print systName,' max variation: ',maxvariation
         
         for r in regions:
@@ -744,6 +752,13 @@ if __name__=='__main__':
                             #'EG_SCALE_ALL',
                              #   'EG_RESOLUTION_ALL',
                                 'JET_Pileup_OffsetMu']
+    systToSmoothTestextraAll=['JET_JER_EffectiveNP_7restTerm','JET_JER_EffectiveNP_1',
+                                  'JET_JER_EffectiveNP_2','JET_JER_EffectiveNP_3',
+                                  'JET_JER_EffectiveNP_4','JET_JER_EffectiveNP_5',
+                                  'JET_JER_EffectiveNP_6','JET_JER_EffectiveNP_7restTerm',
+                                  'MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp',
+                                  'MET_SoftTrk_Scale','EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR',
+                                  'EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR']
     symmet = ['MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','JET_JER_DataVsMC_MC16','JET_fJvtEfficiency','JET_JvtEfficiency','JET_Flavor_Response','JET_Flavor_Composition','JET_EffectiveNP_Modelling3','JET_EffectiveNP_Modelling1','JET_EffectiveNP_Modelling2','JET_JER_EffectiveNP_7restTerm','JET_JER_EffectiveNP_3','JET_Pileup_OffsetMu']
 
     allSyst=[]
@@ -764,6 +779,8 @@ if __name__=='__main__':
         allSyst=systToSmoothTestextra
     elif options.syst=='met200':
         allSyst=systToSmoothTestextraA
+    elif options.syst=='useW':
+        allSyst=systToSmoothTestextraAll        
     else:
         allSyst=[options.syst]
     print 'Number of syst:',len(allSyst)

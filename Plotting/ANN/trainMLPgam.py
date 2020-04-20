@@ -43,30 +43,31 @@ import matplotlib.pyplot as plt
 ###########
 
 # VBFH125 (signal)
-VBFH125 = np.load('VBFH125.npy')
+VBFH125 = np.load('VBFHgam125.npy',allow_pickle=True)
+print(VBFH125)
 label_VBFH125 = np.ones(len(VBFH125))
 VBFH125_labelled = recfn.rec_append_fields(VBFH125, 'label', label_VBFH125)
-VBFH125_labelled['w']*=10.0 # adding weight to center the distribution
-
+#VBFH125_labelled['w']*=10.0 # adding weight to center the distribution
+#print (VBFH125_labelled['w'])
 # Z_strong (background)
-Z_strong = np.load('Z_strong.npy')
+Z_strong = np.load('Zg_EWK.npy',allow_pickle=True)
 label_Z_strong = np.zeros(len(Z_strong))
 Z_strong_labelled = recfn.rec_append_fields(Z_strong, 'label', label_Z_strong)
 
 # Z_EWK (background)
-Z_EWK = np.load('Z_EWK.npy')
+Z_EWK = np.load('Wg_EWK.npy',allow_pickle=True)
 label_Z_EWK = np.zeros(len(Z_EWK))
 Z_EWK_labelled = recfn.rec_append_fields(Z_EWK, 'label', label_Z_EWK)
 
-# ttbar (background)
-ttbar = np.load('ttbar.npy')
-label_ttbar = np.zeros(len(ttbar))
-ttbar_labelled = recfn.rec_append_fields(ttbar, 'label', label_ttbar)
-
-# W_strong (background)
-W_strong = np.load('W_strong.npy')
-label_W_strong = np.zeros(len(W_strong))
-W_strong_labelled = recfn.rec_append_fields(W_strong, 'label', label_W_strong)
+## ttbar (background)
+#ttbar = np.load('ttbar.npy')
+#label_ttbar = np.zeros(len(ttbar))
+#ttbar_labelled = recfn.rec_append_fields(ttbar, 'label', label_ttbar)
+#
+## W_strong (background)
+#W_strong = np.load('W_strong.npy')
+#label_W_strong = np.zeros(len(W_strong))
+#W_strong_labelled = recfn.rec_append_fields(W_strong, 'label', label_W_strong)
 
 ###############################################################################
 
@@ -74,7 +75,7 @@ W_strong_labelled = recfn.rec_append_fields(W_strong, 'label', label_W_strong)
 # Concatenate and shuffle data
 ##############################
 
-data = np.concatenate([VBFH125_labelled, Z_strong_labelled])
+data = np.concatenate([VBFH125_labelled, Z_strong_labelled, Z_EWK_labelled])
 #data = np.concatenate([VBFH125_labelled, Z_strong_labelled, ttbar_labelled, W_strong_labelled])
 np.random.shuffle(data) # shuffle data
 

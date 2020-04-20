@@ -67,7 +67,7 @@ for d in dlist:
             tree_out.Branch("tmva",ann_score,'tmva/f')
             tree_out.SetDirectory(fout)
             
-            nent = tree_in.GetEntries()    
+            nent = tree_in.GetEntries()
             print('Nentries: %s %s'%(nent,d))
             
             

@@ -401,7 +401,8 @@ def prepareBkgRuns(keys,options=None):
                     '308098':'WtaunuEWK',
                         }
     bkg_wewkpow =     {'363237':'WenuEWK',
-                       '363238':'WmunuEWK',
+                       #'363238':'WmunuEWK',
+                       '830006':'WmunuEWK',
                        '363239':'WtaunuEWK',
                         }
 
@@ -506,7 +507,8 @@ def prepareBkgRuns(keys,options=None):
                         }
 
     bkg_zewkpow =     {'363234':'ZeeEWK',
-                       '363235':'ZmmEWK',
+                       #'363235':'ZmmEWK',
+                       '830007':'ZmmEWK',
                        '363236':'ZttEWK',
                        '363233':'ZnnEWK',
                    }
@@ -1067,6 +1069,10 @@ def prepareBkgRuns(keys,options=None):
                      '364518':'nngamma_pty_70_140',
                      '364519':'nngamma_pty_140_E',
                  }
+    bkg_sherpa_zg_228 = {'700011':'Sh_228_eegamma_pty7_EnhMaxpTVpTy',
+                         '700012':'Sh_228_mmgamma_pty7_EnhMaxpTVpTy',
+                         '700013':'Sh_228_ttgamma_pty7_EnhMaxpTVpTy',
+                         '700014':'Sh_228_vvgamma_pty7_EnhMaxpTVpTy',}
 
     bkg_sherpa_wg = {'364521':'engamma_pty_7_15',
                      '364522':'engamma_pty_15_35',
@@ -1084,6 +1090,10 @@ def prepareBkgRuns(keys,options=None):
                      '364534':'tngamma_pty_70_140',
                      '364535':'tngamma_pty_140_E',
                  }
+    bkg_sherpa_wg_228 = {'700015':'Sh_228_evgamma_pty7_EnhMaxpTVpTy',
+                         '700016':'Sh_228_mvgamma_pty7_EnhMaxpTVpTy',
+                         '700017':'Sh_228_tvgamma_pty7_EnhMaxpTVpTy',}
+        
     bkg_mg_zg = {'345775':'FxFx_eegamma_HT0_125',
                 '345776':'FxFx_eegamma_HTGT125_MjjLT150',
                 '345777':'FxFx_eegamma_HTGT125_MjjLT500',
@@ -1244,8 +1254,8 @@ def prepareBkgRuns(keys,options=None):
                 #'top1':bkg_z_strong_madgraph_znn,
                 }
     if options.OverlapPh:
-        bkg_keys['wgam']=bkg_sherpa_wg
-        bkg_keys['zgam']=bkg_sherpa_zg
+        bkg_keys['wgam']=bkg_sherpa_wg # bkg_sherpa_wg_228
+        bkg_keys['zgam']=bkg_sherpa_zg # bkg_sherpa_zg_228
         bkg_keys['wgamewk']=bkg_wgewk
         bkg_keys['zgamewk']=bkg_zgewk
         bkg_keys['ttg']=bkg_ttg
