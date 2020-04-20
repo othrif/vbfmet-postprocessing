@@ -14,9 +14,9 @@ parser = argparse.ArgumentParser( description = "Looping over sys and samples fo
 parser.add_argument( "-n", "--nominal", dest = "nominal", action="store_true", default = False, help = "Do nominal only" )
 parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", default = "submitDir", help = "dir in run where all the output goes to")
 parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", default = "/eos/user/r/rzou/v04/list", help = "list of ntuples to run over" )
-parser.add_argument( "-p", "--proxyName", type = str, dest = "proxyName", default = "/home/schae/testarea/HInv/run/x509up_u20186", help = "proxy file for grid")
+parser.add_argument( "-p", "--proxyName", type = str, dest = "proxyName", default = "/tmp/x509up_u29949", help = "proxy file for grid")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
-parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/f_out_total_v42.root", help = "file with the total number of event processed" )
+parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", help = "file with the total number of event processed" )
 args, unknown = parser.parse_known_args()
 
 ### Load Nominal from VBFAnalysis/python/systematics.py ###

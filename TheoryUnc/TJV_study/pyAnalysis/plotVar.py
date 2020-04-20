@@ -3,8 +3,8 @@ import math
 from optparse import OptionParser
 
 p = OptionParser(usage="python plotVar.py -p <path> -v <variables, comma seperated> --wait -n <suffix>", version="0.1")
-p.add_option('--file','-f',           type='string', default='hists_extract_Zll_QCD_CR,hists_extract_Zvv_QCD_SR', dest='file')
-p.add_option('--var','-v',           type='string', default='all/Mjj1/el_eta,all/Mjj1/nu_eta', dest='var')
+p.add_option('--file','-f',           type='string', default='hists_extract_Zvv_QCD_SR,hists_extract_Zll_QCD_CR', dest='file')
+p.add_option('--var','-v',           type='string', default='all/Incl/boson_pt,all/Incl/boson_pt', dest='var')
 p.add_option('--path','-p', type='string', default='./processed', dest='path')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
 p.add_option('--name','-n', type='string', default='', dest='name')
@@ -186,6 +186,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
 
     h1 = f1.Get(hname1)
     h2 = f2.Get(hname2)
+    print h1,h2
     #h1.Scale(h1_norm)
     #h2.Scale(h2_norm)
     h1.SetStats(0)
@@ -296,7 +297,7 @@ def Fit(_suffix=''):
     for i in range(len(files)/2):
         f1=ROOT.TFile.Open(path+'/'+files[2*i]+'.root')
         f2=ROOT.TFile.Open(path+'/'+files[2*i+1]+'.root')
-        Draw(hnames[0],hnames[1],f1,f2,can,GetError=False)
+        Draw(hnames[2*i],hnames[2*i+1],f1,f2,can,GetError=False)
 
 
 

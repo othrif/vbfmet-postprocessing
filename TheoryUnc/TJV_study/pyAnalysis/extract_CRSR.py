@@ -22,7 +22,7 @@ processes = {"Zvv_QCD": "(364142 <= runNumber && runNumber <= 364155)",
              "Zll_QCD": "(364114 <= runNumber && runNumber <= 364127)",
              "Wlv_QCD": "(364170 <= runNumber && runNumber <= 364183)"
              }
-common = " && jet_pt[0]>60e3 && jet_pt[1]>40e3 && n_jet>=2 && jet_eta[0]*jet_eta[1]<0 && jj_deta>2.5 && jj_dphi<2.4  && jj_mass>200e3 "
+common = " && jet_pt[0]>60e3 && jet_pt[1]>40e3 && n_jet>=2 && jet_eta[0]*jet_eta[1]<0 && jj_deta>2.5 && jj_dphi<2.4  && jj_mass>200e3"
 SR     = " && met_et>100e3       && (n_el+n_mu==0)"
 CRW    = " && met_nolep_et>100e3 && ( (n_el==1 && n_mu==0 ) )"
 CRZ    = " && met_nolep_et>100e3 && ( (n_el==2 && n_mu==0 && el_charge[0]*el_charge[1]<0 && abs(mll-91.2e3)<25e3) )"
