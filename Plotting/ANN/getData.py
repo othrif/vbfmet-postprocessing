@@ -7,13 +7,15 @@ fs = ['/share/t3data2/schae/v26LooseJ400/VBFH125.root',
       '/share/t3data2/schae/v26LooseJ400/W_strong.root',
       '/share/t3data2/schae/v26LooseJ400/Z_EWK.root',
       '/share/t3data2/schae/v26LooseJ400/ttbar.root']
-
+#fs=['/tmp/QCDDD.root']
+fs=['/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v34DLooseMETPassThru/Z_EWK.root']
 branches =  ['w', 'runNumber', 'n_jet']
 branches += ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
-branches += ['jet_pt[2]', 'j3_centrality[0]', 'j3_centrality[1]', 'j3_min_mj_over_mjj'] # for n_jet >= 2
+#branches += ['jet_pt[2]', 'j3_centrality[0]', 'j3_centrality[1]', 'j3_min_mj_over_mjj'] # for n_jet >= 2
 branches += ['maxCentrality', 'max_mj_over_mjj']
 
-selection = 'n_jet >= 2 && n_jet <= 3 && met_tst_et > 150.0e3 && (n_basemu == 0 && n_baseel == 0 && n_ph == 1)'# && abs(met_tst_j1_dphi) > 1.0 && abs(met_tst_j2_dphi) > 1.0'
+#selection = 'n_jet >= 2 && n_jet <= 3 && met_tst_et > 150.0e3 && (n_basemu == 0 && n_baseel == 0 && n_ph == 1)'# && abs(met_tst_j1_dphi) > 1.0 && abs(met_tst_j2_dphi) > 1.0'
+selection = 'n_jet >= 2 && n_jet <= 3 && met_tst_et > 120.0e3 && (n_basemu == 0 && n_baseel == 0 && n_ph == 0)'# && abs(met_tst_j1_dphi) > 1.0 && abs(met_tst_j2_dphi) > 1.0'
 
 for f in fs:
     fname = os.path.basename(os.path.normpath(f))

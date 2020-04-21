@@ -20,6 +20,8 @@ name_model='_v37syst' # model partial name
 #name_model='_v37syst_noMJ' # model partial name
 #idir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37ESyst/' # input directory
 idir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37/v37'+RegN+'Tight/' # input directory
+idir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/VBFHPlots/MJSystKerasv1/v37'+RegN+'MJSyst/'
+idir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37MJSyst/v37'+RegN+'MJSyst/'
 #idir='/tmp/v37Esyst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
 #idir='/tmp/mj_noMJ/'
 #idir='/tmp/mj/'
@@ -29,6 +31,8 @@ idir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37/v37'+RegN+'Tight
 #odir='/tmp/mj/'
 #odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37Esyst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
 odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37TightApr15b/v37'+RegN+'syst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
+odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/VBFHPlots/MJSystKerasv1/v37'+RegN+'MJSyst/'
+odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37MJSyst/v37'+RegN+'MJSyst/'
 #variables used for training:
 #COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
 #COLS= ['jj_mass', 'jj_dphi', 'jj_deta', 'jet_pt[0]', 'jet_pt[1]',  'met_tst_et', 'met_tenacious_tst_et',  'met_soft_tst_et', 'met_cst_jet',  'n_jet', 'maxCentrality']
@@ -59,7 +63,7 @@ print(listdir)
 for i in listdir:
     cpcmd='cp '+idir.rstrip('/')+'/'+i+' '+odir.rstrip('/')+'/'+i
     print(cpcmd)
-    os.system(cpcmd)
+    #os.system(cpcmd)
 
 #prepare the list of files
 fs=[] #fs =['/tmp/v37Egam/VBFHgam125.root']
@@ -94,6 +98,8 @@ for f in fs:
     # Collect the tree names
     for key in myfile.GetListOfKeys():
         if key.GetClassName()=='TTree':
+            if not key.GetName().count('Nominal'):
+                continue
             print(key.GetName())
             TreeList+=[key.GetName()]
     myfile.Close()
