@@ -15,7 +15,9 @@ VBFAnalysis/python/job_configurations package allows users to add user defined f
 ```bash
 cd $TestArea
 git clone ssh://git@gitlab.cern.ch:7999/VBFInv/STPostProcessing.git source/
-mkdir build;cd build
+cd source
+git checkout ZHdarkPhoton; cd ..
+mkdir build; cd build
 acmSetup AthAnalysis,21.2.101
 acm compile
 ```
@@ -29,29 +31,29 @@ acmSetup
 # Create the input files
 Generating a map is the preferred option for listing files:
 ```bash
-# For GRID files
+# For listing MiniNtuple.root GRID files
 python VBFAnalysis/util/writeFileMap.py 
 # Copy in a text file with one input file per line. There is an input for text files from the GRID, and these can be overwritten preferring your local files.
 python VBFAnalysis/util/writeFileMapLS.py 
 ```
 Then collect the pickle file to get the total event counts for normalization:
 ```bash
-python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/uchicagoFileMap_v15Loose.p -o fout_v15raw.root
+python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/<your map from the previous step> -o fout.root
 ```
 To check the number of raw events, the RAW counts need to be saved: Add the -r 1 option.
 ```bash
-python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/uchicagoFileMap_v15Loose.p -o fout_v15raw.root -r 1
+python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/<your map from the previous step> -o fout.root -r 1
 ```
 
-## Run VBFAnalysisAlg ##
+## Run ZHdarkPhotonAnalysisAlg ##
 This generates the micro ntuples (from the MiniNtuples).
 For running locally with athena:
 ```bash
 cd run
 # run locally on 10 events over a file
-athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/user/r/rzou/v04/user.othrif.v04.364162.Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV140_280_CVetoBVeto.e5340_s3126_r9364_r9315_p3575_MiniNtuple.root/user.othrif.14790250._000001.MiniNtuple.root - --currentVariation Nominal
+athena VBFAnalysis/ZHdarkPhotonAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/atlas/atlascerngroupdisk/phys-hdbs/hlrs/yyd/nominal-v02/user.ssevova.ZHyyD_v02.700011.Sh_228_eegamma_pty7_EnhMaxpTVpTy.e7947_s3126_r9364_p3916_MiniNtuple.root/user.ssevova.21056957._000001.MiniNtuple.root - --currentVariation Nominal
 # run locally over a dir
-athena VBFAnalysis/VBFAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/user/r/rzou/v04/user.othrif.v04.364106.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CVetoBVeto.e5271_s3126_r9364_r9315_p3575_MiniNtuple.root/* - --currentVariation Nominal
+athena VBFAnalysis/ZHdarkPhotonAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/atlas/atlascerngroupdisk/phys-hdbs/hlrs/yyd/nominal-v02/user.ssevova.ZHyyD_v02.700011.Sh_228_eegamma_pty7_EnhMaxpTVpTy.e7947_s3126_r9364_p3916_MiniNtuple.root/* - --currentVariation Nominal
 ```
 For running on condor:
 ```bash
@@ -59,13 +61,13 @@ For running on condor:
 python VBFAnalysis/util/writeFileMap.py
 # there is also a setup for local files  VBFAnalysis/util/writeFileMapLS.py
 # run on condor over a list of files for nominal
-submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list -n
+submitZHdarkPhotonAnalysisCondor.py -l <your list> -n
 # run on condor over a list of files for all sys
-submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list
+submitZHdarkPhotonAnalysisCondor.py -l <your list>
 # run on condor over a list of files for all sys with log files saved to a specific dir
-submitVBFAnalysisCondor.py -l /eos/user/r/rzou/v04/list -d dir
+submitZHdarkPhotonAnalysisCondor.py -l <your list> -d dir
 # you'll need a grid proxy, which needs to have global permission. This is in the /tmp/x509*. Use the -p option. -l is for the map of the files at chicago on RUCIO
-submitVBFAnalysisCondor.py -l ../source/VBFAnalysis/data/uchicagoFileMap.p -n -p /home/schae/testarea/HInv/run/x509up_u20186
+submitZHdarkPhotonAnalysisCondor.py -n -l <your map> -p <your grid proxy cert> -f <your norm file> --TightSkim
 ```
 You can change the list of systematics in VBFAnalysis/python/systematics.py.
 To merge the samples, in the dir where microtuples live do:
