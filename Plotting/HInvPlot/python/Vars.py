@@ -53,7 +53,6 @@ myvars_notplotted = [['trigger_met_encoded', '2', '0.0', '1.0'],
               ['passVjetsFilterTauEl', '2', '0.0', '1.0'],              
               ['passVjetsPTV', '2', '0.0', '1.0'],
                          ['passJetCleanTight', '2', '-0.5', '1.5'],
-                         ['in_vy_overlap', '2', '-0.5', '1.5'],                         
         ]
 
 # These MET variables are plotted too, but if DETAIL_LEVEL_MET
@@ -211,9 +210,11 @@ mev_vars = ['jj_mass',
             'SherpaVTruthPt',
                 ]
 
-def GetVarStr(entry=0, syst_name='Nominal'):
+def GetVarStr(entry=0, syst_name='Nominal', ph_ana=False):
     varstr = []
     all_vars = myvars+metplots+myvars_notplotted
+    if ph_ana:
+        all_vars+=[['in_vy_overlap', '2', '-0.5', '1.5']]
     for i in all_vars:
         skip=False
         if syst_name!='Nominal':

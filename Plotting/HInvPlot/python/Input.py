@@ -89,7 +89,7 @@ class ReadEvent:
         # Additional input variables
         #    - read branches from tree and add to Event::VarHolder as enums
         #
-        inp_vars = get_vars.GetVarStr(0, syst_name)
+        inp_vars = get_vars.GetVarStr(0, syst_name, options.OverlapPh)
         mev_vars = get_vars.mev_vars
         self.read_reg.SetVal('ReadEvent::InputVars', ','.join(sorted(inp_vars)))
         self.read_reg.SetVal('ReadEvent::VarMeV',    ','.join(sorted(mev_vars)))

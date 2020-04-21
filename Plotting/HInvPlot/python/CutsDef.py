@@ -28,7 +28,7 @@ class BasicCuts:
                             'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2',
 
                             'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2',
-                                'njgt2','njgt2lt5','njgt3lt5','nj3','lowmet','revfjvt',
+                                'njgt2','njgt2lt5','njgt3lt5','nj3','lowmet','revfjvt','njgt3',
                                 'LowMETQCDRevFJVT',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
                             'metsfVBFTopo','metsfxe110XE70','metsfxe110XE65',
@@ -508,8 +508,8 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
             cuts += metCuts(basic_cuts,options,metCut=130.0, cstCut=100.0)#, maxMET=150.0)
         else:
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
-            cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0,maxMET=200.0)
-            #cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
+            #cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0,maxMET=200.0)
+            cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
             #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
 
