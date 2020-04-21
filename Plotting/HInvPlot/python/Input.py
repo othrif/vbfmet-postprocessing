@@ -89,7 +89,7 @@ class ReadEvent:
         # Additional input variables
         #    - read branches from tree and add to Event::VarHolder as enums
         #
-        inp_vars = get_vars.GetVarStr(0, syst_name)
+        inp_vars = get_vars.GetVarStr(0, syst_name, options.OverlapPh)
         mev_vars = get_vars.mev_vars
         self.read_reg.SetVal('ReadEvent::InputVars', ','.join(sorted(inp_vars)))
         self.read_reg.SetVal('ReadEvent::VarMeV',    ','.join(sorted(mev_vars)))
@@ -1272,7 +1272,8 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['wdpi'].update(bkg_ttg)
         bkg_keys['wdpi'].update(bkg_pho)
         bkg_keys['wdpi'].update(bkg_pho_v2)
-        bkg_keys['wdpi'].update(bkg_sherpa_vgg)        
+        bkg_keys['wdpi'].update(bkg_sherpa_vgg)
+    bkg_keys['wdpi'].update(bkg_vewkbad)
     if not options.mergeKTPTV:
         bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
         bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
