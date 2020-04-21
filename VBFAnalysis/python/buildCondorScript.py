@@ -9,7 +9,7 @@ def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="VBFAnalysis
     os.system("echo 'setupATLAS' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'lsetup rucio'  >> "+subDir+"/"+scriptName+syst+".sh")
-    os.system("echo 'asetup AthAnalysis,21.2.83,here' >> "+subDir+"/"+scriptName+syst+".sh")
+    os.system("echo 'asetup AthAnalysis,21.2.101,here' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'voms-proxy-info'  >> "+subDir+"/"+scriptName+syst+".sh")
     #os.system("echo 'cd "+buildDir+"; acmSetup; cd -;' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
