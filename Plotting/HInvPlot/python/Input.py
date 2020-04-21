@@ -512,6 +512,8 @@ def prepareBkgRuns(keys,options=None):
                        '363236':'ZttEWK',
                        '363233':'ZnnEWK',
                    }
+    bkg_vewkbad = {'363235':'ZmmEWKBad',
+                   '363238':'WmunuEWKBad',}
 
     bkg_zqcd_zmm = {'364100':'Zmumu_MAXHTPTV0_70_CVetoBVeto',
                     '364101':'TBD',
@@ -1270,7 +1272,8 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['wdpi'].update(bkg_ttg)
         bkg_keys['wdpi'].update(bkg_pho)
         bkg_keys['wdpi'].update(bkg_pho_v2)
-        bkg_keys['wdpi'].update(bkg_sherpa_vgg)        
+        bkg_keys['wdpi'].update(bkg_sherpa_vgg)
+    bkg_keys['wdpi'].update(bkg_vewkbad)
     if not options.mergeKTPTV:
         bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
         bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
