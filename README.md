@@ -1,11 +1,11 @@
 ### General Description ###
-Algorithms included: VBFAnalysisAlg, HFInputAlg, VBFTruthAlg.
+Algorithms included: ZHdarkPhotonAnalysisAlg, VBFAnalysisAlg, HFInputAlg, VBFTruthAlg.
 
 In order to run the algorithms all the samples should have the name pattern: user.ANYNAME.vTAG.RUNNUMBER. Data samples should in addition has physics_Main in the name.
 
 The list of systematics is defined in VBFAnalysis/python/systematics.py. See VBFAnalysis/scripts/submitHFInputCondor.py as an example of how to use it.
 
-The grouping of samples is based on RUNNUMBER and "physics_Main". It is defined in VBFAnalysis/python/sample.py. See VBFAnalysis/share/VBFAnalysisAlgJobOptions.py as an example of how to use it.
+The grouping of samples is based on RUNNUMBER and "physics_Main". It is defined in VBFAnalysis/python/sample.py. See VBFAnalysis/share/ZHDarkPhAnalysisAlgJobOptions.py as an example of how to use it.
 
 VBFAnalysis/python/job_configurations package allows users to add user defined flags to athena job options. See VBFAnalysis/share/HFInputJobOptions.py as an example of how to use it.
 
@@ -45,29 +45,30 @@ To check the number of raw events, the RAW counts need to be saved: Add the -r 1
 python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/<your map from the previous step> -o fout.root -r 1
 ```
 
-## Run ZHdarkPhotonAnalysisAlg ##
+## Run ZHDarkPhAnalysisAlg ##
 This generates the micro ntuples (from the MiniNtuples).
 For running locally with athena:
 ```bash
 cd run
 # run locally on 10 events over a file
-athena VBFAnalysis/ZHdarkPhotonAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/atlas/atlascerngroupdisk/phys-hdbs/hlrs/yyd/nominal-v02/user.ssevova.ZHyyD_v02.700011.Sh_228_eegamma_pty7_EnhMaxpTVpTy.e7947_s3126_r9364_p3916_MiniNtuple.root/user.ssevova.21056957._000001.MiniNtuple.root - --currentVariation Nominal
+athena VBFAnalysis/ZHDarkPhAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/atlas/atlascerngroupdisk/phys-hdbs/hlrs/yyd/nominal-v02/user.ssevova.ZHyyD_v02.700011.Sh_228_eegamma_pty7_EnhMaxpTVpTy.e7947_s3126_r9364_p3916_MiniNtuple.root/user.ssevova.21056957._000001.MiniNtuple.root - --currentVariation Nominal
 # run locally over a dir
-athena VBFAnalysis/ZHdarkPhotonAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/atlas/atlascerngroupdisk/phys-hdbs/hlrs/yyd/nominal-v02/user.ssevova.ZHyyD_v02.700011.Sh_228_eegamma_pty7_EnhMaxpTVpTy.e7947_s3126_r9364_p3916_MiniNtuple.root/* - --currentVariation Nominal
+athena VBFAnalysis/ZHDarkPhAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/atlas/atlascerngroupdisk/phys-hdbs/hlrs/yyd/nominal-v02/user.ssevova.ZHyyD_v02.700011.Sh_228_eegamma_pty7_EnhMaxpTVpTy.e7947_s3126_r9364_p3916_MiniNtuple.root/* - --currentVariation Nominal
 ```
 For running on condor:
 ```bash
 # you'll want to generate a list of files, which only has to be done once. give it a comma separated list of input containers
 python VBFAnalysis/util/writeFileMap.py
-# there is also a setup for local files  VBFAnalysis/util/writeFileMapLS.py
+# recall, there is also a setup for local files:
+python VBFAnalysis/util/writeFileMapLS.py
 # run on condor over a list of files for nominal
-submitZHdarkPhotonAnalysisCondor.py -l <your list> -n
+submitZHDarkPhAnalysisCondor.py -l <your list> -n
 # run on condor over a list of files for all sys
-submitZHdarkPhotonAnalysisCondor.py -l <your list>
+submitZHDarkPhAnalysisCondor.py -l <your list>
 # run on condor over a list of files for all sys with log files saved to a specific dir
-submitZHdarkPhotonAnalysisCondor.py -l <your list> -d dir
+submitZHDarkPhAnalysisCondor.py -l <your list> -d dir
 # you'll need a grid proxy, which needs to have global permission. This is in the /tmp/x509*. Use the -p option. -l is for the map of the files at chicago on RUCIO
-submitZHdarkPhotonAnalysisCondor.py -n -l <your map> -p <your grid proxy cert> -f <your norm file> --TightSkim
+submitZHDarkPhAnalysisCondor.py -n -l <your map> -p <your grid proxy cert> -f <your norm file> --TightSkim
 ```
 You can change the list of systematics in VBFAnalysis/python/systematics.py.
 To merge the samples, in the dir where microtuples live do:
