@@ -20,7 +20,7 @@
             "max": 120.0,
             "min": 60.0,
             "name": "boson_m",
-            "nbins": 600
+            "nbins": 60
         },
         {
             "draw": "met_nolep_et*1e-3",
@@ -195,6 +195,13 @@
             "max": 500.0,
             "min": 0.0,
             "name": "jet2_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "jet_pt[2]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "jet3_pt",
             "nbins": 50
         }
     ]

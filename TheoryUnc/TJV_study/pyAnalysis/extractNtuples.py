@@ -31,9 +31,9 @@ common = "  && useMerged==1 && boson_pt[0] > 150e3 && jet_pt[0]>80e3 && jet_pt[1
 #CRW    = " && met_nolep_et>100e3 && ( (n_el==1 && n_mu==0 ) )"
 #CRZ    = " && met_nolep_et>100e3 && ( (n_el==2 && n_mu==0 && el_charge[0]*el_charge[1]<0 && abs(mll-91.2e3)<25e3) )"
 selection = {
-#             "Zvv_QCD"  : processes["Zvv_QCD"] + common,# + SR,
-#             "Wlv_QCD"  : processes["Wlv_QCD"] + common,# + SR,
-#             "Zll_QCD"  : processes["Zll_QCD"] + common,# + CRZ,
+             "Zvv_QCD"  : processes["Zvv_QCD"] + common,# + SR,
+             "Wlv_QCD"  : processes["Wlv_QCD"] + common,# + SR,
+             "Zll_QCD"  : processes["Zll_QCD"] + common,# + CRZ,
              "Zee_QCD"  : processes["Zee_QCD"] + common,
              "Zmm_QCD"  : processes["Zmm_QCD"] + common,
              "Wev_QCD"  : processes["Wev_QCD"] + common,

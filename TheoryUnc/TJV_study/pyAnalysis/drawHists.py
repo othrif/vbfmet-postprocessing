@@ -1,17 +1,30 @@
 import ROOT
 import math
+import os
 from optparse import OptionParser
+from helper import HistEntry
 
-p = OptionParser(usage="python plotVar.py -p <path> -v <variables, comma seperated> --wait -n <suffix>", version="0.1")
-p.add_option('--file','-f',           type='string', default='hists_extract_Zvv_QCD_SR,hists_extract_Zll_QCD_CR', dest='file')
-p.add_option('--var','-v',           type='string', default='all/Incl/boson_pt,all/Incl/boson_pt', dest='var')
+
+p = OptionParser(usage="python drawHists.py -p <path> -v <variables, comma seperated> -f <files>--wait -n <suffix>", version="0.1")
+p.add_option('--file','-f',           type='string', default='hists_extract_Zee_QCD,hists_extract_Zmm_QCD', dest='file')
+p.add_option('--var','-v',           type='string', default='', dest='var') #all/Incl/boson_pt,all/Incl/boson_pt
 p.add_option('--path','-p', type='string', default='./processed', dest='path')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
-p.add_option('--name','-n', type='string', default='', dest='name')
+p.add_option('--name','-n', type='string', default='test', dest='name')
 p.add_option('--logscale', '-l',         action='store_true', default=False,   dest='logscale')
 p.add_option('--atlasrootstyle','-s', type='string', default='/afs/desy.de/user/o/othrif/atlasrootstyle', dest='atlasrootstyle')
 (options, args) = p.parse_args()
 
+#-----------------------------------------
+def getall(d, basepath="/"):
+    "Walk the directory structure and content in and below a directory. Return (path, obj) pairs"
+    for key in d.GetListOfKeys():
+        kname = key.GetName()
+        if key.IsFolder():
+            for i in getall(d.Get(kname), basepath+kname+"/"):
+                yield i
+        else:
+            yield basepath+kname, d.Get(kname)
 #-----------------------------------------
 def Style():
     ROOT.gROOT.LoadMacro(options.atlasrootstyle+'/AtlasStyle.C')
@@ -184,11 +197,65 @@ def PlotError(h):
 def Draw(hname1, hname2,f1, f2,can,GetError=True):
     can.Clear()
 
+    hname = hname1
     h1 = f1.Get(hname1)
     h2 = f2.Get(hname2)
-    print h1,h2
     #h1.Scale(h1_norm)
     #h2.Scale(h2_norm)
+    print f1.GetName(), f2.GetName()
+
+    # Fix labels
+
+    type_sample='QCD '
+    type_sample_out='qcd'
+    if f1.GetName().count('EWK') or f2.GetName().count('EWK'):
+        type_sample='EWK '
+        type_sample_out='ewk'
+    num_name = 'Z#rightarrow#nu#nu'
+    den_name = 'Z#rightarrow ll'
+    comp1='znn'
+    comp2='znn'
+    if f1.GetName().count('_Zll'):
+        num_name = 'Z#rightarrow ll'
+        comp1='zll'
+    if f1.GetName().count('_Zmm'):
+        num_name = 'Z#rightarrow #mu#mu'
+        comp1='zmm'
+    if f1.GetName().count('_Zee'):
+        num_name = 'Z#rightarrow ee'
+        comp1='zee'
+    if f1.GetName().count('_Zvv'):
+        num_name = 'Z#rightarrow#nu#nu'
+    if f1.GetName().count('_Wlv'):
+        num_name = 'W#rightarrowl#nu'
+        comp1='wln'
+    if f1.GetName().count('_Wev'):
+        num_name = 'W#rightarrowe#nu'
+        comp1='wen'
+    if f1.GetName().count('_Wmv'):
+        num_name = 'W#rightarrow#mu#nu'
+        comp1='wmn'
+    if f2.GetName().count('_Zll'):
+        den_name = 'Z#rightarrow ll'
+        comp2='zll'
+    if f2.GetName().count('_Zmm'):
+        den_name = 'Z#rightarrow #mu#mu'
+        comp2='zmm'
+    if f2.GetName().count('_Zee'):
+        den_name = 'Z#rightarrow ee'
+        comp2='zee'
+    if f2.GetName().count('_Zvv'):
+        den_name = 'Z#rightarrow#nu#nu'
+    if f2.GetName().count('_Wlv'):
+        den_name = 'W#rightarrowl#nu'
+        comp2='wln'
+    if f2.GetName().count('_Wev'):
+        den_name = 'W#rightarrowe#nu'
+        comp2='wen'
+    if f2.GetName().count('_Wmv'):
+        den_name = 'W#rightarrow#mu#nu'
+        comp2='wmn'
+
     h1.SetStats(0)
     h2.SetStats(0)
     h1.SetLineColor(1)
@@ -216,18 +283,32 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         h2 = PlotError(h2)
 
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
-    h1.GetYaxis().SetRangeUser(0.001, max_bin*1.7)
+    h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.7)
     if options.logscale:
-        h1.GetYaxis().SetRangeUser(0.001, max_bin*2.5)
+        h1.GetYaxis().SetRangeUser(1e-8, max_bin*5)
 
-    h1.Draw()
-    h2.Draw('same')
+    h1.DrawNormalized()
+    h2.DrawNormalized('same')
+
+    chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
+    kval = 1#h1.KolmogorovTest(h2, '')
+    print 'chi2: ',chi2,' ks: ',kval
+    ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
+    ks_text2.SetNDC()
+    ks_text2.SetTextSize(0.055)
+    ks_text2.SetTextAlign(11)
+    ks_text2.SetTextColor(ROOT.kBlack)
+    ks_text2.Draw()
+
+    e=ROOT.Double(0.0)
+    print 'Integral '+comp1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
+    print 'Integral '+comp2+': ',h2.IntegralAndError(0,1001,e),'+/-',e
 
     leg = ROOT.TLegend(0.6,0.7,0.8,0.8)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
-    leg.AddEntry(h1,hname1)
-    leg.AddEntry(h2,hname2)
+    leg.AddEntry(h1,num_name)
+    leg.AddEntry(h2,den_name)
 
     leg.Draw()
 
@@ -244,6 +325,9 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     pad2.cd();       # pad2 becomes the current pad
 
     hratio = h1.Clone()
+    intden = h1.Integral()
+    if intden>0.0:
+        hratio.Scale(h2.Integral()/intden)
     hratio.Divide(h2)
     pad1.SetLogy(0)
     if options.logscale:
@@ -252,8 +336,69 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     pad1.SetLogx(0)
     pad2.SetLogx(0)
 
-    hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
-    hratio.GetYaxis().SetRangeUser(-0.5,1)
+    print "drawing ", hname, "..."
+    if  hname.count('boson_pt'):
+        hratio.GetXaxis().SetTitle('Boson p_{T} [GeV]')
+    elif  hname.count('boson_m'):
+        hratio.GetXaxis().SetTitle('Boson Mass [GeV]')
+    elif  hname.count('jj_mass'):
+        hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
+    elif  hname.count('jj_deta'):
+        hratio.GetXaxis().SetTitle('#Delta#eta_{jj}')
+    elif  hname.count('jj_dphi'):
+        hratio.GetXaxis().SetTitle('#Delta#phi_{jj}')
+    elif  hname.count('jet1_pt'):
+        hratio.GetXaxis().SetTitle('Lead Jet p_{T} [GeV]')
+    elif  hname.count('jet2_pt'):
+        hratio.GetXaxis().SetTitle('Sub-Lead Jet p_{T} [GeV]')
+    elif  hname.count('jet3_pt'):
+        hratio.GetXaxis().SetTitle('3rd jet p_{T} [GeV]')
+    elif hname.count('met_tst_et'):
+        hratio.GetXaxis().SetTitle('MET [GeV]')
+    elif  hname.count('met_tst_nolep_et'):
+        hratio.GetXaxis().SetTitle('MET (no leptons) [GeV]')
+    elif hname.count('el1_pt'):
+        hratio.GetXaxis().SetTitle('Lead Electron p_{T} [GeV]')
+    elif hname.count('el2_pt'):
+        hratio.GetXaxis().SetTitle('Sub-Lead Electron p_{T} [GeV]')
+    elif hname.count('el1_eta'):
+        hratio.GetXaxis().SetTitle('Lead Electron  #eta [GeV]')
+    elif hname.count('el2_eta'):
+        hratio.GetXaxis().SetTitle('Sub-Lead Electron #eta [GeV]')
+    elif hname.count('mu1_pt'):
+        hratio.GetXaxis().SetTitle('Lead Muon p_{T} [GeV]')
+    elif hname.count('mu2_pt'):
+        hratio.GetXaxis().SetTitle('Sub-Lead Muon p_{T} [GeV]')
+    elif hname.count('mu1_eta'):
+        hratio.GetXaxis().SetTitle('Lead Electron  #eta [GeV]')
+    elif hname.count('mu2_eta'):
+        hratio.GetXaxis().SetTitle('Sub-Lead Electron #eta [GeV]')
+    elif hname.count('nu1_pt'):
+        hratio.GetXaxis().SetTitle('Lead Neutrino p_{T} [GeV]')
+    elif hname.count('nu2_pt'):
+        hratio.GetXaxis().SetTitle('Sub-Lead Neutrino p_{T} [GeV]')
+    elif hname.count('nu1_eta'):
+        hratio.GetXaxis().SetTitle('Lead Neutrino  #eta [GeV]')
+    elif hname.count('nu2_eta'):
+        hratio.GetXaxis().SetTitle('Sub-Lead Neutrino #eta [GeV]')
+    elif hname.count('lep_jet_dR'):
+        hratio.GetXaxis().SetTitle('#DeltaR(#ell,jet)')
+    elif  hname.count('n_jet'):
+        hratio.GetXaxis().SetTitle('N_{jet}')
+    elif  hname.count('n_jet25'):
+        hratio.GetXaxis().SetTitle('N_{jet}^{25GeV}')
+    elif  hname.count('n_jet50'):
+        hratio.GetXaxis().SetTitle('N_{jet}^{50GeV}')
+    elif  hname.count('n_el'):
+        hratio.GetXaxis().SetTitle('N_{e}')
+    elif  hname.count('n_mu'):
+        hratio.GetXaxis().SetTitle('N_{#mu}')
+    elif  hname.count('n_nu'):
+        hratio.GetXaxis().SetTitle('N_{#nu}')
+
+
+    hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
+    hratio.GetYaxis().SetRangeUser(0.5,1.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -266,8 +411,6 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);
     hratio.Draw()
-
-
     can.Update()
 
     if options.wait:
@@ -276,10 +419,15 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     if options.logscale:
         log_label='_log'
 
+
+    mypath=options.path+'/plots/'
+    if not os.path.exists(mypath):
+        os.makedirs(mypath)
+    mypath=mypath+hname[1:].replace("/", "_")
     if GetError:
-        can.SaveAs(options.path+'/'+hname1.split("/")[-1]+'_'+hname1.split("/")[-1]+'_'+options.name+log_label+'_err.pdf')
+        can.SaveAs(mypath+'_'+comp1+'_'+comp2+'_'+options.name+log_label+'_err.pdf')
     else:
-        can.SaveAs(options.path+'/'+hname2.split("/")[-1]+'_'+hname2.split("/")[-1]+'_'+options.name+log_label+'.pdf')
+        can.SaveAs(mypath+'_'+comp1+'_'+comp2+'_'+options.name+log_label+'.pdf')
 
 def Fit(_suffix=''):
 
@@ -288,16 +436,25 @@ def Fit(_suffix=''):
     path=options.path
 
     files=options.file.split(',')
-    hnames=options.var.split(',')
+    f=[]
+    for fname in files:
+        f.append(ROOT.TFile.Open(path+'/'+fname+'.root'))
 
-    if len(files) != len(hnames):
-        print("WARNING: number of files does not match number of histogram names, insure they are the same!")
+    if options.var:
+        hnames=options.var.split(',')
+        if len(files) != len(hnames):
+            print("WARNING: number of files does not match number of histogram names, insure they are the same!")
+            return
+        for i in range(len(files)/2):
+            Draw(hnames[2*i],hnames[2*i+1],f[2*i],f[2*i+1],can,GetError=False)
+    else:
+        print "Run over all histograms of the file..."
+        for k,o in getall(f[0]):
+            print "Get ready to plot", o.ClassName(), k
+            Draw(k,k,f[0],f[1],can,GetError=False)
         return
 
-    for i in range(len(files)/2):
-        f1=ROOT.TFile.Open(path+'/'+files[2*i]+'.root')
-        f2=ROOT.TFile.Open(path+'/'+files[2*i+1]+'.root')
-        Draw(hnames[2*i],hnames[2*i+1],f1,f2,can,GetError=False)
+
 
 
 

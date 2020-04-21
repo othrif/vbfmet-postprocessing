@@ -20,7 +20,7 @@ Plotting/*.pdf
 *.pcm
 TheoryUnc/TJV_study/input*/*
 TheoryUnc/TJV_study/processed*/*
-
+TheoryUnc/TJV_study/*pdf
 # tmp file
 ._*
 *~

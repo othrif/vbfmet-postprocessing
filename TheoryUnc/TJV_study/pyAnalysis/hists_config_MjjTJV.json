@@ -18,66 +18,10 @@
         },
         {
             "draw": "jet_pt[2]*1e-3",
-            "max": 300,
+            "max": 500,
             "min": 0,
             "name": "j3_pt",
-            "nbins": 60
-        },
-        {
-            "draw": "el_pt*1e-3",
-            "max": 600.0,
-            "min": 0.0,
-            "name": "el_pt",
-            "nbins": 24
-        },
-        {
-            "draw": "mu_pt*1e-3",
-            "max": 600.0,
-            "min": 0.0,
-            "name": "mu_pt",
-            "nbins": 24
-        },
-        {
-            "draw": "nu_pt*1e-3",
-            "max": 600.0,
-            "min": 0.0,
-            "name": "nu_pt",
-            "nbins": 24
-        },
-        {
-            "draw": "el_eta",
-            "max": 5,
-            "min": -5,
-            "name": "el_eta",
-            "nbins": 25
-        },
-        {
-            "draw": "mu_eta",
-            "max": 5,
-            "min": -5,
-            "name": "mu_eta",
-            "nbins": 25
-        },
-        {
-            "draw": "nu_eta",
-            "max": 5,
-            "min": -5,
-            "name": "nu_eta",
-            "nbins": 25
-        },
-        {
-            "draw": "met_et*1e-3",
-            "max": 600.0,
-            "min": 0.0,
-            "name": "met_et",
-            "nbins": 24
-        },
-        {
-            "draw": "met_nolep_et*1e-3",
-            "max": 600.0,
-            "min": 0.0,
-            "name": "met_nolep_et",
-            "nbins": 24
+            "nbins": 50
         }
     ]
 }

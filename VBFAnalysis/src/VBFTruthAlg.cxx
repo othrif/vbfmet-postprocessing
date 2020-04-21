@@ -29,8 +29,8 @@ StatusCode VBFTruthAlg::initialize() {
 
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
-  std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
-  //xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
+  //std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+  std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
   //std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
@@ -635,7 +635,7 @@ for(auto reg : regions){
 
 // useMerged = 1 for nominal MAXHTPTV
 // useMerged = 2 for kt-merged + PTV
-if (vbfSkimloose && new_jj_mass>800.e3 && new_jj_dphi<2.5 && (useMerged == 1 || useMerged == 2) ){ // and boson_pt->at(0) > 120.e3
+if (vbfSkimloose && new_jj_mass>800.e3 && new_jj_dphi<2.5 && (useMerged == 1 || useMerged == 2) ){
   m_tree_out->Fill();
 }
 
