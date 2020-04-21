@@ -11,25 +11,25 @@ p.add_option('--wait',          action='store_true', default=False,   dest='wait
 (options, args) = p.parse_args()
 #-------------------------------------------------------------------------
 def getATLASLabels(pad, x, y, text=None, selkey=None):
-    
+
     l = ROOT.TLatex(x, y, 'ATLAS')
     l.SetNDC()
     l.SetTextFont(72)
     l.SetTextSize(0.055)
-    l.SetTextAlign(11)    
+    l.SetTextAlign(11)
     l.SetTextColor(ROOT.kBlack)
-    l.Draw()    
-    
+    l.Draw()
+
     delx = 0.05*pad.GetWh()/(pad.GetWw())
     labs = [l]
-    
+
     if True:
         p = ROOT.TLatex(x+0.12, y, ' Internal') #
         p.SetNDC()
         p.SetTextFont(42)
         p.SetTextSize(0.055)
         p.SetTextAlign(11)
-        p.SetTextColor(ROOT.kBlack)        
+        p.SetTextColor(ROOT.kBlack)
         p.Draw()
         labs += [p]
     if True:
@@ -55,7 +55,7 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
         b.SetTextAlign(12)
         b.SetTextColor(ROOT.kBlack)
         b.Draw()
-        labs += [b]        
+        labs += [b]
 
     return labs
 #-----------------------------------------------------------------------------
@@ -65,64 +65,64 @@ def setPlotDefaults(root, options = None):
 
     #root.gROOT.SetStyle('Plain')
 
-    root.gStyle.SetFillColor(10)           
-    root.gStyle.SetFrameFillColor(10) 
-    root.gStyle.SetCanvasColor(10)         
-    root.gStyle.SetPadColor(10)            
-    root.gStyle.SetTitleFillColor(0)       
-    root.gStyle.SetStatColor(10)   
-    
+    root.gStyle.SetFillColor(10)
+    root.gStyle.SetFrameFillColor(10)
+    root.gStyle.SetCanvasColor(10)
+    root.gStyle.SetPadColor(10)
+    root.gStyle.SetTitleFillColor(0)
+    root.gStyle.SetStatColor(10)
+
     root.gStyle.SetCanvasBorderMode(0)
-    root.gStyle.SetFrameBorderMode(0) 
-    root.gStyle.SetPadBorderMode(0)   
-    root.gStyle.SetDrawBorder(0)      
+    root.gStyle.SetFrameBorderMode(0)
+    root.gStyle.SetPadBorderMode(0)
+    root.gStyle.SetDrawBorder(0)
     root.gStyle.SetTitleBorderSize(0)
-    
+
     root.gStyle.SetFuncWidth(2)
     root.gStyle.SetHistLineWidth(2)
     root.gStyle.SetFuncColor(2)
-    
+
     root.gStyle.SetPadTopMargin(0.08)
     root.gStyle.SetPadBottomMargin(0.16)
     root.gStyle.SetPadLeftMargin(0.16)
     root.gStyle.SetPadRightMargin(0.12)
-  
+
     # set axis ticks on top and right
-    root.gStyle.SetPadTickX(1)         
-    root.gStyle.SetPadTickY(1)         
-  
+    root.gStyle.SetPadTickX(1)
+    root.gStyle.SetPadTickY(1)
+
     # Set the background color to white
-    root.gStyle.SetFillColor(10)           
-    root.gStyle.SetFrameFillColor(10)      
-    root.gStyle.SetCanvasColor(10)         
-    root.gStyle.SetPadColor(10)            
-    root.gStyle.SetTitleFillColor(0)       
-    root.gStyle.SetStatColor(10)           
-  
-  
+    root.gStyle.SetFillColor(10)
+    root.gStyle.SetFrameFillColor(10)
+    root.gStyle.SetCanvasColor(10)
+    root.gStyle.SetPadColor(10)
+    root.gStyle.SetTitleFillColor(0)
+    root.gStyle.SetStatColor(10)
+
+
     # Turn off all borders
     root.gStyle.SetCanvasBorderMode(0)
-    root.gStyle.SetFrameBorderMode(0) 
-    root.gStyle.SetPadBorderMode(0)   
-    root.gStyle.SetDrawBorder(0)      
-    root.gStyle.SetTitleBorderSize(0) 
-  
+    root.gStyle.SetFrameBorderMode(0)
+    root.gStyle.SetPadBorderMode(0)
+    root.gStyle.SetDrawBorder(0)
+    root.gStyle.SetTitleBorderSize(0)
+
     # Set the size of the default canvas
-    root.gStyle.SetCanvasDefH(400)          
-    root.gStyle.SetCanvasDefW(650)          
+    root.gStyle.SetCanvasDefH(400)
+    root.gStyle.SetCanvasDefW(650)
     #gStyle->SetCanvasDefX(10)
-    #gStyle->SetCanvasDefY(10)   
-  
+    #gStyle->SetCanvasDefY(10)
+
     # Set fonts
     font = 42
     #root.gStyle.SetLabelFont(font,'xyz')
-    #root.gStyle.SetStatFont(font)       
-    #root.gStyle.SetTitleFont(font)      
+    #root.gStyle.SetStatFont(font)
+    #root.gStyle.SetTitleFont(font)
     #root.gStyle.SetTitleFont(font,'xyz')
-    #root.gStyle.SetTextFont(font)       
-    #root.gStyle.SetTitleX(0.3)        
-    #root.gStyle.SetTitleW(0.4)        
-  
+    #root.gStyle.SetTextFont(font)
+    #root.gStyle.SetTitleX(0.3)
+    #root.gStyle.SetTitleW(0.4)
+
    # Set Line Widths
    #gStyle->SetFrameLineWidth(0)
    #root.gStyle.SetFuncWidth(2)
@@ -165,11 +165,11 @@ def setPlotDefaults(root, options = None):
     #root.gStyle.SetTextAlign(22)
     root.gStyle.SetTextSize(0.1)
    #
-   ##root.gStyle.SetPaperSize(root.TStyle.kA4)  
+   ##root.gStyle.SetPaperSize(root.TStyle.kA4)
     root.gStyle.SetPalette(1)
    #
    ##root.gStyle.SetHistMinimumZero(True)
-   
+
     root.gROOT.ForceStyle()
 #-----------------------------------------
 def Format(h):
@@ -189,13 +189,13 @@ def PlotError(h):
         newval=0.0
         if valb!=0.0:
             newval = errb/abs(valb)
-        
+
         hnew.SetBinContent(i,newval)
         hnew.SetBinError(i,0.0)
     return hnew
 #-----------------------------------------
 def Style():
-    ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasStyle.C')                   
+    ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasStyle.C')
     ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasUtils.C')
     ROOT.SetAtlasStyle()
 
@@ -239,20 +239,20 @@ def GetHistsRatio(hname1,f1,hpath1all=[''],hpath2all=['']):
         h2.Rebin(rebin)
     if hname1=='met_tst_et':
         h1.Rebin(rebin)
-        h2.Rebin(rebin) 
+        h2.Rebin(rebin)
     if hname1=='jj_dphi':
         h1.Rebin(rebin)
-        h2.Rebin(rebin) 
+        h2.Rebin(rebin)
     if hname1=='met_tst_nolep_et':
         h1.Rebin(5)
-        h2.Rebin(5) 
+        h2.Rebin(5)
     hratio = h2.Clone()
     intden = h2.Integral()
     if intden>0.0:
         hratio.Scale(h1.Integral()/intden)
     hratio.Divide(h1)
     return hratio
-    
+
 def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],extra=''):
     can.Clear()
 
@@ -294,7 +294,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
     h2.SetMarkerColor(2)
     h1.SetMarkerSize(0.5)
     h2.SetMarkerSize(0.5)
-    
+
     hpath1=hpath1all[0]
     hpath2=hpath2all[0]
 
@@ -327,13 +327,13 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
             num_name = 'W#rightarrowl_{lost}#nu'
     if hpath1.count('_wcr_'):
         num_name = 'W#rightarrow l#nu'
-        comp1='wle'        
+        comp1='wle'
         if hpath1.count('_u_'):
             num_name = 'W#rightarrow #mu#nu'
             comp1='wmn'
         if hpath1.count('_e_'):
             num_name = 'W#rightarrow e#nu'
-            comp1='wen'            
+            comp1='wen'
     if hpath2.count('zcr'):
         den_name = 'Z#rightarrow ll'
         comp2='zll'
@@ -390,15 +390,15 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
         h2.Rebin(rebin)
     if hname1=='met_tst_et':
         h1.Rebin(rebin)
-        h2.Rebin(rebin) 
+        h2.Rebin(rebin)
     if hname1=='jj_dphi':
         h1.Rebin(rebin)
-        h2.Rebin(rebin) 
+        h2.Rebin(rebin)
     if hname1=='met_tst_nolep_et':
         h1.Rebin(5)
-        h2.Rebin(5) 
+        h2.Rebin(5)
     if GetError:
-        h1.GetYaxis().SetTitle('Relative Error')        
+        h1.GetYaxis().SetTitle('Relative Error')
     else:
         h1.GetYaxis().SetTitle('Normalized Events')
 
@@ -408,7 +408,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
     h1.GetYaxis().SetRangeUser(0.01,h1.GetMaximum()*1.5)
     h1.DrawNormalized()
     h2.DrawNormalized('same')
-    
+
     chi2 = h1.Chi2Test      (h2, 'UW CHI2')
     kval = h1.KolmogorovTest(h2, '')
     print 'chi2: ',chi2,' ks: ',kval
@@ -418,11 +418,11 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
     ks_text2.SetTextAlign(11)
     ks_text2.SetTextColor(ROOT.kBlack)
     ks_text2.Draw()
-    
+
     e=ROOT.Double(0.0)
     print 'Integral old: ',h1.IntegralAndError(0,1001,e),'+/-',e
     print 'Integral new: ',h2.IntegralAndError(0,1001,e),'+/-',e
-    
+
     leg = ROOT.TLegend(0.6,0.5,0.92,0.8)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
@@ -430,7 +430,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
     leg.AddEntry(h2,type_sample+den_name)
 
     leg.Draw()
-        
+
     texts = getATLASLabels(can, 0.6, 0.85, extra_text)
     for text in texts:
         text.Draw()
@@ -459,7 +459,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
     hsys=ROOT.TGraphAsymmErrors(hsysr)
     for i in range(0,hsysr.GetNbinsX()+1):
         hsys.SetPointEXhigh(i-1,hsysr.GetXaxis().GetBinWidth(i)/2.0)
-        hsys.SetPointEXlow(i-1,hsysr.GetXaxis().GetBinWidth(i)/2.0)    
+        hsys.SetPointEXlow(i-1,hsysr.GetXaxis().GetBinWidth(i)/2.0)
     if f1up:
         x1a=ROOT.Double()
         y1a=ROOT.Double()
@@ -493,7 +493,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
             else:
                 hsys.SetPointEYlow(ib-1,0.0)
                 hsys.SetPointEYhigh(ib-1,0.0)
-            
+
         hsys.SetFillColor(1)
         hsys.SetLineColor(1)
         hsys.SetFillStyle(3018)
@@ -516,23 +516,23 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
             pad1.SetLogy(1)
             #pad2.SetLogy(1)
             pad1.SetLogx(1)
-            pad2.SetLogx(1)                
+            pad2.SetLogx(1)
     elif hname=='elpos_pt':
         hratio.GetXaxis().SetTitle('Electron p_{T} [GeV]')
         if not GetError:
             pad1.SetLogy(1)
             #pad2.SetLogy(1)
             pad1.SetLogx(1)
-            pad2.SetLogx(1)                
+            pad2.SetLogx(1)
 
     elif  hname=='ph_pt':
         hratio.GetXaxis().SetTitle('Photon p_{T} [GeV]')
     elif  hname=='ph_eta':
         hratio.GetXaxis().SetTitle('Photon #eta')
     elif  hname=='ph_eta_lead':
-        hratio.GetXaxis().SetTitle('Lead Photon #eta')        
+        hratio.GetXaxis().SetTitle('Lead Photon #eta')
     elif  hname=='boson_eta':
-        hratio.GetXaxis().SetTitle('Boson #eta')        
+        hratio.GetXaxis().SetTitle('Boson #eta')
     elif  hname=='boson_pt':
         hratio.GetXaxis().SetTitle('Boson p_{T} [GeV]')
     elif  hname=='njet' or hname.count('n_jet'):
@@ -544,7 +544,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
     elif  hname=='dr_ph_boson':
         hratio.GetXaxis().SetTitle('#DeltaR(#gamma,boson)')
     elif  hname.count('truth_jj_mass'):
-        hratio.GetXaxis().SetTitle('Truth m_{jj} [GeV]')        
+        hratio.GetXaxis().SetTitle('Truth m_{jj} [GeV]')
     elif  hname.count('jj_mass'):
         hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
     elif  hname.count('truth_jj_deta'):
@@ -560,7 +560,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
     elif  hname.count('jj_deta'):
         hratio.GetXaxis().SetTitle('#Delta#eta_{jj}')
     elif  hname.count('jj_dphi'):
-        hratio.GetXaxis().SetTitle('#Delta#phi_{jj}')        
+        hratio.GetXaxis().SetTitle('#Delta#phi_{jj}')
     elif  hname.count('met_tst_et'):
         hratio.GetXaxis().SetTitle('MET [GeV]')
     elif  hname.count('met_truth_et'):
@@ -569,20 +569,20 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
         hratio.GetXaxis().SetTitle('3rd jet p_{T} [GeV]')
     elif  hname.count('met_tst_nolep_et'):
         hratio.GetXaxis().SetTitle('MET (no leptons) [GeV]')
-       
+
     hratio.GetYaxis().SetTitle(den_name +' / '+ num_name)
-    hratio.GetYaxis().SetRangeUser(0.5,1.5)       
+    hratio.GetYaxis().SetRangeUser(0.5,1.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
     hratio.GetYaxis().SetTitleOffset(1.55);
-    hratio.GetYaxis().SetLabelFont(43); 
+    hratio.GetYaxis().SetLabelFont(43);
     hratio.GetYaxis().SetLabelSize(15);
     hratio.GetXaxis().SetTitleSize(20);
     hratio.GetXaxis().SetTitleFont(43);
     hratio.GetXaxis().SetTitleOffset(4.);
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
-    hratio.GetXaxis().SetLabelSize(15);    
+    hratio.GetXaxis().SetLabelSize(15);
     hratio.Draw()
     if f1up:
         hsys.Draw('E2 same')
@@ -600,7 +600,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],e
         can.SaveAs(hname1+'_'+comp1+'_'+comp2+'_'+type_sample_out+extra_text_save+'_err.pdf')
     else:
         can.SaveAs(hname1+'_'+comp1+'_'+comp2+'_'+type_sample_out+extra_text_save+'.pdf')
-    
+
 def Fit(_suffix=''):
 
     can=ROOT.TCanvas('can',"can",600,600)
@@ -623,7 +623,7 @@ def Fit(_suffix=''):
     path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
     for hname in hnames:
         Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
-    
+
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/']
     path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/']
     for hname in hnames:
@@ -632,18 +632,18 @@ def Fit(_suffix=''):
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_zewk/','pass_sr_allmjj_nn_Nominal/plotEvent_zqcd/']
     path2=['pass_zcr_allmjj_ll_Nominal/plotEvent_zewk/','pass_zcr_allmjj_ll_Nominal/plotEvent_zqcd/']
     for hname in hnames:
-        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)        
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
 
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
     path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
     for hname in hnames:
         Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
-    
+
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/']
     path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/']
     for hname in hnames:
         Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
-        
+
     path1=['pass_sr_allmjj_nn_Nominal/plotEvent_wewk/','pass_sr_allmjj_nn_Nominal/plotEvent_wqcd/']
     path2=['pass_wcr_allmjj_l_Nominal/plotEvent_wewk/','pass_wcr_allmjj_l_Nominal/plotEvent_wqcd/']
     for hname in hnames:

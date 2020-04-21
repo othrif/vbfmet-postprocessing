@@ -1,6 +1,6 @@
 {
     "cuts": [
-     {"cut": "(w/w_noxsec)* (jj_mass>0)", "name": "Incl"}
+     {"cut": "(w)* (jj_mass>0)", "name": "Incl"}
  ],
     "draw": [
         {

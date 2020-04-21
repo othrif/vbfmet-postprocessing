@@ -50,7 +50,6 @@ for f in args.files:
       if "nbins" in toDraw:
         print "\tmaking {4}D histogram {0}\n\t{1} bins from {2} to {3}".format(toDraw['name'], toDraw['nbins'], toDraw['min'], toDraw['max'], histDimension)
         if histDimension == 1:
-          print toDraw['nbins'], toDraw['min'], toDraw['max'], histName
           h = ROOT.TH1F(histName,histName,toDraw['nbins'], toDraw['min'], toDraw['max'])
         else:
           raise ValueError('Not handling higher dim for now {0}'.format(toDraw))

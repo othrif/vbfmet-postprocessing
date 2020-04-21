@@ -9,53 +9,200 @@
             "name": "jj_mass"
         },
         {
-            "draw": "el_pt*1e-3",
-            "max": 600.0,
-            "min": 0.0,
-            "name": "el_pt",
-            "nbins": 24
-        },
-        {
-            "draw": "mu_pt*1e-3",
-            "max": 600.0,
-            "min": 0.0,
-            "name": "mu_pt",
-            "nbins": 24
-        },
-        {
-            "draw": "nu_pt*1e-3",
-            "max": 600.0,
-            "min": 0.0,
-            "name": "nu_pt",
-            "nbins": 24
-        },
-        {
-            "draw": "el_eta",
-            "max": 2.5,
-            "min": -2.5,
-            "name": "el_eta",
-            "nbins": 25
-        },
-        {
-            "draw": "mu_eta",
-            "max": 2.5,
-            "min": -2.5,
-            "name": "mu_eta",
-            "nbins": 25
-        },
-        {
-            "draw": "nu_eta",
-            "max": 2.5,
-            "min": -2.5,
-            "name": "nu_eta",
-            "nbins": 25
-        },
-        {
-            "draw": "boson_pt*1e-3",
-            "max": 1000.0,
+            "draw": "boson_pt[0]*1e-3",
+            "max": 1500,
             "min": 0.0,
             "name": "boson_pt",
-            "nbins": 24
+            "nbins": 150
+        },
+        {
+            "draw": "boson_m[0]*1e-3",
+            "max": 120.0,
+            "min": 60.0,
+            "name": "boson_m",
+            "nbins": 60
+        },
+        {
+            "draw": "met_nolep_et*1e-3",
+            "max": 500.0,
+            "min": 0,
+            "name": "met_nolep_et",
+            "nbins": 50
+        },
+        {
+            "draw": "met_et*1e-3",
+            "max": 500.0,
+            "min": 0,
+            "name": "met_et",
+            "nbins": 50
+        },
+        {
+            "draw": "el_pt[0]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "el1_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "el_eta[0]",
+            "max": 6,
+            "min": -6,
+            "name": "el1_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "mu_pt[0]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "mu1_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "mu_eta[0]",
+            "max": 6,
+            "min": -6,
+            "name": "mu1_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "nu_pt[0]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "nu1_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "nu_eta[0]",
+            "max": 6,
+            "min": -6,
+            "name": "nu1_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "el_pt[1]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "el2_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "el_eta[1]",
+            "max": 6,
+            "min": -6,
+            "name": "el2_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "mu_pt[1]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "mu2_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "mu_eta[1]",
+            "max": 6,
+            "min": -6,
+            "name": "mu2_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "nu_pt[1]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "nu2_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "nu_eta[1]",
+            "max": 6,
+            "min": -6,
+            "name": "nu2_eta",
+            "nbins": 25
+        },
+        {
+            "draw": "lep_jet_dR",
+            "max": 6,
+            "min": 0,
+            "name": "lep_jet_dR",
+            "nbins": 25
+        },
+        {
+            "draw": "jj_deta",
+            "max": 10,
+            "min": 0,
+            "name": "jj_deta",
+            "nbins": 10
+        },
+        {
+            "draw": "jj_dphi",
+            "max": 3.2,
+            "min": 0,
+            "name": "jj_dphi",
+            "nbins": 16
+        },
+        {
+            "draw": "n_jet",
+            "max": 9.5,
+            "min": -0.5,
+            "name": "n_jet",
+            "nbins": 10
+        },
+        {
+            "draw": "n_jet25",
+            "max": 9.5,
+            "min": -0.5,
+            "name": "n_jet25",
+            "nbins": 10
+        },
+        {
+            "draw": "n_jet50",
+            "max": 9.5,
+            "min": -0.5,
+            "name": "n_jet50",
+            "nbins": 10
+        },
+        {
+            "draw": "n_el",
+            "max": 3.5,
+            "min": -0.5,
+            "name": "n_el",
+            "nbins": 4
+        },
+        {
+            "draw": "n_mu",
+            "max": 3.5,
+            "min": -0.5,
+            "name": "n_mu",
+            "nbins": 4
+        },
+        {
+            "draw": "n_nu",
+            "max": 3.5,
+            "min": -0.5,
+            "name": "n_nu",
+            "nbins": 4
+        },
+        {
+            "draw": "jet_pt[0]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "jet1_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "jet_pt[1]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "jet2_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "jet_pt[2]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "jet3_pt",
+            "nbins": 50
         }
     ]
 }

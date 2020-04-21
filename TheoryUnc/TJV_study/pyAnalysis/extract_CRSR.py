@@ -18,26 +18,35 @@ parser.add_argument('files', type=str, nargs='+', metavar='<file.root>', help='R
 args = parser.parse_args()
 
 branches=['runNumber', 'eventNumber']
-processes = {"Zvv_QCD": "(364142 <= runNumber && runNumber <= 364155)",
-             "Zll_QCD": "(364114 <= runNumber && runNumber <= 364127)",
-             "Wlv_QCD": "(364170 <= runNumber && runNumber <= 364183)"
+processes = {"Zvv_QCD": "((312484 <= runNumber && runNumber <= 312495) || (364222 <= runNumber && runNumber <= 364223))",
+             "Zll_QCD": "((312448 <= runNumber && runNumber <= 312483) || (364216 <= runNumber && runNumber <= 364221))",
+             "Zee_QCD": "((312448 <= runNumber && runNumber <= 312459) || (364218 <= runNumber && runNumber <= 364219))",
+             "Zmm_QCD": "((312460 <= runNumber && runNumber <= 312471) || (364216 <= runNumber && runNumber <= 364217))",
+             "Wlv_QCD": "((312496 <= runNumber && runNumber <= 312531) || (364224 <= runNumber && runNumber <= 364229))",
+             "Wev_QCD": "((312496 <= runNumber && runNumber <= 312507) || (364226 <= runNumber && runNumber <= 364227))",
+             "Wmv_QCD": "((312508 <= runNumber && runNumber <= 312519) || (364224 <= runNumber && runNumber <= 364225))",
              }
-common = " && jet_pt[0]>60e3 && jet_pt[1]>40e3 && n_jet>=2 && jet_eta[0]*jet_eta[1]<0 && jj_deta>2.5 && jj_dphi<2.4  && jj_mass>200e3"
-SR     = " && met_et>100e3       && (n_el+n_mu==0)"
-CRW    = " && met_nolep_et>100e3 && ( (n_el==1 && n_mu==0 ) )"
-CRZ    = " && met_nolep_et>100e3 && ( (n_el==2 && n_mu==0 && el_charge[0]*el_charge[1]<0 && abs(mll-91.2e3)<25e3) )"
+common = "  && useMerged==1 && boson_pt[0] > 150e3 && jet_pt[0]>80e3 && jet_pt[1]>50e3 && n_jet>=2 && jet_eta[0]*jet_eta[1]<0 && jj_deta>2.5 && jj_dphi<2.5  && jj_mass>800e3"
+#SR     = " && met_et>100e3       && (n_el+n_mu==0)"
+#CRW    = " && met_nolep_et>100e3 && ( (n_el==1 && n_mu==0 ) )"
+#CRZ    = " && met_nolep_et>100e3 && ( (n_el==2 && n_mu==0 && el_charge[0]*el_charge[1]<0 && abs(mll-91.2e3)<25e3) )"
 selection = {
-             "Zvv_QCD_SR"  : processes["Zvv_QCD"] + common + SR,
-             "Zll_QCD_SR"  : processes["Zll_QCD"] + common + SR,
-             "Wlv_QCD_SR"  : processes["Wlv_QCD"] + common + SR,
-             "Zll_QCD_CR"  : processes["Zll_QCD"] + common + CRZ,
-             "Wlv_QCD_CR"  : processes["Wlv_QCD"] + common + CRW,
+#             "Zvv_QCD"  : processes["Zvv_QCD"] + common,# + SR,
+#             "Wlv_QCD"  : processes["Wlv_QCD"] + common,# + SR,
+#             "Zll_QCD"  : processes["Zll_QCD"] + common,# + CRZ,
+             "Zee_QCD"  : processes["Zee_QCD"] + common,
+             "Zmm_QCD"  : processes["Zmm_QCD"] + common,
+             "Wev_QCD"  : processes["Wev_QCD"] + common,
+             "Wmv_QCD"  : processes["Wmv_QCD"] + common,
              }
 
 for f in args.files:
   print "\nopening {0}".format(f)
   for key, sel in selection.iteritems():
     print "Processing ", key, "..."
+    if "Z" in key and "W" in f or  "W" in key and "Z" in f:
+      print "Skipping... "
+      continue
     treelist_r21 = ROOT.TList()
     in_f_r21 = ROOT.TFile.Open(f, "READ")
     keyList = in_f_r21.GetListOfKeys()
