@@ -13,6 +13,8 @@ parser.add_argument('--out_tdirectory', required=False, type=str, dest='outdir',
 parser.add_argument('--treename', required=False, type=str, dest='treename', metavar='', help='Tree containing the ntuple information', default='oTree')
 parser.add_argument('--eventWeight', required=False, type=str, dest='eventWeightBranch', metavar='', help='Event Weight Branch name', default='weight')
 parser.add_argument('--newOutputs', action='store_true', default=False, help='create new output files for histograms')
+parser.add_argument('--name', required=False, type=str, dest='name', metavar='', help='Suffix to add to histogram name', default='')
+
 
 # parse the arguments, throw errors if missing any
 args = parser.parse_args()
@@ -23,7 +25,7 @@ for f in args.files:
   print "opening {0}".format(f)
   if args.newOutputs:
     in_file = ROOT.TFile.Open(f, "READ")
-    out_file = ROOT.TFile.Open(os.path.join(os.path.dirname(f), "hists_{0:s}".format(os.path.basename(f))), "RECREATE")
+    out_file = ROOT.TFile.Open(os.path.join(os.path.dirname(f), "hists_{1:s}{0:s}".format(os.path.basename(f),args.name)), "RECREATE")
     tree = in_file.Get(args.treename)
   else:
     out_file = ROOT.TFile.Open(f, "UPDATE")

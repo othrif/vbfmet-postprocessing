@@ -2,7 +2,7 @@ import math
 import ROOT
 
 class HistEntry:
-    def __init__(self, hist, hname, file):
+    def __init__(self, hist, hname):
         self.hname    = hname
         self.hist     = hist.Clone()
         self.file     = file
