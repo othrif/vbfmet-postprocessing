@@ -303,8 +303,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
 def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR', syst='Nominal'):
 
     cuts = FilterCuts(options)
-    # if options.OverlapPh:
-    #     cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
+    cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
         
     if basic_cuts.chan in ['nn']:
         cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst)
@@ -319,27 +318,32 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
 
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
+    cuts += getJetCuts(basic_cuts,options)
 
     if Region=='SR':
-        cuts += getJetCuts(basic_cuts,options)
-        cutNumLep = CutItem('CutNumLep')
+        cutNumLep = CutItem('CutNumLep')    
         if basic_cuts.chan=='ee':
             cutNumLep.AddCut(CutItem('CutNumEle','n_el == 2'), 'AND')
         elif basic_cuts.chan=='uu':
             cutNumLep.AddCut(CutItem('CutNumMu','n_mu == 2'), 'AND')
-        elif basic_cuts.chan=='eu':
-            cutNumLep.AddCut(CutItem('CutNumEle','n_el == 1'), 'AND')
-            cutNumLep.AddCut(CutItem('CutNumMu','n_mu == 1'), 'AND')
 
         cuts += [cutNumLep]
-
         cuts += [CutItem('CutL0Pt', 'lepPt0 > 26.0')]
         cuts += [CutItem('CutL1Pt', 'lepPt1 > 7.0')]
-
         cuts += [CutItem('CutMass', 'mll < 116.0 && mll > 66.0')]
-        cuts += [CutItem('CutNumBjets','n_bjet <= 1')]
-#    elif Region=='CR':
-#        cuts += getJetCuts(basic_cuts,options) 
+        cuts += [CutItem('CutVetoBjets','n_bjet == 0')]
+
+    elif Region=='CRtt':
+        cutNumLep = CutItem('CutNumLep')    
+        cutNumLep.AddCut(CutItem('CutNumEle','n_el == 1'), 'AND')
+        cutNumLep.AddCut(CutItem('CutNumMu','n_mu == 1'), 'AND')
+
+        cuts += [cutNumLep]
+        cuts += [CutItem('CutL0Pt', 'lepPt0 > 26.0')]
+        cuts += [CutItem('CutL1Pt', 'lepPt1 > 7.0')]
+        cuts += [CutItem('CutMass', 'mll < 116.0 && mll > 66.0')]
+        cuts += [CutItem('CutNumBjetsgt1','n_bjet >= 1')]
+
 
     return GetCuts(cuts)
 
@@ -392,8 +396,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['vvv'] =['vvv']
     bkgs['vv']  =['vv']
     bkgs['vvy']  =['vvy']
-    bkgs['vvjj'] = ['vvjj']
-    bkgs['ggvv'] = ['ggvv']
+    bkgs['vvewk'] = ['vvewk']
     bkgs['ttv'] = ['ttv']
     bkgs['dqcd'] = ['dqcd']
     bkgs['mqcd'] = ['mqcd']
@@ -439,7 +442,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     #
     if reg != None and key != None:
         
-        reg.SetVal(key, 'vvjj,ggvv,top,vvv,vv,vvy,zqcd,zewk,ttg,ttv,zgam,zgamewk,bkgs,data')
+        reg.SetVal(key, 'vvewk,top,vvv,vv,vvy,zqcd,zewk,ttg,ttv,zgam,zgamewk,bkgs,data')
         
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
@@ -485,7 +488,20 @@ def preparePassEventForSR(alg_name, options, basic_cuts, cut='BASIC',syst='Nomin
 
     reg  = ROOT.Msl.Registry()
 
-    cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, syst=syst)
+    cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met,  Region='SR', syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+#-------------------------------------------------------------------------
+def preparePassEventForCRtt(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, Region='CRtt', syst=syst)
 
     #
     # Fill Registry with cuts and samples for cut-flow

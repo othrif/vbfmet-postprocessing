@@ -203,7 +203,7 @@ namespace Msl
     std::vector<float> *mu_pt;
     std::vector<float> *mu_eta;
     std::vector<float> *mu_phi;
-    std::vector<float> *tau_charge;
+    /* std::vector<float> *tau_charge; */
     std::vector<float> *tau_pt;
     std::vector<float> *tau_eta;
     std::vector<float> *tau_phi;
@@ -215,9 +215,9 @@ namespace Msl
     std::vector<float> *jet_jvt;
     std::vector<float> *jet_fjvt;
     std::vector<float> *jet_btag_weight;
-    std::vector<float> *jet_TrackWidth;
+    /* std::vector<float> *jet_TrackWidth; */
     //std::vector<std::vector<unsigned short> > *jet_NTracks;
-    std::vector<unsigned short> *jet_NTracks;
+    /* std::vector<unsigned short> *jet_NTracks; */
     std::vector<float> *jet_PartonTruthLabelID;
 
     std::vector<float> *truth_el_pt;
@@ -237,7 +237,7 @@ namespace Msl
     std::vector<float> *baseel_eta;
     std::vector<float> *baseel_phi;
     std::vector<float> *baseel_ptvarcone20;
-    std::vector<float> *baseel_ptvarcone30;
+    /* std::vector<float> *baseel_ptvarcone30; */
     std::vector<float> *baseel_topoetcone20;
     std::vector<float> *basemu_pt;
     std::vector<int>   *basemu_charge;

@@ -79,11 +79,10 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kvvv:   return "vvv";
     case kvvy:   return "vvy";
     case kvv:    return "vv";
-    case kvvjj:  return "vvjj";
+    case kvvEWK:  return "vvewk";
     case kvh:    return "vh";
     case kvbfzy: return "vbfzy";
     case kgghzy: return "gghzy";  
-    case kggvv:  return "ggvv";
     case kJPsi:  return "jpsi";
     case kUpsl:  return "upsl";
     case kZqcdPow:  return "zqcdPow";
@@ -167,8 +166,7 @@ std::string Msl::Mva::Convert2Std(Sample s)
     case kvvv:  return "vvv";
     case kvvy:  return "vvy";
     case kvv:   return "vv";
-    case kvvjj:   return "vvjj";
-    case kggvv:   return "ggvv";
+    case kvvEWK:   return "vvewk";
     case kvh:    return "vh";
     case kvbfzy: return "vbfzy";
     case kgghzy: return "gghzy";  
@@ -232,11 +230,10 @@ std::string Msl::Mva::Convert2Tex(const SampleSet &s)
   if(s.GetName() == "vvv")   return "VVV";
   if(s.GetName() == "vvy")   return "VV\\gamma";
   if(s.GetName() == "vv")    return "VV";
-  if(s.GetName() == "vvjj")  return "VVjj EWK";
+  if(s.GetName() == "vvewk")  return "VV EWK";
   if(s.GetName() == "vh")    return "VH(Z#it{gamma})";
   if(s.GetName() == "vbfzy") return "VBF H(Z#it{gamma})";
   if(s.GetName() == "gghzy") return "gg->H(Z#it{gamma})";
-  if(s.GetName() == "ggvv")  return "gg->VV"; 
   if(s.GetName() == "jpsi")  return "$J/\\psi$";
   if(s.GetName() == "upsl")  return "$\\upsilon$";
 
@@ -313,8 +310,7 @@ Msl::Mva::Sample Msl::Mva::Convert2Sample(const std::string &s)
   if(s == "vvv")  return kvvv;
   if(s == "vvy")  return kvvy;
   if(s == "vv")   return kvv;
-  if(s == "vvjj") return kvvjj;
-  if(s == "ggvv") return kggvv;
+  if(s == "vvewk") return kvvEWK;
   if(s == "vh") return kvh;
   if(s == "vbfzy") return kvbfzy;
   if(s == "gghzy") return kgghzy;
@@ -404,8 +400,7 @@ const std::vector<Msl::Mva::Sample>& Msl::Mva::GetAllSamples()
     vars.push_back(kvvv);
     vars.push_back(kvvy);
     vars.push_back(kvv);
-    vars.push_back(kvvjj);
-    vars.push_back(kggvv);
+    vars.push_back(kvvEWK);
     vars.push_back(kvh);
     vars.push_back(kvbfzy);
     vars.push_back(kgghzy);

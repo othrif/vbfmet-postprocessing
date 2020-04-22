@@ -174,7 +174,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   mu_pt      = new std::vector<float>();
   mu_eta     = new std::vector<float>();
   mu_phi     = new std::vector<float>();
-  tau_charge  = new std::vector<float>();
+  // tau_charge  = new std::vector<float>();
   tau_pt      = new std::vector<float>();
   tau_eta     = new std::vector<float>();
   tau_phi     = new std::vector<float>();
@@ -186,8 +186,8 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   jet_jvt    = new std::vector<float>();
   jet_fjvt   = new std::vector<float>();
   jet_btag_weight    = new std::vector<float>();
-  jet_TrackWidth   = new std::vector<float>();
-  jet_NTracks   = new std::vector<unsigned short>();
+  // jet_TrackWidth   = new std::vector<float>();
+  // jet_NTracks   = new std::vector<unsigned short>();
   jet_PartonTruthLabelID   = new std::vector<float>();
   truth_el_pt  = new std::vector<float>();
   truth_el_eta = new std::vector<float>();
@@ -213,7 +213,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   baseel_eta      = new std::vector<float>();
   baseel_phi      = new std::vector<float>();
   baseel_ptvarcone20    = new std::vector<float>();
-  baseel_ptvarcone30    = new std::vector<float>();
+  // baseel_ptvarcone30    = new std::vector<float>();
   baseel_topoetcone20    = new std::vector<float>();
   ph_pt     = new std::vector<float>();
   ph_eta    = new std::vector<float>();
@@ -299,7 +299,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("mu_pt",    &mu_pt);
   tree->SetBranchAddress("mu_eta",   &mu_eta);
   tree->SetBranchAddress("mu_phi",   &mu_phi);
-  tree->SetBranchAddress("tau_charge",&tau_charge);
+  // tree->SetBranchAddress("tau_charge",&tau_charge);
   tree->SetBranchAddress("tau_pt",    &tau_pt);
   tree->SetBranchAddress("tau_eta",   &tau_eta);
   tree->SetBranchAddress("tau_phi",   &tau_phi);
@@ -311,8 +311,8 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("jet_jvt",   &jet_jvt);
   tree->SetBranchAddress("jet_fjvt",   &jet_fjvt);
   tree->SetBranchAddress("jet_btag_weight",   &jet_btag_weight);
-  tree->SetBranchAddress("jet_TrackWidth",   &jet_TrackWidth);
-  tree->SetBranchAddress("jet_NTracks",   &jet_NTracks);
+  // tree->SetBranchAddress("jet_TrackWidth",   &jet_TrackWidth);
+  // tree->SetBranchAddress("jet_NTracks",   &jet_NTracks);
   tree->SetBranchAddress("jet_PartonTruthLabelID",   &jet_PartonTruthLabelID);
 
   if(fisMC){
@@ -334,7 +334,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("baseel_eta",   &baseel_eta);
   tree->SetBranchAddress("baseel_phi",   &baseel_phi);
   tree->SetBranchAddress("baseel_ptvarcone20",   &baseel_ptvarcone20);
-  tree->SetBranchAddress("baseel_ptvarcone30",   &baseel_ptvarcone30);
+  // tree->SetBranchAddress("baseel_ptvarcone30",   &baseel_ptvarcone30);
   tree->SetBranchAddress("baseel_topoetcone20",   &baseel_topoetcone20);
   tree->SetBranchAddress("basemu_pt",    &basemu_pt);
   tree->SetBranchAddress("basemu_charge",    &basemu_charge);
@@ -629,6 +629,7 @@ void Msl::ReadEvent::Read(const std::string &path)
   //
   if(autoDiscovery){  fTrees.clear(); fTreesMap.clear(); }
   log() << "Read - processing time: " << Msl::PrintResetStopWatch(timer) << endl;
+  cout << "==================================================================" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -763,7 +764,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	new_ele.m   = 0.000511;
 	new_ele.AddVar(Mva::charge,baseel_charge->at(iEle));
 	if(baseel_ptvarcone20 && baseel_ptvarcone20->size()>iEle) new_ele.AddVar(Mva::ptvarcone20,baseel_ptvarcone20->at(iEle)/baseel_pt->at(iEle));
-	if(baseel_ptvarcone30 && baseel_ptvarcone30->size()>iEle) new_ele.AddVar(Mva::ptvarcone30,baseel_ptvarcone30->at(iEle)/baseel_pt->at(iEle));
+	// if(baseel_ptvarcone30 && baseel_ptvarcone30->size()>iEle) new_ele.AddVar(Mva::ptvarcone30,baseel_ptvarcone30->at(iEle)/baseel_pt->at(iEle));
 	if(baseel_topoetcone20 && baseel_topoetcone20->size()>iEle) new_ele.AddVar(Mva::topoetcone20,baseel_topoetcone20->at(iEle)/baseel_pt->at(iEle));
 	event->electrons.push_back(new_ele);
       }
@@ -845,8 +846,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       new_jet.phi = jet_phi->at(iJet);
       new_jet.AddVar(Mva::timing,jet_timing->at(iJet));
       if(jet_btag_weight && jet_btag_weight->size()>iJet) new_jet.AddVar(Mva::jetBtagWeight,jet_btag_weight->at(iJet));
-      if(jet_TrackWidth && jet_TrackWidth->size()>iJet) new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));      
-      if(jet_NTracks && jet_NTracks->size()>iJet) new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));
+      // if(jet_TrackWidth && jet_TrackWidth->size()>iJet) new_jet.AddVar(Mva::jetTrackWidth,jet_TrackWidth->at(iJet));      
+      // if(jet_NTracks && jet_NTracks->size()>iJet) new_jet.AddVar(Mva::jetNTracks,jet_NTracks->at(iJet));
       if(jet_PartonTruthLabelID && jet_PartonTruthLabelID->size()>iJet) new_jet.AddVar(Mva::jetPartonTruthLabelID,jet_PartonTruthLabelID->at(iJet));
 
       if(jet_jvt && jet_jvt->size()>iJet){
@@ -1030,7 +1031,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
         // Store the ptvarcone{20,30} and the topoetcone.
         if (baseel_ptvarcone20 && baseel_ptvarcone20->size()>iEl) new_ele.AddVar(Mva::ptvarcone20,baseel_ptvarcone20->at(iEl)/base_pt);
-        if (baseel_ptvarcone30 && baseel_ptvarcone30->size()>iEl) new_ele.AddVar(Mva::ptvarcone30,baseel_ptvarcone30->at(iEl)/base_pt);
+        // if (baseel_ptvarcone30 && baseel_ptvarcone30->size()>iEl) new_ele.AddVar(Mva::ptvarcone30,baseel_ptvarcone30->at(iEl)/base_pt);
         if (baseel_topoetcone20 && baseel_topoetcone20->size()>iEl) new_ele.AddVar(Mva::topoetcone20,baseel_topoetcone20->at(iEl)/base_pt);
 
 	//new_ele.AddVar(Mva::ptvarcone20,jet_timing->at(iJet));

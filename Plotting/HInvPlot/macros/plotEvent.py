@@ -67,10 +67,19 @@ def prepareSeqSR(basic_cuts, alg_take=None, syst='Nominal'):
     selkey = basic_cuts.GetSelKey()
     region = 'sr'
 
-#    if basic_cuts.chan !='nn' or not passRegion(region):
-#        return ('', [])
-
     pass_alg = hstudy.preparePassEventForSR('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
+
+#-----------------------------------------------------------------------------------------
+def prepareSeqCRtt(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'crtt'
+
+    pass_alg = hstudy.preparePassEventForCRtt('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
     plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
 
     # return normal plotting
@@ -170,15 +179,23 @@ def main():
         input_cut = []
 
         for sign in signs: # 0=opposite sign, 1=same sign
+            print sign
             for a in anas:
+                print a
                 for c in chans:
+                    print c
                     basic_cuts = hstudy.BasicCuts(Analysis=a, Chan=c, options=options, SameSign=sign)
                     #
                     # SR Cut based regions and algorithms
                     #
                     (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
                     read_alg.AddNormalAlg(name_sr,  alg_sr)
-
+                    #
+                    # CRtt Cut based regions and algorithms
+                    #
+                    (name_crtt,  alg_crtt)  = prepareSeqCRtt (basic_cuts, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_crtt,  alg_crtt)
+                    
 
         read_alg.RunConfForAlgs()
 

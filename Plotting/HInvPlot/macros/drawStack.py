@@ -413,8 +413,7 @@ def getLabelSortKey(sample):
     elif sample == 'vvv': return 2
     elif sample == 'vv': return 5
     elif sample == 'vvy': return 5
-    elif sample == 'vvjj': return 3
-    elif sample == 'ggvv': return 1
+    elif sample == 'vvewk': return 3
     elif sample == 'ttv': return 7
     elif sample == 'higgs': return 20
     elif sample == 'jpsi': return 21
@@ -443,7 +442,8 @@ def getSampleSortKey(sample):
     elif sample == 'vvv': return 2
     elif sample == 'vv': return 5
     elif sample == 'vvy': return 5
-    elif sample == 'vvjj': return 3
+    elif sample == 'vvewk': return 3
+    elif sample == 'ttv': return 3
     elif sample == 'ggvv': return 1
     elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
@@ -489,8 +489,7 @@ def getSampleLabel(sample):
         'vvv': '#it{VVV}',
         'vvy': '#it{VV}+#it{#gamma}',
         'vv': '#it{VV}',
-        'vvjj': '#it{VVjj} EWK',
-        'ggvv': 'gg#rightarrow#it{VV}',
+        'vvewk': '#it{VV} EWK',
         'zldy': '#it{Z} low m.',
         'wzzz': '#it{ZV}',#'WZ/ZZ',
         'wz': '#it{WZ}',
@@ -509,7 +508,7 @@ def getSampleLabel(sample):
         #'hvbf':  '#it{h}(#it{B}_{inv} = 0.13)',
         'higgs':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
         'hvbf':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
-        'ttv' : 't#bar{t}V',
+        'ttv' : 't#bar{t}+V',
         'data': 'Data',
         'bkgs': 'Total SM',
         }
@@ -573,14 +572,14 @@ def getStyle(sample):
     color_vvv = ROOT.kOrange
     color_vvy = ROOT.kOrange+1
     color_vv = ROOT.kOrange+2
-    color_vvjj = ROOT.kOrange+3
-    color_ggvv = ROOT.kOrange+4
+    color_vvewk = ROOT.kOrange+3
     color_zldy = ROOT.kOrange-3
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
     color_wgamewk = ROOT.kOrange-5
     color_zgamewk = ROOT.kOrange-6    
     color_ttg = ROOT.kBlue   -9
+    color_ttv = ROOT.kBlue-8
     color_pho = ROOT.kGreen -3
     color_wgas = ROOT.kOrange-7
     color_zgas = ROOT.kOrange-7
@@ -607,6 +606,7 @@ def getStyle(sample):
         'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'pho':{'color':color_pho, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'ttv':{'color':color_ttv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'wgam':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zgamewk':{'color':color_zgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
@@ -614,8 +614,7 @@ def getStyle(sample):
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvy':{'color':color_vvy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vv':{'color':color_vv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'vvjj':{'color':color_vvjj, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
-        'ggvv':{'color':color_ggvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'vvewk':{'color':color_vvewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
         'hggf':{'color':color_hggf, 'fill_style':0, 'marker_style': 0, 'line_width':5, 'leg_opt':'f'},
@@ -2588,7 +2587,7 @@ def main():
     rfile  = ROOT.TFile(rpath, 'READ')
 
     sfiles={}
-    print 'Reading nSyst: ',len(mysyst.getsystematicsListWithDown())
+    #print 'Reading nSyst: ',len(mysyst.getsystematicsListWithDown())
     for ia in mysyst.getsystematicsListWithDown():
         sfiles[ia]=rfile
 
@@ -2602,15 +2601,11 @@ def main():
     #
     # Select histograms and samples for stacks
     #
-    #bkgs = ['zewk', 'zqcd','wewk','wqcd','top1','top2']
     if options.madgraph:
         bkgs = ['zewk', 'zqcdMad','wewk','wqcdMad','top2','vvv'] #,'zldy'
     else:
-        bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
-        #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
-        if options.ph_ana:
-            #bkgs = ['ttg', 'zgam','wgam','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','vvv','vv','ggvv','vvjj'] #,'mqcd','zldy','vvv'
-            bkgs = ['zgam','zewk', 'zqcd','vvv','vv','ggvv','vvjj','vvy','top'] #,'mqcd','zldy','vvv'
+        bkgs = ['zgam','zewk', 'zqcd','vvv','vv','vvewk','vvy','top','ttv'] 
+
     if options.add_fakeE:
         bkgs+=['tth']
     if options.stack_signal:
@@ -2653,7 +2648,7 @@ def main():
     for var in vars:
 
         stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)
-        print 'nSYST: ',len(sfiles)
+        #print 'nSYST: ',len(sfiles)
         if options.draw_syst:
             if len(sfiles)>0:
                 stack.ReadSystFiles(sfiles)

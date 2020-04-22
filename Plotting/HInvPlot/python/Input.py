@@ -1,6 +1,5 @@
 """
 
-
 This module configures input files
 
 """
@@ -952,22 +951,18 @@ def prepareBkgRuns(keys,options=None):
         '366161':'WWy',
         '366162':'ZZy',
     }
-    bkg_vvjj_ewk = {
+    bkg_vv_ewk = {
         '364284':'lllvjj_ewk',
         '364285':'llvvjj_ewk',
     }
-    bkg_vvjj_ewk_alt = {
+    bkg_vv_ewk_alt = {
         '363724':'ZZllvvjj_ewk',
     }
-    bkg_gg_zz = {
+    bkg_gg_vv = {
         '345723':'gg->ZZ',
-    }
-    bkg_gg_ww = {
         '345718':'gg->WW',
     }
-    bkg_gg_vv = {}
-    bkg_gg_vv.update(bkg_gg_zz)
-    bkg_gg_vv.update(bkg_gg_ww)
+    bkg_vv.update(bkg_gg_vv)
 
     bkg_zz_llvv = {
         '345666':'ZZ_llvv',
@@ -1199,45 +1194,19 @@ def prepareBkgRuns(keys,options=None):
                 #'whww':sig_VH125v2,
                 'vbfg':sig_vbfgam,
                 'whww':alt_VBF,
-                #'hvbf500':{'308279':'VBF125 - H500',},
-                #'hvbf1k':{'308281':'VBF125 - H1000',},
-                #'hvbf3k':{'308283':'VBF125 - H3000',},
                 'hggf':sig_ggF125,
                 'tth':bkg_ttH,
                 'hvbf':sig_VBF125,
-                #'wewk':bkg_wewk,
-                #'wewk':bkg_wewkpow,
-                #'wqcd':bkg_wqcd,
                 'zewk':bkg_zewk,
-                #'zewk':bkg_zewkpow,
-                #'top2':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
                 'top1':bkg_top1, # all top
-               #'top2':bkg_zqcd_sh_ktExtalt, # all top
-                #'top2':{'345323':'hww'}, # all top
-                #'top2':bkg_zewkpow,
-                #'top2':{'312487':'Znunu_PTV100_140_MJJ0_500_KtMerging','312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',}, # all top
-                #'top1':bkg_top1,
-                ##'hvbf':bkg_wqcd_mnu,
-                ##'wewk':bkg_wqcd_tnu,
-                ##'wqcd':bkg_wqcd_enu,
-                ##'zewk':bkg_zqcd_zmm,
-                ##'zqcd':bkg_zqcd_zee,
-                ##'top2':bkg_zqcd_ztt,
-                ##'top1':bkg_zqcd_znn,
                 'vvv':bkg_vvv,
                 'vv':bkg_vv,
-                'vvjj':bkg_vvjj_ewk,
-                'ggvv':bkg_gg_vv,
+                'vvewk':bkg_vv_ewk,
                 'vvy':bkg_vvy,
                 'vh':bkg_VH,
                 'vbfzy': bkg_VBFZy,
                 'gghzy': bkg_ggHZy,
-                #'mqcd':bkg_qcdw,
-                #'dqcd':bkg_datadriveqcd,
-                #'mqcd':bkg_qcdunw,
-                #'zqcdMad':bkg_z_strong_madgraph,
-                #'wqcdMad':bkg_w_strong_madgraph,
                 'wdpi':bkg_top_other,
                }
     if options.OverlapPh:
