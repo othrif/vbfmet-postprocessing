@@ -1,29 +1,13 @@
 {
     "cuts": [
-     {"cut": "( n_jet>=0 )", "name": "SRmTJV"},
-     {"cut": "( n_jet25==2 )", "name": "SR25"},
-     {"cut": "( n_jet30==2 )", "name": "SR30"},
-     {"cut": "( n_jet35==2 )", "name": "SR35"},
-     {"cut": "( n_jet40==2 )", "name": "SR40"},
-     {"cut": "( n_jet50==2 )", "name": "SR50"}
+     {"cut": "( n_jet25>=2 )", "name": "SRmTJV"},
+     {"cut": "( n_jet25==2 )", "name": "SR25"}
  ],
     "draw": [
         {
             "draw": "jj_mass*1e-3",
-            "edges": [200,400,600,800,1000,1200,1500,2000,2750,3500,5000],
-            "name": "jj_mass_new"
-        },
-        {
-            "draw": "jj_mass*1e-3",
             "edges": [800,1000,1500,2000,3500,5000],
-            "name": "jj_mass_old"
-        },
-        {
-            "draw": "jet_pt[2]*1e-3",
-            "max": 300,
-            "min": 0,
-            "name": "j3_pt",
-            "nbins": 60
+            "name": "jj_mass"
         }
     ]
 }

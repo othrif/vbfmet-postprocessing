@@ -13,7 +13,7 @@
             "max": 1500,
             "min": 0.0,
             "name": "boson_pt",
-            "nbins": 150
+            "nbins": 70
         },
         {
             "draw": "boson_m[0]*1e-3",

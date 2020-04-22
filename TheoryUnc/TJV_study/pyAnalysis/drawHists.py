@@ -283,15 +283,16 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         h2 = PlotError(h2)
 
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
-    h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.7)
+    #print h1.GetMaximum(),h2.GetMaximum()
+    #h1.GetYaxis().SetRangeUser(0,0.75)
     if options.logscale:
-        h1.GetYaxis().SetRangeUser(1e-8, max_bin*5)
+        h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
     h1.DrawNormalized()
     h2.DrawNormalized('same')
 
     chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
-    kval = 1#h1.KolmogorovTest(h2, '')
+    kval = h1.KolmogorovTest(h2, '')
     print 'chi2: ',chi2,' ks: ',kval
     ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
     ks_text2.SetNDC()
@@ -353,9 +354,9 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         hratio.GetXaxis().SetTitle('Sub-Lead Jet p_{T} [GeV]')
     elif  hname.count('jet3_pt'):
         hratio.GetXaxis().SetTitle('3rd jet p_{T} [GeV]')
-    elif hname.count('met_tst_et'):
+    elif hname.count('met_et'):
         hratio.GetXaxis().SetTitle('MET [GeV]')
-    elif  hname.count('met_tst_nolep_et'):
+    elif  hname.count('met_nolep_et'):
         hratio.GetXaxis().SetTitle('MET (no leptons) [GeV]')
     elif hname.count('el1_pt'):
         hratio.GetXaxis().SetTitle('Lead Electron p_{T} [GeV]')
@@ -383,12 +384,12 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         hratio.GetXaxis().SetTitle('Sub-Lead Neutrino #eta [GeV]')
     elif hname.count('lep_jet_dR'):
         hratio.GetXaxis().SetTitle('#DeltaR(#ell,jet)')
+    elif  hname.count('n_jet25'):
+        hratio.GetXaxis().SetTitle('N_{jet}^{25}')
+    elif  hname.count('n_jet50'):
+        hratio.GetXaxis().SetTitle('N_{jet}^{50}')
     elif  hname.count('n_jet'):
         hratio.GetXaxis().SetTitle('N_{jet}')
-    elif  hname.count('n_jet25'):
-        hratio.GetXaxis().SetTitle('N_{jet}^{25GeV}')
-    elif  hname.count('n_jet50'):
-        hratio.GetXaxis().SetTitle('N_{jet}^{50GeV}')
     elif  hname.count('n_el'):
         hratio.GetXaxis().SetTitle('N_{e}')
     elif  hname.count('n_mu'):

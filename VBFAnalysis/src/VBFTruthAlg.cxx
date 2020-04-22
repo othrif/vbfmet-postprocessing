@@ -284,6 +284,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
 
   // if Nominal Sherpa_221 MAXHTPTV, do not merge or change anything in the workflow
   // if Sherpa_227 PTV_MJJ kt merged OR Sherpa_221 PTV, merge the two based on PTV
+  /*
   if (364100 <= RunNumber && RunNumber <= 364197)
     {useMerged = 0;
       if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< "Event " << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
@@ -294,7 +295,22 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   {useMerged = 1;}
 else
    {useMerged = 2;}
+  */
 
+if (364100 <= RunNumber && RunNumber <= 364197)
+{useMerged = 0;
+      if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< "Event " << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
+    }
+else if (120.e3 < boson_pt->at(0) && 312448 <= RunNumber && RunNumber <= 312531){
+  useMerged = 1;
+  if(boson_pt->at(0) < 500e3)
+    useMerged = 2;
+}
+else if (boson_pt->at(0) > 500.e3 && 364216 <= RunNumber && RunNumber <= 364229){
+  useMerged = 2;
+}
+else
+  {useMerged = 3;}
 
 // Prepare variables
 
@@ -555,7 +571,7 @@ float MjjCut =2e5;
 float DEtajjCut =2.5;
 
 bool vbfSkim = (new_jet_pt->at(0) > LeadJetPtCut) & (new_jet_pt->at(1) > subLeadJetPtCut) & (new_jj_deta > DEtajjCut) & ((new_jet_eta->at(0) * new_jet_eta->at(1))<0) & (new_jj_mass > MjjCut);
-bool vbfSkimloose = (new_jet_pt->at(0) > 80.0e3) & (new_jet_pt->at(1) > 50.0e3) & ( boson_pt->at(0) > 150e3) & (new_jj_deta > 2.5) & (new_jj_mass > 500e3);
+bool vbfSkimloose = (new_jet_pt->at(0) > 80.0e3) & (new_jet_pt->at(1) > 50.0e3) & ( boson_pt->at(0) > 150e3) & (new_jj_mass > 800e3) & (new_jj_deta > 2.5)  & (new_jj_dphi<2.5) ;
 
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
@@ -632,9 +648,10 @@ for(auto reg : regions){
     }
 
 
-// useMerged = 1 for nominal MAXHTPTV
+// useMerged = 0 for nominal MAXHTPTV ONLY
+// useMerged = 1 for kt-merged ONLY
 // useMerged = 2 for kt-merged + PTV
-if (vbfSkimloose && new_jj_mass>800.e3 && new_jj_dphi<2.5 && (useMerged == 1 || useMerged == 2) ){
+if (vbfSkimloose && (useMerged == 0 || useMerged == 1 || useMerged == 2) ){
   m_tree_out->Fill();
 }
 
