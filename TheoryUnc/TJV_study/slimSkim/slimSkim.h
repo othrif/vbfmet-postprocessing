@@ -108,7 +108,7 @@ class slimSkim : public TSelector {
    TTreeReaderValue<Int_t> njets = {fReader, "njets"};
    TTreeReaderValue<Int_t> nels = {fReader, "nels"};
    TTreeReaderValue<Int_t> nmus = {fReader, "nmus"};
-   TTreeReaderValue<Int_t> nnus = {fReader, "nnus"};
+   //TTreeReaderValue<Int_t> nnus = {fReader, "nnus"};
    TTreeReaderValue<Float_t> jj_mass = {fReader, "jj_mass"};
    TTreeReaderValue<Float_t> jj_deta = {fReader, "jj_deta"};
    TTreeReaderValue<Float_t> jj_dphi = {fReader, "jj_dphi"};
@@ -138,7 +138,7 @@ class slimSkim : public TSelector {
    TTreeReaderArray<float> nu_pt = {fReader, "nu_pt"};
    TTreeReaderArray<float> nu_phi = {fReader, "nu_phi"};
    TTreeReaderArray<float> nu_eta = {fReader, "nu_eta"};
-   TTreeReaderArray<float> nu_pdgid = {fReader, "nu_pdgid"};
+   //TTreeReaderArray<float> nu_pdgid = {fReader, "nu_pdgid"};
    TTreeReaderValue<Float_t> mll = {fReader, "mll"};
    TTreeReaderValue<Bool_t> hasZ = {fReader, "hasZ"};
 

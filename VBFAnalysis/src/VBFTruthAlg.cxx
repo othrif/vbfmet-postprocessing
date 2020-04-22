@@ -19,6 +19,7 @@ VBFTruthAlg::VBFTruthAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
+  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", "path to a file with the number of events processed" );
 }
 
 VBFTruthAlg::~VBFTruthAlg() {}
@@ -28,8 +29,8 @@ StatusCode VBFTruthAlg::initialize() {
 
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
-  std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
-  //xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
+  //std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+  std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
   //std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
@@ -124,9 +125,6 @@ StatusCode VBFTruthAlg::initialize() {
   m_tree_out->Branch("sumw", &new_sumw);
   m_tree_out->Branch("runNumber",&RunNumber);
   m_tree_out->Branch("eventNumber",&EventNumber);
-  m_tree_out->Branch("njets",&new_njets);
-  m_tree_out->Branch("nels",&new_nels);
-  m_tree_out->Branch("nmus",&new_nmus);
   m_tree_out->Branch("jj_mass",&new_jj_mass);
   m_tree_out->Branch("jj_deta",&new_jj_deta);
   m_tree_out->Branch("jj_dphi",&new_jj_dphi);
@@ -148,7 +146,7 @@ StatusCode VBFTruthAlg::initialize() {
   m_tree_out->Branch("jet_E",&new_jet_E);
   m_tree_out->Branch("met_significance",&new_met_significance);
   m_tree_out->Branch("lep_jet_dR",&new_lep_jet_dR);
- m_tree_out->Branch("boson_m",&new_boson_m);
+  m_tree_out->Branch("boson_m",&new_boson_m);
   m_tree_out->Branch("boson_pt",&new_boson_pt);
   m_tree_out->Branch("boson_phi",&new_boson_phi);
   m_tree_out->Branch("boson_eta",&new_boson_eta);
@@ -160,8 +158,38 @@ StatusCode VBFTruthAlg::initialize() {
   m_tree_out->Branch("mll",&new_Mll);
   m_tree_out->Branch("hasZ",&new_hasZ);
 
+
+  m_tree_out->Branch("n_jet",   &new_njets);
+  m_tree_out->Branch("n_jet25", &new_n_jet25);
+  m_tree_out->Branch("n_jet30", &new_n_jet30);
+  m_tree_out->Branch("n_jet35", &new_n_jet35);
+  m_tree_out->Branch("n_jet40", &new_n_jet40);
+  m_tree_out->Branch("n_jet50", &new_n_jet50);
+
+  m_tree_out->Branch("n_el",&new_nels);
+  m_tree_out->Branch("n_mu",&new_nmus);
+  m_tree_out->Branch("n_nu",&new_nnus);
+  m_tree_out->Branch("n_boson",&new_nbosons);
+
+  m_tree_out->Branch("ee_pt",   &new_ee_pt);
+  m_tree_out->Branch("ee_eta",  &new_ee_eta);
+  m_tree_out->Branch("ee_phi",  &new_ee_phi);
+  m_tree_out->Branch("ee_m",    &new_ee_m);
+  m_tree_out->Branch("mumu_pt", &new_mumu_pt);
+  m_tree_out->Branch("mumu_eta",&new_mumu_eta);
+  m_tree_out->Branch("mumu_phi",&new_mumu_phi);
+  m_tree_out->Branch("mumu_m",  &new_mumu_m);
+  m_tree_out->Branch("nunu_pt", &new_nunu_pt);
+  m_tree_out->Branch("nunu_eta",&new_nunu_eta);
+  m_tree_out->Branch("nunu_phi",&new_nunu_phi);
+  m_tree_out->Branch("nunu_m",  &new_nunu_m);
+
+  m_tree_out->Branch("useMerged",  &useMerged);
+
   //Register the output TTree
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
+
+  MapNgen(); //fill std::map with dsid->Ngen
   ATH_MSG_DEBUG ("Done Initializing");
 
   std::ostringstream runNumberss;
@@ -191,6 +219,23 @@ StatusCode VBFTruthAlg::finalize() {
 
   return StatusCode::SUCCESS;}
 
+StatusCode VBFTruthAlg::MapNgen(){
+  TFile *f = TFile::Open(m_normFile.c_str(),"READ");
+  if(!f or f->IsZombie()) std::cout << "\n\n\nERROR normFile. Could not open " << m_normFile << std::endl;
+  h_Gen = (TH1D*) f->Get("h_total");
+  if(!h_Gen)ATH_MSG_WARNING("Number of events not found");
+
+  for(int i=1; i<=h_Gen->GetNbinsX();i++){
+    TString tmp = h_Gen->GetXaxis()->GetBinLabel(i);
+    int dsid = tmp.Atoi();
+    double N = h_Gen->GetBinContent(i);
+    Ngen[dsid]=N;
+    //std::cout << "input: " << dsid << " " << N << std::endl;
+   }
+  return StatusCode::SUCCESS;
+
+}
+
   StatusCode VBFTruthAlg::execute() {
       ATH_MSG_DEBUG ("\n\nExecuting " << name() << "...");
 
@@ -218,24 +263,63 @@ for (int i = 0; i < 9; i++) {
 }
 if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
 
+
+ // Number of generated events
+ double NgenCorrected = 0.;
+ NgenCorrected = Ngen[RunNumber];
+
   // Apply proper xsec
   crossSection = my_XsecDB->xsectTimesEff(RunNumber);//xs in pb
   // Multiply electron cross section by 3 to get all leptonic decay modes covered - ONLY for varied samples
   // 362192-362575 for zee and wenu
   if(362192 <= RunNumber && RunNumber <= 362575) crossSection *= 1; // this should be *3, but keep just the e-channel for now
-  if(nFileEvtTot>0)  weight = crossSection/nFileEvtTot;
+  // Apply proper nomalization
+  if(NgenCorrected>0)  weight = crossSection/NgenCorrected;
   else ATH_MSG_WARNING("Ngen " << nFileEvtTot << " dsid " << RunNumber );
-  ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << nFileEvtTot);
+  ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << NgenCorrected);
   new_xsec = crossSection;
-  new_sumw = nFileEvtTot;
+  new_sumw = NgenCorrected;
+
+  // Decide which samples to use:
+
+  // if Nominal Sherpa_221 MAXHTPTV, do not merge or change anything in the workflow
+  // if Sherpa_227 PTV_MJJ kt merged OR Sherpa_221 PTV, merge the two based on PTV
+  /*
+  if (364100 <= RunNumber && RunNumber <= 364197)
+    {useMerged = 0;
+      if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< "Event " << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
+    }
+  else if (120.e3 < boson_pt->at(0) && boson_pt->at(0) < 500.e3 && 312448 <= RunNumber && RunNumber <= 312531)
+    {useMerged = 1;}
+  else if (boson_pt->at(0) > 500.e3 && 364216 <= RunNumber && RunNumber <= 364229)
+  {useMerged = 1;}
+else
+   {useMerged = 2;}
+  */
+
+if (364100 <= RunNumber && RunNumber <= 364197)
+{useMerged = 0;
+      if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< "Event " << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
+    }
+else if (120.e3 < boson_pt->at(0) && 312448 <= RunNumber && RunNumber <= 312531){
+  useMerged = 1;
+  if(boson_pt->at(0) < 500e3)
+    useMerged = 2;
+}
+else if (boson_pt->at(0) > 500.e3 && 364216 <= RunNumber && RunNumber <= 364229){
+  useMerged = 2;
+}
+else
+  {useMerged = 3;}
 
 // Prepare variables
 
   // jets
   my_jets jet_signal;
   jet_signal.num_jets = 0;
+  int njet25=0, njet30=0, njet35=0, njet40=0, njet50=0;
   for (size_t jeti = 0; jeti < jet_pt->size(); jeti++)
-    if(jet_pt->at(jeti)>25e3 && fabs(jet_eta->at(jeti)) < 4.5)
+    //if(jet_pt->at(jeti)>25e3 && fabs(jet_eta->at(jeti)) < 4.5)
     {
       jet_signal.index[jet_signal.num_jets] = jeti;
       jet_signal.E[jet_signal.num_jets] =  jet_E->at(jeti);
@@ -243,16 +327,28 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
       jet_signal.eta[jet_signal.num_jets] =  jet_eta->at(jeti);
       jet_signal.phi[jet_signal.num_jets] =  jet_phi->at(jeti);
       jet_signal.num_jets++;
+
+      if(jet_pt->at(jeti) > 25e3) njet25++;
+      if(jet_pt->at(jeti) > 30e3) njet30++;
+      if(jet_pt->at(jeti) > 35e3) njet35++;
+      if(jet_pt->at(jeti) > 40e3) njet40++;
+      if(jet_pt->at(jeti) > 50e3) njet50++;
   }
   new_njets=jet_signal.num_jets;
   if (new_njets < 2) return StatusCode::SUCCESS;
   sortJets(&jet_signal);
 
+  new_n_jet25 = njet25;
+  new_n_jet30 = njet30;
+  new_n_jet35 = njet35;
+  new_n_jet40 = njet40;
+  new_n_jet50 = njet50;
+
   // electrons
   my_leptons el_signal;
   el_signal.num_leptons = 0;
   for (size_t lepi = 0; lepi < el_pt->size(); lepi++)
-    if(el_pt->at(lepi)>10e3 && fabs(el_eta->at(lepi)) < 2.5)
+    //if(el_pt->at(lepi)>10e3 && fabs(el_eta->at(lepi)) < 2.5)
     {
       el_signal.index[el_signal.num_leptons] = lepi;
       el_signal.pT[el_signal.num_leptons] = el_pt->at(lepi);
@@ -270,7 +366,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   my_leptons mu_signal;
   mu_signal.num_leptons = 0;
   for (size_t lepi = 0; lepi < mu_pt->size(); lepi++)
-    if(mu_pt->at(lepi)>10e3 && fabs(mu_eta->at(lepi)) < 2.5)
+    //if(mu_pt->at(lepi)>10e3 && fabs(mu_eta->at(lepi)) < 2.5)
     {
       mu_signal.index[mu_signal.num_leptons] = lepi;
       mu_signal.pT[mu_signal.num_leptons] = mu_pt->at(lepi);
@@ -288,7 +384,7 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
   my_leptons nu_signal;
   nu_signal.num_leptons = 0;
   for (size_t lepi = 0; lepi < nu_pt->size(); lepi++)
-    if(nu_pt->at(lepi)>10e3 && fabs(nu_eta->at(lepi)) < 2.5)
+    //if(nu_pt->at(lepi)>10e3 && fabs(nu_eta->at(lepi)) < 2.5)
     {
       nu_signal.index[nu_signal.num_leptons] = lepi;
       nu_signal.pT[nu_signal.num_leptons] = nu_pt->at(lepi);
@@ -357,10 +453,56 @@ if (passExp) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
     new_boson_eta->push_back(boson_eta->at(i_v));
     new_boson_pdgid->push_back(boson_pdgid->at(i_v));
   }
-  if(new_nels>1) {new_Mll = el_signal.Mll; new_hasZ = el_signal.has_Z_OS;}
-  else if(new_nmus>1) {new_Mll = mu_signal.Mll; new_hasZ = mu_signal.has_Z_OS;}
-  else if(new_nnus>1) {new_Mll = nu_signal.Mll; new_hasZ = nu_signal.has_Z_OS;}
-  else {new_Mll = -9999.; new_hasZ = el_signal.has_Z_OS;}
+
+
+  // compute boson variables
+  Double_t ee_m(-9999), ee_pt(-9999), ee_eta(-9999), ee_phi(-9999);
+  Double_t mumu_m(-9999), mumu_pt(-9999), mumu_eta(-9999), mumu_phi(-9999);
+  Double_t nunu_m(-9999), nunu_pt(-9999), nunu_eta(-9999), nunu_phi(-9999);
+
+  TLorentzVector lep_tlv[3];
+  if(new_nels==2) {
+    new_Mll = el_signal.Mll; new_hasZ = el_signal.has_Z_OS;
+    for(int i=0; i<2; i++) lep_tlv[i].SetPtEtaPhiM(el_signal.pT[i], el_signal.eta[i], el_signal.phi[i], electron_mass);
+    lep_tlv[2] = lep_tlv[0] + lep_tlv[1];
+    ee_pt  = (lep_tlv[2]).Pt();
+    ee_eta = (lep_tlv[2]).Eta();
+    ee_phi = (lep_tlv[2]).Phi();
+    ee_m   = (lep_tlv[2]).M();
+  }
+
+  if(new_nmus==2) {
+    new_Mll = mu_signal.Mll; new_hasZ = mu_signal.has_Z_OS;
+    for(int i=0; i<2; i++) lep_tlv[i].SetPtEtaPhiM(mu_signal.pT[i], mu_signal.eta[i], mu_signal.phi[i], muon_mass);
+    lep_tlv[2] = lep_tlv[0] + lep_tlv[1];
+    mumu_pt  = (lep_tlv[2]).Pt();
+    mumu_eta = (lep_tlv[2]).Eta();
+    mumu_phi = (lep_tlv[2]).Phi();
+    mumu_m   = (lep_tlv[2]).M();
+  }
+
+  if(new_nnus==2) {
+    new_Mll = nu_signal.Mll; new_hasZ = nu_signal.has_Z_OS;
+    for(int i=0; i<2; i++) lep_tlv[i].SetPtEtaPhiM(nu_signal.pT[i], nu_signal.eta[i], nu_signal.phi[i], nu_mass);
+    lep_tlv[2] = lep_tlv[0] + lep_tlv[1];
+    nunu_pt  = (lep_tlv[2]).Pt();
+    nunu_eta = (lep_tlv[2]).Eta();
+    nunu_phi = (lep_tlv[2]).Phi();
+    nunu_m   = (lep_tlv[2]).M();
+  }
+
+  new_ee_pt  = ee_pt ;
+  new_ee_eta = ee_eta;
+  new_ee_phi = ee_phi;
+  new_ee_m   = ee_m  ;
+  new_mumu_pt  = mumu_pt ;
+  new_mumu_eta = mumu_eta;
+  new_mumu_phi = mumu_phi;
+  new_mumu_m   = mumu_m  ;
+  new_nunu_pt  = nunu_pt ;
+  new_nunu_eta = nunu_eta;
+  new_nunu_phi = nunu_phi;
+  new_nunu_m   = nunu_m  ;
 
   computejj(&jet_signal, new_jj_mass, new_jj_deta, new_jj_dphi);
   new_met_et = met_et;
@@ -429,7 +571,7 @@ float MjjCut =2e5;
 float DEtajjCut =2.5;
 
 bool vbfSkim = (new_jet_pt->at(0) > LeadJetPtCut) & (new_jet_pt->at(1) > subLeadJetPtCut) & (new_jj_deta > DEtajjCut) & ((new_jet_eta->at(0) * new_jet_eta->at(1))<0) & (new_jj_mass > MjjCut);
-bool vbfSkimloose = (new_jet_pt->at(0) > 50.0e3) & (new_jet_pt->at(1) > 50.0e3) & (new_met_et > 100e3 || new_met_nolep_et > 100e3) & (new_jj_deta > 2.5) & (new_jj_mass > 200e3);
+bool vbfSkimloose = (new_jet_pt->at(0) > 80.0e3) & (new_jet_pt->at(1) > 50.0e3) & ( boson_pt->at(0) > 150e3) & (new_jj_mass > 800e3) & (new_jj_deta > 2.5)  & (new_jj_dphi<2.5) ;
 
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
@@ -450,7 +592,7 @@ if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
 
 
-if(vbfSkimloose && 362192 <= RunNumber && RunNumber <= 362383 || 364114 <= RunNumber && RunNumber <= 364127 ){
+if(vbfSkimloose && ( (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127) ) ){
 if ((new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZll = true;
 if ((new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZll = true;
 }
@@ -484,11 +626,13 @@ for(auto reg : regions){
       hist( "boson_mass_"+reg+"_nominal" )->Fill(boson_m->at(0)/1e3, new_w);
     }
   }
-    if (m_theoVariation){
+
+    if (m_theoVariation && ( (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127) ) ){
       for(int i=0; i<115; i++){
         if(regDecision[reg])
           hist("jj_mass_"+reg+"_index_"+to_string(i))->Fill(new_jj_mass/1e6, weight*EventWeightSys->at(i));
       }
+
       if(regDecision[reg])
 	{
           hist( "scales/jj_mass_"+reg+"_fac_up" )->Fill(new_jj_mass/1e6, weight*EventWeightSys->at(8));
@@ -504,7 +648,10 @@ for(auto reg : regions){
     }
 
 
-if (vbfSkimloose){
+// useMerged = 0 for nominal MAXHTPTV ONLY
+// useMerged = 1 for kt-merged ONLY
+// useMerged = 2 for kt-merged + PTV
+if (vbfSkimloose && (useMerged == 0 || useMerged == 1 || useMerged == 2) ){
   m_tree_out->Fill();
 }
 
@@ -523,6 +670,7 @@ StatusCode VBFTruthAlg::beginInputFile() {
   if(!m_tree) ATH_MSG_ERROR("VBFAnaysisAlg::beginInputFile - tree is invalid " << m_tree);
 
   nFileEvtTot=m_tree->GetEntries();
+  ATH_MSG_INFO(">>> Processing " << nFileEvtTot << " events!");
   m_tree->SetBranchStatus("*",0);
 
   m_tree->SetBranchStatus("EventNumber", 1);
@@ -646,6 +794,11 @@ StatusCode VBFTruthAlg::beginInputFile() {
   m_tree->SetBranchAddress("parton_pdfid1", &parton_pdfid1);
   m_tree->SetBranchAddress("parton_pdfid2", &parton_pdfid2);
   m_tree->SetBranchAddress("parton_pp", &parton_pp);
+
+  m_tree->SetBranchAddress("truthF_jj_mass", &truthF_jj_mass);
+  m_tree->SetBranchAddress("truthF_jj_deta", &truthF_jj_deta);
+  m_tree->SetBranchAddress("truthF_jj_dphi", &truthF_jj_dphi);
+  m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
 
   return StatusCode::SUCCESS;
 }

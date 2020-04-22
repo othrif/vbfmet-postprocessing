@@ -14,6 +14,8 @@
 
 #define muon_mass             105.6583715   // in MeV
 #define electron_mass         0.510998928   // in MeV
+#define nu_mass         0   // in MeV
+
 const Int_t MAXJETS = 20;
 const Int_t MAXLEPT = 10;
 
@@ -27,6 +29,7 @@ public:
     virtual StatusCode  beginInputFile(); //start of each input file, only metadata loaded
     virtual StatusCode  execute();
     virtual StatusCode  finalize();       //once, after all events processed
+    virtual StatusCode  MapNgen();
 
 private:
     bool m_theoVariation;
@@ -41,6 +44,8 @@ private:
     TString m_treeName = "MiniNtuple";
     TString outputFileName = "ntuple";
 
+  TH1D *h_Gen;
+  std::map<int,double> Ngen;
 
     //output tree
     std::string outputName;
@@ -120,6 +125,11 @@ private:
     vector<int>     *parton_pdfid1;
     vector<int>     *parton_pdfid2;
     vector<int>     *parton_pp;
+
+    Bool_t passVjetsFilter;
+    Float_t truthF_jj_mass=-9999;
+    Float_t truthF_jj_deta=-9999;
+    Float_t truthF_jj_dphi=-9999;
 
    // List of branches
    TBranch        *b_EventNumber;   //!
@@ -233,6 +243,29 @@ private:
    Bool_t          new_hasZ;
 
    Float_t         weight;
+
+
+   Float_t new_ee_pt ;
+   Float_t new_ee_eta;
+   Float_t new_ee_phi;
+   Float_t new_ee_m  ;
+   Float_t new_mumu_pt ;
+   Float_t new_mumu_eta;
+   Float_t new_mumu_phi;
+   Float_t new_mumu_m  ;
+   Float_t new_nunu_pt ;
+   Float_t new_nunu_eta;
+   Float_t new_nunu_phi;
+   Float_t new_nunu_m  ;
+   Int_t   new_n_jet;
+   Int_t   new_n_jet25;
+   Int_t   new_n_jet30;
+   Int_t   new_n_jet35;
+   Int_t   new_n_jet40;
+   Int_t   new_n_jet50;
+
+   Int_t  useMerged=-1;
+
 
 };
 
