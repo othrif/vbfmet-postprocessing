@@ -1167,7 +1167,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
   if(!passMJSkim) return StatusCode::SUCCESS;
-  bool GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
+  bool GammaMETSR = (n_ph>0 || n_el>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (n_jet < 2) return StatusCode::SUCCESS;
   if (!(n_jet < 5) && !(m_LooseSkim || m_AltSkim)) return StatusCode::SUCCESS;

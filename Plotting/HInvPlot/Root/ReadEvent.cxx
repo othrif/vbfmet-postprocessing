@@ -732,12 +732,13 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.24;
         if(fWeightSystName=="MJClos2018__1up" && fYear==2018) MJDDScaling*=1.19;
 
-        if(fWeightSystName=="MJClosHDPhi2016__1up" && fYear==2016) MJDDScaling*=1.8;
-        if(fWeightSystName=="MJClosHDPhi2017__1up" && fYear==2017) MJDDScaling*=1.47;
-        if(fWeightSystName=="MJClosHDPhi2018__1up" && fYear==2018) MJDDScaling*=1.43;
-        if(fWeightSystName=="MJClosLDPhi2016__1up" && fYear==2016) MJDDScaling*=1.32;
-        if(fWeightSystName=="MJClosLDPhi2017__1up" && fYear==2017) MJDDScaling*=1.72;
-        if(fWeightSystName=="MJClosLDPhi2018__1up" && fYear==2018) MJDDScaling*=1.62;
+	bool SystLT1 = event->GetVar(Mva::jj_dphi)<1.0;
+        if(fWeightSystName=="MJClosHDPhi2016__1up" && fYear==2016 && !SystLT1) MJDDScaling*=1.8;
+        if(fWeightSystName=="MJClosHDPhi2017__1up" && fYear==2017 && !SystLT1) MJDDScaling*=1.47;
+        if(fWeightSystName=="MJClosHDPhi2018__1up" && fYear==2018 && !SystLT1) MJDDScaling*=1.43;
+        if(fWeightSystName=="MJClosLDPhi2016__1up" && fYear==2016 && SystLT1) MJDDScaling*=1.32;
+        if(fWeightSystName=="MJClosLDPhi2017__1up" && fYear==2017 && SystLT1) MJDDScaling*=1.72;
+        if(fWeightSystName=="MJClosLDPhi2018__1up" && fYear==2018 && SystLT1) MJDDScaling*=1.62;
 	
       } else if (fMJNormStrategy == "dphijj3") {
         if (fYear == 2016) MJDDScaling = 0.3878;
