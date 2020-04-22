@@ -9,7 +9,7 @@ The configuration of the histograms (additional selection, binning, name, etc.) 
 
 4-Draw histograms comparing `file1.root` with `file2.root`:
 
-    a- One distribution from two files by specifying `-v` option: `python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_extract_Wlv_QCD -v all/Incl/boson_pt,all/Incl/boson_pt --wait`
+    a- One distribution from two files by specifying `-v` option: `python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD -v all/Incl/boson_pt,all/Incl/boson_pt --wait`
 
     b- All distributions by NOT specifying the `-v` option: `python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD`
 

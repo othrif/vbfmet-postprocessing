@@ -20,20 +20,20 @@ void plotTJVRatio(TString outAREA="./processed"){
   processname["Zll_QCD"]="Z #rightarrow ll QCD";
 
 
-  TString cuts[]       = {"SRmTJV", "SR50", "SR40", "SR35", "SR30", "SR25"};
-  TString names_cut[]  = {"No jet veto", "p_{T}^{j3} #leq 50 GeV", "p_{T}^{j3} #leq 40 GeV", "p_{T}^{j3} #leq 35 GeV", "p_{T}^{j3} #leq 30 GeV", "p_{T}^{j3} #leq 25 GeV"};
-  TString histos[] = {"jj_mass_old"};
+  TString cuts[]       = {"SRmTJV", "SR25"}; //{"SRmTJV", "SR50", "SR40", "SR35", "SR30", "SR25"};
+  TString names_cut[]  = {"No jet veto", "p_{T}^{j3} #leq 25 GeV"}; //, "p_{T}^{j3} #leq 50 GeV", "p_{T}^{j3} #leq 40 GeV", "p_{T}^{j3} #leq 35 GeV", "p_{T}^{j3} #leq 30 GeV", "p_{T}^{j3} #leq 25 GeV"};
+  TString histos[] = {"jj_mass"};
   TString names_histo[]  = {"m_{jj} [GeV]"};
   int colors[] = {kRed, kBlue, kViolet, kOrange, kCyan+1, kMagenta-10};
 
   double maxYratio = 1.1;
   double minYratio = -.1;
 
-  std::map<TString,TH1D*[6]> hProcCut;
+  std::map<TString,TH1D*[2]> hProcCut;
   for (auto const& x : processname){
     TString process = x.first;
     std::cout << "Looking at process: " << process << std::endl;
-    TString additional ="_6TJV";
+    TString additional ="_2TJV";
     bool ratio = true;
     const char separator    = ' ';
     const int nameWidth     = 20;
@@ -58,11 +58,11 @@ void plotTJVRatio(TString outAREA="./processed"){
          p1->Draw();
          p2->Draw();
        }
-    for (int i_cut=0; i_cut<6; i_cut++) // cuts
+    for (int i_cut=0; i_cut<2; i_cut++) // cuts
     {
       if(ratio)
        p1->cd();
-     p1->SetLogy();
+     //p1->SetLogy();
      TString histname = histos[i_h];
      histocounter++;
      TString a = "all/"+cuts[i_cut]+"/";
@@ -153,7 +153,7 @@ for (auto const& x : processratio){
   TString name; name.Form("%d",i++);
   TCanvas *myCanvas2 = new TCanvas("myCanvas2"+name, "",0,0,600,500);
   TLegend *l2 = new TLegend(0.72,0.61,0.92,0.91);
-   for (int i_cut=0; i_cut<6; i_cut++) // cuts
+   for (int i_cut=0; i_cut<2; i_cut++) // cuts
    {
     TH1D* hproc = (TH1D*)hProcCut[processratio[process][0]][i_cut]->Clone("ZWQCD");
     hproc->Divide( hProcCut[processratio[process][1]][i_cut] );

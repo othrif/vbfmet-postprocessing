@@ -1,0 +1,7 @@
+python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD -v all/Incl/boson_pt,all/Incl/boson_pt --wait -l 
+python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD -v all/Incl/jj_mass,all/Incl/jj_mass --wait 
+python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD -v all/Incl/n_jet25,all/Incl/n_jet25 --wait
+
+python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD -v all/Incl/boson_pt,all/Incl/boson_pt --wait -l 
+python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD -v all/Incl/jj_mass,all/Incl/jj_mass --wait 
+python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD -v all/Incl/n_jet25,all/Incl/n_jet25 --wait
