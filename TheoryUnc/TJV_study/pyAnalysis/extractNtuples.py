@@ -26,10 +26,7 @@ processes = {"Zvv_QCD": "((312484 <= runNumber && runNumber <= 312495) || (36422
              "Wev_QCD": "((312496 <= runNumber && runNumber <= 312507) || (364226 <= runNumber && runNumber <= 364227))",
              "Wmv_QCD": "((312508 <= runNumber && runNumber <= 312519) || (364224 <= runNumber && runNumber <= 364225))",
              }
-common = "  && useMerged==1 && boson_pt[0] > 150e3 && jet_pt[0]>80e3 && jet_pt[1]>50e3 && n_jet>=2 && jet_eta[0]*jet_eta[1]<0 && jj_deta>2.5 && jj_dphi<2.5  && jj_mass>800e3"
-#SR     = " && met_et>100e3       && (n_el+n_mu==0)"
-#CRW    = " && met_nolep_et>100e3 && ( (n_el==1 && n_mu==0 ) )"
-#CRZ    = " && met_nolep_et>100e3 && ( (n_el==2 && n_mu==0 && el_charge[0]*el_charge[1]<0 && abs(mll-91.2e3)<25e3) )"
+common = "  && useMerged==1 && boson_pt[0] > 150e3 && jet_pt[0]>80e3 && jet_pt[1]>50e3 && n_jet>=2 && jet_eta[0]*jet_eta[1]<0 && jj_deta>3.8 && jj_dphi<2  && jj_mass>800e3"
 selection = {
              "Zvv_QCD"  : processes["Zvv_QCD"] + common,# + SR,
              "Wlv_QCD"  : processes["Wlv_QCD"] + common,# + SR,

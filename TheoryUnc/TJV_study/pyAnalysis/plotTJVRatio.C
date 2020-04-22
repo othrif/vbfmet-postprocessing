@@ -1,47 +1,34 @@
 // Terminology on ratios needed
 // Processes:
-// Zvv_QCD_SR, Zvv_EWK_SR
-// Zll_QCD_SR, Zll_EWK_SR
-// Wlv_QCD_SR, Wlv_EWK_SR
-// Zll_QCD_CR, Zll_EWK_CR
-// Wlv_QCD_CR, Wlv_EWK_CR
-//
+// Zvv_QCD
+// Zll_QCD
+// Wlv_QCD
+
 // Process ratios:
-// Zvv_QCD_SR/Wlv_QCD_CR, Zvv_EWK_SR/Wlv_EWK_CR
-// Zvv_QCD_SR/Zll_QCD_CR, Zvv_EWK_SR/Zll_EWK_CR
-// Wlv_QCD_SR/Wlv_QCD_CR, Wlv_EWK_SR/Wlv_EWK_CR
-// Zvv_QCD_SR/Wlv_QCD_SR, Zvv_EWK_SR/Wlv_EWK_SR
-// Zvv_QCD_SR/Zvv_EWK_SR
+// Zvv_QCD/Wlv_QCD
+// Zvv_QCD/Zll_QCD
 
 void plotTJVRatio(TString outAREA="./processed"){
 
   //gSystem->Exec("mkdir -p "+outAREA+"/plots/Mjj");
   gSystem->Exec("mkdir -p "+outAREA+"/plots/Ratio");
-  gSystem->Exec("mkdir -p "+outAREA+"/plots/TJV");
+  //gSystem->Exec("mkdir -p "+outAREA+"/plots/TJV");
 
   std::map<TString,TString> processname;
-  //processname["Zvv_EWK_SR"]="Z #rightarrow #nu#nu EWK, SR";
-  processname["Zvv_QCD_SR"]="Z #rightarrow #nu#nu QCD, SR";
-  //processname["Zll_EWK_SR"]="Z #rightarrow ll EWK, SR";
-  //processname["Zll_QCD_SR"]="Z #rightarrow ll QCD, SR";
-  //processname["Wlv_EWK_SR"]="W #rightarrow #slash{l}#nu EWK, SR";
-  processname["Wlv_QCD_SR"]="W #rightarrow #slash{l}#nu QCD, SR";
-  //processname["Wlv_EWK_CR"]="W #rightarrow l#nu EWK, CRW";
-  processname["Wlv_QCD_CR"]="W #rightarrow l#nu QCD, CRW";
-  //processname["Zll_EWK_CR"]="Z #rightarrow ll EWK, CRZ";
-  processname["Zll_QCD_CR"]="Z #rightarrow ll QCD, CRZ";
+  processname["Zvv_QCD"]="Z #rightarrow #nu#nu QCD";
+  processname["Wlv_QCD"]="W #rightarrow l#nu QCD";
+  processname["Zll_QCD"]="Z #rightarrow ll QCD";
 
 
   TString cuts[]       = {"SRmTJV", "SR50", "SR40", "SR35", "SR30", "SR25"};
   TString names_cut[]  = {"No jet veto", "p_{T}^{j3} #leq 50 GeV", "p_{T}^{j3} #leq 40 GeV", "p_{T}^{j3} #leq 35 GeV", "p_{T}^{j3} #leq 30 GeV", "p_{T}^{j3} #leq 25 GeV"};
   TString histos[] = {"jj_mass_old"};
-  TString names_histo[]  = {"m_{jj} [GeV]"}; //, "#slash{E}_{T} [GeV]", "N_{jets}"};
+  TString names_histo[]  = {"m_{jj} [GeV]"};
   int colors[] = {kRed, kBlue, kViolet, kOrange, kCyan+1, kMagenta-10};
 
   double maxYratio = 1.1;
   double minYratio = -.1;
 
-  //TH1D  *hProcCut[10][6];
   std::map<TString,TH1D*[6]> hProcCut;
   for (auto const& x : processname){
     TString process = x.first;
@@ -52,7 +39,7 @@ void plotTJVRatio(TString outAREA="./processed"){
     const int nameWidth     = 20;
     const int numWidth      = 8;
 
-    TFile *f = new TFile(outAREA+"/hists_extract_"+process+".root");
+    TFile *f = new TFile(outAREA+"/hists_tjv_extract_"+process+".root");
     TFile *fout= new TFile(outAREA+"/out_"+process+".root","RECREATE");
     TList *list = new TList();
 
@@ -62,7 +49,7 @@ void plotTJVRatio(TString outAREA="./processed"){
      TString name; name.Form("%d",i_h);
      TCanvas *myCanvas = new TCanvas("myCanvas"+name+process, "",0,0,600,500);
      TLegend *l = new TLegend(0.72,0.49,0.92,0.91);
-       TPad* p1 = new TPad("p1","p1",0.0,0.33,1.0,1.0,-22); // xlow,ylow,xup,yup
+       TPad* p1 = new TPad("p1","p1",0.0,0.33,1.0,1.0,-22);
        TPad* p2 = new TPad("p2","p2",0.0,0.0,1.0,0.33,-21);
        p1->SetBottomMargin(0.02);
        p2->SetTopMargin(0.05);
@@ -85,7 +72,7 @@ void plotTJVRatio(TString outAREA="./processed"){
      if(!h){
        std::cout << "Problem with histogram " << histname << std::endl;
        break;}
-       h->SetLineColor(colors[i_cut]); h->SetLineWidth(2);
+       h->SetLineColor(colors[i_cut]); h->SetLineWidth(2);h->SetMarkerColor(colors[i_cut]);
        h->GetXaxis()->SetTitle(names_histo[i_h]);
        h->GetXaxis()->SetLabelOffset(999);
        h->GetYaxis()->SetTitle("Events");
@@ -150,22 +137,15 @@ void plotTJVRatio(TString outAREA="./processed"){
 }
 
 // Process ratios:
-// Zvv_QCD_SR/Wlv_QCD_CR, Zvv_EWK_SR/Wlv_EWK_CR > P_Z_W_QCD/EWK
-// Zvv_QCD_SR/Zll_QCD_CR, Zvv_EWK_SR/Zll_EWK_CR > P_Z_Z_QCD/EWK
-// Wlv_QCD_SR/Wlv_QCD_CR, Wlv_EWK_SR/Wlv_EWK_CR > P_W_W_QCD/EWK
-// Zvv_QCD_SR/Wlv_QCD_SR, Zvv_EWK_SR/Wlv_EWK_SR > S_Z_W_QCD/EWK
-// Zvv_QCD_SR/Zvv_EWK_SR > F_Z_Z
+// Zvv_QCD/Wlv_QCD
+// Zvv_QCD/Zll_QCD
+// Zll_QCD/Wlv_QCD
 
 std::map<TString,std::array<string,5>> processratio;
-processratio["P_Z_W_QCD"]=std::array<std::string, 5>{"Zvv_QCD_SR","Wlv_QCD_CR","Z(vv)/W(lv) QCD"  , "0.6", "1.4"};
-//processratio["P_Z_W_EWK"]=std::array<std::string, 5>{"Zvv_EWK_SR","Wlv_EWK_CR","Z(vv)/W(lv) EWK"  , "0.85", "1.2"};
-processratio["P_Z_Z_QCD"]=std::array<std::string, 5>{"Zvv_QCD_SR","Zll_QCD_CR","Z(vv)/Z(ll) QCD"  , "0.8", "1.4"};
-//processratio["P_Z_Z_EWK"]=std::array<std::string, 5>{"Zvv_EWK_SR","Zll_EWK_CR","Z(vv)/Z(ll) EWK"  , "0.8", "1.4"};
-processratio["P_W_W_QCD"]=std::array<std::string, 5>{"Wlv_QCD_SR","Wlv_QCD_CR","W(v)/W(lv) QCD"   , "0.6", "1.35"};
-//processratio["P_W_W_EWK"]=std::array<std::string, 5>{"Wlv_EWK_SR","Wlv_EWK_CR","W(v)/W(lv) EWK"   , "0.6", "1.4"};
-processratio["S_Z_W_QCD"]=std::array<std::string, 5>{"Zvv_QCD_SR","Wlv_QCD_SR","Z(vv)/W(v) QCD"   , "0.8", "1.4"};
-//processratio["S_Z_W_EWK"]=std::array<std::string, 5>{"Zvv_EWK_SR","Wlv_EWK_SR","Z(vv)/W(v) EWK"   , "0.95", "1.7"};
-//processratio["F_Z_Z"]    =std::array<std::string, 5>{"Zvv_QCD_SR","Zvv_EWK_SR","Z(vv)QCD/Z(vv)EWK", "0", "1.9"};
+processratio["ratio_Zvv_W_QCD"]=std::array<std::string, 5>{"Zvv_QCD","Wlv_QCD","Z(vv)/W(lv) QCD"  , "0.6", "1.4"};
+processratio["ratio_Z_Z_QCD"]=std::array<std::string, 5>{"Zvv_QCD","Zll_QCD","Z(vv)/Z(ll) QCD"  , "0.8", "1.4"};
+processratio["ratio_Zll_W_QCD"]=std::array<std::string, 5>{"Zll_QCD","Wlv_QCD","Z(vv)/W(v) QCD"   , "0.8", "1.4"};
+
 
 int i=0;
 for (auto const& x : processratio){

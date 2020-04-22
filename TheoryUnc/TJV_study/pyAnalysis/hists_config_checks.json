@@ -20,7 +20,7 @@
             "max": 120.0,
             "min": 60.0,
             "name": "boson_m",
-            "nbins": 60
+            "nbins": 30
         },
         {
             "draw": "met_nolep_et*1e-3",
