@@ -31,7 +31,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
     if Binning==10:
         multijets = [30.0, 13.5, 30.0, 13.5, 12.0, 29.0, 10.0, 10.0, 2.0, 2.0]
         multijets += [5.0]
-    if Binning==11 or Binning==12 or Binning==13:
+    if Binning==11 or Binning==12 or Binning==13 or Binning==21 or Binning==22:
         #multijets=[88.1, 102.9, 32.3, 21.3, 1.6, 69.5, 127.1, 35.7, 23.1, 0.0,56.4]
         #multijets_statunc=[12.2, 13.2, 4.7, 5.3, 0.9, 7.0, 12.8, 5.2, 5.2, 0.2,11.1]
         multijets=[83.0,99.6,30.7,21.4,2.4,71.2,132.0,36.97,23.8,0.0,56.5]
@@ -74,7 +74,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 multijets_statunc+=[(MJSF)*tmpmj_statunc[i]] # MET>160... from scaling to low mjj
     # MJ for other years
     if year==2017:
-        if Binning==11 or Binning==12 or Binning==13:
+        if Binning==11 or Binning==12 or Binning==13 or Binning==21 or Binning==22:
             #multijets=[166.1, 194.1, 61.0, 40.2, 3.1, 131.1, 239.7, 67.3, 43.5, 0.0,188.5]
             #multijets_statunc=[23.0, 24.9, 8.8, 10.0, 1.6, 13.2, 24.2, 9.9, 9.9, 0.2,31.2]
             multijets=[161.3,193.6,59.9,41.5,4.6,132.7,245.7,68.8,44.2,0,182.2]
@@ -118,7 +118,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
         else:
             print 'MJ is not defined for binning: ',Binning
     elif year==2018:
-        if Binning==11 or Binning==12 or Binning==13:
+        if Binning==11 or Binning==12 or Binning==13 or Binning==21 or Binning==22:
             #multijets=[210.7, 246.2, 77.3, 51.0, 3.9, 166.3, 304.0, 85.3, 55.2, 0.0, 331.0]
             #multijets_stat=[29.2, 31.6, 11.2, 12.6, 2.1, 16.7, 30.6, 12.5, 12.5, 0.2, 58.7]
             multijets=[182.1,218.5,67.6,46.8,5.2,174.5,323.1,90.5,58.2,0.0,364.3]
@@ -165,13 +165,41 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             multijets = [300.0, 135, 120.0, 70.0, 120.0, 120.0, 50.0]
         else:
             print 'MJ is not defined for binning: ',Binning
+    # let's split njet bin and add lower met bins
+    if Binning==21 or Binning==22:
+        if year==2016:
+            multijets[10]=4.6
+            multijets_statunc[10]=2.0
+            multijets+=[2.3,0.2]
+            multijets_statunc+=[1.0,0.2]
+            if Binning==22:
+                multijets+=[24.5,18.3,0.3]
+                multijets_statunc+=[3.2,4.3,0.2]
+        elif year==2017:
+            multijets[10]=11.6
+            multijets_statunc[10]=5.2
+            multijets+=[5.7,0.5]
+            multijets_statunc+=[2.5,0.5]
+            if Binning==22:
+                multijets+=[62.0,46.4,0.8]
+                multijets_statunc+=[8.1,10.9,0.5]
+        elif year==2018: #set for 2018
+            multijets[10]=14.3
+            multijets_statunc[10]=6.4
+            multijets+=[7.1,0.6]
+            multijets_statunc+=[3.1,0.6]
+            if Binning==22: # for 160-200. 150 to 160 efficiency is 0.67
+                multijets+=[76.7,57.3,0.9]
+                multijets_statunc+=[10.0,13.5,0.7]
 
     if doDoubleRatio:
         multijets+=[300.0]
     a = 1
     f_multijet = ROOT.TFile("multijet.root", "recreate")    
     if not singleHist:
+        imult=-1
         for multijet in multijets:
+            imult+=1
             hist=None
             histClosUp=[]
             histClosDw=[]
@@ -200,6 +228,7 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             histUp.SetBinError(1,0.0)
             histDw.SetBinContent(1,multijet/1.387)
             histDw.SetBinError(1,0.0)
+            isLowDPhiBin=(imult in [0,1,2,3,4]) # separates the low and high dphijj MJ uncertainties
             # setting the default value
             for itr in range(0,len(histClosUp)):
                 histClosUp[itr].SetBinContent(1,multijet) 
@@ -207,28 +236,46 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 histClosDw[itr].SetBinContent(1,multijet)
                 histClosDw[itr].SetBinError(1,0.0)                    
             if  year==2016:
-                histClosUp[0].SetBinContent(1,multijet*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
-                histClosDw[0].SetBinContent(1,multijet/1.8)
-                histClosUp[1].SetBinContent(1,multijet*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
-                histClosDw[1].SetBinContent(1,multijet/1.8)
+                if isLowDPhiBin:
+                    histClosUp[0].SetBinContent(1,multijet) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+                    histClosDw[0].SetBinContent(1,multijet)
+                    histClosUp[1].SetBinContent(1,multijet*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+                    histClosDw[1].SetBinContent(1,multijet/1.8)
+                else:
+                    histClosUp[0].SetBinContent(1,multijet*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+                    histClosDw[0].SetBinContent(1,multijet/1.8)
+                    histClosUp[1].SetBinContent(1,multijet) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+                    histClosDw[1].SetBinContent(1,multijet)
                 histClosUp[2].SetBinContent(1,multijet*1.54) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
                 histClosDw[2].SetBinContent(1,multijet/1.54)
             if  year==2017:
                 histUp.SetBinContent(1,multijet*1.189)
                 histDw.SetBinContent(1,multijet/1.189)
-                histClosUp[3].SetBinContent(1,multijet*1.72) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
-                histClosDw[3].SetBinContent(1,multijet/1.72)
-                histClosUp[4].SetBinContent(1,multijet*1.47) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
-                histClosDw[4].SetBinContent(1,multijet/1.47)
+                if isLowDPhiBin:
+                    histClosUp[3].SetBinContent(1,multijet) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                    histClosDw[3].SetBinContent(1,multijet)
+                    histClosUp[4].SetBinContent(1,multijet*1.47) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                    histClosDw[4].SetBinContent(1,multijet/1.47)
+                else:
+                    histClosUp[3].SetBinContent(1,multijet*1.72) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                    histClosDw[3].SetBinContent(1,multijet/1.72)
+                    histClosUp[4].SetBinContent(1,multijet) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                    histClosDw[4].SetBinContent(1,multijet)
                 histClosUp[5].SetBinContent(1,multijet*1.24) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
                 histClosDw[5].SetBinContent(1,multijet/1.24)
             if  year==2018:
                 histUp.SetBinContent(1,multijet*1.226)
                 histDw.SetBinContent(1,multijet/1.226)
-                histClosUp[6].SetBinContent(1,multijet*1.32) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
-                histClosDw[6].SetBinContent(1,multijet/1.32)
-                histClosUp[7].SetBinContent(1,multijet*1.62) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
-                histClosDw[7].SetBinContent(1,multijet/1.62)
+                if isLowDPhiBin:
+                    histClosUp[6].SetBinContent(1,multijet) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                    histClosDw[6].SetBinContent(1,multijet)
+                    histClosUp[7].SetBinContent(1,multijet*1.62) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                    histClosDw[7].SetBinContent(1,multijet/1.62)
+                else:
+                    histClosUp[6].SetBinContent(1,multijet*1.32) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                    histClosDw[6].SetBinContent(1,multijet/1.32)
+                    histClosUp[7].SetBinContent(1,multijet) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                    histClosDw[7].SetBinContent(1,multijet)
                 histClosUp[8].SetBinContent(1,multijet*1.19) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
                 histClosDw[8].SetBinContent(1,multijet/1.19)
             hist.Write()
@@ -319,7 +366,7 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, ME
     if Binning==10:
         fakeelesp = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2 ,5.3]
         fakeelesm = [10.4, 10.0, 10.4, 10.0, 5.3, 14.5, 14.2, 6.2, 14.2, 6.2, 5.3]
-    if Binning==11 or Binning==12 or Binning==13: # set for all years
+    if Binning==11 or Binning==12 or Binning==13 or Binning==21 or Binning==22: # set for all years
         fakeelesp = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1]
         fakeelesm = [8.3, 11.1, 6.7, 4.0, 1.9, 8.3, 11.1, 6.7, 4.0, 1.9, 9.1] # met>150 numbers
         if METCut==160:
@@ -328,7 +375,13 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, ME
         if METCut==200:
             fakeelesp = [4.3, 6.4, 10.6, 5.1, 5.7, 4.3, 6.4, 10.6, 5.1, 5.8, 4.9]
             fakeelesm = [4.3, 6.4, 10.6, 5.1, 5.7, 4.3, 6.4, 10.6, 5.1, 5.8, 4.9]
-    fakeInit = [9.0238,7.4043,3.1402,3.5567,1.5765,8.6259,7.2854,3.5912,5.6147,0.8996,8.44]
+        if Binning==21 or Binning==22:
+            fakeelesp+=[4.9,4.9]
+            fakeelesm+=[4.9,4.9]
+        if Binning==22:
+            fakeelesp+=[6.6, 3.9, 4.0]
+            fakeelesm+=[6.6, 3.9, 4.0]
+    fakeInit = [9.0238,7.4043,3.1402,3.5567,1.5765,8.6259,7.2854,3.5912,5.6147,0.8996,8.44,1.0,1.0,1.0,1.0,1.0,1.0]
     if doDoubleRatio:
         fakeelesp+=[12.5]
         fakeelesm+=[12.5]
@@ -455,10 +508,15 @@ def writeFakeMuo(Binning=0, year=2016, METCut=150):
     f_fakemuo = ROOT.TFile("fakemuo.root", "recreate")
     fakemuos=[]
     fakemuos = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.0, 3.0, 3.0, 3.0]
-    if Binning==11 or Binning==12 or Binning==13: # set for all years
+    if Binning==11 or Binning==12 or Binning==13 or Binning==21 or Binning==22: # set for all years
         fakemuos = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.0, 3.0, 3.0, 3.0]
         if METCut==160:
             fakemuos = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.0, 3.0, 3.0, 3.0]
+        if Binning==21 or Binning==22:
+            fakemuos+=[3.0,3.0]
+        if Binning==22:
+            fakemuos+=[3.0,3.0,3.0]
+            
     a=1
     hists=[]
     histcr=None

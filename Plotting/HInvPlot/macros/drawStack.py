@@ -38,6 +38,7 @@ p.add_option('--xmin',         type='float',  default=None,          dest='xmin'
 p.add_option('--blind',         action='store_true', default=False,   dest='blind')
 p.add_option('--preliminary',   action='store_true', default=False,   dest='preliminary')
 p.add_option('--normalizeBkg',  action='store_true', default=False,   dest='normalizeBkg')
+p.add_option('--getMJNF',       action='store_true', default=False,   dest='getMJNF')
 p.add_option('--madgraph',      action='store_true', default=False,   dest='madgraph')
 p.add_option('--do-eps',        action='store_true', default=False,   dest='do_eps')
 p.add_option('--do-c',          action='store_true', default=False,   dest='do_c')
@@ -240,7 +241,7 @@ def getHistPars(hist):
         'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
         'j0timing' : {'xtitle':'Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
         'j1timing' : {'xtitle':'sub-Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
-        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events', 'rebin':0, 'ymin':0.1, 'logy':False, 'LtoRCut':1, 'xmax':9.0},
+        'n_jet'   : {'xtitle':'Number of Jets',               'ytitle':'Events',  'ymin':0.1, 'logy':False, 'LtoRCut':1, 'xmax':9.0},
         'n_jet_fwd'   : {'xtitle':'Number of extra Jets |eta|>2.5',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
         'n_jet_fwdj30'   : {'xtitle':'Number of Jets outside tagging jets',               'ytitle':'Events', 'rebin':0},
@@ -286,7 +287,7 @@ def getHistPars(hist):
         'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
         'mllg'    : {'xtitle':'#it{m}_{ll#gamma} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':500.0},
         'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / 500 GeV', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
-        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':200.0, 'xmax':5000.0,    'ymin':0.1,      'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':True, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000, 'ymin':50.1,'ymax':20000,
+        'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':200.0, 'xmax':5000.0,    'ymin':0.1,      'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':False, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000, 'ymin':50.1,'ymax':20000,
         'jj_mass_variableBinGam'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':250.0,     'ymin':0.1,      'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':False, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000, 'ymin':50.1,'ymax':20000,         'xmax':3500.0,
         'tmva_variableBin'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':10.01,'logy':True, 'LtoRCut':2},
         'tmva_variableBin11'    : {'xtitle':'ANN Output'  ,                   'ytitle':'Events', 'rebin':0,  'ymin':10.01,'logy':True, 'LtoRCut':2},
@@ -1868,6 +1869,17 @@ class DrawStack:
                     for i in range(0,den_tmp.GetNbinsX()):
                         den_tmp.SetBinError(i,0.0)
                 self.ratio.Divide(den_tmp)
+                if options.getMJNF:
+                    multijethist = self.bkgs['dqcd'].hist
+                    for myMJBin in range(1,multijethist.GetNbinsX()+1):
+                        data_mj = self.data.hist.GetBinContent(myMJBin)
+                        totalbkgmj = self.bkg_sum.GetBinContent(myMJBin)
+                        mjinBin = multijethist.GetBinContent(myMJBin)
+                        nfmjbin=1.0
+                        if mjinBin>0.0:
+                            nfmjbin = (data_mj - (totalbkgmj - mjinBin))/mjinBin
+                        print 'multijethist: ',myMJBin,' MJ: ',multijethist.GetBinContent(myMJBin),' NF: ',nfmjbin
+                    
                 # compute the mu-error
                 if options.blind and not options.ph_ana:
                     leftToRight=1

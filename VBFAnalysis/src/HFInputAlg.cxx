@@ -119,6 +119,8 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==11) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==12) bins=12; // mjj binning + njet bin + dphijj by 2 mjj>800
   else if(m_binning==13) bins=5; // mjj binning mjj>250
+  else if(m_binning==21) bins=14; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800
+  else if(m_binning==22) bins=17; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800 + 3 bins low MET
 
   // multivariate number of bins
   if(doTMVA &&  doVBFMETGam) bins=6;
@@ -328,7 +330,7 @@ StatusCode HFInputAlg::execute() {
   float METCSTJetCut = 150.0e3; // 120.0e3
   float jj_detaCut = 4.8; // 4.0
   float jj_massCut = 1000.0e3; // 1000.0e3
-  if(m_binning>=7 && m_binning<=12){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
+  if((m_binning>=7 && m_binning<=12) || m_binning==21 || m_binning==22){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
   if(doDoubleRatio) jj_massCut=500.0e3;
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
   bool nbjetCut = (n_bjet < 2); 
@@ -451,6 +453,7 @@ StatusCode HFInputAlg::execute() {
     METCut=m_METCut;
     METCSTJetCut=m_METCut-20.0e3;
   }
+  bool METCutForMETBinning = (met_tst_nolep_et > 200e3) && (met_cst_jet > 180e3);
 
   // setting MET cuts for photon analysis
   if(doVBFMETGam){
@@ -717,6 +720,29 @@ StatusCode HFInputAlg::execute() {
       else if (jj_mass < 1.5e6)   bin = 2;
       //else if (jj_mass < 2.0e6) bin = 3;
       else bin = 3;
+    }else if(m_binning==21 || m_binning==22){
+      if(METCutForMETBinning){
+	if      (jj_mass < 1.0e6) bin = 0;
+	else if (jj_mass < 1.5e6) bin = 1;
+	else if (jj_mass < 2e6)   bin = 2;
+	else if (jj_mass < 3.5e6) bin = 3;
+	else bin = 4;
+	if(jj_dphi>1)  bin+=5; // separate dphijj
+	if(n_jet>2){
+	  if (jj_mass < 1.5e6) return StatusCode::SUCCESS; // remove njet>2 and mjj<1.5 TeV
+	  else if (jj_mass < 2e6)   bin = 10;
+	  else if (jj_mass < 3.5e6) bin = 11;
+	  else bin = 12;
+	}
+      }else{// low met
+	if(m_binning==21) return StatusCode::SUCCESS;
+	else{
+	  if (jj_mass < 1.5e6) return StatusCode::SUCCESS;
+	  else if (jj_mass < 2e6)   bin = 13;
+	  else if (jj_mass < 3.5e6) bin = 14;
+	  else bin = 15;
+	}
+      }
     }
 
     // alternative binning approaches

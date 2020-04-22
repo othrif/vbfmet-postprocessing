@@ -29,14 +29,22 @@ parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", d
 parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis, set --Binning=13")
 parser.add_argument( "--singleHist", dest = "singleHist", action="store_true", default = False, help = "Runs VBF + MET in one histogram when true")
 parser.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
-parser.add_argument("--METCut", type=int, dest='METCut', default=160e3, help="METCut, default: 160 MeV")
+parser.add_argument("--METCut", type=int, dest='METCut', default=200e3, help="METCut, default: 200e3 MeV")
 parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
 
 if not args.doVBFMETGam:
-    writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=int(args.METCut/1e3), singleHist=args.singleHist)
-    writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist,METCut=int(args.METCut/1e3))
-    writeFakeMuo(int(args.Binning), args.year, METCut=int(args.METCut/1e3))
+    myMetCut=int(args.METCut/1e3)
+
+    if int(args.Binning)==22:
+        if myMetCut!=160:
+            print 'you are gonna have a bad time. Only setup for MET>160 for these binning options'
+            sys.exit(0)
+
+        myMetCut=200 # only setup for this value now for the fakes and mj. this is only for python
+    writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist)
+    writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist,METCut=myMetCut)
+    writeFakeMuo(int(args.Binning), args.year, METCut=myMetCut)
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:
