@@ -1,5 +1,6 @@
 """
 
+
 This module configures input files
 
 """
@@ -720,6 +721,7 @@ def prepareBkgRuns(keys,options=None):
         '410645':'schan_antitop',
         '410646':'Wt_top',
         '410647':'Wt_top',
+        '410470':'ttbar(1l)',
         '410472':'ttbar(2l)',
         } #410643,410642,410648,410649
     bkg_top_other = {
@@ -945,9 +947,17 @@ def prepareBkgRuns(keys,options=None):
                   '363357':'WZ->qqnn',
                   '363358':'WZ->qqll',
                     }
+    bkg_vvy = {
+        '366160':'WZy',
+        '366161':'WWy',
+        '366162':'ZZy',
+    }
     bkg_vvjj_ewk = {
         '364284':'lllvjj_ewk',
         '364285':'llvvjj_ewk',
+    }
+    bkg_vvjj_ewk_alt = {
+        '363724':'ZZllvvjj_ewk',
     }
     bkg_gg_zz = {
         '345723':'gg->ZZ',
@@ -964,6 +974,20 @@ def prepareBkgRuns(keys,options=None):
     }
     bkg_ww_PhPy8 = {
         '361600':'WWlvlv_PhPy8'
+    }
+    bkg_ttH = {
+        '346198':'ttHZy',
+    }
+    bkg_VH = {
+        '345320':'VHZy',
+        '345321':'VHZy',
+        '345322':'VHZy',
+    }
+    bkg_VBFZy = {
+        '345833':'VBFHZy',
+    }
+    bkg_ggHZy = {
+        '345316':'ggHZy',
     }
 
     bkg_vbfExt = {'309662':'Wenu_MAXHTPTV70_140',
@@ -1045,8 +1069,10 @@ def prepareBkgRuns(keys,options=None):
                      '364517':'nngamma_pty_35_70',
                      '364518':'nngamma_pty_70_140',
                      '364519':'nngamma_pty_140_E',
-                 }
-
+                     '700011':'eegamma_pty7_EnhMaxpTBpTy',
+                     '700012':'mmgamma_pty7_EnhMaxpTBpTy',
+                     '700013':'ttgamma_pty7_EnhMaxpTBpTy',
+                }
     bkg_sherpa_wg = {'364521':'engamma_pty_7_15',
                      '364522':'engamma_pty_15_35',
                      '364523':'engamma_pty_35_70',
@@ -1072,8 +1098,7 @@ def prepareBkgRuns(keys,options=None):
                 '345781':'FxFx_mumugamma_HTGT125_MjjLT500',
                 '345782':'FxFx_mumugamma_HTGT125_MjjGT500',
                 '345784':'FxFx_nunugamma_pty_140',
-                         }
-
+    }
     bkg_sherpa_vgg = {'364550':'eegammagamma_pty_17_myy_80',
                       '364552':'eegammagamma_pty_35_70',
                       '364553':'eegammagamma_pty_70_140',
@@ -1102,10 +1127,13 @@ def prepareBkgRuns(keys,options=None):
                           '364582':'taunugammagamma_pty_35_70',
                           '364583':'taunugammagamma_pty_70_140',
                           '364584':'taunugammagamma_pty_140_E_CMS',
-                          }
+    }
     bkg_ttg = {'410082':'ttgamma_noallhad',
-                   '410087':'ttgamma_allhad'
-                   }
+               '410087':'ttgamma_allhad',
+           }
+    bkg_ttv = {'410155':'ttW',
+               '410156':'ttZnunu',
+           }
     bkg_pho = {'364541':'SinglePhoton_pty_17_35',
                '364542':'SinglePhoton_pty_35_70',
                '364543':'SinglePhoton_pty_70_140',
@@ -1175,11 +1203,11 @@ def prepareBkgRuns(keys,options=None):
                 #'hvbf1k':{'308281':'VBF125 - H1000',},
                 #'hvbf3k':{'308283':'VBF125 - H3000',},
                 'hggf':sig_ggF125,
-                'tth':sig_tth125,
+                'tth':bkg_ttH,
                 'hvbf':sig_VBF125,
-                'wewk':bkg_wewk,
+                #'wewk':bkg_wewk,
                 #'wewk':bkg_wewkpow,
-                'wqcd':bkg_wqcd,
+                #'wqcd':bkg_wqcd,
                 'zewk':bkg_zewk,
                 #'zewk':bkg_zewkpow,
                 #'top2':bkg_zewkpow,
@@ -1201,11 +1229,15 @@ def prepareBkgRuns(keys,options=None):
                 'vv':bkg_vv,
                 'vvjj':bkg_vvjj_ewk,
                 'ggvv':bkg_gg_vv,
-                'mqcd':bkg_qcdw,
-                'dqcd':bkg_datadriveqcd,
+                'vvy':bkg_vvy,
+                'vh':bkg_VH,
+                'vbfzy': bkg_VBFZy,
+                'gghzy': bkg_ggHZy,
+                #'mqcd':bkg_qcdw,
+                #'dqcd':bkg_datadriveqcd,
                 #'mqcd':bkg_qcdunw,
-                'zqcdMad':bkg_z_strong_madgraph,
-                'wqcdMad':bkg_w_strong_madgraph,
+                #'zqcdMad':bkg_z_strong_madgraph,
+                #'wqcdMad':bkg_w_strong_madgraph,
                 'wdpi':bkg_top_other,
                }
     if options.OverlapPh:
@@ -1214,6 +1246,7 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['wgamewk']=bkg_wgewk
         bkg_keys['zgamewk']=bkg_zgewk
         bkg_keys['ttg']=bkg_ttg
+        bkg_keys['ttv']=bkg_ttv
         bkg_keys['pho']=bkg_pho
         bkg_keys['phoAlt']=bkg_pho_v2
         bkg_keys['vgg']=bkg_sherpa_vgg

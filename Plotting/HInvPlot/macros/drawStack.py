@@ -412,6 +412,7 @@ def getLabelSortKey(sample):
     elif sample == 'wgas': return 17
     elif sample == 'vvv': return 2
     elif sample == 'vv': return 5
+    elif sample == 'vvy': return 5
     elif sample == 'vvjj': return 3
     elif sample == 'ggvv': return 1
     elif sample == 'ttv': return 7
@@ -441,6 +442,7 @@ def getSampleSortKey(sample):
     elif sample == 'dqcd': return -5
     elif sample == 'vvv': return 2
     elif sample == 'vv': return 5
+    elif sample == 'vvy': return 5
     elif sample == 'vvjj': return 3
     elif sample == 'ggvv': return 1
     elif sample == 'zldy': return 7
@@ -485,6 +487,7 @@ def getSampleLabel(sample):
         'top2': 'Top', #'t#bar{t}',
         'tall': 'Other',#'Top+#it{VV}/#it{VVV}',
         'vvv': '#it{VVV}',
+        'vvy': '#it{VV}+#it{#gamma}',
         'vv': '#it{VV}',
         'vvjj': '#it{VVjj} EWK',
         'ggvv': 'gg#rightarrow#it{VV}',
@@ -506,7 +509,7 @@ def getSampleLabel(sample):
         #'hvbf':  '#it{h}(#it{B}_{inv} = 0.13)',
         'higgs':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
         'hvbf':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
-        'ttv' : 't#bar{t}V+tV',
+        'ttv' : 't#bar{t}V',
         'data': 'Data',
         'bkgs': 'Total SM',
         }
@@ -568,6 +571,7 @@ def getStyle(sample):
     color_wz = ROOT.kTeal-8 #ROOT.kMagenta-3
     color_zz = ROOT.kAzure-4 #ROOT.kMagenta-3
     color_vvv = ROOT.kOrange
+    color_vvy = ROOT.kOrange+1
     color_vv = ROOT.kOrange+2
     color_vvjj = ROOT.kOrange+3
     color_ggvv = ROOT.kOrange+4
@@ -608,6 +612,7 @@ def getStyle(sample):
         'zgamewk':{'color':color_zgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'wgamewk':{'color':color_wgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvv':{'color':color_vvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'vvy':{'color':color_vvy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vv':{'color':color_vv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'vvjj':{'color':color_vvjj, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'ggvv':{'color':color_ggvv, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
@@ -2605,7 +2610,7 @@ def main():
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
             #bkgs = ['ttg', 'zgam','wgam','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','vvv','vv','ggvv','vvjj'] #,'mqcd','zldy','vvv'
-            bkgs = ['zgam','zewk', 'zqcd','vvv','vv','ggvv','vvjj','top'] #,'mqcd','zldy','vvv'
+            bkgs = ['zgam','zewk', 'zqcd','vvv','vv','ggvv','vvjj','vvy','top'] #,'mqcd','zldy','vvv'
     if options.add_fakeE:
         bkgs+=['tth']
     if options.stack_signal:

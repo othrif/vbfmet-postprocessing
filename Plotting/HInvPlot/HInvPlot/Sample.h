@@ -1,3 +1,4 @@
+
 #ifndef MSL_SAMPLE_H
 #define MSL_SAMPLE_H
 
@@ -93,9 +94,13 @@ namespace Msl
       kpho,
       kphoAlt,
       kvvv,
+      kvvy,
       kvv,
       kvvjj,
       kggvv,
+      kvh,
+      kvbfzy,
+      kgghzy,
       kJPsi,
       kUpsl,
       kZqcdPow,

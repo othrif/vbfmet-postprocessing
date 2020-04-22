@@ -391,8 +391,10 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['top'] = ['top1']
     bkgs['vvv'] =['vvv']
     bkgs['vv']  =['vv']
+    bkgs['vvy']  =['vvy']
     bkgs['vvjj'] = ['vvjj']
     bkgs['ggvv'] = ['ggvv']
+    bkgs['ttv'] = ['ttv']
     bkgs['dqcd'] = ['dqcd']
     bkgs['mqcd'] = ['mqcd']
     if options.OverlapPh:
@@ -437,7 +439,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     #
     if reg != None and key != None:
         
-        reg.SetVal(key, 'vvjj,ggvv,top,vvv,vv,wqcd,wewk,zqcd,zewk,ttg,wgam,zgam,zgamewk,wgamewk,bkgs,data')
+        reg.SetVal(key, 'vvjj,ggvv,top,vvv,vv,vvy,zqcd,zewk,ttg,ttv,zgam,zgamewk,bkgs,data')
         
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))

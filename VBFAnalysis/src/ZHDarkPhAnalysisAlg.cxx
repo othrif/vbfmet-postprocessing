@@ -184,20 +184,20 @@ StatusCode ZHDarkPhAnalysisAlg::initialize() {
   ph_pt = new std::vector<float>(0);
   ph_phi = new std::vector<float>(0);
   ph_eta = new std::vector<float>(0);
-  // ph_ptcone20 = new std::vector<float>(0);
-  // ph_topoetcone40 = new std::vector<float>(0);
-  // ph_truthOrigin  = new std::vector<int>(0);
-  // baseph_pt = new std::vector<float>(0);
-  // baseph_phi = new std::vector<float>(0);
-  // baseph_eta = new std::vector<float>(0);
-  // baseph_ptcone20 = new std::vector<float>(0);
-  // baseph_topoetcone40 = new std::vector<float>(0);
-  // baseph_truthOrigin  = new std::vector<int>(0);
-  // baseph_isEM  = new std::vector<unsigned>(0);
-  // baseph_iso  = new std::vector<bool>(0);
-  // tau_pt = new std::vector<float>(0);
-  // tau_phi = new std::vector<float>(0);
-  // tau_eta = new std::vector<float>(0);
+  ph_ptcone20 = new std::vector<float>(0);
+  ph_topoetcone40 = new std::vector<float>(0);
+  ph_truthOrigin  = new std::vector<int>(0);
+  baseph_pt = new std::vector<float>(0);
+  baseph_phi = new std::vector<float>(0);
+  baseph_eta = new std::vector<float>(0);
+  baseph_ptcone20 = new std::vector<float>(0);
+  baseph_topoetcone40 = new std::vector<float>(0);
+  baseph_truthOrigin  = new std::vector<int>(0);
+  baseph_isEM  = new std::vector<unsigned>(0);
+  baseph_iso  = new std::vector<bool>(0);
+  tau_pt = new std::vector<float>(0);
+  tau_phi = new std::vector<float>(0);
+  tau_eta = new std::vector<float>(0);
 
   mcEventWeights = new std::vector<float>(0);
 
@@ -346,7 +346,7 @@ StatusCode ZHDarkPhAnalysisAlg::initialize() {
     m_tree_out->Branch("ph_pt", &ph_pt);
     m_tree_out->Branch("ph_phi",&ph_phi);
     m_tree_out->Branch("ph_eta",&ph_eta);
-    /*
+    //    /*
     if(m_currentVariation=="Nominal"){
 
       m_tree_out->Branch("ph_ptcone20", &ph_ptcone20);
@@ -369,7 +369,7 @@ StatusCode ZHDarkPhAnalysisAlg::initialize() {
     }else{
       tau_pt=0; tau_phi=0; tau_eta=0;
     }
-    */
+    //    */
     // Tenacious MET
     m_tree_out->Branch("met_tenacious_tst_et",   &met_tenacious_tst_et);
     m_tree_out->Branch("met_tenacious_tst_phi",  &met_tenacious_tst_phi);
@@ -659,7 +659,7 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   outtau_pt->clear();
   outtau_eta->clear();
   outtau_phi->clear();
-  /*
+  //  /*
   if(m_extraVars || true){
 
     // overlap remove with the photons
@@ -693,7 +693,7 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
       }// end tau loop
     }// end tau overlap removal
   }// end extra variables
-    */
+  //    */
 
   // -----------------------
   // refill the base leptons
@@ -1427,25 +1427,25 @@ StatusCode ZHDarkPhAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("ph_pt",           &ph_pt);
     m_tree->SetBranchAddress("ph_phi",          &ph_phi);
     m_tree->SetBranchAddress("ph_eta",          &ph_eta);
-    // if(m_currentVariation=="Nominal" && m_isMC){
-      // m_tree->SetBranchAddress("ph_ptcone20",      &ph_ptcone20);
-      // m_tree->SetBranchAddress("ph_topoetcone40",  &ph_topoetcone40);
-      // m_tree->SetBranchAddress("ph_truthOrigin",   &ph_truthOrigin);
+    if(m_currentVariation=="Nominal" && m_isMC){
+      m_tree->SetBranchAddress("ph_ptcone20",      &ph_ptcone20);
+      m_tree->SetBranchAddress("ph_topoetcone40",  &ph_topoetcone40);
+      m_tree->SetBranchAddress("ph_truthOrigin",   &ph_truthOrigin);
 
-      // m_tree->SetBranchAddress("baseph_pt",           &baseph_pt);
-      // m_tree->SetBranchAddress("baseph_phi",          &baseph_phi);
-      // m_tree->SetBranchAddress("baseph_eta",          &baseph_eta);
-      // m_tree->SetBranchAddress("baseph_ptcone20",     &baseph_ptcone20);
-      // m_tree->SetBranchAddress("baseph_topoetcone40", &baseph_topoetcone40);
-      // m_tree->SetBranchAddress("baseph_truthOrigin",  &baseph_truthOrigin);
-      // m_tree->SetBranchAddress("baseph_isEM",         &baseph_isEM);
-      // m_tree->SetBranchAddress("baseph_iso",          &baseph_iso);
+      m_tree->SetBranchAddress("baseph_pt",           &baseph_pt);
+      m_tree->SetBranchAddress("baseph_phi",          &baseph_phi);
+      m_tree->SetBranchAddress("baseph_eta",          &baseph_eta);
+      m_tree->SetBranchAddress("baseph_ptcone20",     &baseph_ptcone20);
+      m_tree->SetBranchAddress("baseph_topoetcone40", &baseph_topoetcone40);
+      m_tree->SetBranchAddress("baseph_truthOrigin",  &baseph_truthOrigin);
+      m_tree->SetBranchAddress("baseph_isEM",         &baseph_isEM);
+      m_tree->SetBranchAddress("baseph_iso",          &baseph_iso);
 
-      // m_tree->SetBranchAddress("tau_pt",           &tau_pt);
-      // m_tree->SetBranchAddress("tau_phi",          &tau_phi);
-      // m_tree->SetBranchAddress("tau_eta",          &tau_eta);
-    // }
-    // tau_pt=0; tau_phi=0; tau_eta=0;
+      m_tree->SetBranchAddress("tau_pt",           &tau_pt);
+      m_tree->SetBranchAddress("tau_phi",          &tau_phi);
+      m_tree->SetBranchAddress("tau_eta",          &tau_eta);
+    }
+    tau_pt=0; tau_phi=0; tau_eta=0;
 
     m_tree->SetBranchAddress("met_soft_tst_et",        &met_soft_tst_et);
     m_tree->SetBranchAddress("met_soft_tst_phi",       &met_soft_tst_phi);

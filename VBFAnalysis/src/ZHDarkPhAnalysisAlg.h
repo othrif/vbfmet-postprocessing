@@ -365,17 +365,17 @@ class ZHDarkPhAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* ph_ptcone20;
   std::vector<Float_t>* ph_topoetcone40;
   std::vector<Int_t>*   ph_truthOrigin;
-  /* std::vector<Float_t>* baseph_pt; */
-  /* std::vector<Float_t>* baseph_phi; */
-  /* std::vector<Float_t>* baseph_eta; */
-  /* std::vector<Float_t>* baseph_ptcone20; */
-  /* std::vector<Float_t>* baseph_topoetcone40; */
-  /* std::vector<Int_t>*   baseph_truthOrigin; */
-  /* std::vector<unsigned>* baseph_isEM; */
-  /* std::vector<bool>*    baseph_iso; */
-  /* std::vector<Float_t>* tau_pt; */
-  /* std::vector<Float_t>* tau_phi; */
-  /* std::vector<Float_t>* tau_eta; */
+  std::vector<Float_t>* baseph_pt;
+  std::vector<Float_t>* baseph_phi;
+  std::vector<Float_t>* baseph_eta;
+  std::vector<Float_t>* baseph_ptcone20;
+  std::vector<Float_t>* baseph_topoetcone40;
+  std::vector<Int_t>*   baseph_truthOrigin;
+  std::vector<unsigned>* baseph_isEM;
+  std::vector<bool>*    baseph_iso;
+  std::vector<Float_t>* tau_pt;
+  std::vector<Float_t>* tau_phi;
+  std::vector<Float_t>* tau_eta;
 
   std::vector<Float_t>* mcEventWeights;
 
