@@ -16,4 +16,3 @@ The configuration of the histograms (additional selection, binning, name, etc.) 
 5- Jet veto efficiency study, make histograms using  `python pyAnalysis/makeHists.py processed/extract_* --config pyAnalysis/hists_config_NjetTJV.json --treename nominal --eventWeight "w" --newOutputs --name tjv_`
 
 6- To evaluate the impact of the jet veto on Z and W and their ratios, run:  `root pyAnalysis/plotTJVRatio.C `
-
