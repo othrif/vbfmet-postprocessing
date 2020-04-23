@@ -1498,8 +1498,10 @@ void Msl::ReadEvent::FillEvent(Event &event)
 
   if(event.photons.size()>0){
     TLorentzVector leadPh = event.photons.at(0).GetLVec();
+
     double MT_METy = sqrt(2. * leadPh.Pt() * event.met.Pt() * (1. - cos(leadPh.Phi() - event.met.Phi())));
     event.AddVar(Mva::mt_mety, MT_METy);
+
   }
 
   if(event.electrons.size()>0 && event.muons.size()>0){
@@ -1528,6 +1530,8 @@ void Msl::ReadEvent::FillEvent(Event &event)
       TLorentzVector Zg = (event.electrons.at(0).GetLVec()+event.muons.at(0).GetLVec()+event.photons.at(0).GetLVec());
       event.RepVar(Mva::mllg,  Zg.M());
       event.RepVar(Mva::ptllg, Zg.Pt());
+      TLorentzVector METg = (event.met+event.photons.at(0).GetLVec());
+      event.RepVar(Mva::dphi_mety_ll, fabs(METg.DeltaPhi(Z)));
     }
   }else{
     // electrons
@@ -1548,7 +1552,10 @@ void Msl::ReadEvent::FillEvent(Event &event)
       if(event.photons.size()>0){
 	TLorentzVector Zg = (event.electrons.at(1).GetLVec()+event.electrons.at(0).GetLVec()+event.photons.at(0).GetLVec());
 	event.RepVar(Mva::mllg,  Zg.M());
-	event.RepVar(Mva::ptllg, Zg.Pt());
+	event.RepVar(Mva::ptllg, Zg.Pt());      
+	TLorentzVector METg = (event.met+event.photons.at(0).GetLVec());
+	event.RepVar(Mva::dphi_mety_ll, fabs(METg.DeltaPhi(Z)));
+
       }
     }
 
@@ -1571,6 +1578,9 @@ void Msl::ReadEvent::FillEvent(Event &event)
 	TLorentzVector Zg = (event.muons.at(1).GetLVec()+event.muons.at(0).GetLVec()+event.photons.at(0).GetLVec());
 	event.RepVar(Mva::mllg,  Zg.M());
 	event.RepVar(Mva::ptllg, Zg.Pt());
+	TLorentzVector METg = (event.met+event.photons.at(0).GetLVec());
+	event.RepVar(Mva::dphi_mety_ll, fabs(METg.DeltaPhi(Z)));
+
       }
     }
   }
