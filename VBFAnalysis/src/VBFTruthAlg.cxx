@@ -297,6 +297,12 @@ else
    {useMerged = 2;}
   */
 
+
+// Nominal: useMerged = 0
+// kt-merged only: (useMerged = 2 || useMerged = 1) && (312448 <= RunNumber && RunNumber <= 312531))
+// kt-merged + PTV: useMerged = 2
+// ckkw/qsf: useMerged = 3
+
 if (364100 <= RunNumber && RunNumber <= 364197)
 {useMerged = 0;
       if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< "Event " << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
@@ -309,9 +315,10 @@ else if (120.e3 < boson_pt->at(0) && 312448 <= RunNumber && RunNumber <= 312531)
 else if (boson_pt->at(0) > 500.e3 && 364216 <= RunNumber && RunNumber <= 364229){
   useMerged = 2;
 }
-else
+else if (362000 <= RunNumber && RunNumber <= 362575)
   {useMerged = 3;}
-
+else
+  {useMerged = 4;}
 // Prepare variables
 
   // jets
@@ -648,10 +655,7 @@ for(auto reg : regions){
     }
 
 
-// useMerged = 0 for nominal MAXHTPTV ONLY
-// useMerged = 1 for kt-merged ONLY
-// useMerged = 2 for kt-merged + PTV
-if (vbfSkimloose && (useMerged == 0 || useMerged == 1 || useMerged == 2) ){
+if (vbfSkimloose && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3) ){
   m_tree_out->Fill();
 }
 
