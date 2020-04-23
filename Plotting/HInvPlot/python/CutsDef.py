@@ -403,7 +403,11 @@ def getVBFCuts(options, basic_cuts, isLep=False):
     return cuts
 
 #-------------------------------------------------------------------------
-def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET=-1):
+def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET=-1):
+
+    if basic_cuts.analysis=='mjjLow200' or basic_cuts.analysis=='deta25':
+        metCut=150.0
+        cstCut=130.0
 
     highMET=180.0
     if metCut>180.0:
@@ -509,6 +513,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
         else:
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
             #cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0,maxMET=200.0)
+            #cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
             cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
             #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
