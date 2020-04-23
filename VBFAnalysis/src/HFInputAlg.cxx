@@ -123,10 +123,10 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==22) bins=17; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800 + 3 bins low MET
 
   // multivariate number of bins
-  if(doTMVA &&  doVBFMETGam) bins=6;
+  if(doTMVA &&  doVBFMETGam) bins=7;
   if(doTMVA && !doVBFMETGam){
-    if(m_binning==11) bins=7;
-    bins=11;
+    //if(m_binning==11) bins=7;
+    bins=12;
   }
   totalBins = bins-1;
 
@@ -410,7 +410,7 @@ StatusCode HFInputAlg::execute() {
     //leptonVeto = (n_baseel>0 || n_basemu>0) && !(((n_el+n_mu)==1 && (n_baseel+n_basemu)==1) || ((n_el+n_mu)==2 && (n_baseel+n_basemu)==2));
     metSoftVeto = met_soft_tst_et>20.0e3;
     if(m_extraVars==3) metSoftVeto=false;
-    if(doTMVA) metSoftVeto=false; // turn off the veto for ANN
+    //if(doTMVA) metSoftVeto=false; // turn off the veto for ANN
     if(jet_fjvt->size()>1)
       fJVTVeto = fabs(jet_fjvt->at(0))>0.5 || fabs(jet_fjvt->at(1))>0.5;
     else fJVTVeto=true;
@@ -672,8 +672,9 @@ StatusCode HFInputAlg::execute() {
       float tmvaBinBoundaries[7] = { 0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
       for(unsigned i=0; i<6; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } }
     }else{
-      float tmvaBinBoundaries[8] = { 0.0000000, 0.67050000, 0.74600000, 0.79600000, 0.83300000, 0.86450000, 0.89500000, 1.0 }; // var10_noNjet
-      for(unsigned i=0; i<7; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } } 
+      //float tmvaBinBoundaries[8] = { 0.0000000, 0.67050000, 0.74600000, 0.79600000, 0.83300000, 0.86450000, 0.89500000, 1.0 }; // var10_noNjet
+      float tmvaBinBoundaries[12] = {0.0, 0.75100000, 0.80770000, 0.83910000, 0.86250000, 0.88030000, 0.89640000, 0.90950000, 0.92100000, 0.93210000, 0.9448,1.0 }; // 11bins
+      for(unsigned i=0; i<11; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } } 
     }
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.71250000, 0.80000000, 0.84850000, 0.88300000, 0.91150000, 0.93800000,1.0 };// var 9 - new tenacious cut
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.74300000, 0.80700000, 0.84550000, 0.87400000, 0.89850000, 0.92500000,1.0 };// var 11 - new tenacious cut

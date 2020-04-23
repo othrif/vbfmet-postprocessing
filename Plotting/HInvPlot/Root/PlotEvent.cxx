@@ -182,7 +182,8 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
   htmva_variableBin11 =  GetTH1("tmva_variableBin11",  11,  binstmva12);
   float binstmvamj[8] = {0.0,0.80480000, 0.83740000, 0.87190000, 0.91070000, 0.93410000, 0.9508,1.0};
   htmva_wmj_variableBin =  GetTH1("tmva_wmj_variableBin",  7,  binstmvamj);
-  float binstmvamj12[12] = {0.0, 0.77910000, 0.81730000, 0.83540000, 0.85340000, 0.87840000, 0.90440000, 0.92230000, 0.93580000, 0.94670000, 0.956, 1.0};
+  //float binstmvamj12[12] = {0.0, 0.77910000, 0.81730000, 0.83540000, 0.85340000, 0.87840000, 0.90440000, 0.92230000, 0.93580000, 0.94670000, 0.956, 1.0};
+  float binstmvamj12[12] = {0.0, 0.75100000, 0.80770000, 0.83910000, 0.86250000, 0.88030000, 0.89640000, 0.90950000, 0.92100000, 0.93210000, 0.9448,1.0};
   htmva_wmj_variableBin11 =  GetTH1("tmva_wmj_variableBin11",  11,  binstmvamj12);  
 
   // creating histograms

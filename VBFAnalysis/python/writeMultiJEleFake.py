@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 import os
-def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False):
+def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
     #multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
@@ -192,6 +192,15 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 multijets+=[76.7,57.3,0.9]
                 multijets_statunc+=[10.0,13.5,0.7]
 
+    if doTMVA:
+        multijets=[293.3,77.9,38.2,38.7,26.7,69.9,13.7,11.9,51.6,7.1,9.1]
+        multijets_statunc=[25.,18.,12.,12.,16.,30.,7.,9.,45.,7.1,9.1]
+
+        # divide for the periods
+        for m in range(0,len(multijets)):
+            multijets[m]=multijets[m]/3.0
+            multijets_statunc[m]=multijets_statunc[m]/3.0
+
     if doDoubleRatio:
         multijets+=[300.0]
     a = 1
@@ -261,8 +270,12 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                     histClosDw[3].SetBinContent(1,multijet/1.72)
                     histClosUp[4].SetBinContent(1,multijet) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
                     histClosDw[4].SetBinContent(1,multijet)
-                histClosUp[5].SetBinContent(1,multijet*1.24) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
-                histClosDw[5].SetBinContent(1,multijet/1.24)
+                if not doTMVA:
+                    histClosUp[5].SetBinContent(1,multijet*1.24) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                    histClosDw[5].SetBinContent(1,multijet/1.24)
+                else:
+                    histClosUp[5].SetBinContent(1,multijet*1.6) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                    histClosDw[5].SetBinContent(1,multijet/1.6)
             if  year==2018:
                 histUp.SetBinContent(1,multijet*1.226)
                 histDw.SetBinContent(1,multijet/1.226)
@@ -276,8 +289,12 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                     histClosDw[6].SetBinContent(1,multijet/1.32)
                     histClosUp[7].SetBinContent(1,multijet) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
                     histClosDw[7].SetBinContent(1,multijet)
-                histClosUp[8].SetBinContent(1,multijet*1.19) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
-                histClosDw[8].SetBinContent(1,multijet/1.19)
+                if not doTMVA:
+                    histClosUp[8].SetBinContent(1,multijet*1.19) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                    histClosDw[8].SetBinContent(1,multijet/1.19)
+                else:
+                    histClosUp[8].SetBinContent(1,multijet*1.6) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                    histClosDw[8].SetBinContent(1,multijet/1.6)
             hist.Write()
             histUp.Write()
             histDw.Write()
