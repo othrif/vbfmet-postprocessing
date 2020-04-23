@@ -2,6 +2,8 @@
 
 1- Copy `W_strong.root` and `Z_strong.root` MicroNtuples from `/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v42Truth/microntuple_230420` to a local directory, call it `processed` for example
 
+You can run steps 2-4 using this script: `source plotAll.sh`, or following the step-by-step:
+
 2- Make region specific trees using `python pyAnalysis/extractNtuples.py processed/W_strong.root processed/Z_strong.root`
 
 3- Make histograms  using:
