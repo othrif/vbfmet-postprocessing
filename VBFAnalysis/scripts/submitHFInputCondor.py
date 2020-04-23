@@ -42,7 +42,7 @@ if not args.doVBFMETGam:
             sys.exit(0)
 
         myMetCut=200 # only setup for this value now for the fakes and mj. this is only for python
-    writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist)
+    writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist, doTMVA=args.doTMVA)
     writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist,METCut=myMetCut)
     writeFakeMuo(int(args.Binning), args.year, METCut=myMetCut)
 
@@ -138,7 +138,7 @@ if args.METDef!="0":
 if args.year!=2016:
     extraCommand+=' --year %s ' %(args.year)
 if args.METCut!=160e3:
-    extraCommand+=' --METCut %s ' %(args.METCut)
+    extraCommand+=' --METCut %i ' %(args.METCut)
 if args.doTMVA:
     extraCommand+=' --doTMVA '
 if args.doDoubleRatio:
