@@ -188,118 +188,6 @@ def metCuts(basic_cuts, options, isLep=False, metCut=150.0, cstCut=130.0, maxMET
     return cuts
 
 #-------------------------------------------------------------------------
-def getMETTriggerCut(cut = '', options=None, basic_cuts=None, Localsyst=None, ORTrig=''):
-    cuts=[]
-    apply_weight=None
-    if Localsyst!=None and Localsyst!='NOXESF':
-        apply_weight='xeSFTrigWeight'
-    if Localsyst=='xeSFTrigWeight__1up':
-        apply_weight='xeSFTrigWeight__1up'
-    elif Localsyst=='xeSFTrigWeight__1down':
-        apply_weight='xeSFTrigWeight__1down'
-    if apply_weight!=None and (ORTrig!='' or basic_cuts.chan in ['u','uu']):
-        apply_weight=apply_weight.replace('xeSFTrigWeight','xeSFTrigWeight_nomu')
-
-    if options.year==2017:
-        cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 4'+ORTrig, weight=apply_weight)]
-    elif options.year==2018:
-        #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 3', weight=apply_weight)]
-        #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5')]
-        #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11')]
-        if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
-            cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11 || trigger_met_encodedv2 == 5'+ORTrig)]
-        else:
-            cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5'+ORTrig, weight=apply_weight)] # use this one
-    else:
-        cuts += [CutItem('CutTrig',      'trigger_met == 1'+ORTrig, weight=apply_weight)]
-    return cuts
-
-#-------------------------------------------------------------------------
-def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR'):
-
-    cuts = FilterCuts(options)
-    if options.year==2018:
-        if basic_cuts.GetSelKey().count('metsfVBFTopo'):
-            cuts += [CutItem('CutMETTrigRuns20', 'runPeriod == 20')]
-            if basic_cuts.GetSelKey().count('trigOR'):
-                cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 11 || trigger_met_encodedv2 == 5')]
-                #cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 5')]
-            elif basic_cuts.GetSelKey().count('trig'): # this is broken!!!
-                cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 11')]
-        elif basic_cuts.GetSelKey().count('metsfxe110XE70'):
-            #cuts += [CutItem('CutMETTrigRuns30', 'runPeriod == 30')]
-            if basic_cuts.GetSelKey().count('trig'):
-                cuts += [CutItem('CutMETTrigMET', 'trigger_met_encodedv2 == 5')]
-        elif basic_cuts.GetSelKey().count('metsfxe110XE65'):
-            cuts += [CutItem('CutMETTrigRuns31', 'runPeriod == 31 || runPeriod == 20')]
-            if basic_cuts.GetSelKey().count('trig'):
-                cuts += [CutItem('CutMETTrigMET', 'trigger_met_encodedv2 == 5')]
-    elif options.year==2017:
-        if basic_cuts.GetSelKey().count('metsfxe90'):
-            cuts += [CutItem('CutMETTrigRuns10', 'runPeriod == 10')]
-        elif basic_cuts.GetSelKey().count('metsfxe110L155'): # ran all year
-            cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13 || runPeriod == 12 || runPeriod == 11 || runPeriod == 10')]
-        elif basic_cuts.GetSelKey().count('metsfxe100'):
-            cuts += [CutItem('CutMETTrigRuns11', 'runPeriod == 11')]
-        elif basic_cuts.GetSelKey().count('metsfxe100L150'):
-            cuts += [CutItem('CutMETTrigRuns10to13', 'runPeriod == 13')]
-        # apply the trigger
-        if basic_cuts.GetSelKey().count('trig'):
-            cuts += [CutItem('CutMETTrigVBFTopo', 'trigger_met_encodedv2 == 4')]
-
-    else: # 2015+2016
-        if basic_cuts.GetSelKey().count('trigxe70J400'):
-            cuts += [CutItem('CutMETTrigxe70J400', 'trigger_met_byrun == 1 || trigger_met_byrun == 4')]
-        elif basic_cuts.GetSelKey().count('trigxe70'):
-            cuts += [CutItem('CutMETTrigxe70', 'trigger_met_byrun == 1')]
-        elif basic_cuts.GetSelKey().count('trigxe90J400'):
-            cuts += [CutItem('CutMETTrigxe90J400', 'trigger_met_byrun == 2 || trigger_met_byrun == 5')]
-        elif basic_cuts.GetSelKey().count('trigxe110J400'):
-            cuts += [CutItem('CutMETTrigxe110J400', 'trigger_met_byrun == 3 || trigger_met_byrun == 6')]
-        elif basic_cuts.GetSelKey().count('trigxe90'):
-            cuts += [CutItem('CutMETTrigxe90', 'trigger_met_byrun == 2')]
-        elif basic_cuts.GetSelKey().count('trigxe110'):
-            cuts += [CutItem('CutMETTrigxe110', 'trigger_met_byrun == 3')]
-        elif basic_cuts.GetSelKey().count('metsfxe70'):
-            cuts += [CutItem('CutMETTrigRuns1', 'runPeriod == 1')]
-        elif basic_cuts.GetSelKey().count('metsfxe90'):
-            cuts += [CutItem('CutMETTrigRuns2', 'runPeriod == 2')]
-        elif basic_cuts.GetSelKey().count('metsfxe110'):
-            cuts += [CutItem('CutMETTrigRuns3', 'runPeriod == 3')]
-
-    cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
-    met_choice=options.met_choice
-    isLep=False
-    #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
-    #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
-
-    if basic_cuts.chan=='e':
-        cuts += [CutItem('CutLepTrig', 'trigger_lep == 1')]
-        cuts += [CutItem('CutEl','n_el == 1')]
-        cuts += [CutItem('CutBaseLep','n_baselep == 1')]
-    elif basic_cuts.chan=='u':
-        cuts += [CutItem('CutLepTrig', 'trigger_lep == 1')]
-        cuts += [CutItem('CutMu','n_mu == 1')]
-        cuts += [CutItem('CutBaseLep','n_baselep == 1')]
-        met_choice=options.met_choice.replace('_tst','_tst_nolep')
-        isLep=True
-    elif basic_cuts.chan=='nn':
-        cuts += [CutItem('CutBaseLep','n_baselep == 0')]
-    # cuts
-    cuts += [CutItem('CutPh', 'n_ph==0')]
-
-    cuts += getJetCuts(basic_cuts, options);
-    cuts += [CutItem('CutMet',       '%s > 100.0' %(met_choice))]
-    cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
-    # does the vertex matter? does the CST met cut matter? does the fjvt cuts matter?
-    #cuts += metCuts(basic_cuts,options, metCut=100.0, cstCut=0.0)
-    #cuts += metCuts(basic_cuts,options, metCut=100.0, cstCut=130.0)
-    # VBF cuts
-    cuts += getVBFCuts(options, basic_cuts, isLep=isLep)
-
-    return GetCuts(cuts)
-
-#-------------------------------------------------------------------------
 def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR', syst='Nominal'):
 
     cuts = FilterCuts(options)
@@ -309,19 +197,16 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst)
     elif basic_cuts.chan in ['uu','ee','ll','eu']:
         cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
-        #cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst, ORTrig=' || trigger_lep > 0')
-        # trigger fix for electron channel
-        # cutElTrig = CutItem('CutElTrig')
-        # cutElTrig.AddCut(CutItem('Electron',  'n_el_w > 0 && trigger_lep==1'), 'OR')
-        # cutElTrig.AddCut(CutItem('Muon', 'n_mu>0 || n_mu_w>0'), 'OR')
-        # cuts += [cutElTrig]
 
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     cuts += getLepChannelCuts(basic_cuts)
     cuts += getJetCuts(basic_cuts,options)
-
+    cuts += [CutItem('CutMet', '%s > 50.0' %(options.met_choice))]
+    
+    cutNumLep = CutItem('CutNumLep')    
+    
     if Region=='SR':
-        cutNumLep = CutItem('CutNumLep')    
+    
         if basic_cuts.chan=='ee':
             cutNumLep.AddCut(CutItem('CutNumEle','n_el == 2'), 'AND')
         elif basic_cuts.chan=='uu':
@@ -334,7 +219,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutVetoBjets','n_bjet == 0')]
 
     elif Region=='CRtt':
-        cutNumLep = CutItem('CutNumLep')    
+
         cutNumLep.AddCut(CutItem('CutNumEle','n_el == 1'), 'AND')
         cutNumLep.AddCut(CutItem('CutNumMu','n_mu == 1'), 'AND')
 
@@ -342,7 +227,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutL0Pt', 'lepPt0 > 26.0')]
         cuts += [CutItem('CutL1Pt', 'lepPt1 > 7.0')]
         cuts += [CutItem('CutMass', 'mll < 116.0 && mll > 66.0')]
-        cuts += [CutItem('CutNumBjetsgt1','n_bjet >= 1')]
+        cuts += [CutItem('CutNumBjetsGt1','n_bjet >= 1')]
 
 
     return GetCuts(cuts)
@@ -378,16 +263,11 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     sigs = {}
     sigs['higgs'] = ['hggf','hvh','hvbf','tth']
     sigs['hggf']  = ['hggf']
-    #sigs['whww']  = ['whww']
     sigs['hvh']   = ['hvh']
     sigs['hvbf']  = ['hvbf']
     sigs['tth']  = ['tth']
-    #sigs['hvbf500']  = ['hvbf500']
-    #sigs['hvbf1k']  = ['hvbf1k']
-    #sigs['hvbf3k']  = ['hvbf3k']
 
     bkgs = {}
-
     bkgs['wqcd'] = ['wqcd']
     bkgs['zqcd'] = ['zqcd']
     bkgs['wewk'] = ['wewk']
@@ -398,24 +278,15 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['vvy']  =['vvy']
     bkgs['vvewk'] = ['vvewk']
     bkgs['ttv'] = ['ttv']
-    bkgs['dqcd'] = ['dqcd']
-    bkgs['mqcd'] = ['mqcd']
-    if options.OverlapPh:
-        sigs['vbfg'] = ['vbfg']
-        sigs['higgs'] += ['vbfg']
-        bkgs['ttg']  = ['ttg']
-        bkgs['pho']  = ['pho']
-        bkgs['phoAlt']  = ['phoAlt']
-        bkgs['wgam'] = ['wgam']
-        bkgs['zgam'] = ['zgam','vgg']
-        bkgs['wgamewk'] = ['wgamewk']
-        bkgs['zgamewk'] = ['zgamewk']
+    bkgs['hzy'] = ['hzy']
+    bkgs['zgam'] = ['zgam','vgg']
+    bkgs['zgamewk'] = ['zgamewk']
 
-    other={}
-    other['dqcd']    = ['dqcd']
-    other['zqcdMad'] = ['zqcdMad']
-    other['wqcdMad'] = ['wqcdMad']
-    other['zqcdPow'] = ['zqcdPow']
+    # other={}
+    # other['dqcd']    = ['dqcd']
+    # other['zqcdMad'] = ['zqcdMad']
+    # other['wqcdMad'] = ['wqcdMad']
+    # other['zqcdPow'] = ['zqcdPow']
     #if not options.OverlapPh:
     #    other['ttg']  = ['ttg']
     #    other['pho']  = ['pho']
@@ -428,7 +299,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     samples = {}
     samples.update(sigs)
     samples.update(bkgs)
-    samples.update(other)
+#    samples.update(other)
 
     samples['data'] = ['data']
     samples['bkgs'] = []
@@ -442,7 +313,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     #
     if reg != None and key != None:
         
-        reg.SetVal(key, 'vvewk,top,vvv,vv,vvy,zqcd,zewk,ttg,ttv,zgam,zgamewk,bkgs,data')
+        reg.SetVal(key, 'vvewk,vv,vvv,vvy,zqcd,zewk,zgam,hzy,top,ttv,bkgs,data')
         
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))

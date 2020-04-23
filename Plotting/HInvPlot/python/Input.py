@@ -970,13 +970,13 @@ def prepareBkgRuns(keys,options=None):
     bkg_ww_PhPy8 = {
         '361600':'WWlvlv_PhPy8'
     }
-    bkg_ttH = {
+    bkg_ttHZy = {
         '346198':'ttHZy',
     }
-    bkg_VH = {
-        '345320':'VHZy',
-        '345321':'VHZy',
-        '345322':'VHZy',
+    bkg_VHZy = {
+        '345320':'WmHZy',
+        '345321':'WpHZy',
+        '345322':'ZHZy',
     }
     bkg_VBFZy = {
         '345833':'VBFHZy',
@@ -984,7 +984,13 @@ def prepareBkgRuns(keys,options=None):
     bkg_ggHZy = {
         '345316':'ggHZy',
     }
-
+    bkg_HZy = {}
+    bkg_HZy.update(bkg_ttHZy)
+    bkg_HZy.update(bkg_VHZy)
+    bkg_HZy.update(bkg_VBFZy)
+    bkg_HZy.update(bkg_ggHZy)
+    
+    
     bkg_vbfExt = {'309662':'Wenu_MAXHTPTV70_140',
                   '309663':'Wmunu_MAXHTPTV70_140',
                   '309664':'Wtaunu_MAXHTPTV70_140',
@@ -1195,7 +1201,7 @@ def prepareBkgRuns(keys,options=None):
                 'vbfg':sig_vbfgam,
                 'whww':alt_VBF,
                 'hggf':sig_ggF125,
-                'tth':bkg_ttH,
+                'tth':sig_tth125,
                 'hvbf':sig_VBF125,
                 'zewk':bkg_zewk,
                 'zqcd':bkg_zqcd,
@@ -1204,9 +1210,6 @@ def prepareBkgRuns(keys,options=None):
                 'vv':bkg_vv,
                 'vvewk':bkg_vv_ewk,
                 'vvy':bkg_vvy,
-                'vh':bkg_VH,
-                'vbfzy': bkg_VBFZy,
-                'gghzy': bkg_ggHZy,
                 'wdpi':bkg_top_other,
                }
     if options.OverlapPh:
@@ -1216,6 +1219,7 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['zgamewk']=bkg_zgewk
         bkg_keys['ttg']=bkg_ttg
         bkg_keys['ttv']=bkg_ttv
+        bkg_keys['hzy']=bkg_HZy
         bkg_keys['pho']=bkg_pho
         bkg_keys['phoAlt']=bkg_pho_v2
         bkg_keys['vgg']=bkg_sherpa_vgg

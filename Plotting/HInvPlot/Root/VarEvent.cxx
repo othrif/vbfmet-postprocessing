@@ -1,4 +1,3 @@
-
 // Local
 #include "HInvPlot/Registry.h"
 #include "HInvPlot/VarEvent.h"

@@ -124,7 +124,7 @@ def getParser():
     p.add_option('--debug-alg',    type='string', default='no',          dest='debug_alg',  help='')
     p.add_option('--print-alg',    type='string', default='no',          dest='print_alg',  help='')
 
-    p.add_option('--region',       type='string', default='sr,gamsr,zcr,wcr,gamzcr,gamwcr,metsf',          dest='region',     help='')
+    p.add_option('--region',       type='string', default='sr,crtt',          dest='region',     help='')
     p.add_option('--chan',         type='string', default=None,          dest='chan',       help='')
     p.add_option('--njet',         type='string', default=None,          dest='njet',       help='')
     p.add_option('--syst',         type='string', default='Nominal',     dest='syst',       help='')
@@ -138,7 +138,7 @@ def getParser():
     p.add_option('--mj-trig-name', type='choice', default='TriggerEffWeightBDT', dest='mj_trigger_name', choices=['TriggerEffWeightBDT', 'TriggerEffWeight'], help='Trigger for multijet.')
     p.add_option('--mj-norm', type='choice', default="sr", dest="mj_norm", choices=['off', 'dphijj3', 'sr'], help="Normalization for QCD background.")
     p.add_option('--mva-weights-path',    type='string', default='',            dest='mva_weights_path',  help='full path to weights files for tmva')
-    p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
+    p.add_option('--met-choice',         type='string', default='met_tight_tst_et',     dest='met_choice',       help='')
     p.add_option('--mergePTV',  action='store_true', default=False,   dest='mergePTV',          help='Merge the pTV slices')
     p.add_option('--mergeKTPTV',  action='store_true', default=False,   dest='mergeKTPTV',          help='Merge the KT pTV slices')    
     p.add_option('--mergeMGExt',  action='store_true', default=False,   dest='mergeMGExt',          help='Merge the MG extensions')
@@ -152,14 +152,13 @@ def getParser():
     p.add_option('--DetailLvl',    type='int'       ,   default=0,       dest='DetailLvl',      help='Integer for detail level of plotting. =1 plots jet variables only, 10 removes a lot of plots')
     p.add_option('--metsf-cuts',   type='int',   default=0,  dest='metsf_cuts',          help='METSF cuts: 0 Nominal, 1 nj3, 2 no centrality')
 
-    p.add_option('--vv-vr',    action='store_true', default=False,   dest='vv_vr',            help='Run the VV VR')
-    p.add_option('--pu-weight-one',    action='store_true', default=False,   dest='pu_weight_one',            help='Pileup Weight One')
-
-    p.add_option('--no-plot',  action='store_true', default=False,   dest='no_plot',          help='Do not plot')
+    p.add_option('--vv-vr',        action='store_true', default=False,   dest='vv_vr',            help='Run the VV VR')
+    p.add_option('--pu-weight-one',action='store_true', default=False,   dest='pu_weight_one',            help='Pileup Weight One')
+    p.add_option('--no-plot',      action='store_true', default=False,   dest='no_plot',          help='Do not plot')
     p.add_option('--ignore-njet',  action='store_true', default=False,   dest='ignore_njet',        help='Ignore Njet')
     p.add_option('--ignore-met',   action='store_true', default=False,   dest='ignore_met',         help='Ignore MET')
     p.add_option('--LoadBaseLep',  action='store_true', default=False,   dest='LoadBaseLep',        help='Use looser leptons')
-    p.add_option('--OverlapPh',    action='store_true', default=True,   dest='OverlapPh',          help='Overlap remove photons')
+    p.add_option('--OverlapPh',    action='store_true', default=True,    dest='OverlapPh',          help='Overlap remove photons')
     p.add_option('--ReverseFJVT',  action='store_true', default=False,   dest='ReverseFJVT',        help='Reverse the FJVT cuts')    
     p.add_option('--debug',        action='store_true', default=False,   dest='debug',      help='')
     p.add_option('--print',        action='store_true', default=False,   dest='print',      help='')
@@ -170,7 +169,6 @@ def getParser():
     p.add_option('--mc-evt-count', action='store_true', default=False,   dest='mc_evt_count', help='Do not apply mc event weight. Shows raw mc counts')
     p.add_option('--unblind',      action='store_true', default=False,   dest='unblind',    help='')
     p.add_option('--prec',         action='store_true', default=False,   dest='prec',       help='Increase the cutflow precision')
-
     p.add_option('--sumw',         type='float'       , default=0,       dest='sumw',       help='Sumw of total dataset')
     p.add_option('--nraw',         type='float'       , default=0,       dest='nraw',       help='Raw number of events of the subset that one is running over')
 

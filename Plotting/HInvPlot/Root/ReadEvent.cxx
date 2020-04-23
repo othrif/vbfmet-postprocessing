@@ -714,10 +714,19 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       if(!fMCEventCount) {
 	float extraTheoryWeight=1.0;
 	if(fTheorySystWeight!=0 && mcEventWeights && fTheorySystWeight<mcEventWeights->size()) extraTheoryWeight=mcEventWeights->at(fTheorySystWeight);
-        if(fnoVjWeight) event->SetWeight((fWeight*fLumi*extraTheoryWeight/vjWeight)); // assume vjweight is already applied to the nominal weight
-        else event->SetWeight(fWeight*fLumi*extraTheoryWeight);
-      }
-      else  event->SetWeight(1.0);
+        if(fnoVjWeight){
+	  event->SetWeight((fWeight*fLumi*extraTheoryWeight/vjWeight)); // assume vjweight is already applied to the nominal weight
+	} else {
+	  float HZgamBkgWeight=1.0;
+	  if     (fRunNumber==345320 || fRunNumber==345321 || fRunNumber==345322) { HZgamBkgWeight = 0.00015708; }//VHZy
+	  else if(fRunNumber==346198){ HZgamBkgWeight = 0.00154; } //ttHZy
+	  else if(fRunNumber==345833){ HZgamBkgWeight = 0.00015708; }//VBFHZy
+	  else if(fRunNumber==345316){ HZgamBkgWeight = 0.00015708; } //ggHZy
+
+	  event->SetWeight(fWeight*fLumi*extraTheoryWeight*HZgamBkgWeight);
+	}
+      } 
+      else event->SetWeight(1.0);
 
       float MJDDScaling=1.0;
       if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight*MJDDScaling);
