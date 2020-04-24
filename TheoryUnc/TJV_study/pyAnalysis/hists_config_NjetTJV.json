@@ -1,7 +1,11 @@
 {
     "cuts": [
      {"cut": "( n_jet25>=2 )", "name": "SRmTJV"},
-     {"cut": "( n_jet25==2 )", "name": "SR25"}
+     {"cut": "( n_jet25==2 )", "name": "SR25"},
+     {"cut": "( n_jet30==2 )", "name": "SR30"},
+     {"cut": "( n_jet35==2 )", "name": "SR35"},
+     {"cut": "( n_jet40==2 )", "name": "SR40"},
+     {"cut": "( n_jet50==2 )", "name": "SR50"}
  ],
     "draw": [
         {
