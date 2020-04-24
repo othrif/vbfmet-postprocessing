@@ -111,6 +111,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case ptllg:	                  return "ptllg";
     case mt:	                  return "mt";
     case mt_mety:                 return "mt_mety";
+    case pTt:                     return "pTt";
     case dphi_mety_ll:            return "dphi_mety_ll";
     case averageIntPerXing:	  return "averageIntPerXing";
     case lb:	                  return "lb";
@@ -278,6 +279,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "ptllg")             return ptllg;
   if(var == "mt")                return mt;
   if(var == "mt_mety")           return mt_mety;
+  if(var == "pTt")               return pTt;
   if(var == "dphi_mety_ll")      return dphi_mety_ll;
   if(var == "averageIntPerXing") return averageIntPerXing;
   if(var == "lb")                return lb;
@@ -532,6 +534,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(ptllg);    
     vars.push_back(mt);
     vars.push_back(mt_mety);
+    vars.push_back(pTt);
     vars.push_back(dphi_mety_ll);
     vars.push_back(averageIntPerXing);
     vars.push_back(lb);

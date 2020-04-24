@@ -1532,6 +1532,11 @@ void Msl::ReadEvent::FillEvent(Event &event)
       event.RepVar(Mva::ptllg, Zg.Pt());
       TLorentzVector METg = (event.met+event.photons.at(0).GetLVec());
       event.RepVar(Mva::dphi_mety_ll, fabs(METg.DeltaPhi(Z)));
+
+      TLorentzVector leadPh = event.photons.at(0).GetLVec();
+      double pTtFactor = 2*Z.Pt()*leadPh.Pt()*fabs(sin(Z.Phi() - leadPh.Phi()));
+      double pTt = pTtFactor/Zg.Pt();
+      event.AddVar(Mva::pTt, pTt);
     }
   }else{
     // electrons
@@ -1555,6 +1560,11 @@ void Msl::ReadEvent::FillEvent(Event &event)
 	event.RepVar(Mva::ptllg, Zg.Pt());      
 	TLorentzVector METg = (event.met+event.photons.at(0).GetLVec());
 	event.RepVar(Mva::dphi_mety_ll, fabs(METg.DeltaPhi(Z)));
+
+	TLorentzVector leadPh = event.photons.at(0).GetLVec();
+	double pTtFactor = 2*Z.Pt()*leadPh.Pt()*fabs(sin(Z.Phi() - leadPh.Phi()));
+	double pTt = pTtFactor/Zg.Pt();
+	event.AddVar(Mva::pTt, pTt);
 
       }
     }
@@ -1581,6 +1591,10 @@ void Msl::ReadEvent::FillEvent(Event &event)
 	TLorentzVector METg = (event.met+event.photons.at(0).GetLVec());
 	event.RepVar(Mva::dphi_mety_ll, fabs(METg.DeltaPhi(Z)));
 
+	TLorentzVector leadPh = event.photons.at(0).GetLVec();
+	double pTtFactor = 2*Z.Pt()*leadPh.Pt()*fabs(sin(Z.Phi() - leadPh.Phi()));
+	double pTt = pTtFactor/Zg.Pt();
+	event.AddVar(Mva::pTt, pTt);
       }
     }
   }

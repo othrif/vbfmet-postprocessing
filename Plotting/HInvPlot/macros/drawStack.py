@@ -299,6 +299,7 @@ def getHistPars(hist):
         'ptllg'   : {'xtitle':'#it{p}_{T,ll#gamma} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0, 'logy':False},
         'mt'     : {'xtitle':'#it{m}_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'mt_mety'     : {'xtitle':'#it{m}_{T}(#it{E}_{T}^{miss},#gamma#it{p}_{T}) [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
+        'pTt'     : {'xtitle':'#it{p}_{Tt} [GeV]'   ,         'ytitle':'Events / (5 GeV)', 'ymin':0.01,'logy':False},
         'dphi_mety_ll': {'xtitle':'|#Delta#phi(#it{E}_{T}^{miss}+#gamma#it{p}_{T}, #it{p}_{T,ll})|' ,         'ytitle':'Events / 0.1 rad', 'ymin':0.1, 'logy':False},
         'met_significance'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':2,  'ymin':0.1,'logy':True},
         'metsig_variableBin'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':1,  'ymin':2,'logy':True},

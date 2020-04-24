@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SELKEY=$1
-VARS="met_tight_tst_et,mll,mt_mety,ptll,lepPt0,lepPt1,phPt,mllg,ptllg,dphi_mety_ll"
+VARS="met_tight_tst_et,mll,mt_mety,ptll,lepPt0,lepPt1,phPt,mllg,ptllg,dphi_mety_ll,pTt"
 FieldSeparator=$IFS
 
 IFS=,
