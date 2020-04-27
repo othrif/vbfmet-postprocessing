@@ -1,0 +1,18 @@
+
+
+Samples                                                                                                    XS                     
+mc15_13TeV.312484.Sh_227_NN30NNLO_Znunu_PTV100_140_MJJ0_500_KtMerging.evgen.EVNT.e7728                     105.869824             
+mc15_13TeV.312485.Sh_227_NN30NNLO_Znunu_PTV100_140_MJJ500_1000_KtMerging.evgen.EVNT.e7728                  6.07922176             
+mc15_13TeV.312486.Sh_227_NN30NNLO_Znunu_PTV100_140_MJJ1000_E_CMS_KtMerging.evgen.EVNT.e7728                1.69043456             
+mc15_13TeV.312487.Sh_227_NN30NNLO_Znunu_PTV140_220_MJJ0_500_KtMerging.evgen.EVNT.e7739                     44.8820736             
+mc15_13TeV.312488.Sh_227_NN30NNLO_Znunu_PTV140_220_MJJ500_1000_KtMerging.evgen.EVNT.e7739                  4.25969664             
+mc15_13TeV.312489.Sh_227_NN30NNLO_Znunu_PTV140_220_MJJ1000_E_CMS_KtMerging.evgen.EVNT.e7739                1.34723072             
+mc15_13TeV.312490.Sh_227_NN30NNLO_Znunu_PTV220_280_MJJ0_500_KtMerging.evgen.EVNT.e7728                     6.11492352             
+mc15_13TeV.312491.Sh_227_NN30NNLO_Znunu_PTV220_280_MJJ500_1000_KtMerging.evgen.EVNT.e7728                  0.9627412479999999     
+mc15_13TeV.312492.Sh_227_NN30NNLO_Znunu_PTV220_280_MJJ1000_E_CMS_KtMerging.evgen.EVNT.e7728                0.343709696            
+mc15_13TeV.312493.Sh_227_NN30NNLO_Znunu_PTV280_500_MJJ0_500_KtMerging.evgen.EVNT.e7739                     3.1371827199999998     
+mc15_13TeV.312494.Sh_227_NN30NNLO_Znunu_PTV280_500_MJJ500_1000_KtMerging.evgen.EVNT.e7739                  0.715241472            
+mc15_13TeV.312495.Sh_227_NN30NNLO_Znunu_PTV280_500_MJJ1000_E_CMS_KtMerging.evgen.EVNT.e7739                0.296373248            
+
+mc15_13TeV.364222.Sherpa_221_NNPDF30NNLO_Znunu_PTV500_1000.evgen.EVNT.e5626                                 0.3044
+mc15_13TeV.364223.Sherpa_221_NNPDF30NNLO_Znunu_PTV1000_E_CMS.evgen.EVNT.e5626                               0.0058558
