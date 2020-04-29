@@ -227,8 +227,8 @@ def Draw(h1, h2,f1, f2,can,GetError=True):
     if options.logscale:
         h1.GetYaxis().SetRangeUser(0.001, max_bin*2.5)
 
-    h1.Draw()
-    h2.Draw('same')
+    h1.Draw('hist')
+    h2.Draw('hist same')
 
     leg = ROOT.TLegend(0.6,0.7,0.8,0.8)
     leg.SetBorderSize(0)
@@ -260,7 +260,7 @@ def Draw(h1, h2,f1, f2,can,GetError=True):
     pad2.SetLogx(0)
 
     hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
-    hratio.GetYaxis().SetRangeUser(-0.5,2.5)
+    hratio.GetYaxis().SetRangeUser(-0.5,5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);

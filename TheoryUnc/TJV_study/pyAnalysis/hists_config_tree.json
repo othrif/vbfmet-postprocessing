@@ -1,6 +1,6 @@
 {
     "cuts": [
-     {"cut": "(w)* (jj_mass>0)", "name": "Incl"}
+     {"cut": "(w)* (jj_mass>800e3 && boson_pt[0] > 150e3)", "name": "Incl"}
  ],
     "draw": [
         {
@@ -9,18 +9,16 @@
             "name": "jj_mass_new"
         },
         {
-            "draw": "w_noxsec",
-           "max": 10.0,
-            "min": -10.0,
-            "name": "w_noxsec",
-            "nbins": 20
-        },
-        {
             "draw": "boson_m*1e-3",
            "max": 116.0,
             "min": 75.0,
             "name": "boson_m",
             "nbins": 50
+        },
+        {
+            "draw": "boson_pt*1e-3",
+            "edges": [0,70,140,280,500,1000,2000,3000],
+            "name": "boson_pt"
         }
     ]
 }
