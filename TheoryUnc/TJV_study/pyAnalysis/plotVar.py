@@ -3,13 +3,15 @@ import math
 from optparse import OptionParser
 
 p = OptionParser(usage="python plotVar.py -p <path> -v <variables, comma seperated> --wait -n <suffix>", version="0.1")
-p.add_option('--file','-f',           type='string', default='hists_extract_Zvv_QCD_SR,hists_extract_Zll_QCD_CR', dest='file')
-p.add_option('--var','-v',           type='string', default='all/Incl/boson_pt,all/Incl/boson_pt', dest='var')
+p.add_option('--file','-f',           type='string', default='hists_extract_Zll_QCD_CR,hists_extract_Zvv_QCD_SR', dest='file')
+p.add_option('--var','-v',           type='string', default='all/Mjj1/el_eta,all/Mjj1/nu_eta', dest='var')
 p.add_option('--path','-p', type='string', default='./processed', dest='path')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
 p.add_option('--name','-n', type='string', default='', dest='name')
 p.add_option('--logscale', '-l',         action='store_true', default=False,   dest='logscale')
 p.add_option('--atlasrootstyle','-s', type='string', default='/afs/desy.de/user/o/othrif/atlasrootstyle', dest='atlasrootstyle')
+p.add_option('--ratioMin', '-m', type='float', default='0.5', dest='ratioMin')
+p.add_option('--ratioMax', '-M', type='float', default='1.5', dest='ratioMax')
 (options, args) = p.parse_args()
 
 #-----------------------------------------
@@ -186,7 +188,6 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
 
     h1 = f1.Get(hname1)
     h2 = f2.Get(hname2)
-    print h1,h2
     #h1.Scale(h1_norm)
     #h2.Scale(h2_norm)
     h1.SetStats(0)
@@ -223,6 +224,10 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     h1.Draw()
     h2.Draw('same')
 
+    e=ROOT.Double(0.0)
+    print 'Integral '+hname1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
+    print 'Integral '+hname2+': ',h2.IntegralAndError(0,1001,e),'+/-',e
+
     leg = ROOT.TLegend(0.6,0.7,0.8,0.8)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
@@ -253,7 +258,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     pad2.SetLogx(0)
 
     hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
-    hratio.GetYaxis().SetRangeUser(-0.5,1)
+    hratio.GetYaxis().SetRangeUser(options.ratioMin,options.ratioMax)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -277,9 +282,9 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         log_label='_log'
 
     if GetError:
-        can.SaveAs(options.path+'/'+hname1.split("/")[-1]+'_'+hname1.split("/")[-1]+'_'+options.name+log_label+'_err.pdf')
+        can.SaveAs(options.path+'/'+hname1.split("/")[-1]+'_'+hname1.split("/")[-1]+'_'+options.file.split(',')[0]+'_'+options.file.split(',')[1]+'_'+options.name+log_label+'_err.pdf')
     else:
-        can.SaveAs(options.path+'/'+hname2.split("/")[-1]+'_'+hname2.split("/")[-1]+'_'+options.name+log_label+'.pdf')
+        can.SaveAs(options.path+'/'+hname2.split("/")[-1]+'_'+hname2.split("/")[-1]+'_'+options.file.split(',')[0]+'_'+options.file.split(',')[1]+'_'+options.name+log_label+'.pdf')
 
 def Fit(_suffix=''):
 
@@ -297,7 +302,7 @@ def Fit(_suffix=''):
     for i in range(len(files)/2):
         f1=ROOT.TFile.Open(path+'/'+files[2*i]+'.root')
         f2=ROOT.TFile.Open(path+'/'+files[2*i+1]+'.root')
-        Draw(hnames[2*i],hnames[2*i+1],f1,f2,can,GetError=False)
+        Draw(hnames[0],hnames[1],f1,f2,can,GetError=False)
 
 
 
