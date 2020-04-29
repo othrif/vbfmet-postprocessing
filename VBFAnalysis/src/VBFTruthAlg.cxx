@@ -20,6 +20,7 @@ VBFTruthAlg::VBFTruthAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
   declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", "path to a file with the number of events processed" );
+  declareProperty( "noSkim", noSkim = false, "No skim");
 }
 
 VBFTruthAlg::~VBFTruthAlg() {}
@@ -680,7 +681,7 @@ for(auto reg : regions){
       }
     }
 
-if (vbfSkimloose ){ // && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3)
+if (vbfSkimloose || noSkim ){ // && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3)
   m_tree_out->Fill();
 }
 
