@@ -1,6 +1,6 @@
 {
     "cuts": [
-     {"cut": "(w)* (jj_mass>800e3 && boson_pt[0] > 150e3)", "name": "Incl"}
+     {"cut": "(w)* (jj_mass>0)", "name": "Incl"}
  ],
     "draw": [
         {

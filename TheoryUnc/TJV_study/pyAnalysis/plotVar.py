@@ -199,6 +199,29 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     h1.SetMarkerSize(1)
     h2.SetMarkerSize(1)
 
+    # naming
+    label1 = ''
+    label2 = ''
+
+    if options.file.split(',')[0].count('Z_strong') or options.file.split(',')[1].count('Z_strong'):
+        label1 += 'Z QCD'
+        label2 += 'Z QCD'
+    if options.file.split(',')[0].count('W_strong') or options.file.split(',')[1].count('W_strong'):
+        label1 += 'W QCD'
+        label2 += 'W QCD'
+    if options.file.split(',')[0].count('_ckkw15'):
+        label1 += ', CKKW15'
+    else:
+        label1 += ', Nominal'
+    if options.file.split(',')[1].count('_ckkw15'):
+        label2 += ', CKKW15'
+    else:
+        label2 += ', Nominal'
+    if hname1.count('Incl') or hname2.count('Incl'):
+        label1 += ', Inclusive'
+        label2 += ', Inclusive'
+
+
 
     # pads
     pad1 = ROOT.TPad("pad1", "pad1", 0, 0.3, 1, 1.0);
@@ -225,14 +248,14 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     h2.Draw('same')
 
     e=ROOT.Double(0.0)
-    print 'Integral '+hname1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
-    print 'Integral '+hname2+': ',h2.IntegralAndError(0,1001,e),'+/-',e
+    print 'Integral '+label1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
+    print 'Integral '+label2+': ',h2.IntegralAndError(0,1001,e),'+/-',e
 
-    leg = ROOT.TLegend(0.6,0.7,0.8,0.8)
+    leg = ROOT.TLegend(0.5,0.6,0.9,0.8)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
-    leg.AddEntry(h1,hname1)
-    leg.AddEntry(h2,hname2)
+    leg.AddEntry(h1,label1)
+    leg.AddEntry(h2,label2)
 
     leg.Draw()
 
@@ -257,7 +280,8 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     pad1.SetLogx(0)
     pad2.SetLogx(0)
 
-    hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
+    #hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
+    hratio.GetYaxis().SetTitle("Ratio")
     hratio.GetYaxis().SetRangeUser(options.ratioMin,options.ratioMax)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
