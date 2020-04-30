@@ -13,6 +13,8 @@ p.add_option('--name','-n', type='string', default='', dest='name')
 p.add_option('--logscale', '-l',         action='store_true', default=False,   dest='logscale')
 p.add_option('--atlasrootstyle','-s', type='string', default='/afs/desy.de/user/o/othrif/atlasrootstyle', dest='atlasrootstyle')
 p.add_option('--config', type=str, default='/nfs/dust/atlas/user/othrif/vbf/myPP/source/TheoryUnc/TJV_study/pyAnalysis/hists_config_tree.json', dest='config', help='json file containing configurations for making histograms')
+p.add_option('--ratioMin', '-m', type='float', default='0.5', dest='ratioMin')
+p.add_option('--ratioMax', '-M', type='float', default='1.5', dest='ratioMax')
 
 (options, args) = p.parse_args()
 config = json.load(file(options.config))
@@ -260,7 +262,7 @@ def Draw(h1, h2,f1, f2,can,GetError=True):
     pad2.SetLogx(0)
 
     hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
-    hratio.GetYaxis().SetRangeUser(-0.5,5)
+    hratio.GetYaxis().SetRangeUser(options.ratioMin,options.ratioMax)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);

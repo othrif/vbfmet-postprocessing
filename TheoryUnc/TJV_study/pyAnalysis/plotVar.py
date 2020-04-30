@@ -211,10 +211,22 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         label2 += 'W QCD'
     if options.file.split(',')[0].count('_ckkw15'):
         label1 += ', CKKW15'
+    elif options.file.split(',')[0].count('_ckkw30'):
+        label1 += ', CKKW30'
+    elif options.file.split(',')[0].count('_qsf025'):
+        label1 += ', QSF025'
+    elif options.file.split(',')[0].count('_qsf4'):
+        label1 += ', QSF4'
     else:
         label1 += ', Nominal'
     if options.file.split(',')[1].count('_ckkw15'):
         label2 += ', CKKW15'
+    elif options.file.split(',')[0].count('_ckkw30'):
+        label2 += ', CKKW30'
+    elif options.file.split(',')[0].count('_qsf025'):
+        label2 += ', QSF025'
+    elif options.file.split(',')[0].count('_qsf4'):
+        label2 += ', QSF4'
     else:
         label2 += ', Nominal'
     if hname1.count('Incl') or hname2.count('Incl'):
