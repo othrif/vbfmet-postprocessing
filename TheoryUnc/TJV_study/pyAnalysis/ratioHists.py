@@ -404,7 +404,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
 
     #hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
     hratio.GetYaxis().SetTitle(var_num_name+' / '+var_den_name)
-    hratio.GetYaxis().SetRangeUser(0.5,1.5)
+    hratio.GetYaxis().SetRangeUser(0.,1.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -590,6 +590,15 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     print "drawing ", hname, "..."
     hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
 
+    if  hname.count('boson_pt'):
+        hratio.GetXaxis().SetTitle('Boson p_{T} [GeV]')
+    elif  hname.count('jj_mass'):
+        hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
+    elif hname.count('met_et'):
+        hratio.GetXaxis().SetTitle('MET [GeV]')
+    elif  hname.count('met_nolep_et'):
+        hratio.GetXaxis().SetTitle('MET (no leptons) [GeV]')
+
 
     #hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
     hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
@@ -617,8 +626,8 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     for i in range(1,hratio.GetNbinsX()+1):
         valb = hratio.GetBinContent(i)
         errb = hratio.GetBinError(i)
-        print 'Bin {0:d} with uncertainty {1:.2%}, fitted {2:.2%}'.format(i, hratio.GetBinContent(i)-1, par0+hratio.GetBinCenter(i)*par1-1)
-        #print '{0:.2%}'.format(hratio.GetBinContent(i)-1)
+        #print 'Bin {0:d} with uncertainty {1:.2%}, fitted {2:.2%}'.format(i, hratio.GetBinContent(i)-1, par0+hratio.GetBinCenter(i)*par1-1)
+        print '{0:.2%}'.format(hratio.GetBinContent(i)-1)
     can.Update()
     hratio.Print("all")
 

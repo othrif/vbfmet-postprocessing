@@ -20,6 +20,7 @@ VBFTruthAlg::VBFTruthAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
   declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", "path to a file with the number of events processed" );
+  declareProperty( "noSkim", noSkim = false, "No skim");
 }
 
 VBFTruthAlg::~VBFTruthAlg() {}
@@ -29,9 +30,9 @@ StatusCode VBFTruthAlg::initialize() {
 
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
-  //std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
-  std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
-  //std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
+ // std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+ // std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
+  std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
 
@@ -297,28 +298,25 @@ else
    {useMerged = 2;}
   */
 
-
 // Nominal: useMerged = 0
-// kt-merged only: (useMerged = 2 || useMerged = 1) && (312448 <= RunNumber && RunNumber <= 312531))
-// kt-merged + PTV: useMerged = 2
-// ckkw/qsf: useMerged = 3
+// kt-merged + PTV: useMerged = 1
+// ckkw/qsf: useMerged = 2
 
-if (364100 <= RunNumber && RunNumber <= 364197)
+if (364100 <= RunNumber && RunNumber <= 364197) // Sherpa_221 MAXHTPTV
 {useMerged = 0;
       if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< ", EventNumber=" << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
-    }
-else if (120.e3 < boson_pt->at(0) && 312448 <= RunNumber && RunNumber <= 312531){
+}
+else if (312448 <= RunNumber && RunNumber <= 312531){ // Sherpa_227 PTV_MJJ kt merged
   useMerged = 1;
-  if(boson_pt->at(0) < 500e3)
-    useMerged = 2;
 }
-else if (boson_pt->at(0) > 500.e3 && 364216 <= RunNumber && RunNumber <= 364229){
-  useMerged = 2;
+else if (364216 <= RunNumber && RunNumber <= 364229){ // Sherpa_221 PTV
+  useMerged = 1;
+  if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< ", EventNumber=" << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
 }
-else if (362000 <= RunNumber && RunNumber <= 362575)
-  {useMerged = 3;}
+else if (362000 <= RunNumber && RunNumber <= 362575) // Sherpa_211 CT10 ckkw15,ckkw30,qsf025, qsf4
+  {useMerged = 2;}
 else
-  {useMerged = 4;}
+  {useMerged = 3;}
 
 // Prepare variables
 
@@ -607,7 +605,7 @@ else
   ATH_MSG_ERROR("THERE IS A PROBLEM with Number of bosons!!");
 
 bool vbfSkim = (new_jet_pt->at(0) > LeadJetPtCut) & (new_jet_pt->at(1) > subLeadJetPtCut) & (new_jj_deta > DEtajjCut) & ((new_jet_eta->at(0) * new_jet_eta->at(1))<0) & (new_jj_mass > MjjCut);
-bool vbfSkimloose = (new_jet_pt->at(0) > 80.0e3) & (new_jet_pt->at(1) > 50.0e3) & ( PTV > 150e3) & (new_jj_mass > 800e3) & (new_jj_deta > 2.5)  & (new_jj_dphi<2.5) ;
+bool vbfSkimloose = (new_jet_pt->at(0) > 50.0e3) & (new_jet_pt->at(1) > 50.0e3) & ( PTV > 150e3) & (new_jj_mass > 500e3) & (new_jj_deta > 2.5); //  & (new_jj_dphi<2.5) ;
 
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
@@ -683,7 +681,7 @@ for(auto reg : regions){
       }
     }
 
-if (vbfSkimloose && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3) ){
+if (vbfSkimloose || noSkim ){ // && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3)
   m_tree_out->Fill();
 }
 

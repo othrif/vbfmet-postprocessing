@@ -290,6 +290,8 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
 
     h1.DrawNormalized()
     h2.DrawNormalized('same')
+    #h1.Draw()
+    #h2.Draw('same')
 
     chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
     kval = h1.KolmogorovTest(h2, '')
