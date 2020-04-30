@@ -30,8 +30,8 @@ StatusCode VBFTruthAlg::initialize() {
 
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
-  //std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
-  //std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
+ // std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+ // std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
   std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);

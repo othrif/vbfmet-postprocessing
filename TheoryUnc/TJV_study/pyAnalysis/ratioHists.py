@@ -532,7 +532,7 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
     #print h1.GetMaximum(),h2.GetMaximum()
     #h1.GetYaxis().SetRangeUser(0,0.75)
-    h1.GetYaxis().SetRangeUser(0.1,2.5)
+    h1.GetYaxis().SetRangeUser(0.1,1.5)
     if options.logscale:
         h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
