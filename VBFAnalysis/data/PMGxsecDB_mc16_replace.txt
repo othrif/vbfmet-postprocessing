@@ -1,6 +1,4 @@
 dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncertUP/D:relUncertDOWN/D:generator_name/C
-999999         VBFHAltSignal                                               3.782          5.1260E-01          1.0            0.0            0.0            Powheg+Pythia8(v.230)+EvtGen(v.1.6.0)e7613
-305186         Sherpa_CT10_Znunu2JetsEW1JetQCD15GeV_ckkw15                 12.649         1.0000E+00          1.0            0.0            0.0            Sherpa(v2.1.1)
 362000         Sherpa_CT10_Znunu_Pt0_70_CVetoBVeto_ckkw15                  11966.0        0.776316003959      0.991312       0.0            0.0            Sherpa(v2.1.1)
 362008         Sherpa_CT10_Znunu_Pt0_70_CFilterBVeto_ckkw15                11966.0        0.14167378997       0.991312       0.0            0.0            Sherpa(v2.1.1)
 362016         Sherpa_CT10_Znunu_Pt0_70_BFilter_ckkw15                     11966.0        0.0819079604995     0.991312       0.0            0.0            Sherpa(v2.1.1)
@@ -25,7 +23,6 @@ dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncert
 362168         Sherpa_CT10_Znunu_Pt2000_E_CMS_CVetoBVeto_ckkw15            2.3732e-05     0.59533280364       0.991312       0.0            0.0            Sherpa(v2.1.1)
 362176         Sherpa_CT10_Znunu_Pt2000_E_CMS_CFilterBVeto_ckkw15          2.3732e-05     0.349681181291      0.991312       0.0            0.0            Sherpa(v2.1.1)
 362184         Sherpa_CT10_Znunu_Pt2000_E_CMS_BFilter_ckkw15               2.3732e-05     0.211726111126      0.991312       0.0            0.0            Sherpa(v2.1.1)
-305187         Sherpa_CT10_Znunu2JetsEW1JetQCD15GeV_ckkw30                 11.631         1.0000E+00          1.0            0.0            0.0            Sherpa(v2.1.1)
 362001         Sherpa_CT10_Znunu_Pt0_70_CVetoBVeto_ckkw30                  11771.0        0.778082483749      0.993625       0.0            0.0            Sherpa(v2.1.1)
 362009         Sherpa_CT10_Znunu_Pt0_70_CFilterBVeto_ckkw30                11771.0        0.140581269169      0.993625       0.0            0.0            Sherpa(v2.1.1)
 362017         Sherpa_CT10_Znunu_Pt0_70_BFilter_ckkw30                     11771.0        0.0804960541262     0.993625       0.0            0.0            Sherpa(v2.1.1)
@@ -50,7 +47,6 @@ dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncert
 362169         Sherpa_CT10_Znunu_Pt2000_E_CMS_CVetoBVeto_ckkw30            2.9202e-05     0.61727183394       0.993625       0.0            0.0            Sherpa(v2.1.1)
 362177         Sherpa_CT10_Znunu_Pt2000_E_CMS_CFilterBVeto_ckkw30          2.9202e-05     0.3361276411        0.993625       0.0            0.0            Sherpa(v2.1.1)
 362185         Sherpa_CT10_Znunu_Pt2000_E_CMS_BFilter_ckkw30               2.9202e-05     0.21466434553       0.993625       0.0            0.0            Sherpa(v2.1.1)
-305192         Sherpa_CT10_Znunu2JetsEW1JetQCD15GeV_qsf025                 13.649         1.0000E+00          1.0            0.0            0.0            Sherpa(v2.1.1)
 362006         Sherpa_CT10_Znunu_Pt0_70_CVetoBVeto_qsf025                  12162.0        0.78031990647       0.991887       0.0            0.0            Sherpa(v2.1.1)
 362014         Sherpa_CT10_Znunu_Pt0_70_CFilterBVeto_qsf025                12162.0        0.139589207444      0.991887       0.0            0.0            Sherpa(v2.1.1)
 362022         Sherpa_CT10_Znunu_Pt0_70_BFilter_qsf025                     12162.0        0.0788230575067     0.991887       0.0            0.0            Sherpa(v2.1.1)
@@ -75,7 +71,6 @@ dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncert
 362174         Sherpa_CT10_Znunu_Pt2000_E_CMS_CVetoBVeto_qsf025            2.3961e-05     0.560013587095      0.991887       0.0            0.0            Sherpa(v2.1.1)
 362182         Sherpa_CT10_Znunu_Pt2000_E_CMS_CFilterBVeto_qsf025          2.3961e-05     0.336639454258      0.991887       0.0            0.0            Sherpa(v2.1.1)
 362190         Sherpa_CT10_Znunu_Pt2000_E_CMS_BFilter_qsf025               2.3961e-05     0.193093017058      0.991887       0.0            0.0            Sherpa(v2.1.1)
-305193         Sherpa_CT10_Znunu2JetsEW1JetQCD15GeV_qsf4                   11.517         1.0000E+00          1.0            0.0            0.0            Sherpa(v2.1.1)
 362007         Sherpa_CT10_Znunu_Pt0_70_CVetoBVeto_qsf4                    11802.0        0.777836843281      0.992245       0.0            0.0            Sherpa(v2.1.1)
 362015         Sherpa_CT10_Znunu_Pt0_70_CFilterBVeto_qsf4                  11802.0        0.140689827588      0.992245       0.0            0.0            Sherpa(v2.1.1)
 362023         Sherpa_CT10_Znunu_Pt0_70_BFilter_qsf4                       11802.0        0.0810568912825     0.992245       0.0            0.0            Sherpa(v2.1.1)
@@ -100,7 +95,6 @@ dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncert
 362175         Sherpa_CT10_Znunu_Pt2000_E_CMS_CVetoBVeto_qsf4              2.6213e-05     0.574770713437      0.992245       0.0            0.0            Sherpa(v2.1.1)
 362183         Sherpa_CT10_Znunu_Pt2000_E_CMS_CFilterBVeto_qsf4            2.6213e-05     0.32266660355       0.992245       0.0            0.0            Sherpa(v2.1.1)
 362191         Sherpa_CT10_Znunu_Pt2000_E_CMS_BFilter_qsf4                 2.6213e-05     0.215330840201      0.992245       0.0            0.0            Sherpa(v2.1.1)
-305194         Sherpa_CT10_Zee2JetsEW1JetQCD15GeVM40_ckkw15                2.3503         1.0000E+00          1.0            0.0            0.0            Sherpa(v2.1.1)
 362192         Sherpa_CT10_Zee_Pt0_70_CVetoBVeto_ckkw15                    2212.0         0.7759              1.011006       0.0            0.0            Sherpa(v2.1.1)
 362200         Sherpa_CT10_Zee_Pt0_70_CFilterBVeto_ckkw15                  2212.0         0.1436              1.011006       0.0            0.0            Sherpa(v2.1.1)
 362208         Sherpa_CT10_Zee_Pt0_70_BFilter_ckkw15                       2212.0         0.08067             1.011006       0.0            0.0            Sherpa(v2.1.1)
@@ -125,7 +119,6 @@ dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncert
 362360         Sherpa_CT10_Zee_Pt2000_E_CMS_CVetoBVeto_ckkw15              4.419e-06      0.5437              1.011006       0.0            0.0            Sherpa(v2.1.1)
 362368         Sherpa_CT10_Zee_Pt2000_E_CMS_CFilterBVeto_ckkw15            4.419e-06      0.3212              1.011006       0.0            0.0            Sherpa(v2.1.1)
 362376         Sherpa_CT10_Zee_Pt2000_E_CMS_BFilter_ckkw15                 4.419e-06      0.2074              1.011006       0.0            0.0            Sherpa(v2.1.1)
-305195         Sherpa_CT10_Zee2JetsEW1JetQCD15GeVM40_ckkw30                2.1911         1.0000E+00          1.0            0.0            0.0            Sherpa(v2.1.1)
 362193         Sherpa_CT10_Zee_Pt0_70_CVetoBVeto_ckkw30                    2175.0         0.7793              1.010830       0.0            0.0            Sherpa(v2.1.1)
 362201         Sherpa_CT10_Zee_Pt0_70_CFilterBVeto_ckkw30                  2175.0         0.142               1.010830       0.0            0.0            Sherpa(v2.1.1)
 362209         Sherpa_CT10_Zee_Pt0_70_BFilter_ckkw30                       2175.0         0.07919             1.010830       0.0            0.0            Sherpa(v2.1.1)
@@ -150,7 +143,6 @@ dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncert
 362361         Sherpa_CT10_Zee_Pt2000_E_CMS_CVetoBVeto_ckkw30              5.609e-06      0.5437              1.010830       0.0            0.0            Sherpa(v2.1.1)
 362369         Sherpa_CT10_Zee_Pt2000_E_CMS_CFilterBVeto_ckkw30            5.609e-06      0.2412              1.010830       0.0            0.0            Sherpa(v2.1.1)
 362377         Sherpa_CT10_Zee_Pt2000_E_CMS_BFilter_ckkw30                 5.609e-06      0.2151              1.010830       0.0            0.0            Sherpa(v2.1.1)
-305200         Sherpa_CT10_Zee2JetsEW1JetQCD15GeVM40_qsf025                2.54           1.0000E+00          1.0            0.0            0.0            Sherpa(v2.1.1)
 362198         Sherpa_CT10_Zee_Pt0_70_CVetoBVeto_qsf025                    2240.0         0.7811              1.010401       0.0            0.0            Sherpa(v2.1.1)
 362206         Sherpa_CT10_Zee_Pt0_70_CFilterBVeto_qsf025                  2240.0         0.1413              1.010401       0.0            0.0            Sherpa(v2.1.1)
 362214         Sherpa_CT10_Zee_Pt0_70_BFilter_qsf025                       2240.0         0.07823             1.010401       0.0            0.0            Sherpa(v2.1.1)
@@ -175,7 +167,6 @@ dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncert
 362366         Sherpa_CT10_Zee_Pt2000_E_CMS_CVetoBVeto_qsf025              4.302e-06      0.5651              1.010401       0.0            0.0            Sherpa(v2.1.1)
 362374         Sherpa_CT10_Zee_Pt2000_E_CMS_CFilterBVeto_qsf025            4.302e-06      0.2942              1.010401       0.0            0.0            Sherpa(v2.1.1)
 362382         Sherpa_CT10_Zee_Pt2000_E_CMS_BFilter_qsf025                 4.302e-06      0.1779              1.010401       0.0            0.0            Sherpa(v2.1.1)
-305201         Sherpa_CT10_Zee2JetsEW1JetQCD15GeVM40_qsf4                  2.1616         1.0000E+00          1.0            0.0            0.0            Sherpa(v2.1.1)
 362199         Sherpa_CT10_Zee_Pt0_70_CVetoBVeto_qsf4                      2178.0         0.7777              1.011656       0.0            0.0            Sherpa(v2.1.1)
 362207         Sherpa_CT10_Zee_Pt0_70_CFilterBVeto_qsf4                    2178.0         0.1424              1.011656       0.0            0.0            Sherpa(v2.1.1)
 362215         Sherpa_CT10_Zee_Pt0_70_BFilter_qsf4                         2178.0         0.07987             1.011656       0.0            0.0            Sherpa(v2.1.1)
@@ -324,34 +315,6 @@ dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncert
 364125         Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV280_500_BFilter          8.6799         1.7647E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5299
 364126         Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV500_1000                 1.8092         1.0000E+00          0.9751         0.0            0.0            Sherpa(v2.2.1) e5299
 364127         Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV1000_E_CMS               0.14875        1.0000E+00          0.9751         0.0            0.0            Sherpa(v2.2.1) e5299
-364100         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV0_70_CVetoBVeto        1982.5         8.2172E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364101         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV0_70_CFilterBVeto      1982.2         1.1355E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364102         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV0_70_BFilter           1981.5         6.5890E-02          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364103         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_CVetoBVeto      109.14         6.8992E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364104         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_CFilterBVeto    108.98         1.9665E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364105         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_BFilter         109.03         1.1556E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364106         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CVetoBVeto     39.87          5.9942E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364107         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CFilterBVeto   39.857         2.3527E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364108         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_BFilter        39.888         1.5570E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364109         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV280_500_CVetoBVeto     8.5251         5.6023E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364110         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV280_500_CFilterBVeto   8.5259         2.6641E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364111         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV280_500_BFilter        8.5292         1.7673E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364112         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV500_1000               1.787          1.0000E+00          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364113         Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV1000_E_CMS             0.14761        1.0000E+00          0.9751         0.0            0.0            Sherpa(v2.2.1) e5271
-364128         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV0_70_CVetoBVeto      1982.0         8.3444E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364129         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV0_70_CFilterBVeto    1981.9         1.1365E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364130         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV0_70_BFilter         1982.1         6.5763E-02          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364131         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_CVetoBVeto    110.66         6.9264E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364132         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_CFilterBVeto  110.46         1.9060E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364133         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_BFilter       110.67         0.110886            0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364134         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV140_280_CVetoBVeto   40.756         6.1880E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364135         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV140_280_CFilterBVeto 40.716         2.3432E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364136         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV140_280_BFilter      40.746         1.5532E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364137         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV280_500_CVetoBVeto   8.6726         5.6384E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364138         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV280_500_CFilterBVeto 8.6757         2.6432E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5313
-364139         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV280_500_BFilter      8.6755         1.7628E-01          0.9751         0.0            0.0            Sherpa(v2.2.1) e5313
-364140         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV500_1000             1.8078         1.0000E+00          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
-364141         Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV1000_E_CMS           0.14826        1.0000E+00          0.9751         0.0            0.0            Sherpa(v2.2.1) e5307
 364170         Sherpa_221_NNPDF30NNLO_Wenu_MAXHTPTV0_70_CVetoBVeto         19153.0        8.2467E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
 364171         Sherpa_221_NNPDF30NNLO_Wenu_MAXHTPTV0_70_CFilterBVeto       19144.0        1.3075E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
 364172         Sherpa_221_NNPDF30NNLO_Wenu_MAXHTPTV0_70_BFilter            19143.0        4.4810E-02          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
@@ -366,31 +329,3 @@ dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncert
 364181         Sherpa_221_NNPDF30NNLO_Wenu_MAXHTPTV280_500_BFilter         72.077         1.3865E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
 364182         Sherpa_221_NNPDF30NNLO_Wenu_MAXHTPTV500_1000                15.05          1.0000E+00          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
 364183         Sherpa_221_NNPDF30NNLO_Wenu_MAXHTPTV1000_E_CMS              1.2344         1.0000E+00          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364156         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV0_70_CVetoBVeto        19151.0        8.2465E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364157         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV0_70_CFilterBVeto      19144.0        1.3114E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364158         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV0_70_BFilter           19143.0        4.4603E-02          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364159         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV70_140_CVetoBVeto      945.89         6.7430E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364160         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV70_140_CFilterBVeto    946.12         2.4357E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364161         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV70_140_BFilter         944.8          8.4525E-02          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364162         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV140_280_CVetoBVeto     339.73         6.0009E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364163         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV140_280_CFilterBVeto   339.8          2.9256E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364164         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV140_280_BFilter        339.68         0.110298            0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364165         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV280_500_CVetoBVeto     72.084         5.4766E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364166         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV280_500_CFilterBVeto   72.103         3.2016E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364167         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV280_500_BFilter        72.063         1.3137E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364168         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV500_1000               15.008         1.0000E+00          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364169         Sherpa_221_NNPDF30NNLO_Wmunu_MAXHTPTV1000_E_CMS             1.2349         1.0000E+00          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364184         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV0_70_CVetoBVeto       19155.0        8.2462E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364185         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV0_70_CFilterBVeto     19153.0        1.3167E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364186         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV0_70_BFilter          19152.0        4.5128E-02          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364187         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV70_140_CVetoBVeto     945.58         6.7560E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364188         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV70_140_CFilterBVeto   946.49         2.4245E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364189         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV70_140_BFilter        945.71         0.10391             0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364190         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV140_280_CVetoBVeto    339.69         5.9884E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364191         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV140_280_CFilterBVeto  339.84         2.8478E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364192         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV140_280_BFilter       339.68         1.0575E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364193         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV280_500_CVetoBVeto    72.078         5.6172E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364194         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV280_500_CFilterBVeto  71.99          3.1863E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364195         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV280_500_BFilter       71.944         1.3597E-01          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364196         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV500_1000              15.052         1.0000E+00          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
-364197         Sherpa_221_NNPDF30NNLO_Wtaunu_MAXHTPTV1000_E_CMS            1.2342         1.0000E+00          0.9702         0.0            0.0            Sherpa(v2.2.1) e5340
