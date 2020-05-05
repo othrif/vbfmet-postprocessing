@@ -10,6 +10,7 @@ p.add_option('--file','-f',           type='string', default='hists_extract_Zee_
 p.add_option('--var','-v',           type='string', default='', dest='var') #all/Incl/boson_pt,all/Incl/boson_pt
 p.add_option('--path','-p', type='string', default='./processed', dest='path')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
+p.add_option('--doFit',          action='store_true', default=False,   dest='doFit')
 p.add_option('--name','-n', type='string', default='test', dest='name')
 p.add_option('--logscale', '-l',         action='store_true', default=False,   dest='logscale')
 p.add_option('--atlasrootstyle','-s', type='string', default='/afs/desy.de/user/o/othrif/atlasrootstyle', dest='atlasrootstyle')
@@ -288,8 +289,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         h2 = PlotError(h2)
 
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
-    #print h1.GetMaximum(),h2.GetMaximum()
-    #h1.GetYaxis().SetRangeUser(0,0.75)
+    #h1.GetYaxis().SetRangeUser(0.1,1.5)
     if options.logscale:
         h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
@@ -404,7 +404,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
 
     #hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
     hratio.GetYaxis().SetTitle(var_num_name+' / '+var_den_name)
-    hratio.GetYaxis().SetRangeUser(0.5,1.5)
+    hratio.GetYaxis().SetRangeUser(0.,1.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -532,11 +532,14 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
     #print h1.GetMaximum(),h2.GetMaximum()
     #h1.GetYaxis().SetRangeUser(0,0.75)
+    h1.GetYaxis().SetRangeUser(0.1,1.5)
     if options.logscale:
         h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
-    h1.DrawNormalized()
-    h2.DrawNormalized('same')
+    #h1.DrawNormalized()
+    #h2.DrawNormalized('same')
+    h1.Draw()
+    h2.Draw('same')
 
     chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
     kval = 1#h1.KolmogorovTest(h2, '')
@@ -574,8 +577,8 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
 
     hratio = h1.Clone()
     intden = h1.Integral()
-    if intden>0.0:
-        hratio.Scale(h2.Integral()/intden)
+    #if intden>0.0:
+    #    hratio.Scale(h2.Integral()/intden)
     hratio.Divide(h2)
     pad1.SetLogy(0)
     if options.logscale:
@@ -586,6 +589,15 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
 
     print "drawing ", hname, "..."
     hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
+
+    if  hname.count('boson_pt'):
+        hratio.GetXaxis().SetTitle('Boson p_{T} [GeV]')
+    elif  hname.count('jj_mass'):
+        hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
+    elif hname.count('met_et'):
+        hratio.GetXaxis().SetTitle('MET [GeV]')
+    elif  hname.count('met_nolep_et'):
+        hratio.GetXaxis().SetTitle('MET (no leptons) [GeV]')
 
 
     #hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
@@ -603,11 +615,21 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);
     hratio.Draw()
-    for i in range(0,hratio.GetNbinsX()+1):
+    par0=0
+    par1=0
+    if options.doFit:
+        hratio.Fit('pol1',"R","",800.0,5000.0)
+        myfunc = hratio.GetFunction('pol1')
+        par0 = myfunc.GetParameter(0)
+        err0 = myfunc.GetParError(0)
+        par1 = myfunc.GetParameter(1)
+    for i in range(1,hratio.GetNbinsX()+1):
         valb = hratio.GetBinContent(i)
         errb = hratio.GetBinError(i)
-        print 'Bin {0:d} with uncertainty {1:.2%}'.format(i, hratio.GetBinContent(i)-1)
+        #print 'Bin {0:d} with uncertainty {1:.2%}, fitted {2:.2%}'.format(i, hratio.GetBinContent(i)-1, par0+hratio.GetBinCenter(i)*par1-1)
+        print '{0:.2%}'.format(hratio.GetBinContent(i)-1)
     can.Update()
+    hratio.Print("all")
 
     if options.wait:
         can.WaitPrimitive()
@@ -642,7 +664,9 @@ def Fit(_suffix=''):
             print("WARNING: number of files or number of histogram names is not equal to 2, insure this is satisfied!")
             return
         hratio1 = Draw(hnames[0],hnames[1],f[0],f[0],can,GetError=False)
+        hratio1.Print("all")
         hratio2 = Draw(hnames[0],hnames[1],f[1],f[1],can,GetError=False)
+        hratio2.Print("all")
         Ratio(hratio1,hratio2,files[0],files[1],can,GetError=False)
     else:
         print "Provide ..."

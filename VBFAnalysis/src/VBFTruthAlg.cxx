@@ -20,6 +20,7 @@ VBFTruthAlg::VBFTruthAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
   declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", "path to a file with the number of events processed" );
+  declareProperty( "noSkim", noSkim = false, "No skim");
 }
 
 VBFTruthAlg::~VBFTruthAlg() {}
@@ -29,9 +30,9 @@ StatusCode VBFTruthAlg::initialize() {
 
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
-  //std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
-  std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
-  //std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
+ // std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+ // std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
+  std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
 
@@ -297,28 +298,26 @@ else
    {useMerged = 2;}
   */
 
-
 // Nominal: useMerged = 0
-// kt-merged only: (useMerged = 2 || useMerged = 1) && (312448 <= RunNumber && RunNumber <= 312531))
-// kt-merged + PTV: useMerged = 2
-// ckkw/qsf: useMerged = 3
+// kt-merged + PTV: useMerged = 1
+// ckkw/qsf: useMerged = 2
 
-if (364100 <= RunNumber && RunNumber <= 364197)
+if (364100 <= RunNumber && RunNumber <= 364197) // Sherpa_221 MAXHTPTV
 {useMerged = 0;
-      if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< "Event " << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
-    }
-else if (120.e3 < boson_pt->at(0) && 312448 <= RunNumber && RunNumber <= 312531){
+      if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< ", EventNumber=" << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
+}
+else if (312448 <= RunNumber && RunNumber <= 312531){ // Sherpa_227 PTV_MJJ kt merged
   useMerged = 1;
-  if(boson_pt->at(0) < 500e3)
-    useMerged = 2;
 }
-else if (boson_pt->at(0) > 500.e3 && 364216 <= RunNumber && RunNumber <= 364229){
-  useMerged = 2;
+else if (364216 <= RunNumber && RunNumber <= 364229){ // Sherpa_221 PTV
+  useMerged = 1;
+  if (fabs(EventWeight) > 100 ) {EventWeight=1.; std::cout << "RunNumber=" << RunNumber<< ", EventNumber=" << EventNumber << " with |weight|>100 " << EventWeight << ", set to 1." << std::endl; }
 }
-else if (362000 <= RunNumber && RunNumber <= 362575)
-  {useMerged = 3;}
+else if (362000 <= RunNumber && RunNumber <= 362575) // Sherpa_211 CT10 ckkw15,ckkw30,qsf025, qsf4
+  {useMerged = 2;}
 else
-  {useMerged = 4;}
+  {useMerged = 3;}
+
 // Prepare variables
 
   // jets
@@ -511,6 +510,22 @@ else
   new_nunu_phi = nunu_phi;
   new_nunu_m   = nunu_m  ;
 
+if(new_nbosons==0){
+  std::cout << "NO boson found! build one" << std::endl;
+  if ( 364142 <= RunNumber && RunNumber <= 364155 ){ //Zvv
+    new_boson_m->push_back(new_nunu_m);
+    new_boson_pt->push_back(new_nunu_pt);
+  }
+  else if ( 364100 <= RunNumber && RunNumber <= 364113 ){ //Zmm
+    new_boson_m->push_back(new_mumu_m);
+    new_boson_pt->push_back(new_mumu_pt);
+  }  else if ( 364114 <= RunNumber && RunNumber <= 364127 ){ //Zee
+    new_boson_m->push_back(new_ee_m);
+    new_boson_pt->push_back(new_ee_pt);
+  }
+  new_nbosons++;
+}
+
   computejj(&jet_signal, new_jj_mass, new_jj_deta, new_jj_dphi);
   new_met_et = met_et;
   new_met_phi = met_phi;
@@ -576,9 +591,21 @@ float LeadJetPtCut = 80.0e3;
 float subLeadJetPtCut = 50.0e3;
 float MjjCut =2e5;
 float DEtajjCut =2.5;
+float MV = -999;
+float PTV = -999;
+if(boson_pt->size() == 0 && new_boson_pt->size() !=0 ){
+  PTV = new_boson_pt->at(0);
+  MV = new_boson_m->at(0);
+}
+else if (boson_pt->size() != 0){
+  PTV = boson_pt->at(0);
+  MV = boson_m->at(0);
+}
+else
+  ATH_MSG_ERROR("THERE IS A PROBLEM with Number of bosons!!");
 
 bool vbfSkim = (new_jet_pt->at(0) > LeadJetPtCut) & (new_jet_pt->at(1) > subLeadJetPtCut) & (new_jj_deta > DEtajjCut) & ((new_jet_eta->at(0) * new_jet_eta->at(1))<0) & (new_jj_mass > MjjCut);
-bool vbfSkimloose = (new_jet_pt->at(0) > 80.0e3) & (new_jet_pt->at(1) > 50.0e3) & ( boson_pt->at(0) > 150e3) & (new_jj_mass > 800e3) & (new_jj_deta > 2.5)  & (new_jj_dphi<2.5) ;
+bool vbfSkimloose = (new_jet_pt->at(0) > 50.0e3) & (new_jet_pt->at(1) > 50.0e3) & ( PTV > 150e3) & (new_jj_mass > 500e3) & (new_jj_deta > 2.5); //  & (new_jj_dphi<2.5) ;
 
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
 if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
@@ -597,7 +624,6 @@ if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZNjet = true;
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWNjet = true;
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
-
 
 if(vbfSkimloose && ( (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127) ) ){
 if ((new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZll = true;
@@ -620,7 +646,6 @@ regDecision["CRZNjet"]=CRZNjet;
 regDecision["CRWNjet"]=CRWNjet;
 regDecision["CRZll"]=(CRZll);
 
-
 new_w = weight*EventWeight;
 new_w_noxsec = EventWeight;
 
@@ -628,10 +653,12 @@ for(auto reg : regions){
     if(regDecision[reg]){
       hist( "jj_mass_"+reg+"_nominal" )->Fill(new_jj_mass/1e6, new_w);
       hist( "Z_mass_"+reg+"_nominal" )->Fill(new_Mll/1e3, new_w);
-      if(new_nbosons>0){
-      hist( "boson_pT_"+reg+"_nominal" )->Fill(boson_pt->at(0)/1e3, new_w);
-      hist( "boson_mass_"+reg+"_nominal" )->Fill(boson_m->at(0)/1e3, new_w);
+      if( boson_pt->size() != 0 || new_boson_pt->size() !=0 ){
+      hist( "boson_pT_"+reg+"_nominal" )->Fill(PTV/1e3, new_w);
+      hist( "boson_mass_"+reg+"_nominal" )->Fill(MV/1e3, new_w);
     }
+    else
+        ATH_MSG_ERROR("THERE IS A PROBLEM with Number of bosons!!");
   }
 
     if (m_theoVariation && ( (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127) ) ){
@@ -654,8 +681,7 @@ for(auto reg : regions){
       }
     }
 
-
-if (vbfSkimloose && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3) ){
+if (vbfSkimloose || noSkim ){ // && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3)
   m_tree_out->Fill();
 }
 
@@ -801,7 +827,7 @@ StatusCode VBFTruthAlg::beginInputFile() {
 
   m_tree->SetBranchAddress("truthF_jj_mass", &truthF_jj_mass);
   m_tree->SetBranchAddress("truthF_jj_deta", &truthF_jj_deta);
-  m_tree->SetBranchAddress("truthF_jj_dphi", &truthF_jj_dphi);
+  //m_tree->SetBranchAddress("truthF_jj_dphi", &truthF_jj_dphi); // Missing in v42
   m_tree->SetBranchAddress("passVjetsFilter", &passVjetsFilter);
 
   return StatusCode::SUCCESS;

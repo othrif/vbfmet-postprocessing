@@ -1,0 +1,34 @@
+#Setup athena Rivet 
+```bash
+asetup 21.6.16,AthGeneration 
+source setupRivet.sh
+```
+
+#Compile Rivet routine
+```bash
+rivet-buildplugin Rivet_MC_Vjj_vbf.so MC_Vjj_vbf.cc
+```
+
+#Run routine locally
+if you run over the kT merged samples you need to add a cut at pTV<500 GeV in the routine (MC_Vjj_vbf.cc)
+If you run over the pTV samples, invert the cut (ptv>500 GeV)
+
+To run the routine you need to specify the analysis name and the cross section in a JobOptions. An example is found in jobOptions.py
+run it over one file locally like: 
+```bash
+athena jobOptions.py
+```
+
+#Run routine in the grid
+You just need to remove the input file from the JobOptions. Example in gridJobOptions.py
+Run it like 
+```bash
+lsetup panda
+pathena --extOutFile=OUTPUT_NAME.yoda.gz --inDS=DID --outDS=user.`whoami`.RivetOnTheGrid.OUTPUT_NAME --extFile=Rivet_MC_Vjj_vbf.so gridJobOptions.py
+```
+
+#Merged output 
+yodamerge -o MERGED_NAME *.yoda.gz
+
+#Plot histograms
+rivet-mkhtml --errs -o plots NAME.yoda.gz

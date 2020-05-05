@@ -33,6 +33,7 @@ public:
 
 private:
     bool m_theoVariation;
+    bool noSkim;
     std::map< std::string, std::vector<TH1*> >  h_theoVariations;  //!
     TH1D* make1DHist (TString name, TString title, unsigned nbins, float low, float high);
     int npevents = 0;
