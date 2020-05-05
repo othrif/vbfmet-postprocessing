@@ -738,7 +738,7 @@ StatusCode HFInputAlg::execute() {
       }else{// low met
 	if(m_binning==21) return StatusCode::SUCCESS;
 	else{
-	  if (jj_mass < 1.5e6) return StatusCode::SUCCESS;
+	  if (jj_mass < 1.5e6 || n_jet>2) return StatusCode::SUCCESS;
 	  else if (jj_mass < 2e6)   bin = 13;
 	  else if (jj_mass < 3.5e6) bin = 14;
 	  else bin = 15;

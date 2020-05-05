@@ -137,7 +137,7 @@ if args.METDef!="0":
     extraCommand+=' --METDef '+args.METDef+' '
 if args.year!=2016:
     extraCommand+=' --year %s ' %(args.year)
-if args.METCut!=160e3:
+if args.METCut!=100e3:
     extraCommand+=' --METCut %i ' %(args.METCut)
 if args.doTMVA:
     extraCommand+=' --doTMVA '
