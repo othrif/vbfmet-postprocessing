@@ -569,7 +569,7 @@ def prepareBkgRuns(keys,options=None):
                     '364151':'TBD',#280
                     '364152':'TBD',
                     '364153':'TBD',
-                    '364154':'TBD',
+                    '364154':'Znunu_MAXHTPTV500_1000',
                     '364155':'Znunu_MAXHTPTV1000',
                     }
     bkg_zqcd_znn_mc16e = {                # mc16e samples
@@ -1210,11 +1210,11 @@ def prepareBkgRuns(keys,options=None):
                 'hggf':sig_ggF125,
                 'tth':sig_tth125,
                 'hvbf':sig_VBF125,
-                'wewk':bkg_wewk,
-                #'wewk':bkg_wewkpow,
+                #'wewk':bkg_wewk,
+                'wewk':bkg_wewkpow,
                 'wqcd':bkg_wqcd,
-                'zewk':bkg_zewk,
-                #'zewk':bkg_zewkpow,
+                #'zewk':bkg_zewk,
+                'zewk':bkg_zewkpow,
                 #'top2':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
                 'top2':bkg_top2, # all top
@@ -1258,6 +1258,8 @@ def prepareBkgRuns(keys,options=None):
     if options.OverlapPh:
         bkg_keys['wgam']=bkg_sherpa_wg # bkg_sherpa_wg_228
         bkg_keys['zgam']=bkg_sherpa_zg # bkg_sherpa_zg_228
+        #bkg_keys['wgam']=bkg_sherpa_wg_228
+        #bkg_keys['zgam']=bkg_sherpa_zg_228        
         bkg_keys['wgamewk']=bkg_wgewk
         bkg_keys['zgamewk']=bkg_zgewk
         bkg_keys['ttg']=bkg_ttg
@@ -1306,8 +1308,8 @@ def prepareBkgRuns(keys,options=None):
         #bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)
 
     # extra samples here for now
-    bkg_keys['wdpi'].update(bkg_wewkpow)
-    bkg_keys['wdpi'].update(bkg_zewkpow)
+    bkg_keys['wdpi'].update(bkg_wewk) #bkg_wewkpow
+    bkg_keys['wdpi'].update(bkg_zewk) #bkg_zewkpow
     bkg_keys['wdpi'].update(bkg_zee_228)
     bkg_keys['wdpi'].update(bkg_mg_zg)
 
