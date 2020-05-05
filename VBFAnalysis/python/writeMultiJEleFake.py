@@ -193,13 +193,19 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                 multijets_statunc+=[10.0,13.5,0.7]
 
     if doTMVA:
-        multijets=[293.3,77.9,38.2,38.7,26.7,69.9,13.7,11.9,51.6,7.1,9.1]
-        multijets_statunc=[25.,18.,12.,12.,16.,30.,7.,9.,45.,7.1,9.1]
+        #multijets=[293.3,77.9,38.2,38.7,26.7,69.9,13.7,11.9,51.6,7.1,9.1]
+        #multijets_statunc=[25.,18.,12.,12.,16.,30.,7.,9.,45.,7.1,9.1]
+        multijets=[534.7,52.3,24.1,34.2,19.1,14.1,25.9,10.5,134.0,10.9,80.2]
+        multijets_statunc=[40.,18.,12.,12.,16.,30.,7.,9.,45.,7.1,9.1]
 
         # divide for the periods
+        divideUnit=3.0
+        if year==2016:   divideUnit=9.0
+        elif year==2017: divideUnit=2.571428
+        elif year==2018: divideUnit=2.0
         for m in range(0,len(multijets)):
-            multijets[m]=multijets[m]/3.0
-            multijets_statunc[m]=multijets_statunc[m]/3.0
+            multijets[m]=multijets[m]/divideUnit
+            multijets_statunc[m]=multijets_statunc[m]/divideUnit
 
     if doDoubleRatio:
         multijets+=[300.0]
@@ -274,8 +280,8 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                     histClosUp[5].SetBinContent(1,multijet*1.24) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
                     histClosDw[5].SetBinContent(1,multijet/1.24)
                 else:
-                    histClosUp[5].SetBinContent(1,multijet*1.6) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
-                    histClosDw[5].SetBinContent(1,multijet/1.6)
+                    histClosUp[5].SetBinContent(1,multijet*1.24) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+                    histClosDw[5].SetBinContent(1,multijet/1.24)
             if  year==2018:
                 histUp.SetBinContent(1,multijet*1.226)
                 histDw.SetBinContent(1,multijet/1.226)
@@ -293,8 +299,8 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
                     histClosUp[8].SetBinContent(1,multijet*1.19) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
                     histClosDw[8].SetBinContent(1,multijet/1.19)
                 else:
-                    histClosUp[8].SetBinContent(1,multijet*1.6) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
-                    histClosDw[8].SetBinContent(1,multijet/1.6)
+                    histClosUp[8].SetBinContent(1,multijet*1.19) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+                    histClosDw[8].SetBinContent(1,multijet/1.19)
             hist.Write()
             histUp.Write()
             histDw.Write()
