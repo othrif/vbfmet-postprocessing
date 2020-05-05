@@ -5,11 +5,12 @@ from optparse import OptionParser
 from helper import HistEntry
 
 
-p = OptionParser(usage="python drawHists.py -p <path> -v <variables, comma seperated> -f <files>--wait -n <suffix>", version="0.1")
+p = OptionParser(usage="python ratioHists.py -p <path> -v <variables, comma seperated> -f <files>--wait -n <suffix>", version="0.1")
 p.add_option('--file','-f',           type='string', default='hists_extract_Zee_QCD,hists_extract_Zmm_QCD', dest='file')
 p.add_option('--var','-v',           type='string', default='', dest='var') #all/Incl/boson_pt,all/Incl/boson_pt
 p.add_option('--path','-p', type='string', default='./processed', dest='path')
 p.add_option('--wait',          action='store_true', default=False,   dest='wait')
+p.add_option('--doFit',          action='store_true', default=False,   dest='doFit')
 p.add_option('--name','-n', type='string', default='test', dest='name')
 p.add_option('--logscale', '-l',         action='store_true', default=False,   dest='logscale')
 p.add_option('--atlasrootstyle','-s', type='string', default='/afs/desy.de/user/o/othrif/atlasrootstyle', dest='atlasrootstyle')
@@ -212,7 +213,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         type_sample='EWK '
         type_sample_out='ewk'
     num_name = 'Z#rightarrow#nu#nu'
-    den_name = 'Z#rightarrow ll'
+    den_name = 'Z#rightarrow#nu#nu'
     comp1='znn'
     comp2='znn'
     if f1.GetName().count('_Zll'):
@@ -256,6 +257,11 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         den_name = 'W#rightarrow#mu#nu'
         comp2='wmn'
 
+    var_num_name = 'N_{jet}^{25} = 2'
+    var_den_name = 'N_{jet}^{25} #geq 2'
+    num_name = num_name + ' ' + var_num_name
+    den_name = den_name + ' ' + var_den_name
+
     h1.SetStats(0)
     h2.SetStats(0)
     h1.SetLineColor(1)
@@ -283,25 +289,22 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         h2 = PlotError(h2)
 
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
-    #print h1.GetMaximum(),h2.GetMaximum()
-    #h1.GetYaxis().SetRangeUser(0,0.75)
+    #h1.GetYaxis().SetRangeUser(0.1,1.5)
     if options.logscale:
         h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
     h1.DrawNormalized()
     h2.DrawNormalized('same')
-    #h1.Draw()
-    #h2.Draw('same')
 
     chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
-    kval = h1.KolmogorovTest(h2, '')
-    print 'chi2: ',chi2,' ks: ',kval
+    kval = 1#h1.KolmogorovTest(h2, '')
+    #print 'chi2: ',chi2,' ks: ',kval
     ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
     ks_text2.SetNDC()
     ks_text2.SetTextSize(0.055)
     ks_text2.SetTextAlign(11)
     ks_text2.SetTextColor(ROOT.kBlack)
-    ks_text2.Draw()
+    #ks_text2.Draw()
 
     e=ROOT.Double(0.0)
     print 'Integral '+comp1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
@@ -399,7 +402,205 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     elif  hname.count('n_nu'):
         hratio.GetXaxis().SetTitle('N_{#nu}')
 
+    #hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
+    hratio.GetYaxis().SetTitle(var_num_name+' / '+var_den_name)
+    hratio.GetYaxis().SetRangeUser(0.,1.5)
+    hratio.GetYaxis().SetNdivisions(505);
+    hratio.GetYaxis().SetTitleSize(20);
+    hratio.GetYaxis().SetTitleFont(43);
+    hratio.GetYaxis().SetTitleOffset(1.55);
+    hratio.GetYaxis().SetLabelFont(43);
+    hratio.GetYaxis().SetLabelSize(15);
+    hratio.GetXaxis().SetTitleSize(20);
+    hratio.GetXaxis().SetTitleFont(43);
+    hratio.GetXaxis().SetTitleOffset(4.);
+    hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
+    hratio.GetXaxis().SetLabelSize(15);
+    hratio.Draw()
+    hratio.Print()
+    can.Update()
 
+    if options.wait and False:
+        can.WaitPrimitive()
+    log_label=''
+    if options.logscale:
+        log_label='_log'
+
+
+    mypath=options.path+'/plots/'
+    if not os.path.exists(mypath):
+        os.makedirs(mypath)
+    mypath=mypath+hname[1:].replace("/", "_")
+    if GetError:
+        can.SaveAs(mypath+'_'+comp1+'_'+comp2+'_'+options.name+log_label+'_err.pdf')
+    else:
+        can.SaveAs(mypath+'_'+comp1+'_'+comp2+'_'+options.name+log_label+'.pdf')
+
+    return hratio
+
+def Ratio(h1, h2,f1name,f2name,can,GetError=True):
+    can.Clear()
+
+    hname = h1.GetName()
+    #h1.Scale(h1_norm)
+    #h2.Scale(h2_norm)
+    print f1name,f2name
+
+    # Fix labels
+
+    type_sample='QCD '
+    type_sample_out='qcd'
+    if f1name.count('EWK') or f2name.count('EWK'):
+        type_sample='EWK '
+        type_sample_out='ewk'
+    num_name = 'Z#rightarrow#nu#nu'
+    den_name = 'Z#rightarrow#nu#nu'
+    comp1='znn'
+    comp2='znn'
+    if f1name.count('_Zll'):
+        num_name = 'Z#rightarrow ll'
+        comp1='zll'
+    if f1name.count('_Zmm'):
+        num_name = 'Z#rightarrow #mu#mu'
+        comp1='zmm'
+    if f1name.count('_Zee'):
+        num_name = 'Z#rightarrow ee'
+        comp1='zee'
+    if f1name.count('_Zvv'):
+        num_name = 'Z#rightarrow#nu#nu'
+    if f1name.count('_Wlv'):
+        num_name = 'W#rightarrowl#nu'
+        comp1='wln'
+    if f1name.count('_Wev'):
+        num_name = 'W#rightarrowe#nu'
+        comp1='wen'
+    if f1name.count('_Wmv'):
+        num_name = 'W#rightarrow#mu#nu'
+        comp1='wmn'
+    if f2name.count('_Zll'):
+        den_name = 'Z#rightarrow ll'
+        comp2='zll'
+    if f2name.count('_Zmm'):
+        den_name = 'Z#rightarrow #mu#mu'
+        comp2='zmm'
+    if f2name.count('_Zee'):
+        den_name = 'Z#rightarrow ee'
+        comp2='zee'
+    if f2name.count('_Zvv'):
+        den_name = 'Z#rightarrow#nu#nu'
+    if f2name.count('_Wlv'):
+        den_name = 'W#rightarrowl#nu'
+        comp2='wln'
+    if f2name.count('_Wev'):
+        den_name = 'W#rightarrowe#nu'
+        comp2='wen'
+    if f2name.count('_Wmv'):
+        den_name = 'W#rightarrow#mu#nu'
+        comp2='wmn'
+
+    var_num_name = 'N_{jet}^{25} = 2'
+    var_den_name = 'N_{jet}^{25} #geq 2'
+    num_name_l = num_name + ' ' + var_num_name + '/' + var_den_name
+    den_name_l = den_name + ' ' + var_num_name + '/' + var_den_name
+
+    h1.SetStats(0)
+    h2.SetStats(0)
+    h1.SetLineColor(1)
+    h1.SetMarkerColor(1)
+    h2.SetLineColor(2)
+    h2.SetMarkerColor(2)
+    h1.SetMarkerSize(1)
+    h2.SetMarkerSize(1)
+
+
+    # pads
+    pad1 = ROOT.TPad("pad1", "pad1", 0, 0.3, 1, 1.0);
+    pad1.SetBottomMargin(0); # Upper and lower plot are joined
+    #pad1.SetGridx();         # Vertical grid
+    pad1.Draw();             # Draw the upper pad: pad1
+    pad1.cd();               # pad1 becomes the current pad
+
+    if GetError:
+        h1.GetYaxis().SetTitle('Relative Error')
+    else:
+        h1.GetYaxis().SetTitle('Events')
+
+    if GetError:
+        h1 = PlotError(h1)
+        h2 = PlotError(h2)
+
+    max_bin = max(h1.GetMaximum(),h2.GetMaximum())
+    #print h1.GetMaximum(),h2.GetMaximum()
+    #h1.GetYaxis().SetRangeUser(0,0.75)
+    h1.GetYaxis().SetRangeUser(0.1,1.5)
+    if options.logscale:
+        h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
+
+    #h1.DrawNormalized()
+    #h2.DrawNormalized('same')
+    h1.Draw()
+    h2.Draw('same')
+
+    chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
+    kval = 1#h1.KolmogorovTest(h2, '')
+    #print 'chi2: ',chi2,' ks: ',kval
+    ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
+    ks_text2.SetNDC()
+    ks_text2.SetTextSize(0.055)
+    ks_text2.SetTextAlign(11)
+    ks_text2.SetTextColor(ROOT.kBlack)
+    #ks_text2.Draw()
+
+    e=ROOT.Double(0.0)
+    print 'Integral '+comp1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
+    print 'Integral '+comp2+': ',h2.IntegralAndError(0,1001,e),'+/-',e
+
+    leg = ROOT.TLegend(0.5,0.6,0.8,0.8)
+    leg.SetBorderSize(0)
+    leg.SetFillColor(0)
+    leg.AddEntry(h1,num_name_l)
+    leg.AddEntry(h2,den_name_l)
+
+    leg.Draw()
+
+    texts = getATLASLabels(can, 0.6, 0.85, "")
+    for text in texts:
+        text.Draw()
+
+    can.cd();          # Go back to the main canvas before defining pad2
+    pad2 = ROOT.TPad("pad2", "pad2", 0, 0.03, 1, 0.3);
+    pad2.SetTopMargin(0);
+    pad2.SetBottomMargin(0.3);
+    pad2.SetGridy(); # vertical grid
+    pad2.Draw();
+    pad2.cd();       # pad2 becomes the current pad
+
+    hratio = h1.Clone()
+    intden = h1.Integral()
+    #if intden>0.0:
+    #    hratio.Scale(h2.Integral()/intden)
+    hratio.Divide(h2)
+    pad1.SetLogy(0)
+    if options.logscale:
+        pad1.SetLogy(1)
+    pad2.SetLogy(0)
+    pad1.SetLogx(0)
+    pad2.SetLogx(0)
+
+    print "drawing ", hname, "..."
+    hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
+
+    if  hname.count('boson_pt'):
+        hratio.GetXaxis().SetTitle('Boson p_{T} [GeV]')
+    elif  hname.count('jj_mass'):
+        hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
+    elif hname.count('met_et'):
+        hratio.GetXaxis().SetTitle('MET [GeV]')
+    elif  hname.count('met_nolep_et'):
+        hratio.GetXaxis().SetTitle('MET (no leptons) [GeV]')
+
+
+    #hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
     hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
     hratio.GetYaxis().SetRangeUser(0.5,1.5)
     hratio.GetYaxis().SetNdivisions(505);
@@ -414,7 +615,21 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);
     hratio.Draw()
+    par0=0
+    par1=0
+    if options.doFit:
+        hratio.Fit('pol1',"R","",800.0,5000.0)
+        myfunc = hratio.GetFunction('pol1')
+        par0 = myfunc.GetParameter(0)
+        err0 = myfunc.GetParError(0)
+        par1 = myfunc.GetParameter(1)
+    for i in range(1,hratio.GetNbinsX()+1):
+        valb = hratio.GetBinContent(i)
+        errb = hratio.GetBinError(i)
+        #print 'Bin {0:d} with uncertainty {1:.2%}, fitted {2:.2%}'.format(i, hratio.GetBinContent(i)-1, par0+hratio.GetBinCenter(i)*par1-1)
+        print '{0:.2%}'.format(hratio.GetBinContent(i)-1)
     can.Update()
+    hratio.Print("all")
 
     if options.wait:
         can.WaitPrimitive()
@@ -445,16 +660,16 @@ def Fit(_suffix=''):
 
     if options.var:
         hnames=options.var.split(',')
-        if len(files) != len(hnames):
-            print("WARNING: number of files does not match number of histogram names, insure they are the same!")
+        if len(files) != 2 or len(hnames) != 2:
+            print("WARNING: number of files or number of histogram names is not equal to 2, insure this is satisfied!")
             return
-        for i in range(len(files)/2):
-            Draw(hnames[2*i],hnames[2*i+1],f[2*i],f[2*i+1],can,GetError=False)
+        hratio1 = Draw(hnames[0],hnames[1],f[0],f[0],can,GetError=False)
+        hratio1.Print("all")
+        hratio2 = Draw(hnames[0],hnames[1],f[1],f[1],can,GetError=False)
+        hratio2.Print("all")
+        Ratio(hratio1,hratio2,files[0],files[1],can,GetError=False)
     else:
-        print "Run over all histograms of the file..."
-        for k,o in getall(f[0]):
-            print "Get ready to plot", o.ClassName(), k
-            Draw(k,k,f[0],f[1],can,GetError=False)
+        print "Provide ..."
         return
 
 
