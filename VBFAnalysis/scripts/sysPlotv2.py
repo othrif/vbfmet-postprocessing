@@ -217,7 +217,7 @@ def Smooth(rfile,options,can,systName,histName,regions,systNameToSymmet):
     nomMap={}
     sysUpMap={}
     sysDwMap={}
-    binOrder=[1,3,5,7,9,2,4,6,8,10,11]
+    binOrder=[1,3,5,7,9,2,4,6,8,10,11,12,13,14,15,16]
     for r in regions:
         hName  =HistName(histName, r, 'Nom', options.binNum+1)
         hNameUp=HistName(histName, r, 'Up', options.binNum+1)        
@@ -469,7 +469,7 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
     sysDwMap={}
     hSaveName=''
     nLoaded=0
-    binOrder=[1,3,5,7,9,2,4,6,8,10,11]
+    binOrder=[1,3,5,7,9,2,4,6,8,10,11,12,13,14,15,16]
     #binOrder=[1,2,3,4,5,6,7,8,9,10,11]
     for r in regions:
         #print r
@@ -555,7 +555,15 @@ def DrawRatio(rfile,options,can,systName,histName,regions):
         sysUpMap[r].GetXaxis().SetBinLabel(5,'1.5<M_{jj}<2')
         sysUpMap[r].GetXaxis().SetBinLabel(7,'2<M_{jj}<3.5')
         sysUpMap[r].GetXaxis().SetBinLabel(9,'3.5<M_{jj}')
-        sysUpMap[r].GetXaxis().SetBinLabel(11,'n_{j}>2')   
+        if options.nBin==11:
+            sysUpMap[r].GetXaxis().SetBinLabel(11,'n_{j}>2')
+        else:
+            sysUpMap[r].GetXaxis().SetBinLabel(11,'n_{j}>2 1.5-2')
+            sysUpMap[r].GetXaxis().SetBinLabel(12,'n_{j}>2 2-3.5')
+            sysUpMap[r].GetXaxis().SetBinLabel(13,'n_{j}>2 >3.5')
+            sysUpMap[r].GetXaxis().SetBinLabel(14,'Low E_{T}^{miss} 1.5-2')
+            sysUpMap[r].GetXaxis().SetBinLabel(15,'Low E_{T}^{miss} 2-3.5')
+            sysUpMap[r].GetXaxis().SetBinLabel(16,'Low E_{T}^{miss} >3.5')
 
     # check the region
     color_vec=[1,2, 3, 4, 5, 6,
@@ -631,7 +639,7 @@ if __name__=='__main__':
 
     p.add_option('--lumi', type='float', default=139, help='Defines the integrated luminosity shown in the label')
     p.add_option('--batch', action='store_true', default=False, help='Turn on batch mode')    
-    p.add_option('--binNum', type='int', default=11, help='number of bins')    
+    p.add_option('--binNum', type='int', default=16, help='number of bins')    
     p.add_option('--nBin', type='int', default=1, help='Defines which bin is plotted')
     p.add_option('--smooth', type='int', default=0, help='Smooth options: 1 average bins, 2 run parabolic smoothing, 3 avg Wln and Zll, 5 determine style of smoothing')    
     p.add_option('-s', '--syst', type='string', default="All", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
