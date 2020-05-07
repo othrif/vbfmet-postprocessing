@@ -265,6 +265,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);
     //if(m_theoVariation) 
       m_tree_out->Branch("mcEventWeights",&mcEventWeights);
+      m_tree_out->Branch("HTXS_Higgs_pt",&HTXS_Higgs_pt);
   }
   if(m_currentVariation=="Nominal") m_tree_out->Branch("eleANTISF",&eleANTISF);
   m_tree_out->Branch("runNumber",&runNumber);
@@ -883,6 +884,7 @@ StatusCode VBFAnalysisAlg::execute() {
     if(NgenCorrected>0)  weight = crossSection/NgenCorrected;
     else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber );
     ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
+    if(nFileEvt<10)     ATH_MSG_INFO("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
     //correct the LO SHERPA to H7 EWK
     //if(m_isMC && runNumber>=308092 && runNumber<=308098 && truth_jj_mass>200.0e3) weight*=0.000047991*truth_jj_mass/1.0e3+0.8659;
     if(m_isMC && runNumber>=308092 && runNumber<=308098 && truthF_jj_mass>200.0e3) weight*=0.000047991*truthF_jj_mass/1.0e3+0.8659;
@@ -1538,6 +1540,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("HTXS_prodMode", 1);
     m_tree->SetBranchStatus("HTXS_errorCode", 1);
     m_tree->SetBranchStatus("HTXS_Stage1_1_Fine_Category_pTjet25", 1);
+    m_tree->SetBranchStatus("HTXS_Higgs_pt", 1);
   }
   if(m_isMC) m_tree->SetBranchStatus("truthF_jj_mass", 1);
   m_tree->SetBranchStatus("puWeight", 1);
@@ -1750,6 +1753,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("HTXS_prodMode", &HTXS_prodMode);
     m_tree->SetBranchAddress("HTXS_errorCode", &HTXS_errorCode);
     m_tree->SetBranchAddress("HTXS_Stage1_1_Fine_Category_pTjet25", &HTXS_Stage1_1_Fine_Category_pTjet25);
+    m_tree->SetBranchAddress("HTXS_Higgs_pt", &HTXS_Higgs_pt);
   }
   if(m_isMC) m_tree->SetBranchAddress("truthF_jj_mass", &truthF_jj_mass);
   m_tree->SetBranchAddress("puWeight", &puWeight);
