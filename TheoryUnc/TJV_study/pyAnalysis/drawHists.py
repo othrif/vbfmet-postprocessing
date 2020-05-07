@@ -331,7 +331,8 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     intden = h1.Integral()
     if intden>0.0:
         hratio.Scale(h2.Integral()/intden)
-    hratio.Divide(h2)
+    #hratio.Divide(h2)
+    hratio.Divide(h1,h2,1.0,1.0,"B");
     pad1.SetLogy(0)
     if options.logscale:
         pad1.SetLogy(1)
