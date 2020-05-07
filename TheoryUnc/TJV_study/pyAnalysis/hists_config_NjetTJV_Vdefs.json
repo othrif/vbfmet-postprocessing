@@ -1,0 +1,13 @@
+{
+    "cuts": [
+     {"cut": "( V_undressed_pt > 200e3 && n_jet25>=2 )", "name": "SRmTJV"},
+     {"cut": "( V_undressed_pt > 200e3 && n_jet25==2 )", "name": "SR25"}
+ ],
+    "draw": [
+        {
+            "draw": "jj_mass*1e-3",
+            "edges": [800,1000,1500,2000,3500,5000],
+            "name": "jj_mass"
+        }
+    ]
+}

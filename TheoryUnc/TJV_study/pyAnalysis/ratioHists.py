@@ -289,26 +289,28 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
         h2 = PlotError(h2)
 
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
-    #h1.GetYaxis().SetRangeUser(0.1,1.5)
+    h1.GetYaxis().SetRangeUser(0,max_bin*1.2)
     if options.logscale:
         h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
-    h1.DrawNormalized()
-    h2.DrawNormalized('same')
+    h1.Draw()
+    h2.Draw('same')
 
     chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
-    kval = 1#h1.KolmogorovTest(h2, '')
+    kval = h1.KolmogorovTest(h2, '')
     #print 'chi2: ',chi2,' ks: ',kval
     ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
     ks_text2.SetNDC()
     ks_text2.SetTextSize(0.055)
     ks_text2.SetTextAlign(11)
     ks_text2.SetTextColor(ROOT.kBlack)
-    #ks_text2.Draw()
+    ks_text2.Draw()
 
     e=ROOT.Double(0.0)
-    print 'Integral '+comp1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
-    print 'Integral '+comp2+': ',h2.IntegralAndError(0,1001,e),'+/-',e
+    print 'Integral '+num_name+': ',h1.IntegralAndError(0,1001,e),'+/-',e
+    h1.Print("all")
+    print 'Integral '+den_name+': ',h2.IntegralAndError(0,1001,e),'+/-',e
+    h2.Print("all")
 
     leg = ROOT.TLegend(0.6,0.7,0.8,0.8)
     leg.SetBorderSize(0)
@@ -332,9 +334,10 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
 
     hratio = h1.Clone()
     intden = h1.Integral()
-    if intden>0.0:
-        hratio.Scale(h2.Integral()/intden)
-    hratio.Divide(h2)
+    #if intden>0.0:
+    #    hratio.Scale(h2.Integral()/intden)
+    #hratio.Divide(h2)
+    hratio.Divide(h1,h2,1.0,1.0,"B");
     pad1.SetLogy(0)
     if options.logscale:
         pad1.SetLogy(1)
@@ -404,7 +407,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
 
     #hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
     hratio.GetYaxis().SetTitle(var_num_name+' / '+var_den_name)
-    hratio.GetYaxis().SetRangeUser(0.,1.5)
+    hratio.GetYaxis().SetRangeUser(0.,.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -532,7 +535,7 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
     #print h1.GetMaximum(),h2.GetMaximum()
     #h1.GetYaxis().SetRangeUser(0,0.75)
-    h1.GetYaxis().SetRangeUser(0.1,1.5)
+    h1.GetYaxis().SetRangeUser(0.,0.3)
     if options.logscale:
         h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
@@ -542,14 +545,14 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     h2.Draw('same')
 
     chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
-    kval = 1#h1.KolmogorovTest(h2, '')
+    kval = h1.KolmogorovTest(h2, '')
     #print 'chi2: ',chi2,' ks: ',kval
     ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
     ks_text2.SetNDC()
     ks_text2.SetTextSize(0.055)
     ks_text2.SetTextAlign(11)
     ks_text2.SetTextColor(ROOT.kBlack)
-    #ks_text2.Draw()
+    ks_text2.Draw()
 
     e=ROOT.Double(0.0)
     print 'Integral '+comp1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
@@ -577,9 +580,10 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
 
     hratio = h1.Clone()
     intden = h1.Integral()
-    #if intden>0.0:
-    #    hratio.Scale(h2.Integral()/intden)
+    if intden>0.0:
+        hratio.Scale(h2.Integral()/intden)
     hratio.Divide(h2)
+    #hratio.Divide(h1,h2,1.0,1.0,"B");
     pad1.SetLogy(0)
     if options.logscale:
         pad1.SetLogy(1)

@@ -1,0 +1,131 @@
+{
+    "cuts": [
+     {"cut": "jj_mass > 800e3", "name": "Incl"}
+ ],
+    "draw": [
+        {
+            "draw": "jj_mass*1e-3",
+            "edges": [200,400,600,800,1000,1500,2000,3500,5000],
+            "name": "jj_mass"
+        },
+        {
+            "draw": "jj_deta",
+            "max": 10,
+            "min": 0,
+            "name": "jj_deta",
+            "nbins": 10
+        },
+        {
+            "draw": "jj_dphi",
+            "max": 3.2,
+            "min": 0,
+            "name": "jj_dphi",
+            "nbins": 16
+        },
+        {
+            "draw": "boson_pt*1e-3",
+            "max": 1500,
+            "min": 0.0,
+            "name": "boson_pt",
+            "nbins": 70
+        },
+        {
+            "draw": "boson_m*1e-3",
+            "max": 120.0,
+            "min": 60.0,
+            "name": "boson_m",
+            "nbins": 30
+        },
+        {
+            "draw": "V_dressed_pt*1e-3",
+            "max": 1500,
+            "min": 0.0,
+            "name": "V_dressed_pt",
+            "nbins": 70
+        },
+        {
+            "draw": "V_dressed_m*1e-3",
+            "max": 120.0,
+            "min": 60.0,
+            "name": "V_dressed_m",
+            "nbins": 30
+        },
+        {
+            "draw": "V_undressed_pt*1e-3",
+            "max": 1500,
+            "min": 0.0,
+            "name": "V_undressed_pt",
+            "nbins": 70
+        },
+        {
+            "draw": "V_dressed_m*1e-3",
+            "max": 120.0,
+            "min": 60.0,
+            "name": "V_dressed_m",
+            "nbins": 30
+        },
+        {
+            "draw": "photon_boson_dR",
+            "max": 1,
+            "min": 0,
+            "name": "photon_boson_dR",
+            "nbins": 25
+        },
+        {
+            "draw": "photon_lepton_dressed_dR",
+            "max": 1,
+            "min": 0,
+            "name": "photon_lepton_dressed_dR",
+            "nbins": 25
+        },
+        {
+            "draw": "photon_MCTC",
+            "max": 45,
+            "min": 0,
+            "name": "photon_MCTC",
+            "nbins": 45
+        },
+        {
+            "draw": "photon_lepton_undressed_dR",
+            "max": 1,
+            "min": 0,
+            "name": "photon_lepton_undressed_dR",
+            "nbins": 25
+        },
+        {
+            "draw": "n_jet25",
+            "max": 9.5,
+            "min": -0.5,
+            "name": "n_jet25",
+            "nbins": 10
+        },
+        {
+            "draw": "n_jet50",
+            "max": 9.5,
+            "min": -0.5,
+            "name": "n_jet50",
+            "nbins": 10
+        },
+        {
+            "draw": "jet_pt[0]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "jet1_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "jet_pt[1]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "jet2_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "jet_pt[2]*1e-3",
+            "max": 500.0,
+            "min": 0.0,
+            "name": "jet3_pt",
+            "nbins": 50
+        }
+    ]
+}
