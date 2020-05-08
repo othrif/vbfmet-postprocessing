@@ -144,6 +144,7 @@ for bin_num in bins:
     if not h:
         sTot=bin_num-1
         break
+#sTot=10
 print 'Number of bins found: ',sTot
 table_per_bin={}
 for b in bins: table_per_bin[b]={}
@@ -292,7 +293,8 @@ for keyn in keys_regions:
         table_per_bin_line+=' & %s'  %keyn        
 print table_per_bin_line,' \\\\\\hline\\hline'
 for b in bins:
-    if b>11 or b>sTot:
+    #if b>11 or b>sTot:
+    if b>16 or b>sTot:
         continue
     for v in [0,1,2,3]:
         table_per_bin_line='%s ' %b
