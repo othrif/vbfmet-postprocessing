@@ -25,7 +25,7 @@ processes = {"Zvv_QCD": "((312484 <= runNumber && runNumber <= 312495) )", # || 
              "Wev_QCD": "((312496 <= runNumber && runNumber <= 312507) )", # || (364226 <= runNumber && runNumber <= 364227)
              "Wmv_QCD": "((312508 <= runNumber && runNumber <= 312519) )", # || (364224 <= runNumber && runNumber <= 364225)
              }
-common = "   && jet_pt[0]>80e3 && jet_pt[1]>50e3 && jj_deta>3.8 && jj_dphi<2  && jj_mass>800e3 " #&& met_nolep_et > 200e3
+common = "   && jet_pt[0]>80e3 && jet_pt[1]>50e3 && jj_deta>3.8 && jj_dphi<2  && jj_mass>800e3 &&  n_jet25>=2" #&& met_nolep_et > 200e3
 selection = {
              "Zvv_QCD"  : processes["Zvv_QCD"] + common,
              "Wlv_QCD"  : processes["Wlv_QCD"] + common,

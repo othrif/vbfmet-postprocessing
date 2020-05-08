@@ -87,6 +87,9 @@ private:
     Double_t        crossSection;
 
     Float_t new_w;
+    Float_t new_EventWeight;
+    Float_t new_crossSection;
+    Float_t new_nevents;
 
     Int_t   new_n_jet;
    Int_t   new_n_jet25;
