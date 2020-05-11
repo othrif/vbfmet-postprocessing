@@ -292,7 +292,16 @@ StatusCode HFInputAlg::execute() {
 
   m_tree->GetEntry(m_tree->GetReadEntry());
   // check if we need to output the physics tree for signal overlap
-  if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634 || runNumber==346693 || runNumber==346694 || runNumber==345596)){
+  //signal MC dsid numbers
+  //VBFH125     346600  
+  //ggFH125     346588
+  //VH125       346605,346606,346607
+  //VBFHOther   308275,308277,308278,308279,308280,308281,308282,308283,313134,313135,313136,313137,313138,313139,313140,313141
+  //if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634 || runNumber==346693 || runNumber==346694 || runNumber==345596)){
+  std::vector<int> mcSamples = { 346588, 346600, 412243, 346729, 346730, 346693, 346694, 346605, 346606, 346607, 345596, 346632, 346633, 346634 };
+  if( (isMC && std::count(mcSamples.begin(), mcSamples.end(), runNumber)) || !isMC){
+
+  //if((isMC && (runNumber==346600 || runNumber==346588 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==308275  || runNumber==308277 || runNumber==308278 || runNumber==308279 || runNumber==308280 || runNumber==308281 || runNumber==308282 || runNumber==308283 || runNumber==313134 || runNumber==313135 || runNumber==313136 || runNumber==313137 || runNumber==313138 || runNumber==313139 || runNumber==313140 || runNumber==313141 )) || !isMC){
     m_doSigOverlapTree=true;
     if(m_signalOverlapFileMap.find(runNumber)==m_signalOverlapFileMap.end()){
       stringstream soName;
@@ -302,8 +311,13 @@ StatusCode HFInputAlg::execute() {
       m_signalOverlapTreeMap[runNumber]->SetDirectory(m_signalOverlapFileMap[runNumber]);
       m_signalOverlapTreeMap[runNumber]->Branch("event", &m_sigOverlapEvent, "event/l");
       m_signalOverlapTreeMap[runNumber]->Branch("category",&m_sigOverlapCategory);
-      m_signalOverlapTreeMap[runNumber]->Branch("dsid",&runNumber);
+      m_signalOverlapTreeMap[runNumber]->Branch("DSID",&runNumber);
       m_signalOverlapTreeMap[runNumber]->Branch("year",&year);
+      if(isMC){
+           m_signalOverlapTreeMap[runNumber]->Branch("truth_jj_mass",&truthF_jj_mass);
+           m_signalOverlapTreeMap[runNumber]->Branch("truth_n_jet",&n_jet_truth);
+           if (runNumber==346600 || runNumber==346588) m_signalOverlapTreeMap[runNumber]->Branch("truth_H_pt",&HTXS_Higgs_pt);
+      }
     }
   }else{  m_doSigOverlapTree=false; }
 
@@ -940,6 +954,9 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_eta",1);
   m_tree->SetBranchStatus("jet_m",1);
   m_tree->SetBranchStatus("jet_timing",1);
+  m_tree->SetBranchStatus("n_jet_truth",1);
+  m_tree->SetBranchStatus("truthF_jj_mass",1);
+  if (runNumber==346600 || runNumber==346588)m_tree->SetBranchStatus("HTXS_Higgs_pt",1);
 
   m_tree->SetBranchAddress("runNumber",&runNumber);
   m_tree->SetBranchAddress("randomRunNumber",&randomRunNumber);
@@ -997,6 +1014,9 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_phi",&jet_phi);
   m_tree->SetBranchAddress("jet_eta",&jet_eta);
   m_tree->SetBranchAddress("jet_m",&jet_m);
+  m_tree->SetBranchAddress("n_jet_truth",&n_jet_truth);
+  m_tree->SetBranchAddress("truthF_jj_mass",&truthF_jj_mass);
+  if (runNumber==346600 || runNumber==346588)m_tree->SetBranchAddress("HTXS_Higgs_pt",&HTXS_Higgs_pt);
 
   if(m_extraVars>0 || m_metdef>0){  
     m_tree->SetBranchStatus("met_soft_tst_et",1);

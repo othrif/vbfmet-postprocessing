@@ -187,6 +187,11 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* baseel_eta;
   std::vector<Float_t>* baseel_phi;
   
+  //for overlap ntuples
+  Int_t n_jet_truth; 
+  Double_t truthF_jj_mass; 
+  Float_t HTXS_Higgs_pt;
+
 }; 
 
 #endif //> !VBFANALYSIS_HFINPUTALG_H
