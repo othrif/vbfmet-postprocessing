@@ -265,6 +265,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     m_tree_out->Branch("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);
     //if(m_theoVariation) 
       m_tree_out->Branch("mcEventWeights",&mcEventWeights);
+      m_tree_out->Branch("HTXS_Higgs_pt",&HTXS_Higgs_pt);
   }
   if(m_currentVariation=="Nominal") m_tree_out->Branch("eleANTISF",&eleANTISF);
   m_tree_out->Branch("runNumber",&runNumber);
@@ -883,6 +884,7 @@ StatusCode VBFAnalysisAlg::execute() {
     if(NgenCorrected>0)  weight = crossSection/NgenCorrected;
     else ATH_MSG_WARNING("Ngen " << Ngen[runNumber] << " dsid " << runNumber );
     ATH_MSG_DEBUG("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
+    if(nFileEvt<10)     ATH_MSG_INFO("VBFAnalysisAlg: xs: "<< crossSection << " nevent: " << Ngen[runNumber] );
     //correct the LO SHERPA to H7 EWK
     //if(m_isMC && runNumber>=308092 && runNumber<=308098 && truth_jj_mass>200.0e3) weight*=0.000047991*truth_jj_mass/1.0e3+0.8659;
     if(m_isMC && runNumber>=308092 && runNumber<=308098 && truthF_jj_mass>200.0e3) weight*=0.000047991*truthF_jj_mass/1.0e3+0.8659;
@@ -1093,6 +1095,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if((runNumber>=312448 && runNumber<=312531)){
     passVjetsPTV=true; // these are the KT merged samples 100-500 GeV
     // use passVjetsFilter as it was calculated...nothing more needs to be done here
+    if(SherpaVTruthPt<-10.0) SherpaVTruthPt=truth_V_dressed_pt;
     if(SherpaVTruthPt<120.0e3){ passVjetsFilter=false; passVjetsFilterTauEl=false; } //remove if pTV<140 
   }
   else if((runNumber>=364100 && runNumber<=364113) || // Zmm MAXPTHT
@@ -1103,6 +1106,7 @@ StatusCode VBFAnalysisAlg::execute() {
      (runNumber>=364156 && runNumber<=364169) || // Wmunu MAXPTHT
      (runNumber>=364170 && runNumber<=364183) || // Wenu MAXPTHT
      (runNumber>=364184 && runNumber<=364197)){  // Wtaunu MAXPTHT  
+    if(SherpaVTruthPt<-10.0) SherpaVTruthPt=truth_V_dressed_pt; // protect against this not being filled
     if(SherpaVTruthPt<100.0e3) passVjetsPTV=true; // keep if pTV>100
     //else if(SherpaVTruthPt>500.0e3) passVjetsPTV=true; // remove if pTV>500 // these should come from the PTV samples
     else passVjetsPTV = false;
@@ -1128,12 +1132,14 @@ StatusCode VBFAnalysisAlg::execute() {
   float minDPhijjCut = -1.0;
   float MHTCut = -1.0;
   bool passMJSkim=true;
+  bool TruthSkim=false;
   if(m_LooseSkim && m_currentVariation=="Nominal"){
     METCut = 100.0e3;
     LeadJetPtCut = 60.0e3; // 60.0e3
     subLeadJetPtCut = 50.0e3; // 40.0e3
     MjjCut =2e5; // 2e5
     DEtajjCut =3.5; // 3.5
+    TruthSkim=((SherpaVTruthPt>140e3 || truth_V_dressed_pt>140e3) && n_jet_truth>1 && truthF_jj_mass>800e3 && truth_jet_pt->size()>1 && truth_jet_pt->at(1)>50e3);
   }
   if(m_AltSkim && m_currentVariation=="Nominal"){
     METCut = 100.0e3;
@@ -1167,9 +1173,10 @@ StatusCode VBFAnalysisAlg::execute() {
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
   if(!passMJSkim) return StatusCode::SUCCESS;
-  bool GammaMETSR = (n_ph>0 || n_el>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
+  bool GammaMETSR = (n_ph>0 || n_el>0 || (baseph_pt && baseph_pt->size()>0)) && (jj_deta>2.5) && (jj_mass>200.0e3);
+  if(m_currentVariation!="Nominal") GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
-  if (n_jet < 2) return StatusCode::SUCCESS;
+  if (n_jet < 2 && !TruthSkim) return StatusCode::SUCCESS;
   if (!(n_jet < 5) && !(m_LooseSkim || m_AltSkim)) return StatusCode::SUCCESS;
   if (!(n_jet < 5) &&  (m_AltSkim)) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("n_jet = 2!");
@@ -1178,7 +1185,9 @@ StatusCode VBFAnalysisAlg::execute() {
   if(!m_LooseSkim){
     if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (met_cst_jet>MHTCut) & (jj_dphi < DPhijjCut) & (minDPhijjCut<jj_dphi) & (jj_deta > DEtajjCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
   }else{
-    if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (met_cst_jet>MHTCut) & (jj_dphi < DPhijjCut) & (minDPhijjCut<jj_dphi) & (jj_deta > DEtajjCut) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+    if(!TruthSkim){
+      if (!(((jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut) & (met_cst_jet>MHTCut) & (jj_dphi < DPhijjCut) & (minDPhijjCut<jj_dphi) & (jj_deta > DEtajjCut) & (jj_mass > MjjCut)) || GammaMETSR)) return StatusCode::SUCCESS; // was 1e6 for mjj
+    }
   }
   // skim on the photon plus jet events
   if(m_PhotonSkim && !GammaMETSR) return StatusCode::SUCCESS;
@@ -1272,7 +1281,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if (CRZmm) ATH_MSG_DEBUG ("It's CRZmm!"); else ATH_MSG_DEBUG ("It's NOT CRZmm");
   if ((trigger_lep > 0 || passMETTrig) && (passMETNoLepCut) && (n_baseel+n_basemu>=2)){ CRZtt = true;}
   if (CRZtt) ATH_MSG_DEBUG ("It's CRZtt!"); else ATH_MSG_DEBUG ("It's NOT CRZtt"); // this allows the baseline>=2 to pass
-
+  
   // reset the electron anti-ID SF to only affect W events. To be fixed. kind of a hack
   bool isWenu = ((runNumber>=364170 && runNumber<=364183) || (runNumber>=363600 && runNumber<=363623) || (runNumber>=312496 && runNumber<=312507) || (runNumber==363359 || runNumber==363360 || runNumber==363489 || runNumber==308096 || runNumber==363237));
   bool isWmnu = ((runNumber>=364156 && runNumber<=364169) || (runNumber>=363624 && runNumber<=363647) || (runNumber>=312508 && runNumber<=312519) || (runNumber==363359 || runNumber==363360 || runNumber==363489 || runNumber==308097 || runNumber==363238));
@@ -1403,7 +1412,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //std::cout << "VBFAnalysisAlg: evtNum: " << eventNumber <<" wTOT: " << w << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " Vjets syst: " << tmp_vjWeight << " n_el_w: " << n_el_w << " n_el: " << n_el << " n_mu_w: " << n_mu_w << " n_mu: " << n_mu << " n_jet " << n_jet << std::endl;
 
   // only save events that pass any of the regions
-  if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR)) return StatusCode::SUCCESS;
+  if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR || TruthSkim)) return StatusCode::SUCCESS;
   double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
   computeMETj(met_tenacious_tst_phi, jet_phi, m_met_tenacious_tst_j1_dphi,m_met_tenacious_tst_j2_dphi);
   met_tenacious_tst_j1_dphi = m_met_tenacious_tst_j1_dphi;
@@ -1531,6 +1540,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("HTXS_prodMode", 1);
     m_tree->SetBranchStatus("HTXS_errorCode", 1);
     m_tree->SetBranchStatus("HTXS_Stage1_1_Fine_Category_pTjet25", 1);
+    m_tree->SetBranchStatus("HTXS_Higgs_pt", 1);
   }
   if(m_isMC) m_tree->SetBranchStatus("truthF_jj_mass", 1);
   m_tree->SetBranchStatus("puWeight", 1);
@@ -1743,6 +1753,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("HTXS_prodMode", &HTXS_prodMode);
     m_tree->SetBranchAddress("HTXS_errorCode", &HTXS_errorCode);
     m_tree->SetBranchAddress("HTXS_Stage1_1_Fine_Category_pTjet25", &HTXS_Stage1_1_Fine_Category_pTjet25);
+    m_tree->SetBranchAddress("HTXS_Higgs_pt", &HTXS_Higgs_pt);
   }
   if(m_isMC) m_tree->SetBranchAddress("truthF_jj_mass", &truthF_jj_mass);
   m_tree->SetBranchAddress("puWeight", &puWeight);

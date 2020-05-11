@@ -123,7 +123,7 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==22) bins=17; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800 + 3 bins low MET
 
   // multivariate number of bins
-  if(doTMVA &&  doVBFMETGam) bins=7;
+  if(doTMVA &&  doVBFMETGam) bins=5;
   if(doTMVA && !doVBFMETGam){
     //if(m_binning==11) bins=7;
     bins=12;
@@ -683,11 +683,13 @@ StatusCode HFInputAlg::execute() {
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.66800000, 0.76700000, 0.82300000, 0.86250000, 0.89500000, 0.92800000, 1.0 }; // var9_noNjetCST
 
     if(doVBFMETGam){
-      float tmvaBinBoundaries[7] = { 0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-      for(unsigned i=0; i<6; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } }
+      //float tmvaBinBoundaries[7] = { 0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+      float tmvaBinBoundaries[5] = {0.0, 0.55, 0.65 , 0.8, 1.0};
+      for(unsigned i=0; i<4; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } }
     }else{
       //float tmvaBinBoundaries[8] = { 0.0000000, 0.67050000, 0.74600000, 0.79600000, 0.83300000, 0.86450000, 0.89500000, 1.0 }; // var10_noNjet
-      float tmvaBinBoundaries[12] = {0.0, 0.75100000, 0.80770000, 0.83910000, 0.86250000, 0.88030000, 0.89640000, 0.90950000, 0.92100000, 0.93210000, 0.9448,1.0 }; // 11bins
+      //float tmvaBinBoundaries[12] = {0.0, 0.75100000, 0.80770000, 0.83910000, 0.86250000, 0.88030000, 0.89640000, 0.90950000, 0.92100000, 0.93210000, 0.9448,1.0 }; // 11bins
+      float tmvaBinBoundaries[12] = {0.0,  0.83490000, 0.86300000, 0.87740000, 0.88990000, 0.90140000, 0.91320000, 0.92450000, 0.93410000, 0.94210000, 0.94960000, 1.0};
       for(unsigned i=0; i<11; ++i){ if(tmva>tmvaBinBoundaries[i] && tmva<=tmvaBinBoundaries[i+1]){ bin=i; break; } } 
     }
     //float tmvaBinBoundaries[8] = { 0.0000000, 0.71250000, 0.80000000, 0.84850000, 0.88300000, 0.91150000, 0.93800000,1.0 };// var 9 - new tenacious cut
@@ -752,7 +754,7 @@ StatusCode HFInputAlg::execute() {
       }else{// low met
 	if(m_binning==21) return StatusCode::SUCCESS;
 	else{
-	  if (jj_mass < 1.5e6) return StatusCode::SUCCESS;
+	  if (jj_mass < 1.5e6 || n_jet>2) return StatusCode::SUCCESS;
 	  else if (jj_mass < 2e6)   bin = 13;
 	  else if (jj_mass < 3.5e6) bin = 14;
 	  else bin = 15;

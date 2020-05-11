@@ -1076,6 +1076,7 @@ class DrawStack:
                 bhist = ent.hist.Clone()
                 bhist.SetDirectory(0)
             else:
+                #print bkg,ent.hist.Integral()
                 bhist.Add(ent.hist)
 
         return bhist
@@ -1976,14 +1977,13 @@ class DrawStack:
                                         zBKG = self.bkgs['zqcd'+madgraph].hist.Integral(ibin,ibin)+self.bkgs['zewk'].hist.Integral(ibin,ibin)
                                 total_zcr=-100.0
                                 total_zcrOpp=-100.0
-                                #print 'self.zcr_stack: ',self.zcr_stack
                                 if self.zcr_stack and not self.zcr_stack.bkg_sum:
                                     self.zcr_stack.bkg_sum = self.zcr_stack.GetTotalBkgHist()
                                 total_zcr = self.zcr_stack.bkg_sum.Integral(0,ibin)
                                 if leftToRight==0 and self.zcr_stack:
                                     total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,10001)
                                 elif (leftToRight==2) and self.zcr_stack:
-                                    total_zcr = self.zcr_stack.bkg_sum.Integral(ibin,ibin)
+                                    total_zcr = self.zcr_stack.bkg_sum.GetBinContent(ibin)
                                 elif leftToRight==3: # add bins together
                                     total_zcrOpp = self.zcr_stack.bkg_sum.Integral(ibin+1,10001)
                                 elif leftToRight==4 and ibin%2==0:# pair every 2 bins together
@@ -2011,6 +2011,8 @@ class DrawStack:
                                     elif signifValOpp>0.0 and not signifVal>0:
                                         signifVal=signifValOpp
                                 #print signifVal
+                                #signifVal=4.*total_zcr/cut_Nbkg
+                                #print signifVal,cut_Nbkg,total_zcr
                                 self.signifCR.SetBinContent(ibin, signifVal)
 
             # Set Names

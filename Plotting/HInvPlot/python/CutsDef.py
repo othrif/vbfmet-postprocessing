@@ -443,8 +443,8 @@ def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET
             cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 100.0')]
         else:
             if options.ReverseFJVT:
-                cutMET.AddCut(CutItem('HighMET', '%s > %s && j0fjvt > 0.5' %(met_choice,highMET)), 'OR')
-                cutMET.AddCut(CutItem('HighMET', '%s > %s && j1fjvt > 0.5' %(met_choice,highMET)), 'OR')
+                cutMET.AddCut(CutItem('HighMET1', '%s > %s && j0fjvt > 0.5' %(met_choice,highMET)), 'OR')
+                cutMET.AddCut(CutItem('HighMET2', '%s > %s && j1fjvt > 0.5' %(met_choice,highMET)), 'OR')
             else:
                 cutMET.AddCut(CutItem('HighMET', '%s > %s' %(met_choice,highMET)), 'OR')
             if options.ReverseFJVT:
