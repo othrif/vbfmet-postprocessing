@@ -7,14 +7,14 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst,Ext)
-        self.sampleTypeList = ["W_EWKPow","W_EWK","W_strongExt","W_strong","Z_EWKPow","Z_EWK", "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strong228", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
+        self.sampleTypeList = ["W_EWKPow","W_EWKSh","W_EWK","W_strongExt","W_strong","Z_EWKPow","W_EWKSh","Z_EWK", "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strong228", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
                                "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","VBFHAltSignal","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',
                                'VBFH3000','VBFH2000','VBFH1000','VBFH750','VBFH300','VBFH100','VBFH50','VBFH75',
                                "data"] # do not change order
 
         self.sampleMap = {'data':['data'],
-                          'W_EWK':['W_EWK',"W_EWKPow"],
-                          'Z_EWK':['Z_EWK',"Z_EWKPow"],
+                          'W_EWK':['W_EWK',"W_EWKPow","W_EWKSh"],
+                          'Z_EWK':['Z_EWK',"Z_EWKPow","Z_EWKSh"],
                           'W_strong':['W_strong'],
                           'W_strongExt':['W_strongExt'],
                           'Z_strong':['Z_strong','Z_strong_VBFFilt','Z_strong_LowMass'],
@@ -79,7 +79,7 @@ class sample(object):
         if (self.isMC):
             print "runNumebr::: ",self.runNumber
             if (self.runNumber >= 308096 and self.runNumber <= 308098):
-                self.sampleType = "W_EWK"
+                self.sampleType = "W_EWKSh"
             elif (self.runNumber >= 364500 and self.runNumber <= 364519) or (self.runNumber>=345775 and self.runNumber<=345784) or (self.runNumber>=364550 and self.runNumber<=364584) or (self.runNumber>=700011 and self.runNumber<=700014):
                 self.sampleType = "Zg_strong"
             elif (self.runNumber >= 364520 and self.runNumber <= 364535) or (self.runNumber >= 700015 and self.runNumber <= 700017):
@@ -101,7 +101,7 @@ class sample(object):
             elif (self.runNumber >= 363600 and self.runNumber <= 363671) or (self.runNumber >= 311445 and self.runNumber <= 311453):
                 self.sampleType = "W_strong" # madgraph
             elif (self.runNumber >= 308092 and self.runNumber <= 308095):
-                self.sampleType = "Z_EWK"
+                self.sampleType = "Z_EWKSh"
             elif (self.runNumber >= 345099 and self.runNumber <= 345102):
                 self.sampleType = "Z_strong_VBFFilt"
             elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515) or (self.runNumber>=366010 and self.runNumber<=366035) or (self.runNumber>=311429 and self.runNumber<=311444):
@@ -111,9 +111,9 @@ class sample(object):
             elif self.runNumber==421301:
                 self.sampleType = "Z_strong228"
             elif (self.runNumber>=363233 and self.runNumber<=363236) or (self.runNumber==830007):
-                self.sampleType = "Z_EWKPow"
+                self.sampleType = "Z_EWK"
             elif (self.runNumber>=363237 and self.runNumber<=363239)  or (self.runNumber==830006):
-                self.sampleType = "W_EWKPow"
+                self.sampleType = "W_EWK"
             elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)) or (self.runNumber>=410642 and self.runNumber<=410649) or self.runNumber==410642 or self.runNumber==410643:
                 self.sampleType = "ttbar"
             elif self.runNumber==346600:

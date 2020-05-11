@@ -108,3 +108,9 @@ python VBFAnalysis/scripts/sysPlotv2.py -i  /tmp/HFALL_feb17d_sysNew_smooth5.New
 # run on condor over all the contributions and nominal only for photon analysis
 submitHFInputCondor.py --mergeKTPTV --extraVars 7 --Binning 13 -d submitTest -i /home/schae/testarea/HInv/runSherpa227/v34ATight120/ -n --slc7 --doVBFMETGam
 ```
+
+```bash
+# run on condor over all the contributions and nominal only for update cut-based analysis
+submitHFInputCondor.py --mergeKTPTV --extraVars 7 --Binning 22 -d submitTest -i /share/t3data2/schae/PileupStudies/April30_EWKV/mc16a/v41a/ --slc7  -n --METCut 160000
+```
+
