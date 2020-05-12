@@ -27,7 +27,7 @@ public:
 
 private:
     bool m_theoVariation;
-    bool noSkim;
+    int m_skim;
     std::map< std::string, std::vector<TH1*> >  h_theoVariations;  //!
     TH1D* make1DHist (TString name, TString title, unsigned nbins, float low, float high);
     int npevents = 0;
@@ -82,6 +82,8 @@ private:
    vector<float>   *jet_phi;
    vector<float>   *jet_m;
    vector<int>     *jet_label;
+   Float_t         met_et;
+   Float_t         met_phi;
 
 
     Double_t        crossSection;
@@ -121,6 +123,8 @@ private:
   vector<float> *new_photon_lepton_dressed_dR;
   vector<float> *new_photon_lepton_undressed_dR;
 
+   Float_t         new_met_nolep_et;
+   Float_t         new_met_nolep_phi;
 
 
 };

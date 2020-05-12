@@ -10,7 +10,7 @@ You can run steps 2-4 using this script: `source plotAll.sh`, or following the s
 ``` bash
 #python pyAnalysis/makeHists.py processed/extract_* --config pyAnalysis/hists_config_checks.json --treename nominal --eventWeight "w" --newOutputs --name checks_
 python pyAnalysis/makeHists.py processed/extract_* --config pyAnalysis/hists_config_Vdefs.json --treename nominal --eventWeight "w" --newOutputs --name checks_
-python pyAnalysis/makeHists.py processed/extract_* --config pyAnalysis/hists_config_NjetTJV.json --treename nominal --eventWeight "w" --newOutputs --name tjv_
+python pyAnalysis/makeHists.py processed/extract_* --config pyAnalysis/hists_config_NjetTJV_Vdefs.json --treename nominal --eventWeight "w" --newOutputs --name tjv_
 ```
 The configuration of the histograms (additional selection, binning, name, etc.) is specified using a `json` files:
 - `hists_config_checks.json` is to draw all distributions to perform checks

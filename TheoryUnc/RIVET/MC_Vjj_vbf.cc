@@ -183,13 +183,13 @@ namespace Rivet {
 	cut_detajj = 2.5;
      }
 
-     
+
 
      const FastJets& jetproj = applyProjection<FastJets>(event, "Jets");
 
      // Apply cuts on jets
      Jets jets;
-     double htjets = 0; 
+     double htjets = 0;
      foreach(const Jet& jet_iter,jetproj.jetsByPt( 0.*GeV )) {
       if( jet_iter.momentum().abseta() < cut_etaj ) {
         jets.push_back(jet_iter);
@@ -200,8 +200,8 @@ namespace Rivet {
 
      //VBF selection
      if (jets.size() < 2) vetoEvent;
-     if (jets[0].momentum().pT() < cut_pTj1) vetoEvent; 
-     if (jets[1].momentum().pT() < cut_pTj2) vetoEvent; 
+     if (jets[0].momentum().pT() < cut_pTj1) vetoEvent;
+     if (jets[1].momentum().pT() < cut_pTj2) vetoEvent;
 
      double mjj=(jets[0].momentum()+jets[1].momentum()).mass();
      if (mjj < cut_mjj) vetoEvent;
@@ -223,7 +223,7 @@ namespace Rivet {
      const vector<DressedLepton>& leptons = apply<DressedLeptons>(event, "leptons").dressedLeptons();
 
 
-     FourMomentum vec; 
+     FourMomentum vec;
      bool lcuts = false;
      if (_mode == 1) {
 	     //Z->ll selection
@@ -232,12 +232,12 @@ namespace Rivet {
 	     vec = leptons[0].momentum()+leptons[1].momentum();
 	     if (leptons[0].momentum().pT() > 30 && abs(leptons[0].momentum().eta()) < 2.5
 	      && leptons[1].momentum().pT() > 30 && abs(leptons[1].momentum().eta()) < 2.5
-		) lcuts = true; 
+		) lcuts = true;
      } else if (_mode == 2) {
 	     //W->ln selection
 	     if (leptons.size() < 1 || neutrinos.size() < 1) vetoEvent;
 	     vec = leptons[0].momentum()+neutrinos[0].momentum();
-	     if (leptons[0].momentum().pT() > 30 && abs(leptons[0].momentum().eta()) < 2.5) lcuts = true; 
+	     if (leptons[0].momentum().pT() > 30 && abs(leptons[0].momentum().eta()) < 2.5) lcuts = true;
      } else if (_mode == 3) {
 	     //Z->nn selection
 	     if (neutrinos.size() < 2) vetoEvent;
@@ -271,7 +271,7 @@ namespace Rivet {
      if (jets.size() > 2) _histos["j3_pT"]->fill(jets[2].momentum().pT(), event);
      _histos["j1_eta"]->fill(jets[0].momentum().eta(), event);
      _histos["j2_eta"]->fill(jets[1].momentum().eta(), event);
-     if (jets.size() > 2) _histos["j3_eta"]->fill(jets[2].momentum().eta(), event); 
+     if (jets.size() > 2) _histos["j3_eta"]->fill(jets[2].momentum().eta(), event);
 
      _histos["V_pT"]->fill(pTV, event);
      _histos["V_pT_log"]->fill(pTV, event);
@@ -347,7 +347,7 @@ namespace Rivet {
 	     if (jets.size() > 2) _histos["j3_pT"]->fill(jets[2].momentum().pT(), event);
 	     _histos["lcuts_j1_eta"]->fill(jets[0].momentum().eta(), event);
 	     _histos["lcuts_j2_eta"]->fill(jets[1].momentum().eta(), event);
-	     if (jets.size() > 2) _histos["j3_eta"]->fill(jets[2].momentum().eta(), event); 
+	     if (jets.size() > 2) _histos["j3_eta"]->fill(jets[2].momentum().eta(), event);
 
 	     _histos["lcuts_V_pT"]->fill(pTV, event);
 	     _histos["lcuts_V_pT_log"]->fill(pTV, event);
@@ -410,7 +410,7 @@ namespace Rivet {
 	     }
 
      }
-     
+
 
     }
 
@@ -427,8 +427,8 @@ namespace Rivet {
     }
 
   protected:
-    size_t _mode; 
-    int _cuts; 
+    size_t _mode;
+    int _cuts;
 
   private:
 	std::map<string,NLOHisto1DPtr> _histos;

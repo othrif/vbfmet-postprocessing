@@ -19,8 +19,8 @@ VBFVjetsAlg::VBFVjetsAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
-  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", "path to a file with the number of events processed" );
-  declareProperty( "noSkim", noSkim = false, "No skim");
+  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v44.root", "path to a file with the number of events processed" );
+  declareProperty( "skim", m_skim = 2, "Skim options: 0 No skimming applied, 1 Loose skimming, 2 tight skimming (default), 3 skimming matching ACE");
 }
 
 VBFVjetsAlg::~VBFVjetsAlg() {}
@@ -57,6 +57,9 @@ StatusCode VBFVjetsAlg::initialize() {
   m_tree_out->Branch("jet_phi",&jet_phi);
   m_tree_out->Branch("jet_E",&jet_E);
 
+  m_tree_out->Branch("met_et",&met_et);
+  m_tree_out->Branch("met_phi",&met_phi);
+
   m_tree_out->Branch("w",&new_w);
   m_tree_out->Branch("EventWeight",&new_EventWeight);
   m_tree_out->Branch("crossSection",&new_crossSection);
@@ -91,6 +94,9 @@ StatusCode VBFVjetsAlg::initialize() {
   m_tree_out->Branch("photon_boson_dR", &new_photon_boson_dR);
   m_tree_out->Branch("photon_lepton_dressed_dR", &new_photon_lepton_dressed_dR);
   m_tree_out->Branch("photon_lepton_undressed_dR", &new_photon_lepton_undressed_dR);
+
+  m_tree_out->Branch("met_nolep_et",&new_met_nolep_et);
+  m_tree_out->Branch("met_nolep_phi",&new_met_nolep_phi);
 
   //Register the output TTree
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
@@ -292,11 +298,25 @@ if (!decayFound) {
 int nDecay = 0;
 int nDecay_boson = 0;
 
+new_met_nolep_et = -9999.;
+new_met_nolep_phi = -9999.;
+Float_t px = 0;
+Float_t py = 0;
+
 for (unsigned int iLep = 0; iLep < leptons.size(); iLep++) {
   nDecay++;
   vV += leptons[iLep];
   vV_unDressed += leptons_unDressed[iLep];
+
+  px += leptons[iLep].Pt() * TMath::Cos(leptons[iLep].Phi());
+  py += leptons[iLep].Pt() * TMath::Sin(leptons[iLep].Phi());
 }
+
+Float_t mpx = met_et*TMath::Cos(met_phi) + px;
+Float_t mpy = met_et*TMath::Sin(met_phi) + py;
+new_met_nolep_et = TMath::Sqrt(mpx*mpx+mpy*mpy);
+new_met_nolep_phi = TMath::ATan2(mpy,mpx);
+
 for (unsigned int iNu = 0; iNu < neutrinos.size(); iNu++) {
   nDecay++;
   vV += neutrinos[iNu];
@@ -334,9 +354,26 @@ for (unsigned int iPh = 0; iPh < photons.size(); iPh++) {
   new_V_undressed_phi = vV_unDressed.Phi();
   new_V_undressed_eta = vV_unDressed.Eta();
 
-  bool PTV = (new_V_dressed_pt>150e3); // || new_V_dressed_pt > 150e3 || new_boson_pt > 150e3);
-  // new_V_dressed_pt > 100e3 &&
-  if ( PTV && (jet_pt->at(0) > 100.0e3) && (jet_pt->at(1) > 50.0e3) && (jj_mass > 500e3) && (jj_deta > 2.5)){
+  //bool PTV = ((new_V_dressed_pt>150e3) || new_V_dressed_pt > 150e3 || new_boson_pt > 150e3);
+  bool tightSkim = ( (new_V_dressed_pt>200e3) && (jet_pt->at(0) > 80.0e3)  && (jet_pt->at(1) > 50.0e3) && (jj_mass > 800e3) && (jj_deta > 3.8) && (jj_dphi < 2));
+  bool looseSkim = ( (new_V_dressed_pt>100e3) && (jet_pt->at(0) > 80.0e3)  && (jet_pt->at(1) > 50.0e3) && (jj_mass > 500e3) && (jj_deta > 2.5) );
+  bool ace = ( (new_V_dressed_pt>150e3) && (jet_pt->at(0) > 100.0e3) && (jet_pt->at(1) > 50.0e3) && (jj_mass > 500e3) && (jj_deta > 2.5));
+  bool passSkim = tightSkim;
+  std::cout << m_skim << std::endl;
+  if(m_skim == 0){
+    passSkim = true;
+    std::cout << "Got here! passSkim = true" << std::endl;
+  }
+  if(m_skim == 1){
+    passSkim = looseSkim;
+        std::cout << "Got here! passSkim = looseSkim" << std::endl;
+  }
+  if(m_skim == 2)
+    passSkim = tightSkim;
+  if(m_skim == 3)
+    passSkim = ace;
+
+  if ( passSkim ){
     m_tree_out->Fill();
   }
 
@@ -393,6 +430,8 @@ StatusCode VBFVjetsAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_phi", 1);
   m_tree->SetBranchStatus("jet_m" , 1);
   m_tree->SetBranchStatus("jet_label", 1);
+  m_tree->SetBranchStatus("met_et", 1);
+  m_tree->SetBranchStatus("met_phi", 1);
 
   m_tree->SetBranchAddress("run",&run );
   m_tree->SetBranchAddress("event",&event );
@@ -424,6 +463,8 @@ StatusCode VBFVjetsAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_phi", &jet_phi);
   m_tree->SetBranchAddress("jet_m" , &jet_m);
   m_tree->SetBranchAddress("jet_label", &jet_label);
+  m_tree->SetBranchAddress("met_et", &met_et);
+  m_tree->SetBranchAddress("met_phi", &met_phi);
 
   return StatusCode::SUCCESS;
 }
