@@ -402,7 +402,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
 
 
     hratio.GetYaxis().SetTitle(num_name+' / '+den_name)
-    hratio.GetYaxis().SetRangeUser(0.5,1.5)
+    hratio.GetYaxis().SetRangeUser(0.,1.5)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);

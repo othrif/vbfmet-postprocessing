@@ -19,8 +19,8 @@ VBFVjetsAlg::VBFVjetsAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
-  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", "path to a file with the number of events processed" );
-  declareProperty( "noSkim", noSkim = false, "No skim");
+  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v44.root", "path to a file with the number of events processed" );
+  declareProperty( "skim", m_skim = 2, "Skim options: 0 No skimming applied, 1 Loose skimming, 2 tight skimming (default), 3 skimming matching ACE");
 }
 
 VBFVjetsAlg::~VBFVjetsAlg() {}
@@ -30,8 +30,8 @@ StatusCode VBFVjetsAlg::initialize() {
 
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
-  std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
- // std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
+  //std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+  std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
   //std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
@@ -57,7 +57,13 @@ StatusCode VBFVjetsAlg::initialize() {
   m_tree_out->Branch("jet_phi",&jet_phi);
   m_tree_out->Branch("jet_E",&jet_E);
 
+  m_tree_out->Branch("met_et",&met_et);
+  m_tree_out->Branch("met_phi",&met_phi);
+
   m_tree_out->Branch("w",&new_w);
+  m_tree_out->Branch("EventWeight",&new_EventWeight);
+  m_tree_out->Branch("crossSection",&new_crossSection);
+  m_tree_out->Branch("nevents",&new_nevents);
 
   m_tree_out->Branch("n_boson",&new_nbosons);
   m_tree_out->Branch("boson_m",&new_boson_m);
@@ -88,6 +94,9 @@ StatusCode VBFVjetsAlg::initialize() {
   m_tree_out->Branch("photon_boson_dR", &new_photon_boson_dR);
   m_tree_out->Branch("photon_lepton_dressed_dR", &new_photon_lepton_dressed_dR);
   m_tree_out->Branch("photon_lepton_undressed_dR", &new_photon_lepton_undressed_dR);
+
+  m_tree_out->Branch("met_nolep_et",&new_met_nolep_et);
+  m_tree_out->Branch("met_nolep_phi",&new_met_nolep_phi);
 
   //Register the output TTree
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
@@ -176,7 +185,9 @@ if (364216 <= run && run <= 364229 && fabs(mconly_weight) > 100) mconly_weight =
  if(NgenCorrected>0)  weight = crossSection/NgenCorrected;
 
  new_w = weight*mconly_weight;
-
+ new_EventWeight = mconly_weight;
+ new_crossSection = crossSection;
+ new_nevents = NgenCorrected;
 
   // JETS
   int njet=0, njet25=0, njet30=0, njet35=0, njet40=0, njet50=0;
@@ -287,11 +298,25 @@ if (!decayFound) {
 int nDecay = 0;
 int nDecay_boson = 0;
 
+new_met_nolep_et = -9999.;
+new_met_nolep_phi = -9999.;
+Float_t px = 0;
+Float_t py = 0;
+
 for (unsigned int iLep = 0; iLep < leptons.size(); iLep++) {
   nDecay++;
   vV += leptons[iLep];
   vV_unDressed += leptons_unDressed[iLep];
+
+  px += leptons[iLep].Pt() * TMath::Cos(leptons[iLep].Phi());
+  py += leptons[iLep].Pt() * TMath::Sin(leptons[iLep].Phi());
 }
+
+Float_t mpx = met_et*TMath::Cos(met_phi) + px;
+Float_t mpy = met_et*TMath::Sin(met_phi) + py;
+new_met_nolep_et = TMath::Sqrt(mpx*mpx+mpy*mpy);
+new_met_nolep_phi = TMath::ATan2(mpy,mpx);
+
 for (unsigned int iNu = 0; iNu < neutrinos.size(); iNu++) {
   nDecay++;
   vV += neutrinos[iNu];
@@ -329,10 +354,34 @@ for (unsigned int iPh = 0; iPh < photons.size(); iPh++) {
   new_V_undressed_phi = vV_unDressed.Phi();
   new_V_undressed_eta = vV_unDressed.Eta();
 
-bool PTV = (new_V_undressed_pt>100e3 || new_V_dressed_pt > 100e3 || new_boson_pt > 100e3);
-if ( PTV && (jet_pt->at(0) > 80.0e3) && (jet_pt->at(1) > 50.0e3) && (jj_mass > 500e3) && (jj_deta > 3.8) )
-  m_tree_out->Fill();
+  //bool PTV = ((new_V_dressed_pt>150e3) || new_V_dressed_pt > 150e3 || new_boson_pt > 150e3);
+  bool tightSkim = ( (new_V_dressed_pt>200e3) && (jet_pt->at(0) > 80.0e3)  && (jet_pt->at(1) > 50.0e3) && (jj_mass > 800e3) && (jj_deta > 3.8) && (jj_dphi < 2));
+  bool looseSkim = ( (new_V_dressed_pt>100e3) && (jet_pt->at(0) > 80.0e3)  && (jet_pt->at(1) > 50.0e3) && (jj_mass > 500e3) && (jj_deta > 2.5) );
+  bool ace = ( (new_V_dressed_pt>150e3) && (jet_pt->at(0) > 100.0e3) && (jet_pt->at(1) > 50.0e3) && (jj_mass > 500e3) && (jj_deta > 2.5));
+  bool passSkim = tightSkim;
+  std::cout << m_skim << std::endl;
+  if(m_skim == 0){
+    passSkim = true;
+    std::cout << "Got here! passSkim = true" << std::endl;
+  }
+  if(m_skim == 1){
+    passSkim = looseSkim;
+        std::cout << "Got here! passSkim = looseSkim" << std::endl;
+  }
+  if(m_skim == 2)
+    passSkim = tightSkim;
+  if(m_skim == 3)
+    passSkim = ace;
 
+  if ( passSkim ){
+    m_tree_out->Fill();
+  }
+
+/*if (event == 1013191 || event == 1013369 || event == 1018864) // || event == 1021688 || event == 1028037 || event == 1036430 || event == 1040676 || event == 1040790 || event == 1048612 || event == 1051420 || event == 1053203 || event == 1058369 || event == 1067499 || event == 1069777 || event == 1073575 || event == 1074182 || event == 1086560 || event == 1090537 || event == 1091793 || event == 1092553 || event == 1093251 || event == 1095526 || event == 1096625 || event == 1108058 || event == 1112330 || event == 1118256 || event == 1123150 || event == 1127248 || event == 1131208 || event == 1132446 || event == 1134023 || event == 1136903 || event == 1139088 || event == 1139460 || event == 114664 || event == 1152632 || event == 1154077 || event == 1158359 || event == 1159855 || event == 1164014 || event == 1166433 || event == 1169503 || event == 1180737 || event == 1182870 || event == 1183312 || event == 1185824 || event == 11859 || event == 1193667 || event == 1208051 || event == 1209442 || event == 1217393 || event == 1218480 || event == 1219221 || event == 1229717 || event == 1229795 || event == 1231006 || event == 1232332 || event == 1244509 || event == 124612 || event == 1246269 || event == 1252432 || event == 125615 || event == 1258926 || event == 1269575 || event == 127259 || event == 1277346 || event == 1279475 || event == 1282725 || event == 1286677 || event == 1293346 || event == 1297965 || event == 1300467 || event == 1300801 || event == 1303113 || event == 1305170 || event == 1308861 || event == 1312834 || event == 1315563 || event == 1324883 || event == 1326641 || event == 1337867 || event == 1345608 || event == 134755 || event == 1356954 || event == 1359297 || event == 1360292 || event == 1361479 || event == 1363689 || event == 1365056 || event == 1367539 || event == 137713 || event == 1377993 || event == 1381397 || event == 1382938 || event == 1388681 || event == 1389224 || event == 1390444 || event == 139095 || event == 1391663 || event == 139537 || event == 1398943 || event == 140921 || event == 14281 || event == 151216 || event == 161996 || event == 162879 || event == 163722 || event == 177715 || event == 180509 || event == 184043 || event == 185115 || event == 185992 || event == 186892 || event == 191126 || event == 205445 || event == 221510 || event == 222090 || event == 223535 || event == 22496 || event == 228090 || event == 238888 || event == 25742 || event == 258419 || event == 259188 || event == 261641 || event == 262961 || event == 265910 || event == 267606 || event == 273710 || event == 282378 || event == 283562 || event == 284881 || event == 284982 || event == 288652 || event == 290315 || event == 291053 || event == 296312 || event == 302547 || event == 307668 || event == 310811 || event == 319444 || event == 324207 || event == 328218 || event == 333778 || event == 342705 || event == 343682 || event == 346567 || event == 346769 || event == 353000 || event == 356424 || event == 363747 || event == 369656 || event == 375903 || event == 375946 || event == 376389 || event == 378509 || event == 382040 || event == 384446 || event == 388462 || event == 389349 || event == 39 || event == 390662 || event == 393111 || event == 399133 || event == 402446 || event == 404607 || event == 404749 || event == 413017 || event == 417869 || event == 424769 || event == 42789 || event == 429660 || event == 43049 || event == 430524 || event == 431011 || event == 43749 || event == 443231 || event == 445187 || event == 447968 || event == 449750 || event == 449838 || event == 457199 || event == 459516 || event == 461563 || event == 464631 || event == 468708 || event == 472610 || event == 476392 || event == 47838 || event == 482837 || event == 489876 || event == 495608 || event == 501975 || event == 503436 || event == 508843 || event == 514236 || event == 518054 || event == 518108 || event == 519169 || event == 52037 || event == 528681 || event == 530478 || event == 533700 || event == 534009 || event == 534027 || event == 535441 || event == 539860 || event == 543992 || event == 544692 || event == 55149 || event == 563953 || event == 577082 || event == 577959 || event == 579681 || event == 582055 || event == 58335 || event == 586935 || event == 592997 || event == 606051 || event == 609675 || event == 610510 || event == 611380 || event == 611431 || event == 611732 || event == 612101 || event == 619702 || event == 621699 || event == 624584 || event == 625259 || event == 625533 || event == 631379 || event == 632007 || event == 632973 || event == 633806 || event == 65132 || event == 655765 || event == 658537 || event == 661033 || event == 665683 || event == 668403 || event == 670669 || event == 670840 || event == 672885 || event == 679152 || event == 680877 || event == 687540 || event == 690785 || event == 694749 || event == 695569 || event == 703372 || event == 706518 || event == 706561 || event == 707475 || event == 708551 || event == 709992 || event == 711989 || event == 712987 || event == 715028 || event == 72429 || event == 724515 || event == 725480 || event == 728012 || event == 728197 || event == 730304 || event == 730665 || event == 731494 || event == 734536 || event == 735968 || event == 745596 || event == 748070 || event == 750989 || event == 754785 || event == 759356 || event == 765065 || event == 76725 || event == 771313 || event == 778403 || event == 7789 || event == 782251 || event == 782531 || event == 783329 || event == 78627 || event == 787282 || event == 78976 || event == 79238 || event == 798327 || event == 79923 || event == 801339 || event == 805755 || event == 806832 || event == 807108 || event == 811649 || event == 813117 || event == 814947 || event == 817916 || event == 819403 || event == 820998 || event == 821052 || event == 829223 || event == 82974 || event == 834794 || event == 836446 || event == 838904 || event == 8401 || event == 840529 || event == 848924 || event == 859003 || event == 860388 || event == 860913 || event == 862085 || event == 862991 || event == 866328 || event == 868527 || event == 872016 || event == 872560 || event == 879158 || event == 881498 || event == 882783 || event == 886097 || event == 887315 || event == 898120 || event == 90074 || event == 90724 || event == 909059 || event == 913352 || event == 91869 || event == 930183 || event == 934186 || event == 937271 || event == 94423 || event == 946416 || event == 949869 || event == 951771 || event == 953377 || event == 957091 || event == 957297 || event == 958862 || event == 989088 || event == 989852 || event == 312489)
+{
+
+std::cout << run << " " << event  << " " << new_EventWeight  << " " << new_crossSection  << " " <<  new_nevents  << " " << jj_mass  << " " << jj_deta  << " " << jj_dphi  << " " << new_V_dressed_pt   << std::endl;
+}*/
 
 return StatusCode::SUCCESS;
 }
@@ -381,6 +430,8 @@ StatusCode VBFVjetsAlg::beginInputFile() {
   m_tree->SetBranchStatus("jet_phi", 1);
   m_tree->SetBranchStatus("jet_m" , 1);
   m_tree->SetBranchStatus("jet_label", 1);
+  m_tree->SetBranchStatus("met_et", 1);
+  m_tree->SetBranchStatus("met_phi", 1);
 
   m_tree->SetBranchAddress("run",&run );
   m_tree->SetBranchAddress("event",&event );
@@ -412,6 +463,8 @@ StatusCode VBFVjetsAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_phi", &jet_phi);
   m_tree->SetBranchAddress("jet_m" , &jet_m);
   m_tree->SetBranchAddress("jet_label", &jet_label);
+  m_tree->SetBranchAddress("met_et", &met_et);
+  m_tree->SetBranchAddress("met_phi", &met_phi);
 
   return StatusCode::SUCCESS;
 }

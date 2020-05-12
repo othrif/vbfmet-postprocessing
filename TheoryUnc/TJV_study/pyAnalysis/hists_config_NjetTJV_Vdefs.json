@@ -1,7 +1,7 @@
 {
     "cuts": [
-     {"cut": "( V_undressed_pt > 200e3 && n_jet25>=2 )", "name": "SRmTJV"},
-     {"cut": "( V_undressed_pt > 200e3 && n_jet25==2 )", "name": "SR25"}
+     {"cut": "( V_dressed_pt > 200e3 && n_jet25>=2 )", "name": "SRmTJV"},
+     {"cut": "( V_dressed_pt > 200e3 && n_jet25==2 )", "name": "SR25"}
  ],
     "draw": [
         {

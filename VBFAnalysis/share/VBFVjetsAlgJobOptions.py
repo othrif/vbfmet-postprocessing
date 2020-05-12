@@ -18,8 +18,8 @@ arg_group = config.parser.add_argument_group("JobOptions", "Extra arguments spec
 arg_group.add_argument("--currentVariation", dest='currentVariation', default="Nominal", help="current systematics, default: Nominal")
 arg_group.add_argument("--containerName", dest='containerName', default="", help="container name used to look up the sample ID if not in the file path")
 arg_group.add_argument("--noVariation", dest='theoVariation', action="store_false", default=True, help="do theory systematic variations, default: False")
-arg_group.add_argument("--noSkim", dest='noSkim', action="store_true", default=False, help="No skim, default: False")
-arg_group.add_argument("--normFile", dest='normFile', default="/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v43Jets.root", help="file with the total number of event processed")
+arg_group.add_argument("--skim", dest='skim', default='2', help="Skim options: 0 No skimming applied, 1 Loose skimming, 2 tight skimming (default), 3 skimming matching ACE")
+arg_group.add_argument("--normFile", dest='normFile', default="/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v44.root", help="file with the total number of event processed")
 
 # parse the commandline options
 args = config.parse_args()
@@ -52,7 +52,7 @@ athAlgSeq += CfgMgr.VBFVjetsAlg("VBFVjetsAlg",
                                    currentSample = currentSample,
                                    runNumberInput = runNumber,
                                    theoVariation = args.theoVariation and not isVariedSamples,
-                                   noSkim = args.noSkim,
+                                   skim = int(args.skim),
                                    normFile = args.normFile); #args.theoVariation and isSherpaVjets);
 
 include("AthAnalysisBaseComps/SuppressLogging.py") #optional line

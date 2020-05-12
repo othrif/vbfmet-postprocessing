@@ -296,9 +296,9 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     h1.Draw()
     h2.Draw('same')
 
-    chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
+    chi2 = h1.Chi2Test      (h2, 'UW CHI2')
     kval = h1.KolmogorovTest(h2, '')
-    #print 'chi2: ',chi2,' ks: ',kval
+    print 'chi2: ',chi2,' ks: ',kval
     ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
     ks_text2.SetNDC()
     ks_text2.SetTextSize(0.055)
@@ -308,9 +308,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
 
     e=ROOT.Double(0.0)
     print 'Integral '+num_name+': ',h1.IntegralAndError(0,1001,e),'+/-',e
-    h1.Print("all")
     print 'Integral '+den_name+': ',h2.IntegralAndError(0,1001,e),'+/-',e
-    h2.Print("all")
 
     leg = ROOT.TLegend(0.6,0.7,0.8,0.8)
     leg.SetBorderSize(0)
@@ -333,7 +331,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     pad2.cd();       # pad2 becomes the current pad
 
     hratio = h1.Clone()
-    intden = h1.Integral()
+    #intden = h1.Integral()
     #if intden>0.0:
     #    hratio.Scale(h2.Integral()/intden)
     #hratio.Divide(h2)
@@ -539,14 +537,12 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     if options.logscale:
         h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
-    #h1.DrawNormalized()
-    #h2.DrawNormalized('same')
     h1.Draw()
     h2.Draw('same')
 
-    chi2 = 1#h1.Chi2Test      (h2, 'UW CHI2')
+    chi2 = h1.Chi2Test      (h2, 'UW CHI2')
     kval = h1.KolmogorovTest(h2, '')
-    #print 'chi2: ',chi2,' ks: ',kval
+    print 'chi2: ',chi2,' ks: ',kval
     ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
     ks_text2.SetNDC()
     ks_text2.SetTextSize(0.055)
@@ -631,9 +627,8 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
         valb = hratio.GetBinContent(i)
         errb = hratio.GetBinError(i)
         #print 'Bin {0:d} with uncertainty {1:.2%}, fitted {2:.2%}'.format(i, hratio.GetBinContent(i)-1, par0+hratio.GetBinCenter(i)*par1-1)
-        print '{0:.2%}'.format(hratio.GetBinContent(i)-1)
+        print '{0:.2} +- {1:.2}'.format(hratio.GetBinContent(i), hratio.GetBinError(i))
     can.Update()
-    hratio.Print("all")
 
     if options.wait:
         can.WaitPrimitive()
@@ -668,9 +663,7 @@ def Fit(_suffix=''):
             print("WARNING: number of files or number of histogram names is not equal to 2, insure this is satisfied!")
             return
         hratio1 = Draw(hnames[0],hnames[1],f[0],f[0],can,GetError=False)
-        hratio1.Print("all")
         hratio2 = Draw(hnames[0],hnames[1],f[1],f[1],can,GetError=False)
-        hratio2.Print("all")
         Ratio(hratio1,hratio2,files[0],files[1],can,GetError=False)
     else:
         print "Provide ..."

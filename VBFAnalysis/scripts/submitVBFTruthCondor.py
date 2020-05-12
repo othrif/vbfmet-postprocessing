@@ -16,7 +16,7 @@ parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", defau
 parser.add_argument( "-l", "--listSample", type = str, dest = "listSample", default = "/eos/user/r/rzou/v04/list", help = "list of ntuples to run over" )
 parser.add_argument( "-p", "--proxyName", type = str, dest = "proxyName", default = "/tmp/x509up_u29949", help = "proxy file for grid")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
-parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", help = "file with the total number of event processed" )
+parser.add_argument( "-f", "--normFile", type = str, dest = "normFile", default = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v45.root", help = "file with the total number of event processed" )
 parser.add_argument( "--noSkim", dest='noSkim', action="store_true", default=False, help="No skim, default: False")
 parser.add_argument( "--theoVariation", dest = "theoVariation", action="store_true", default = False, help = "Run Theory uncertainties ")
 args, unknown = parser.parse_known_args()

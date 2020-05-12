@@ -19,7 +19,7 @@ VBFTruthAlg::VBFTruthAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
-  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v42.root", "path to a file with the number of events processed" );
+  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v45.root", "path to a file with the number of events processed" );
   declareProperty( "noSkim", noSkim = false, "No skim");
 }
 
@@ -511,7 +511,7 @@ else
   new_nunu_m   = nunu_m  ;
 
 if(new_nbosons==0){
-  std::cout << "NO boson found! build one" << std::endl;
+  ATH_MSG_DEBUG("NO boson found! build one");
   if ( 364142 <= RunNumber && RunNumber <= 364155 ){ //Zvv
     new_boson_m->push_back(new_nunu_m);
     new_boson_pt->push_back(new_nunu_pt);
@@ -631,7 +631,7 @@ if ((new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZll = true;
 }
 
 std::map<TString,bool> regDecision;
-regDecision["Incl"]=true;
+regDecision["Incl"]=vbfSkimloose;
 regDecision["SRPhi"]=(SRPhiHigh || SRPhiLow);
 regDecision["CRZPhi"]=(CRZPhiHigh || CRZPhiLow);
 regDecision["CRWPhi"]=(CRWPhiHigh || CRWPhiLow);
@@ -681,7 +681,7 @@ for(auto reg : regions){
       }
     }
 
-if (vbfSkimloose || noSkim ){ // && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3)
+if (vbfSkimloose ){ // && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3)
   m_tree_out->Fill();
 }
 
