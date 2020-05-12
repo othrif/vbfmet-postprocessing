@@ -223,7 +223,7 @@ def GetHistsRatio(hname1,f1,hpath1all=[''],hpath2all=['']):
         else:
             h2 = h2b.Clone()
     rebin=2
-    if hname=='ph_pt_lead':
+    if hname=='ph_pt_lead' or hname1=="phPt":
         h1.Rebin(5)
         h2.Rebin(5)
         h1.GetXaxis().SetRangeUser(5.0,1000.0)
@@ -389,10 +389,10 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],h
 
     if hname.count('ph_pt'):
         h1.GetXaxis().SetTitle('Photon p_{T} [GeV]')
-    if hname=='ph_pt_lead':
-        h1.Rebin(5)
-        h2.Rebin(5)
-        if h3: h3.Rebin(5)        
+    if hname=='ph_pt_lead' or hname1=="phPt":
+        h1.Rebin(2)
+        h2.Rebin(2)
+        if h3: h3.Rebin(2)
         h1.GetXaxis().SetRangeUser(5.0,1000.0)
         h2.GetXaxis().SetRangeUser(5.0,1000.0)
     if hname1=='jj_mass':
@@ -547,16 +547,16 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],h
         hsys.SetLineWidth(0)
         hsys.SetMarkerSize(0)
         hsys.SetMarkerColor(1)
-    if hname=='ph_pt_lead':
+    if hname=='ph_pt_lead' or hname1=="phPt":
         hratio.GetXaxis().SetTitle('Lead Photon p_{T} [GeV]')
         h1.GetXaxis().SetRangeUser(11.0,1000.0)
         h2.GetXaxis().SetRangeUser(11.0,1000.0)
         hratio.GetXaxis().SetRangeUser(11.0,1000.0)
-        if not GetError:
-            pad1.SetLogy(1)
+        #if not GetError:
+        #    pad1.SetLogy(1)
             #pad2.SetLogy(1)
-            pad1.SetLogx(1)
-            pad2.SetLogx(1)
+            #pad1.SetLogx(1)
+            #pad2.SetLogx(1)
     elif hname=='elneg_pt':
         hratio.GetXaxis().SetTitle('Electron p_{T} [GeV]')
         if not GetError:
