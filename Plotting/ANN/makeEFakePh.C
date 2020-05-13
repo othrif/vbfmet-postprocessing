@@ -1,6 +1,84 @@
-float getFakeWeight(float pt, float eta){
-
-  return 0.015;
+std::vector<float> getFakeWeight(float pt, float eta){
+  std::vector<float> out;
+  float fr=0.0;
+  float stat=0.0;
+  float wind=0.0;
+  float bkg=0.0;
+  float en=0.0;
+  if(fabs(eta)<=0.8){
+    if(pt<15.0e3)       { fr=0.0147; stat=0.0000; wind=0.0016; bkg=0.0025; en=0.0015; }
+    else if(pt<25.0e3) 	{ fr=0.0147; stat=0.0000; wind=0.0016; bkg=0.0025; en=0.0015; }
+    else if(pt<35.0e3) 	{ fr=0.0147; stat=0.0000; wind=0.0016; bkg=0.0025; en=0.0015; }
+    else if(pt<45.0e3) 	{ fr=0.0172; stat=0.0000; wind=0.0003; bkg=0.0003; en=0.0007; }
+    else if(pt<55.0e3) 	{ fr=0.0161; stat=0.0000; wind=0.0004; bkg=0.0014; en=0.0015; }
+    else if(pt<65.0e3) 	{ fr=0.0188; stat=0.0001; wind=0.0007; bkg=0.0007; en=0.0010; }
+    else if(pt<75.0e3) 	{ fr=0.0199; stat=0.0001; wind=0.0007; bkg=0.0008; en=0.0014; }
+    else if(pt<100.0e3)	{ fr=0.0188; stat=0.0002; wind=0.0001; bkg=0.0022; en=0.0016; }
+    else if(pt<150.0e3)	{ fr=0.0190; stat=0.0003; wind=0.0003; bkg=0.0029; en=0.0012; }
+    else if(pt<250.0e3)	{ fr=0.0217; stat=0.0006; wind=0.0012; bkg=0.0002; en=0.0010; }
+  }else if(fabs(eta)<=1.15){
+    if(pt<15.0e3)      { fr=0.0183; stat=0.0001; wind=0.0016; bkg=0.0015; en=0.0033; }
+    else if(pt<25.0e3) { fr=0.0183; stat=0.0001; wind=0.0016; bkg=0.0015; en=0.0033; }
+    else if(pt<35.0e3) { fr=0.0183; stat=0.0001; wind=0.0016; bkg=0.0015; en=0.0033; }
+    else if(pt<45.0e3) { fr=0.0198; stat=0.0000; wind=0.0004; bkg=0.0008; en=0.0005; }
+    else if(pt<55.0e3) { fr=0.0196; stat=0.0001; wind=0.0005; bkg=0.0006; en=0.0018; }
+    else if(pt<65.0e3) { fr=0.0211; stat=0.0001; wind=0.0000; bkg=0.0014; en=0.0010; }
+    else if(pt<75.0e3) { fr=0.0233; stat=0.0003; wind=0.0005; bkg=0.0010; en=0.0015; }
+    else if(pt<100.0e3){ fr=0.0215; stat=0.0003; wind=0.0001; bkg=0.0026; en=0.0019; }
+    else if(pt<150.0e3){ fr=0.0223; stat=0.0005; wind=0.0003; bkg=0.0029; en=0.0013; }    
+    else if(pt<250.0e3){ fr=0.0240; stat=0.0010; wind=0.0012; bkg=0.0003; en=0.0013; }
+  }else if(fabs(eta)<=1.37){
+    if(pt<15.0e3)      { fr=0.0256; stat=0.0001; wind=0.0007; bkg=0.0008; en=0.0019; }
+    else if(pt<25.0e3) { fr=0.0256; stat=0.0001; wind=0.0007; bkg=0.0008; en=0.0019; }
+    else if(pt<35.0e3) { fr=0.0256; stat=0.0001; wind=0.0007; bkg=0.0008; en=0.0019; }
+    else if(pt<45.0e3) { fr=0.0291; stat=0.0001; wind=0.0009; bkg=0.0008; en=0.0017; }
+    else if(pt<55.0e3) { fr=0.0278; stat=0.0001; wind=0.0004; bkg=0.0009; en=0.0029; }
+    else if(pt<65.0e3) { fr=0.0303; stat=0.0002; wind=0.0008; bkg=0.0010; en=0.0028; }
+    else if(pt<75.0e3) { fr=0.0303; stat=0.0004; wind=0.0007; bkg=0.0016; en=0.0029; }
+    else if(pt<100.0e3){ fr=0.0315; stat=0.0005; wind=0.0010; bkg=0.0020; en=0.0023; }
+    else if(pt<150.0e3){ fr=0.0301; stat=0.0002; wind=0.0000; bkg=0.0034; en=0.0031; }    
+    else if(pt<250.0e3){ fr=0.0319; stat=0.0015; wind=0.0002; bkg=0.0023; en=0.0020; }
+  }else if(fabs(eta)<=1.81){
+    if(pt<15.0e3)      { fr=0.0363; stat=0.0001; wind=0.0005; bkg=0.0008; en=0.0009; }
+    else if(pt<25.0e3) { fr=0.0363; stat=0.0001; wind=0.0005; bkg=0.0008; en=0.0009; }
+    else if(pt<35.0e3) { fr=0.0363; stat=0.0001; wind=0.0005; bkg=0.0008; en=0.0009; }
+    else if(pt<45.0e3) { fr=0.0379; stat=0.0001; wind=0.0001; bkg=0.0008; en=0.0014; }
+    else if(pt<55.0e3) { fr=0.0372; stat=0.0001; wind=0.0005; bkg=0.0002; en=0.0035; }
+    else if(pt<65.0e3) { fr=0.0398; stat=0.0003; wind=0.0003; bkg=0.0013; en=0.0036; }
+    else if(pt<75.0e3) { fr=0.0411; stat=0.0002; wind=0.0000; bkg=0.0001; en=0.0038; }
+    else if(pt<100.0e3){ fr=0.0418; stat=0.0005; wind=0.0007; bkg=0.0020; en=0.0042; }
+    else if(pt<150.0e3){ fr=0.0439; stat=0.0009; wind=0.0002; bkg=0.0033; en=0.0058; }    
+    else if(pt<250.0e3){ fr=0.0437; stat=0.0018; wind=0.0005; bkg=0.0040; en=0.0025; }
+  }else if(fabs(eta)<=2.01){
+    if(pt<15.0e3)      { fr=0.0443; stat=0.0002; wind=0.0002; bkg=0.0003; en=0.0019; }
+    else if(pt<25.0e3) { fr=0.0443; stat=0.0002; wind=0.0002; bkg=0.0003; en=0.0019; }
+    else if(pt<35.0e3) { fr=0.0443; stat=0.0002; wind=0.0002; bkg=0.0003; en=0.0019; }
+    else if(pt<45.0e3) { fr=0.0471; stat=0.0001; wind=0.0001; bkg=0.0004; en=0.0017; }
+    else if(pt<55.0e3) { fr=0.0477; stat=0.0002; wind=0.0003; bkg=0.0002; en=0.0023; }
+    else if(pt<65.0e3) { fr=0.0530; stat=0.0004; wind=0.0012; bkg=0.0012; en=0.0023; }
+    else if(pt<75.0e3) { fr=0.0519; stat=0.0007; wind=0.0003; bkg=0.0003; en=0.0025; }
+    else if(pt<100.0e3){ fr=0.0536; stat=0.0008; wind=0.0008; bkg=0.0016; en=0.0039; }
+    else if(pt<150.0e3){ fr=0.0556; stat=0.0015; wind=0.0005; bkg=0.0028; en=0.0050; }   
+    else if(pt<250.0e3){ fr=0.0543; stat=0.0029; wind=0.0011; bkg=0.0022; en=0.0051; }   
+  }else if(fabs(eta)<=2.37){
+    if(pt<15.0e3)      { fr=0.0657; stat=0.0002; wind=0.0026; bkg=0.0005; en=0.0028; }
+    else if(pt<25.0e3) { fr=0.0657; stat=0.0002; wind=0.0026; bkg=0.0005; en=0.0028; }
+    else if(pt<35.0e3) { fr=0.0657; stat=0.0002; wind=0.0026; bkg=0.0005; en=0.0028; }
+    else if(pt<45.0e3) { fr=0.0741; stat=0.0001; wind=0.0033; bkg=0.0005; en=0.0035; }
+    else if(pt<55.0e3) { fr=0.0772; stat=0.0002; wind=0.0048; bkg=0.0004; en=0.0039; }
+    else if(pt<65.0e3) { fr=0.0826; stat=0.0005; wind=0.0026; bkg=0.0003; en=0.0046; }
+    else if(pt<75.0e3) { fr=0.0855; stat=0.0008; wind=0.0027; bkg=0.0004; en=0.0050; }
+    else if(pt<100.0e3){ fr=0.0862; stat=0.0009; wind=0.0059; bkg=0.0028; en=0.0047; }
+    else if(pt<150.0e3){ fr=0.0833; stat=0.0016; wind=0.0050; bkg=0.0025; en=0.0050; }    
+    else if(pt<250.0e3){ fr=0.0906; stat=0.0035; wind=0.0051; bkg=0.0027; en=0.0060; }
+  }
+  // output
+  out.push_back(fr);
+  out.push_back(stat);
+  out.push_back(wind);
+  out.push_back(bkg);
+  out.push_back(en);
+  return out;
 }
 
 void makeEFakePh(std::string treeNmae="Wg_strong") {
@@ -19,6 +97,15 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
   std::string oldtreeNmae=treeNmae+"Nominal";
   TTree *oldtree = (TTree*)oldfile->Get(oldtreeNmae.c_str());
   Long64_t nentries = oldtree->GetEntries();
+
+  // turn off weights
+  for(const auto &pleaf : *(oldtree->GetListOfLeaves())){
+    std::string leafName = pleaf->GetName();
+    if(leafName.size()>1 && leafName[0]==string("w")){
+      oldtree->SetBranchStatus(leafName.c_str(),0);
+      std::cout << "Turned off: " << leafName << std::endl;
+    }
+  }
 
   std::vector<float> copy_el_pt;
   std::vector<float> copy_el_phi;
@@ -98,7 +185,24 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
   TFile *newfile = new TFile(outfileName.c_str(),"recreate");
   TTree *newtree = oldtree->CloneTree(0);
   newtree->SetName("EFakePhNominal");
-  newtree->SetTitle("EFakePhNominal");  
+  newtree->SetTitle("EFakePhNominal");
+  float wEFakePhWindow__1up = 0.0;
+  float wEFakePhWindow__1down = 0.0;
+  float wEFakePhStat__1up = 0.0;
+  float wEFakePhStat__1down = 0.0;
+  float wEFakePhBkgSub__1up = 0.0;
+  float wEFakePhBkgSub__1down = 0.0;
+  float wEFakePhEn__1up = 0.0;
+  float wEFakePhEn__1down = 0.0;  
+    
+  newtree->Branch("wEFakePhWindow__1up",&wEFakePhWindow__1up);
+  newtree->Branch("wEFakePhWindow__1down",&wEFakePhWindow__1down);
+  newtree->Branch("wEFakePhStat__1up",&wEFakePhStat__1up);
+  newtree->Branch("wEFakePhStat__1down",&wEFakePhStat__1down);
+  newtree->Branch("wEFakePhBkgSub__1up",&wEFakePhBkgSub__1up);
+  newtree->Branch("wEFakePhBkgSub__1down",&wEFakePhBkgSub__1down);
+  newtree->Branch("wEFakePhEn__1up",&wEFakePhEn__1up);
+  newtree->Branch("wEFakePhEn__1down",&wEFakePhEn__1down);  
   TVector3 met,met_nolep,newel,jet1,jet2;
   for (Long64_t i=0;i<nentries; i++) {
     if((i%100000)==0) std::cout <<"evt: " << i << std::endl;
@@ -116,7 +220,18 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
       if(ph_pt->at(0)<10e3) continue;
       
       //add electron
-      w*=getFakeWeight(ph_pt->at(0),ph_eta->at(0));
+      std::vector<float> new_fake_w=getFakeWeight(ph_pt->at(0),ph_eta->at(0));
+      float wold = w;
+      w*=new_fake_w.at(0);
+      wEFakePhWindow__1up=wold*(new_fake_w.at(0)+new_fake_w.at(1));
+      wEFakePhWindow__1down=wold*(new_fake_w.at(0)-new_fake_w.at(1));
+      wEFakePhStat__1up=wold*(new_fake_w.at(0)+new_fake_w.at(2));
+      wEFakePhStat__1down=wold*(new_fake_w.at(0)-new_fake_w.at(2));
+      wEFakePhBkgSub__1up=wold*(new_fake_w.at(0)+new_fake_w.at(3));
+      wEFakePhBkgSub__1down=wold*(new_fake_w.at(0)-new_fake_w.at(3));
+      wEFakePhEn__1up=wold*(new_fake_w.at(0)+new_fake_w.at(4));
+      wEFakePhEn__1down=wold*(new_fake_w.at(0)-new_fake_w.at(4));
+      
       newel.SetPtEtaPhi(ph_pt->at(0),0.0,ph_phi->at(0));
       met.SetPtEtaPhi(met_tst_et,0.0,met_tst_phi);
       met_nolep.SetPtEtaPhi(met_tst_nolep_et,0.0,met_tst_nolep_phi);
@@ -168,7 +283,17 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
 	if(ph_pt->at(0)<10e3) continue;
 	
 	//add electron
-	w*=getFakeWeight(ph_pt->at(0),ph_eta->at(0));
+	std::vector<float> new_fake_w=getFakeWeight(ph_pt->at(0),ph_eta->at(0));
+	float wold = w;
+	w*=new_fake_w.at(0);
+	wEFakePhWindow__1up=wold*(new_fake_w.at(0)+new_fake_w.at(1));
+	wEFakePhWindow__1down=wold*(new_fake_w.at(0)-new_fake_w.at(1));
+	wEFakePhStat__1up=wold*(new_fake_w.at(0)+new_fake_w.at(2));
+	wEFakePhStat__1down=wold*(new_fake_w.at(0)-new_fake_w.at(2));
+	wEFakePhBkgSub__1up=wold*(new_fake_w.at(0)+new_fake_w.at(3));
+	wEFakePhBkgSub__1down=wold*(new_fake_w.at(0)-new_fake_w.at(3));
+	wEFakePhEn__1up=wold*(new_fake_w.at(0)+new_fake_w.at(4));
+	wEFakePhEn__1down=wold*(new_fake_w.at(0)-new_fake_w.at(4));
 	newel.SetPtEtaPhi(ph_pt->at(0),0.0,ph_phi->at(0));
 	met.SetPtEtaPhi(met_tst_et,0.0,met_tst_phi);
 	met_nolep.SetPtEtaPhi(met_tst_nolep_et,0.0,met_tst_nolep_phi);
