@@ -240,7 +240,8 @@ private:
    Float_t         new_jj_dphi;
    Float_t         new_met_significance;
    vector<float>         *new_lep_jet_dR;
-   Float_t         new_Mll;
+   Float_t         new_MV;
+   Float_t         new_PTV;
    Bool_t          new_hasZ;
 
    Float_t         weight;
@@ -298,6 +299,7 @@ struct lepton_info {
   float charge[2 * MAXLEPT];
   bool has_Z_OS;
   double Mll;
+  double PTV;
 };
 typedef struct lepton_info my_leptons;
 
@@ -383,13 +385,15 @@ void containsZ(my_leptons *lep) {
   TLorentzVector P_lep2;
 
   lep->has_Z_OS = false;
-  lep->Mll = -1;
+  lep->Mll = -9999;
+  lep->PTV = -9999;
 
   if (lep->num_leptons < 2)
     return;
 
 double best_M = -1;
 double M;
+double PTV;
 
 int lept_count = 0;
 for (int i = 0; i < lep->num_leptons && lept_count < 5; i++)
@@ -410,15 +414,18 @@ for (int i = 0; i < lep->num_leptons && lept_count < 5; i++)
         }
         TLorentzVector lep_sum = P_lep1 + P_lep2;
         M = (lep_sum).M();
+        PTV = (lep_sum).Pt();
 
-        if (best_M < 0) {
+/*        if (best_M < 0) {
             best_M = M;
             lep->Mll = M;
-        }
+        }*/
+
           // pick the pair closest to the Z mass if more than one Z
         if (fabs(M - 91000.) < fabs(best_M - 91000.)) {
             best_M = M;
             lep->Mll = M;
+            lep->PTV = PTV;
         }
         if (M  < 116.2*1.e3 && M > 66.2*1.e3 &&  lep->charge[i] * lep->charge[j] < 0){
             lep->has_Z_OS = true;
