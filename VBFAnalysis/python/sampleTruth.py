@@ -105,6 +105,9 @@ class sample(object):
             elif ((self.runNumber >= 312496 and self.runNumber <= 312531) or (self.runNumber >= 364224 and self.runNumber <= 364229)):
                 #self.sampleType = "W_strong_KTPTV"
                 self.sampleType = "W_strong"
+            elif ((self.runNumber >= 361372 and self.runNumber <= 361379)):
+                #self.sampleType = "Z_strong_KTPTV"
+                self.sampleType = "Z_strong_211"
             else:
                 print "python/sample.py: runNumber "+str(self.runNumber)+" could not be identified as a valid MC :o"
                 self.sampleType = "ERROR"

@@ -28,3 +28,7 @@ if [ $(ls | grep W_strong_ckkw15 | wc -l) == 0 ] ;then echo "WARNING: (W_strong_
 if [ $(ls | grep W_strong_ckkw30 | wc -l) == 0 ] ;then echo "WARNING: (W_strong_ckkw30*root) No Files found" ;else hadd ${OUTDIRVAR}/W_strong_ckkw30.root W_strong_ckkw30*root; fi
 if [ $(ls | grep W_strong_qsf025 | wc -l) == 0 ] ;then echo "WARNING: (W_strong_qsf025*root) No Files found" ;else hadd ${OUTDIRVAR}/W_strong_qsf025.root W_strong_qsf025*root; fi
 if [ $(ls | grep W_strong_qsf4 | wc -l) == 0 ] ;then echo "WARNING: (W_strong_qsf4*root) No Files found" ;else hadd ${OUTDIRVAR}/W_strong_qsf4.root W_strong_qsf4*root; fi
+
+
+if [ $(ls | grep Z_strong_211Nominal | wc -l) == 0 ] ;then echo "WARNING: (Z_strong_211Nominal*root) No Files found" ;else hadd ${OUTDIRVAR}/Z_strong_211.root Z_strong_211Nominal*root; fi
+if [ $(ls | grep theoVariation_Z_strong_211 | wc -l) == 0 ] ;then echo "WARNING: (theoVariation_Z_strong_211Nominal*root) No Files found" ;else hadd ${OUTDIRVAR}/theoVariation_Z_strong_211.root theoVariation_Z_strong_211Nominal*root; fi

@@ -9,7 +9,7 @@
 
 #define LINE std::cerr << __FILE__ << "::" << __FUNCTION__ << "::" << __LINE__ << std::endl;
 
-const std::string regions[] = {"Incl","SRPhi", "CRWPhi", "CRZPhi", "SRPhiHigh","CRWPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet","CRZll"};
+const std::string regions[] = {"Incl","SRPhi", "CRWPhi", "CRZPhi","CRZll"}; //, "SRPhiHigh","CRWPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet"
 const std::string variations[] = {"fac_up","fac_down","renorm_up","renorm_down","both_up","both_down"};
 
 
@@ -121,71 +121,72 @@ StatusCode VBFTruthAlg::initialize() {
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&new_w);
-  m_tree_out->Branch("w_noxsec",&new_w_noxsec);
-  m_tree_out->Branch("xsec",&new_xsec);
-  m_tree_out->Branch("sumw", &new_sumw);
+//  m_tree_out->Branch("w_noxsec",&new_w_noxsec);
+//  m_tree_out->Branch("xsec",&new_xsec);
+//  m_tree_out->Branch("sumw", &new_sumw);
   m_tree_out->Branch("runNumber",&RunNumber);
-  m_tree_out->Branch("eventNumber",&EventNumber);
+//  m_tree_out->Branch("eventNumber",&EventNumber);
   m_tree_out->Branch("jj_mass",&new_jj_mass);
   m_tree_out->Branch("jj_deta",&new_jj_deta);
   m_tree_out->Branch("jj_dphi",&new_jj_dphi);
   m_tree_out->Branch("met_et",&new_met_et);
   m_tree_out->Branch("met_nolep_et",&new_met_nolep_et);
-  m_tree_out->Branch("met_phi",&new_met_phi);
-  m_tree_out->Branch("met_nolep_phi",&new_met_nolep_phi);
-  m_tree_out->Branch("mu_charge",&new_mu_charge);
-  m_tree_out->Branch("mu_pt",&new_mu_pt);
-  m_tree_out->Branch("el_charge",&new_el_charge);
-  m_tree_out->Branch("el_pt",&new_el_pt);
-  m_tree_out->Branch("mu_phi",&new_mu_phi);
-  m_tree_out->Branch("el_phi",&new_el_phi);
-  m_tree_out->Branch("mu_eta",&new_mu_eta);
-  m_tree_out->Branch("el_eta",&new_el_eta);
+//  m_tree_out->Branch("met_phi",&new_met_phi);
+//  m_tree_out->Branch("met_nolep_phi",&new_met_nolep_phi);
+//  m_tree_out->Branch("mu_charge",&new_mu_charge);
+//  m_tree_out->Branch("mu_pt",&new_mu_pt);
+//  m_tree_out->Branch("el_charge",&new_el_charge);
+//  m_tree_out->Branch("el_pt",&new_el_pt);
+//  m_tree_out->Branch("mu_phi",&new_mu_phi);
+//  m_tree_out->Branch("el_phi",&new_el_phi);
+//  m_tree_out->Branch("mu_eta",&new_mu_eta);
+//  m_tree_out->Branch("el_eta",&new_el_eta);
   m_tree_out->Branch("jet_pt",&new_jet_pt);
-  m_tree_out->Branch("jet_eta",&new_jet_eta);
-  m_tree_out->Branch("jet_phi",&new_jet_phi);
-  m_tree_out->Branch("jet_E",&new_jet_E);
-  m_tree_out->Branch("met_significance",&new_met_significance);
-  m_tree_out->Branch("lep_jet_dR",&new_lep_jet_dR);
+//  m_tree_out->Branch("jet_eta",&new_jet_eta);
+//  m_tree_out->Branch("jet_phi",&new_jet_phi);
+//  m_tree_out->Branch("jet_E",&new_jet_E);
+//  m_tree_out->Branch("met_significance",&new_met_significance);
+//  m_tree_out->Branch("lep_jet_dR",&new_lep_jet_dR);
   m_tree_out->Branch("boson_m",&new_boson_m);
   m_tree_out->Branch("boson_pt",&new_boson_pt);
-  m_tree_out->Branch("boson_phi",&new_boson_phi);
-  m_tree_out->Branch("boson_eta",&new_boson_eta);
-  m_tree_out->Branch("boson_pdgid",&new_boson_pdgid);
-  m_tree_out->Branch("nu_pt",&new_nu_pt);
-  m_tree_out->Branch("nu_phi",&new_nu_phi);
-  m_tree_out->Branch("nu_eta",&new_nu_eta);
-  m_tree_out->Branch("nu_charge",&new_nu_charge);
-  m_tree_out->Branch("mll",&new_Mll);
+//  m_tree_out->Branch("boson_phi",&new_boson_phi);
+//  m_tree_out->Branch("boson_eta",&new_boson_eta);
+//  m_tree_out->Branch("boson_pdgid",&new_boson_pdgid);
+//  m_tree_out->Branch("nu_pt",&new_nu_pt);
+//  m_tree_out->Branch("nu_phi",&new_nu_phi);
+//  m_tree_out->Branch("nu_eta",&new_nu_eta);
+//  m_tree_out->Branch("nu_charge",&new_nu_charge);
+  m_tree_out->Branch("MV",&new_MV);
+  m_tree_out->Branch("PTV",&new_PTV);
   m_tree_out->Branch("hasZ",&new_hasZ);
 
 
   m_tree_out->Branch("n_jet",   &new_njets);
-  m_tree_out->Branch("n_jet25", &new_n_jet25);
-  m_tree_out->Branch("n_jet30", &new_n_jet30);
-  m_tree_out->Branch("n_jet35", &new_n_jet35);
-  m_tree_out->Branch("n_jet40", &new_n_jet40);
-  m_tree_out->Branch("n_jet50", &new_n_jet50);
+//  m_tree_out->Branch("n_jet25", &new_n_jet25);
+//  m_tree_out->Branch("n_jet30", &new_n_jet30);
+//  m_tree_out->Branch("n_jet35", &new_n_jet35);
+//  m_tree_out->Branch("n_jet40", &new_n_jet40);
+//  m_tree_out->Branch("n_jet50", &new_n_jet50);
 
   m_tree_out->Branch("n_el",&new_nels);
-  m_tree_out->Branch("n_mu",&new_nmus);
+//  m_tree_out->Branch("n_mu",&new_nmus);
   m_tree_out->Branch("n_nu",&new_nnus);
   m_tree_out->Branch("n_boson",&new_nbosons);
 
   m_tree_out->Branch("ee_pt",   &new_ee_pt);
-  m_tree_out->Branch("ee_eta",  &new_ee_eta);
-  m_tree_out->Branch("ee_phi",  &new_ee_phi);
+//  m_tree_out->Branch("ee_eta",  &new_ee_eta);
+//  m_tree_out->Branch("ee_phi",  &new_ee_phi);
   m_tree_out->Branch("ee_m",    &new_ee_m);
-  m_tree_out->Branch("mumu_pt", &new_mumu_pt);
-  m_tree_out->Branch("mumu_eta",&new_mumu_eta);
-  m_tree_out->Branch("mumu_phi",&new_mumu_phi);
-  m_tree_out->Branch("mumu_m",  &new_mumu_m);
+//  m_tree_out->Branch("mumu_pt", &new_mumu_pt);
+//  m_tree_out->Branch("mumu_eta",&new_mumu_eta);
+//  m_tree_out->Branch("mumu_phi",&new_mumu_phi);
+//  m_tree_out->Branch("mumu_m",  &new_mumu_m);
   m_tree_out->Branch("nunu_pt", &new_nunu_pt);
-  m_tree_out->Branch("nunu_eta",&new_nunu_eta);
-  m_tree_out->Branch("nunu_phi",&new_nunu_phi);
+//  m_tree_out->Branch("nunu_eta",&new_nunu_eta);
+//  m_tree_out->Branch("nunu_phi",&new_nunu_phi);
   m_tree_out->Branch("nunu_m",  &new_nunu_m);
 
-  m_tree_out->Branch("useMerged",  &useMerged);
+//  m_tree_out->Branch("useMerged",  &useMerged);
 
   //Register the output TTree
   CHECK(histSvc()->regTree("/MYSTREAM/"+treeTitleOut,m_tree_out));
@@ -199,17 +200,18 @@ StatusCode VBFTruthAlg::initialize() {
 
   for (auto reg : regions){
     ANA_CHECK (book (TH1F (Form("jj_mass_%s_nominal",reg.c_str()), ";m_{jj} [TeV];Entries", 50, 0, 5)));
-    ANA_CHECK (book (TH1F (Form("Z_mass_%s_nominal",reg.c_str()), ";M_{Z} [GeV];Entries", 50, 0, 500)));
+    ANA_CHECK (book (TH1F (Form("MV_%s_nominal",reg.c_str()), ";M_{V} [GeV];Entries", 50, 0, 500)));
+    ANA_CHECK (book (TH1F (Form("PTV_%s_nominal",reg.c_str()), ";p_{T}^{V} [GeV];Entries", 50, 0, 500)));
     ANA_CHECK (book (TH1F (Form("boson_pT_%s_nominal",reg.c_str()), ";Boson p_{T} [GeV];Entries", 50, 0, 500)));
     ANA_CHECK (book (TH1F (Form("boson_mass_%s_nominal",reg.c_str()), ";Boson Mass [GeV];Entries", 50, 0, 500)));
-    if (m_theoVariation){
+   /* if (m_theoVariation){
       for(int i=0; i<115; i++)
         ANA_CHECK (book (TH1F (Form("all/jj_mass_%s_index_%d", reg.c_str(), i), ";m_{jj} [TeV];Entries", 50, 0, 5)));
     for (auto var : variations)
         ANA_CHECK (book (TH1F (Form("scales/jj_mass_%s_%s",reg.c_str(),var.c_str()), ";m_{jj} [TeV];Entries", 50, 0, 5)));
     for(int j=0; j<100; j++)
         ANA_CHECK (book (TH1F (Form("PDF/jj_mass_%s_pdf%d",reg.c_str(),j), ";m_{jj} [TeV];Entries", 50, 0, 5)));
-    }
+    }*/
 }
 
 return StatusCode::SUCCESS;
@@ -468,7 +470,7 @@ else
 
   TLorentzVector lep_tlv[3];
   if(new_nels==2) {
-    new_Mll = el_signal.Mll; new_hasZ = el_signal.has_Z_OS;
+    //new_MV = el_signal.Mll; new_hasZ = el_signal.has_Z_OS;
     for(int i=0; i<2; i++) lep_tlv[i].SetPtEtaPhiM(el_signal.pT[i], el_signal.eta[i], el_signal.phi[i], electron_mass);
     lep_tlv[2] = lep_tlv[0] + lep_tlv[1];
     ee_pt  = (lep_tlv[2]).Pt();
@@ -478,7 +480,7 @@ else
   }
 
   if(new_nmus==2) {
-    new_Mll = mu_signal.Mll; new_hasZ = mu_signal.has_Z_OS;
+    //new_MV = mu_signal.Mll; new_hasZ = mu_signal.has_Z_OS;
     for(int i=0; i<2; i++) lep_tlv[i].SetPtEtaPhiM(mu_signal.pT[i], mu_signal.eta[i], mu_signal.phi[i], muon_mass);
     lep_tlv[2] = lep_tlv[0] + lep_tlv[1];
     mumu_pt  = (lep_tlv[2]).Pt();
@@ -488,7 +490,7 @@ else
   }
 
   if(new_nnus==2) {
-    new_Mll = nu_signal.Mll; new_hasZ = nu_signal.has_Z_OS;
+    //new_MV = nu_signal.Mll; new_hasZ = nu_signal.has_Z_OS;
     for(int i=0; i<2; i++) lep_tlv[i].SetPtEtaPhiM(nu_signal.pT[i], nu_signal.eta[i], nu_signal.phi[i], nu_mass);
     lep_tlv[2] = lep_tlv[0] + lep_tlv[1];
     nunu_pt  = (lep_tlv[2]).Pt();
@@ -510,6 +512,7 @@ else
   new_nunu_phi = nunu_phi;
   new_nunu_m   = nunu_m  ;
 
+/*
 if(new_nbosons==0){
   ATH_MSG_DEBUG("NO boson found! build one");
   if ( 364142 <= RunNumber && RunNumber <= 364155 ){ //Zvv
@@ -519,11 +522,27 @@ if(new_nbosons==0){
   else if ( 364100 <= RunNumber && RunNumber <= 364113 ){ //Zmm
     new_boson_m->push_back(new_mumu_m);
     new_boson_pt->push_back(new_mumu_pt);
-  }  else if ( 364114 <= RunNumber && RunNumber <= 364127 ){ //Zee
+  }  else if ( 364114 <= RunNumber && RunNumber <= 364127 || 361372 <= RunNumber && RunNumber <= 361374 ||  364114 <= RunNumber && RunNumber <= 364127){ //Zee
     new_boson_m->push_back(new_ee_m);
     new_boson_pt->push_back(new_ee_pt);
   }
   new_nbosons++;
+}*/
+
+ if ( (364142 <= RunNumber && RunNumber <= 364155) || (362000 <= RunNumber && RunNumber <= 362191)){ //Zvv
+  new_MV = nu_signal.Mll; new_hasZ = nu_signal.has_Z_OS; new_PTV = nu_signal.PTV;
+ }
+ else if ( (364114 <= RunNumber && RunNumber <= 364127) || (361372 <= RunNumber && RunNumber <= 361374) ||  (362192 <= RunNumber && RunNumber <= 362383)){ //Zee
+new_MV = el_signal.Mll; new_hasZ = el_signal.has_Z_OS; new_PTV = el_signal.PTV;
+
+}
+ else if ( ((364170 <= RunNumber && RunNumber <= 364183) ||  (362384 <= RunNumber && RunNumber <= 362575)) && new_nbosons!=0){ //Wenu
+new_MV = boson_m->at(0); new_hasZ = false; new_PTV = boson_pt->at(0); // hack for now, need to compute the W boson mass and ptv from e and nu
+}else if  ( ((364170 <= RunNumber && RunNumber <= 364183) ||  (362384 <= RunNumber && RunNumber <= 362575)) && new_nbosons==0){
+  ATH_MSG_DEBUG("Missing TruthBoson record, need to handle this case properly!!");
+}
+else {
+  ATH_MSG_ERROR("MISSED A SAMPLE");
 }
 
   computejj(&jet_signal, new_jj_mass, new_jj_deta, new_jj_dphi);
@@ -593,7 +612,8 @@ float MjjCut =2e5;
 float DEtajjCut =2.5;
 float MV = -999;
 float PTV = -999;
-if(boson_pt->size() == 0 && new_boson_pt->size() !=0 ){
+
+/*if(boson_pt->size() == 0 && new_boson_pt->size() !=0 ){
   PTV = new_boson_pt->at(0);
   MV = new_boson_m->at(0);
 }
@@ -602,49 +622,47 @@ else if (boson_pt->size() != 0){
   MV = boson_m->at(0);
 }
 else
-  ATH_MSG_ERROR("THERE IS A PROBLEM with Number of bosons!!");
+  ATH_MSG_ERROR("THERE IS A PROBLEM with Number of bosons!!");*/
 
 bool vbfSkim = (new_jet_pt->at(0) > LeadJetPtCut) & (new_jet_pt->at(1) > subLeadJetPtCut) & (new_jj_deta > DEtajjCut) & ((new_jet_eta->at(0) * new_jet_eta->at(1))<0) & (new_jj_mass > MjjCut);
-bool vbfSkimloose = (new_jet_pt->at(0) > 50.0e3) & (new_jet_pt->at(1) > 50.0e3) & ( PTV > 150e3) & (new_jj_mass > 500e3) & (new_jj_deta > 2.5); //  & (new_jj_dphi<2.5) ;
+bool vbfSkimloose = (new_jet_pt->at(0) > 50.0e3) & (new_jet_pt->at(1) > 50.0e3)  & (new_jj_mass > 500e3) & (new_jj_deta > 2.5) & (new_PTV > 100e3); //  & (new_jj_dphi<2.5)  & ( PTV > 100e3)
 
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiHigh = true;
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiHigh = true;
-if (vbfSkim & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiHigh = true;
+if (vbfSkimloose & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiHigh = true;
+if (vbfSkimloose & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiHigh = true;
+if (vbfSkimloose & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiHigh = true;
+if (vbfSkimloose & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiHigh = true;
+if (vbfSkimloose & (new_njets == 2) & (1 <= new_jj_dphi && new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiHigh = true;
+if (vbfSkimloose & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiLow= true;
+if (vbfSkimloose & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiLow = true;
+if (vbfSkimloose & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiLow = true;
+if (vbfSkimloose & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiLow = true;
+if (vbfSkimloose & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiLow = true;
+if (vbfSkimloose & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRNjet    = true;
+if (vbfSkimloose & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZNjet = true;
+if (vbfSkimloose & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZNjet = true;
+if (vbfSkimloose & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWNjet = true;
+if (vbfSkimloose & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
 
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRPhiLow= true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWPhiLow = true;
-if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 1.) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWPhiLow = true;
-
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0))            SRNjet    = true;
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZNjet = true;
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZNjet = true;
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 1) & (new_nmus == 0) )           CRWNjet = true;
-if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & (new_nels == 0) & (new_nmus == 1) )           CRWNjet = true;
-
-if(vbfSkimloose && ( (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127) ) ){
-if ((new_nels == 2) & (new_nmus == 0) & new_hasZ) CRZll = true;
-if ((new_nels == 0) & (new_nmus == 2) & new_hasZ) CRZll = true;
+if(vbfSkimloose /*&& ( (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127) )*/ ){
+if (new_hasZ) CRZll = true; // (new_nels == 2) & (new_nmus == 0) &
+//if (new_hasZ) CRZll = true; // (new_nels == 0) & (new_nmus == 2) &
 }
 
 std::map<TString,bool> regDecision;
-regDecision["Incl"]=vbfSkimloose;
+regDecision["Incl"]=(new_PTV > 100e3);
 regDecision["SRPhi"]=(SRPhiHigh || SRPhiLow);
 regDecision["CRZPhi"]=(CRZPhiHigh || CRZPhiLow);
 regDecision["CRWPhi"]=(CRWPhiHigh || CRWPhiLow);
-regDecision["SRPhiHigh"]=SRPhiHigh;
-regDecision["CRZPhiHigh"]=CRZPhiHigh;
-regDecision["CRWPhiHigh"]=CRWPhiHigh;
-regDecision["SRPhiLow"]=SRPhiLow;
-regDecision["CRZPhiLow"]=CRZPhiLow;
-regDecision["CRWPhiLow"]=CRWPhiLow;
-regDecision["SRNjet"]=SRNjet;
-regDecision["CRZNjet"]=CRZNjet;
-regDecision["CRWNjet"]=CRWNjet;
-regDecision["CRZll"]=(CRZll);
+//regDecision["SRPhiHigh"]=SRPhiHigh;
+//regDecision["CRZPhiHigh"]=CRZPhiHigh;
+//regDecision["CRWPhiHigh"]=CRWPhiHigh;
+//regDecision["SRPhiLow"]=SRPhiLow;
+//regDecision["CRZPhiLow"]=CRZPhiLow;
+//regDecision["CRWPhiLow"]=CRWPhiLow;
+//regDecision["SRNjet"]=SRNjet;
+//regDecision["CRZNjet"]=CRZNjet;
+//regDecision["CRWNjet"]=CRWNjet;
+regDecision["CRZll"]=((new_PTV > 100e3) && new_hasZ); //CRZll
 
 new_w = weight*EventWeight;
 new_w_noxsec = EventWeight;
@@ -652,15 +670,16 @@ new_w_noxsec = EventWeight;
 for(auto reg : regions){
     if(regDecision[reg]){
       hist( "jj_mass_"+reg+"_nominal" )->Fill(new_jj_mass/1e6, new_w);
-      hist( "Z_mass_"+reg+"_nominal" )->Fill(new_Mll/1e3, new_w);
-      if( boson_pt->size() != 0 || new_boson_pt->size() !=0 ){
-      hist( "boson_pT_"+reg+"_nominal" )->Fill(PTV/1e3, new_w);
-      hist( "boson_mass_"+reg+"_nominal" )->Fill(MV/1e3, new_w);
+      hist( "MV_"+reg+"_nominal" )->Fill(new_MV/1e3, new_w);
+      hist( "PTV_"+reg+"_nominal" )->Fill(new_PTV/1e3, new_w);
+      if( new_boson_pt->size() != 0 ){
+      hist( "boson_pT_"+reg+"_nominal" )->Fill(new_boson_pt->at(0)/1e3, new_w);
+      hist( "boson_mass_"+reg+"_nominal" )->Fill(new_boson_m->at(0)/1e3, new_w);
     }
     else
-        ATH_MSG_ERROR("THERE IS A PROBLEM with Number of bosons!!");
+        ATH_MSG_DEBUG("Missing TruthBoson record!!");
   }
-
+/*
     if (m_theoVariation && ( (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127) ) ){
       for(int i=0; i<115; i++){
         if(regDecision[reg])
@@ -678,10 +697,10 @@ for(auto reg : regions){
           for(unsigned int j = 11; j <= 110; j++)
             hist( "PDF/jj_mass_"+reg+"_pdf"+to_string(j-11) )->Fill(new_jj_mass/1e6, weight*EventWeightSys->at(j));
         }
-      }
+      }*/
     }
 
-if (vbfSkimloose ){ // && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3)
+if (vbfSkimloose || noSkim){ // && (useMerged == 0 || useMerged == 1 || useMerged == 2  || useMerged == 3)
   m_tree_out->Fill();
 }
 
