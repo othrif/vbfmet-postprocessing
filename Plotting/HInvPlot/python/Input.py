@@ -414,9 +414,16 @@ def prepareBkgRuns(keys,options=None):
 
     bkg_wgewk =     {'363270':'WenEWK',
                      '363271':'WmnEWK',
-                     '363272':'WtnEWK',  }
+                     '363272':'WtnEWK',  
+}
 
     bkg_new = {#'312243':'',
+        #'363270':'WenEWK',
+         #            '363271':'WmnEWK',
+                     #'363272':'WtnEWK',  
+        #'700015':'Sh_228_evgamma_pty7_EnhMaxpTVpTy',
+         #                '700016':'Sh_228_mvgamma_pty7_EnhMaxpTVpTy',
+                         #'700017':'Sh_228_tvgamma_pty7_EnhMaxpTVpTy',
                    '343982':'',
                    '343983':'',
                    '343984':'',
@@ -1094,7 +1101,8 @@ def prepareBkgRuns(keys,options=None):
                  }
     bkg_sherpa_wg_228 = {'700015':'Sh_228_evgamma_pty7_EnhMaxpTVpTy',
                          '700016':'Sh_228_mvgamma_pty7_EnhMaxpTVpTy',
-                         '700017':'Sh_228_tvgamma_pty7_EnhMaxpTVpTy',}
+                         '700017':'Sh_228_tvgamma_pty7_EnhMaxpTVpTy',
+    }
         
     bkg_mg_zg = {'345775':'FxFx_eegamma_HT0_125',
                 '345776':'FxFx_eegamma_HTGT125_MjjLT150',
@@ -1256,10 +1264,10 @@ def prepareBkgRuns(keys,options=None):
                 #'top1':bkg_z_strong_madgraph_znn,
                 }
     if options.OverlapPh:
-        bkg_keys['wgam']=bkg_sherpa_wg # bkg_sherpa_wg_228
-        bkg_keys['zgam']=bkg_sherpa_zg # bkg_sherpa_zg_228
-        #bkg_keys['wgam']=bkg_sherpa_wg_228
-        #bkg_keys['zgam']=bkg_sherpa_zg_228        
+        bkg_keys['wgam']=bkg_sherpa_wg_228 # bkg_sherpa_wg_228
+        bkg_keys['zgam']=bkg_sherpa_zg_228 # bkg_sherpa_zg_228
+        bkg_keys['wdpi'].update(bkg_sherpa_wg)
+        bkg_keys['wdpi'].update(bkg_sherpa_zg)
         bkg_keys['wgamewk']=bkg_wgewk
         bkg_keys['zgamewk']=bkg_zgewk
         bkg_keys['ttg']=bkg_ttg
@@ -1269,6 +1277,8 @@ def prepareBkgRuns(keys,options=None):
     else:
         bkg_keys['wdpi'].update(bkg_sherpa_wg)
         bkg_keys['wdpi'].update(bkg_sherpa_zg)
+        bkg_keys['wdpi'].update(bkg_sherpa_wg_228)
+        bkg_keys['wdpi'].update(bkg_sherpa_zg_228)
         bkg_keys['wdpi'].update(bkg_wgewk)
         bkg_keys['wdpi'].update(bkg_zgewk)
         bkg_keys['wdpi'].update(bkg_ttg)
@@ -1276,6 +1286,7 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['wdpi'].update(bkg_pho_v2)
         bkg_keys['wdpi'].update(bkg_sherpa_vgg)
     bkg_keys['wdpi'].update(bkg_vewkbad)
+    bkg_keys['wdpi'].update(bkg_qcdunw)
     if not options.mergeKTPTV:
         bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
         bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
