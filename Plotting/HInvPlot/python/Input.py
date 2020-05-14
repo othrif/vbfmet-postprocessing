@@ -1210,11 +1210,11 @@ def prepareBkgRuns(keys,options=None):
                 'hggf':sig_ggF125,
                 'tth':sig_tth125,
                 'hvbf':sig_VBF125,
-                #'wewk':bkg_wewk,
-                'wewk':bkg_wewkpow,
+                'wewk':bkg_wewk,
+                #'wewk':bkg_wewkpow,
                 'wqcd':bkg_wqcd,
-                #'zewk':bkg_zewk,
-                'zewk':bkg_zewkpow,
+                'zewk':bkg_zewk,
+                #'zewk':bkg_zewkpow,
                 #'top2':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
                 'top2':bkg_top2, # all top
@@ -1256,19 +1256,29 @@ def prepareBkgRuns(keys,options=None):
                 #'top1':bkg_z_strong_madgraph_znn,
                 }
     if options.OverlapPh:
-        bkg_keys['wgam']=bkg_sherpa_wg # bkg_sherpa_wg_228
-        bkg_keys['zgam']=bkg_sherpa_zg # bkg_sherpa_zg_228
-        #bkg_keys['wgam']=bkg_sherpa_wg_228
-        #bkg_keys['zgam']=bkg_sherpa_zg_228        
+        bkg_keys['wgam']=bkg_sherpa_wg_228 # bkg_sherpa_wg_228
+        bkg_keys['zgam']=bkg_sherpa_zg_228 # bkg_sherpa_zg_228
+        bkg_keys['wdpi'].update(bkg_sherpa_wg)
+        bkg_keys['wdpi'].update(bkg_sherpa_zg)
         bkg_keys['wgamewk']=bkg_wgewk
         bkg_keys['zgamewk']=bkg_zgewk
         bkg_keys['ttg']=bkg_ttg
         bkg_keys['pho']=bkg_pho
         bkg_keys['phoAlt']=bkg_pho_v2
         bkg_keys['vgg']=bkg_sherpa_vgg
+        bkg_keys['wgam'].update(bkg_keys['wqcd'])
+        bkg_keys['zgam'].update(bkg_keys['zqcd'])
+        bkg_keys['wgamewk'].update(bkg_keys['wewk'])
+        bkg_keys['zgamewk'].update(bkg_keys['zewk'])
+        del bkg_keys['wewk']
+        del bkg_keys['zewk']
+        del bkg_keys['wqcd']
+        del bkg_keys['zqcd']
     else:
         bkg_keys['wdpi'].update(bkg_sherpa_wg)
         bkg_keys['wdpi'].update(bkg_sherpa_zg)
+        bkg_keys['wdpi'].update(bkg_sherpa_wg_228)
+        bkg_keys['wdpi'].update(bkg_sherpa_zg_228)        
         bkg_keys['wdpi'].update(bkg_wgewk)
         bkg_keys['wdpi'].update(bkg_zgewk)
         bkg_keys['wdpi'].update(bkg_ttg)
@@ -1308,7 +1318,7 @@ def prepareBkgRuns(keys,options=None):
         #bkg_keys['wdpi'].update(bkg_wqcd_LO_Filt)
 
     # extra samples here for now
-    bkg_keys['wdpi'].update(bkg_wewk) #bkg_wewkpow
+    bkg_keys['wdpi'].update(bkg_wewkpow) #bkg_wewkpow
     bkg_keys['wdpi'].update(bkg_zewk) #bkg_zewkpow
     bkg_keys['wdpi'].update(bkg_zee_228)
     bkg_keys['wdpi'].update(bkg_mg_zg)

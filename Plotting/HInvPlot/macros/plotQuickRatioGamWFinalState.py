@@ -269,9 +269,9 @@ def GetName(hpath1):
     if hpath1.count('_sr_') or hpath1.count('_gamsr_'):
         num_name = '#gamma+Z#rightarrow#nu#nu'
         if hpath1.count('_wewk') or hpath1.count('_wqcd') or hpath1.count('_wgam'):
-            num_name = '#gamma+W#rightarrowl_{lost}#nu'
+            num_name = '#gamma+W#rightarrowe_{lost}#nu'
     if hpath1.count('_wcr_') or hpath1.count('_gamwcr_'):
-        num_name = '#gamma+W#rightarrow l#nu'
+        num_name = '#gamma+W#rightarrow e#nu'
         comp1='wle'
         if hpath1.count('_u_'):
             num_name = '#gamma+W#rightarrow #mu#nu'
@@ -311,7 +311,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],h
     for hpath2 in hpath2all:
         hnamev2=hpath2+hname1
         print hnamev2
-        h2b = f1.Get(hnamev2)
+        h2b = f1up.Get(hnamev2)
         #print hnamev2,h2b.Integral()
         if h2:
             h2.Add(h2b)
@@ -323,7 +323,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],h
     for hpath3 in hpath3all:
         hnamev3=hpath3+hname1
         print hnamev3
-        h3b = f1.Get(hnamev3)
+        h3b = f1dw.Get(hnamev3)
         #print hnamev3,h3b.Integral()
         if h3:
             h3.Add(h3b)
@@ -422,7 +422,7 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],h
     if GetError:
         h1.GetYaxis().SetTitle('Relative Error')
     else:
-        h1.GetYaxis().SetTitle('Normalized Events')
+        h1.GetYaxis().SetTitle('Events')
 
     if GetError:
         h1 = PlotError(h1)
@@ -430,10 +430,11 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],h
         if h3: h3 = PlotError(h3)
             
     h1.GetYaxis().SetRangeUser(0.01,h1.GetMaximum()*1.5)
-    h1.DrawNormalized()
-    h2.DrawNormalized('same')
+    h1.Draw()
+    h1.GetYaxis().SetRangeUser(0.001,h1.GetMaximum()*1.5)    
+    h2.Draw('same')
     if h3:
-        h3.DrawNormalized('same')
+        h3.Draw('same')
         kval = h1.KolmogorovTest(h3, '')
         print ' ks: ',kval
         ks_text3 = ROOT.TLatex(0.3, 0.88, 'KS: %.2f' %kval)
@@ -461,10 +462,10 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],h
     leg = ROOT.TLegend(0.6,0.5,0.92,0.76)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
-    leg.AddEntry(h1,type_sample+num_name)
-    leg.AddEntry(h2,type_sample+den_name)
+    leg.AddEntry(h1,'#gamma+W#rightarrowe#nu')
+    leg.AddEntry(h2,'#gamma+W#rightarrow#mu#nu')
     if h3:
-        leg.AddEntry(h3,den2_name)        #type_sample+
+        leg.AddEntry(h3,'#gamma+W#rightarrow#tau#nu')        #type_sample+
     leg.Draw()
 
     texts = getATLASLabels(can, 0.6, 0.85, extra_text)
@@ -498,49 +499,11 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],h
         hratio2.Divide(h1)
     hratioUp=None
     hratioDw=None
-    if f1up:
-        hratioUp = GetHistsRatio(hname1,f1up,hpath1all=hpath1all,hpath2all=hpath2all)
-    if f1dw:
-        hratioDw = GetHistsRatio(hname1,f1dw,hpath1all=hpath1all,hpath2all=hpath2all)
     hsysr = hratio.Clone()
     hsys=ROOT.TGraphAsymmErrors(hsysr)
     for i in range(0,hsysr.GetNbinsX()+1):
         hsys.SetPointEXhigh(i-1,hsysr.GetXaxis().GetBinWidth(i)/2.0)
         hsys.SetPointEXlow(i-1,hsysr.GetXaxis().GetBinWidth(i)/2.0)
-    if f1up:
-        x1a=ROOT.Double()
-        y1a=ROOT.Double()
-        for ib in range(1,hsysr.GetNbinsX()+2):
-            diff = hratioUp.GetBinContent(ib)-hratio.GetBinContent(ib)
-            diff2= hratioDw.GetBinContent(ib)-hratio.GetBinContent(ib)
-            #print diff,diff2
-            hsysr.SetBinError(ib,math.sqrt(diff**2+diff2**2))
-            if diff>0.0 and diff2>0.0:
-                if diff<diff2:
-                    diff=-0.001
-                if diff2<diff:
-                    diff2=-0.001
-            if diff<0.0 and diff2<0.0:
-                if diff>diff2:
-                    diff=0.001
-                if diff2>diff:
-                    diff2=0.001
-
-            # asymmetric unc.
-            if diff>0.0 and diff2>0.0:
-                hsys.SetPointEYhigh(ib-1,math.sqrt(diff**2+diff2**2))
-            elif diff<0.0 and diff2<0.0:
-                hsys.SetPointEYlow(ib-1,math.sqrt(diff**2+diff2**2))
-            elif diff<0.0 and diff2>0.0:
-                hsys.SetPointEYlow(ib-1,abs(diff))
-                hsys.SetPointEYhigh(ib-1,diff2)
-            elif diff>0.0 and diff2<0.0:
-                hsys.SetPointEYlow(ib-1,abs(diff2))
-                hsys.SetPointEYhigh(ib-1,diff)
-            else:
-                hsys.SetPointEYlow(ib-1,0.0)
-                hsys.SetPointEYhigh(ib-1,0.0)
-
         hsys.SetFillColor(1)
         hsys.SetLineColor(1)
         hsys.SetFillStyle(3018)
@@ -636,14 +599,6 @@ def Draw(hname1,f1les=[],can=None,GetError=True, hpath1all=[''],hpath2all=[''],h
     if hratio2:
         hratio2.Draw('same')
         
-    if f1up:
-        hsys.Draw('E2 same')
-        #hsys.Draw('HIST same')
-        legR = ROOT.TLegend(0.2,0.34,0.45,0.44)
-        legR.SetFillColor(0)
-        legR.SetBorderSize(0)
-        legR.AddEntry(hsys,'V+jets Scale variations')
-        legR.Draw()
     can.Update()
     if options.wait:
         can.WaitPrimitive()
@@ -657,9 +612,10 @@ def Fit(_suffix=''):
 
     can=ROOT.TCanvas('can',"can",600,600)
     Style();
-    f1 = ROOT.TFile.Open(options.filename)
-    f1up = ROOT.TFile.Open('TheoryUnc/out_NominalUp.root')
-    f1dw = ROOT.TFile.Open('TheoryUnc/out_NominalDwn.root')
+    f1 = ROOT.TFile.Open('/tmp/v41Amergept15bWenu.root')
+    f1up = ROOT.TFile.Open('/tmp/v41Amergept15bWmnu.root')
+    f1dw = ROOT.TFile.Open('/tmp/v41Amergept15bWtnu.root')
+
 
     h1_norm=1.0 #36.100
     h2_norm=1.0 #36.100 #hggf, hvh, hvbf
@@ -671,48 +627,17 @@ def Fit(_suffix=''):
     #for hname in hnames:
     #    Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2)
     #sys.exit(0)
-    path1=['pass_gamsr_allmjj_nn_Nominal/plotEvent_zgam/']
-    path2=['pass_gamzcr_allmjj_ll_Nominal/plotEvent_zgam/']
-    path3 = ['pass_gamsr_allmjj_nn_Nominal/plotEvent_higgs/']
+    path1=['pass_gamwcr_allmjj_l_Nominal/plotEvent_wgam/','pass_gamwcr_allmjj_l_Nominal/plotEvent_wgamewk/']
+    path2=['pass_gamwcr_allmjj_l_Nominal/plotEvent_wgam/','pass_gamwcr_allmjj_l_Nominal/plotEvent_wgamewk/']
+    path3 = ['pass_gamwcr_allmjj_l_Nominal/plotEvent_wgam/','pass_gamwcr_allmjj_l_Nominal/plotEvent_wgamewk/']
     for hname in hnames:
-        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,hpath3all=path3)
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,hpath3all=path3,extra='_WFinalState')
 
-    path1=['pass_gamsr_allmjj_nn_Nominal/plotEvent_zgamewk/']
-    path2=['pass_gamzcr_allmjj_ll_Nominal/plotEvent_zgamewk/']
-    path3 = ['pass_gamsr_allmjj_nn_Nominal/plotEvent_higgs/']
+    # SR
+    path1=['pass_gamsr_allmjj_nn_Nominal/plotEvent_wgam/','pass_gamsr_allmjj_nn_Nominal/plotEvent_wgamewk/']
+    path2=['pass_gamsr_allmjj_nn_Nominal/plotEvent_wgam/','pass_gamsr_allmjj_nn_Nominal/plotEvent_wgamewk/']
+    path3 = ['pass_gamsr_allmjj_nn_Nominal/plotEvent_wgam/','pass_gamsr_allmjj_nn_Nominal/plotEvent_wgamewk/']
     for hname in hnames:
-        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,hpath3all=path3)
-
-    path1=['pass_gamsr_allmjj_nn_Nominal/plotEvent_zgamewk/','pass_gamsr_allmjj_nn_Nominal/plotEvent_zgam/']
-    path2=['pass_gamzcr_allmjj_ll_Nominal/plotEvent_zgamewk/','pass_gamzcr_allmjj_ll_Nominal/plotEvent_zgam/']
-    path3 = ['pass_gamsr_allmjj_nn_Nominal/plotEvent_higgs/']
-    for hname in hnames:
-        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,hpath3all=path3)
-
-    path1=['pass_gamsr_allmjj_nn_Nominal/plotEvent_wgam/']
-    path2=['pass_gamwcr_allmjj_l_Nominal/plotEvent_wgam/']
-    path3 = ['pass_gamsr_allmjj_nn_Nominal/plotEvent_higgs/']
-    for hname in hnames:
-        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,hpath3all=path3)
-        
-    path1=['pass_gamsr_allmjj_nn_Nominal/plotEvent_wgamewk/']
-    path2=['pass_gamwcr_allmjj_l_Nominal/plotEvent_wgamewk/']
-    path3 = ['pass_gamsr_allmjj_nn_Nominal/plotEvent_higgs/']
-    
-    for hname in hnames:
-        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,hpath3all=path3)
-        
-    path1=['pass_gamsr_allmjj_nn_Nominal/plotEvent_wgamewk/','pass_gamsr_allmjj_nn_Nominal/plotEvent_wgam/']
-    path2=['pass_gamwcr_allmjj_l_Nominal/plotEvent_wgamewk/','pass_gamwcr_allmjj_l_Nominal/plotEvent_wgam/']
-    path3 = ['pass_gamsr_allmjj_nn_Nominal/plotEvent_higgs/']
-    for hname in hnames:
-        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,hpath3all=path3)
-
-    # Ratio of wln to Znn
-    path1=['pass_gamsr_allmjj_nn_Nominal/plotEvent_zgamewk/','pass_gamsr_allmjj_nn_Nominal/plotEvent_zgam/']
-    path2=['pass_gamwcr_allmjj_l_Nominal/plotEvent_wgamewk/','pass_gamwcr_allmjj_l_Nominal/plotEvent_wgam/']
-    path3 = ['pass_gamsr_allmjj_nn_Nominal/plotEvent_higgs/']
-    for hname in hnames:
-        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,hpath3all=path3,extra='_ZtoW')
+        Draw(hname,[f1,f1up,f1dw],can,GetError=False, hpath1all=path1,hpath2all=path2,hpath3all=path3,extra='_WFinalState')
 setPlotDefaults(ROOT)
 Fit('90V')
