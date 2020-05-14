@@ -173,24 +173,24 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             multijets+=[2.3,0.2]
             multijets_statunc+=[1.0,0.2]
             if Binning==22:
-                multijets+=[24.5,18.3,0.3]
-                multijets_statunc+=[3.2,4.3,0.2]
+                multijets+=[24.5,18.3,0.5]
+                multijets_statunc+=[3.2,4.3,0.5]
         elif year==2017:
             multijets[10]=11.6
             multijets_statunc[10]=5.2
-            multijets+=[5.7,0.5]
+            multijets+=[5.7,0.9]
             multijets_statunc+=[2.5,0.5]
             if Binning==22:
                 multijets+=[62.0,46.4,0.8]
-                multijets_statunc+=[8.1,10.9,0.5]
+                multijets_statunc+=[8.1,10.9,0.8]
         elif year==2018: #set for 2018
             multijets[10]=14.3
             multijets_statunc[10]=6.4
             multijets+=[7.1,0.6]
             multijets_statunc+=[3.1,0.6]
             if Binning==22: # for 160-200. 150 to 160 efficiency is 0.67
-                multijets+=[76.7,57.3,0.9]
-                multijets_statunc+=[10.0,13.5,0.7]
+                multijets+=[76.7,57.3,1.8]
+                multijets_statunc+=[10.0,13.5,0.9]
 
     if doTMVA:
         #multijets=[293.3,77.9,38.2,38.7,26.7,69.9,13.7,11.9,51.6,7.1,9.1]

@@ -343,7 +343,7 @@ def getHistPars(hist):
     'min_mj3_over_mjj'     : {'xtitle':'min #it{m}_{j1/j2,j3} / #it{m}_{j1,j2}'   ,         'ytitle':'Events',   'ymin':0.1},
     'centrality'     : {'xtitle':'j3 Centrality',         'ytitle':'Events',   'ymin':0.1},
     'phcentrality'     : {'xtitle':'#it{#gamma} Centrality'   ,         'ytitle':'Events',   'ymin':0.1,'rebin':5},
-    'phPt'     : {'xtitle':'#it{#gamma} #it{p}_{T} [GeV]'   ,         'ytitle':'Events',  'rebin':2,'logy':True, 'ymin':0.1},
+    'phPt'     : {'xtitle':'#it{#gamma} #it{p}_{T} [GeV]'   ,         'ytitle':'Events',  'rebin':1,'logy':True, 'ymin':0.1},
     'phEta'     : {'xtitle':'#it{#gamma} #it{#eta}'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.1},
     'met_tst_ph_dphi'     : {'xtitle':'#Delta#it{#phi}(#gamma,MET)'   ,         'ytitle':'Events',   'ymin':0.1},
     'Mtt'     : {'xtitle':'#it{m}_{#tau#tau} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
@@ -418,6 +418,7 @@ def getLabelSortKey(sample):
     elif sample == 'higgs': return 20
     elif sample == 'jpsi': return 21
     elif sample == 'upsl': return 22
+    elif sample == 'efakeph': return 22
 
     log.warning('getSampleSortKey - unknown key: %s' %sample)
     return 100
@@ -450,7 +451,8 @@ def getSampleSortKey(sample):
     elif sample == 'wgam': return 13
     elif sample == 'zgamewk': return 15
     elif sample == 'wgamewk': return 15
-    elif sample == 'pho': return 13        
+    elif sample == 'pho': return 13
+    elif sample == 'efakeph': return 13
 
     log.warning('getLabelSortKey - unknown key: %s' %sample)
     return 100
@@ -488,6 +490,7 @@ def getSampleLabel(sample):
         'wgas': '#it{W#gamma*}',
         'zgas': '#it{Z#gamma*}',
         'zgam': '#it{Z#gamma} strong',
+        'efakeph': '#it{e}#rightarrow#gamma',        
         'zgamewk': '#it{Z#gamma} EWK',
         'wgamewk': '#it{W#gamma} EWK',
         'ttg': '#it{t#bar{t}#gamma}',
@@ -562,6 +565,7 @@ def getStyle(sample):
     color_zldy = ROOT.kOrange-3
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
+    color_efakeph = ROOT.kGreen-2
     color_wgamewk = ROOT.kOrange-5
     color_zgamewk = ROOT.kOrange-6    
     color_ttg = ROOT.kBlue   -9
@@ -590,7 +594,8 @@ def getStyle(sample):
         'tall':{'color':color_tall, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'pho':{'color':color_pho, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
-        'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
+        'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'efakeph':{'color':color_efakeph, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'wgam':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zgamewk':{'color':color_zgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'wgamewk':{'color':color_wgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
@@ -2601,7 +2606,8 @@ def main():
         bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
-            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','tall'] #,'mqcd','zldy','vvv'
+            #bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','tall'] #,'mqcd','zldy','vvv'
+            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','tall','efakeph'] #,'mqcd','zldy','vvv'
     if options.add_fakeE:
         bkgs+=['tth']
     if options.stack_signal:

@@ -57,7 +57,8 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kWjdtm: return "wjdtm";
     case kWjdte: return "wjdte";
     case kQFlip: return "qflip";
-    case kQCD:   return "dqcd";
+    case kEFakePh:   return "efakeph";
+    case kQCD:   return "dqcd";      
     case kQCD_MC: return "mqcd";
     case kWjhf:  return "wjhf";
     case kWgam:  return "wgam";
@@ -138,6 +139,7 @@ std::string Msl::Mva::Convert2Std(Sample s)
     case kWjdtm: return "Wjets_data_muFake";
     case kWjdte: return "Wjets_data_eFake";
     case kQFlip: return "Charge_flip";
+    case kEFakePh:   return "efakeph";
     case kQCD:   return "QCD";
     case kQCD_MC:   return "QCD_MC";
     case kWjhf: return "WjetsHF";
@@ -270,6 +272,7 @@ Msl::Mva::Sample Msl::Mva::Convert2Sample(const std::string &s)
   if(s == "wjdtm") return kWjdtm;
   if(s == "wjdte") return kWjdte;
   if(s == "qflip") return kQFlip;
+  if(s == "efakeph") return kEFakePh;
   if(s == "dqcd") return kQCD;
   if(s == "mqcd") return kQCD_MC;
   if(s == "wjhf") return kWjhf;
@@ -354,7 +357,8 @@ const std::vector<Msl::Mva::Sample>& Msl::Mva::GetAllSamples()
     vars.push_back(kWjdtm);
     vars.push_back(kWjdte);
     vars.push_back(kQFlip);
-    vars.push_back(kQCD);
+    vars.push_back(kEFakePh);
+    vars.push_back(kQCD);    
     vars.push_back(kQCD_MC);
     vars.push_back(kWjhf);
     vars.push_back(kWgam);
@@ -496,7 +500,7 @@ bool Msl::Mva::IsQCD(Mva::Sample s)
 }
 
 //-----------------------------------------------------------------------------
-bool Msl::Mva::IsZjet(Mva::Sample s)  
+bool Msl::Mva::IsZjet(Mva::Sample s)
 {
   switch(s) 
     {
