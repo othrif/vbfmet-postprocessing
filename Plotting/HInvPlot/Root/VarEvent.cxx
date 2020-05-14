@@ -318,7 +318,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "phEta")	         return phEta;
   if(var == "met_tst_ph_dphi")	 return met_tst_ph_dphi;
   if(var == "passVjetsFilter")	 return passVjetsFilter;
-  if(var == "passVjetsFilterTauEl") return passVjetsFilterTauEl;  
+  if(var == "passVjetsFilterTauEl") return passVjetsFilterTauEl;
   if(var == "passVjetsPTV")	 return passVjetsPTV;
   if(var == "jetBtagWeight")     return jetBtagWeight;
   if(var == "jetTrackWidth")     return jetTrackWidth;
