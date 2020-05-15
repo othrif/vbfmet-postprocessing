@@ -61,8 +61,8 @@ double weightXETrigSF(const float met_pt, unsigned metRunNumber, int syst=0) {
   double e0 = 1.7;
   double e1 = 0.75;
   double x = met_pt / 1.0e3;
-  if (x < 10) { return 0; }
-  if (x > 240) { x = 240; }
+  if (x < 1.0) { return 0; }
+  if (x > 450) { x = 450; }
   double sf = 0.5*(1+TMath::Erf((x-p0)/(TMath::Sqrt(2)*p1)));
   if(sf<0) sf=0.0;
   if(sf > 1.5) sf=1.5;
@@ -199,6 +199,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   float xeSFTrigWeight_nomu__1up=0.0;
   float xeSFTrigWeight_nomu__1down=0.0;
   int trigger_met_encodedv2=0;
+  int trigger_met=0;
   oldtree->SetBranchAddress("w",&w);
   oldtree->SetBranchAddress("runNumber",&runNumber);
   oldtree->SetBranchAddress("n_baseel",&n_baseel);
@@ -252,6 +253,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   oldtree->SetBranchAddress("n_jet",&n_jet);
   
   oldtree->SetBranchAddress("trigger_met_encodedv2",     &trigger_met_encodedv2);
+  oldtree->SetBranchAddress("trigger_met",     &trigger_met);
   oldtree->SetBranchAddress("xeSFTrigWeight",            &xeSFTrigWeight);
   oldtree->SetBranchAddress("xeSFTrigWeight__1up",       &xeSFTrigWeight__1up);
   oldtree->SetBranchAddress("xeSFTrigWeight__1down",     &xeSFTrigWeight__1down);
@@ -289,6 +291,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   m_rand.SetSeed(runNumber+periodSeed);
   for (Long64_t i=0;i<nentries; i++) {
     if((i%10000)==0) std::cout <<"evt: " << i << std::endl;
+    //if(i>30000) break;
     oldtree->GetEntry(i);
     cutflow->Fill(1);
     cutflow->Fill(2,w);
@@ -296,7 +299,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
       
       //divide by the number of smearings
       w/=float(nSamples);
-
+      w*=0.35; // normalizing to the low met region
       // Load the jet vectors
       alljetvec_before.clear();
       for(unsigned ijet=0; ijet<jet_pt->size(); ++ijet){
@@ -327,7 +330,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	tmpJetStruct.jet_phi = basejet_phi->at(ijet);
 	tmpJetStruct.jet_m = basejet_m->at(ijet);
 	tmpJetStruct.jet_jvt = basejet_jvt->at(ijet);	
-	tmpJetStruct.jet_fjvt = 0.0; //basejet_fjvt->at(ijet);
+	tmpJetStruct.jet_fjvt = basejet_fjvt->at(ijet);
 	tmpJetStruct.jet_btag_weight = 0.0;
 	tmpJetStruct.jet_timing = 0.0;
 	tmpJetStruct.jet_PartonTruthLabelID = 1;
@@ -489,7 +492,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	trigger_met_encodedv2 |= 0x1; // pass 2015/6
 	trigger_met_encodedv2 |= 0x2; // pass 2017
 	trigger_met_encodedv2 |= 0x8; // pass 2018
-	  
+	trigger_met=1;
 	if(debug){
 	  std::cout << "njet: " << n_jet << std::endl;
 	  if(n_jet>1)
