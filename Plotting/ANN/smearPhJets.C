@@ -55,7 +55,28 @@ public:
   std::string fKey;
 };
 
+double weightXETrigSF(const float met_pt, unsigned metRunNumber, int syst=0) {
+  double p0 = 245.3;
+  double p1 = 82.86;
+  double e0 = 1.7;
+  double e1 = 0.75;
+  double x = met_pt / 1.0e3;
+  if (x < 10) { return 0; }
+  if (x > 240) { x = 240; }
+  double sf = 0.5*(1+TMath::Erf((x-p0)/(TMath::Sqrt(2)*p1)));
+  if(sf<0) sf=0.0;
+  if(sf > 1.5) sf=1.5;
 
+  // linear parameterization of the systematics
+  if(syst==1){ // up variation
+    if(x<210.0) sf+=((e0)*(150-x)+e1)*0.6;
+    else sf=1.0;
+  }else if(syst==2){ // down
+    if(x<210.0)sf-=((e0)*(150-x)+e1)*0.6;
+    else sf=1.0;
+  }
+  return sf;
+}
 
 //----
 void correctMET(TVector3 &metv, TLorentzVector jetv,bool add){
@@ -169,7 +190,15 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   double met_tst_j1_dphi =0;
   double met_tst_j2_dphi =0;
   double met_tst_nolep_j1_dphi =0;
-  double met_tst_nolep_j2_dphi =0;  
+  double met_tst_nolep_j2_dphi =0;
+
+  float xeSFTrigWeight=0.0;
+  float xeSFTrigWeight__1up=0.0;
+  float xeSFTrigWeight__1down=0.0;
+  float xeSFTrigWeight_nomu=0.0;
+  float xeSFTrigWeight_nomu__1up=0.0;
+  float xeSFTrigWeight_nomu__1down=0.0;
+  int trigger_met_encodedv2=0;
   oldtree->SetBranchAddress("w",&w);
   oldtree->SetBranchAddress("runNumber",&runNumber);
   oldtree->SetBranchAddress("n_baseel",&n_baseel);
@@ -221,6 +250,14 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   oldtree->SetBranchAddress("jj_deta",&jj_deta);
   oldtree->SetBranchAddress("jj_dphi",&jj_dphi);
   oldtree->SetBranchAddress("n_jet",&n_jet);
+  
+  oldtree->SetBranchAddress("trigger_met_encodedv2",     &trigger_met_encodedv2);
+  oldtree->SetBranchAddress("xeSFTrigWeight",            &xeSFTrigWeight);
+  oldtree->SetBranchAddress("xeSFTrigWeight__1up",       &xeSFTrigWeight__1up);
+  oldtree->SetBranchAddress("xeSFTrigWeight__1down",     &xeSFTrigWeight__1down);
+  oldtree->SetBranchAddress("xeSFTrigWeight_nomu",       &xeSFTrigWeight_nomu);
+  oldtree->SetBranchAddress("xeSFTrigWeight_nomu__1up",  &xeSFTrigWeight_nomu__1up);
+  oldtree->SetBranchAddress("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);  
   
   oldtree->SetBranchAddress("truth_jj_mass",&truth_jj_mass);
   oldtree->SetBranchAddress("truth_V_dressed_pt",&truth_V_dressed_pt);
@@ -344,7 +381,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	  if(debug){ std::cout << "jet before: " << alljetvec_before.at(ijet).Pt() << "  after: " << tmptvl.Pt() << std::endl; }
 	}
 	if(debug) std::cout << "smeared jets done " << std::endl;
-	
+
 	// update the MET
 	met_after=met_before;
 	met_cst_after=met_cst_before;	
@@ -363,6 +400,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	    correctMET(met_nolep_after, alljetvec_before.at(ijet).jet_vec, true); // remove old jet. so add it back
 	    correctMET(met_nolep_after, alljetvec_after.at(ijet).jet_vec, false); // subtract it. negative vector sum jazz	    
 	  }
+	  
 	  // do the vector sum of all jets
 	  bool passCSTBefore = alljetvec_before.at(ijet).Pt()>20e3;
 	  bool passCSTAfter = alljetvec_after.at(ijet).Pt()>20e3;
@@ -438,6 +476,20 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	  jj_deta = fabs(jet1.Eta() - jet2.Eta());
 	  jj_mass = (jet1 + jet2).M();
 	}
+
+	// update trigger SF
+	xeSFTrigWeight        = weightXETrigSF(met_tst_et, 0, 0);
+	xeSFTrigWeight__1up   = weightXETrigSF(met_tst_et, 0, 1);
+	xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, 0, 2);
+	xeSFTrigWeight_nomu        = weightXETrigSF(met_tst_nolep_et, 0, 0);
+	xeSFTrigWeight_nomu__1up   = weightXETrigSF(met_tst_nolep_et, 0, 1);
+	xeSFTrigWeight_nomu__1down = weightXETrigSF(met_tst_nolep_et, 0, 2);
+	// set the met triggers to pass
+	//(trigger_met_encodedv2& 0x2);
+	trigger_met_encodedv2 |= 0x1; // pass 2015/6
+	trigger_met_encodedv2 |= 0x2; // pass 2017
+	trigger_met_encodedv2 |= 0x8; // pass 2018
+	  
 	if(debug){
 	  std::cout << "njet: " << n_jet << std::endl;
 	  if(n_jet>1)
