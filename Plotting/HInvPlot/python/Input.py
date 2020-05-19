@@ -1328,7 +1328,7 @@ def prepareBkgRuns(keys,options=None):
 
     # extra samples here for now
     bkg_keys['wdpi'].update(bkg_wewkpow) #bkg_wewkpow
-    bkg_keys['wdpi'].update(bkg_zewk) #bkg_zewkpow
+    bkg_keys['wdpi'].update(bkg_zewkpow) #bkg_zewkpow
     bkg_keys['wdpi'].update(bkg_zee_228)
     bkg_keys['wdpi'].update(bkg_mg_zg)
 

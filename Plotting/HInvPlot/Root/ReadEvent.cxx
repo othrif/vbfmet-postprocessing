@@ -1116,7 +1116,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 
     // Fill signal photons
     if(ph_pt){
-      //unsigned n_ph=0;
+      //unsigned n_ph=event->GetVar(Mva::n_ph);
+      //if(n_ph>0 && ph_pt->at(0)<20e3) n_ph=0;
       for(unsigned iPh=0; iPh<ph_pt->size(); ++iPh){
 	RecParticle new_ph;
 	new_ph.pt  = ph_pt->at(iPh)/1.0e3;

@@ -2,6 +2,30 @@
 //
 // Sorting algorithm
 //
+
+struct JetStruct {
+
+  JetStruct() {}
+
+  float Pt() { return jet_vec.Pt(); }
+  float Eta() { return jet_vec.Eta(); }
+  float Phi() { return jet_vec.Phi(); }
+  float M() { return jet_vec.M(); }
+  
+public:
+  float jet_pt;
+  float jet_eta;
+  float jet_phi;
+  float jet_m;
+  float jet_jvt;
+  float jet_fjvt;
+  float jet_btag_weight;
+  float jet_timing;
+  int jet_PartonTruthLabelID;
+  int jet_ConeTruthLabelID;
+  TLorentzVector jet_vec;
+};
+
 struct SortPhysicsObject {
   
   SortPhysicsObject(const std::string &key = "") :fKey(key) {}
@@ -19,11 +43,40 @@ struct SortPhysicsObject {
     //
     return lhs.Pt() > rhs.Pt();
   }
+  bool operator()(const JetStruct       &lhs, const JetStruct       &rhs) const{
+    //
+    // Sort based on pt 
+    //
+    return lhs.jet_vec.Pt() > rhs.jet_vec.Pt();
+  }
   
 public:
   
   std::string fKey;
 };
+
+double weightXETrigSF(const float met_pt, unsigned metRunNumber, int syst=0) {
+  double p0 = 245.3;
+  double p1 = 82.86;
+  double e0 = 1.7;
+  double e1 = 0.75;
+  double x = met_pt / 1.0e3;
+  if (x < 1.0) { return 0; }
+  if (x > 450) { x = 450; }
+  double sf = 0.5*(1+TMath::Erf((x-p0)/(TMath::Sqrt(2)*p1)));
+  if(sf<0) sf=0.0;
+  if(sf > 1.5) sf=1.5;
+
+  // linear parameterization of the systematics
+  if(syst==1){ // up variation
+    if(x<210.0) sf+=((e0)*(150-x)+e1)*0.6;
+    else sf=1.0;
+  }else if(syst==2){ // down
+    if(x<210.0)sf-=((e0)*(150-x)+e1)*0.6;
+    else sf=1.0;
+  }
+  return sf;
+}
 
 //----
 void correctMET(TVector3 &metv, TLorentzVector jetv,bool add){
@@ -56,7 +109,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   //Author: Rene Brun
   
   //Get old file, old tree and set top branch address
-  std::string oldfileNmae="/tmp/"+treeNmae+"Nominal364541.root";
+  std::string oldfileNmae="/tmp/"+treeNmae+".root";
   TFile *oldfile = new TFile(oldfileNmae.c_str());
   std::cout << "File: " << oldfile << std::endl;
   std::string oldtreeNmae=treeNmae+"Nominal";
@@ -96,12 +149,23 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   std::vector<float> *jet_pt=new std::vector<float>();
   std::vector<float> *jet_m=new std::vector<float>();
   std::vector<float> *jet_jvt=new std::vector<float>();
-
+  std::vector<float> *jet_fjvt=new std::vector<float>();
+  std::vector<float> *jet_btag_weight=new std::vector<float>();
+  std::vector<float> *jet_timing=new std::vector<float>();
+  std::vector<int> *jet_PartonTruthLabelID=new std::vector<int>();
+  std::vector<int> *jet_ConeTruthLabelID=new std::vector<int>();
+  
   std::vector<float> *basejet_phi=new std::vector<float>();
   std::vector<float> *basejet_eta=new std::vector<float>();
   std::vector<float> *basejet_pt=new std::vector<float>();
   std::vector<float> *basejet_m=new std::vector<float>();
   std::vector<float> *basejet_jvt=new std::vector<float>();  
+  std::vector<float> *basejet_fjvt=new std::vector<float>();
+
+  //jet_btag_weight?
+	  //jet_timing?
+	  //jet_PartonTruthLabelID?
+	  //jet_ConeTruthLabelID?
   int runNumber   = 0;
   int n_baseel   = 0;
   int n_el   = 0;
@@ -126,7 +190,16 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   double met_tst_j1_dphi =0;
   double met_tst_j2_dphi =0;
   double met_tst_nolep_j1_dphi =0;
-  double met_tst_nolep_j2_dphi =0;  
+  double met_tst_nolep_j2_dphi =0;
+
+  float xeSFTrigWeight=0.0;
+  float xeSFTrigWeight__1up=0.0;
+  float xeSFTrigWeight__1down=0.0;
+  float xeSFTrigWeight_nomu=0.0;
+  float xeSFTrigWeight_nomu__1up=0.0;
+  float xeSFTrigWeight_nomu__1down=0.0;
+  int trigger_met_encodedv2=0;
+  int trigger_met=0;
   oldtree->SetBranchAddress("w",&w);
   oldtree->SetBranchAddress("runNumber",&runNumber);
   oldtree->SetBranchAddress("n_baseel",&n_baseel);
@@ -144,11 +217,18 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   oldtree->SetBranchAddress("jet_phi",&jet_phi);
   oldtree->SetBranchAddress("jet_m",&jet_m);
   oldtree->SetBranchAddress("jet_jvt",&jet_jvt);
+  oldtree->SetBranchAddress("jet_fjvt",&jet_fjvt);
+  oldtree->SetBranchAddress("jet_btag_weight",&jet_btag_weight);
+  oldtree->SetBranchAddress("jet_timing",&jet_timing);
+  oldtree->SetBranchAddress("jet_PartonTruthLabelID",&jet_PartonTruthLabelID);
+  oldtree->SetBranchAddress("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
+  
   oldtree->SetBranchAddress("basejet_pt", &basejet_pt);
   oldtree->SetBranchAddress("basejet_eta",&basejet_eta);
   oldtree->SetBranchAddress("basejet_phi",&basejet_phi);
   oldtree->SetBranchAddress("basejet_m",  &basejet_m);
   oldtree->SetBranchAddress("basejet_jvt",&basejet_jvt);
+  oldtree->SetBranchAddress("basejet_fjvt",&basejet_fjvt);
   
   oldtree->SetBranchAddress("met_tst_j1_dphi",&met_tst_j1_dphi);
   oldtree->SetBranchAddress("met_tst_j2_dphi",&met_tst_j2_dphi);
@@ -172,12 +252,21 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   oldtree->SetBranchAddress("jj_dphi",&jj_dphi);
   oldtree->SetBranchAddress("n_jet",&n_jet);
   
+  oldtree->SetBranchAddress("trigger_met_encodedv2",     &trigger_met_encodedv2);
+  oldtree->SetBranchAddress("trigger_met",     &trigger_met);
+  oldtree->SetBranchAddress("xeSFTrigWeight",            &xeSFTrigWeight);
+  oldtree->SetBranchAddress("xeSFTrigWeight__1up",       &xeSFTrigWeight__1up);
+  oldtree->SetBranchAddress("xeSFTrigWeight__1down",     &xeSFTrigWeight__1down);
+  oldtree->SetBranchAddress("xeSFTrigWeight_nomu",       &xeSFTrigWeight_nomu);
+  oldtree->SetBranchAddress("xeSFTrigWeight_nomu__1up",  &xeSFTrigWeight_nomu__1up);
+  oldtree->SetBranchAddress("xeSFTrigWeight_nomu__1down",&xeSFTrigWeight_nomu__1down);  
+  
   oldtree->SetBranchAddress("truth_jj_mass",&truth_jj_mass);
   oldtree->SetBranchAddress("truth_V_dressed_pt",&truth_V_dressed_pt);
   oldtree->SetBranchAddress("SherpaVTruthPt",&SherpaVTruthPt);
 
   //Create a new file + a clone of old tree in new file
-  std::string outfileName="/tmp/small"+treeNmae+".root";
+  std::string outfileName="/tmp/smallv2"+treeNmae+".root";
   TFile *newfile = new TFile(outfileName.c_str(),"recreate");
   TTree *newtree = oldtree->CloneTree(0);
   //newtree->SetName("SmearPhJetsNominal");
@@ -191,8 +280,9 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   unsigned nSamples=20;
   TVector3 met_before,met_nolep_before,newel,met_after,met_nolep_after,met_cst_before,met_cst_after;
   TLorentzVector tmptvl,smeared_jet_bit,jet1,jet2;
-  std::vector<TLorentzVector> alljetvec_before, alljetvec_after;
-  std::vector<float> jvt,jvt_after;
+  //std::vector<TLorentzVector> alljetvec_before, alljetvec_after;
+  std::vector<JetStruct> alljetvec_before,alljetvec_after;
+  JetStruct tmpJetStruct;
   std::vector<bool> passMETCuts;
   std::cout << "setting seed: " << runNumber << std::endl;
   int periodSeed=0;
@@ -201,6 +291,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
   m_rand.SetSeed(runNumber+periodSeed);
   for (Long64_t i=0;i<nentries; i++) {
     if((i%10000)==0) std::cout <<"evt: " << i << std::endl;
+    //if(i>30000) break;
     oldtree->GetEntry(i);
     cutflow->Fill(1);
     cutflow->Fill(2,w);
@@ -208,20 +299,44 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
       
       //divide by the number of smearings
       w/=float(nSamples);
-
+      w*=0.35; // normalizing to the low met region
       // Load the jet vectors
       alljetvec_before.clear();
       for(unsigned ijet=0; ijet<jet_pt->size(); ++ijet){
 	tmptvl.SetPtEtaPhiM(jet_pt->at(ijet),jet_eta->at(ijet), jet_phi->at(ijet), jet_m->at(ijet));
-	alljetvec_before.push_back(tmptvl);
-	jvt.push_back(jet_jvt->at(ijet));
+	// filling
+	tmpJetStruct.jet_vec = tmptvl;
+	tmpJetStruct.jet_pt = jet_pt->at(ijet);
+	tmpJetStruct.jet_eta = jet_eta->at(ijet);
+	tmpJetStruct.jet_phi = jet_phi->at(ijet);
+	tmpJetStruct.jet_m = jet_m->at(ijet);
+	tmpJetStruct.jet_jvt = jet_jvt->at(ijet);	
+	tmpJetStruct.jet_fjvt = jet_fjvt->at(ijet);	
+	tmpJetStruct.jet_btag_weight = jet_btag_weight->at(ijet);	
+	tmpJetStruct.jet_timing = jet_timing->at(ijet);	
+	tmpJetStruct.jet_PartonTruthLabelID = jet_PartonTruthLabelID->at(ijet);	
+	tmpJetStruct.jet_ConeTruthLabelID = jet_ConeTruthLabelID->at(ijet);	
+
+	alljetvec_before.push_back(tmpJetStruct);
 	passMETCuts.push_back(passMETSelection(tmptvl,jet_jvt->at(ijet)));
       }
       if(debug) std::cout << "filled jet" << std::endl;      
       for(unsigned ijet=0; ijet<basejet_pt->size(); ++ijet){
 	tmptvl.SetPtEtaPhiM(basejet_pt->at(ijet),basejet_eta->at(ijet), basejet_phi->at(ijet), basejet_m->at(ijet));
-	alljetvec_before.push_back(tmptvl);
-	jvt.push_back(basejet_jvt->at(ijet));
+	// filling
+	tmpJetStruct.jet_vec = tmptvl;
+	tmpJetStruct.jet_pt = basejet_pt->at(ijet);
+	tmpJetStruct.jet_eta = basejet_eta->at(ijet);
+	tmpJetStruct.jet_phi = basejet_phi->at(ijet);
+	tmpJetStruct.jet_m = basejet_m->at(ijet);
+	tmpJetStruct.jet_jvt = basejet_jvt->at(ijet);	
+	tmpJetStruct.jet_fjvt = basejet_fjvt->at(ijet);
+	tmpJetStruct.jet_btag_weight = 0.0;
+	tmpJetStruct.jet_timing = 0.0;
+	tmpJetStruct.jet_PartonTruthLabelID = 1;
+	tmpJetStruct.jet_ConeTruthLabelID = 1;
+	
+	alljetvec_before.push_back(tmpJetStruct);
 	passMETCuts.push_back(passMETSelection(tmptvl,basejet_jvt->at(ijet)));	
       }
       if(debug) std::cout << "filled basejet" << std::endl;
@@ -231,6 +346,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
       basejet_phi->clear();
       basejet_m->clear();
       basejet_jvt->clear();
+      basejet_fjvt->clear();      
 
       // set variables before smearing
       met_before.SetPtEtaPhi(met_tst_et,0.0,met_tst_phi);
@@ -243,7 +359,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	if(debug) std::cout << "sample: " << sample << std::endl;
 	// smear jets
 	for(unsigned ijet=0;ijet<alljetvec_before.size(); ++ijet){
-	  tmptvl=alljetvec_before.at(ijet);
+	  tmptvl=alljetvec_before.at(ijet).jet_vec;
 	  // apply the smearing
 	  float energy_smear = m_rand.Gaus(0.0,smearWidth(tmptvl.Pt(),tmptvl.Eta()));
 	  float rand_deta = m_rand.Gaus(0.0,0.05);	  
@@ -251,57 +367,70 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	  smeared_jet_bit.SetPtEtaPhiM( fabs(energy_smear), tmptvl.Eta()+rand_deta, tmptvl.Phi()+rand_dphi, 0.0); // currently just a pT & energy change & jet angle. not changing the mass
 	  if(energy_smear>0.0) tmptvl+=smeared_jet_bit;
 	  else                 tmptvl-=smeared_jet_bit;
-	  alljetvec_after.push_back(tmptvl);
+	  // filling
+	  tmpJetStruct.jet_vec = tmptvl;
+	  tmpJetStruct.jet_pt = tmptvl.Pt();
+	  tmpJetStruct.jet_eta = tmptvl.Eta();
+	  tmpJetStruct.jet_phi = tmptvl.Phi();
+	  tmpJetStruct.jet_m = tmptvl.M();
+	  tmpJetStruct.jet_jvt = alljetvec_before.at(ijet).jet_jvt;
+	  tmpJetStruct.jet_fjvt = alljetvec_before.at(ijet).jet_fjvt;
+	  tmpJetStruct.jet_btag_weight = alljetvec_before.at(ijet).jet_btag_weight;
+	  tmpJetStruct.jet_timing = alljetvec_before.at(ijet).jet_timing;
+	  tmpJetStruct.jet_PartonTruthLabelID = alljetvec_before.at(ijet).jet_PartonTruthLabelID;
+	  tmpJetStruct.jet_ConeTruthLabelID = alljetvec_before.at(ijet).jet_ConeTruthLabelID;
+	  
+	  alljetvec_after.push_back(tmpJetStruct);
 	  if(debug){ std::cout << "jet before: " << alljetvec_before.at(ijet).Pt() << "  after: " << tmptvl.Pt() << std::endl; }
 	}
 	if(debug) std::cout << "smeared jets done " << std::endl;
-	
+
 	// update the MET
 	met_after=met_before;
 	met_cst_after=met_cst_before;	
 	met_nolep_after=met_nolep_before;
 	for(unsigned ijet=0;ijet<alljetvec_after.size(); ++ijet){
-	  bool newJetPassMETSel = passMETSelection(alljetvec_after.at(ijet), jvt.at(ijet));
+	  bool newJetPassMETSel = passMETSelection(alljetvec_after.at(ijet).jet_vec, alljetvec_after.at(ijet).jet_jvt);
 	  if(passMETCuts.at(ijet) && !newJetPassMETSel){
-	    correctMET(met_after, alljetvec_before.at(ijet), true); // remove old jet. so add it back
-	    correctMET(met_nolep_after, alljetvec_before.at(ijet), true); // remove old jet. so add it back
+	    correctMET(met_after, alljetvec_before.at(ijet).jet_vec, true); // remove old jet. so add it back
+	    correctMET(met_nolep_after, alljetvec_before.at(ijet).jet_vec, true); // remove old jet. so add it back
 	  }else if(!passMETCuts.at(ijet) && newJetPassMETSel){
-	    correctMET(met_after, alljetvec_after.at(ijet), false); // subtract it. negative vector sum jazz
-	    correctMET(met_nolep_after, alljetvec_after.at(ijet), false); // subtract it. negative vector sum jazz
+	    correctMET(met_after, alljetvec_after.at(ijet).jet_vec, false); // subtract it. negative vector sum jazz
+	    correctMET(met_nolep_after, alljetvec_after.at(ijet).jet_vec, false); // subtract it. negative vector sum jazz
 	  }else if(passMETCuts.at(ijet) && newJetPassMETSel){
-	    correctMET(met_after, alljetvec_before.at(ijet), true); // remove old jet. so add it back
-	    correctMET(met_after, alljetvec_after.at(ijet), false); // subtract it. negative vector sum jazz
-	    correctMET(met_nolep_after, alljetvec_before.at(ijet), true); // remove old jet. so add it back
-	    correctMET(met_nolep_after, alljetvec_after.at(ijet), false); // subtract it. negative vector sum jazz	    
+	    correctMET(met_after, alljetvec_before.at(ijet).jet_vec, true); // remove old jet. so add it back
+	    correctMET(met_after, alljetvec_after.at(ijet).jet_vec, false); // subtract it. negative vector sum jazz
+	    correctMET(met_nolep_after, alljetvec_before.at(ijet).jet_vec, true); // remove old jet. so add it back
+	    correctMET(met_nolep_after, alljetvec_after.at(ijet).jet_vec, false); // subtract it. negative vector sum jazz	    
 	  }
+	  
 	  // do the vector sum of all jets
 	  bool passCSTBefore = alljetvec_before.at(ijet).Pt()>20e3;
 	  bool passCSTAfter = alljetvec_after.at(ijet).Pt()>20e3;
 	  if(passCSTBefore && !passCSTAfter){
-	    correctMET(met_after, alljetvec_before.at(ijet), true); // remove old jet. so add it back
+	    correctMET(met_after, alljetvec_before.at(ijet).jet_vec, true); // remove old jet. so add it back
 	  }else if(!passCSTBefore && passCSTAfter){
-	    correctMET(met_after, alljetvec_after.at(ijet), false); // subtract it. negative vector sum jazz
+	    correctMET(met_after, alljetvec_after.at(ijet).jet_vec, false); // subtract it. negative vector sum jazz
 	  }else if(passCSTBefore && passCSTAfter){
-	    correctMET(met_cst_after, alljetvec_before.at(ijet), true); // remove old jet. so add it back
-	    correctMET(met_cst_after, alljetvec_after.at(ijet), false); // subtract it. negative vector sum jazz
+	    correctMET(met_cst_after, alljetvec_before.at(ijet).jet_vec, true); // remove old jet. so add it back
+	    correctMET(met_cst_after, alljetvec_after.at(ijet).jet_vec, false); // subtract it. negative vector sum jazz
 	  }
 	}// end correcting the MET
 	if(debug) std::cout << "update met done " << std::endl;
 	
-	// count jets. doing this by removing those that don't pass cuts
-	jet_jvt->clear();
+	// count jets. doing this by removing those that don't pass cuts		
 	for(unsigned ijet=0;ijet<alljetvec_after.size(); ++ijet){
 	  if(alljetvec_after.at(ijet).Pt()<25.0e3){
 	    alljetvec_after.erase(alljetvec_after.begin()+ijet);
 	    --ijet;
 	    continue;
 	  }
-	  else if(alljetvec_after.at(ijet).Pt()<60.0e3 && fabs(alljetvec_after.at(ijet).Eta())<2.4 && jvt.at(ijet)<0.11){
+	  else if(alljetvec_after.at(ijet).Pt()<60.0e3 && fabs(alljetvec_after.at(ijet).Eta())<2.4 && alljetvec_after.at(ijet).jet_jvt<0.11){
 	    alljetvec_after.erase(alljetvec_after.begin()+ijet);
 	    --ijet;
 	    continue;
 	  }
-	  jet_jvt->push_back(jvt.at(ijet)); // not quite correct as the jet jvt was not sorted. can deal with it later
+	  //jet_jvt->push_back(alljetvec_after.at(ijet).jet_jvt); 
 	}
 	
 	std::sort(alljetvec_after.begin(),alljetvec_after.end(),SortPhysicsObject("pt"));
@@ -310,11 +439,25 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	jet_eta->clear();
 	jet_phi->clear();
 	jet_m->clear();
+	jet_jvt->clear();
+	jet_fjvt->clear();
+	jet_btag_weight->clear();
+	jet_timing->clear();
+	jet_btag_weight->clear();
+	jet_PartonTruthLabelID->clear();
+	jet_ConeTruthLabelID->clear();
+
 	for(unsigned ijet=0;ijet<alljetvec_after.size(); ++ijet){
 	  jet_pt->push_back(alljetvec_after.at(ijet).Pt());
 	  jet_eta->push_back(alljetvec_after.at(ijet).Eta());
 	  jet_phi->push_back(alljetvec_after.at(ijet).Phi());
 	  jet_m->push_back(alljetvec_after.at(ijet).M());
+	  jet_jvt->push_back(alljetvec_after.at(ijet).jet_jvt);
+	  jet_fjvt->push_back(alljetvec_after.at(ijet).jet_fjvt);
+	  jet_timing->push_back(alljetvec_after.at(ijet).jet_timing);	  
+	  jet_btag_weight->push_back(alljetvec_after.at(ijet).jet_btag_weight);
+	  jet_PartonTruthLabelID->push_back(alljetvec_after.at(ijet).jet_PartonTruthLabelID);
+	  jet_ConeTruthLabelID->push_back(alljetvec_after.at(ijet).jet_ConeTruthLabelID);
 	}
 	jj_mass=0.0;
 	jj_deta=0.0;
@@ -326,8 +469,8 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	met_tst_nolep_et=met_nolep_after.Pt();
 	met_tst_nolep_phi=met_nolep_after.Phi();
 	if(alljetvec_after.size()>1){
-	  jet1=alljetvec_after.at(0);
-	  jet2=alljetvec_after.at(1);
+	  jet1=alljetvec_after.at(0).jet_vec;
+	  jet2=alljetvec_after.at(1).jet_vec;
 	  met_tst_j1_dphi=fabs(jet1.Vect().DeltaPhi(met_after));
 	  met_tst_j2_dphi=fabs(jet2.Vect().DeltaPhi(met_after));
 	  met_tst_nolep_j1_dphi=fabs(jet1.Vect().DeltaPhi(met_nolep_after));
@@ -336,6 +479,20 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
 	  jj_deta = fabs(jet1.Eta() - jet2.Eta());
 	  jj_mass = (jet1 + jet2).M();
 	}
+
+	// update trigger SF
+	xeSFTrigWeight        = weightXETrigSF(met_tst_et, 0, 0);
+	xeSFTrigWeight__1up   = weightXETrigSF(met_tst_et, 0, 1);
+	xeSFTrigWeight__1down = weightXETrigSF(met_tst_et, 0, 2);
+	xeSFTrigWeight_nomu        = weightXETrigSF(met_tst_nolep_et, 0, 0);
+	xeSFTrigWeight_nomu__1up   = weightXETrigSF(met_tst_nolep_et, 0, 1);
+	xeSFTrigWeight_nomu__1down = weightXETrigSF(met_tst_nolep_et, 0, 2);
+	// set the met triggers to pass
+	//(trigger_met_encodedv2& 0x2);
+	trigger_met_encodedv2 |= 0x1; // pass 2015/6
+	trigger_met_encodedv2 |= 0x2; // pass 2017
+	trigger_met_encodedv2 |= 0x8; // pass 2018
+	trigger_met=1;
 	if(debug){
 	  std::cout << "njet: " << n_jet << std::endl;
 	  if(n_jet>1)
