@@ -660,8 +660,9 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
         #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
     cuts += [CutItem('CutPh',       'n_ph==1')]
+    cuts += [CutItem('CutPhPt', 'phPt>15.0')] 
     if basic_cuts.analysis not in ['lowmet']:
-        cuts += [CutItem('CutPhPt', 'phPt<110.0')] 
+        cuts += [CutItem('CutPhPtHig', 'phPt<110.0')] 
     cuts += getJetCuts(basic_cuts, options, isPh=True);
 
     # add the extra cuts...decide if we want these
@@ -797,7 +798,11 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
         cutMetSignif = CutItem('CutMetSignif')
         cutMetSignif.AddCut(CutItem('Muon',  'n_mu_w>0'), 'OR')
         cutMetSignif.AddCut(CutItem('METSig', 'met_significance > 4.0'), 'OR')
-        cuts += [cutMetSignif]        
+        cuts += [cutMetSignif]
+        cutWMT = CutItem('CutWMT')
+        cutWMT.AddCut(CutItem('Electron',  'n_el_w>0'), 'OR')
+        cutWMT.AddCut(CutItem('MTW', 'mt > 20.0'), 'OR')
+        cuts += [cutWMT]
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=True)
 

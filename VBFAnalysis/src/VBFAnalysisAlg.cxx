@@ -179,6 +179,12 @@ StatusCode VBFAnalysisAlg::initialize() {
   el_phi= new std::vector<float>(0);
   mu_eta= new std::vector<float>(0);
   el_eta= new std::vector<float>(0);
+  basejet_pt= new std::vector<float>(0);
+  basejet_phi= new std::vector<float>(0);
+  basejet_eta= new std::vector<float>(0);
+  basejet_m= new std::vector<float>(0);
+  basejet_jvt= new std::vector<float>(0);
+  basejet_fjvt= new std::vector<float>(0);
   jet_pt= new std::vector<float>(0);
   jet_phi= new std::vector<float>(0);
   jet_eta= new std::vector<float>(0);
@@ -250,6 +256,20 @@ StatusCode VBFAnalysisAlg::initialize() {
   //Create new output TTree
   treeTitleOut = m_currentSample+m_currentVariation;
   treeNameOut = m_currentSample+m_currentVariation;
+  // relabel things for the photon skim
+  if(m_PhotonSkim){
+    std::string treeSName = m_currentSample;
+    if(m_currentSample=="Z_EWK") treeSName="Zg_EWK";
+    if(m_currentSample=="W_EWK") treeSName="Wg_EWK";
+    if(m_currentSample=="Z_strong") treeSName="Zg_strong";
+    if(m_currentSample=="W_strong") treeSName="Wg_strong";
+    if(m_currentSample=="Z_strongExt") treeSName="Zg_strong";
+    if(m_currentSample=="W_strongExt") treeSName="Wg_strong";
+    if(m_currentSample=="VBFH125") treeSName="VBFgamH125";
+    if(m_currentSample=="ttg") treeSName="ttbar";
+    treeTitleOut= treeSName+m_currentVariation;
+    treeNameOut = treeSName+m_currentVariation;
+  }
   m_tree_out = new TTree(treeNameOut.c_str(), treeTitleOut.c_str());
   m_tree_out->Branch("w",&w);
   //m_tree_out->Branch("nloEWKWeight",&nloEWKWeight);
@@ -320,6 +340,14 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("el_phi",&el_phi);
   m_tree_out->Branch("mu_eta",&mu_eta);
   m_tree_out->Branch("el_eta",&el_eta);
+  if(m_currentVariation=="Nominal" && m_METTrigPassThru){
+    m_tree_out->Branch("basejet_pt",&basejet_pt);
+    m_tree_out->Branch("basejet_phi",&basejet_phi);
+    m_tree_out->Branch("basejet_eta",&basejet_eta);
+    m_tree_out->Branch("basejet_m",  &basejet_m);
+    m_tree_out->Branch("basejet_jvt",&basejet_jvt);
+    m_tree_out->Branch("basejet_fjvt",&basejet_fjvt);
+  }
   m_tree_out->Branch("jet_phi",&jet_phi);
   m_tree_out->Branch("jet_eta",&jet_eta);
   m_tree_out->Branch("jet_m",&jet_m);
@@ -1169,11 +1197,14 @@ StatusCode VBFAnalysisAlg::execute() {
     passMJSkim=false;
     if((jj_mass>2e5 && jj_mass<800e5) && (met_cst_jet>120e3) && jj_dphi<DPhijjCut && jj_deta>DEtajjCut && n_jet>1 && n_jet<5 && (jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut)) passMJSkim=true;  // low mjj
     if((jj_mass>800e5) && (met_cst_jet>100e3) && (met_tst_nolep_et > 100e3 && met_tst_nolep_et<160e3) && (n_baseel==0 && n_basemu==0) && jj_dphi<DPhijjCut && jj_deta>DEtajjCut && n_jet>1 && n_jet<4 && (jet_pt->at(0) > LeadJetPtCut) & (jet_pt->at(1) > subLeadJetPtCut)) passMJSkim=true;  // low met
+  }else if(m_PhotonSkim && m_METTrigPassThru){
+    LeadJetPtCut=50.0e3;
+    subLeadJetPtCut=40e3;
   }
 
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
   if(!passMJSkim) return StatusCode::SUCCESS;
-  bool GammaMETSR = (n_ph>0 || n_el>0 || (baseph_pt && baseph_pt->size()>0)) && (jj_deta>2.5) && (jj_mass>200.0e3);
+  bool GammaMETSR = (n_ph>0 || n_el>0 || (m_currentVariation=="Nominal" ? (baseph_pt && baseph_pt->size()>0): false)) && (jj_deta>2.5) && (jj_mass>200.0e3);
   if(m_currentVariation!="Nominal") GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (n_jet < 2 && !TruthSkim) return StatusCode::SUCCESS;
@@ -1191,6 +1222,27 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   // skim on the photon plus jet events
   if(m_PhotonSkim && !GammaMETSR) return StatusCode::SUCCESS;
+  // remove overlap
+  if(m_PhotonSkim && m_isMC){
+    TruthSkim=false;
+    bool isVjets = (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos );
+    bool isVgjets = (m_currentSample.find("Zg_strong")!= std::string::npos || m_currentSample.find("Wg_strong")!= std::string::npos || m_currentSample.find("Wg_EWK")!= std::string::npos || m_currentSample.find("Zg_EWK") != std::string::npos || m_currentSample.find("VBFgamH125")!= std::string::npos || m_currentSample.find("ttg")!= std::string::npos || m_currentSample.find("VqqGam")!= std::string::npos);
+    bool isTop = m_currentSample.find("ttbar")!= std::string::npos;
+    bool isH =  m_currentSample.find("VBFH125")!= std::string::npos;
+    ATH_MSG_DEBUG("isVjets: " << isVjets << " isH: " << isH << " isTop: " << isTop << " isVgjets: " << isVgjets << " passVjetsFilterTauEl: " << passVjetsFilterTauEl);
+    if(isVjets && in_vy_overlap)   return StatusCode::SUCCESS;
+    if(isH     && in_vy_overlap)   return StatusCode::SUCCESS; // removing overlap in the signal
+    if(isTop   && in_vy_overlap)   return StatusCode::SUCCESS;
+    if(isVgjets && !in_vy_overlap) return StatusCode::SUCCESS;
+    // apply the kt-vjets merging
+    if(!passVjetsFilterTauEl) return  StatusCode::SUCCESS;
+
+    // clean the photons. make sure there aren't e-fakes
+    if(n_ph==1 && ph_pt->at(0)>15e3){
+      if(ph_truthOrigin->at(0)==1 ) return StatusCode::SUCCESS; //ElMagProc 9??, SingleElec 1
+      // LightMeson 23, PiZero 42, TauLep 9 todo for jets faking photons
+    }
+  }
 
   ATH_MSG_DEBUG ("Pass VBF cuts!");
   // encoding met triggers
@@ -1246,6 +1298,25 @@ StatusCode VBFAnalysisAlg::execute() {
   bool OneMuon = (n_mu == 1);// n_mu should be a subset of basemu
   bool passMETCut = (met_tst_et > METCut && (met_tst_j1_dphi>1.0) && (met_tst_j2_dphi>1.0));
   bool passMETNoLepCut = (met_tst_nolep_et > METCut && (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0));
+  // this is for the electron faking photon CR. we need to allow for 1 electron to be visible
+  bool passMETNoLepOR1el = passMETCut || passMETNoLepCut;
+  // if there is one electron and no photon, then this can only enter as a photon fake. So the electron must be in the met. this tightens the cut
+  if(n_el==1 && (n_ph==0) && m_currentVariation=="Nominal"){
+    passMETNoLepOR1el = passMETCut;    
+  }else if(n_el>1 && m_currentVariation=="Nominal"){
+    TVector3 my_met, my_ele;
+    bool noPhotonMETCut=false;
+    for(unsigned iel=0; iel<el_pt->size(); ++iel){
+      my_met.SetPtEtaPhi(met_tst_nolep_et,0.0,met_tst_nolep_phi);
+      my_ele.SetPtEtaPhi(el_pt->at(iel),0.0,el_phi->at(iel));
+      my_met-=my_ele;
+      float met_tst_1el_et = my_met.Pt();
+      noPhotonMETCut = noPhotonMETCut || (met_tst_1el_et>METCut);
+      passMETNoLepOR1el = passMETNoLepOR1el || (met_tst_1el_et>METCut);
+    }
+    // if there is no photon, then let's tighten the met cuts. one electron is visible and the other is not
+    if (n_ph==0) passMETNoLepOR1el=noPhotonMETCut;
+  }
   if(!m_LooseSkim){
     if ((passMETTrig) && (passMETCut) && (n_el == 0) && (n_mu == 0)) SR = true;
   }else{
@@ -1412,7 +1483,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //std::cout << "VBFAnalysisAlg: evtNum: " << eventNumber <<" wTOT: " << w << " weight: " << weight << " mcEventWeight: " << mcEventWeight << " puWeight: " << puWeight << " jvtSFWeight: " << jvtSFWeight << " elSFWeight: " << elSFWeight << " muSFWeight: " << muSFWeight << " elSFTrigWeight: " << elSFTrigWeight << " muSFTrigWeight: " << muSFTrigWeight << " phSFWeight: " << phSFWeight << " eleANTISF: " << eleANTISF << " nloEWKWeight: " << nloEWKWeight << " qg: " << tmp_qgTagWeight << " PU2018: " << tmp_puSyst2018Weight << " Vjets syst: " << tmp_vjWeight << " n_el_w: " << n_el_w << " n_el: " << n_el << " n_mu_w: " << n_mu_w << " n_mu: " << n_mu << " n_jet " << n_jet << std::endl;
 
   // only save events that pass any of the regions
-  if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || GammaMETSR || TruthSkim)) return StatusCode::SUCCESS;
+  if (!(SR || CRWep || CRWen || CRWepLowSig || CRWenLowSig || CRWmp || CRWmn || CRZee || CRZmm || CRZtt || (GammaMETSR && (passMETNoLepOR1el || m_METTrigPassThru)) || TruthSkim)) return StatusCode::SUCCESS;
   double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
   computeMETj(met_tenacious_tst_phi, jet_phi, m_met_tenacious_tst_j1_dphi,m_met_tenacious_tst_j2_dphi);
   met_tenacious_tst_j1_dphi = m_met_tenacious_tst_j1_dphi;
@@ -1613,6 +1684,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("el_pt",1);
   m_tree->SetBranchStatus("el_phi",1);
   m_tree->SetBranchStatus("el_eta",1);
+  if(m_currentVariation=="Nominal" && m_METTrigPassThru){
+    m_tree->SetBranchStatus("basejet_pt",1);
+    m_tree->SetBranchStatus("basejet_phi",1);
+    m_tree->SetBranchStatus("basejet_eta",1);
+    m_tree->SetBranchStatus("basejet_m",1);
+    m_tree->SetBranchStatus("basejet_jvt",1);
+    m_tree->SetBranchStatus("basejet_fjvt",1);
+  }
   m_tree->SetBranchStatus("jet_pt",1);
   m_tree->SetBranchStatus("jet_phi",1);
   m_tree->SetBranchStatus("jet_eta",1);
@@ -1843,6 +1922,14 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("jet_ConeTruthLabelID",&jet_ConeTruthLabelID);
   if(m_currentVariation=="Nominal"){
     m_tree->SetBranchAddress("jet_btag_weight",&jet_btag_weight);
+    if(m_METTrigPassThru){
+      m_tree->SetBranchAddress("basejet_pt", &basejet_pt);
+      m_tree->SetBranchAddress("basejet_phi",&basejet_phi);
+      m_tree->SetBranchAddress("basejet_eta",&basejet_eta);
+      m_tree->SetBranchAddress("basejet_m",  &basejet_m);
+      m_tree->SetBranchAddress("basejet_jvt",&basejet_jvt);
+      m_tree->SetBranchAddress("basejet_fjvt",&basejet_fjvt);
+    }
   }
   //if(foundGenMET) m_tree->SetBranchAddress("jet_passJvt",&jet_passJvt);
   if(m_QGTagger){
