@@ -2606,8 +2606,8 @@ def main():
         bkgs = ['zewk', 'zqcd','wewk','wqcd','tall','dqcd'] #,'mqcd','zldy','vvv'
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
-            #bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','tall'] #,'mqcd','zldy','vvv'
-            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','tall','efakeph'] #,'mqcd','zldy','vvv'
+            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','tall'] #,'mqcd','zldy','vvv'
+            #bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','tall','efakeph'] #,'mqcd','zldy','vvv'
     if options.add_fakeE:
         bkgs+=['tth']
     if options.stack_signal:
