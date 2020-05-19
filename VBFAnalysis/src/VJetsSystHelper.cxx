@@ -331,7 +331,7 @@ const std::vector<TString> &VJetsSystHelper::getAllVariationNames()
 
 }
 
-double VJetsSystHelper::getCorrection(int mcChannelNumber, double pTV, TString variation)
+double VJetsSystHelper::getCorrection(int mcChannelNumber, double pTV, double mjj, TString variation)
 {
 
    if (!m_initialized) {
@@ -351,6 +351,16 @@ double VJetsSystHelper::getCorrection(int mcChannelNumber, double pTV, TString v
    else if ((364100 <= mcChannelNumber && mcChannelNumber <= 364113)||mcChannelNumber==364216||mcChannelNumber==364217) process = "eej"; // Zuu
    else if ((364114 <= mcChannelNumber && mcChannelNumber <= 364127)||mcChannelNumber==364218||mcChannelNumber==364219) process = "eej"; // Zee
    else if ((364128 <= mcChannelNumber && mcChannelNumber <= 364141)||mcChannelNumber==364220||mcChannelNumber==364221) process = "eej"; // Ztt
+
+   // add kT merged samples QCD 227 samples
+   if(312496 <= mcChannelNumber && mcChannelNumber<=312531) process = "evj"; // Wlv
+   else if(312448 <= mcChannelNumber && mcChannelNumber<=312483) process = "eej"; // Zll
+   else if(312484 <= mcChannelNumber && mcChannelNumber<=312495) process = "vvj"; // Znn
+
+   // EWK samples powheg and sherpa
+   if((308096 <= mcChannelNumber && mcChannelNumber<=308098) || (363237 <= mcChannelNumber && mcChannelNumber<=363239) || mcChannelNumber==830006) process = "evj"; // Wlv
+   else if((308092 <= mcChannelNumber && mcChannelNumber<=308094) || (363234 <= mcChannelNumber && mcChannelNumber<=363236) || mcChannelNumber==830007) process = "eej"; // Zll
+   else if(mcChannelNumber==363233 && mcChannelNumber==308095) process = "vvj"; // Znn
 
    if (process == "") return 1.;
 

@@ -27,7 +27,7 @@ public:
 
   const std::vector<TString> &getAllVariationNames();
 
-  double getCorrection(int mcChannelNumber, double pTV, TString variation="Nominal");
+  double getCorrection(int mcChannelNumber, double pTV, double mjj, TString variation="Nominal");
 
 private:
 

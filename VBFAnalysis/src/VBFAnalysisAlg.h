@@ -168,6 +168,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Float_t elSFTrigWeight;
   Float_t muSFTrigWeight;
   Float_t phSFWeight;
+  Float_t ph_pointing_z;
   Float_t xeSFTrigWeight;
   Float_t xeSFTrigWeight__1up;
   Float_t xeSFTrigWeight__1down;
@@ -372,12 +373,16 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   std::vector<Float_t>* ph_ptcone20;
   std::vector<Float_t>* ph_topoetcone40;
   std::vector<Int_t>*   ph_truthOrigin;
+  std::vector<Int_t>*   ph_truthType;
+  std::vector<Float_t>*   ph_vtxpos;
   std::vector<Float_t>* baseph_pt;
   std::vector<Float_t>* baseph_phi;
   std::vector<Float_t>* baseph_eta;
   std::vector<Float_t>* baseph_ptcone20;
   std::vector<Float_t>* baseph_topoetcone40;
   std::vector<Int_t>*   baseph_truthOrigin;
+  std::vector<Int_t>*   baseph_truthType;
+  std::vector<Float_t>*   baseph_vtxpos;
   std::vector<unsigned>* baseph_isEM;
   std::vector<bool>*    baseph_iso;
   std::vector<Float_t>* tau_pt;
