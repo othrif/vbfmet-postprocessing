@@ -278,7 +278,8 @@ keys_regions = ['SR','Zee','Zmm','Wmnminus','Wmnplus','Wenminus','Wenplus']
 if args.combinePlusMinus:
     keys_regions = ['SR','Zll','Wmunu','Wenu']
 if args.ph_ana:
-    keys_regions = ['SR','Zll','Wmunu','Wenu']    
+    keys_regions = ['SR','Zll','Wmunu','Wenu']
+    keys_regions_map={'SR':'SR','Zll':'$Z(\\rightarrow\ell\ell)+\\gamma$ CR','Wmunu':'$W(\\rightarrow\\mu\\nu)+\\gamma$ CR','Wenu':'$W(\\rightarrow$e$\\nu)+\\gamma$ CR','WenuLowMetSig':'Fake e CR','WmunuMT':'Fake $\\mu$ CR'}    
 print ''
 print '\\resizebox{\\textwidth}{!}{ '
 if args.combinePlusMinus:

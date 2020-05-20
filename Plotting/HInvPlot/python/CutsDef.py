@@ -809,7 +809,10 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
         cuts += [cutMetSignif]
         cutWMT = CutItem('CutWMT')
         cutWMT.AddCut(CutItem('Electron',  'n_el_w>0'), 'OR')
-        cutWMT.AddCut(CutItem('MTW', 'mt > 20.0'), 'OR')
+        if basic_cuts.analysis.count('LowMETQCD'):
+            cutWMT.AddCut(CutItem('MTW', 'mt > 40.0'), 'OR')
+        else:
+            cutWMT.AddCut(CutItem('MTW', 'mt > 20.0'), 'OR')
         cuts += [cutWMT]
     # VBF cuts
     cuts+=getVBFCuts(options, basic_cuts, isLep=True)
