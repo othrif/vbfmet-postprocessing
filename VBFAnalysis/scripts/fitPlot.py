@@ -30,12 +30,13 @@ def skipThis(key):
     if "VBFH125Old" in key:  toskip=True
     if "ggFH125Old" in key:  toskip=True
     if "Z_strongmVBFFilt" in key:  toskip=True
-    if "Wg_EWK" in key:  toskip=True
-    if "Zg_EWK" in key:  toskip=True
-    if "Zg_strong" in key:  toskip=True
-    if "Wg_strong" in key:  toskip=True
-    if "SinglePhoton" in key:  toskip=True
-    if "VqqGam" in key:  toskip=True
+    if not options.ph_ana:
+        if "Wg_EWK" in key:  toskip=True
+        if "Zg_EWK" in key:  toskip=True
+        if "Zg_strong" in key:  toskip=True
+        if "Wg_strong" in key:  toskip=True
+        if "SinglePhoton" in key:  toskip=True
+        if "VqqGam" in key:  toskip=True
     if "TTH125" in key:  toskip=True
     if "Ext" in key:  toskip=True
     if "Blind" in key:  toskip=True
@@ -88,7 +89,7 @@ def getNF(histDict, nbins, signalKeys=[], NFOnly=False):
         if hkey in signalKeys:
             sigV+=getBinsYield(histDict[hkey], nbins)
             sigE+=(getBinsError(histDict[hkey], nbins))**2
-        elif hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet"]:
+        elif hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet"]:
             bkgV+=getBinsYield(histDict[hkey], nbins)
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=(dataV-bkgV)
@@ -107,7 +108,7 @@ def getDataMC(histDict, nbins):
     for hkey,hist in histDict.iteritems():
         if hkey=="signal":
             continue
-        if hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet"]:
+        if hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet"]:
             bkgV+=getBinsYield(histDict[hkey], nbins)
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=dataV
@@ -158,7 +159,11 @@ class texTable(object):
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
                    'W_strong':'#it{W} strong',
-                   'signal':'#it{H}(#it{B}_{inv} = 0.13)',
+                   'Zg_EWK':'#it{Z+#gamma} EWK',
+                   'Wg_EWK':'#it{W+#gamma} EWK',
+                   'Zg_strong':'#it{Z+#gamma} strong',
+                   'Wg_strong':'#it{W+#gamma} strong',                   
+                   'signal':'#it{H}(#it{B}_{inv} = %0.2f)' %(options.hscale),
                    'data':'Data',
                    'bkgs':'Total Bkg',
                    'multijet':'Multijet',
@@ -286,7 +291,7 @@ class HistClass(object):
 
         sp=self.hname.split("_")
         self.proc=sp[0][1:]
-        if self.proc in ["W","Z"]:
+        if self.proc in ["W","Z","Zg","Wg"]:
             self.proc+="_"+sp[1]
         self.reg=sp[-3]
         self.mr=self.reg[-1]
@@ -355,7 +360,7 @@ class HistClass(object):
         return True
 
     def isBkg(self):
-        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","VV","VVV","QCDw"]:
+        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet","VV","VVV","QCDw"]:
             return True
         return False
 
@@ -366,7 +371,7 @@ class HistClass(object):
 
 
     def isSignal(self):
-        if self.proc in ["VBFH125", "ggFH125", "VH125"]:
+        if self.proc in ["VBFH125", "ggFH125", "VH125",'VBFHgam125']:
             return True
         return False
 
@@ -410,6 +415,8 @@ class HistClass(object):
         mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","multijet","data"]
         if options.fakeMu:
             mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","data"]
+        elif options.ph_ana:
+            mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","data"]
         for p in mysamples:
             LOK=[k.GetName() for k in cls.Irfile.GetListOfKeys() if p in k.GetName()]
             if len(LOK)==0:
@@ -433,7 +440,12 @@ class HistClass(object):
             if cls.nBins==None:
                 cls.nBins=cls.getNumberOfBins()
             for n in range(1,cls.nBins+1):
-                if options.combinePlusMinus:
+                if options.ph_ana:
+                    cls.regDict["SR{}".format(n)]=cls.nBins*3+n
+                    cls.regDict["oneMuCR{}".format(n)]=cls.nBins+n
+                    cls.regDict["oneEleCR{}".format(n)]=n
+                    cls.regDict["twoLepCR{}".format(n)]=cls.nBins*2+n                    
+                elif options.combinePlusMinus:
                     cls.regDict["SR{}".format(n)]=cls.nBins*4+n
                     cls.regDict["oneMuCR{}".format(n)]=cls.nBins*2+n
                     cls.regDict["oneEleCR{}".format(n)]=cls.nBins+n
@@ -458,7 +470,12 @@ class HistClass(object):
                     cls.regDict["oneElePosLowSigCR{}".format(n)]=cls.nBins+n
 
             cls.regionBins=OrderedDict()
-            if options.combinePlusMinus:
+            if options.ph_ana:
+                cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
+                cls.regionBins["ZCRll"]=[cls.regDict[k] for k in cls.regDict if "twoLepCR" in k]
+                cls.regionBins["WCRenu"]=[cls.regDict[k] for k in cls.regDict if "oneEleCR" in k]
+                cls.regionBins["WCRmunu"]=[cls.regDict[k] for k in cls.regDict if "oneMuCR" in k]                
+            elif options.combinePlusMinus:
                 cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
                 cls.regionBins["ZCRll"]=[cls.regDict[k] for k in cls.regDict if "twoLepCR" in k]
                 cls.regionBins["WCRenu"]=[cls.regDict[k] for k in cls.regDict if "oneEleCR" in k]
@@ -536,7 +553,11 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
                    'W_EWK':'#it{W} EWK',
                    'Z_strong':'#it{Z} strong',
                    'W_strong':'#it{W} strong',
-                   'signal':'#it{H}(#it{B}_{inv} = 0.13)',
+                   'Zg_EWK':'#it{Z+#gamma} EWK',                   
+                   'Wg_EWK':'#it{W+#gamma} EWK',
+                   'Zg_strong':'#it{Z+#gamma} strong',
+                   'Wg_strong':'#it{W+#gamma} strong',
+                   'signal':'#it{H}(#it{B}_{inv} = %0.2f)' %options.hscale,
                    'data':'Data',
                    'bkgs':'Uncertainty',
                    'multijet':'Multijet',
@@ -545,7 +566,7 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
         NameDict['bkgs']='Uncertainty'
     
     if not options.scaleSig:
-        NameDict['signal']='#it{H}(#it{B}_{inv} = 0.13)'
+        NameDict['signal']='#it{H}(#it{B}_{inv} = %0.2f)' %(options.hscale)
     listInputs=[]
     legOrder=[]
     for i in leg.GetListOfPrimitives():
@@ -766,7 +787,7 @@ def getNumberOfBins(rfileInput):
     tmpIrfile=ROOT.TFile(rfileInput)
     nbins=0
     LOK=None
-    for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","data"]:
+    for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","data"]:
         LOK=[k.GetName() for k in tmpIrfile.GetListOfKeys() if p in k.GetName()]
         if len(LOK)==0:
             continue
@@ -790,7 +811,9 @@ def main(options):
 
     can=ROOT.TCanvas("c","c",1000,600)
     byNum=9
-    if options.combinePlusMinus:
+    if options.ph_ana:
+        byNum=4
+    elif options.combinePlusMinus:
         byNum=5
         if options.fakeMu:
             byNum=6
@@ -801,7 +824,8 @@ def main(options):
         ROOT.gPad.SetRightMargin(0.16)
         ROOT.gPad.SetLeftMargin(0.1)
         ROOT.gPad.SetPad(0,0.3,1,1)
-        ROOT.gPad.SetLogy()
+        if not options.ph_ana:
+            ROOT.gPad.SetLogy()
         can.cd(2)
         ROOT.gPad.SetTopMargin(0)
         ROOT.gPad.SetBottomMargin(0.35)
@@ -826,14 +850,21 @@ def main(options):
     if options.stack_signal:
        histNames=["signal"]
     else:
-        histNamesSig+=["signal"]#,"VBFH125","ggFH125","VH125"]
+        histNamesSig+=["signal"]#,"VBFH125","ggFH125","VH125","VBFHgam125"]
     histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
     if options.fakeMu:
-        histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes","muoFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"    
+        histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes","muoFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
+    if options.ph_ana:
+        histNames=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong"] 
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
-        if options.combinePlusMinus:
+        if options.ph_ana:
+            regDict["SR{}".format(n)]=nbins*3+n
+            regDict["oneMuCR{}".format(n)]=nbins+n
+            regDict["oneEleCR{}".format(n)]=n
+            regDict["twoLepCR{}".format(n)]=nbins*2+n            
+        elif options.combinePlusMinus:
             #if not options.cronly:
             regDict["SR{}".format(n)]=nbins*4+n
             regDict["oneMuCR{}".format(n)]=nbins*2+n
@@ -862,13 +893,21 @@ def main(options):
 
     regionBins=OrderedDict()
     byNum=9
-    if options.combinePlusMinus:
+
+    if options.ph_ana:
+        byNum=4
+        regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
+        regionBins["ZCRll"]=[regDict[k] for k in regDict if "twoLepCR" in k]
+        regionBins["WCRenu"]=[regDict[k] for k in regDict if "oneEleCR" in k]
+        regionBins["WCRmunu"]=[regDict[k] for k in regDict if "oneMuCR" in k]
+        regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]
+    elif options.combinePlusMinus:
         byNum=5
         regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
         regionBins["ZCRll"]=[regDict[k] for k in regDict if "twoLepCR" in k]
         regionBins["WCRenu"]=[regDict[k] for k in regDict if "oneEleCR" in k]
         regionBins["WCRmunu"]=[regDict[k] for k in regDict if "oneMuCR" in k]
-        regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]        
+        regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]
         regionBins["lowsigWCRen"]=[regDict[k] for k in regDict if "oneEleLowSigCR" in k]
         if options.fakeMu:
             byNum=6
@@ -900,6 +939,8 @@ def main(options):
     dummyHist.GetYaxis().SetTitleSize(1.4*dummyHist.GetYaxis().GetTitleSize())
     dummyHist.GetYaxis().SetTitleOffset(0.45*dummyHist.GetYaxis().GetTitleOffset())    
     dummyHist.GetYaxis().SetRangeUser(1.001,2000)
+    if options.ph_ana:
+        dummyHist.GetYaxis().SetRangeUser(0.5,180.0)
     #dummyHist.GetYaxis().SetRangeUser(1.73,5000)
     if options.cronly:
         dummyHist.GetXaxis().SetRangeUser(0,44)
@@ -932,16 +973,22 @@ def main(options):
     #Style.setStyles(hDict["ttbar"],[1,1,1,0,1001,0,0,0])
     #Style.setStyles(hDict["eleFakes"],[1,1,1,11,1001,0,0,0])
     #Style.setStyles(hDict["multijet"],[1,1,1,12,1001,0,0,0])
-
+    if options.ph_ana:
+        Style.setStyles(hDict["Zg_strong"],Style.styleDict["Z_strong"])
+        Style.setStyles(hDict["Zg_EWK"],Style.styleDict["Z_EWK"])
+        Style.setStyles(hDict["Wg_strong"],Style.styleDict["W_strong"])
+        Style.setStyles(hDict["Wg_EWK"],Style.styleDict["W_EWK"])
     Style.setStyles(hDict["Z_strong"],Style.styleDict["Z_strong"])
     Style.setStyles(hDict["Z_EWK"],Style.styleDict["Z_EWK"])
     Style.setStyles(hDict["W_strong"],Style.styleDict["W_strong"])
-    Style.setStyles(hDict["W_EWK"],Style.styleDict["W_EWK"])
+    Style.setStyles(hDict["W_EWK"],Style.styleDict["W_EWK"])    
     Style.setStyles(hDict["ttbar"],Style.styleDict["ttbar"])
-    Style.setStyles(hDict["eleFakes"],Style.styleDict["eleFakes"])
+    if not options.ph_ana:
+        Style.setStyles(hDict["eleFakes"],Style.styleDict["eleFakes"])
     if options.fakeMu:
-        Style.setStyles(hDict["muoFakes"],Style.styleDict["muoFakes"])    
-    Style.setStyles(hDict["multijet"],Style.styleDict["multijet"])
+        Style.setStyles(hDict["muoFakes"],Style.styleDict["muoFakes"])
+    if "multijet" in hDict:
+        Style.setStyles(hDict["multijet"],Style.styleDict["multijet"])
     if "Others" in hDict:
         Style.setStyles(hDict["Others"],[1,1,1,2,1001,0,0,0])
 
@@ -964,10 +1011,10 @@ def main(options):
                 break
         if not checkRegion:
             continue
+
         histObj=HistClass(key)
         
         if not histObj.hist: continue
-
         if histObj.isSignal():
             if options.stack_signal:
                 addContent(hDict["signal"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
@@ -976,7 +1023,7 @@ def main(options):
         elif histObj.proc in histNames+["data"]:
             addContent(hDict[histObj.proc], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
         else:
-            if not key.count('hQCDw_'):
+            if not (key.count('hQCDw_') or key.count('hVBFH')): # look for non H125 masses
                 print key, "could not be identified correctly! BinContent will be added to Others"
                 if "Others" in hDict:
                     addContent(hDict["Others"], histObj.nbin, histObj.hist.GetBinContent(options.nBin), histObj.hist.GetBinError(options.nBin))
@@ -1020,7 +1067,7 @@ def main(options):
                 #if ('Fitted_events_VBFH' in pickle_key): # skip signal
                 #    continue
                 if ('Fitted_err_' in pickle_key and 'H125' in pickle_key) and options.stack_signal: # skip signal
-                    if pickle_key_remFit[:pickle_key_remFit.find('_')] in ['VBFH125','VH125','ggFH125']:
+                    if pickle_key_remFit[:pickle_key_remFit.find('_')] in ['VBFH125','VH125','ggFH125','VBFHgam125']:
                          if 'signal' in hDict:
                             ireg=0
                             for iname in pickle_region_names:
@@ -1031,7 +1078,7 @@ def main(options):
                                         hDict['signal'].SetBinError(regDict[iname.rstrip('_cuts')],math.sqrt((fpickle[pickle_key][ireg])**2+e1**2))
                                 ireg+=1
                 if pickle_key_remFit.find('_')>0 and options.scaleSig:
-                    if pickle_key_remFit[:pickle_key_remFit.find('_')] in ['VBFH125','VH125','ggFH125']:
+                    if pickle_key_remFit[:pickle_key_remFit.find('_')] in ['VBFH125','VH125','ggFH125','VBFHgam125']:
                         if 'signal' in hDictSig:
                             ireg=0
                             for iname in pickle_region_names:
@@ -1072,6 +1119,8 @@ def main(options):
     bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","ttbar","multijet"] #+["Others"]
     if options.fakeMu:
         bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","muoFakes","ttbar","multijet"] #+["Others"]
+    if options.ph_ana:
+        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong"] #+["Others"]        
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
     hDict["bkgs"]=bkgs
     hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
@@ -1092,15 +1141,16 @@ def main(options):
         for SRbin in regionBins["SR"]:
             hDict["data"].SetBinContent(SRbin,bkgs.GetBinContent(SRbin))
 
-    dummyHist.SetMaximum(hStack.GetMaximum()*3.4)
+    if not options.ph_ana:
+        dummyHist.SetMaximum(hStack.GetMaximum()*3.4)
     hStack.Draw("samehist")
     if options.data: data.Draw("Esame")
     if options.stack_signal:
         for ib in range(1,hDict["signal"].GetNbinsX()+1):
-            hDict["signal"].SetBinContent(ib,0.13*hDict["signal"].GetBinContent(ib))
+            hDict["signal"].SetBinContent(ib,options.hscale*hDict["signal"].GetBinContent(ib))
     else:
-        hDictSig["signal"].Scale(0.13)
-    print 'scaling signal to 0.13'        
+        hDictSig["signal"].Scale(options.hscale)
+    print 'scaling signal to %0.2f' %(options.hscale)
     if not options.stack_signal:
         hDictSig["signal"].Draw('HISTsame')
     # print the stat uncertainties:
@@ -1366,6 +1416,8 @@ def main(options):
         if options.cronly:
             rHist.GetXaxis().SetRangeUser(0,44)
         rHist.GetYaxis().SetRangeUser(0.801,1.1999)
+        if options.ph_ana:
+            rHist.GetYaxis().SetRangeUser(0.001,1.9999)            
         rHist.Draw()
         line1.Draw("histsame")
         val=0
@@ -1448,7 +1500,37 @@ def main(options):
     yvallab=0.0345
     shift=0.01
     newShift=-0.06
-    if not options.cronly:
+    if options.ph_ana:
+        nameMap={#'FakeE':'#it{W}_{#it{e#nu}}^{low} CR',#Fake-#it{e} CR
+              #   'Wenu':'#it{W}_{#it{e#nu}}^{high} CR',##it{W}#rightarrow#it{e#nu} CR
+              'FakeE':'Fake-#it{e} CR',#Fake-#it{e} CR
+              'FakeM':'Fake-#it{#mu} CR',#Fake-#it{e} CR
+                 'Wenu':'#it{W}_{#it{e#nu}}^{#it{#gamma}} CR',##it{W}#rightarrow#it{e#nu} CR
+                 'Wmunu':'#it{W}_{#it{#mu#nu}}^{#it{#gamma}} CR', ##it{W}#rightarrow#it{#mu#nu}
+                 'Zll':'#it{Z}_{#it{ll}}^{#it{#gamma}} CR',##it{Z}#rightarrow#it{ll}
+                 }
+        
+        shift=0.01
+        newShift=-0.06
+        line0=ROOT.TLine(0.162+newShift-0.002,0.02,0.162+newShift-0.002,0.11)
+        line0.Draw()
+        labelTxt.DrawLatex(0.20+shift+0.005+newShift,yvallab,nameMap['Wenu'])
+        line2=ROOT.TLine(0.347+newShift-0.002,0.02,0.347+newShift-0.002,0.11)
+        line2.Draw()
+        labelTxt.DrawLatex(0.39+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
+        line3=ROOT.TLine(0.531+newShift-0.001,0.02,0.531+newShift-0.001,0.11)
+        line3.Draw()
+        labelTxt.DrawLatex(0.58+shift+newShift,yvallab,nameMap['Zll'])
+        line4=ROOT.TLine(0.715+newShift,0.02,0.715+newShift,0.11)
+        line4.Draw()        
+        labelTxt.DrawLatex(0.79+newShift,yvallab,"SR")
+        line5=ROOT.TLine(0.9+newShift,0.02,0.9+newShift,0.11)
+        line5.Draw()
+        hline=ROOT.TLine(0.16+newShift,0.08,0.9+newShift,0.08)
+        hline.Draw()
+        hline0=ROOT.TLine(0.16+newShift,0.02,0.9+newShift,0.02)
+        hline0.Draw()
+    elif not options.cronly:
         if options.combinePlusMinus:
             labelTxt.SetTextSize(0.04)
         line00=ROOT.TLine(0.16+newShift,0.02,0.16+newShift,0.11)
@@ -1738,6 +1820,13 @@ def plotVar(options):
         plotIndex=5
     if reg=='oneMuNegCR':
         plotIndex=6
+    if options.ph_ana:
+        if reg=='twoLepCR':
+            plotIndex=3
+        if reg=='oneMuCR':
+            plotIndex=2
+        if reg=='oneEleCR':
+            plotIndex=1
     if options.combinePlusMinus:
         if reg=='twoLepCR':
             plotIndex=4
@@ -1781,6 +1870,8 @@ def plotVar(options):
                         continue
                     if 'VBFH125' in pickle_key:
                         continue
+                    if 'VBFHgam125' in pickle_key:
+                        continue                    
                     if 'ggFH125' in pickle_key:
                         continue
                 if  ('Fitted_events_' in pickle_key): # only process the fitted events here
@@ -1895,7 +1986,7 @@ def plotVar(options):
             key=hObj.proc
             signal_scale=1.0
             if not options.scaleSig:
-                signal_scale=0.13
+                signal_scale=options.hscale
             try:
                 sigDict[key].Add(hObj.hist,signal_scale)
             except:
@@ -2268,6 +2359,7 @@ if __name__=='__main__':
     p.add_option('-c', '--compare', type='string', help='Compare any number of input files. Does not support --syst atm. example: --compare rfile1.root,rfile2.root')
 
     p.add_option('--lumi', type='float', default=139, help='Defines the integrated luminosity shown in the label')
+    p.add_option('--hscale', type='float', default=0.13, help='normalization for the signal')
     p.add_option('--nBin', type='int', default=1, help='Defines which bin is plotted')
     p.add_option('-s', '--syst', type='string', default="", help='NEEDS FIXING. defines the systematics that are plotted. -s all <- will plot all available systematics. Otherwise give a key to the dict in systematics.py')# FIXME
     p.add_option('-d', '--data', action='store_true', help='Draw data')
@@ -2277,6 +2369,7 @@ if __name__=='__main__':
     p.add_option('--fakeMu', action='store_true', help='Add Fake muon CR')        
     p.add_option('--stack-signal', action='store_true', help='Stack the signal')
     p.add_option('--cronly', action='store_true', help='Shows the CR only')    
+    p.add_option('--ph-ana', action='store_true', help='Photon analysis')    
     p.add_option('--debug', action='store_true', help='Print in debug mode')
     p.add_option('--combinePlusMinus', action='store_true', help='Combine the plus and minus')
     p.add_option('-r', '--ratio', action='store_true', help='Draw Data/Bkg ratio in case of -i and adds ratios to tables for both -i and -c')
