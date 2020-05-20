@@ -520,7 +520,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
             #cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0,maxMET=200.0)
             #cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
-            cuts += metCuts(basic_cuts,options,metCut=200.0, cstCut=180.0)
+            cuts += metCuts(basic_cuts,options,metCut=options.metCut, cstCut=(options.metCut - 20.0),maxMET=options.maxMET)
             #cuts += metCuts(basic_cuts,options,metCut=180.0, cstCut=150.0)
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=100.0)
 
