@@ -134,6 +134,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   j3_min_mj_over_mjj = new std::vector<float>(0);
   mj34=-9999.0;
   max_j_eta=-9999.0;
+  ph_pointing_z=0.0;
   // add container leptons
   contmu_pt= new std::vector<float>(0);
   contmu_eta= new std::vector<float>(0);
@@ -239,12 +240,16 @@ StatusCode VBFAnalysisAlg::initialize() {
   ph_ptcone20 = new std::vector<float>(0);
   ph_topoetcone40 = new std::vector<float>(0);
   ph_truthOrigin  = new std::vector<int>(0);
+  ph_truthType  = new std::vector<int>(0);
+  ph_vtxpos  = new std::vector<float>(0);
   baseph_pt = new std::vector<float>(0);
   baseph_phi = new std::vector<float>(0);
   baseph_eta = new std::vector<float>(0);
   baseph_ptcone20 = new std::vector<float>(0);
   baseph_topoetcone40 = new std::vector<float>(0);
   baseph_truthOrigin  = new std::vector<int>(0);
+  baseph_truthType  = new std::vector<int>(0);
+  baseph_vtxpos  = new std::vector<float>(0);
   baseph_isEM  = new std::vector<unsigned>(0);
   baseph_iso  = new std::vector<bool>(0);
   tau_pt = new std::vector<float>(0);
@@ -277,6 +282,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("puSyst2018Weight",&puSyst2018Weight);
   m_tree_out->Branch("xeSFTrigWeight",&xeSFTrigWeight);
   m_tree_out->Branch("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
+  m_tree_out->Branch("ph_pointing_z",&ph_pointing_z);
   if(m_currentVariation=="Nominal"){ // only write for the nominal
     m_tree_out->Branch("puWeight",&puWeight);
     m_tree_out->Branch("xeSFTrigWeight__1up",&xeSFTrigWeight__1up);
@@ -446,12 +452,14 @@ StatusCode VBFAnalysisAlg::initialize() {
       m_tree_out->Branch("ph_ptcone20", &ph_ptcone20);
       m_tree_out->Branch("ph_topoetcone40",&ph_topoetcone40);
       m_tree_out->Branch("ph_truthOrigin",&ph_truthOrigin);
+      m_tree_out->Branch("ph_truthType",&ph_truthType);
       m_tree_out->Branch("baseph_pt", &baseph_pt);
       m_tree_out->Branch("baseph_phi",&baseph_phi);
       m_tree_out->Branch("baseph_eta",&baseph_eta);
       m_tree_out->Branch("baseph_ptcone20", &baseph_ptcone20);
       m_tree_out->Branch("baseph_topoetcone40",&baseph_topoetcone40);
       m_tree_out->Branch("baseph_truthOrigin",&baseph_truthOrigin);
+      m_tree_out->Branch("baseph_truthType",&baseph_truthType);
       m_tree_out->Branch("baseph_isEM",&baseph_isEM);
       m_tree_out->Branch("baseph_iso",&baseph_iso);
 
@@ -613,14 +621,13 @@ StatusCode VBFAnalysisAlg::execute() {
 
   //Vjets weight and systematics
   vjWeight = 1.0;
-
   if ( m_isMC && (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos )) {
     // Nominal
-    vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(0));
+    vjWeight = my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., truthF_jj_mass/1.0e3, m_vjVariations.at(0));
     if(m_currentVariation=="Nominal"){
       // Variations
       for(unsigned iVj=1; iVj<m_vjVariations.size(); ++iVj){ // exclude nominal
-	tMapFloat[m_vjVariations.at(iVj)]=my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., m_vjVariations.at(iVj));
+	tMapFloat[m_vjVariations.at(iVj)]=my_vjSystHelper.getCorrection(runNumber, truth_V_dressed_pt / 1000., truthF_jj_mass/1.0e3, m_vjVariations.at(iVj));
       }
     }// end systematics
   }
@@ -1149,6 +1156,15 @@ StatusCode VBFAnalysisAlg::execute() {
     met_tst_nolep_j1_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(0)));
     met_tst_nolep_j2_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(1)));
   }
+
+  // Fill photon pointing
+  ph_pointing_z=0.0;
+  if(ph_pt && ph_vtxpos){
+    if(ph_vtxpos->size()>0) ph_pointing_z=ph_vtxpos->at(0);
+    if(ph_vtxpos->size()==0 && baseph_vtxpos && baseph_vtxpos->size()>0) ph_pointing_z=baseph_vtxpos->at(0);
+  }
+  // setting n_ph to 15 GeV. set to 10 in the MiniNtuples
+  if(ph_pt && ph_pt->size()>0 && n_ph>0 && ph_pt->at(0)<15e3) n_ph=0;
 
   // Definiing a loose skimming
   float METCut = 150.0e3;
@@ -1723,17 +1739,21 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchStatus("ph_pt",1);
     m_tree->SetBranchStatus("ph_phi",1);
     m_tree->SetBranchStatus("ph_eta",1);
-
+    m_tree->SetBranchStatus("ph_vtxpos",1);
+    m_tree->SetBranchStatus("ph_truthOrigin",1);
+    m_tree->SetBranchStatus("ph_truthType",1);
+      
     if(m_currentVariation=="Nominal"){
       m_tree->SetBranchStatus("ph_ptcone20",1);
       m_tree->SetBranchStatus("ph_topoetcone40",1);
-      m_tree->SetBranchStatus("ph_truthOrigin",1);
       m_tree->SetBranchStatus("baseph_pt",1);
       m_tree->SetBranchStatus("baseph_phi",1);
       m_tree->SetBranchStatus("baseph_eta",1);
       m_tree->SetBranchStatus("baseph_ptcone20",1);
       m_tree->SetBranchStatus("baseph_topoetcone40",1);
       m_tree->SetBranchStatus("baseph_truthOrigin",1);
+      m_tree->SetBranchStatus("baseph_truthType",1);
+      m_tree->SetBranchStatus("baseph_vtxpos",1);
       m_tree->SetBranchStatus("baseph_isEM",1);
       m_tree->SetBranchStatus("baseph_iso",1);
       m_tree->SetBranchStatus("tau_pt",1);
@@ -1998,10 +2018,13 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("ph_pt",           &ph_pt);
     m_tree->SetBranchAddress("ph_phi",          &ph_phi);
     m_tree->SetBranchAddress("ph_eta",          &ph_eta);
+    m_tree->SetBranchAddress("ph_truthOrigin",   &ph_truthOrigin);
+    m_tree->SetBranchAddress("ph_truthType",   &ph_truthType);
+    m_tree->SetBranchAddress("ph_vtxpos",   &ph_vtxpos);
+
     if(m_currentVariation=="Nominal" && m_isMC){
       m_tree->SetBranchAddress("ph_ptcone20",      &ph_ptcone20);
       m_tree->SetBranchAddress("ph_topoetcone40",  &ph_topoetcone40);
-      m_tree->SetBranchAddress("ph_truthOrigin",   &ph_truthOrigin);
 
       m_tree->SetBranchAddress("baseph_pt",           &baseph_pt);
       m_tree->SetBranchAddress("baseph_phi",          &baseph_phi);
@@ -2009,6 +2032,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       m_tree->SetBranchAddress("baseph_ptcone20",     &baseph_ptcone20);
       m_tree->SetBranchAddress("baseph_topoetcone40", &baseph_topoetcone40);
       m_tree->SetBranchAddress("baseph_truthOrigin",  &baseph_truthOrigin);
+      m_tree->SetBranchAddress("baseph_truthType",    &baseph_truthType);
+      m_tree->SetBranchAddress("baseph_vtxpos",       &baseph_vtxpos);
       m_tree->SetBranchAddress("baseph_isEM",         &baseph_isEM);
       m_tree->SetBranchAddress("baseph_iso",          &baseph_iso);
 
