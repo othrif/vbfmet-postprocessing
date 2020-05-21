@@ -1,7 +1,13 @@
 {
     "cuts": [
-     {"cut": "( V_dressed_pt > 200e3 && n_jet25>=2 )", "name": "SRmTJV"},
-     {"cut": "( V_dressed_pt > 200e3 && n_jet25==2 )", "name": "SR25"}
+     {"cut": "( V_dressed_pt       > 100e3 && n_jet25>=2 )", "name": "SRmTJV"},
+     {"cut": "( V_dressed_pt       > 100e3 && n_jet25==2 )", "name": "SR25"},
+     {"cut": "( V_undressed_pt     > 100e3 && n_jet25>=2 )", "name": "unSRmTJV"},
+     {"cut": "( V_undressed_pt     > 100e3 && n_jet25==2 )", "name": "unSR25"},
+     {"cut": "( boson_pt           > 100e3 && n_jet25>=2 )", "name": "bSRmTJV"},
+     {"cut": "( boson_pt           > 100e3 && n_jet25==2 )", "name": "bSR25"},
+     {"cut": "( met_nolep_et       > 100e3 && n_jet25>=2 )", "name": "mSRmTJV"},
+     {"cut": "( met_nolep_et       > 100e3 && n_jet25==2 )", "name": "mSR25"}
  ],
     "draw": [
         {
