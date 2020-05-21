@@ -627,7 +627,7 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
         valb = hratio.GetBinContent(i)
         errb = hratio.GetBinError(i)
         #print 'Bin {0:d} with uncertainty {1:.2%}, fitted {2:.2%}'.format(i, hratio.GetBinContent(i)-1, par0+hratio.GetBinCenter(i)*par1-1)
-        print '{0:.2} +- {1:.2}'.format(hratio.GetBinContent(i), hratio.GetBinError(i))
+        print '{0:.4} +- {1:.4}'.format(hratio.GetBinContent(i), hratio.GetBinError(i))
     can.Update()
 
     if options.wait:
