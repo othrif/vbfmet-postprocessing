@@ -24,10 +24,10 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
     for mj in mjs:
         histcr = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_FJVTCR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_FJVTCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         hist = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histcr.SetBinContent(1,mj)
-        histcr.SetBinError(1,mj*0.05)
-        hist.SetBinContent(1,1.0)
-        hist.SetBinError(1,0.07)
+        histcr.SetBinContent(1,1.0)
+        histcr.SetBinError(1,0.05)
+        hist.SetBinContent(1,mj)
+        hist.SetBinError(1,mj*0.07)
 
         histHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
