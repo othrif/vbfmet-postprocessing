@@ -3,7 +3,7 @@ import ROOT
 import os
 def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False):
     f_multijet = ROOT.TFile("multijetFJVT.root", "recreate")
-    mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
+    mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 50.0]
     emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18]    
     if Binning==11 or Binning==12 or Binning==13 or Binning==21 or Binning==22: # set for all years
         mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
@@ -12,11 +12,12 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
             mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
             emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18] 
         if Binning==21 or Binning==22:
-            mjs+=[1.6,2.0]
+            mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 40.0]
+            mjs+=[6.6,4.4]
             emjs += [0.25, 0.25]
         if Binning==22:
-            mjs+=[2.47,1.8,2.24]
-            emjs += [0.18, 0.32, 0.25]
+            mjs+=[1.3,1.0,1.1]
+            emjs += [0.1, 0.12, 0.15]
     a=1
     hists=[]
     histcr=None
@@ -28,7 +29,10 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
         histcr.SetBinError(1,0.05)
         hist.SetBinContent(1,mj)
         hist.SetBinError(1,mj*0.07)
-
+        if Binning==11 and a==11:
+            histcr.SetBinContent(1,0.0)
+        if (Binning==21 or Binning==22) and (a==11 or a==12 or a==13):
+            histcr.SetBinContent(1,0.0)
         histHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histHigh.SetBinContent(1,mj*(1.+emjs[a-1]))

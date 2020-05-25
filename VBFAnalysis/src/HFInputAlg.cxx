@@ -426,9 +426,15 @@ StatusCode HFInputAlg::execute() {
     // tighten fjvt for the lower met events
     if(m_extraVars>1){
       if(n_baseel==0 && n_basemu==0){
-	if(met_tst_et<180.0e3) fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	if(met_tst_et<200.0e3){
+	  fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	  fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.2;
+	}
       }else{
-	if(met_tst_nolep_et<180.0e3) fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	if(met_tst_nolep_et<200.0e3){
+	  fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	  fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.2;
+	}
       }
     }
   
@@ -737,7 +743,7 @@ StatusCode HFInputAlg::execute() {
 	else if (jj_mass < 3.5e6) bin = 3;
 	else bin = 4;
 	if(jj_dphi>1)  bin+=5; // separate dphijj
-	if(n_jet>2){
+	if(n_jet>2 && !fJVTLeadVeto){
 	  if (jj_mass < 1.5e6) return StatusCode::SUCCESS; // remove njet>2 and mjj<1.5 TeV
 	  else if (jj_mass < 2e6)   bin = 10;
 	  else if (jj_mass < 3.5e6) bin = 11;
@@ -746,7 +752,8 @@ StatusCode HFInputAlg::execute() {
       }else{// low met
 	if(m_binning==21) return StatusCode::SUCCESS;
 	else{
-	  if (jj_mass < 1.5e6 || n_jet>2) return StatusCode::SUCCESS;
+	  if ((jj_mass < 1.5e6)) return StatusCode::SUCCESS;
+	  else if((n_jet>2) && !fJVTLeadVeto)  return StatusCode::SUCCESS; // allow for the fjvt crs
 	  else if (jj_mass < 2e6)   bin = 13;
 	  else if (jj_mass < 3.5e6) bin = 14;
 	  else bin = 15;
@@ -770,7 +777,7 @@ StatusCode HFInputAlg::execute() {
     if(m_binning==10 && (jj_dphi>1))  bin+=5; // separate dphijj, mjj binning
     if(m_binning==10 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
     if(m_binning==11 && (jj_dphi>1))  bin+=5; // separate dphijj, mjj binning
-    if(m_binning==11 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
+    if(m_binning==11 && (!fJVTLeadVeto && n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning, not lead jet failing fjvt
     if(m_binning==12 && (jj_dphi>1))  bin+=5; // separate dphijj, mjj binning
     if(m_binning==12 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
 
