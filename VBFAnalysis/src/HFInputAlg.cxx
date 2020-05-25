@@ -426,9 +426,15 @@ StatusCode HFInputAlg::execute() {
     // tighten fjvt for the lower met events
     if(m_extraVars>1){
       if(n_baseel==0 && n_basemu==0){
-	if(met_tst_et<180.0e3) fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	if(met_tst_et<200.0e3){
+	  fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	  fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.2;
+	}
       }else{
-	if(met_tst_nolep_et<180.0e3) fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	if(met_tst_nolep_et<200.0e3){
+	  fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	  fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.2;
+	}
       }
     }
   
