@@ -165,6 +165,8 @@ class BasicCuts:
             self.DPhijjLowerCut   = 2.0
             # limited to 2.5 due to multijet estimate.
             self.DPhijjUpperCut   = 2.5
+        if options.TwoJet:
+            self.NjetCut = 'n_jet == 2'
 
     def PadKey(self, key, val, pf=None, sf=None):
         if len(key) > 0: key += '_'
