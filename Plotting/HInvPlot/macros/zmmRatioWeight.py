@@ -5,7 +5,7 @@ import os,sys
 
 #-----------------------------------------
 def Style():
-    atlas_style_path='/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/'
+    atlas_style_path='../VBFAnalysis/python/Plotting/AtlasStyle/'
     if not os.path.exists(atlas_style_path):
         print("Error: could not find ATLAS style macros at: " + atlas_style_path)
         sys.exit(1)
@@ -204,7 +204,8 @@ if __name__ == "__main__":
     fVBFFilt = ROOT.TFile.Open('/tmp/308095.root')
     fIncl = ROOT.TFile.Open('/tmp/363233Znn.root')
     fZmm = ROOT.TFile.Open('/tmp/830007Zmm.root')
-    fZmmSh = ROOT.TFile.Open('/tmp/308093New.root')    
+    #fZmmSh = ROOT.TFile.Open('/tmp/308093New.root')    
+    fZmmSh = ROOT.TFile.Open('/tmp/3080923.root')    
     treeName1 = 'MiniNtuple'
     treeNamePow = 'MiniNtuple'
     plt=None
@@ -217,7 +218,7 @@ if __name__ == "__main__":
     #cuts = '*( truth_jj_mass>100e3  && jet_pt[1]>30e3 && truth_jj_dphi<2.5 && boson_pt[0]>90e3)'
     cuts = '*( 1)'
     #cuts = '*( njets25>1 && truth_jj_mass>0.2e6)'
-    cuts = '*(truth_jj_mass>0.5e6 && met_nolep_et>150e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0 && truth_jj_deta>3.8)'
+    cuts = '*(truth_jj_mass>0.5e6 && met_nolep_et>110e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0 && truth_jj_deta>3.8 && zboson_m>66.0e3 && zboson_m<116.0e3)'
     #cuts = '*(truth_jj_mass>0.2e6 && jet_pt[1]>40e3 && jet_pt[0]>60e3  && truth_jj_deta>3.0 && zboson_m>82.0e3 && zboson_m<116.0e3)' # && zboson_m>66.0e3 && zboson_m<116.0e3
     h1n = fIncl.Get("NumberEvents")
     h2n = fVBFFilt.Get("NumberEvents")
@@ -267,6 +268,8 @@ if __name__ == "__main__":
         xaxis='boson p_{T} [GeV]'
     elif options.var=="met_et":
         pvar='met_et/1.0e3'
+    elif options.var=="met_nolep_et":
+        pvar='met_nolep_et/1.0e3'
         xaxis='Truth MET [GeV]'
     elif options.var=="met_nolep_et":
         pvar='met_nolep_et/1.0e3'
@@ -388,7 +391,7 @@ if __name__ == "__main__":
         zmmshplt = ROOT.TH1F(n4,n4,25,0.0,500.0)
     zmmshplt.GetYaxis().SetTitle('Events')
     zmmshplt.GetXaxis().SetTitle(xaxis)
-    tZmmSh.Draw(pvar+' >>'+n4,'EventWeight'+cuts+runCutZmm)
+    tZmmSh.Draw(pvar+' >>'+n4,'EventWeight'+cuts+runCutZmmSh)
     zmmshplt.SetLineColor(4)
     zmmshplt.SetMarkerColor(4)
     zmmshplt.SetMarkerSize(0.6)
@@ -402,11 +405,11 @@ if __name__ == "__main__":
     pad1.Draw();             # Draw the upper pad: pad1
     pad1.cd();               # pad1 becomes the current pad
     
-    plt.Draw()
-    vbfplt.Draw('same')
-    zmmplt.Draw('same')
-    zmmshplt.Draw('same')
-    plt.Draw('same')
+    #plt.Draw()
+    #vbfplt.Draw('same')
+    #zmmplt.Draw('same')
+    #zmmshplt.Draw('same')
+    #plt.Draw('same')
     #implt.Draw('same')
     print 'Plt1: ',plt.Integral()
     print 'Plt2: ',vbfplt.Integral()
@@ -414,9 +417,18 @@ if __name__ == "__main__":
     print 'Plt4: ',zmmshplt.Integral()
 
     # Dividing
+    plt.GetYaxis().SetRangeUser(0.1,10.0)
+    if pvar.count('met'):
+        plt.Rebin(2)
+        zmmplt.Rebin(2)
+        zmmshplt.Rebin(2)
+        vbfplt.Rebin(2)
     plt.Divide(zmmplt)
     vbfplt.Divide(zmmshplt)
     
+    plt.Draw()
+    vbfplt.Draw('same')
+
     texts = getATLASLabels(can, 0.65, 0.88,'')
     for t in texts:
         t.Draw()
@@ -460,7 +472,6 @@ if __name__ == "__main__":
         print hratio.GetBinContent(i)
     if pvar.count('jj_mass'):
         hratio.Fit('pol1',"","",500.0,5000.0)
-        hratio2.Fit('pol1',"","",500.0,5000.0)        
     elif pvar.count('pow(truth_jj_deta,2)'):
         hratio.Fit('pol1',"","",0.0,5.0)        
     elif pvar.count('jj_dphi'):
@@ -469,8 +480,9 @@ if __name__ == "__main__":
         hratio.Fit('pol1',"","",2.5,6.5)
     elif pvar.count('boson_pt'):
         hratio.Fit('pol1',"","",90.0,500.0)
-        hratio2.Fit('pol1',"","",90.0,500.0)
     elif pvar.count('boson_m'):
+        hratio.Fit('pol1',"","",90.0,500.0)
+    elif pvar.count('met'):
         hratio.Fit('pol1',"","",90.0,500.0)
     elif pvar.count('jet_pt'):
         hratio.Fit('pol1',"","",10.0,300.0)
@@ -490,6 +502,8 @@ if __name__ == "__main__":
     if pvar=='boson_m[0]/1.0e3':
         pvar_out='boson_m'
     if pvar=='met_et/1.0e3':
+        pvar_out='truthmet'
+    if pvar=='met_nolep_et/1.0e3':
         pvar_out='truthmet'
     if pvar=='met_nolep_et/1.0e3':
         pvar_out='truthmetnolep'
