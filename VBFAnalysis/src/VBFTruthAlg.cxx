@@ -9,7 +9,7 @@
 
 #define LINE std::cerr << __FILE__ << "::" << __FUNCTION__ << "::" << __LINE__ << std::endl;
 
-const std::string regions[] = {"Incl","SRPhi", "CRWPhi", "CRZPhi","CRZll"}; //, "SRPhiHigh","CRWPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet"
+const std::string regions[] = {"Incl_ZCR", "Incl_ZSR", "Incl_WCR", "Incl_WSR"}; //"Incl","SRPhi", "CRWPhi", "CRZPhi","CRZll", "SRPhiHigh","CRWPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet"
 const std::string variations[] = {"fac_up","fac_down","renorm_up","renorm_down","both_up","both_down"};
 
 
@@ -147,8 +147,8 @@ StatusCode VBFTruthAlg::initialize() {
 //  m_tree_out->Branch("jet_E",&new_jet_E);
 //  m_tree_out->Branch("met_significance",&new_met_significance);
 //  m_tree_out->Branch("lep_jet_dR",&new_lep_jet_dR);
-  m_tree_out->Branch("boson_m",&new_boson_m);
-  m_tree_out->Branch("boson_pt",&new_boson_pt);
+//  m_tree_out->Branch("boson_m",&new_boson_m);
+//  m_tree_out->Branch("boson_pt",&new_boson_pt);
 //  m_tree_out->Branch("boson_phi",&new_boson_phi);
 //  m_tree_out->Branch("boson_eta",&new_boson_eta);
 //  m_tree_out->Branch("boson_pdgid",&new_boson_pdgid);
@@ -170,21 +170,21 @@ StatusCode VBFTruthAlg::initialize() {
 
   m_tree_out->Branch("n_el",&new_nels);
 //  m_tree_out->Branch("n_mu",&new_nmus);
-  m_tree_out->Branch("n_nu",&new_nnus);
-  m_tree_out->Branch("n_boson",&new_nbosons);
+ // m_tree_out->Branch("n_nu",&new_nnus);
+ // m_tree_out->Branch("n_boson",&new_nbosons);
 
-  m_tree_out->Branch("ee_pt",   &new_ee_pt);
+ // m_tree_out->Branch("ee_pt",   &new_ee_pt);
 //  m_tree_out->Branch("ee_eta",  &new_ee_eta);
 //  m_tree_out->Branch("ee_phi",  &new_ee_phi);
-  m_tree_out->Branch("ee_m",    &new_ee_m);
+ // m_tree_out->Branch("ee_m",    &new_ee_m);
 //  m_tree_out->Branch("mumu_pt", &new_mumu_pt);
 //  m_tree_out->Branch("mumu_eta",&new_mumu_eta);
 //  m_tree_out->Branch("mumu_phi",&new_mumu_phi);
 //  m_tree_out->Branch("mumu_m",  &new_mumu_m);
-  m_tree_out->Branch("nunu_pt", &new_nunu_pt);
+//  m_tree_out->Branch("nunu_pt", &new_nunu_pt);
 //  m_tree_out->Branch("nunu_eta",&new_nunu_eta);
 //  m_tree_out->Branch("nunu_phi",&new_nunu_phi);
-  m_tree_out->Branch("nunu_m",  &new_nunu_m);
+//  m_tree_out->Branch("nunu_m",  &new_nunu_m);
 
 //  m_tree_out->Branch("useMerged",  &useMerged);
 
@@ -202,8 +202,8 @@ StatusCode VBFTruthAlg::initialize() {
     ANA_CHECK (book (TH1F (Form("jj_mass_%s_nominal",reg.c_str()), ";m_{jj} [TeV];Entries", 50, 0, 5)));
     ANA_CHECK (book (TH1F (Form("MV_%s_nominal",reg.c_str()), ";M_{V} [GeV];Entries", 50, 0, 500)));
     ANA_CHECK (book (TH1F (Form("PTV_%s_nominal",reg.c_str()), ";p_{T}^{V} [GeV];Entries", 50, 0, 500)));
-    ANA_CHECK (book (TH1F (Form("boson_pT_%s_nominal",reg.c_str()), ";Boson p_{T} [GeV];Entries", 50, 0, 500)));
-    ANA_CHECK (book (TH1F (Form("boson_mass_%s_nominal",reg.c_str()), ";Boson Mass [GeV];Entries", 50, 0, 500)));
+    //ANA_CHECK (book (TH1F (Form("boson_pT_%s_nominal",reg.c_str()), ";Boson p_{T} [GeV];Entries", 50, 0, 500)));
+    //ANA_CHECK (book (TH1F (Form("boson_mass_%s_nominal",reg.c_str()), ";Boson Mass [GeV];Entries", 50, 0, 500)));
    /* if (m_theoVariation){
       for(int i=0; i<115; i++)
         ANA_CHECK (book (TH1F (Form("all/jj_mass_%s_index_%d", reg.c_str(), i), ";m_{jj} [TeV];Entries", 50, 0, 5)));
@@ -649,10 +649,22 @@ if (new_hasZ) CRZll = true; // (new_nels == 2) & (new_nmus == 0) &
 }
 
 std::map<TString,bool> regDecision;
-regDecision["Incl"]=(new_PTV > 100e3);
-regDecision["SRPhi"]=(SRPhiHigh || SRPhiLow);
-regDecision["CRZPhi"]=(CRZPhiHigh || CRZPhiLow);
-regDecision["CRWPhi"]=(CRWPhiHigh || CRWPhiLow);
+
+bool Zvv = (362000 <= RunNumber && RunNumber <= 362191);
+bool Zee = (362192 <= RunNumber && RunNumber <= 362383);
+bool Wev = (362384 <= RunNumber && RunNumber <= 362575);
+
+regDecision["Incl_ZSR"]=(/*vbfSkimloose &&*/ Zvv);
+regDecision["Incl_ZCR"]=(/*vbfSkimloose &&*/ Zee);
+regDecision["Incl_WSR"]=(/*vbfSkimloose &&*/ Wev && (new_nels == 0));
+regDecision["Incl_WCR"]=(/*vbfSkimloose &&*/ Wev && (new_nels > 0));
+
+//regDecision["Incl"]=(new_PTV > 100e3);
+//regDecision["SRPhi"]=(SRPhiHigh || SRPhiLow);
+//regDecision["CRZPhi"]=(CRZPhiHigh || CRZPhiLow);
+//regDecision["CRWPhi"]=(CRWPhiHigh || CRWPhiLow);
+//regDecision["CRZll"]=((new_PTV > 100e3) && new_hasZ); //CRZll
+
 //regDecision["SRPhiHigh"]=SRPhiHigh;
 //regDecision["CRZPhiHigh"]=CRZPhiHigh;
 //regDecision["CRWPhiHigh"]=CRWPhiHigh;
@@ -662,7 +674,6 @@ regDecision["CRWPhi"]=(CRWPhiHigh || CRWPhiLow);
 //regDecision["SRNjet"]=SRNjet;
 //regDecision["CRZNjet"]=CRZNjet;
 //regDecision["CRWNjet"]=CRWNjet;
-regDecision["CRZll"]=((new_PTV > 100e3) && new_hasZ); //CRZll
 
 new_w = weight*EventWeight;
 new_w_noxsec = EventWeight;
@@ -672,12 +683,12 @@ for(auto reg : regions){
       hist( "jj_mass_"+reg+"_nominal" )->Fill(new_jj_mass/1e6, new_w);
       hist( "MV_"+reg+"_nominal" )->Fill(new_MV/1e3, new_w);
       hist( "PTV_"+reg+"_nominal" )->Fill(new_PTV/1e3, new_w);
-      if( new_boson_pt->size() != 0 ){
-      hist( "boson_pT_"+reg+"_nominal" )->Fill(new_boson_pt->at(0)/1e3, new_w);
-      hist( "boson_mass_"+reg+"_nominal" )->Fill(new_boson_m->at(0)/1e3, new_w);
-    }
-    else
-        ATH_MSG_DEBUG("Missing TruthBoson record!!");
+      //if( new_boson_pt->size() != 0 ){
+      //hist( "boson_pT_"+reg+"_nominal" )->Fill(new_boson_pt->at(0)/1e3, new_w);
+      //hist( "boson_mass_"+reg+"_nominal" )->Fill(new_boson_m->at(0)/1e3, new_w);
+    //}
+    //else
+      //  ATH_MSG_DEBUG("Missing TruthBoson record!!");
   }
 /*
     if (m_theoVariation && ( (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127) ) ){

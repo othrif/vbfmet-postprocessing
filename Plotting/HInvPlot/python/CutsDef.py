@@ -368,8 +368,8 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts += [CutItem('CutJ0Eta',  'jetEta0 > 2.5 || jetEta0 < -2.5')]
             #cuts += [CutItem('CutJ1Eta',  'jetEta1 > 2.5 || jetEta1 < -2.5')]
     else:
-        
-        cuts = [CutItem('CutNjet',  'n_jet > 1 && n_jet<4')]        
+
+        cuts = [CutItem('CutNjet',  'n_jet > 1 && n_jet<4')]
         #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
         #cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
         #cuts = [CutItem('CutNjet',  'n_jet == 2')]
@@ -399,7 +399,7 @@ def getVBFCuts(options, basic_cuts, isLep=False):
         cuts += basic_cuts.GetDEtajjCut()
         cuts += basic_cuts.GetMjjCut()
     #cuts += [CutItem('CutMu40','averageIntPerXing>40.0')]
-    #cuts += [CutItem('CutOneHSJet',  'nTruthJetMatch == 1')] 
+    #cuts += [CutItem('CutOneHSJet',  'nTruthJetMatch == 1')]
     return cuts
 
 #-------------------------------------------------------------------------
@@ -425,7 +425,7 @@ def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET
         cuts = []
         if not options.ReverseFJVT and not options.ReverseLeadFJVT and not basic_cuts.analysis.count('LowMETQCD'):
             cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
-            
+
         if basic_cuts.analysis.count('LowMETQCDRevFJVT'):
             cutMET.AddCut(CutItem('HighMET', '%s < 180.0 && %s > 150.0' %(met_choice,met_choice)), 'AND')
             if basic_cuts.analysis.count('FJVT'):
@@ -448,14 +448,14 @@ def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET
                 cutMET.AddCut(CutItem('HighMET1', '%s > %s && j0fjvt > 0.5' %(met_choice,highMET)), 'OR')
                 cutMET.AddCut(CutItem('HighMET2', '%s > %s && j1fjvt > 0.5' %(met_choice,highMET)), 'OR')
             elif options.ReverseLeadFJVT:
-                cutMET.AddCut(CutItem('HighMET1', '%s > %s && j0fjvt > 0.5' %(met_choice,highMET)), 'OR')                
+                cutMET.AddCut(CutItem('HighMET1', '%s > %s && j0fjvt > 0.5' %(met_choice,highMET)), 'OR')
             else:
                 cutMET.AddCut(CutItem('HighMET', '%s > %s' %(met_choice,highMET)), 'OR')
             if options.ReverseFJVT:
                 cutMET.AddCut(CutItem('LowMETfjvt1', '%s > %s && j0fjvt > %s' %(met_choice, metCut, options.CutFJVTVal)), 'OR')
                 cutMET.AddCut(CutItem('LowMETfjvt2', '%s > %s && j1fjvt > %s' %(met_choice, metCut, options.CutFJVTVal)), 'OR')
             elif options.ReverseLeadFJVT:
-                cutMET.AddCut(CutItem('LowMETfjvt1', '%s > %s && j0fjvt > %s' %(met_choice, metCut, options.CutFJVTVal)), 'OR')                
+                cutMET.AddCut(CutItem('LowMETfjvt1', '%s > %s && j0fjvt > %s' %(met_choice, metCut, options.CutFJVTVal)), 'OR')
             else:
                 cutMET.AddCut(CutItem('LowMET', '%s > %s && j0fjvt < %s && j1fjvt < %s' %(met_choice, metCut, options.CutFJVTVal, options.CutFJVTVal)), 'OR')
             cuts += [cutMET]
@@ -621,7 +621,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     cuts = FilterCuts(options)
     if options.OverlapPh:
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
-        
+
     if basic_cuts.chan in ['nn']:
         cuts += getMETTriggerCut(cut, options, basic_cuts, Localsyst=syst)
     elif basic_cuts.chan in ['uu','u','up','um','l']:
@@ -664,11 +664,11 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         #cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
         cuts += [CutItem('CutBaseLep','n_baselep == 1')]
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
-        #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
+        #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
     cuts += [CutItem('CutPh',       'n_ph==1')]
-    cuts += [CutItem('CutPhPt', 'phPt>15.0')] 
+    cuts += [CutItem('CutPhPt', 'phPt>15.0')]
     if basic_cuts.analysis not in ['lowmet']:
-        cuts += [CutItem('CutPhPtHig', 'phPt<110.0')] 
+        cuts += [CutItem('CutPhPtHig', 'phPt<110.0')]
     cuts += getJetCuts(basic_cuts, options, isPh=True);
 
     # add the extra cuts...decide if we want these
@@ -682,11 +682,11 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutFJVT','j0fjvt > 0.4 || j1fjvt > 0.4')]
             cuts += [CutItem('CutMjjLow','jj_mass < 1000.0')]
         else:
-            cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]            
+            cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
     #cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]
-    
+
     if cut == 'BeforeMET':
         return GetCuts(cuts)
     if not ignore_met:
@@ -948,7 +948,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     bkgs['zqcd'] = ['zqcd']
     bkgs['wewk'] = ['wewk']
     bkgs['zewk'] = ['zewk']
-    bkgs['tall'] = ['top2','vvv']
+    bkgs['tall'] = ['top2']#,'vvv'] changed to get single top alone
     #bkgs['vvv'] =['vvv']
     bkgs['dqcd'] = ['dqcd']
     bkgs['mqcd'] = ['mqcd']
@@ -962,7 +962,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
         bkgs['zgam'] = ['zgam','vgg']
         bkgs['wgamewk'] = ['wgamewk']
         bkgs['zgamewk'] = ['zgamewk']
-        bkgs['efakeph'] = ['efakeph']        
+        bkgs['efakeph'] = ['efakeph']
         del bkgs['wqcd']
         del bkgs['zqcd']
         del bkgs['wewk']
@@ -1001,7 +1001,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
             #reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamewk,wgamewk,bkgs,data')
             reg.SetVal(key, 'higgs,tall,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamewk,wgamewk,efakeph,bkgs,data')
         else:
-            if options.mergeMGExt:                            
+            if options.mergeMGExt:
                 reg.SetVal(key, 'higgs,tall,wqcdMad,wewk,zqcdMad,zewk,dqcd,bkgs,data')
             else:
                 reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,dqcd,bkgs,data')

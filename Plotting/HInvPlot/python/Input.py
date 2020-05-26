@@ -54,7 +54,7 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::mergeExt',      options.mergeExt)
         self.read_reg.SetVal('ReadEvent::noVjWeight',    options.noVjWeight)
         self.read_reg.SetVal('ReadEvent::Year',          options.year)
-        self.read_reg.SetVal('ReadEvent::TheorySystWeight', options.TheorySystWeight)        
+        self.read_reg.SetVal('ReadEvent::TheorySystWeight', options.TheorySystWeight)
 
         self.read_reg.SetVal('ReadEvent::Print',      'yes')
         self.read_reg.SetVal('ReadEvent::Trees',      ' '.join(self.trees))
@@ -377,9 +377,9 @@ def prepareBkgRuns(keys,options=None):
     alt_VBF = {'308275':'VBF125 - H75',
                '308277':'VBF125 - H200',
                '308278':'VBF125 - H300',
-               #'308279':'VBF125 - H500', 
-               '308280':'VBF125 - H750', 
-               #'308281':'VBF125 - H1000', 
+               #'308279':'VBF125 - H500',
+               '308280':'VBF125 - H750',
+               #'308281':'VBF125 - H1000',
                '308282':'VBF125 - H2000',
                #'308283':'VBF125 - H3000',
                '313134':'VBFH50',
@@ -392,7 +392,7 @@ def prepareBkgRuns(keys,options=None):
                '313141':'VBFH3000',
                    }
     alt_VBFext = {'308279':'VBF125 - H500',
-                  '308281':'VBF125 - H1000', 
+                  '308281':'VBF125 - H1000',
                   '308283':'VBF125 - H3000',}
     alt_VBF.update(alt_VBFext)
 
@@ -414,13 +414,13 @@ def prepareBkgRuns(keys,options=None):
 
     bkg_wgewk =     {'363270':'WenEWK',
                      '363271':'WmnEWK',
-                     '363272':'WtnEWK',  
+                     '363272':'WtnEWK',
 }
 
     bkg_new = {#'312243':'',
         #'363270':'WenEWK',
          #            '363271':'WmnEWK',
-                     #'363272':'WtnEWK',  
+                     #'363272':'WtnEWK',
         #'700015':'Sh_228_evgamma_pty7_EnhMaxpTVpTy',
          #                '700016':'Sh_228_mvgamma_pty7_EnhMaxpTVpTy',
                          #'700017':'Sh_228_tvgamma_pty7_EnhMaxpTVpTy',
@@ -623,7 +623,7 @@ def prepareBkgRuns(keys,options=None):
                          '312484':'Znunu_PTV100_140_MJJ0_500_KtMerging',
                          '312485':'Znunu_PTV100_140_MJJ500_1000_KtMerging',
                          '312487':'Znunu_PTV140_220_MJJ0_500_KtMerging',
-                         '312488':'Znunu_PTV140_220_MJJ500_1000_KtMerging',                         
+                         '312488':'Znunu_PTV140_220_MJJ500_1000_KtMerging',
                                 }
     bkg_zqcd_sh_ktExt = {#'312448':'Zee_PTV100_140_MJJ0_500_KtMerging',
                          #'312449':'Zee_PTV100_140_MJJ500_1000_KtMerging',
@@ -776,6 +776,18 @@ def prepareBkgRuns(keys,options=None):
                      #'410645':'schan_antitop_lept',
                      #'410646':'Wt_top_incl',
                      #'410647':'Wt_antitop_incl',
+        }
+    bkg_OnlySingleTop = {
+        '410658':'tchan_top', #lepton filtered
+        '410659':'tchan_antitop',
+        #'410642':'tchan_lept_top', # to remove
+        #'410643':'tchan_lept_antitop', # to remove
+        '410644':'schan_top',
+        '410645':'schan_antitop',
+        '410646':'Wt_top',
+        '410647':'Wt_top',
+        #'410648':'Wt_DR_dilepton_top', # to remove
+        #'410649':'Wt_DR_dilepton_antitop', # to remove
         }
     bkg_z_strong_madgraph_znn = {'361515':'Znn_Np0',
                       '361516':'Znn_Np1',
@@ -1103,7 +1115,7 @@ def prepareBkgRuns(keys,options=None):
                          '700016':'Sh_228_mvgamma_pty7_EnhMaxpTVpTy',
                          '700017':'Sh_228_tvgamma_pty7_EnhMaxpTVpTy',
     }
-        
+
     bkg_mg_zg = {'345775':'FxFx_eegamma_HT0_125',
                 '345776':'FxFx_eegamma_HTGT125_MjjLT150',
                 '345777':'FxFx_eegamma_HTGT125_MjjLT500',
@@ -1225,7 +1237,8 @@ def prepareBkgRuns(keys,options=None):
                 #'zewk':bkg_zewkpow,
                 #'top2':bkg_zewkpow,
                 'zqcd':bkg_zqcd,
-                'top2':bkg_top2, # all top
+                ###'top2':bkg_top2, # all top # the one to use
+                'top2':bkg_OnlySingleTop,
                 #'top2':bkg_zqcd_sh_ktExtalt, # all top
                 #'top2':{'345323':'hww'}, # all top
                 #'top2':bkg_zewkpow,
@@ -1333,7 +1346,7 @@ def prepareBkgRuns(keys,options=None):
     bkg_keys['wdpi'].update(bkg_mg_zg)
 
     bkg_keys['wdpi'].update({'410083':'ttgamma4080_noallhad','410084':'ttgamma80_noallhad'})
-    
+
     if False:
         bkg_keys['zqcdPow']=bkg_z_strong_powheg
         bkg_keys['vbfz']=bkg_vbfFiltZ
