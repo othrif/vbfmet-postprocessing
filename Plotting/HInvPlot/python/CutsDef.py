@@ -764,8 +764,8 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
             cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=150.0)
         else:
-            cuts += metCuts(basic_cuts, options, True)
-
+            #cuts += metCuts(basic_cuts, options, True)
+            cuts += metCuts(basic_cuts,options,isLep=True,metCut=options.metCut, cstCut=(options.metCut - 20.0),maxMET=options.maxMET)
     if not options.LoadBaseLep:
         if basic_cuts.chan=='ee':
             cuts += [CutItem('CutLepVeto',   'n_mu == 0')]
@@ -803,7 +803,8 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
             cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=150.0)
         else:
-            cuts += metCuts(basic_cuts,options, True)
+            #cuts += metCuts(basic_cuts,options, True)
+            cuts += metCuts(basic_cuts,options,isLep=True,metCut=options.metCut, cstCut=(options.metCut - 20.0),maxMET=options.maxMET)
     if do_met_signif:
         #cuts += [CutItem('CutMetSignif','met_significance > 4.0')]
         cutMetSignif = CutItem('CutMetSignif')
