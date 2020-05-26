@@ -149,6 +149,7 @@ StatusCode HFInputAlg::initialize() {
       hCRWmMT.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuMTCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuMTCR"+to_string(c))));
       hCRWmp.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuPosCR"+to_string(c))));
       hCRWmn.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC), string("oneMuNegCR"+to_string(c))));
+      hCRFJVT.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("FJVTCR"+to_string(c)),to_string(c), syst, isMC), string("FJVTCR"+to_string(c))));
       hCRZll.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoLepCR"+to_string(c)),to_string(c), syst, isMC), string("twoLepCR"+to_string(c))));
       hCRZee.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC), string("twoEleCR"+to_string(c))));
       hCRZmm.push_back(HistoAppend(HistoNameMaker(currentSamplePlot,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC), string("twoMuCR"+to_string(c))));
@@ -165,6 +166,7 @@ StatusCode HFInputAlg::initialize() {
       hnames.push_back(std::make_pair(hCRWmp.back(), HistoNameMaker(currentSamplePlot,string("oneMuPosCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRWmn.back(), HistoNameMaker(currentSamplePlot,string("oneMuNegCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRZll.back(), HistoNameMaker(currentSamplePlot,string("twoLepCR"+to_string(c)),to_string(c), syst, isMC)));
+      hnames.push_back(std::make_pair(hCRFJVT.back(), HistoNameMaker(currentSamplePlot,string("FJVTCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRZee.back(), HistoNameMaker(currentSamplePlot,string("twoEleCR"+to_string(c)),to_string(c), syst, isMC)));
       hnames.push_back(std::make_pair(hCRZmm.back(), HistoNameMaker(currentSamplePlot,string("twoMuCR"+to_string(c)),to_string(c), syst, isMC)));
       CheckHists(hnames);
@@ -289,6 +291,7 @@ StatusCode HFInputAlg::execute() {
   bool CRWmn = false;
   bool CRZee = false;
   bool CRZmm = false;
+  bool CRFJVT = false;
 
   m_tree->GetEntry(m_tree->GetReadEntry());
   // check if we need to output the physics tree for signal overlap
@@ -399,6 +402,7 @@ StatusCode HFInputAlg::execute() {
   bool leptonVeto = false;
   bool metSoftVeto = false;
   bool fJVTVeto = false;
+  bool fJVTLeadVeto = false;
   bool JetTimingVeto = false;
   bool JetQGTagger = false;
   if(m_extraVars>0){
@@ -411,9 +415,10 @@ StatusCode HFInputAlg::execute() {
     metSoftVeto = met_soft_tst_et>20.0e3;
     if(m_extraVars==3) metSoftVeto=false;
     //if(doTMVA) metSoftVeto=false; // turn off the veto for ANN
-    if(jet_fjvt->size()>1)
+    if(jet_fjvt->size()>1){
       fJVTVeto = fabs(jet_fjvt->at(0))>0.5 || fabs(jet_fjvt->at(1))>0.5;
-    else fJVTVeto=true;
+      fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.5;
+    }else { fJVTVeto=true; fJVTLeadVeto=false; }
     if(jet_timing->size()>1)
       JetTimingVeto = fabs(jet_timing->at(0))>11.0 || fabs(jet_timing->at(1))>11.0;
     else JetTimingVeto = true;
@@ -421,9 +426,15 @@ StatusCode HFInputAlg::execute() {
     // tighten fjvt for the lower met events
     if(m_extraVars>1){
       if(n_baseel==0 && n_basemu==0){
-	if(met_tst_et<180.0e3) fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	if(met_tst_et<200.0e3){
+	  fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	  fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.2;
+	}
       }else{
-	if(met_tst_nolep_et<180.0e3) fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	if(met_tst_nolep_et<200.0e3){
+	  fJVTVeto = fabs(jet_fjvt->at(0))>0.2 || fabs(jet_fjvt->at(1))>0.2;
+	  fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.2;
+	}
       }
     }
   
@@ -435,7 +446,7 @@ StatusCode HFInputAlg::execute() {
     }
 
     // veto events with tighter selections
-    if(metSoftVeto || fJVTVeto || JetTimingVeto || leptonVeto) return StatusCode::SUCCESS;
+    if(metSoftVeto || JetTimingVeto || leptonVeto) return StatusCode::SUCCESS;
   
     if(m_extraVars>1){
       METCut=160.0e3; // try 160
@@ -616,15 +627,16 @@ StatusCode HFInputAlg::execute() {
   bool CRDPHIJETMET = (met_tst_nolep_j1_dphi>1.0) && (met_tst_nolep_j2_dphi>1.0);
   SRDPHIJETMET=true;// remove these cuts as there is no impact
   CRDPHIJETMET=true;// remove these cuts as there is no impact 
-  if ((passMETTrig) & (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) SR = true;
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?true:(met_significance > 4.0))) CRWep = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?true:(met_significance > 4.0))) CRWen = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) CRWepLowSig = true;}
-  if ((trigger_lep_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) CRWenLowSig = true;}
-  if ((trigger_lep_Wmu_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
-  if ((trigger_lep_Wmu_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
-  if ((trigger_lep_Zee_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
-  if ((trigger_lep_Zmm_bool) && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
+  if ((passMETTrig) && !fJVTVeto && (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) SR = true;
+  if ((passMETTrig) && fJVTLeadVeto && (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) CRFJVT = true;
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?true:(met_significance > 4.0))) CRWep = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?true:(met_significance > 4.0))) CRWen = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) CRWepLowSig = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) CRWenLowSig = true;}
+  if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
+  if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
+  if ((trigger_lep_Zee_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
+  if ((trigger_lep_Zmm_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
 
   // do duplicate check
   if(doDuplicateCheck){
@@ -731,7 +743,7 @@ StatusCode HFInputAlg::execute() {
 	else if (jj_mass < 3.5e6) bin = 3;
 	else bin = 4;
 	if(jj_dphi>1)  bin+=5; // separate dphijj
-	if(n_jet>2){
+	if(n_jet>2 && !fJVTLeadVeto){
 	  if (jj_mass < 1.5e6) return StatusCode::SUCCESS; // remove njet>2 and mjj<1.5 TeV
 	  else if (jj_mass < 2e6)   bin = 10;
 	  else if (jj_mass < 3.5e6) bin = 11;
@@ -740,7 +752,8 @@ StatusCode HFInputAlg::execute() {
       }else{// low met
 	if(m_binning==21) return StatusCode::SUCCESS;
 	else{
-	  if (jj_mass < 1.5e6 || n_jet>2) return StatusCode::SUCCESS;
+	  if ((jj_mass < 1.5e6)) return StatusCode::SUCCESS;
+	  else if((n_jet>2) && !fJVTLeadVeto)  return StatusCode::SUCCESS; // allow for the fjvt crs
 	  else if (jj_mass < 2e6)   bin = 13;
 	  else if (jj_mass < 3.5e6) bin = 14;
 	  else bin = 15;
@@ -764,7 +777,7 @@ StatusCode HFInputAlg::execute() {
     if(m_binning==10 && (jj_dphi>1))  bin+=5; // separate dphijj, mjj binning
     if(m_binning==10 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
     if(m_binning==11 && (jj_dphi>1))  bin+=5; // separate dphijj, mjj binning
-    if(m_binning==11 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
+    if(m_binning==11 && (!fJVTLeadVeto && n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning, not lead jet failing fjvt
     if(m_binning==12 && (jj_dphi>1))  bin+=5; // separate dphijj, mjj binning
     if(m_binning==12 && (n_jet>2))    bin=10; // separate dphijj, mjj binning, njet binning
 
@@ -790,6 +803,7 @@ StatusCode HFInputAlg::execute() {
     if((CRWmn || CRWmp) && passMTCut==2){ HistoFill(hCRWmMT[bin],w_final*xeSFTrigWeight_nomu); }// low MT
     if (CRZee){ HistoFill(hCRZee[bin],w_final); HistoFill(hCRZll[bin],w_final); }
     if (CRZmm){ HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu);   HistoFill(hCRZll[bin],w_final*xeSFTrigWeight_nomu);  }
+    if (CRFJVT){ HistoFill(hCRFJVT[bin],w_final*xeSFTrigWeight); }
   }else{// one histogram, so need to find the real bin number
     float myWeight=w_final;
     if (CRWmp && CRWmn && CRZmm) myWeight=w_final*xeSFTrigWeight_nomu;

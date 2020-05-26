@@ -12,6 +12,7 @@ parser.add_argument( "-t", "--unblind", action = "store_true", dest = "unblind",
 parser.add_argument( "--ph-ana", action = "store_true", dest = "ph_ana", default = False, help = "photon analysis tables");
 parser.add_argument( "--combinePlusMinus", action = "store_true", dest = "combinePlusMinus", default = False, help = "combine the pos and neg CRs");
 parser.add_argument( "--fakeMu", action = "store_true", dest = "fakeMu", default = False, help = "add fake muon CRs");
+parser.add_argument( "--fjvtcr", action = "store_true", dest = "fjvtcr", default = False, help = "add fjvt CRs");
 args, unknown = parser.parse_known_args()
 
 regions=[
@@ -35,6 +36,8 @@ if args.combinePlusMinus:
     ]
     if args.fakeMu:
         regions+=['VBFjetSel_XNom_oneMuMTCRX_obs_cuts']
+    if args.fjvtcr:
+        regions+=['VBFjetSel_XNom_FJVTCRX_obs_cuts']
 if args.ph_ana:
     regions=[
         'VBFjetSel_XNom_SRX_obs_cuts',
@@ -212,6 +215,7 @@ for rmy in regions:
         if r.count('twoEle'):  region_name=['Zee']
         elif r.count('twoMu'):  region_name=['Zmm']
         elif r.count('twoLep'):  region_name=['Zll']
+        elif r.count('FJVTC'):  region_name=['FJVT']            
         elif r.count('oneMuMTC'):  region_name=['WmunuMT']            
         elif r.count('oneEleLowSigC'):  region_name=['WenuLowMetSig']
         elif r.count('oneEleNegLowSigC'):  region_name=['WenminusLowMetSig']            
@@ -240,6 +244,7 @@ for rmy in regions:
             elif r.count('twoMu'):  sreg=['Zmm']
             elif r.count('twoLep'):  sreg=['Zll']
             elif r.count('oneMuMTC'):  sreg=['WmunuMT']
+            elif r.count('FJVTC'):  sreg=['FJVT']
             elif r.count('oneEleNegLowSigC'):  sreg=['WenminusLowMetSig']                
             elif r.count('oneElePosLowSigC'):  sreg=['WenplusLowMetSig']
             elif r.count('oneEleLowSigC'):  sreg=['WenuLowMetSig']
@@ -273,13 +278,15 @@ for rmy in regions:
 print 'done'
 
 print table_per_bin
-keys_regions_map={'SR':'SR','Zll':'$Z\\rightarrow\ell\ell$ CR','Wmunu':'$W\\rightarrow\\mu\\nu$ CR','Wenu':'$W\\rightarrow$e$\\nu$ CR','WenuLowMetSig':'Fake e CR','WmunuMT':'Fake $\\mu$ CR'}
+keys_regions_map={'SR':'SR','Zll':'$Z\\rightarrow\ell\ell$ CR','Wmunu':'$W\\rightarrow\\mu\\nu$ CR','Wenu':'$W\\rightarrow$e$\\nu$ CR','WenuLowMetSig':'Fake e CR','WmunuMT':'Fake $\\mu$ CR','FJVT':'fJvt CR'}
 keys_regions = ['SR','Zee','Zmm','Wmnminus','Wmnplus','Wenminus','Wenplus']
 if args.combinePlusMinus:
     keys_regions = ['SR','Zll','Wmunu','Wenu']
 if args.ph_ana:
     keys_regions = ['SR','Zll','Wmunu','Wenu']
-    keys_regions_map={'SR':'SR','Zll':'$Z(\\rightarrow\ell\ell)+\\gamma$ CR','Wmunu':'$W(\\rightarrow\\mu\\nu)+\\gamma$ CR','Wenu':'$W(\\rightarrow$e$\\nu)+\\gamma$ CR','WenuLowMetSig':'Fake e CR','WmunuMT':'Fake $\\mu$ CR'}    
+    keys_regions_map={'SR':'SR','Zll':'$Z(\\rightarrow\ell\ell)+\\gamma$ CR','Wmunu':'$W(\\rightarrow\\mu\\nu)+\\gamma$ CR','Wenu':'$W(\\rightarrow$e$\\nu)+\\gamma$ CR','WenuLowMetSig':'Fake e CR','WmunuMT':'Fake $\\mu$ CR','FJVT':'fJvt CR'}
+if args.fjvtcr:
+    keys_regions+=['FJVT']
 print ''
 print '\\resizebox{\\textwidth}{!}{ '
 if args.combinePlusMinus:

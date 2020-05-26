@@ -1,6 +1,52 @@
 #!/usr/bin/env python
 import ROOT
 import os
+def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False):
+    f_multijet = ROOT.TFile("multijetFJVT.root", "recreate")
+    mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 50.0]
+    emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18]    
+    if Binning==11 or Binning==12 or Binning==13 or Binning==21 or Binning==22: # set for all years
+        mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
+        emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18] 
+        if METCut==160:
+            mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
+            emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18] 
+        if Binning==21 or Binning==22:
+            mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 40.0]
+            mjs+=[6.6,4.4]
+            emjs += [0.25, 0.25]
+        if Binning==22:
+            mjs+=[1.04,0.9,0.95]
+            emjs += [0.1, 0.12, 0.15]
+    a=1
+    hists=[]
+    histcr=None
+    hist=None
+    for mj in mjs:
+        histcr = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_FJVTCR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_FJVTCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        hist = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"Nom_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histcr.SetBinContent(1,1.0)
+        histcr.SetBinError(1,0.05)
+        hist.SetBinContent(1,mj)
+        hist.SetBinError(1,mj*0.07)
+        if Binning==11 and a==11:
+            histcr.SetBinContent(1,0.0)
+        if (Binning==21 or Binning==22) and (a==11 or a==12 or a==13):
+            histcr.SetBinContent(1,0.0)
+        histHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histHigh.SetBinContent(1,mj*(1.+emjs[a-1]))
+        histHigh.SetBinError(1,0.0)
+        histLow.SetBinContent(1,mj*(1.-emjs[a-1]))
+        histLow.SetBinError(1,0.0)
+        
+        hists+=[histcr,hist,histHigh,histLow]
+        a += 1
+    f_multijet.cd()
+    for h in hists:
+        h.Write()
+    f_multijet.Close()
+
 def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
@@ -557,6 +603,7 @@ def writeFakeMuo(Binning=0, year=2016, METCut=150):
     for h in hists:
         h.Write()
     f_fakemuo.Close()
+#writeMultiJetFJVT(11, 2016, 150)
 #writeMultiJet(11, 2016, 150)
 #writeMultiJet(11, 2018, 160)
 #os.chdir('../v34D')
