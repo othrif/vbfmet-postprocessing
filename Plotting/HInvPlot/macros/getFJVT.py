@@ -16,14 +16,14 @@ parser.add_argument("--mvar", dest='mvar', default='jj_mass_variableBin', help="
 parser.add_argument("--outdir", dest='outdir', default='/tmp/plotTrig', help="Output Directory")
 parser.add_argument("--wait", action='store_true', dest='wait', default=False, help="wait")
 parser.add_argument("--mg", action='store_true', dest='mg', default=False, help="measure mg")
+parser.add_argument("--style", dest='style', default='/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/' , help="ATLAS style path")
 args, unknown = parser.parse_known_args()
 
 import HInvPlot.JobOptions as config
 import HInvPlot.CutsDef    as hstudy
 
 #-----------------------------------------
-def Style():
-    atlas_style_path='/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/'
+def Style(atlas_style_path):
     if not os.path.exists(atlas_style_path):
         print("Error: could not find ATLAS style macros at: " + atlas_style_path)
         sys.exit(1)
@@ -244,7 +244,7 @@ if __name__ == "__main__":
         if not os.path.exists(args.outdir):
             os.mkdir(args.outdir)
     
-    Style()
+    Style(args.style)
     can = ROOT.TCanvas('stack', 'stack', 500, 500)
     fname=args.input
     fnameFailfjvt = args.inputfail
