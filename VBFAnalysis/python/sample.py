@@ -79,7 +79,7 @@ class sample(object):
         if (self.isMC):
             print "runNumebr::: ",self.runNumber
             if (self.runNumber >= 308096 and self.runNumber <= 308098):
-                self.sampleType = "W_EWK"
+                self.sampleType = "W_EWKSh"
             elif (self.runNumber >= 364500 and self.runNumber <= 364519) or (self.runNumber>=345775 and self.runNumber<=345784) or (self.runNumber>=364550 and self.runNumber<=364584) or (self.runNumber>=700011 and self.runNumber<=700014):
                 self.sampleType = "Zg_strong"
             elif (self.runNumber >= 364520 and self.runNumber <= 364535) or (self.runNumber >= 700015 and self.runNumber <= 700017):
@@ -101,7 +101,7 @@ class sample(object):
             elif (self.runNumber >= 363600 and self.runNumber <= 363671) or (self.runNumber >= 311445 and self.runNumber <= 311453):
                 self.sampleType = "W_strong" # madgraph
             elif (self.runNumber >= 308092 and self.runNumber <= 308095):
-                self.sampleType = "Z_EWK"
+                self.sampleType = "Z_EWKSh"
             elif (self.runNumber >= 345099 and self.runNumber <= 345102):
                 self.sampleType = "Z_strong_VBFFilt"
             elif (self.runNumber >= 364100 and self.runNumber <= 364155) or (self.runNumber <= 361519 and self.runNumber >= 361515) or (self.runNumber>=366010 and self.runNumber<=366035) or (self.runNumber>=311429 and self.runNumber<=311444):
@@ -111,9 +111,9 @@ class sample(object):
             elif self.runNumber==421301:
                 self.sampleType = "Z_strong228"
             elif (self.runNumber>=363233 and self.runNumber<=363236) or (self.runNumber==830007):
-                self.sampleType = "Z_EWKPow"
+                self.sampleType = "Z_EWK"
             elif (self.runNumber>=363237 and self.runNumber<=363239)  or (self.runNumber==830006):
-                self.sampleType = "W_EWKPow"
+                self.sampleType = "W_EWK"
             elif ((self.runNumber >= 410011 and self.runNumber <= 410014) or (self.runNumber == 410025) or (self.runNumber == 410026) or (self.runNumber == 410470) or (self.runNumber == 410471) or (self.runNumber == 410472)) or (self.runNumber>=410642 and self.runNumber<=410649) or self.runNumber==410642 or self.runNumber==410643:
                 self.sampleType = "ttbar"
             elif self.runNumber==346600:

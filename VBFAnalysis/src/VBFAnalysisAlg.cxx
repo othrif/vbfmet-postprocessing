@@ -923,6 +923,8 @@ StatusCode VBFAnalysisAlg::execute() {
     //correct the LO SHERPA to H7 EWK
     //if(m_isMC && runNumber>=308092 && runNumber<=308098 && truth_jj_mass>200.0e3) weight*=0.000047991*truth_jj_mass/1.0e3+0.8659;
     if(m_isMC && runNumber>=308092 && runNumber<=308098 && truthF_jj_mass>200.0e3) weight*=0.000047991*truthF_jj_mass/1.0e3+0.8659;
+    //correct the H7 Zmm, Zee, and Ztt for the missing gamma* component
+    if(m_isMC && ((runNumber>=363234 && runNumber<=363236) || runNumber==830007) && met_tst_nolep_et>110.0e3) weight/=(1.0177+(met_tst_nolep_et*0.00040858/1.0e3));
 
     //std::cout << "crossSection: " << crossSection << " NgenCorrected: " << NgenCorrected << " weight: " << weight << std::endl;
   } else {
@@ -1380,7 +1382,7 @@ StatusCode VBFAnalysisAlg::execute() {
 
   float tmpD_muSFTrigWeight = muSFTrigWeight;
   if(m_oneTrigMuon && passMETTrig) tmpD_muSFTrigWeight=1.0;
-  w = weight*mcEventWeight*(met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
+  w = weight*mcEventWeight*(met_tst_nolep_et>200.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*jvtSFWeight*elSFWeight*muSFWeight*elSFTrigWeight*tmpD_muSFTrigWeight*eleANTISF*nloEWKWeight*phSFWeight*puSyst2018Weight;
   if(m_isMC && runNumber>=364541 && runNumber<=364545 && fabs(puWeight)>10.0 ) puWeight=1.0;
   if(m_isMC && runNumber>=364541 && runNumber<=364542) puWeight=1.0;
   if(m_doPUWeight) w *= puWeight;
@@ -1421,7 +1423,7 @@ StatusCode VBFAnalysisAlg::execute() {
   //
   float tmp_puWeight = puWeight;
   float tmp_jvtSFWeight = jvtSFWeight;
-  float tmp_fjvtSFWeight = (met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
+  float tmp_fjvtSFWeight = (met_tst_nolep_et>200.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
   float tmp_elSFWeight = elSFWeight;
   float tmp_muSFWeight = muSFWeight;
   float tmp_elSFTrigWeight = elSFTrigWeight;
@@ -1440,7 +1442,7 @@ StatusCode VBFAnalysisAlg::execute() {
     // initialize
     tmp_puWeight = puWeight;
     tmp_jvtSFWeight = jvtSFWeight;
-    tmp_fjvtSFWeight = (met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
+    tmp_fjvtSFWeight = (met_tst_nolep_et>200.0e3 ? fjvtSFWeight : fjvtSFTighterWeight);
     tmp_elSFWeight = elSFWeight;
     tmp_muSFWeight = muSFWeight;
     tmp_elSFTrigWeight = elSFTrigWeight;
@@ -1453,8 +1455,8 @@ StatusCode VBFAnalysisAlg::execute() {
     tmp_qgTagWeight = 1.0; // default value is 1
     tmp_signalTruthSyst=1.0; // default value is 1
     tmp_vjWeight = vjWeight;
-    if(it->first.Contains("fjvtSFWeight")        && (met_tst_nolep_et >180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
-    else if(it->first.Contains("fjvtSFTighterWeight") && (met_tst_nolep_et<=180.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    if(it->first.Contains("fjvtSFWeight")        && (met_tst_nolep_et >200.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
+    else if(it->first.Contains("fjvtSFTighterWeight") && (met_tst_nolep_et<=200.0e3))   tmp_fjvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("jvtSFWeight"))         tmp_jvtSFWeight=tMapFloat[it->first];
     else if(it->first.Contains("puWeight"))       tmp_puWeight=tMapFloat[it->first];
     else if(it->first.Contains("elSFWeight"))     tmp_elSFWeight=tMapFloat[it->first];
