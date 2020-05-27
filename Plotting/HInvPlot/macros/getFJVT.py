@@ -9,7 +9,7 @@ import numpy as np
 
 parser = argparse.ArgumentParser( description = "Changing to MG relative uncertainties", add_help=True , fromfile_prefix_chars='@')
 parser.add_argument("--lumi", dest='lumi', default=139, help="Lumi")
-parser.add_argument("--year", dest='year', default='2016', help="Year")
+parser.add_argument("--year", dest='year', default='2019', help="Year")
 parser.add_argument("--input", dest='input', default='v37ALL_fjvt05.root', help="input file name")
 parser.add_argument("--inputfail", dest='inputfail', default='v37ALL_fjvt05rev.root', help="input file name")
 parser.add_argument("--mvar", dest='mvar', default='jj_mass_variableBin', help="MET variable: met_cst_jet, met_tst_et, met_tenacious_tst_et")
@@ -52,7 +52,7 @@ def SetOverflow(h):
     h.SetBinError(maxB,math.sqrt(undere**2+undere1**2))    
     
     
-def GetHists(f,cut_path, mvar, year):
+def GetHists(f,cut_path, mvar, year, met=150.0):
     dpath    = cut_path+'/plotEvent_data/'+mvar
     bkgpaths=[cut_path+'/plotEvent_wqcd/'+mvar,
                   cut_path+'/plotEvent_zqcd/'+mvar,
@@ -71,14 +71,12 @@ def GetHists(f,cut_path, mvar, year):
     bkgTot=None
     for b in bkgpaths:
         #print b
-
-
         a=f.Get(b).Clone()
         if b.count('zqcd'):
             znf=GetZNF(f,cut_path, mvar,year)
             a.Scale(znf) # correcting that Znn sample in 2018
         if b.count('wqcd'):
-            wnf=GetWNF(f,cut_path, mvar,year)
+            wnf=GetWNF(f,cut_path, mvar,year,met=met)
             a.Scale(wnf) # correcting that Wlnu to the control regions
         if bkgTot==None:
             bkgTot=a.Clone()
@@ -89,7 +87,9 @@ def GetHists(f,cut_path, mvar, year):
     dplot.Add(bkgTot,-1.0)
     return dplot #,bkgTot
 
-def GetWNF(f, num_path, mvar, year=2016):
+def GetWNF(f, num_path, mvar, year=2016, met=150.0):
+    if met>140:
+        return 1.01
     return 1.06
 
 def GetZNF(f, num_path, mvar, year=2016):
@@ -100,7 +100,7 @@ def GetZNF(f, num_path, mvar, year=2016):
 
     if year==2019:
         return 1.06 # correcting inclusively
-    return 1.0 
+    return 1.04
     
 def GetFJVT(can, num_path, mvar, fnameA, fnameFailfjvt, year=2019):    
     
@@ -111,7 +111,10 @@ def GetFJVT(can, num_path, mvar, fnameA, fnameFailfjvt, year=2019):
         sys.exit(0)
     fname=fnameA.rstrip('.root')
     hdataMinBkg_passFJVT = GetHists(f,     num_path, mvar, year)
-    hdataMinBkg_failFJVT = GetHists(ffail, num_path, mvar, year)
+
+    den_path=num_path.replace('nj2','allmjj')
+    print 'den_path:',den_path
+    hdataMinBkg_failFJVT = GetHists(ffail, den_path, mvar, year)
 
     hdataMinBkg_passFJVT.GetXaxis().SetTitle('m_{jj} [GeV]')
     hdataMinBkg_failFJVT.GetXaxis().SetTitle('m_{jj} [GeV]')
@@ -265,6 +268,16 @@ if __name__ == "__main__":
     h7,cr7=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met190.root', ntuplev+'_SR_fjvt05rev_met190.root')    
     h8,cr8=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met200.root', ntuplev+'_SR_fjvt05rev_met200.root')    
 
+    num_path='pass_sr_nj2_nn_Nominal'    
+    h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140.root')
+    #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met150.root', ntuplev+'_SR_fjvt02rev_met150.root')
+    #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met120.root', ntuplev+'_SR_fjvt02rev_met120.root')        
+
+    num_path='pass_sr_allmjj_nn_Nominal'    
+    hA,crA=GetFJVT(can, num_path, mvar, 'v37A_fjvt05.root', 'v37A_SR_fjvt05rev.root')
+    hD,crD=GetFJVT(can, num_path, mvar, 'v37D_fjvt05.root', 'v37D_SR_fjvt05rev.root')
+    hE,crE=GetFJVT(can, num_path, mvar, 'v37E_fjvt05.root', 'v37E_SR_fjvt05rev.root')
+    
     can.Clear()
     h1.GetYaxis().SetRangeUser(0,5.0)
     h1.Draw()
@@ -282,6 +295,8 @@ if __name__ == "__main__":
     h7.SetMarkerColor(ROOT.kOrange+5)
     h8.SetLineColor(ROOT.kOrange)
     h8.SetMarkerColor(ROOT.kOrange)
+    h9.SetLineColor(ROOT.kPink)
+    h9.SetMarkerColor(ROOT.kPink)
     h2.Draw('same')
     #h3.Draw('same')
     h4.Draw('same')
@@ -289,6 +304,7 @@ if __name__ == "__main__":
     h6.Draw('same')
     h7.Draw('same')
     h8.Draw('same')
+    h9.Draw('same')
 
     #### --- setup systematics
     # setup systematics
@@ -297,7 +313,10 @@ if __name__ == "__main__":
     WfuncSyst.SetLineStyle(4)
     WfuncSyst.SetFillColor(ROOT.kGreen)
     WfuncSyst.SetFillStyle(3001)
-            
+
+    # generate xyz
+    for i in range(1,h9.GetNbinsX()+2):
+        print 'Bin %0.1f Val: %0.3f ' %(h9.GetXaxis().GetBinLowEdge(i),h9.GetBinContent(i))
     # getting the weighted average
     listofh = [h1,h6,h2,h4,h5,h7,h8]
     for i in range(1,h1.GetNbinsX()+2):
@@ -349,6 +368,7 @@ if __name__ == "__main__":
     leg.AddEntry(h5,' 170<MET<180')
     leg.AddEntry(h7,' 180<MET<190')
     leg.AddEntry(h8,' 190<MET<200')
+    leg.AddEntry(h9,' met140 FJVT>0.2')
     leg.AddEntry(WfuncSyst,' Syst Band')    
     #leg.AddEntry(h3,'MET>200')
     leg.Draw()
@@ -366,6 +386,9 @@ if __name__ == "__main__":
         isf=WfuncSyst.GetBinContent(i)
         cr3.SetBinContent(i,ibin*isf)
         cr3.SetBinError(i,ibine*isf)
+        for hCR in [crA,crD,crE]:
+            hCR.SetBinContent(i,hCR.GetBinContent(i)*isf)
+            hCR.SetBinError(i,hCR.GetBinError(i)*isf)
         
     can.Clear()
     cr3.GetYaxis().SetTitle('MJ Prediction')
@@ -373,6 +396,13 @@ if __name__ == "__main__":
     can.Update()
     can.WaitPrimitive()
     print 'MJ yields: ',cr3.Integral(0,10001)
+    err = ROOT.Double(0.0)
+    totalBkg = crA.IntegralAndError(0,1001,err)
+    print 'MJ A yields: %0.2f +/- %0.2f' %(totalBkg,err)
+    totalBkg = crD.IntegralAndError(0,1001,err)
+    print 'MJ D yields: %0.2f +/- %0.2f' %(totalBkg,err)
+    totalBkg = crE.IntegralAndError(0,1001,err)
+    print 'MJ E yields: %0.2f +/- %0.2f' %(totalBkg,err)    
     for i in range(1,h1.GetNbinsX()+1):
         print 'Bin %0.1f Yield: %0.1f' %(h1.GetXaxis().GetBinLowEdge(i), cr3.GetBinContent(i))
 
@@ -412,13 +442,14 @@ if __name__ == "__main__":
         can.Update()
         can.WaitPrimitive()
 
+    # compare the different years in the low MET region
     num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
     ntuplev='v37A'
     hA,crA=GetFJVT(can, num_path, mvar, ntuplev+'_fjvt05.root', ntuplev+'_fjvt05rev.root',year=2016)
     ntuplev='v37D'
     hD,crD=GetFJVT(can, num_path, mvar, ntuplev+'_fjvt05.root', ntuplev+'_fjvt05rev.root',year=2017)
     ntuplev='v37E'
-    hE,crE=GetFJVT(can, num_path, mvar, ntuplev+'_fjvt05.root', ntuplev+'_fjvt05rev.root',year=2018)
+    hE,crE=GetFJVT(can, num_path, mvar, ntuplev+'_fjvt05.root', ntuplev+'_fjvt05rev.root',year=2018)    
     can.Clear()
     hA.GetYaxis().SetRangeUser(0,5.0)
     hA.Draw()
