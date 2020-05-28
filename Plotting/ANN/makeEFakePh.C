@@ -1,3 +1,9 @@
+/// This script converts electrons to photons, applies the fake rates, and it prepares ntuples with the correct format
+// To run this, it only takes the ntuple name and produces a new ntuple
+// root -l -q makeEFakePh.C\(\"Wg_strong\"\)
+// The code assumes that the input files are in a directory called /tmp/v41Agam/
+// The output is an ntuple that can be used to make the normal selections called  /tmp/smallWg_strong.root
+
 std::vector<float> getFakeWeight(float pt, float eta){
   std::vector<float> out;
   float fr=0.0;

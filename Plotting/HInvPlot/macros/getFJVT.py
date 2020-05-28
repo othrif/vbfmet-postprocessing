@@ -50,9 +50,88 @@ def SetOverflow(h):
     h.SetBinError(maxB+1,0.0)
     h.SetBinContent(maxB,under+under1)
     h.SetBinError(maxB,math.sqrt(undere**2+undere1**2))    
+
+def GetZNFHists(f,cut_pathtmp, mvar, year, met=150.0):
+    cut_path = cut_pathtmp.replace('_sr_','_zcr_')
+    cut_path = cut_path.replace('_nn_','_ll_')    
+    dpath    = cut_path+'/plotEvent_data/'+mvar
+    bkgpaths=[cut_path+'/plotEvent_wqcd/'+mvar,
+                  cut_path+'/plotEvent_wewk/'+mvar,
+                  cut_path+'/plotEvent_tall/'+mvar,]
+    sigpaths = [cut_path+'/plotEvent_zqcd/'+mvar,
+                    cut_path+'/plotEvent_zewk/'+mvar,]
+    dplot    = f.Get(dpath)
+    if not dplot:
+        print dpath
+        sys.exit(0)
+    dplot    = f.Get(dpath).Clone()
+    bkgTot=None
+    sigTot=None
+    for b in bkgpaths:
+        a=f.Get(b).Clone()
+        if bkgTot==None:
+            bkgTot=a.Clone()
+        else:
+            bkgTot.Add(a)
+    for b in sigpaths:
+        a=f.Get(b).Clone()
+        if sigTot==None:
+            sigTot=a.Clone()
+        else:
+            sigTot.Add(a)
+                        
+    dplot.Add(bkgTot,-1.0)
+    data_minus_bkg = dplot.Integral(0,10001)
+    signEvt = sigTot.Integral(0,10001)
+    # correct for the differences in Znn simulation in 2018 and combined
+    xtra=1.0
+    if year==2018:
+        xtra= 1.3
+    if year==2019:
+        xtra= 1.06 # correcting inclusively
     
+    if signEvt>0.0:
+        return xtra*data_minus_bkg/signEvt
+    return xtra
+
+def GetWNFHists(f,cut_pathtmp, mvar, year, met=150.0):
+    cut_path = cut_pathtmp.replace('_sr_','_wcr_')
+    cut_path = cut_path.replace('_nn_','_l_')
+    mvarA='mt'
+    dpath    = cut_path+'/plotEvent_data/'+mvarA
+    bkgpaths=[cut_path+'/plotEvent_zqcd/'+mvarA,
+                  cut_path+'/plotEvent_zewk/'+mvarA,
+                  cut_path+'/plotEvent_tall/'+mvarA,]
+    sigpaths = [cut_path+'/plotEvent_wqcd/'+mvarA,
+                    cut_path+'/plotEvent_wewk/'+mvarA,]
+    dplot = f.Get(dpath)
+    if not dplot:
+        print dpath
+        sys.exit(0)
+    dplot = f.Get(dpath).Clone()
+    bkgTot=None
+    sigTot=None
+    for b in bkgpaths:
+        a=f.Get(b).Clone()
+        if bkgTot==None:
+            bkgTot=a.Clone()
+        else:
+            bkgTot.Add(a)
+    for b in sigpaths:
+        a=f.Get(b).Clone()
+        if sigTot==None:
+            sigTot=a.Clone()
+        else:
+            sigTot.Add(a)
+
+    dplot.Add(bkgTot,-1.0)
+    data_minus_bkg = dplot.Integral(25,10001)
+    signEvt = sigTot.Integral(25,10001)
+    if signEvt>0.0:
+        return data_minus_bkg/signEvt
+    return 1.0
     
-def GetHists(f,cut_path, mvar, year, met=150.0):
+def GetHists(f,cut_path, mvar, year, met=150.0, computeNF=False):
     dpath    = cut_path+'/plotEvent_data/'+mvar
     bkgpaths=[cut_path+'/plotEvent_wqcd/'+mvar,
                   cut_path+'/plotEvent_zqcd/'+mvar,
@@ -60,8 +139,6 @@ def GetHists(f,cut_path, mvar, year, met=150.0):
                   cut_path+'/plotEvent_zewk/'+mvar,
                   cut_path+'/plotEvent_tall/'+mvar,
                   ]
-    wQCDpath = cut_path+'/plotEvent_wqcd/'+mvar
-
     dplot    = f.Get(dpath)
     if not dplot:
         print dpath
@@ -73,10 +150,20 @@ def GetHists(f,cut_path, mvar, year, met=150.0):
         #print b
         a=f.Get(b).Clone()
         if b.count('zqcd'):
-            znf=GetZNF(f,cut_path, mvar,year)
+            znf=1.0
+            if computeNF:
+                znf=GetZNFHists(f,cut_path, mvar,year)
+                print 'zNF: ',znf
+            else:
+                znf=GetZNF(f,cut_path, mvar,year)
             a.Scale(znf) # correcting that Znn sample in 2018
         if b.count('wqcd'):
-            wnf=GetWNF(f,cut_path, mvar,year,met=met)
+            wnf=1.0
+            if computeNF:
+                wnf=GetWNFHists(f,cut_path, mvar,year)
+                print 'wNF: ',wnf                
+            else:
+                wnf=GetWNF(f,cut_path, mvar,year,met=met)                
             a.Scale(wnf) # correcting that Wlnu to the control regions
         if bkgTot==None:
             bkgTot=a.Clone()
@@ -110,7 +197,7 @@ def GetFJVT(can, num_path, mvar, fnameA, fnameFailfjvt, year=2019):
         print 'file: ',fnameA,fnameFailfjvt
         sys.exit(0)
     fname=fnameA.rstrip('.root')
-    hdataMinBkg_passFJVT = GetHists(f,     num_path, mvar, year)
+    hdataMinBkg_passFJVT = GetHists(f,     num_path, mvar, year, computeNF=True)
 
     den_path=num_path.replace('nj2','allmjj')
     print 'den_path:',den_path
@@ -125,7 +212,11 @@ def GetFJVT(can, num_path, mvar, fnameA, fnameFailfjvt, year=2019):
     elif mvar.count('jj_dphi'):
         hdataMinBkg_passFJVT.GetXaxis().SetTitle('#Delta#phi_{jj}')
         hdataMinBkg_failFJVT.GetXaxis().SetTitle('#Delta#phi_{jj}')
-        rebin=10
+        rebin=10        
+    elif mvar.count('jetPt0'):
+        hdataMinBkg_passFJVT.GetXaxis().SetTitle('Jet p_{T} [GeV]')
+        hdataMinBkg_failFJVT.GetXaxis().SetTitle('Jet p_{T} [GeV]')
+
     if rebin>1:
         hdataMinBkg_failFJVT.Rebin(rebin)
         hdataMinBkg_passFJVT.Rebin(rebin)
@@ -265,11 +356,13 @@ if __name__ == "__main__":
     h4,cr4=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met170.root', ntuplev+'_SR_fjvt05rev_met170.root')
     h5,cr5=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met180.root', ntuplev+'_SR_fjvt05rev_met180.root')
     h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met140.root', ntuplev+'_SR_fjvt05rev_met140.root')    
-    h7,cr7=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met190.root', ntuplev+'_SR_fjvt05rev_met190.root')    
+    #h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met140.root', ntuplev+'_SR_fjvt05rev_met140_nomjj.root')    
+    h7,cr7=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met190.root', ntuplev+'_SR_fjvt05rev_met190.root')
     h8,cr8=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met200.root', ntuplev+'_SR_fjvt05rev_met200.root')    
 
     num_path='pass_sr_nj2_nn_Nominal'    
-    h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140.root')
+    #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140.root')
+    h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140_nomjj.root')
     #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met150.root', ntuplev+'_SR_fjvt02rev_met150.root')
     #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met120.root', ntuplev+'_SR_fjvt02rev_met120.root')        
 
