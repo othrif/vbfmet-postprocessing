@@ -179,6 +179,13 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
 
     return labs
 
+def printHist(h,name):
+    print(name+':')
+    for i in range(1,h.GetNbinsX()+1):
+        valb = h.GetBinContent(i)
+        errb = h.GetBinError(i)
+        print '{0:.4} +- {1:.4}'.format(h.GetBinContent(i), h.GetBinError(i))
+
 #-----------------------------------------
 def PlotError(h):
 
@@ -203,7 +210,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     h2 = f2.Get(hname2)
     #h1.Scale(h1_norm)
     #h2.Scale(h2_norm)
-    print f1.GetName(), f2.GetName()
+    print('\n'+f1.GetName()+' '+f2.GetName())
 
     # Fix labels
 
@@ -293,22 +300,22 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     if options.logscale:
         h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
-    h1.Draw()
-    h2.Draw('same')
+    h1.Draw('hist')
+    h2.Draw('same hist')
 
-    chi2 = h1.Chi2Test      (h2, 'UW CHI2')
-    kval = h1.KolmogorovTest(h2, '')
-    print 'chi2: ',chi2,' ks: ',kval
+    chi2 = 1.#h1.Chi2Test      (h2, 'UW CHI2')
+    kval = 1.#h1.KolmogorovTest(h2, '')
+    #print 'chi2: ',chi2,' ks: ',kval
     ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
     ks_text2.SetNDC()
     ks_text2.SetTextSize(0.055)
     ks_text2.SetTextAlign(11)
     ks_text2.SetTextColor(ROOT.kBlack)
-    ks_text2.Draw()
+    #ks_text2.Draw()
 
     e=ROOT.Double(0.0)
-    print 'Integral '+num_name+': ',h1.IntegralAndError(0,1001,e),'+/-',e
-    print 'Integral '+den_name+': ',h2.IntegralAndError(0,1001,e),'+/-',e
+    #print 'Integral '+num_name+': ',h1.IntegralAndError(0,1001,e),'+/-',e
+    #print 'Integral '+den_name+': ',h2.IntegralAndError(0,1001,e),'+/-',e
 
     leg = ROOT.TLegend(0.6,0.7,0.8,0.8)
     leg.SetBorderSize(0)
@@ -335,7 +342,12 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     #if intden>0.0:
     #    hratio.Scale(h2.Integral()/intden)
     #hratio.Divide(h2)
+
+    printHist(h1,num_name)
+    printHist(h2,den_name)
     hratio.Divide(h1,h2,1.0,1.0,"B");
+    printHist(hratio,num_name+'/'+den_name)
+
     pad1.SetLogy(0)
     if options.logscale:
         pad1.SetLogy(1)
@@ -417,8 +429,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     hratio.GetXaxis().SetTitleOffset(4.);
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);
-    hratio.Draw()
-    hratio.Print()
+    hratio.Draw('EL')
     can.Update()
 
     if options.wait and False:
@@ -445,7 +456,7 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     hname = h1.GetName()
     #h1.Scale(h1_norm)
     #h2.Scale(h2_norm)
-    print f1name,f2name
+   # print f1name,f2name
 
     # Fix labels
 
@@ -537,22 +548,22 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     if options.logscale:
         h1.GetYaxis().SetRangeUser(1e-8, max_bin*1.5)
 
-    h1.Draw()
-    h2.Draw('same')
+    h1.Draw('hist')
+    h2.Draw('same hist')
 
-    chi2 = h1.Chi2Test      (h2, 'UW CHI2')
-    kval = h1.KolmogorovTest(h2, '')
-    print 'chi2: ',chi2,' ks: ',kval
+    chi2 = 1.#h1.Chi2Test      (h2, 'UW CHI2')
+    kval = 1.#h1.KolmogorovTest(h2, '')
+    #print 'chi2: ',chi2,' ks: ',kval
     ks_text2 = ROOT.TLatex(0.3, 0.95, 'KS: %.2f' %kval)
     ks_text2.SetNDC()
     ks_text2.SetTextSize(0.055)
     ks_text2.SetTextAlign(11)
     ks_text2.SetTextColor(ROOT.kBlack)
-    ks_text2.Draw()
+    #ks_text2.Draw()
 
     e=ROOT.Double(0.0)
-    print 'Integral '+comp1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
-    print 'Integral '+comp2+': ',h2.IntegralAndError(0,1001,e),'+/-',e
+    #print 'Integral '+comp1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
+    #print 'Integral '+comp2+': ',h2.IntegralAndError(0,1001,e),'+/-',e
 
     leg = ROOT.TLegend(0.5,0.6,0.8,0.8)
     leg.SetBorderSize(0)
@@ -576,8 +587,8 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
 
     hratio = h1.Clone()
     intden = h1.Integral()
-    if intden>0.0:
-        hratio.Scale(h2.Integral()/intden)
+    #if intden>0.0:
+    #    hratio.Scale(h2.Integral()/intden)
     hratio.Divide(h2)
     #hratio.Divide(h1,h2,1.0,1.0,"B");
     pad1.SetLogy(0)
@@ -614,7 +625,7 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
     hratio.GetXaxis().SetTitleOffset(4.);
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);
-    hratio.Draw()
+    hratio.Draw('EL')
     par0=0
     par1=0
     if options.doFit:
@@ -623,11 +634,7 @@ def Ratio(h1, h2,f1name,f2name,can,GetError=True):
         par0 = myfunc.GetParameter(0)
         err0 = myfunc.GetParError(0)
         par1 = myfunc.GetParameter(1)
-    for i in range(1,hratio.GetNbinsX()+1):
-        valb = hratio.GetBinContent(i)
-        errb = hratio.GetBinError(i)
-        #print 'Bin {0:d} with uncertainty {1:.2%}, fitted {2:.2%}'.format(i, hratio.GetBinContent(i)-1, par0+hratio.GetBinCenter(i)*par1-1)
-        print '{0:.4} +- {1:.4}'.format(hratio.GetBinContent(i), hratio.GetBinError(i))
+    printHist(hratio,num_name+' / '+den_name)
     can.Update()
 
     if options.wait:

@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description='Author: O. Rifki')
 parser.add_argument('files', type=str, nargs='+', metavar='<file.root>', help='ROOT files containing the jigsaw information. Histograms will be drawn and saved in the file.')
 args = parser.parse_args()
 
-processes = {"Zvv_QCD": "((312484 <= runNumber && runNumber <= 312495) || (364222 <= runNumber && runNumber <= 364223) )", #
+processes = {"Zvv_QCD": "((312484 <= runNumber && runNumber <= 312495) || (364222 <= runNumber && runNumber <= 364223))", #
              "Zll_QCD": "((312448 <= runNumber && runNumber <= 312483) || (364216 <= runNumber && runNumber <= 364221))", #
              "Zee_QCD": "((312448 <= runNumber && runNumber <= 312459) || (364218 <= runNumber && runNumber <= 364219))", #
              "Zmm_QCD": "((312460 <= runNumber && runNumber <= 312471) || (364216 <= runNumber && runNumber <= 364217))", #

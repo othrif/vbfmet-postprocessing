@@ -301,7 +301,7 @@ def Draw(hname1, hname2,f1, f2,can,GetError=True):
     ks_text2.SetTextSize(0.055)
     ks_text2.SetTextAlign(11)
     ks_text2.SetTextColor(ROOT.kBlack)
-    ks_text2.Draw()
+    #ks_text2.Draw()
 
     e=ROOT.Double(0.0)
     print 'Integral '+comp1+': ',h1.IntegralAndError(0,1001,e),'+/-',e
