@@ -19,7 +19,7 @@ arg_group.add_argument("--currentVariation", dest='currentVariation', default="N
 arg_group.add_argument("--containerName", dest='containerName', default="", help="container name used to look up the sample ID if not in the file path")
 arg_group.add_argument("--noVariation", dest='theoVariation', action="store_false", default=True, help="do theory systematic variations, default: False")
 arg_group.add_argument("--skim", dest='skim', default='2', help="Skim options: 0 No skimming applied, 1 Loose skimming, 2 tight skimming (default), 3 skimming matching ACE")
-arg_group.add_argument("--normFile", dest='normFile', default="/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v44.root", help="file with the total number of event processed")
+arg_group.add_argument("--normFile", dest='normFile', default="/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v46.root", help="file with the total number of event processed")
 
 # parse the commandline options
 args = config.parse_args()

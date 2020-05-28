@@ -13,13 +13,18 @@ const std::string regions[] = {"Incl","SRPhi", "CRWPhi", "CRZPhi", "SRPhiHigh","
 const std::string variations[] = {"fac_up","fac_down","renorm_up","renorm_down","both_up","both_down"};
 
 
+class SortByPt {
+public:
+   bool operator()(const TLorentzVector &a, const TLorentzVector &b) const { return (a.Perp() > b.Perp()); }
+};
+
 
 VBFVjetsAlg::VBFVjetsAlg( const std::string& name, ISvcLocator* pSvcLocator ) : AthAnalysisAlgorithm( name, pSvcLocator ){
   declareProperty( "currentSample", m_currentSample = "W_strong", "current sample");
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
-  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v44.root", "path to a file with the number of events processed" );
+  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v46.root", "path to a file with the number of events processed" );
   declareProperty( "skim", m_skim = 2, "Skim options: 0 No skimming applied, 1 Loose skimming, 2 tight skimming (default), 3 skimming matching ACE");
 }
 
@@ -41,6 +46,11 @@ StatusCode VBFVjetsAlg::initialize() {
   new_photon_lepton_dressed_dR = new std::vector<float>(0);
   new_photon_lepton_undressed_dR = new std::vector<float>(0);
 
+  jet_E_undress = new std::vector<float>(0);
+  jet_pt_undress = new std::vector<float>(0);
+  jet_eta_undress = new std::vector<float>(0);
+  jet_phi_undress = new std::vector<float>(0);
+
   //Create new output TTree
   treeTitleOut = m_currentSample+m_currentVariation;
   treeNameOut = m_currentSample+m_currentVariation;
@@ -49,6 +59,7 @@ StatusCode VBFVjetsAlg::initialize() {
 
   m_tree_out->Branch("runNumber",&run);
   m_tree_out->Branch("eventNumber",&event);
+
   m_tree_out->Branch("jj_mass",&jj_mass);
   m_tree_out->Branch("jj_deta",&jj_deta);
   m_tree_out->Branch("jj_dphi",&jj_dphi);
@@ -56,6 +67,15 @@ StatusCode VBFVjetsAlg::initialize() {
   m_tree_out->Branch("jet_eta",&jet_eta);
   m_tree_out->Branch("jet_phi",&jet_phi);
   m_tree_out->Branch("jet_E",&jet_E);
+
+  m_tree_out->Branch("jj_mass_undress",&jj_mass_undress);
+  m_tree_out->Branch("jj_deta_undress",&jj_deta_undress);
+  m_tree_out->Branch("jj_dphi_undress",&jj_dphi_undress);
+  m_tree_out->Branch("jet_pt_undress",&jet_pt_undress);
+  m_tree_out->Branch("jet_eta_undress",&jet_eta_undress);
+  m_tree_out->Branch("jet_phi_undress",&jet_phi_undress);
+  m_tree_out->Branch("jet_E_undress",&jet_E_undress);
+  m_tree_out->Branch("n_jet25_undress", &n_jet25_undress);
 
   m_tree_out->Branch("met_et",&met_et);
   m_tree_out->Branch("met_phi",&met_phi);
@@ -65,23 +85,23 @@ StatusCode VBFVjetsAlg::initialize() {
   m_tree_out->Branch("crossSection",&new_crossSection);
   m_tree_out->Branch("nevents",&new_nevents);
 
-  m_tree_out->Branch("n_boson",&new_nbosons);
-  m_tree_out->Branch("boson_m",&new_boson_m);
-  m_tree_out->Branch("boson_pt",&new_boson_pt);
-  m_tree_out->Branch("boson_phi",&new_boson_phi);
-  m_tree_out->Branch("boson_eta",&new_boson_eta);
+//  m_tree_out->Branch("n_boson",&new_nbosons);
+//  m_tree_out->Branch("boson_m",&new_boson_m);
+//  m_tree_out->Branch("boson_pt",&new_boson_pt);
+//  m_tree_out->Branch("boson_phi",&new_boson_phi);
+//  m_tree_out->Branch("boson_eta",&new_boson_eta);
 
-  m_tree_out->Branch("n_V_dressed",&new_n_V_dressed);
-  m_tree_out->Branch("V_dressed_m",&new_V_dressed_m);
+  //m_tree_out->Branch("n_V_dressed",&new_n_V_dressed);
+  //m_tree_out->Branch("V_dressed_m",&new_V_dressed_m);
   m_tree_out->Branch("V_dressed_pt",&new_V_dressed_pt);
-  m_tree_out->Branch("V_dressed_phi",&new_V_dressed_phi);
-  m_tree_out->Branch("V_dressed_eta",&new_V_dressed_eta);
+  //m_tree_out->Branch("V_dressed_phi",&new_V_dressed_phi);
+  //m_tree_out->Branch("V_dressed_eta",&new_V_dressed_eta);
 
-  m_tree_out->Branch("n_V_undressed",&new_n_V_undressed);
-  m_tree_out->Branch("V_undressed_m",&new_V_undressed_m);
+  //m_tree_out->Branch("n_V_undressed",&new_n_V_undressed);
+  //m_tree_out->Branch("V_undressed_m",&new_V_undressed_m);
   m_tree_out->Branch("V_undressed_pt",&new_V_undressed_pt);
-  m_tree_out->Branch("V_undressed_phi",&new_V_undressed_phi);
-  m_tree_out->Branch("V_undressed_eta",&new_V_undressed_eta);
+  //m_tree_out->Branch("V_undressed_phi",&new_V_undressed_phi);
+  //m_tree_out->Branch("V_undressed_eta",&new_V_undressed_eta);
 
   m_tree_out->Branch("n_jet",   &new_n_jet);
   m_tree_out->Branch("n_jet25", &new_n_jet25);
@@ -90,10 +110,10 @@ StatusCode VBFVjetsAlg::initialize() {
   m_tree_out->Branch("n_jet40", &new_n_jet40);
   m_tree_out->Branch("n_jet50", &new_n_jet50);
 
-  m_tree_out->Branch("photon_MCTC", &new_photon_MCTC);
-  m_tree_out->Branch("photon_boson_dR", &new_photon_boson_dR);
-  m_tree_out->Branch("photon_lepton_dressed_dR", &new_photon_lepton_dressed_dR);
-  m_tree_out->Branch("photon_lepton_undressed_dR", &new_photon_lepton_undressed_dR);
+ // m_tree_out->Branch("photon_MCTC", &new_photon_MCTC);
+ // m_tree_out->Branch("photon_boson_dR", &new_photon_boson_dR);
+ // m_tree_out->Branch("photon_lepton_dressed_dR", &new_photon_lepton_dressed_dR);
+ // m_tree_out->Branch("photon_lepton_undressed_dR", &new_photon_lepton_undressed_dR);
 
   m_tree_out->Branch("met_nolep_et",&new_met_nolep_et);
   m_tree_out->Branch("met_nolep_phi",&new_met_nolep_phi);
@@ -189,6 +209,27 @@ if (364216 <= run && run <= 364229 && fabs(mconly_weight) > 100) mconly_weight =
  new_crossSection = crossSection;
  new_nevents = NgenCorrected;
 
+
+
+ TLorentzVector vV(0, 0, 0, 0);
+ TLorentzVector vV_boson(0, 0, 0, 0);
+ TLorentzVector vV_unDressed(0, 0, 0, 0);
+
+ std::vector<TLorentzVector> bosons;
+ std::vector<TLorentzVector> leptons;
+ std::vector<TLorentzVector> leptons_unDressed;
+ std::vector<TLorentzVector> neutrinos;
+ std::vector<TLorentzVector> photons;
+ std::vector<TLorentzVector> jets;
+
+new_photon_MCTC->clear();
+new_photon_boson_dR->clear();
+new_photon_lepton_dressed_dR->clear();
+new_photon_lepton_undressed_dR->clear();
+
+
+ const Int_t n_mc = truth_mc_pdg->size();
+
   // JETS
   int njet=0, njet25=0, njet30=0, njet35=0, njet40=0, njet50=0;
   for (size_t jeti = 0; jeti < jet_pt->size(); jeti++)
@@ -207,25 +248,68 @@ if (364216 <= run && run <= 364229 && fabs(mconly_weight) > 100) mconly_weight =
   new_n_jet40 = njet40;
   new_n_jet50 = njet50;
 
-  if (new_n_jet < 2) return StatusCode::SUCCESS;
+// JETS
+// Undress jets: remove muon or neutrino if within 0.4 of a jet
+jets.clear();
+for (size_t jeti = 0; jeti < jet_pt->size(); jeti++)
+    {
+      TLorentzVector jet_tmp; jet_tmp.SetPtEtaPhiE(jet_pt->at(jeti), jet_eta->at(jeti), jet_phi->at(jeti), jet_E->at(jeti));
 
- TLorentzVector vV(0, 0, 0, 0);
- TLorentzVector vV_boson(0, 0, 0, 0);
- TLorentzVector vV_unDressed(0, 0, 0, 0);
+      for (int mc = 0; mc < n_mc; mc++) {
+        TLorentzVector p4(truth_mc_px->at(mc), truth_mc_py->at(mc), truth_mc_pz->at(mc), truth_mc_e->at(mc));
+        if ( (truth_mc_status->at(mc) == 1) && (abs(truth_mc_pdg->at(mc)) == 13 || abs(truth_mc_pdg->at(mc)) == 12 || abs(truth_mc_pdg->at(mc)) == 14 || abs(truth_mc_pdg->at(mc)) == 16)){
 
- std::vector<TLorentzVector> bosons;
- std::vector<TLorentzVector> leptons;
- std::vector<TLorentzVector> leptons_unDressed;
- std::vector<TLorentzVector> neutrinos;
- std::vector<TLorentzVector> photons;
+          Float_t dR = p4.DeltaR(jet_tmp);
+          if (dR<0.4){
+            ATH_MSG_DEBUG(event << ": jet" << jeti << ": " << jet_tmp.Pt() << ", " << jet_tmp.Eta() << ", " << jet_tmp.Phi() << ", " << jet_tmp.E());
+            ATH_MSG_DEBUG(event << ": mc" << mc << " " <<  truth_mc_pdg->at(mc)  << ": "<< p4.Pt() << ", " << p4.Eta() << ", " << p4.Phi() << ", " << p4.E());
+            TLorentzVector new_jet_tmp = jet_tmp-p4;
+            jet_tmp = new_jet_tmp;
+            ATH_MSG_DEBUG(event << ": new jet: " << new_jet_tmp.Pt() << " " << new_jet_tmp.Eta() << " " << new_jet_tmp.Phi() << " " << new_jet_tmp.E());
+          }
+        }
+      }
+      jets.push_back(jet_tmp);
+    }
 
-new_photon_MCTC->clear();
-new_photon_boson_dR->clear();
-new_photon_lepton_dressed_dR->clear();
-new_photon_lepton_undressed_dR->clear();
+std::sort(jets.begin(), jets.end(), SortByPt());
+
+  jet_E_undress->clear();
+  jet_pt_undress->clear();
+  jet_eta_undress->clear();
+  jet_phi_undress->clear();
+
+int njet25un=0,njetun=0;
+for (int ijet=0; ijet<jets.size(); ijet++){
+  jet_E_undress->push_back(jets.at(ijet).E());
+  jet_pt_undress->push_back(jets.at(ijet).Pt());
+  jet_eta_undress->push_back(jets.at(ijet).Eta());
+  jet_phi_undress->push_back(jets.at(ijet).Phi());
+  if (jets.at(ijet).Pt() > 25.e3) njet25un++;
+  njetun++;
+}
+n_jet25_undress = njet25un;
+
+   if (new_n_jet < 2 && njetun>1)
+     ATH_MSG_INFO(event << ": Got one event passing Njet" <<  new_n_jet << " " << n_jet25_undress);
+  if (new_n_jet < 2 && njetun<2) return StatusCode::SUCCESS;
 
 
- const Int_t n_mc = truth_mc_pdg->size();
+jj_mass_undress = (jets.at(0)+jets.at(1)).M();
+jj_deta_undress = fabs(jets.at(0).Eta() - jets.at(1).Eta());
+jj_dphi_undress = fabs(jets.at(0).DeltaPhi(jets.at(1)));
+
+ATH_MSG_DEBUG(event << ": old dijet " <<  jj_mass << " " << jj_deta << " " << jj_dphi);
+ATH_MSG_DEBUG(event << ": new dijet " <<  jj_mass_undress << " " << jj_deta_undress << " " << jj_dphi_undress);
+
+
+
+if (jets.at(1).Pt() > jets.at(0).Pt())
+  ATH_MSG_ERROR(event << ": PROBLEM, jets not sorted properly!");
+
+
+// Check bosons
+
  Bool_t decayFound = false;
 
  for (int mc = 0; mc < n_mc; mc++) {
@@ -334,6 +418,7 @@ for (unsigned int iPh = 0; iPh < photons.size(); iPh++) {
   new_photon_boson_dR->push_back(dR_boson);
 }
 
+
 // Fill Tree
 
   new_nbosons = nDecay_boson;
@@ -354,19 +439,28 @@ for (unsigned int iPh = 0; iPh < photons.size(); iPh++) {
   new_V_undressed_phi = vV_unDressed.Phi();
   new_V_undressed_eta = vV_unDressed.Eta();
 
+  // Variables to skim on:
+  float PTV    = new_V_dressed_pt;
+  float JetPt0 = jet_pt->at(0); //std::max(jet_pt->at(0),jets.at(0).Pt());
+  float JetPt1 = jet_pt->at(1); //std::max(jet_pt->at(1),jets.at(1).Pt());
+  float MJJ    = jj_mass; //std::max(jj_mass_undress, jj_mass);
+  float ETAJJ  = jj_deta; //std::max(jj_deta_undress, jj_deta);
+  float PHIJJ  = jj_dphi; //std::max(jj_dphi_undress, jj_dphi);
+
+
   //bool PTV = ((new_V_dressed_pt>150e3) || new_V_dressed_pt > 150e3 || new_boson_pt > 150e3);
-  bool tightSkim = ( (new_V_dressed_pt>200e3) && (jet_pt->at(0) > 80.0e3)  && (jet_pt->at(1) > 50.0e3) && (jj_mass > 800e3) && (jj_deta > 3.8) && (jj_dphi < 2));
-  bool looseSkim = ( (new_V_dressed_pt>100e3) && (jet_pt->at(0) > 80.0e3)  && (jet_pt->at(1) > 50.0e3) && (jj_mass > 500e3) && (jj_deta > 2.5) );
-  bool ace = ( (new_V_dressed_pt>150e3) && (jet_pt->at(0) > 100.0e3) && (jet_pt->at(1) > 50.0e3) && (jj_mass > 500e3) && (jj_deta > 2.5));
-  bool passSkim = tightSkim;
-  std::cout << m_skim << std::endl;
+  bool tightSkim = ( (PTV> 200e3) && (JetPt0> 80.0e3)    && (JetPt1> 50.0e3)  && (MJJ> 800e3)   && (ETAJJ> 3.8)  && (PHIJJ<2));
+  bool looseSkim = ( (PTV> 200e3) && (JetPt0> 80.0e3)    && (JetPt1> 50.0e3)  && (MJJ> 800e3)   && (ETAJJ> 2.5)  && (PHIJJ<2.5));
+  bool ace =       ( (PTV> 150e3) && (JetPt0> 100.0e3)   && (JetPt1> 50.0e3)  && (MJJ> 500e3)   && (ETAJJ> 2.5));
+  bool passSkim = true;
+
   if(m_skim == 0){
     passSkim = true;
-    std::cout << "Got here! passSkim = true" << std::endl;
+    //std::cout << "Got here! passSkim = true" << std::endl;
   }
   if(m_skim == 1){
     passSkim = looseSkim;
-        std::cout << "Got here! passSkim = looseSkim" << std::endl;
+      //  std::cout << "Got here! passSkim = looseSkim" << std::endl;
   }
   if(m_skim == 2)
     passSkim = tightSkim;

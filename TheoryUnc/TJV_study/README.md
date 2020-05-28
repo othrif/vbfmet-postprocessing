@@ -20,6 +20,6 @@ The configuration of the histograms (additional selection, binning, name, etc.) 
 
 a- One distribution from two files by specifying `-v` option: `python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD -v /all/Incl/boson_pt,/all/Incl/boson_pt -l --wait`
 
-b- All distributions by NOT specifying the `-v` option: `python pyAnalysis/drawHists.py -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD`
+b- All distributions by NOT specifying the `-v` option: `python pyAnalysis/drawHists.py  -p processed -f hists_checks_extract_Zvv_QCD,hists_checks_extract_Wlv_QCD`
 
-c- Jet veto efficiency study done by running: `python pyAnalysis/ratioHists.py -f hists_tjv_extract_Zvv_QCD,hists_tjv_extract_Wlv_QCD -v /all/SR25/jj_mass,/all/SRmTJV/jj_mass --wait`
+c- Jet veto efficiency study done by running: `python pyAnalysis/ratioHists.py  -p processed -f hists_tjv_extract_Zvv_QCD,hists_tjv_extract_Wlv_QCD -v /all/SR25/jj_mass,/all/SRmTJV/jj_mass --wait`
