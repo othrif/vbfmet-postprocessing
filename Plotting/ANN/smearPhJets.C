@@ -1,8 +1,14 @@
+/// This script smears jets and recomputes quanities needed for to run through plotEvent
+// To run this, it only takes the ntuple name and produces a new ntuple
+// root -l -q smearPhJets.C\(\"SinglePhoton\",\"A\"\)
+// the 2nd input is the MC period. Either A, D or E. It sets the seed for the random number generator used for jet smearing so that ntuples are generated with different smearing
+// The code assumes that the input files are in a directory called /tmp/
+// The output is an ntuple that can be used to make the normal selections called  /tmp/smallv2SinglePhoton.root
+
 
 //
 // Sorting algorithm
 //
-
 struct JetStruct {
 
   JetStruct() {}

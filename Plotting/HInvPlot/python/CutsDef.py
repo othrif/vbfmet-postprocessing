@@ -669,6 +669,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
         #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
     cuts += [CutItem('CutPh',       'n_ph==1')]
+    #cuts += [CutItem('CutPhPointing','ph_pointing_z<90.0')]    
     cuts += [CutItem('CutPhPt', 'phPt>15.0')] 
     if basic_cuts.analysis not in ['lowmet']:
         cuts += [CutItem('CutPhPtHig', 'phPt<110.0')] 
@@ -705,7 +706,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
             cuts += [CutItem('CutMetCST',    'met_cst_jet > 120.0')]
 
-    cuts += [CutItem('CutDPhiMetPh','met_tst_ph_dphi > 1.8')]
+    cuts += [CutItem('CutDPhiMetPh','met_tst_nolep_ph_dphi > 1.8')]
     cuts += [CutItem('CutPhCentrality','phcentrality > 0.4')]
     # VBF cuts
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]
