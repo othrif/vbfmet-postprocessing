@@ -519,7 +519,7 @@ StatusCode HFInputAlg::execute() {
     jj_DPHICut=2.0;
     phSelectionCut=(n_ph==1 && ph_pt->at(0)<110e3);
     if(n_ph>0) phcentrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(ph_eta->at(0) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
-    met_tst_ph_dphi = fabs(GetDPhi(met_tst_phi, ph_phi->at(0)));
+    met_tst_ph_dphi = fabs(GetDPhi(met_tst_nolep_phi, ph_phi->at(0)));
     // if this is a vjets sample and it has a photon overlap, then remove it
     if(isVjets && in_vy_overlap) in_vy_overlapCut=false;
     if(isTop   && in_vy_overlap) in_vy_overlapCut=false;

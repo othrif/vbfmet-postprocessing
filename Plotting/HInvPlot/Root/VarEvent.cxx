@@ -110,7 +110,10 @@ std::string Msl::Mva::Convert2Str(Var var)
     case ptll:	                  return "ptll";
     case mllg:	                  return "mllg";
     case ptllg:	                  return "ptllg";
+    case ph_pointing_z:	          return "ph_pointing_z";
     case mt:	                  return "mt";
+    case mtgammet:	          return "mtgammet";
+    case mtlepgammet:	          return "mtlepgammet";
     case averageIntPerXing:	  return "averageIntPerXing";
     case lb:	                  return "lb";
     case n_vx:	                  return "n_vx";
@@ -152,6 +155,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case phPt:	                  return "phPt";
     case phEta:	                  return "phEta";
     case met_tst_ph_dphi:	  return "met_tst_ph_dphi";
+    case met_tst_nolep_ph_dphi:	  return "met_tst_nolep_ph_dphi";
     case passVjetsFilter:	  return "passVjetsFilter";
     case passVjetsFilterTauEl:	  return "passVjetsFilterTauEl";      
     case passVjetsPTV:	          return "passVjetsPTV";
@@ -273,9 +277,12 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "baselepCh0")        return baselepCh0;
   if(var == "mll")               return mll;
   if(var == "ptll")              return ptll;
-  if(var == "mllg")               return mllg;
-  if(var == "ptllg")              return ptllg;
+  if(var == "mllg")              return mllg;
+  if(var == "ptllg")             return ptllg;
+  if(var == "ph_pointing_z")     return ph_pointing_z;
   if(var == "mt")                return mt;
+  if(var == "mtgammet")          return mtgammet;
+  if(var == "mtlepgammet")       return mtlepgammet;
   if(var == "averageIntPerXing") return averageIntPerXing;
   if(var == "lb")                return lb;
   if(var == "n_vx")              return n_vx;
@@ -317,6 +324,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "phPt")	         return phPt;
   if(var == "phEta")	         return phEta;
   if(var == "met_tst_ph_dphi")	 return met_tst_ph_dphi;
+  if(var == "met_tst_nolep_ph_dphi")	 return met_tst_nolep_ph_dphi;
   if(var == "passVjetsFilter")	 return passVjetsFilter;
   if(var == "passVjetsFilterTauEl") return passVjetsFilterTauEl;
   if(var == "passVjetsPTV")	 return passVjetsPTV;
@@ -527,7 +535,10 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(ptll);
     vars.push_back(mllg);
     vars.push_back(ptllg);    
+    vars.push_back(ph_pointing_z);
     vars.push_back(mt);
+    vars.push_back(mtgammet);
+    vars.push_back(mtlepgammet);
     vars.push_back(averageIntPerXing);
     vars.push_back(lb);
     vars.push_back(n_vx);
@@ -569,6 +580,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(phPt);
     vars.push_back(phEta);
     vars.push_back(met_tst_ph_dphi);
+    vars.push_back(met_tst_nolep_ph_dphi);
     vars.push_back(passVjetsFilter);
     vars.push_back(passVjetsFilterTauEl);    
     vars.push_back(passVjetsPTV);

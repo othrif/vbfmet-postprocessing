@@ -49,6 +49,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hjj_deta_diff(0),
 				  hjj_deta_abs(0),
 				  hmuDR(0),
+				  hgamLepDR(0),
 				  hmuEta(0),
 				  hptvarcone20(0),
 				  hptvarcone30(0),
@@ -142,6 +143,7 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
     hjj_deta_diff     = GetTH1("jj_deta_diff",   50, -10.0, 10.0);
     hjj_deta_abs      = GetTH1("jj_deta_abs",   50, -3.0, 3.0);    
     hmuDR           = GetTH1("muDR",           25,  0.0,  5.0);
+    hgamLepDR           = GetTH1("gamLepDR",   25,  0.0,  5.0);
     hmuEta          = GetTH1("muEta",          30,  0.0,  3.0);
     hJetEMECvsBCIDPosPt25 = GetTH2("JetEMECvsBCIDPosPt25",  5,  -0.5,  4.5, 35, 0.0, 70);
     hJetEMECvsBCIDPosPt35 = GetTH2("JetEMECvsBCIDPosPt35",  5,  -0.5,  4.5, 35, 0.0, 70);
@@ -226,8 +228,6 @@ bool Msl::PlotEvent::DoExec(Event &event)
   //
   // Fill histograms
   //
-  //std::cout << "Run:" << " " << event.RunNumber << " event: " << event.EventNumber << std::endl;
-  //FillHist(hZMCIDQCD,   Mva::jj_deta, event, weight);
   if(hZPTVMCIDQCD)  hZPTVMCIDQCD->Fill(event.RunNumber, weight);
   if(hZMCIDQCD)     hZMCIDQCD->Fill(event.RunNumber, weight);  
   if(hWMCIDQCD)     hWMCIDQCD->Fill(event.RunNumber, weight);
@@ -262,15 +262,29 @@ bool Msl::PlotEvent::DoExec(Event &event)
     if(hTruthElEta) hTruthElEta->Fill(event.truth_el.at(0).eta, weight);
   }
 
+  // gamma loop
+  for(unsigned iph=0; iph<event.photons.size(); ++iph){
+    float minDRg = 999.0;
+    for(unsigned il=0; il<event.muons.size(); ++il){
+      float dr1 = event.muons.at(il).GetVec().DeltaR(event.photons.at(iph).GetVec());
+      if(minDRg>dr1) minDRg=dr1;
+    }
+    for(unsigned il=0; il<event.electrons.size(); ++il){
+      float dr1 = event.electrons.at(il).GetVec().DeltaR(event.photons.at(iph).GetVec());
+      if(minDRg>dr1) minDRg=dr1;
+    }
+    if(hgamLepDR) hgamLepDR->Fill(minDRg,weight);
+  }
+  
   if(event.muons.size()>1){
     if(hmuDR)  hmuDR->Fill(event.muons.at(0).GetVec().DeltaR(event.muons.at(1).GetVec()), weight);
     if(hmuEta) hmuEta->Fill(event.muons.at(0).eta, weight);
-    if(hmuEta) hmuEta->Fill(event.muons.at(1).eta, weight);        
+    if(hmuEta) hmuEta->Fill(event.muons.at(1).eta, weight);
   }
   if(event.electrons.size()>1){
     if(hmuDR)  hmuDR->Fill(event.electrons.at(0).GetVec().DeltaR(event.electrons.at(1).GetVec()), weight);
     if(hmuEta) hmuEta->Fill(event.electrons.at(0).eta, weight);
-    if(hmuEta) hmuEta->Fill(event.electrons.at(1).eta, weight);        
+    if(hmuEta) hmuEta->Fill(event.electrons.at(1).eta, weight);
   }
 
   if(event.basemu.size()>0){

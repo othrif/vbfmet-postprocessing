@@ -5,7 +5,7 @@ import os,sys
 
 #-----------------------------------------
 def Style():
-    atlas_style_path='/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/'
+    atlas_style_path='../VBFAnalysis/python/Plotting/AtlasStyle/'
     if not os.path.exists(atlas_style_path):
         print("Error: could not find ATLAS style macros at: " + atlas_style_path)
         sys.exit(1)
@@ -189,26 +189,23 @@ if __name__ == "__main__":
     from optparse  import OptionParser
     p = OptionParser()
 
-    p.add_option( '--ipath1',     type='string',      default='/tmp/dipole.root',                 dest='ipath1',      help='Input path 1')
-    p.add_option( '--ipath2',     type='string',      default='/tmp/AOWmunuNom.root',        dest='ipath2',      help='Input path 2')
+    p.add_option( '--ipath1',     type='string',      default='/tmp/363233.root',                 dest='ipath1',      help='Input path 1')
+    p.add_option( '--ipath2',     type='string',      default='/tmp/308095.root',        dest='ipath2',      help='Input path 2')
     p.add_option( '--var',      type='string',      default='jj_mass',                 dest='var',       help='jj_mass,jet_pt2,njets,njets25,jj_dphi,jj_deta,bosonpt')
 
     (options, args) = p.parse_args()
     
     Style()
-    fout = ROOT.TFile.Open('myplt_W.root','RECREATE')
+    fout = ROOT.TFile.Open('myplt_Znn.root','RECREATE')
     can = ROOT.TCanvas('stack', 'stack', 800, 500)
 
-    sampleName='H7HFact'
-    sampleName='H7PT10'
-    sampleName='H7Pow'
-    #sampleName='H7R207'
-    #sampleName='H7AO'
+    sampleName='H7ZnnRatio'
     tpye = 'Sig'
-    fIncl = ROOT.TFile.Open(options.ipath1)
-    #fVBFFilt = ROOT.TFile.Open('/tmp/dipoleMuUp.root')/tmp/wmunudipoleR207.root
-    #fVBFFilt = ROOT.TFile.Open('/tmp/AOWmunuNom.root')
-    fVBFFilt = ROOT.TFile.Open(options.ipath2)
+    fVBFFilt = ROOT.TFile.Open('/tmp/308095.root')
+    fIncl = ROOT.TFile.Open('/tmp/363233Znn.root')
+    fZmm = ROOT.TFile.Open('/tmp/830007Zmm.root')
+    #fZmmSh = ROOT.TFile.Open('/tmp/308093New.root')    
+    fZmmSh = ROOT.TFile.Open('/tmp/3080923.root')    
     treeName1 = 'MiniNtuple'
     treeNamePow = 'MiniNtuple'
     plt=None
@@ -218,13 +215,19 @@ if __name__ == "__main__":
     #cuts = '*(jj_mass>1.0e6 && jj_dphi<1.8 && jj_deta>3.8 && met_cst_jet>120.0e3 && met_tst_et>150.0e3 && jet_pt[0]>80.0e3 && jet_pt[1]>50e3 && n_jet<5 )'    
     #cuts = '*( truth_jj_mass>200e3 && boson_pt[0]>150e3 && truth_jj_deta>3.0 && truth_jj_dphi<2.5 && jet_pt[1]>40e3)'
     #cuts = '*( truth_jj_mass>200e3 && boson_pt[0]>150e3 && truth_jj_deta>3.0 && truth_jj_dphi<2.5 && jet_pt[1]>40e3)'
-    cuts = '*( truth_jj_mass>100e3 && jet_pt[1]>30e3 && truth_jj_dphi<2.5 && boson_pt[0]>90e3)'
-    cuts = '*( truth_jj_mass>100e3  && jet_pt[1]>30e3 && truth_jj_dphi<2.5 && boson_pt[0]>90e3)'
-    #cuts = '*(jj_mass>0.2e6 && met_truth_et>150e3)'
+    #cuts = '*( truth_jj_mass>100e3  && jet_pt[1]>30e3 && truth_jj_dphi<2.5 && boson_pt[0]>90e3)'
+    cuts = '*( 1)'
+    #cuts = '*( njets25>1 && truth_jj_mass>0.2e6)'
+    cuts = '*(truth_jj_mass>0.5e6 && met_nolep_et>110e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0 && truth_jj_deta>3.8 && zboson_m>66.0e3 && zboson_m<116.0e3)'
+    #cuts = '*(truth_jj_mass>0.2e6 && jet_pt[1]>40e3 && jet_pt[0]>60e3  && truth_jj_deta>3.0 && zboson_m>82.0e3 && zboson_m<116.0e3)' # && zboson_m>66.0e3 && zboson_m<116.0e3
     h1n = fIncl.Get("NumberEvents")
     h2n = fVBFFilt.Get("NumberEvents")
-    runCutH7='/%s' %(h2n.GetBinContent(2))
-    runCutSh='/%s' %(h1n.GetBinContent(2))
+    h3n = fZmm.Get("NumberEvents")
+    h4n = fZmmSh.Get("NumberEvents")
+    runCutH7='/%s*3.4831' %(h1n.GetBinContent(2))
+    runCutSh='/%s*2.9385' %(h2n.GetBinContent(2))
+    runCutZmm='/%s*0.62' %(h3n.GetBinContent(2))
+    runCutZmmSh='/%s*0.63197' %(h4n.GetBinContent(2))
     
     pvar='truth_jj_mass/1.0e3'
     xaxis='Truth m_{jj} [GeV]'
@@ -251,6 +254,26 @@ if __name__ == "__main__":
     elif options.var=="bosonpt": 
         pvar='boson_pt[0]/1.0e3'
         xaxis='boson p_{T} [GeV]'
+    elif options.var=="bosonm":
+        pvar='boson_m[0]/1.0e3'
+        xaxis='boson mass [GeV]'
+    elif options.var=="zboson_m":
+        pvar='zboson_m/1.0e3'
+        xaxis='boson mass [GeV]'
+    elif options.var=="zboson_eta":
+        pvar='zboson_eta'
+        xaxis='boson #eta'        
+    elif options.var=="zboson_pt":
+        pvar='zboson_pt/1.0e3'
+        xaxis='boson p_{T} [GeV]'
+    elif options.var=="met_et":
+        pvar='met_et/1.0e3'
+    elif options.var=="met_nolep_et":
+        pvar='met_nolep_et/1.0e3'
+        xaxis='Truth MET [GeV]'
+    elif options.var=="met_nolep_et":
+        pvar='met_nolep_et/1.0e3'
+        xaxis='Truth MET (nonInt+Z-charged leptons) [GeV]'        
     #pvar='jj_dphi'
     #xaxis='#Delta#phi_{jj}'
     #pvar='met_truth_et/1.0e3'
@@ -266,7 +289,7 @@ if __name__ == "__main__":
         plt = ROOT.TH1F(n1,n1,10,0.0,5000.0)
     elif pvar.count('pow(truth_jj_deta,2)'):
         plt = ROOT.TH1F(n1,n1,25,0.0,5.0)
-    elif pvar=='jet_phi[0]-jet_phi[1]':
+    elif pvar=='jet_phi[0]-jet_phi[1]' or pvar=='zboson_eta':
         plt = ROOT.TH1F(n1,n1,50,-7.0,7.0)
     elif pvar.count('njets'):
         plt = ROOT.TH1F(n1,n1,10,-0.5,9.5)
@@ -283,18 +306,18 @@ if __name__ == "__main__":
     plt.GetYaxis().SetTitle('Arb. Normalisation')
     plt.GetXaxis().SetTitle(xaxis)
     print tIncl
-    tIncl.Draw(pvar+' >>'+n1,'EventWeight'+cuts+runCutSh)
+    tIncl.Draw(pvar+' >>'+n1,'EventWeight'+cuts+runCutH7)
     plt.SetDirectory(fout)
     plt.SetMarkerSize(0.6)
     plt.Write()
-
+    #cuts = '*(truth_jj_mass>0.2e6 && jet_pt[1]>40e3 && jet_pt[0]>60e3  && truth_jj_deta>3.0)'
     tVBFFilt = fVBFFilt.Get(treeNamePow)
     n2='vbfptruth_jj_mass'
     if pvar.count('jj_mass'):
         vbfplt = ROOT.TH1F(n2,n2,10,0.0,5000.0)
     elif pvar.count('pow(truth_jj_deta,2)'):
         vbfplt = ROOT.TH1F(n2,n2,25,0.0,5.0)        
-    elif pvar=='jet_phi[0]-jet_phi[1]':
+    elif pvar=='jet_phi[0]-jet_phi[1]' or pvar=='zboson_eta':
         vbfplt = ROOT.TH1F(n2,n2,50,-7.0,7.0)
     elif pvar.count('njets'):
         vbfplt = ROOT.TH1F(n2,n2,10,-0.5,9.5)
@@ -310,31 +333,70 @@ if __name__ == "__main__":
         vbfplt = ROOT.TH1F(n2,n2,25,0.0,500.0)
     vbfplt.GetYaxis().SetTitle('Events')
     vbfplt.GetXaxis().SetTitle(xaxis)
-    tVBFFilt.Draw(pvar+' >>'+n2,'EventWeight'+cuts+runCutH7)
+    tVBFFilt.Draw(pvar+' >>'+n2,'EventWeight'+cuts+runCutSh)
     vbfplt.SetLineColor(2)
     vbfplt.SetMarkerColor(2)
     vbfplt.SetMarkerSize(0.6)
     vbfplt.SetDirectory(fout)
     vbfplt.Write()
 
-    #imMERGETree = fInclForMerge.Get(treeName)
-    #n3='inclmergedtruth_jj_mass'
-    #if pvar.count('jj_mass'): 
-    #    implt = ROOT.TH1F(n3,n3,100,0.0,5000.0)
-    #elif pvar=='truth_jet_phi[0]-truth_jet_phi[1]':
-    #    implt = ROOT.TH1F(n3,n3,50,-7.0,7.0)           
-    #else:
-    #    implt = ROOT.TH1F(n3,n3,50,0.0,500.0)
-    #implt.GetYaxis().SetTitle('Events')
-    #implt.GetXaxis().SetTitle(xaxis)
-    #imMERGETree.Draw(pvar+'/1.0e3 >>'+n3,'w*36000.0'+cuts)
-    #implt.SetLineColor(3)
-    #implt.SetMarkerColor(3)
-    #implt.SetMarkerSize(0.6)
-    #implt.SetDirectory(fout)
-    #implt.Write()
+    tZmm = fZmm.Get(treeNamePow)
+    n3='zmmptruth_jj_mass'
+    if pvar.count('jj_mass'):
+        zmmplt = ROOT.TH1F(n3,n3,10,0.0,5000.0)
+    elif pvar.count('pow(truth_jj_deta,2)'):
+        zmmplt = ROOT.TH1F(n3,n3,25,0.0,5.0)        
+    elif pvar=='jet_phi[0]-jet_phi[1]' or pvar=='zboson_eta':
+        zmmplt = ROOT.TH1F(n3,n3,50,-7.0,7.0)
+    elif pvar.count('njets'):
+        zmmplt = ROOT.TH1F(n3,n3,10,-0.5,9.5)
+    elif pvar.count('jj_dphi') or pvar.count('jet_phi[0]-jet_phi[1]'):
+        zmmplt = ROOT.TH1F(n3,n3,10,0.0,3.0)
+    elif pvar.count('jj_deta'):
+        zmmplt = ROOT.TH1F(n3,n3,30,0.0,10.0)
+    elif pvar=='truth_jet_phi[0]-truth_jet_phi[1]':
+        zmmplt = ROOT.TH1F(n3,n3,50,-7.0,7.0)
+    elif pvar=='jet_pt[2]/1.0e3':
+        zmmplt = ROOT.TH1F(n3,n3,50,0.0,500.0)
+    else:
+        zmmplt = ROOT.TH1F(n3,n3,25,0.0,500.0)
+    zmmplt.GetYaxis().SetTitle('Events')
+    zmmplt.GetXaxis().SetTitle(xaxis)
+    tZmm.Draw(pvar+' >>'+n3,'EventWeight'+cuts+runCutZmm)
+    zmmplt.SetLineColor(3)
+    zmmplt.SetMarkerColor(3)
+    zmmplt.SetMarkerSize(0.6)
+    zmmplt.SetDirectory(fout)
+    zmmplt.Write()
 
-    # Now Draw
+    tZmmSh = fZmmSh.Get(treeNamePow)
+    n4='zmmptruth_jj_mass'
+    if pvar.count('jj_mass'):
+        zmmshplt = ROOT.TH1F(n4,n4,10,0.0,5000.0)
+    elif pvar.count('pow(truth_jj_deta,2)'):
+        zmmshplt = ROOT.TH1F(n4,n4,25,0.0,5.0)        
+    elif pvar=='jet_phi[0]-jet_phi[1]' or pvar=='zboson_eta':
+        zmmshplt = ROOT.TH1F(n4,n4,50,-7.0,7.0)
+    elif pvar.count('njets'):
+        zmmshplt = ROOT.TH1F(n4,n4,10,-0.5,9.5)
+    elif pvar.count('jj_dphi') or pvar.count('jet_phi[0]-jet_phi[1]'):
+        zmmshplt = ROOT.TH1F(n4,n4,10,0.0,3.0)
+    elif pvar.count('jj_deta'):
+        zmmshplt = ROOT.TH1F(n4,n4,30,0.0,10.0)
+    elif pvar=='truth_jet_phi[0]-truth_jet_phi[1]':
+        zmmshplt = ROOT.TH1F(n4,n4,50,-7.0,7.0)
+    elif pvar=='jet_pt[2]/1.0e3':
+        zmmshplt = ROOT.TH1F(n4,n4,50,0.0,500.0)
+    else:
+        zmmshplt = ROOT.TH1F(n4,n4,25,0.0,500.0)
+    zmmshplt.GetYaxis().SetTitle('Events')
+    zmmshplt.GetXaxis().SetTitle(xaxis)
+    tZmmSh.Draw(pvar+' >>'+n4,'EventWeight'+cuts+runCutZmmSh)
+    zmmshplt.SetLineColor(4)
+    zmmshplt.SetMarkerColor(4)
+    zmmshplt.SetMarkerSize(0.6)
+    zmmshplt.SetDirectory(fout)
+    zmmshplt.Write()
 
     # pads
     pad1 = ROOT.TPad("pad1", "pad1", 0, 0.3, 1, 1.0);
@@ -343,27 +405,30 @@ if __name__ == "__main__":
     pad1.Draw();             # Draw the upper pad: pad1
     pad1.cd();               # pad1 becomes the current pad
     
-    plt.Draw()
-    #vbfplt.Scale(1.10)
-    vbfplt.Draw('same')
+    #plt.Draw()
+    #vbfplt.Draw('same')
+    #zmmplt.Draw('same')
+    #zmmshplt.Draw('same')
+    #plt.Draw('same')
     #implt.Draw('same')
+    print 'Plt1: ',plt.Integral()
+    print 'Plt2: ',vbfplt.Integral()
+    print 'Plt3: ',zmmplt.Integral()
+    print 'Plt4: ',zmmshplt.Integral()
 
-    #sumed = vbfplt.Clone()
-    #sumed.Add(implt)
-    #sumed.SetLineColor(4)
-    #sumed.SetMarkerColor(4)    
-    #sumed.Draw('same')
-
-    #e=ROOT.Double(0.0)
-    #tot=sumed.IntegralAndError(0,10001,e)
-    #print 'Merged: ',tot,'+/-',e
-    #tot=plt.IntegralAndError(0,10001,e)
-    #print 'Incl: ',tot,'+/-',e
-    #tot=vbfplt.IntegralAndError(0,10001,e)
-    #print 'Filtered only: ',tot,'+/-',e
-    #tot=implt.IntegralAndError(0,10001,e)
-    #print 'Incl to be merged: ',tot,'+/-',e        
+    # Dividing
+    plt.GetYaxis().SetRangeUser(0.1,10.0)
+    if pvar.count('met'):
+        plt.Rebin(2)
+        zmmplt.Rebin(2)
+        zmmshplt.Rebin(2)
+        vbfplt.Rebin(2)
+    plt.Divide(zmmplt)
+    vbfplt.Divide(zmmshplt)
     
+    plt.Draw()
+    vbfplt.Draw('same')
+
     texts = getATLASLabels(can, 0.65, 0.88,'')
     for t in texts:
         t.Draw()
@@ -373,14 +438,8 @@ if __name__ == "__main__":
     leg.SetFillStyle (0)
     leg.SetTextFont(42);
     leg.SetTextSize(0.04);
-    leg.AddEntry(plt,'Dipole Recoil')
-    #leg.AddEntry(vbfplt,'Rel 20.7')
-    #leg.AddEntry(vbfplt,'AO Shower')
-    #leg.AddEntry(vbfplt,'HFact')
-    #leg.AddEntry(vbfplt,'PT10')
-    leg.AddEntry(vbfplt,'Powheg')
-    #leg.AddEntry(implt,'Incl for Merging')
-    #leg.AddEntry(sumed,'Merged')
+    leg.AddEntry(plt,'H7 Z#rightarrow#nu#nu/Z#rightarrow#mu#mu')
+    leg.AddEntry(vbfplt,'Sherpa Z#rightarrow#nu#nu/Z#rightarrow#mu#mu')
     leg.Draw()
 
     can.cd();          # Go back to the main canvas before defining pad2
@@ -392,11 +451,9 @@ if __name__ == "__main__":
     pad2.cd();       # pad2 becomes the current pad
 
     hratio = vbfplt.Clone()
-    hratio.Divide(plt)
-    #hratio.GetYaxis().SetTitle('AO/DipoleRec')
-    hratio.GetYaxis().SetTitle('Pow/Nom')
-    #hratio.GetYaxis().SetTitle('R20p7/Rel21')    
-    hratio.GetYaxis().SetRangeUser(0.9,1.1)       
+    
+    hratio.GetYaxis().SetTitle('Sherpa/H7')
+    hratio.GetYaxis().SetRangeUser(0.5,1.5)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
     hratio.GetYaxis().SetTitleFont(43);
@@ -408,6 +465,7 @@ if __name__ == "__main__":
     hratio.GetXaxis().SetTitleOffset(3.);
     hratio.GetXaxis().SetLabelFont(43); # Absolute font size in pixel (precision 3)
     hratio.GetXaxis().SetLabelSize(15);
+    hratio.Divide(plt)
     hratio.Draw()
 
     for i in range(1,hratio.GetNbinsX()+1):
@@ -417,10 +475,14 @@ if __name__ == "__main__":
     elif pvar.count('pow(truth_jj_deta,2)'):
         hratio.Fit('pol1',"","",0.0,5.0)        
     elif pvar.count('jj_dphi'):
-        hratio.Fit('pol1',"","",0.3,2.5)
+        hratio.Fit('pol1',"","",0.3,3.2)
     elif pvar.count('jj_deta'):
         hratio.Fit('pol1',"","",2.5,6.5)
     elif pvar.count('boson_pt'):
+        hratio.Fit('pol1',"","",90.0,500.0)
+    elif pvar.count('boson_m'):
+        hratio.Fit('pol1',"","",90.0,500.0)
+    elif pvar.count('met'):
         hratio.Fit('pol1',"","",90.0,500.0)
     elif pvar.count('jet_pt'):
         hratio.Fit('pol1',"","",10.0,300.0)
@@ -433,6 +495,18 @@ if __name__ == "__main__":
         pvar_out=pvar.split('/')[0]
     if pvar=='boson_pt[0]/1.0e3':
         pvar_out='boson_pt'
+    if pvar=='zboson_pt/1.0e3':
+        pvar_out='zboson_pt'
+    if pvar=='zboson_m/1.0e3':
+        pvar_out='zboson_m'
+    if pvar=='boson_m[0]/1.0e3':
+        pvar_out='boson_m'
+    if pvar=='met_et/1.0e3':
+        pvar_out='truthmet'
+    if pvar=='met_nolep_et/1.0e3':
+        pvar_out='truthmet'
+    if pvar=='met_nolep_et/1.0e3':
+        pvar_out='truthmetnolep'
     if pvar.count('pow(truth_jj_deta,2)'):
         pvar_out='centrality'
     if pvar=='jet_pt[2]/1.0e3':
