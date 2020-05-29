@@ -441,8 +441,10 @@ StatusCode HFInputAlg::execute() {
     // setting fjvt for photon analysis
     if(doVBFMETGam){
       metSoftVeto=false; // turn off the veto for gamma analysis
-      if(jet_fjvt->size()>1)
+      if(jet_fjvt->size()>1){
 	fJVTVeto = fabs(jet_fjvt->at(0))>0.4 || fabs(jet_fjvt->at(1))>0.4;
+	fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.4;
+      }
     }
 
     // veto events with tighter selections
