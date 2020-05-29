@@ -295,7 +295,7 @@ StatusCode HFInputAlg::execute() {
 
   m_tree->GetEntry(m_tree->GetReadEntry());
   // check if we need to output the physics tree for signal overlap
-  if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634 || runNumber==346693 || runNumber==346694 || runNumber==345596)){
+  if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634 || runNumber==346693 || runNumber==346694 || runNumber==345596 || runNumber==600069 || runNumber==600070 || runNumber==313343)){
     m_doSigOverlapTree=true;
     if(m_signalOverlapFileMap.find(runNumber)==m_signalOverlapFileMap.end()){
       stringstream soName;
@@ -517,7 +517,7 @@ StatusCode HFInputAlg::execute() {
     jj_DPHICut=2.0;
     phSelectionCut=(n_ph==1 && ph_pt->at(0)<110e3);
     if(n_ph>0) phcentrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(ph_eta->at(0) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
-    met_tst_ph_dphi = fabs(GetDPhi(met_tst_phi, ph_phi->at(0)));
+    met_tst_ph_dphi = fabs(GetDPhi(met_tst_nolep_phi, ph_phi->at(0)));
     // if this is a vjets sample and it has a photon overlap, then remove it
     if(isVjets && in_vy_overlap) in_vy_overlapCut=false;
     if(isTop   && in_vy_overlap) in_vy_overlapCut=false;

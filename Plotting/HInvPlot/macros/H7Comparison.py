@@ -265,7 +265,7 @@ if __name__ == "__main__":
     if pvar.count('jj_mass'):
         plt = ROOT.TH1F(n1,n1,10,0.0,5000.0)
     elif pvar.count('pow(truth_jj_deta,2)'):
-        plt = ROOT.TH1F(n1,n1,25,0.0,5.0)        
+        plt = ROOT.TH1F(n1,n1,25,0.0,5.0)
     elif pvar=='jet_phi[0]-jet_phi[1]':
         plt = ROOT.TH1F(n1,n1,50,-7.0,7.0)
     elif pvar.count('njets'):
