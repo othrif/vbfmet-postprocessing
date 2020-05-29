@@ -355,7 +355,12 @@ def getJetCuts(basic_cuts, options, isPh=False):
                 if options.metsf_cuts==0:
                     cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
                     #cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.35')]
-                    if not options.ReverseLeadFJVT:
+                    if options.ReverseLeadFJVT and options.CutFJVTVal>0.25:
+                        cutMaxMj3_over_mjj = CutItem('CutMaxMj3_over_mjj')
+                        cutMaxMj3_over_mjj.AddCut(CutItem('highdphijj',  'jj_dphi>1.0'), 'OR')
+                        cutMaxMj3_over_mjj.AddCut(CutItem('mjj',         'maxmj3_over_mjj <0.05'), 'OR')
+                        cuts += [cutMaxMj3_over_mjj]
+                    else:
                         cuts += [CutItem('CutMaxMj3_over_mjj',  'maxmj3_over_mjj <0.05')]
             elif basic_cuts.analysis=='nj3': #OR
                 cutCent = CutItem('CutJetCent')
