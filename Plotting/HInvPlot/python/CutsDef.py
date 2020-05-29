@@ -686,7 +686,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutFJVT','j0fjvt > 0.4')]
             #cuts += [CutItem('CutMjjLow','jj_mass < 1000.0')]
         else:
-            cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]            
+            cuts += [CutItem('CutFJVT','j0fjvt < 0.4 && j1fjvt < 0.4')]
     cuts += [CutItem('CutJetTiming0','j0timing < 11.0 && j0timing > -11.0')]
     cuts += [CutItem('CutJetTiming1','j1timing < 11.0 && j1timing > -11.0')]
     #cuts += [CutItem('CutJetMETSoft','met_soft_tst_et < 20.0')]

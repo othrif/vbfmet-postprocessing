@@ -338,6 +338,7 @@ def getHistPars(hist):
     'dRj1'     : {'xtitle':'#DeltaR(j1,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
     'dRj2'     : {'xtitle':'#DeltaR(j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
     'minDR'     : {'xtitle':'min #DeltaR(j1/j2,j3)'   ,         'ytitle':'Events',   'ymin':0.1},
+    'gamLepDR' : {'xtitle':'min #DeltaR(lep,#gamma)'   ,         'ytitle':'Events',   'ymin':0.1},
     'mj1'     : {'xtitle':'#it{m}_{j1,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'mj2'     : {'xtitle':'#it{m}_{j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},
     'minDRmj2'     : {'xtitle':'minDR #it{m}_{j1/j2,j3} [GeV]'   ,         'ytitle':'Events',   'ymin':0.1},

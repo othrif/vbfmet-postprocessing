@@ -140,6 +140,7 @@ namespace Msl
     TH1                        *hj3Jvt;
     TH1                        *hj3FJvt;
     TH1                        *hmuDR;
+    TH1                        *hgamLepDR;
     TH1                        *hmuEta;
 
     TH1                        *hZMCIDQCD;
