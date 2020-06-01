@@ -674,7 +674,11 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
         #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
     cuts += [CutItem('CutPh',       'n_ph==1')]
-    #cuts += [CutItem('CutPhPointing','ph_pointing_z<90.0')]    
+    #cuts += [CutItem('CutPhPointing','ph_pointing_z<250.0')]    # 250 mm of the primary vertex. variable is not absolute value
+    #cutPhPointing = CutItem('CutPhPointing')
+    #cutPhPointing.AddCut(CutItem('High',  'ph_pointing_z<250.0'), 'AND')
+    #cutPhPointing.AddCut(CutItem('Low', 'ph_pointing_z>-250.0'), 'AND')
+    #cuts += [cutPhPointing]
     cuts += [CutItem('CutPhPt', 'phPt>15.0')] 
     if basic_cuts.analysis not in ['lowmet']:
         cuts += [CutItem('CutPhPtHig', 'phPt<110.0')] 

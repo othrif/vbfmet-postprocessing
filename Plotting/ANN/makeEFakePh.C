@@ -144,6 +144,7 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
   float met_tst_phi=0;
   float met_tst_nolep_phi=0;  
   float SherpaVTruthPt=0;
+  float ph_pointing_z=0;
   float truth_V_dressed_pt=0;
   double truth_jj_mass=0;
   float w=0.0;
@@ -172,6 +173,7 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
   oldtree->SetBranchAddress("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);  
   
   oldtree->SetBranchAddress("ph_pt",&ph_pt);
+  oldtree->SetBranchAddress("ph_pointing_z",&ph_pointing_z);
   oldtree->SetBranchAddress("ph_eta",&ph_eta);
   oldtree->SetBranchAddress("ph_phi",&ph_phi);
   oldtree->SetBranchAddress("n_el_w",&n_el_w);
@@ -214,6 +216,7 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
     if((i%100000)==0) std::cout <<"evt: " << i << std::endl;
     oldtree->GetEntry(i); //n_baseel==0 && n_basemu==0 
     if (n_ph==0 && n_el==1 && n_el_w==1 && n_baseel==1){
+      ph_pointing_z=0.0;//setting arbitrary 0 because this is an electron with vertex confirmation, so it should pass
       n_ph=1;
       n_el=0;
       n_el_w=0;
@@ -276,6 +279,7 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
 	  copy_baseel_phi = *baseel_phi;
 	  copy_baseel_eta = *baseel_eta;
 	}
+	ph_pointing_z=0.0;//setting arbitrary 0 because this is an electron with vertex confirmation, so it should pass
 	n_ph=1;
 	n_el=1;
 	n_el_w=1;
