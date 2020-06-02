@@ -225,9 +225,9 @@ def Draw(h1, h2,f1, f2,can,GetError=True):
         h2 = PlotError(h2)
 
     max_bin = max(h1.GetMaximum(),h2.GetMaximum())
-    h1.GetYaxis().SetRangeUser(0.001, max_bin*1.7)
-    if options.logscale:
-        h1.GetYaxis().SetRangeUser(0.001, max_bin*2.5)
+   #h1.GetYaxis().SetRangeUser(0.001, max_bin*1.2)
+    #if options.logscale:
+    #    h1.GetYaxis().SetRangeUser(0.001, max_bin*2.5)
 
     h1.Draw('hist')
     h2.Draw('hist same')
@@ -235,8 +235,8 @@ def Draw(h1, h2,f1, f2,can,GetError=True):
     leg = ROOT.TLegend(0.6,0.7,0.8,0.8)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
-    leg.AddEntry(h1,hname1)
-    leg.AddEntry(h2,hname2)
+    leg.AddEntry(h1,'21.2.10')#hname1)
+    leg.AddEntry(h2,'21.2.87')#hname2)
 
     leg.Draw()
 
@@ -261,7 +261,17 @@ def Draw(h1, h2,f1, f2,can,GetError=True):
     pad1.SetLogx(0)
     pad2.SetLogx(0)
 
-    hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
+    if  hname1.count('jj_mass'):
+        hratio.GetXaxis().SetTitle('m_{jj} [GeV]')
+    if  hname1.count('V_dressed_pt'):
+        hratio.GetXaxis().SetTitle('Dressed Boson p_{T} [GeV]')
+    if  hname1.count('jet1_pt'):
+        hratio.GetXaxis().SetTitle('Lead Jet p_{T} [GeV]')
+    if  hname1.count('jet2_pt'):
+        hratio.GetXaxis().SetTitle('Sub-Lead Jet p_{T} [GeV]')
+
+    #hratio.GetYaxis().SetTitle(hname1.split("/")[-1]+' / '+hname2.split("/")[-1])
+    hratio.GetYaxis().SetTitle('21.2.10/21.2.87')
     hratio.GetYaxis().SetRangeUser(options.ratioMin,options.ratioMax)
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);

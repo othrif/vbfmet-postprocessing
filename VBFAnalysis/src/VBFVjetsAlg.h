@@ -126,7 +126,14 @@ private:
    Float_t         new_met_nolep_et;
    Float_t         new_met_nolep_phi;
 
-
+   Float_t        jj_mass_undress;
+   Float_t        jj_dphi_undress;
+   Float_t        jj_deta_undress;
+   vector<float>        *jet_pt_undress ;
+   vector<float>        *jet_eta_undress;
+   vector<float>        *jet_phi_undress;
+   vector<float>        *jet_E_undress  ;
+   Int_t n_jet25_undress;
 };
 
 

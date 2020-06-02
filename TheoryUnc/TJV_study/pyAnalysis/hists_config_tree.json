@@ -5,20 +5,38 @@
     "draw": [
         {
             "draw": "jj_mass*1e-3",
-            "edges": [500,1000,1500,2000,3500,5000],
-            "name": "jj_mass_new"
-        },
-        {
-            "draw": "boson_m*1e-3",
-           "max": 116.0,
-            "min": 75.0,
-            "name": "boson_m",
+            "max": 10000.0,
+            "min": 1000.0,
+            "name": "jj_mass",
             "nbins": 50
         },
         {
-            "draw": "boson_pt*1e-3",
-            "edges": [0,70,140,280,500,1000,2000,3000],
-            "name": "boson_pt"
+            "draw": "V_dressed_pt*1e-3",
+            "max": 1000.0,
+            "min": 100.0,
+            "name": "V_dressed_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "jet_pt[0]*1e-3",
+            "max": 5000.0,
+            "min": 0.0,
+            "name": "jet1_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "jet_pt[1]*1e-3",
+            "max": 5000.0,
+            "min": 0.0,
+            "name": "jet2_pt",
+            "nbins": 50
+        },
+        {
+            "draw": "jet_pt[2]*1e-3",
+            "max": 5000.0,
+            "min": 0.0,
+            "name": "jet3_pt",
+            "nbins": 50
         }
     ]
 }
