@@ -95,9 +95,22 @@ void correctMET(TVector3 &metv, TLorentzVector jetv,bool add){
 }
 
 float smearWidth(float pt, float eta){
-  if(fabs(eta)>2.5) return 4.0e3;
-  return 3.0e3;
 
+  if(fabs(eta)<0.7){
+    if(pt>40e3) return 0.8e3;
+    else return 2.0e3;
+  }else if(fabs(eta)<1.5){
+    if(pt>40e3) return 1.2e3;
+    else return 2.5e3;
+  }else if(fabs(eta)<2.5){
+    if(pt>40e3) return 1.8e3;
+    else return 3.4e3;
+  }else{
+    if(pt>40e3) return 3.5e3;
+    else return 4.5e3;
+  }
+  //if(fabs(eta)>2.5) return 4.0e3;
+  //return 3.0e3;
 }
 
 bool passMETSelection(TLorentzVector jet, float jvt){

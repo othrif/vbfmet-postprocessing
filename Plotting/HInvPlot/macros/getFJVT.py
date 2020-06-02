@@ -53,7 +53,7 @@ def SetOverflow(h):
 
 def GetZNFHists(f,cut_pathtmp, mvar, year, met=150.0):
     cut_path = cut_pathtmp.replace('_sr_','_zcr_')
-    cut_path = cut_path.replace('_nn_','_ll_')    
+    cut_path = cut_path.replace('_nn_','_ll_')
     dpath    = cut_path+'/plotEvent_data/'+mvar
     bkgpaths=[cut_path+'/plotEvent_wqcd/'+mvar,
                   cut_path+'/plotEvent_wewk/'+mvar,
@@ -81,8 +81,10 @@ def GetZNFHists(f,cut_pathtmp, mvar, year, met=150.0):
             sigTot.Add(a)
                         
     dplot.Add(bkgTot,-1.0)
-    data_minus_bkg = dplot.Integral(0,10001)
-    signEvt = sigTot.Integral(0,10001)
+    errordata = ROOT.Double(0.0)
+    errormc = ROOT.Double(0.0)  
+    data_minus_bkg = dplot.IntegralAndError(0,10001,errordata)
+    signEvt = sigTot.IntegralAndError(0,10001,errormc)
     # correct for the differences in Znn simulation in 2018 and combined
     xtra=1.0
     if year==2018:
@@ -91,7 +93,8 @@ def GetZNFHists(f,cut_pathtmp, mvar, year, met=150.0):
         xtra= 1.06 # correcting inclusively
     
     if signEvt>0.0:
-        return xtra*data_minus_bkg/signEvt
+        NFerr = math.sqrt(errordata**2+errormc**2)/signEvt
+        return xtra*data_minus_bkg/signEvt,NFerr
     return xtra
 
 def GetWNFHists(f,cut_pathtmp, mvar, year, met=150.0):
@@ -124,11 +127,14 @@ def GetWNFHists(f,cut_pathtmp, mvar, year, met=150.0):
         else:
             sigTot.Add(a)
 
+    errordata = ROOT.Double(0.0)
+    errormc = ROOT.Double(0.0)    
     dplot.Add(bkgTot,-1.0)
-    data_minus_bkg = dplot.Integral(25,10001)
-    signEvt = sigTot.Integral(25,10001)
+    data_minus_bkg = dplot.IntegralAndError(25,10001,errordata)
+    signEvt = sigTot.IntegralAndError(25,10001,errormc)
     if signEvt>0.0:
-        return data_minus_bkg/signEvt
+        NFerr = math.sqrt(errordata**2+errormc**2)/signEvt
+        return data_minus_bkg/signEvt,NFerr
     return 1.0
     
 def GetHists(f,cut_path, mvar, year, met=150.0, computeNF=False):
@@ -149,22 +155,34 @@ def GetHists(f,cut_path, mvar, year, met=150.0, computeNF=False):
     for b in bkgpaths:
         #print b
         a=f.Get(b).Clone()
-        if b.count('zqcd'):
+        if b.count('zqcd') or b.count('zewk'):
             znf=1.0
+            znferr=0.0
             if computeNF:
-                znf=GetZNFHists(f,cut_path, mvar,year)
-                print 'zNF: ',znf
+                znf,znferr=GetZNFHists(f,cut_path, mvar,year)
+                print 'zNF: ',znf,znferr
             else:
                 znf=GetZNF(f,cut_path, mvar,year)
             a.Scale(znf) # correcting that Znn sample in 2018
-        if b.count('wqcd'):
+            for ibin in range(0,a.GetNbinsX()+2):
+                binerr = a.GetBinError(ibin)
+                bincont = a.GetBinContent(ibin)
+                a.SetBinError(ibin,math.sqrt(binerr**2+(bincont*znferr)**2))
+        if b.count('wqcd') or b.count('wewk'):
             wnf=1.0
+            wnferr=0.0
             if computeNF:
-                wnf=GetWNFHists(f,cut_path, mvar,year)
-                print 'wNF: ',wnf                
+                wnf,wnferr=GetWNFHists(f,cut_path, mvar,year)
+                if wnferr<0.02:
+                    wnferr=0.02
+                print 'wNF: ',wnf,wnferr
             else:
-                wnf=GetWNF(f,cut_path, mvar,year,met=met)                
+                wnf=GetWNF(f,cut_path, mvar,year,met=met)
             a.Scale(wnf) # correcting that Wlnu to the control regions
+            for ibin in range(0,a.GetNbinsX()+2):
+                binerr = a.GetBinError(ibin)
+                bincont = a.GetBinContent(ibin)
+                a.SetBinError(ibin,math.sqrt(binerr**2+(bincont*wnferr)**2))
         if bkgTot==None:
             bkgTot=a.Clone()
         else:
@@ -373,6 +391,8 @@ if __name__ == "__main__":
     
     can.Clear()
     h1.GetYaxis().SetRangeUser(0,5.0)
+    if args.mvar.count('jetPt0'):
+        h1.GetXaxis().SetRangeUser(50.0,150.0)
     h1.Draw()
     h2.SetLineColor(2)
     h2.SetMarkerColor(2)
@@ -435,7 +455,7 @@ if __name__ == "__main__":
             variance = np.average((npvals-weightedAvg)**2, weights=nperrs)
             
             #(average, math.sqrt(variance))
-            print 'Bin %0.1f Average: %0.3f +/- %0.3f +/- %0.3f (weighted) relative Error: %0.2f' %(h1.GetXaxis().GetBinLowEdge(i),weightedAvg,avgerr, math.sqrt(variance), (math.sqrt(variance)/weightedAvg))
+            print 'Bin %0.1f Average: %0.3f +/- %0.3f (std dev.) +/- %0.3f (weighted err) relative Error: %0.2f (rel. error on weighted avg)' %(h1.GetXaxis().GetBinLowEdge(i),weightedAvg,avgerr, math.sqrt(variance), (math.sqrt(variance)/weightedAvg))
             WfuncSyst.SetBinContent(i,weightedAvg)
             WfuncSyst.SetBinError(i,math.sqrt(variance))
         else:
@@ -467,7 +487,7 @@ if __name__ == "__main__":
     leg.Draw()
     can.Update()
     can.WaitPrimitive()
-
+    #raw_input('')
     can.Clear()
     cr3.GetYaxis().SetTitle('MJ CR Yields')
     cr3.Draw()
