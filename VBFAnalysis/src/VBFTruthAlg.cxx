@@ -654,10 +654,10 @@ bool Zvv = (362000 <= RunNumber && RunNumber <= 362191);
 bool Zee = (362192 <= RunNumber && RunNumber <= 362383);
 bool Wev = (362384 <= RunNumber && RunNumber <= 362575);
 
-regDecision["Incl_ZSR"]=(/*vbfSkimloose &&*/ Zvv);
-regDecision["Incl_ZCR"]=(/*vbfSkimloose &&*/ Zee);
-regDecision["Incl_WSR"]=(/*vbfSkimloose &&*/ Wev && (new_nels == 0));
-regDecision["Incl_WCR"]=(/*vbfSkimloose &&*/ Wev && (new_nels > 0));
+regDecision["Incl_ZSR"]=(vbfSkimloose && Zvv);
+regDecision["Incl_ZCR"]=(vbfSkimloose && Zee);
+regDecision["Incl_WSR"]=(vbfSkimloose && Wev && (new_nels == 0));
+regDecision["Incl_WCR"]=(vbfSkimloose && Wev && (new_nels > 0));
 
 //regDecision["Incl"]=(new_PTV > 100e3);
 //regDecision["SRPhi"]=(SRPhiHigh || SRPhiLow);
