@@ -444,6 +444,7 @@ StatusCode HFInputAlg::execute() {
       if(jet_fjvt->size()>1){
 	fJVTVeto = fabs(jet_fjvt->at(0))>0.4 || fabs(jet_fjvt->at(1))>0.4;
 	fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.4;
+	//if(fabs(ph_pointing_z)>250.0) return StatusCode::SUCCESS;
       }
     }
 
@@ -940,6 +941,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("met_tst_phi",1);
   m_tree->SetBranchStatus("met_tst_nolep_phi",1);
   m_tree->SetBranchStatus("met_cst_jet",1);
+  m_tree->SetBranchStatus("ph_pointing_z",1);  
   m_tree->SetBranchStatus("mu_charge",1);
   m_tree->SetBranchStatus("basemu_charge",1);
   m_tree->SetBranchStatus("mu_pt",1);
@@ -997,6 +999,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("met_tst_phi",&met_tst_phi);
   m_tree->SetBranchAddress("met_tst_nolep_phi",&met_tst_nolep_phi);
   m_tree->SetBranchAddress("met_cst_jet",&met_cst_jet);
+  m_tree->SetBranchAddress("ph_pointing_z",&ph_pointing_z);  
   m_tree->SetBranchAddress("mu_charge",&mu_charge);
   m_tree->SetBranchAddress("basemu_charge",&basemu_charge);
   m_tree->SetBranchAddress("mu_pt",&mu_pt);
