@@ -362,22 +362,26 @@ if __name__ == "__main__":
     fnameFailfjvt = args.inputfail
     mvar = args.mvar
     #h1=DrawFJVT(can,trig,lep, mvar, fname,fnameFailfjvt)
-    num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
+    #num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
+    num_path='pass_sr_nj2_nn_Nominal'
     ntuplev='v37ALL'
     #ntuplev='v37D'
-    h1,cr1=GetFJVT(can, num_path, mvar, fname, fnameFailfjvt)
-    num_path='pass_sr_allmjj_nn_Nominal'    
-    h2,cr2=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met160.root', ntuplev+'_SR_fjvt05rev_met160.root')
-    num_path='pass_sr_allmjj_nn_Nominal'    
+    #h1,cr1=GetFJVT(can, num_path, mvar, fname, fnameFailfjvt)
+    h1,cr1=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met100.root', ntuplev+'_SR_fjvt05rev_met100.root')    
+    #num_path='pass_sr_allmjj_nn_Nominal'
+    num_path='pass_sr_nj2_nn_Nominal'
+    h2,cr2=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met150.root', ntuplev+'_SR_fjvt05rev_met150.root')
+    h30,cr30=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met130.root', ntuplev+'_SR_fjvt05rev_met130.root')    
+    num_path='pass_sr_allmjj_nn_Nominal'
     h3,cr3=GetFJVT(can, num_path, mvar, ntuplev+'_fjvt05.root', ntuplev+'_SR_fjvt05rev.root')
-    num_path='pass_sr_allmjj_nn_Nominal'    
+    num_path='pass_sr_nj2_nn_Nominal'
     h4,cr4=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met170.root', ntuplev+'_SR_fjvt05rev_met170.root')
     h5,cr5=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met180.root', ntuplev+'_SR_fjvt05rev_met180.root')
-    h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met140.root', ntuplev+'_SR_fjvt05rev_met140.root')    
+    print '140'
+    h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met140.root', ntuplev+'_SR_fjvt05rev_met140.root')
     #h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met140.root', ntuplev+'_SR_fjvt05rev_met140_nomjj.root')    
     h7,cr7=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met190.root', ntuplev+'_SR_fjvt05rev_met190.root')
     h8,cr8=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met200.root', ntuplev+'_SR_fjvt05rev_met200.root')    
-
     num_path='pass_sr_nj2_nn_Nominal'    
     #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140.root')
     h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140_nomjj.root')
@@ -410,6 +414,8 @@ if __name__ == "__main__":
     h8.SetMarkerColor(ROOT.kOrange)
     h9.SetLineColor(ROOT.kPink)
     h9.SetMarkerColor(ROOT.kPink)
+    h30.SetLineColor(ROOT.kPink)
+    h30.SetMarkerColor(ROOT.kPink)    
     h2.Draw('same')
     #h3.Draw('same')
     h4.Draw('same')
@@ -417,7 +423,8 @@ if __name__ == "__main__":
     h6.Draw('same')
     h7.Draw('same')
     h8.Draw('same')
-    h9.Draw('same')
+    h30.Draw('same')    
+    #h9.Draw('same')
 
     #### --- setup systematics
     # setup systematics
@@ -431,7 +438,7 @@ if __name__ == "__main__":
     for i in range(1,h9.GetNbinsX()+2):
         print 'Bin %0.1f Val: %0.3f ' %(h9.GetXaxis().GetBinLowEdge(i),h9.GetBinContent(i))
     # getting the weighted average
-    listofh = [h1,h6,h2,h4,h5,h7,h8]
+    listofh = [h1,h30,h6,h2,h4,h5,h7,h8]
     for i in range(1,h1.GetNbinsX()+2):
         vals=[]
         errs=[]
@@ -474,7 +481,8 @@ if __name__ == "__main__":
     leg.SetFillStyle (0)
     leg.SetTextFont(42);
     leg.SetTextSize(0.04);
-    leg.AddEntry(h1,'Low MET')
+    leg.AddEntry(h1,'100< MET<130')
+    leg.AddEntry(h30,'130< MET<140')
     leg.AddEntry(h6,' 140<MET<150')
     leg.AddEntry(h2,' 150<MET<160')    
     leg.AddEntry(h4,' 160<MET<170')

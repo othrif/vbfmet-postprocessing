@@ -263,7 +263,13 @@ def main():
         chans   = ['nn']
     if options.analysis=='qcdA':
         anas = ['allmjj','mjjLow200','LowMETQCDSRFJVT','LowMETQCDSR','LowMETQCDRevFJVT','nj2']
-        chans   = ['nn']        
+        chans   = ['nn']
+    if options.analysis=='qcdB':
+        anas = ['allmjj','mjjLow200','nj2','nj2dphijj1','nj2dphijj2','dphijj1','dphijj2']
+        chans   = ['nn','l','ll']
+    if options.analysis=='qcdC':
+        anas = ['allmjj','mjjLow200','nj2','nj2dphijj1','nj2dphijj2','dphijj1','dphijj2']
+        chans   = ['nn','u','uu']        
 
     # dphijj > 2 analysis: run with or without binning.
     if options.analysis == "dphijj3":
