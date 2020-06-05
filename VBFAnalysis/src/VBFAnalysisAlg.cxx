@@ -1153,6 +1153,19 @@ StatusCode VBFAnalysisAlg::execute() {
     else{ passVjetsFilter=true; passVjetsFilterTauEl=true; }
   }else{ passVjetsFilter=true; passVjetsFilterTauEl=true; }
 
+  // setting the same variables for the Vgamma overlap removal for our ptV filtered samples
+  if((runNumber>=700018 && runNumber<=700024)){
+    passVjetsPTV=true; // these are the Vgamma with pTV>90 GeV
+    passVjetsFilterTauEl=true;
+    passVjetsFilter=true;
+  }else if((runNumber>=700011 && runNumber<=700017)){
+    if(SherpaVTruthPt<90.0e3){
+      passVjetsPTV=true; // these are the inclusive QCD Vgamma samples
+      passVjetsFilterTauEl=true;
+      passVjetsFilter=true;
+    }
+  }
+  
   // Fixing a bug in the variables
   if(jet_phi->size()>1){
     met_tst_nolep_j1_dphi = fabs(GetDPhi(met_tst_nolep_phi, jet_phi->at(0)));

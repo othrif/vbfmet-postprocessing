@@ -21,6 +21,7 @@ p.add_option('--vars',         type='string', default=None,          dest='vars'
 p.add_option('--outdir',       type='string', default=None,          dest='outdir')
 
 p.add_option('--pref',         type='string', default=None,          dest='pref')
+p.add_option('--signal',       type='string', default='higgs',       dest='signal',help='options: higgs or gamd')
 p.add_option('--syst',         type='string', default='Nominal',     dest='syst')
 p.add_option('--syst-sel',     type='string', default='Nominal',     dest='syst_sel')
 p.add_option('--syst-see',     type='string', default=None,          dest='syst_see')
@@ -306,7 +307,7 @@ def getHistPars(hist):
         'metsig_variableBin'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':1,  'ymin':2,'logy':True},
         'metsig_tst'     : {'xtitle':'#it{S}_{MET}^{TST} [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':2,  'ymin':0.01,'logy':True},
         'alljet_metsig'     : {'xtitle':'#it{S}_{MET} (all jets) [GeV^{1/2}]'   ,         'ytitle':'Events', 'rebin':10,  'ymin':0.1,'logy':True},
-    'met_cst_jet'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':5,  'ymin':5.1},
+    'met_cst_jet'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT} [GeV]'   ,         'ytitle':'Events', 'rebin':1,  'ymin':5.1},
     'met_cst_tst_sub'     : {'xtitle':'#it{E}_{T}^{jet,no-JVT}-#it{E}_{T}^{miss} [GeV]'   ,         'ytitle':'Events',   'ymin':5.1},
     'met_cst_tst_ratio'     : {'xtitle':'|1-#it{E}_{T}^{jet,no-JVT}/#it{E}_{T}^{miss}|'   ,         'ytitle':'Events', 'ymin':5.1},
     'met_truth_et'     : {'xtitle':'Truth MET [GeV]'   ,         'ytitle':'Events',   'ymin':0.1,'logy':True,'LtoRCut':0,'xmax':500.0,'ymax':1.0e4},
@@ -423,6 +424,7 @@ def getLabelSortKey(sample):
     elif sample == 'jpsi': return 21
     elif sample == 'upsl': return 22
     elif sample == 'efakeph': return 22
+    elif sample == 'gamd': return 23
 
     log.warning('getSampleSortKey - unknown key: %s' %sample)
     return 100
@@ -457,6 +459,7 @@ def getSampleSortKey(sample):
     elif sample == 'wgamewk': return 15
     elif sample == 'pho': return 13
     elif sample == 'efakeph': return 13
+    elif sample == 'gamd': return 14        
 
     log.warning('getLabelSortKey - unknown key: %s' %sample)
     return 100
@@ -504,6 +507,8 @@ def getSampleLabel(sample):
         #'higgs':  '#it{h}(#it{B}_{inv} = 0.13)',
         #'hvbf':  '#it{h}(#it{B}_{inv} = 0.13)',
         'higgs':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
+        'gamd':  '#it{H} (#it{B}_{#gamma_{dark}} = %0.2f)' %options.hscale,        
+        #'higgs':  '#it{H} (#it{B}_{inv} = 1.00)' ,
         'hvbf':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
         'ttv' : 't#bar{t}V+tV',
         'data': 'Data',
@@ -578,6 +583,7 @@ def getStyle(sample):
     color_zgas = ROOT.kOrange-7
     color_higgs = ROOT.kViolet-9 #ROOT.kRed    +0
     color_hvbf = ROOT.kRed+1 #ROOT.kRed    +0
+    color_gamd = ROOT.kRed+2 #ROOT.kRed    +0    
     color_hggf = ROOT.kRed+1 #ROOT.kRed    +0
     color_higgsall = ROOT.kRed+1 #ROOT.kRed    +0
     color_bkgs = ROOT.kBlue   +1
@@ -608,12 +614,13 @@ def getStyle(sample):
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
         'hggf':{'color':color_hggf, 'fill_style':0, 'marker_style': 0, 'line_width':5, 'leg_opt':'f'},
         'hvbf':{'color':color_hvbf, 'fill_style':0,    'marker_style': 0, 'line_width':5, 'leg_opt':'f'},
+        'gamd':{'color':color_gamd, 'fill_style':0,    'marker_style': 0, 'line_width':5, 'leg_opt':'f'},        
         'data':{'color':color_data, 'fill_style':0,    'marker_style':20, 'line_width':0, 'leg_opt':'ple'},
         'bkgs':{'color':color_bkgs, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         }
 
     if options.stack_signal:
-        styles['higgs']={'color':color_higgs, 'fill_style':3144,    'marker_style': 0, 'line_width':0, 'leg_opt':'f'}
+        styles[options.signal]={'color':color_higgs, 'fill_style':3144,    'marker_style': 0, 'line_width':0, 'leg_opt':'f'}
 
     try:
         return styles[sample]
@@ -2615,7 +2622,7 @@ def main():
     if options.add_fakeE:
         bkgs+=['tth']
     if options.stack_signal:
-        if not 'higgs' in bkgs: bkgs+=['higgs']
+        if not options.signal in bkgs: bkgs+=[options.signal]
 
     # Signal events to extract
     extract_sig=[]
@@ -2653,7 +2660,7 @@ def main():
 
     for var in vars:
 
-        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)
+        stack = DrawStack(var, rfile, options.signal, 'data', bkgs, nf_map, extract_sig)
         print 'nSYST: ',len(sfiles)
         if options.draw_syst:
             if len(sfiles)>0:
