@@ -236,6 +236,19 @@ if __name__ == "__main__":
     #cuts = '*( truth_jj_mass>200e3 && boson_pt[0]>150e3 && truth_jj_deta>3.0 && truth_jj_dphi<2.5 && jet_pt[1]>40e3)'
     #cuts = '*( truth_jj_mass>200e3 && boson_pt[0]>150e3 && truth_jj_deta>3.0 && truth_jj_dphi<2.5 && jet_pt[1]>40e3)'
     #cuts = '*( truth_jj_mass>100e3  && jet_pt[1]>30e3 && truth_jj_dphi<2.5 && boson_pt[0]>90e3)'
+    # Wln CR - only needed for the Wmunu
+    #cuts = '*(truth_jj_mass>0.2e6 && met_nolep_et>160e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<1.0 && truth_jj_deta>3.8 && mu_pt[0]>30e3 && abs(mu_eta[0])<2.5)'
+    #cuts = '*(truth_jj_mass>0.2e6 && met_nolep_et>160e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0  && truth_jj_dphi>1.0 && truth_jj_deta>3.8 && mu_pt[0]>30e3 && abs(mu_eta[0])<2.5)'
+    #cuts = '*(truth_jj_mass>0.2e6 && met_nolep_et>160e3 && (njets25==3 || njets25==4) && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0 && truth_jj_deta>3.8 && mu_pt[0]>30e3 && abs(mu_eta[0])<2.5)'
+    # Zll CR - only needed for the Zee
+    #cuts = '*(truth_jj_mass>0.2e6 && met_nolep_et>160e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0 && truth_jj_deta>3.8 && el_pt[0]>30e3 && abs(el_eta[0])<2.37 && el_pt[1]>4e3 && abs(el_eta[1])<2.37)'
+    #cuts = '*(truth_jj_mass>0.2e6 && met_nolep_et>160e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && && truth_jj_dphi<2.0  && truth_jj_dphi>1.0 && truth_jj_deta>3.8 && el_pt[0]>30e3 && abs(el_eta[0])<2.37 && el_pt[1]>4e3 && abs(el_eta[1])<2.37)'    
+    #cuts = '*(truth_jj_mass>0.2e6 && met_nolep_et>160e3 && (njets25==3 || njets25==4) && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0 && truth_jj_deta>3.8 && el_pt[0]>30e3 && abs(el_eta[0])<2.37 && el_pt[1]>4e3 && abs(el_eta[1])<2.37)'
+    # SR - only needed for the Znn and Wmunu
+    #cuts = '*(truth_jj_mass>0.2e6 && met_nolep_et>160e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0 && truth_jj_deta>3.8 && maxCentral_mu_pt<4.0e3)'
+    #cuts = '*(truth_jj_mass>0.2e6 && met_nolep_et>160e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0  && truth_jj_dphi>1.0 && truth_jj_deta>3.8 && maxCentral_mu_pt<4.0e3)'    
+    #cuts = '*(truth_jj_mass>0.2e6 && met_nolep_et>160e3 && (njets25==3 || njets25==4) && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0 && truth_jj_deta>3.8 && maxCentral_mu_pt<4.0e3)'
+    
     cuts = '*( 1)'
     #cuts = '*( njets25>1 && truth_jj_mass>0.2e6)'
     cuts2jet = '*(truth_jj_mass>0.5e6 && met_nolep_et>150e3 && njets25==2 && jet_pt[1]>40e3 && jet_pt[0]>60e3 && truth_jj_dphi<2.0 && truth_jj_deta>3.8)'
@@ -363,6 +376,14 @@ if __name__ == "__main__":
     rplots[1].Draw('same')
     print 'Plt1: ',plots[0].Integral()
     print 'Plt2: ',plots[1].Integral()       
+
+    # Print the differences:
+    for i in range(1,rplots[0].GetNbinsX()+1):
+        diff = rplots[0].GetBinContent(i)-rplots[1].GetBinContent(i)
+        # for the parton shower or powheg comparisons use the equation above. There is only nominal and parton shower        
+        #  it is (up - down)/2.0 for example (MuUp - MuDw)/2.0
+        #diff = (rplots[0].GetBinContent(i)-rplots[1].GetBinContent(i))/2.0
+        print 'Bin range: %0.1f - %0.1f: %0.3f' %(rplots[0].GetXaxis().GetBinLowEdge(i),rplots[0].GetXaxis().GetBinUpEdge(i), diff)
     
     texts = getATLASLabels(can, 0.65, 0.88,'')
     for t in texts:
