@@ -318,7 +318,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
       
       //divide by the number of smearings
       w/=float(nSamples);
-      w*=0.35; // normalizing to the low met region
+      w*=0.3; // normalizing to the low met region
       // Load the jet vectors
       alljetvec_before.clear();
       for(unsigned ijet=0; ijet<jet_pt->size(); ++ijet){
