@@ -314,7 +314,7 @@ void smearPhJets(std::string treeNmae="SinglePhoton",std::string period="A") {
     oldtree->GetEntry(i);
     cutflow->Fill(1);
     cutflow->Fill(2,w);
-    if (n_ph==1 && n_el==0 && n_el_w==0 && n_baseel==0){
+    if (n_ph==1){ //  && n_el==0 && n_el_w==0 && n_baseel==0 // no need to require these 
       
       //divide by the number of smearings
       w/=float(nSamples);
