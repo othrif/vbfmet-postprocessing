@@ -9,7 +9,7 @@ class sample(object):
         self.load(samplename,syst,Ext)
         self.sampleTypeList = ["W_EWKPow","W_EWKSh","W_EWK","W_strongExt","W_strong","Z_EWKPow","W_EWKSh","Z_EWK", "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strong228", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
                                "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","VBFHAltSignal","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',
-                               'VBFH3000','VBFH2000','VBFH1000','VBFH750','VBFH300','VBFH100','VBFH50','VBFH75',
+                               'VBFH3000','VBFH2000','VBFH1000','VBFH750','VBFH300','VBFH100','VBFH50','VBFH75','VBFHgamdark125','ggFHgamdark125','gamgamZ',
                                "data"] # do not change order
 
         self.sampleMap = {'data':['data'],
@@ -32,6 +32,7 @@ class sample(object):
                           'SinglePhotonBCL':['SinglePhotonBCL'],
                           'VqqGam':['VqqGam'],
                           'signal':['VBFH125','ggFH125','VH125','TTH125','VBFHgam125'],
+                          'signaldark':['VBFHgamdark125','ggFHgamdark125'],
                           'signalOld':['VBFH125Old','ggFH125Old','VH125Old'],
                           'VBFHOther':['VBFHOther'],
                           'VBFHAltSignal':['VBFHAltSignal'],
@@ -80,9 +81,9 @@ class sample(object):
             print "runNumebr::: ",self.runNumber
             if (self.runNumber >= 308096 and self.runNumber <= 308098):
                 self.sampleType = "W_EWKSh"
-            elif (self.runNumber >= 364500 and self.runNumber <= 364519) or (self.runNumber>=345775 and self.runNumber<=345784) or (self.runNumber>=364550 and self.runNumber<=364584) or (self.runNumber>=700011 and self.runNumber<=700014):
+            elif (self.runNumber >= 364500 and self.runNumber <= 364519) or (self.runNumber>=345775 and self.runNumber<=345784) or (self.runNumber>=364550 and self.runNumber<=364584) or (self.runNumber>=700011 and self.runNumber<=700014) or (self.runNumber>=700018 and self.runNumber<=700021):
                 self.sampleType = "Zg_strong"
-            elif (self.runNumber >= 364520 and self.runNumber <= 364535) or (self.runNumber >= 700015 and self.runNumber <= 700017):
+            elif (self.runNumber >= 364520 and self.runNumber <= 364535) or (self.runNumber >= 700015 and self.runNumber <= 700017) or (self.runNumber >= 700022 and self.runNumber <= 700024):
                 self.sampleType = "Wg_strong"
             elif (self.runNumber >= 363270 and self.runNumber <= 363272):
                 self.sampleType = "Wg_EWK"
@@ -122,8 +123,14 @@ class sample(object):
                 self.sampleType = "VBFH125Old"
             elif ((self.runNumber >= 346632) and (self.runNumber <= 346634)):
                 self.sampleType = "TTH125"
-            elif self.runNumber==312243:
+            elif self.runNumber==312243 or self.runNumber==313343:
                 self.sampleType = "VBFHgam125"
+            elif self.runNumber==600070:
+                self.sampleType = "VBFHgamdark125"
+            elif self.runNumber==600069:
+                self.sampleType = "ggFHgamdark125"                
+            elif self.runNumber in [345319,345306,345041,345317,345318,345316,345322,345321,345320,345042]:
+                self.sampleType = "gamgamZ"                
             elif ((self.runNumber >= 308275) and self.runNumber <= 308283):
                 self.sampleType = "VBFHOther"
             elif self.runNumber ==313134: # and self.runNumber <=313141):

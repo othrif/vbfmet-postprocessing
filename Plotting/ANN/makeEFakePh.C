@@ -4,6 +4,19 @@
 // The code assumes that the input files are in a directory called /tmp/v41Agam/
 // The output is an ntuple that can be used to make the normal selections called  /tmp/smallWg_strong.root
 
+// we collecting the TightLH electrons and we want to map the missing efficiency for MediumLH electrons that the fake rates are derived for.
+// https://link.springer.com/content/pdf/10.1140/epjc/s10052-019-7140-6.pdf
+float getTightEtoMedium(float pt, float eta){
+
+  if(pt<20.0e3) return 1.2;
+  else if(pt>70e3) return 1.06;
+  // linearly correct from 20 to 70 GeV
+  return 1.2 - (pt-20.0e3)*0.0028*0.001; 
+  
+  //return 1.13; //average correction for electron pT>15 GeV
+}
+
+/// fake rates for an electron with MediumLH+FCLoose -> Tight Photon + Tight Iso
 std::vector<float> getFakeWeight(float pt, float eta){
   std::vector<float> out;
   float fr=0.0;
@@ -79,7 +92,7 @@ std::vector<float> getFakeWeight(float pt, float eta){
     else if(pt<250.0e3){ fr=0.0906; stat=0.0035; wind=0.0051; bkg=0.0027; en=0.0060; }
   }
   // output
-  out.push_back(fr);
+  out.push_back(fr*getTightEtoMedium(pt,eta));
   out.push_back(stat);
   out.push_back(wind);
   out.push_back(bkg);
@@ -144,6 +157,7 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
   float met_tst_phi=0;
   float met_tst_nolep_phi=0;  
   float SherpaVTruthPt=0;
+  float ph_pointing_z=0;
   float truth_V_dressed_pt=0;
   double truth_jj_mass=0;
   float w=0.0;
@@ -172,6 +186,7 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
   oldtree->SetBranchAddress("met_tst_nolep_j2_dphi",&met_tst_nolep_j2_dphi);  
   
   oldtree->SetBranchAddress("ph_pt",&ph_pt);
+  oldtree->SetBranchAddress("ph_pointing_z",&ph_pointing_z);
   oldtree->SetBranchAddress("ph_eta",&ph_eta);
   oldtree->SetBranchAddress("ph_phi",&ph_phi);
   oldtree->SetBranchAddress("n_el_w",&n_el_w);
@@ -213,7 +228,8 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
   for (Long64_t i=0;i<nentries; i++) {
     if((i%100000)==0) std::cout <<"evt: " << i << std::endl;
     oldtree->GetEntry(i); //n_baseel==0 && n_basemu==0 
-    if (n_ph==0 && n_el==1 && n_el_w==1 && n_baseel==1){
+    if (n_ph==0 && n_el==1 && n_el_w==1 && n_baseel==1){// extrapolating from the TightLH+FCLoose
+      ph_pointing_z=0.0;//setting arbitrary 0 because this is an electron with vertex confirmation, so it should pass
       n_ph=1;
       n_el=0;
       n_el_w=0;
@@ -266,7 +282,7 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
       baseel_eta->clear();
       baseel_phi->clear();      
       newtree->Fill();
-    }else if (n_ph==0 && n_el==2 && n_baseel==2){
+    }else if (n_ph==0 && n_el==2 && n_baseel==2 && n_el_w==2){ // extrapolating from the TightLH+FCLoose
       for(unsigned iele=0; iele<2; ++iele){
 	if(iele==0){
 	  copy_el_pt = *el_pt;
@@ -276,6 +292,7 @@ void makeEFakePh(std::string treeNmae="Wg_strong") {
 	  copy_baseel_phi = *baseel_phi;
 	  copy_baseel_eta = *baseel_eta;
 	}
+	ph_pointing_z=0.0;//setting arbitrary 0 because this is an electron with vertex confirmation, so it should pass
 	n_ph=1;
 	n_el=1;
 	n_el_w=1;

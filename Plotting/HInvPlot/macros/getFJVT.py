@@ -53,7 +53,7 @@ def SetOverflow(h):
 
 def GetZNFHists(f,cut_pathtmp, mvar, year, met=150.0):
     cut_path = cut_pathtmp.replace('_sr_','_zcr_')
-    cut_path = cut_path.replace('_nn_','_ll_')    
+    cut_path = cut_path.replace('_nn_','_ll_')
     dpath    = cut_path+'/plotEvent_data/'+mvar
     bkgpaths=[cut_path+'/plotEvent_wqcd/'+mvar,
                   cut_path+'/plotEvent_wewk/'+mvar,
@@ -81,8 +81,10 @@ def GetZNFHists(f,cut_pathtmp, mvar, year, met=150.0):
             sigTot.Add(a)
                         
     dplot.Add(bkgTot,-1.0)
-    data_minus_bkg = dplot.Integral(0,10001)
-    signEvt = sigTot.Integral(0,10001)
+    errordata = ROOT.Double(0.0)
+    errormc = ROOT.Double(0.0)  
+    data_minus_bkg = dplot.IntegralAndError(0,10001,errordata)
+    signEvt = sigTot.IntegralAndError(0,10001,errormc)
     # correct for the differences in Znn simulation in 2018 and combined
     xtra=1.0
     if year==2018:
@@ -91,7 +93,8 @@ def GetZNFHists(f,cut_pathtmp, mvar, year, met=150.0):
         xtra= 1.06 # correcting inclusively
     
     if signEvt>0.0:
-        return xtra*data_minus_bkg/signEvt
+        NFerr = math.sqrt(errordata**2+errormc**2)/signEvt
+        return xtra*data_minus_bkg/signEvt,NFerr
     return xtra
 
 def GetWNFHists(f,cut_pathtmp, mvar, year, met=150.0):
@@ -124,11 +127,14 @@ def GetWNFHists(f,cut_pathtmp, mvar, year, met=150.0):
         else:
             sigTot.Add(a)
 
+    errordata = ROOT.Double(0.0)
+    errormc = ROOT.Double(0.0)    
     dplot.Add(bkgTot,-1.0)
-    data_minus_bkg = dplot.Integral(25,10001)
-    signEvt = sigTot.Integral(25,10001)
+    data_minus_bkg = dplot.IntegralAndError(25,10001,errordata)
+    signEvt = sigTot.IntegralAndError(25,10001,errormc)
     if signEvt>0.0:
-        return data_minus_bkg/signEvt
+        NFerr = math.sqrt(errordata**2+errormc**2)/signEvt
+        return data_minus_bkg/signEvt,NFerr
     return 1.0
     
 def GetHists(f,cut_path, mvar, year, met=150.0, computeNF=False):
@@ -149,22 +155,34 @@ def GetHists(f,cut_path, mvar, year, met=150.0, computeNF=False):
     for b in bkgpaths:
         #print b
         a=f.Get(b).Clone()
-        if b.count('zqcd'):
+        if b.count('zqcd') or b.count('zewk'):
             znf=1.0
+            znferr=0.0
             if computeNF:
-                znf=GetZNFHists(f,cut_path, mvar,year)
-                print 'zNF: ',znf
+                znf,znferr=GetZNFHists(f,cut_path, mvar,year)
+                print 'zNF: ',znf,znferr
             else:
                 znf=GetZNF(f,cut_path, mvar,year)
             a.Scale(znf) # correcting that Znn sample in 2018
-        if b.count('wqcd'):
+            for ibin in range(0,a.GetNbinsX()+2):
+                binerr = a.GetBinError(ibin)
+                bincont = a.GetBinContent(ibin)
+                a.SetBinError(ibin,math.sqrt(binerr**2+(bincont*znferr)**2))
+        if b.count('wqcd') or b.count('wewk'):
             wnf=1.0
+            wnferr=0.0
             if computeNF:
-                wnf=GetWNFHists(f,cut_path, mvar,year)
-                print 'wNF: ',wnf                
+                wnf,wnferr=GetWNFHists(f,cut_path, mvar,year)
+                if wnferr<0.02:
+                    wnferr=0.02
+                print 'wNF: ',wnf,wnferr
             else:
-                wnf=GetWNF(f,cut_path, mvar,year,met=met)                
+                wnf=GetWNF(f,cut_path, mvar,year,met=met)
             a.Scale(wnf) # correcting that Wlnu to the control regions
+            for ibin in range(0,a.GetNbinsX()+2):
+                binerr = a.GetBinError(ibin)
+                bincont = a.GetBinContent(ibin)
+                a.SetBinError(ibin,math.sqrt(binerr**2+(bincont*wnferr)**2))
         if bkgTot==None:
             bkgTot=a.Clone()
         else:
@@ -344,22 +362,26 @@ if __name__ == "__main__":
     fnameFailfjvt = args.inputfail
     mvar = args.mvar
     #h1=DrawFJVT(can,trig,lep, mvar, fname,fnameFailfjvt)
-    num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
+    #num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
+    num_path='pass_sr_nj2_nn_Nominal'
     ntuplev='v37ALL'
     #ntuplev='v37D'
-    h1,cr1=GetFJVT(can, num_path, mvar, fname, fnameFailfjvt)
-    num_path='pass_sr_allmjj_nn_Nominal'    
-    h2,cr2=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met160.root', ntuplev+'_SR_fjvt05rev_met160.root')
-    num_path='pass_sr_allmjj_nn_Nominal'    
+    #h1,cr1=GetFJVT(can, num_path, mvar, fname, fnameFailfjvt)
+    h1,cr1=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met100.root', ntuplev+'_SR_fjvt05rev_met100.root')    
+    #num_path='pass_sr_allmjj_nn_Nominal'
+    num_path='pass_sr_nj2_nn_Nominal'
+    h2,cr2=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met150.root', ntuplev+'_SR_fjvt05rev_met150.root')
+    h30,cr30=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met130.root', ntuplev+'_SR_fjvt05rev_met130.root')    
+    num_path='pass_sr_allmjj_nn_Nominal'
     h3,cr3=GetFJVT(can, num_path, mvar, ntuplev+'_fjvt05.root', ntuplev+'_SR_fjvt05rev.root')
-    num_path='pass_sr_allmjj_nn_Nominal'    
+    num_path='pass_sr_nj2_nn_Nominal'
     h4,cr4=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met170.root', ntuplev+'_SR_fjvt05rev_met170.root')
     h5,cr5=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met180.root', ntuplev+'_SR_fjvt05rev_met180.root')
-    h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met140.root', ntuplev+'_SR_fjvt05rev_met140.root')    
+    print '140'
+    h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met140.root', ntuplev+'_SR_fjvt05rev_met140.root')
     #h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met140.root', ntuplev+'_SR_fjvt05rev_met140_nomjj.root')    
     h7,cr7=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met190.root', ntuplev+'_SR_fjvt05rev_met190.root')
     h8,cr8=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt05_met200.root', ntuplev+'_SR_fjvt05rev_met200.root')    
-
     num_path='pass_sr_nj2_nn_Nominal'    
     #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140.root')
     h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140_nomjj.root')
@@ -373,6 +395,8 @@ if __name__ == "__main__":
     
     can.Clear()
     h1.GetYaxis().SetRangeUser(0,5.0)
+    if args.mvar.count('jetPt0'):
+        h1.GetXaxis().SetRangeUser(50.0,150.0)
     h1.Draw()
     h2.SetLineColor(2)
     h2.SetMarkerColor(2)
@@ -390,6 +414,8 @@ if __name__ == "__main__":
     h8.SetMarkerColor(ROOT.kOrange)
     h9.SetLineColor(ROOT.kPink)
     h9.SetMarkerColor(ROOT.kPink)
+    h30.SetLineColor(ROOT.kPink)
+    h30.SetMarkerColor(ROOT.kPink)    
     h2.Draw('same')
     #h3.Draw('same')
     h4.Draw('same')
@@ -397,7 +423,8 @@ if __name__ == "__main__":
     h6.Draw('same')
     h7.Draw('same')
     h8.Draw('same')
-    h9.Draw('same')
+    h30.Draw('same')    
+    #h9.Draw('same')
 
     #### --- setup systematics
     # setup systematics
@@ -411,7 +438,7 @@ if __name__ == "__main__":
     for i in range(1,h9.GetNbinsX()+2):
         print 'Bin %0.1f Val: %0.3f ' %(h9.GetXaxis().GetBinLowEdge(i),h9.GetBinContent(i))
     # getting the weighted average
-    listofh = [h1,h6,h2,h4,h5,h7,h8]
+    listofh = [h1,h30,h6,h2,h4,h5,h7,h8]
     for i in range(1,h1.GetNbinsX()+2):
         vals=[]
         errs=[]
@@ -435,7 +462,7 @@ if __name__ == "__main__":
             variance = np.average((npvals-weightedAvg)**2, weights=nperrs)
             
             #(average, math.sqrt(variance))
-            print 'Bin %0.1f Average: %0.3f +/- %0.3f +/- %0.3f (weighted) relative Error: %0.2f' %(h1.GetXaxis().GetBinLowEdge(i),weightedAvg,avgerr, math.sqrt(variance), (math.sqrt(variance)/weightedAvg))
+            print 'Bin %0.1f Average: %0.3f +/- %0.3f (std dev.) +/- %0.3f (weighted err) relative Error: %0.2f (rel. error on weighted avg)' %(h1.GetXaxis().GetBinLowEdge(i),weightedAvg,avgerr, math.sqrt(variance), (math.sqrt(variance)/weightedAvg))
             WfuncSyst.SetBinContent(i,weightedAvg)
             WfuncSyst.SetBinError(i,math.sqrt(variance))
         else:
@@ -454,7 +481,8 @@ if __name__ == "__main__":
     leg.SetFillStyle (0)
     leg.SetTextFont(42);
     leg.SetTextSize(0.04);
-    leg.AddEntry(h1,'Low MET')
+    leg.AddEntry(h1,'100< MET<130')
+    leg.AddEntry(h30,'130< MET<140')
     leg.AddEntry(h6,' 140<MET<150')
     leg.AddEntry(h2,' 150<MET<160')    
     leg.AddEntry(h4,' 160<MET<170')
@@ -467,7 +495,7 @@ if __name__ == "__main__":
     leg.Draw()
     can.Update()
     can.WaitPrimitive()
-
+    #raw_input('')
     can.Clear()
     cr3.GetYaxis().SetTitle('MJ CR Yields')
     cr3.Draw()

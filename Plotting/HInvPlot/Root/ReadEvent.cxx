@@ -1523,6 +1523,12 @@ void Msl::ReadEvent::FillEvent(Event &event)
     event.AddVar(Mva::jetPartonTruthLabelID1,  event.jets.at(1).GetVar(Mva::jetPartonTruthLabelID));
   }
 
+  // MT gamma+met
+  if(event.photons.size()>0){
+    double MT = sqrt(2. * event.photons.at(0).pt * event.met_nolep.Pt() * (1. - cos(event.photons.at(0).phi - event.met_nolep.Phi())));
+    event.AddVar(Mva::mtgammet, MT);
+  }
+  
   if(event.electrons.size()>0 && event.muons.size()>0){
 
     TLorentzVector leadL = event.electrons.at(0).GetLVec();
@@ -1539,7 +1545,13 @@ void Msl::ReadEvent::FillEvent(Event &event)
     event.AddVar(Mva::lepPt0,  leadL.Pt());
     double MT = sqrt(2. * leadL.Pt() * event.met.Pt() * (1. - cos(leadL.Phi() - event.met.Phi())));
     event.AddVar(Mva::mt, MT);
-
+    // MT gamma+met+lepton
+    if(event.photons.size()>0){
+      TLorentzVector leadLgam = leadL+event.photons.at(0).GetLVec();
+      double MT = sqrt(2. * leadLgam.Pt() * event.met.Pt() * (1. - cos(leadLgam.Phi() - event.met.Phi())));
+      event.AddVar(Mva::mtlepgammet, MT);
+    }
+  
     TLorentzVector Z = (event.electrons.at(0).GetLVec()+event.muons.at(0).GetLVec());
     event.RepVar(Mva::mll,  Z.M());
     event.RepVar(Mva::ptll, Z.Pt());
@@ -1557,6 +1569,12 @@ void Msl::ReadEvent::FillEvent(Event &event)
       event.AddVar(Mva::lepCh0,  event.electrons.at(0).GetVar(Mva::charge));
       double MT = sqrt(2. * event.electrons.at(0).pt * event.met.Pt() * (1. - cos(event.electrons.at(0).phi - event.met.Phi())));
       event.AddVar(Mva::mt, MT);
+      // MT gamma+met+lepton
+      if(event.photons.size()>0){
+	TLorentzVector leadLgam = event.electrons.at(0).GetLVec()+event.photons.at(0).GetLVec();
+	double MT = sqrt(2. * leadLgam.Pt() * event.met.Pt() * (1. - cos(leadLgam.Phi() - event.met.Phi())));
+	event.AddVar(Mva::mtlepgammet, MT);
+      }
     }
     if(event.electrons.size()>1){
       event.AddVar(Mva::lepPt1,  event.electrons.at(1).pt);
@@ -1579,6 +1597,12 @@ void Msl::ReadEvent::FillEvent(Event &event)
       event.AddVar(Mva::lepCh0,  event.muons.at(0).GetVar(Mva::charge));
       double MT = sqrt(2. * event.muons.at(0).pt * event.met.Pt() * (1. - cos(event.muons.at(0).phi - event.met.Phi())));
       event.AddVar(Mva::mt, MT);
+      // MT gamma+met+lepton
+      if(event.photons.size()>0){
+	TLorentzVector leadLgam = event.muons.at(0).GetLVec()+event.photons.at(0).GetLVec();
+	double MT = sqrt(2. * leadLgam.Pt() * event.met.Pt() * (1. - cos(leadLgam.Phi() - event.met.Phi())));
+	event.AddVar(Mva::mtlepgammet, MT);
+      }      
     }
     if(event.muons.size()>1){
       event.AddVar(Mva::lepPt1, event.muons.at(1).pt);
@@ -1880,15 +1904,18 @@ void Msl::ReadEvent::AddPhoton(Event &event)
   float phPt = -999.0;
   float phEta = -999.0;
   float met_tst_ph_dphi = -999.;
+  float met_tst_nolep_ph_dphi = -999.;
   if(event.photons.size()>0 && event.jets.size()>1){
     centrality = exp(-4.0/std::pow(event.GetVar(Mva::jj_deta),2) * std::pow(event.photons.at(0).eta - (event.jets.at(0).eta+event.jets.at(1).eta)/2.0,2));
     phPt = event.photons.at(0).pt;
     phEta = event.photons.at(0).eta;
     met_tst_ph_dphi = fabs(event.photons.at(0).GetVec().DeltaPhi(event.met.Vect()));
+    met_tst_nolep_ph_dphi = fabs(event.photons.at(0).GetVec().DeltaPhi(event.met_nolep.Vect()));
   }
   event.RepVar(Mva::phcentrality,centrality);
 
   event.AddVar(Mva::met_tst_ph_dphi, met_tst_ph_dphi);
+  event.AddVar(Mva::met_tst_nolep_ph_dphi, met_tst_nolep_ph_dphi);
   event.AddVar(Mva::phPt, phPt);
   event.AddVar(Mva::phEta, phEta);
 }
