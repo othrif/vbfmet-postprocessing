@@ -366,19 +366,24 @@ def prepareBkgRuns(keys,options=None):
 
     sig_ggF125 = {'308284':'ggF125',
                   '346588':'ggF125 reshower',}
-    #sig_ggF125 = {'364162':'Wmunu_MAXHTPTV140_280_CVetoBVeto',}
+
+    sig_gamdark = {'600070':'gamdark VBF',
+                   '600069':'gamdark ggF',}
+        #sig_ggF125 = {'364162':'Wmunu_MAXHTPTV140_280_CVetoBVeto',}
     #sig_VH125     = {'364106':'TBD',}
     #sig_VH125v2     = {'364148':'TBD',}
     sig_VBF125     = {'308276':'VBF125 - met',
                       '308567':'VBF125 - all',
                       '346600':'VBF125 - met>75',
                           }
-    sig_vbfgam = {'312243':'vbf gamma', }
+    sig_vbfgam = {'312243':'vbf gamma',
+                      '313343':'vbf gamma high stats',
+                      }
     alt_VBF = {'308275':'VBF125 - H75',
                '308277':'VBF125 - H200',
                '308278':'VBF125 - H300',
-               #'308279':'VBF125 - H500', 
-               '308280':'VBF125 - H750', 
+               #'308279':'VBF125 - H500',
+               '308280':'VBF125 - H750',
                #'308281':'VBF125 - H1000', 
                '308282':'VBF125 - H2000',
                #'308283':'VBF125 - H3000',
@@ -1081,7 +1086,12 @@ def prepareBkgRuns(keys,options=None):
     bkg_sherpa_zg_228 = {'700011':'Sh_228_eegamma_pty7_EnhMaxpTVpTy',
                          '700012':'Sh_228_mmgamma_pty7_EnhMaxpTVpTy',
                          '700013':'Sh_228_ttgamma_pty7_EnhMaxpTVpTy',
-                         '700014':'Sh_228_vvgamma_pty7_EnhMaxpTVpTy',}
+                         '700014':'Sh_228_vvgamma_pty7_EnhMaxpTVpTy',
+                         '700018':'Sh_228_eegamma_pty7_ptV90',
+                         '700019':'Sh_228_mmgamma_pty7_ptV90',
+                         '700020':'Sh_228_ttgamma_pty7_ptV90',
+                         '700021':'Sh_228_vvgamma_pty7_ptV90',
+                             }
 
     bkg_sherpa_wg = {'364521':'engamma_pty_7_15',
                      '364522':'engamma_pty_15_35',
@@ -1102,7 +1112,10 @@ def prepareBkgRuns(keys,options=None):
     bkg_sherpa_wg_228 = {'700015':'Sh_228_evgamma_pty7_EnhMaxpTVpTy',
                          '700016':'Sh_228_mvgamma_pty7_EnhMaxpTVpTy',
                          '700017':'Sh_228_tvgamma_pty7_EnhMaxpTVpTy',
-    }
+                         '700022':'Sh_228_evgamma_pty7_ptV90',
+                         '700023':'Sh_228_mvgamma_pty7_ptV90',
+                         '700024':'Sh_228_tvgamma_pty7_ptV90',
+        }
         
     bkg_mg_zg = {'345775':'FxFx_eegamma_HT0_125',
                 '345776':'FxFx_eegamma_HTGT125_MjjLT150',
@@ -1211,6 +1224,7 @@ def prepareBkgRuns(keys,options=None):
                 'hvh':sig_VH125,
                 #'whww':sig_VH125v2,
                 'vbfg':sig_vbfgam,
+                'gamd':sig_gamdark,
                 'whww':alt_VBF,
                 #'hvbf500':{'308279':'VBF125 - H500',},
                 #'hvbf1k':{'308281':'VBF125 - H1000',},
