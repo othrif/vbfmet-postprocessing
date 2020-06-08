@@ -20,6 +20,12 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
             #emjs += [0.1, 0.12, 0.15]
             mjs+=[0.55,0.63,0.46]
             emjs += [0.10, 0.09, 0.24]
+        if Binning==23: # drops the dphijj binning
+            mjs = [2.7, 2.3, 2.3, 1.45, 2.0, 40.0, 6.6, 4.4]
+            emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.25, 0.25, 0.25 ]
+            mjs+=[0.55,0.63,0.46]
+            emjs += [0.10, 0.09, 0.24]
+            
     a=1
     hists=[]
     histcr=None

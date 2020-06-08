@@ -28,6 +28,8 @@ parser.add_argument( "--doPlot", dest = "doPlot", action="store_true", default =
 parser.add_argument( "--doFJVTCR", dest = "doFJVTCR", action="store_true", default = False, help = "Generate MJ for fjvt CR")
 parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
 parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis, set --Binning=13")
+parser.add_argument( "--doMTFit", dest = "doMTFit", action="store_true", default = False, help = "VBF + MET + photon analysis with an mt fit, set --Binning=13")
+parser.add_argument( "--doHighDphijj", dest = "doHighDphijj", action="store_true", default = False, help = "Fit dphijj>2.5 analysis with no dphijj binning, set --Binning=23")
 parser.add_argument( "--singleHist", dest = "singleHist", action="store_true", default = False, help = "Runs VBF + MET in one histogram when true")
 parser.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
 parser.add_argument("--METCut", type=int, dest='METCut', default=200e3, help="METCut, default: 200e3 MeV")
@@ -153,6 +155,10 @@ if args.singleHist:
     extraCommand+=' --singleHist '
 if args.doVBFMETGam:
     extraCommand+=' --doVBFMETGam '
+if args.doHighDphijj:
+    extraCommand+=' --doHighDphijj '
+if args.doMTFit:
+    extraCommand+=' --doMTFit '
 if args.doPlot:
     extraCommand+=' --doPlot '
 extraCommand+=' --Binning '+args.Binning
