@@ -20,6 +20,12 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
             #emjs += [0.1, 0.12, 0.15]
             mjs+=[0.55,0.63,0.46]
             emjs += [0.10, 0.09, 0.24]
+        if Binning==23: # drops the dphijj binning
+            mjs = [2.7, 2.3, 2.3, 1.45, 2.0, 40.0, 6.6, 4.4]
+            emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.25, 0.25, 0.25 ]
+            mjs+=[0.55,0.63,0.46]
+            emjs += [0.10, 0.09, 0.24]
+            
     a=1
     hists=[]
     histcr=None
@@ -452,6 +458,9 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, ME
         if Binning==22:
             fakeelesp+=[6.6, 3.9, 4.0]
             fakeelesm+=[6.6, 3.9, 4.0]
+    if Binning==23: # drop the dphijj binning
+        fakeelesp = [4.3, 6.4, 10.6, 5.1, 5.7, 4.3, 4.3, 4.3, 6.6, 3.9, 4.0]
+        fakeelesm = [4.3, 6.4, 10.6, 5.1, 5.7, 4.3, 4.3, 4.3, 6.6, 3.9, 4.0]
     fakeInit = [9.0238,7.4043,3.1402,3.5567,1.5765,8.6259,7.2854,3.5912,5.6147,0.8996,8.44,1.0,1.0,1.0,1.0,1.0,1.0]
     if doDoubleRatio:
         fakeelesp+=[12.5]
@@ -587,6 +596,8 @@ def writeFakeMuo(Binning=0, year=2016, METCut=150):
             fakemuos+=[3.0,3.0]
         if Binning==22:
             fakemuos+=[3.0,3.0,3.0]
+    if Binning==23:
+        fakemuos = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.0, 3.0, 3.0, 3.0]
             
     a=1
     hists=[]
