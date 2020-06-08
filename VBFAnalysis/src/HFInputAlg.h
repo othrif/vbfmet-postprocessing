@@ -61,8 +61,10 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Bool_t doPlot = false;
   Bool_t singleHist = false;
   Bool_t doVBFMETGam = false;
+  Bool_t doMTFit = false;  
   Bool_t doDuplicateCheck = false;
   Bool_t doDoubleRatio = false;
+  Bool_t doHighDphijj = false;  
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
@@ -150,6 +152,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Float_t met_tst_phi;
   Float_t met_tst_nolep_phi;
   Double_t met_cst_jet;
+  Float_t ph_pointing_z;  
   std::vector<Int_t>* mu_charge;
   std::vector<Int_t>* basemu_charge;
   std::vector<Float_t>* mu_pt;

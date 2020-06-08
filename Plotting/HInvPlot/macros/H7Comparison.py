@@ -225,7 +225,17 @@ if __name__ == "__main__":
     h2n = fVBFFilt.Get("NumberEvents")
     runCutH7='/%s' %(h2n.GetBinContent(2))
     runCutSh='/%s' %(h1n.GetBinContent(2))
-    
+    # Zmm Powheg shower 0.00062192050907858992
+    # Znn Powheg shower 0.0034834435002710027
+    #     here are the cross-sections for those variations:
+    # Znunu MuUp 0.0034563678686666665
+    # Znunu MuDw 0.003472884178515009
+    # 
+    # Zee MuDw 0.0006192522647257948
+    # Zee MuUp 0.0006216421926666668
+    # 
+    # Wmn MuUp 0.008057846420000007
+    # Wmn MuDw 0.008043762061374258
     pvar='truth_jj_mass/1.0e3'
     xaxis='Truth m_{jj} [GeV]'
     if options.var=="centrality":
@@ -438,3 +448,4 @@ if __name__ == "__main__":
     if pvar=='jet_pt[2]/1.0e3':
         pvar_out='jet_pt2'
     can.SaveAs(sampleName+'_'+tpye+'_'+pvar_out+'.pdf')
+
