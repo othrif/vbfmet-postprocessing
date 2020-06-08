@@ -61,8 +61,10 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Bool_t doPlot = false;
   Bool_t singleHist = false;
   Bool_t doVBFMETGam = false;
+  Bool_t doMTFit = false;  
   Bool_t doDuplicateCheck = false;
   Bool_t doDoubleRatio = false;
+  Bool_t doHighDphijj = false;  
   bool is2015;
   bool is2016;
   TTree *m_tree = 0;
