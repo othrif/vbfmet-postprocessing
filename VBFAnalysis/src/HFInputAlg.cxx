@@ -528,7 +528,7 @@ StatusCode HFInputAlg::execute() {
   float met_tst_ph_dphiCut = 1.8;
   bool in_vy_overlapCut=true;
   bool jetPtCuts=(n_jet>1 && (jet_pt->at(0) > 80e3) && (jet_pt->at(1) > 50e3));
-  float mtgam=-1.0;
+  mtgam=-1.0;
   if(doVBFMETGam){
     jetCut = (n_jet ==2 || n_jet==3);
     jetPtCuts=(n_jet>1 && (jet_pt->at(0) > 60e3) && (jet_pt->at(1) > 50e3));
