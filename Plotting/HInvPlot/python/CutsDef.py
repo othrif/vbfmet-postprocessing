@@ -60,7 +60,10 @@ class BasicCuts:
         self.JetEta = ''
         if Analysis.count('metsf'):
             self.DEtajjLowerCut   = 3.5 # was 3.5
-            self.MjjLowerCut   = 600.0
+            self.MjjLowerCut   = 600.0 # was 600
+            if options.OverlapPh:
+                self.DEtajjLowerCut   = 3.0 
+                self.MjjLowerCut   = 250.0 
             if Analysis.count('VBFTopo'):
                 self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
                 self.DEtajjLowerCut   = 4.2 # was 3.5
@@ -625,9 +628,12 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
     elif basic_cuts.chan=='nn':
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     # cuts
-    cuts += [CutItem('CutPh', 'n_ph==0')]
+    if options.OverlapPh:
+        cuts += [CutItem('CutPh', 'n_ph==1')]        
+    else:
+        cuts += [CutItem('CutPh', 'n_ph==0')]
 
-    cuts += getJetCuts(basic_cuts, options);
+    cuts += getJetCuts(basic_cuts, options, isPh=options.OverlapPh);
     cuts += [CutItem('CutMet',       '%s > 100.0' %(met_choice))]
     cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     # does the vertex matter? does the CST met cut matter? does the fjvt cuts matter?
