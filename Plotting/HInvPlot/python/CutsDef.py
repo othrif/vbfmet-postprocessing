@@ -442,7 +442,7 @@ def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET
         cuts += [CutItem('CutMetCSTJet', 'met_cst_jet > 150.0')]
     else:
         cuts = []
-        if not options.ReverseFJVT and not options.ReverseLeadFJVT and not basic_cuts.analysis.count('LowMETQCD'):
+        if not options.ReverseFJVT and not options.ReverseLeadFJVT and not options.ReverseSubleadFJVT and not basic_cuts.analysis.count('LowMETQCD'):
             cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
             
         if basic_cuts.analysis.count('LowMETQCDRevFJVT'):
@@ -458,6 +458,9 @@ def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET
                     cutMET.AddCut(CutItem('FJVT', 'j0fjvt > %s || j1fjvt > %s' %(options.CutFJVTVal,options.CutFJVTVal)), 'AND')
                 elif options.ReverseLeadFJVT:
                     cutMET.AddCut(CutItem('FJVT', 'j0fjvt > %s' %(options.CutFJVTVal)), 'AND')
+                elif options.ReverseSubleadFJVT:
+                    #cutMET.AddCut(CutItem('FJVT', 'j0fjvt < %s && j1fjvt > %s' %(options.CutFJVTVal,options.CutFJVTVal)), 'AND')
+                    cutMET.AddCut(CutItem('FJVT', 'j1fjvt > %s' %(options.CutFJVTVal)), 'AND')
                 else:
                     cutMET.AddCut(CutItem('FJVT', 'j0fjvt < %s && j1fjvt < %s' %(options.CutFJVTVal,options.CutFJVTVal)), 'AND')
             cuts += [cutMET]
@@ -468,6 +471,9 @@ def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET
                 cutMET.AddCut(CutItem('HighMET2', '%s > %s && j1fjvt > 0.5' %(met_choice,highMET)), 'OR')
             elif options.ReverseLeadFJVT:
                 cutMET.AddCut(CutItem('HighMET1', '%s > %s && j0fjvt > 0.5' %(met_choice,highMET)), 'OR')
+            elif options.ReverseSubleadFJVT:
+                #cutMET.AddCut(CutItem('HighMET1', '%s > %s && j0fjvt < 0.5' %(met_choice,highMET)), 'AND')
+                cutMET.AddCut(CutItem('HighMET2', '%s > %s && j1fjvt > 0.5' %(met_choice,highMET)), 'OR')
             else:
                 cutMET.AddCut(CutItem('HighMET', '%s > %s' %(met_choice,highMET)), 'OR')
             if options.ReverseFJVT:
@@ -475,6 +481,9 @@ def metCuts(basic_cuts, options, isLep=False, metCut=200.0, cstCut=180.0, maxMET
                 cutMET.AddCut(CutItem('LowMETfjvt2', '%s > %s && j1fjvt > %s' %(met_choice, metCut, options.CutFJVTVal)), 'OR')
             elif options.ReverseLeadFJVT:
                 cutMET.AddCut(CutItem('LowMETfjvt1', '%s > %s && j0fjvt > %s' %(met_choice, metCut, options.CutFJVTVal)), 'OR')
+            elif options.ReverseSubleadFJVT:
+                #cutMET.AddCut(CutItem('LowMETfjvt1', '%s > %s && j0fjvt < %s' %(met_choice, metCut, options.CutFJVTVal)), 'AND')
+                cutMET.AddCut(CutItem('LowMETfjvt2', '%s > %s && j1fjvt > %s' %(met_choice, metCut, options.CutFJVTVal)), 'OR')
             else:
                 cutMET.AddCut(CutItem('LowMET', '%s > %s && j0fjvt < %s && j1fjvt < %s' %(met_choice, metCut, options.CutFJVTVal, options.CutFJVTVal)), 'OR')
             cuts += [cutMET]

@@ -162,6 +162,7 @@ def getParser():
     p.add_option('--OverlapPh',    action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')
     p.add_option('--ReverseFJVT',  action='store_true', default=False,   dest='ReverseFJVT',        help='Reverse the FJVT cuts')
     p.add_option('--ReverseLeadFJVT',  action='store_true', default=False,   dest='ReverseLeadFJVT',        help='Reverse lead jet FJVT cuts')
+    p.add_option('--ReverseSubleadFJVT',  action='store_true', default=False,   dest='ReverseSubleadFJVT',        help='Reverse sub-lead jet FJVT cuts')
     p.add_option('--TwoJet',  action='store_true', default=False,   dest='TwoJet',        help='Force only two jets')    
     p.add_option('--CutFJVTVal',  type='float'       , default=0.2,   dest='CutFJVTVal',        help='Change cut on jet FJVT cuts at low met')
     p.add_option('--maxMET',  type='float'       , default=-1.0,   dest='maxMET',        help='Max MET cut in GeV')
