@@ -48,6 +48,7 @@ def GetHists(f,cut_path, zcut_path, mvar):
     wEWKpath = cut_path+'/plotEvent_wewk/'+mvar
     zQCDpath = zcut_path+'/plotEvent_zqcd/'+mvar
     zEWKpath = zcut_path+'/plotEvent_zewk/'+mvar
+    zgQCDpath = zcut_path+'/plotEvent_zgam/'+mvar    
     if args.mg:
         zQCDpath = zcut_path+'/plotEvent_zqcdMad/'+mvar
         wQCDpath = zcut_path+'/plotEvent_wqcdMad/'+mvar
@@ -76,15 +77,16 @@ def GetHists(f,cut_path, zcut_path, mvar):
     bkgTot.Add(topBkgplot)
     
     zQCDplot = f.Get(zQCDpath).Clone()
+    zgQCDplot = f.Get(zgQCDpath).Clone()    
     zEWKplot = f.Get(zEWKpath).Clone()
 
     rebin=2
-    plts = [dplot,wQCDplot,wEWKplot,zQCDplot,zEWKplot,bkgTot]
+    plts = [dplot,wQCDplot,wEWKplot,zQCDplot,zgQCDplot,zEWKplot,bkgTot]
     if not mvar.count('nolep') or True:
         for p in plts:
             p.Rebin(rebin)
     
-    return dplot,wQCDplot,wEWKplot,zQCDplot,zEWKplot,bkgTot
+    return dplot,wQCDplot,wEWKplot,zQCDplot,zgQCDplot,zEWKplot,bkgTot
 
 def DoFit(name, hist, color=1):
     ROOT.gROOT.LoadMacro("fit.C");
@@ -146,8 +148,8 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
         zden_path = 'pass_metsf_metsf'+trig+'_nn_Nominal'
         znum_path = 'pass_metsf_metsf'+trig+mytrig+'_nn_Nominal'
         
-    dnum,wQCDnum,wEWKnum,zQCDnum,zEWKnum,bkgNum = GetHists(f,num_path, znum_path, mvar)
-    dden,wQCDden,wEWKden,zQCDden,zEWKden,bkgDen = GetHists(f,den_path, zden_path, mvar)
+    dnum,wQCDnum,wEWKnum,zQCDnum,zgQCDnum,zEWKnum,bkgNum = GetHists(f,num_path, znum_path, mvar)
+    dden,wQCDden,wEWKden,zQCDden,zgQCDden,zEWKden,bkgDen = GetHists(f,den_path, zden_path, mvar)
 
     deff = config.ComputeEff([dnum],[dden])
     wQCDeff = config.ComputeEff([wQCDnum],[wQCDden])
@@ -159,16 +161,20 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     wnum = wQCDnum.Clone(); wnum.Add(wEWKnum)
     wden = wQCDden.Clone(); wden.Add(wEWKden)
 
+    zgnum = zgQCDnum.Clone(); zgden = zgQCDden.Clone();
     znum = zQCDnum.Clone(); znum.Add(zEWKnum)
     zden = zQCDden.Clone(); zden.Add(zEWKden)
     print 'Integral: ',zden_path,znum.Integral(0,1001),zden.Integral(0,1001)
     weff = config.ComputeEff([wnum],[wden])
-    zeff = config.ComputeEff([znum],[zden])    
+    zeff = config.ComputeEff([znum],[zden])
+    zgeff = config.ComputeEff([zgnum],[zgden])    
     
     deff[0].SetLineColor(1)
     deff[0].SetMarkerColor(1)
     zeff[0].SetLineColor(3)
     zeff[0].SetMarkerColor(3)
+    zgeff[0].SetLineColor(ROOT.kOrange)
+    zgeff[0].SetMarkerColor(ROOT.kOrange)
     weff[0].SetLineColor(2)
     weff[0].SetMarkerColor(2)
     bkgeff[0].SetLineColor(4)
@@ -189,10 +195,12 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     deff[0].Draw()
     weff[0].Draw('same')
     zeff[0].Draw('same')
+    zgeff[0].Draw('same')
     bkgeff[0].Draw('same')
     deff[0].SetDirectory(0)
     weff[0].SetDirectory(0)
     zeff[0].SetDirectory(0)
+    zgeff[0].SetDirectory(0)
     bkgeff[0].SetDirectory(0)
     
     leg = ROOT.TLegend(0.65, 0.2, 0.98, 0.5)
@@ -201,7 +209,8 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     leg.SetTextFont(42);
     leg.SetTextSize(0.04);    
     leg.AddEntry(deff[0],'Data')
-    leg.AddEntry(zeff[0],'Z')         
+    leg.AddEntry(zeff[0],'Z')
+    leg.AddEntry(zgeff[0],'Z#gamma')
     leg.AddEntry(weff[0],'W')
     leg.AddEntry(bkgeff[0],'W+bkg')
     
@@ -215,13 +224,16 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     SFW = deff[0].Clone()
     SFZ = deff[0].Clone()
     SFBkg = deff[0].Clone()
+    SFZg = deff[0].Clone()
     SFW.SetDirectory(0)
     SFZ.SetDirectory(0)
+    SFZg.SetDirectory(0)
     SFBkg.SetDirectory(0)
     
     SFW.Divide(weff[0])
     SFZ.Divide(zeff[0])
     SFBkg.Divide(bkgeff[0])
+    SFZg.Divide(zgeff[0])    
     SFW.GetXaxis().SetRangeUser(100.0,300.0)
     SFW.GetYaxis().SetRangeUser(0.7,1.15)    
     SFW.GetXaxis().SetTitle('Loose MET [GeV]')
@@ -234,13 +246,17 @@ def DrawSF(can,trig, lep, mvar, fnameA,year=2018):
     SFZ.SetMarkerColor(2)    
     SFBkg.SetLineColor(3)
     SFBkg.SetMarkerColor(3)
+    SFZg.SetLineColor(4)
+    SFZg.SetMarkerColor(4)
     SFW.Draw()
     SFZ.Draw('same')
+    SFZg.Draw('same')
     SFBkg.Draw('same')
     leg.Clear()
     leg.AddEntry(SFZ,'Z#rightarrow#nu#nu')
     leg.AddEntry(SFW,'W#rightarrow l#nu')
     leg.AddEntry(SFBkg,'W+bkg')
+    leg.AddEntry(SFZg,'Z(#rightarrow#nu#nu)+#gamma')
     leg.Draw()
     can.Update()
     if args.wait:

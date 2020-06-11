@@ -27,6 +27,8 @@ arg_group.add_argument("--isLow", action="store_true", dest='isLow', default=Fal
 arg_group.add_argument("--weightSyst", action="store_true", dest='weightSyst', default=False, help="is a weight systematic, default: False")
 arg_group.add_argument("--v26Ntuples", action="store_true", dest='v26Ntuples', default=False, help="run v26 style ntuples, default: False")
 arg_group.add_argument("--doVBFMETGam", action="store_true", dest='doVBFMETGam', default=False, help="run VBF+MET+gamma analysis, default: False")
+arg_group.add_argument("--doMTFit", action="store_true", dest='doMTFit', default=False, help="run VBF+MET+gamma with an MT Fit analysis, default: False")
+arg_group.add_argument("--doHighDphijj", action="store_true", dest='doHighDphijj', default=False, help="run dphijj>2.5 Fit analysis, drops the dphijj binning, default: False")
 arg_group.add_argument("--singleHist", action="store_true", dest='singleHist', default=False, help="run VBF+MET into a single histogram, default: True")
 arg_group.add_argument("--oldInput", action="store_true", dest='oldInput', default=False, help="if oldInput, switch to HFInputOldInput")
 arg_group.add_argument("--doPlot", action="store_true", dest='doPlot', default=False, help="doPlot, to turn on additional histograms used for postfit plots, default: False")
@@ -101,7 +103,9 @@ if True:
                                        doPlot = args.doPlot,
                                        v26Ntuples = args.v26Ntuples,
                                        singleHist = args.singleHist,
-                                       doVBFMETGam = args.doVBFMETGam);
+                                       doVBFMETGam = args.doVBFMETGam,
+                                       doMTFit = args.doMTFit,
+                                       doHighDphijj = args.doHighDphijj);
     else:
         if args.currentSample == "physics_micro":
             isMC = False
@@ -124,7 +128,9 @@ if True:
                                                doPlot = args.doPlot,
                                                singleHist = args.singleHist,
                                                v26Ntuples = args.v26Ntuples,
-                                               doVBFMETGam = args.doVBFMETGam);
+                                               doVBFMETGam = args.doVBFMETGam,
+                                               doMTFit = args.doMTFit,
+                                               doHighDphijj = args.doHighDphijj);
     
     include("AthAnalysisBaseComps/SuppressLogging.py")              #Optional include to suppress as much athena output as possible. Keep at bottom of joboptions so that it doesn't suppress the logging of the things you have configured above
 

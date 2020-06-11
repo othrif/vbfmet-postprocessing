@@ -114,3 +114,21 @@ submitHFInputCondor.py --mergeKTPTV --extraVars 7 --Binning 13 -d submitTest -i 
 submitHFInputCondor.py --mergeKTPTV --extraVars 7 --Binning 22 -d submitTest -i /share/t3data2/schae/PileupStudies/April30_EWKV/mc16a/v41a/ --slc7  -n --METCut 160000
 ```
 
+```bash
+#!/bin/bash
+# example of running one file
+export HOME=$(pwd)
+export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet
+setupATLAS
+export X509_USER_PROXY=/home/schae/testarea/HInv/run/x509up_u20186
+lsetup rucio
+asetup AthAnalysis,21.2.101,here
+voms-proxy-info
+export X509_USER_PROXY=/home/schae/testarea/HInv/run/x509up_u20186
+export CMTCONFIG=x86_64-centos7-gcc8-opt
+source /afs/cern.ch/user/e/erath/public/tmp2/build/${CMTCONFIG}/setup.sh
+ echo INPUT:$1 $2
+ echo athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation Nominal --extraVars 7 --mergeKTPTV  --METCut 200000  --doTMVA  --doVBFMETGam  --Binning 13
+ athena VBFAnalysis/HFInputJobOptions.py --filesInput "$1" - --currentVariation Nominal --extraVars 7 --mergeKTPTV  --METCut 200000  --doTMVA  --doVBFMETGam  --Binning 13
+ ```
