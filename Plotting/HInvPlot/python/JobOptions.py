@@ -156,6 +156,7 @@ def getParser():
     p.add_option('--pu-weight-one',    action='store_true', default=False,   dest='pu_weight_one',            help='Pileup Weight One')
 
     p.add_option('--no-plot',  action='store_true', default=False,   dest='no_plot',          help='Do not plot')
+    p.add_option('--v41',  action='store_true', default=False,   dest='v41',          help='updates for v41')
     p.add_option('--ignore-njet',  action='store_true', default=False,   dest='ignore_njet',        help='Ignore Njet')
     p.add_option('--ignore-met',   action='store_true', default=False,   dest='ignore_met',         help='Ignore MET')
     p.add_option('--LoadBaseLep',  action='store_true', default=False,   dest='LoadBaseLep',        help='Use looser leptons')

@@ -648,7 +648,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
 def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR', syst='Nominal'):
 
     cuts = FilterCuts(options)
-    if options.OverlapPh:
+    if options.OverlapPh and options.v41:
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
         
     if basic_cuts.chan in ['nn']:
