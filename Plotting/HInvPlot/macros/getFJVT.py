@@ -657,6 +657,7 @@ if __name__ == "__main__":
         can.Update()
         mjerr=ROOT.Double()
         print 'MJ yields: %0.2f +/- %0.2f' %(fulldist.IntegralAndError(0,10001,mjerr,''),mjerr)
+        print '    when 1.5 TeV < mjj: %0.2f +/- %0.2f' %(fulldist.IntegralAndError(6,10001,mjerr,''),mjerr)
     err = ROOT.Double(0.0)
     totalBkg = crA.IntegralAndError(0,1001,err)
     print 'MJ A yields: %0.2f +/- %0.2f' %(totalBkg,err)
@@ -664,6 +665,14 @@ if __name__ == "__main__":
     print 'MJ D yields: %0.2f +/- %0.2f' %(totalBkg,err)
     totalBkg = crE.IntegralAndError(0,1001,err)
     print 'MJ E yields: %0.2f +/- %0.2f' %(totalBkg,err)
+    if args.lowfjvt and mvar.count("mass"):
+        higherr = ROOT.Double(0.0)
+        highBkg = crA.IntegralAndError(6,1001,higherr)
+        print '    MJ A when 1.5 TeV < mjj, %0.2f +\- %0.2f' %(highBkg,higherr)
+        highBkg = crD.IntegralAndError(6,1001,higherr)
+        print '    MJ D when 1.5 TeV < mjj, %0.2f +\- %0.2f' %(highBkg,higherr)
+        highBkg = crE.IntegralAndError(6,1001,higherr)
+        print '    MJ E when 1.5 TeV < mjj, %0.2f +\- %0.2f' %(highBkg,higherr)
     if fulldist:
         for i in range(1,h1.GetNbinsX()+1):
             print 'Bin %0.1f Yield: %0.1f' %(h1.GetXaxis().GetBinLowEdge(i), fulldist.GetBinContent(i))
