@@ -17,6 +17,8 @@ parser.add_argument("--outdir", dest='outdir', default='/tmp/plotTrig', help="Ou
 parser.add_argument("--wait", action='store_true', dest='wait', default=False, help="wait")
 parser.add_argument("--mg", action='store_true', dest='mg', default=False, help="measure mg")
 parser.add_argument("--style", dest='style', default='/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/' , help="ATLAS style path")
+parser.add_argument("--lowFJVT", action='store_true', dest='lowfjvt', default=False, help="Inputs consider low-MET region with low fJVT requirement (0.2)")
+parser.add_argument("--save", action='store_true', dest='save', default=False, help="Save plots as pdf")
 args, unknown = parser.parse_known_args()
 
 import HInvPlot.JobOptions as config
@@ -62,7 +64,7 @@ def GetZNFHists(f,cut_pathtmp, mvar, year, met=150.0):
                     cut_path+'/plotEvent_zewk/'+mvar,]
     dplot    = f.Get(dpath)
     if not dplot:
-        print dpath
+        print "Could not find "+str(dpath)+" in "+str(f)+" - GetZNFHists"
         sys.exit(0)
     dplot    = f.Get(dpath).Clone()
     bkgTot=None
@@ -109,7 +111,7 @@ def GetWNFHists(f,cut_pathtmp, mvar, year, met=150.0):
                     cut_path+'/plotEvent_wewk/'+mvarA,]
     dplot = f.Get(dpath)
     if not dplot:
-        print dpath
+        print "Could not find "+str(dpath)+" in "+str(f)+" - GetWNFHists"
         sys.exit(0)
     dplot = f.Get(dpath).Clone()
     bkgTot=None
@@ -146,8 +148,8 @@ def GetHists(f,cut_path, mvar, year, met=150.0, computeNF=False):
                   cut_path+'/plotEvent_tall/'+mvar,
                   ]
     dplot    = f.Get(dpath)
-    if not dplot:
-        print dpath
+    if not dplot:        
+        print "Could not find "+str(dpath)+" in "+str(f)+" - GetHists"
         sys.exit(0)
     dplot    = f.Get(dpath).Clone()
     SetOverflow(dplot)
@@ -215,6 +217,7 @@ def GetFJVT(can, num_path, mvar, fnameA, fnameFailfjvt, year=2019):
         print 'file: ',fnameA,fnameFailfjvt
         sys.exit(0)
     fname=fnameA.rstrip('.root')
+    print 'GetFJVT: num_path = ',num_path
     hdataMinBkg_passFJVT = GetHists(f,     num_path, mvar, year, computeNF=True)
 
     if num_path.count('nj2dphijj'):
@@ -342,7 +345,10 @@ def DrawList(can,plts,names,plt_name,ytitle='Trigger Eff.',trig='xe110',input_er
     if input_err:
         leg.AddEntry(input_err,'Fit+Err')
     leg.Draw()
-    texts = getATLASLabels(can, 0.2, 0.88,trig)
+    if args.lowfjvt:
+      texts = getATLASLabels(can, 0.2, 0.88,trig,'low fJVT')
+    else:
+      texts = getATLASLabels(can, 0.2, 0.88,trig)   
     for t in texts:
         t.Draw()
     can.Update()
@@ -360,124 +366,167 @@ if __name__ == "__main__":
             os.mkdir(args.outdir)
     
     Style(args.style)
-    can = ROOT.TCanvas('stack', 'stack', 500, 500)
+    if args.lowfjvt:
+      can = ROOT.TCanvas('stack', 'stack', 900,500)
+    else:
+      can = ROOT.TCanvas('stack', 'stack', 500, 500)
     fname=args.input
     fnameFailfjvt = args.inputfail
     mvar = args.mvar
-    #h1=DrawFJVT(can,trig,lep, mvar, fname,fnameFailfjvt)
-    #num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
-    num_path='pass_sr_nj2_nn_Nominal'
-    #num_path='pass_sr_nj2dphijj2_nn_Nominal'
-    ntuplev='v37ALL'
-    fjvt='fjvt02'
-    #ntuplev='v37D'
-    #h1,cr1=GetFJVT(can, num_path, mvar, fname, fnameFailfjvt)
-    h1=None
-    cr1=None
-    cr3=None
-    h3=None
-    if fjvt=='fjvt05':
-        h1,cr1=GetFJVT(can, num_path, mvar, ntuplev+'Loose_SR_'+fjvt+'_met100.root', ntuplev+'Loose_SR_'+fjvt+'rev_met100.root')
-        #num_path='pass_sr_nj2dphijj1_nn_Nominal'
-        h3,cr3=GetFJVT(can, 'pass_sr_allmjj_nn_Nominal', mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_SR_'+fjvt+'rev.root')        
+
+    if args.lowfjvt:
+      num_path='pass_sr_nj2_nn_Nominal'
+      h1,cr1=GetFJVT(can, num_path, mvar, '../160met200/v37MJSyst.root','../160met200/v37MJSyst_rev.root')#for high met comparison region
+      h2,cr2=GetFJVT(can, num_path, mvar, '/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37ALL_SR_fjvt02_met100.root','/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37ALL_SR_fjvt02rev_met100.root')
+      h3,cr3=GetFJVT(can, num_path, mvar, '/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37ALL_SR_fjvt02_met130.root','/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37ALL_SR_fjvt02rev_met130.root')
+      h4,cr4=GetFJVT(can, num_path, mvar, '/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37ALL_SR_fjvt02_met140.root','/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37ALL_SR_fjvt02rev_met140.root')
+      h5,cr5=GetFJVT(can, num_path, mvar, '/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37ALL_SR_fjvt02_met150.root','/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37ALL_SR_fjvt02rev_met150.root')
+      #individual elements of h1 (160-200 slice)
+      hA,crA=GetFJVT(can, num_path, mvar, '../160met200/out_v37AMJSyst_dougHighMET.root','../160met200/out_v37AMJSyst_rev_dougHighMET.root',year=2016)
+      hD,crD=GetFJVT(can, num_path, mvar, '../160met200/out_v37DMJSyst_dougHighMET.root','../160met200/out_v37DMJSyst_rev_dougHighMET.root',year=2017)
+      hE,crE=GetFJVT(can, num_path, mvar, '../160met200/out_v37EMJSyst_dougHighMET.root','../160met200/out_v37EMJSyst_rev_dougHighMET.root',year=2018)
+      h9=None
+      can.Clear()
+      #h2.GetYaxis().SetRangeUser(0,5.0)
+      h2.GetYaxis().SetRangeUser(0,3.0)
+      if args.mvar.count('jetPt'):
+          h2.GetXaxis().SetRangeUser(50.0,150.0)
+      elif mvar.count('met'):
+          h2.GetYaxis().SetRangeUser(0,1)
+      h2.Draw()
+      h3.SetLineColor(2)
+      h3.SetMarkerColor(2)
+      h4.SetLineColor(4)
+      h4.SetMarkerColor(4)
+      h5.SetLineColor(5)
+      h5.SetMarkerColor(5)
+      h3.Draw('same')
+      h4.Draw('same')
+      h5.Draw('same')
+
     else:
-        h1,cr1=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met100.root', ntuplev+'_SR_'+fjvt+'rev_met100.root')    
-    #num_path='pass_sr_allmjj_nn_Nominal'
-    num_path='pass_sr_nj2_nn_Nominal'
-    h2,cr2=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met150.root', ntuplev+'_SR_'+fjvt+'rev_met150.root')
-    h30,cr30=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met130.root', ntuplev+'_SR_'+fjvt+'rev_met130.root')    
-    num_path='pass_sr_allmjj_nn_Nominal'
-
-    num_path='pass_sr_nj2_nn_Nominal'
-    h4=None
-    h5=None
-    if fjvt=='fjvt05':
-        h4,cr4=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met170.root', ntuplev+'_SR_'+fjvt+'rev_met170.root')
-        h5,cr5=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met180.root', ntuplev+'_SR_'+fjvt+'rev_met180.root')
-    print '140'
-    h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met140.root', ntuplev+'_SR_'+fjvt+'rev_met140.root')
-    #h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met140.root', ntuplev+'_SR_'+fjvt+'rev_met140_nomjj.root')
-    h7=None
-    h8=None
-    cr7=None
-    cr8=None
-    if fjvt=='fjvt05':
-        h7,cr7=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met190.root', ntuplev+'_SR_'+fjvt+'rev_met190.root')
-        h8,cr8=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met200.root', ntuplev+'_SR_'+fjvt+'rev_met200.root')    
-    num_path='pass_sr_nj2_nn_Nominal'    
-    #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140.root')
-    h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140_nomjj.root')
-    #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met150.root', ntuplev+'_SR_fjvt02rev_met150.root')
-    #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met120.root', ntuplev+'_SR_fjvt02rev_met120.root')        
-
-    num_path='pass_sr_allmjj_nn_Nominal'
-    fjvt='fjvt05'
-    hA,crA=GetFJVT(can, num_path, mvar, 'v37A_'+fjvt+'.root', 'v37A_SR_'+fjvt+'rev.root')
-    hD,crD=GetFJVT(can, num_path, mvar, 'v37D_'+fjvt+'.root', 'v37D_SR_'+fjvt+'rev.root')
-    hE,crE=GetFJVT(can, num_path, mvar, 'v37E_'+fjvt+'.root', 'v37E_SR_'+fjvt+'rev.root')
-    #if args.mvar=='met_tst_et':
-    #    h1.SetBinContent(11,1.5)
-    #    if h5:
-    #        h5.SetBinContent(18,1.55)
-    #    if h4:
-    #        h4.SetBinContent(17,1.44)
-    can.Clear()
-    h1.GetYaxis().SetRangeUser(0,5.0)
-    if args.mvar.count('jetPt0'):
-        h1.GetXaxis().SetRangeUser(50.0,150.0)
-    h1.Draw()
-    h2.SetLineColor(2)
-    h2.SetMarkerColor(2)
-    if h3:
-        h3.SetLineColor(3)
-        h3.SetMarkerColor(3)
-    if h4:
-        h4.SetLineColor(4)
-        h4.SetMarkerColor(4)
-    if h5:
-        h5.SetLineColor(5)
-        h5.SetMarkerColor(5)
-    h6.SetLineColor(ROOT.kMagenta)
-    h6.SetMarkerColor(ROOT.kMagenta)
-    if h7:
-        h7.SetLineColor(ROOT.kOrange+5)
-        h7.SetMarkerColor(ROOT.kOrange+5)
-    if h8:
-        h8.SetLineColor(ROOT.kOrange)
-        h8.SetMarkerColor(ROOT.kOrange)
-    h9.SetLineColor(ROOT.kPink)
-    h9.SetMarkerColor(ROOT.kPink)
-    h30.SetLineColor(ROOT.kPink)
-    h30.SetMarkerColor(ROOT.kPink)    
-    h2.Draw('same')
-    #h3.Draw('same')
-    if h4:
-        h4.Draw('same')
-    if h5:
-        h5.Draw('same')
-    h6.Draw('same')
-    if h7:
-        h7.Draw('same')
-    if h8:
-        h8.Draw('same')
-    h30.Draw('same')    
-    #h9.Draw('same')
+      #h1=DrawFJVT(can,trig,lep, mvar, fname,fnameFailfjvt)
+      #num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
+      num_path='pass_sr_nj2_nn_Nominal'
+      #num_path='pass_sr_nj2dphijj2_nn_Nominal'
+      ntuplev='v37ALL'
+      fjvt='fjvt02'
+      #ntuplev='v37D'
+      #h1,cr1=GetFJVT(can, num_path, mvar, fname, fnameFailfjvt)
+      h1=None
+      cr1=None
+      cr3=None
+      h3=None
+      if fjvt=='fjvt05':
+          h1,cr1=GetFJVT(can, num_path, mvar, ntuplev+'Loose_SR_'+fjvt+'_met100.root', ntuplev+'Loose_SR_'+fjvt+'rev_met100.root')
+          #num_path='pass_sr_nj2dphijj1_nn_Nominal'
+          h3,cr3=GetFJVT(can, 'pass_sr_allmjj_nn_Nominal', mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_SR_'+fjvt+'rev.root')        
+      else:
+          h1,cr1=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met100.root', ntuplev+'_SR_'+fjvt+'rev_met100.root')    
+      #num_path='pass_sr_allmjj_nn_Nominal'
+      num_path='pass_sr_nj2_nn_Nominal'
+      h2,cr2=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met150.root', ntuplev+'_SR_'+fjvt+'rev_met150.root')
+      h30,cr30=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met130.root', ntuplev+'_SR_'+fjvt+'rev_met130.root')    
+      num_path='pass_sr_allmjj_nn_Nominal'
+     
+      num_path='pass_sr_nj2_nn_Nominal'
+      h4=None
+      h5=None
+      if fjvt=='fjvt05':
+          h4,cr4=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met170.root', ntuplev+'_SR_'+fjvt+'rev_met170.root')
+          h5,cr5=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met180.root', ntuplev+'_SR_'+fjvt+'rev_met180.root')
+      print '140'
+      h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met140.root', ntuplev+'_SR_'+fjvt+'rev_met140.root')
+      #h6,cr6=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met140.root', ntuplev+'_SR_'+fjvt+'rev_met140_nomjj.root')
+      h7=None
+      h8=None
+      cr7=None
+      cr8=None
+      if fjvt=='fjvt05':
+          h7,cr7=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met190.root', ntuplev+'_SR_'+fjvt+'rev_met190.root')
+          h8,cr8=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met200.root', ntuplev+'_SR_'+fjvt+'rev_met200.root')    
+      num_path='pass_sr_nj2_nn_Nominal'    
+      #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140.root')
+      h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met140.root', ntuplev+'_SR_fjvt02rev_met140_nomjj.root')
+      #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met150.root', ntuplev+'_SR_fjvt02rev_met150.root')
+      #h9,cr9=GetFJVT(can, num_path, mvar, ntuplev+'_SR_fjvt02_met120.root', ntuplev+'_SR_fjvt02rev_met120.root')        
+     
+      num_path='pass_sr_allmjj_nn_Nominal'
+      fjvt='fjvt05'
+      hA,crA=GetFJVT(can, num_path, mvar, 'v37A_'+fjvt+'.root', 'v37A_SR_'+fjvt+'rev.root')
+      hD,crD=GetFJVT(can, num_path, mvar, 'v37D_'+fjvt+'.root', 'v37D_SR_'+fjvt+'rev.root')
+      hE,crE=GetFJVT(can, num_path, mvar, 'v37E_'+fjvt+'.root', 'v37E_SR_'+fjvt+'rev.root')
+      #if args.mvar=='met_tst_et':
+      #    h1.SetBinContent(11,1.5)
+      #    if h5:
+      #        h5.SetBinContent(18,1.55)
+      #    if h4:
+      #        h4.SetBinContent(17,1.44)
+      can.Clear()
+      h1.GetYaxis().SetRangeUser(0,5.0)
+      if args.mvar.count('jetPt0'):
+          h1.GetXaxis().SetRangeUser(50.0,150.0)
+      h1.Draw()
+      h2.SetLineColor(2)
+      h2.SetMarkerColor(2)
+      if h3:
+          h3.SetLineColor(3)
+          h3.SetMarkerColor(3)
+      if h4:
+          h4.SetLineColor(4)
+          h4.SetMarkerColor(4)
+      if h5:
+          h5.SetLineColor(5)
+          h5.SetMarkerColor(5)
+      h6.SetLineColor(ROOT.kMagenta)
+      h6.SetMarkerColor(ROOT.kMagenta)
+      if h7:
+          h7.SetLineColor(ROOT.kOrange+5)
+          h7.SetMarkerColor(ROOT.kOrange+5)
+      if h8:
+          h8.SetLineColor(ROOT.kOrange)
+          h8.SetMarkerColor(ROOT.kOrange)
+      h9.SetLineColor(ROOT.kPink)
+      h9.SetMarkerColor(ROOT.kPink)
+      h30.SetLineColor(ROOT.kPink)
+      h30.SetMarkerColor(ROOT.kPink)    
+      h2.Draw('same')
+      #h3.Draw('same')
+      if h4:
+          h4.Draw('same')
+      if h5:
+          h5.Draw('same')
+      h6.Draw('same')
+      if h7:
+          h7.Draw('same')
+      if h8:
+          h8.Draw('same')
+      h30.Draw('same')    
+      #h9.Draw('same')
 
     #### --- setup systematics
     # setup systematics
-    WfuncSyst = h1.Clone()
+    if args.lowfjvt:
+      WfuncSyst = h2.Clone()
+    else:
+      WfuncSyst = h1.Clone()
     WfuncSyst.SetMarkerSize(0)
     WfuncSyst.SetLineStyle(4)
     WfuncSyst.SetFillColor(ROOT.kGreen)
     WfuncSyst.SetFillStyle(3001)
 
-    # generate xyz
-    for i in range(1,h9.GetNbinsX()+2):
+    # generate xyz - for 140 slice
+    if h9:
+      for i in range(1,h9.GetNbinsX()+2):
         print 'Bin %0.1f Val: %0.3f ' %(h9.GetXaxis().GetBinLowEdge(i),h9.GetBinContent(i))
     # getting the weighted average
-    listofh = [h1,h30,h6,h2,h4,h5,h7,h8]
-    if not h7:
-            listofh = [h1,h30,h6,h2]
+    if args.lowfjvt:
+      listofh = [h2,h3,h4,h5]
+    else:
+      listofh = [h1,h30,h6,h2,h4,h5,h7,h8]
+      if not h7:
+        listofh = [h1,h30,h6,h2]
+
     allvs=[]
     alles=[]
     for i in range(1,h1.GetNbinsX()+2):
@@ -536,55 +585,78 @@ if __name__ == "__main__":
 
     #### --- end systematics
     
-    texts = getATLASLabels(can, 0.2, 0.88,'')
-    for t in texts:
-        t.Draw()
     leg = ROOT.TLegend(0.65, 0.2, 0.98, 0.5)
     leg.SetBorderSize(0)
     leg.SetFillStyle (0)
     leg.SetTextFont(42);
     leg.SetTextSize(0.04);
-    leg.AddEntry(h1,'100< MET<130')
-    leg.AddEntry(h30,'130< MET<140')
-    leg.AddEntry(h6,' 140<MET<150')
-    leg.AddEntry(h2,' 150<MET<160')
-    if h4:
-        leg.AddEntry(h4,' 160<MET<170')
-    if h5:
-        leg.AddEntry(h5,' 170<MET<180')
-    if h7:
-        leg.AddEntry(h7,' 180<MET<190')
-    if h8:
-        leg.AddEntry(h8,' 190<MET<200')
-    #leg.AddEntry(h9,' met140 FJVT>0.2')
+    if args.lowfjvt:
+      texts = getATLASLabels(can, 0.2, 0.88,'low fJVT')
+      leg = ROOT.TLegend(0.7, 0.4, 0.98, 0.7)
+      leg.AddEntry(h2,'100<MET<130')
+      leg.AddEntry(h3,'130<MET<140')
+      leg.AddEntry(h4,'140<MET<150')
+      leg.AddEntry(h5,'150<MET<160')
+    else:
+      texts = getATLASLabels(can, 0.2, 0.88,'')
+      leg.AddEntry(h1,'100< MET<130')
+      leg.AddEntry(h30,'130< MET<140')
+      leg.AddEntry(h6,' 140<MET<150')
+      leg.AddEntry(h2,' 150<MET<160')
+      if h4:
+          leg.AddEntry(h4,' 160<MET<170')
+      if h5:
+          leg.AddEntry(h5,' 170<MET<180')
+      if h7:
+          leg.AddEntry(h7,' 180<MET<190')
+      if h8:
+          leg.AddEntry(h8,' 190<MET<200')
+      #leg.AddEntry(h9,' met140 FJVT>0.2')
+    for t in texts:
+        t.Draw()
     leg.AddEntry(WfuncSyst,' Syst Band')
     #leg.AddEntry(h3,'MET>200')
     leg.Draw()
     can.Update()
-    can.WaitPrimitive()
-    raw_input('')
+    if args.save:
+      canSave = can.Clone()
+      canSave.SaveAs(mvar+'.pdf')
+    if args.wait:
+      can.WaitPrimitive()
+      raw_input('')
+
     can.Clear()
-    if cr3:
-        cr3.GetYaxis().SetTitle('MJ CR Yields')
-        cr3.Draw()
+    if args.lowfjvt:
+      fulldist=cr1
+    elif cr3:
+      fulldist=cr3
+    else:
+      fulldist=None
+
+    if fulldist:
+        fulldist.GetYaxis().SetTitle('MJ CR Yields')
+        fulldist.Draw()
         can.Update()
-        can.WaitPrimitive()
+        if args.wait:
+            can.WaitPrimitive()
         for i in range(1,h1.GetNbinsX()+1):
-            ibin=cr3.GetBinContent(i)
-            ibine=cr3.GetBinError(i)
+            ibin=fulldist.GetBinContent(i)
+            ibine=fulldist.GetBinError(i)
             isf=WfuncSyst.GetBinContent(i)
-            cr3.SetBinContent(i,ibin*isf)
-            cr3.SetBinError(i,ibine*isf)
+            fulldist.SetBinContent(i,ibin*isf)
+            fulldist.SetBinError(i,ibine*isf)
             for hCR in [crA,crD,crE]:
                 hCR.SetBinContent(i,hCR.GetBinContent(i)*isf)
                 hCR.SetBinError(i,hCR.GetBinError(i)*isf)
 
         can.Clear()
-        cr3.GetYaxis().SetTitle('MJ Prediction')
-        cr3.Draw()
+        fulldist.GetYaxis().SetTitle('MJ Prediction')
+        fulldist.Draw()
+        if args.wait:
+          can.WaitPrimitive()
         can.Update()
-        can.WaitPrimitive()
-        print 'MJ yields: ',cr3.Integral(0,10001)
+        mjerr=ROOT.Double()
+        print 'MJ yields: %0.2f +/- %0.2f' %(fulldist.IntegralAndError(0,10001,mjerr,''),mjerr)
     err = ROOT.Double(0.0)
     totalBkg = crA.IntegralAndError(0,1001,err)
     print 'MJ A yields: %0.2f +/- %0.2f' %(totalBkg,err)
@@ -592,70 +664,108 @@ if __name__ == "__main__":
     print 'MJ D yields: %0.2f +/- %0.2f' %(totalBkg,err)
     totalBkg = crE.IntegralAndError(0,1001,err)
     print 'MJ E yields: %0.2f +/- %0.2f' %(totalBkg,err)
-    if cr3:
+    if fulldist:
         for i in range(1,h1.GetNbinsX()+1):
-            print 'Bin %0.1f Yield: %0.1f' %(h1.GetXaxis().GetBinLowEdge(i), cr3.GetBinContent(i))
+            print 'Bin %0.1f Yield: %0.1f' %(h1.GetXaxis().GetBinLowEdge(i), fulldist.GetBinContent(i))
 
-    for j in ['140','160']:
-        num_path='pass_sr_allmjj_nn_Nominal'
-        ntuplev='v37A'
-        hA,crA=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met%s.root' %(j), ntuplev+'_SR_'+fjvt+'rev_met%s.root' %(j),year=2016)
-        ntuplev='v37D'
-        hD,crD=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met%s.root' %(j), ntuplev+'_SR_'+fjvt+'rev_met%s.root' %(j),year=2017)
-        ntuplev='v37E'
-        hE,crE=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met%s.root' %(j), ntuplev+'_SR_'+fjvt+'rev_met%s.root' %(j),year=2018)
-        can.Clear()
-        hA.GetYaxis().SetRangeUser(0,5.0)
-        hA.Draw()
-        hD.SetLineColor(2)
-        hD.SetMarkerColor(2)
-        hE.SetLineColor(3)
-        hE.SetMarkerColor(3)
-        hD.Draw('same')
-        hE.Draw('same')
-        WfuncSyst.Draw('same E3')
-        texts=[]
-        if j=='140':
-            texts = getATLASLabels(can, 0.2, 0.88,'%s<MET<150' %(j))
-        if j=='160':
-            texts = getATLASLabels(can, 0.2, 0.88,'150<MET<160')
-        for t in texts:
-            t.Draw()
-        leg.Clear()
-        leg.AddEntry(hA,'2015/6')
-        leg.AddEntry(hD,'2017')
-        leg.AddEntry(hE,'2018')    
-        leg.AddEntry(WfuncSyst,'SystBand')    
-        leg.Draw()
-        can.Update()
+
+    if args.lowfjvt:
+      #hardcoded for 140<MET<150 for direct comparison
+      hA,crA=GetFJVT(can, num_path, mvar, '/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37A_SR_fjvt02_met140.root','/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37A_SR_fjvt02rev_met140.root',year=2016)
+      hD,crD=GetFJVT(can, num_path, mvar, '/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37D_SR_fjvt02_met140.root','/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37D_SR_fjvt02rev_met140.root',year=2016)
+      hE,crE=GetFJVT(can, num_path, mvar, '/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37E_SR_fjvt02_met140.root','/eos/atlas/atlascerngroupdisk/penn-ww/schae/June7_FJVTCR/v37E_SR_fjvt02rev_met140.root',year=2016)
+      can.Clear()
+      #hA.GetYaxis().SetRangeUser(0,5.0)
+      hA.GetYaxis().SetRangeUser(0,3.0)
+      if mvar.count('jetPt'):
+          hA.GetXaxis().SetRangeUser(70,150)
+      elif mvar.count('met'):
+          hA.GetYaxis().SetRangeUser(0,1)
+      hA.Draw()
+      hD.SetLineColor(2)
+      hD.SetMarkerColor(2)
+      hE.SetLineColor(3)
+      hE.SetMarkerColor(3)
+      hD.Draw('same')
+      hE.Draw('same')
+      WfuncSyst.Draw('same E3')
+      texts=[]
+      texts = getATLASLabels(can, 0.2, 0.88,'140<MET<150')
+      for t in texts:
+          t.Draw()
+      leg.Clear()
+      leg.AddEntry(hA,'2015/6')
+      leg.AddEntry(hD,'2017')
+      leg.AddEntry(hE,'2018')
+      leg.AddEntry(WfuncSyst,'SystBand')
+      leg.Draw()
+      can.Update()
+      if args.wait:
         can.WaitPrimitive()
+      if args.save:
+        canSave = can.Clone()
+        canSave.SaveAs(mvar+'_years.pdf')
+    else:
+      for j in ['140','160']:
+          num_path='pass_sr_allmjj_nn_Nominal'
+          ntuplev='v37A'
+          hA,crA=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met%s.root' %(j), ntuplev+'_SR_'+fjvt+'rev_met%s.root' %(j),year=2016)
+          ntuplev='v37D'
+          hD,crD=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met%s.root' %(j), ntuplev+'_SR_'+fjvt+'rev_met%s.root' %(j),year=2017)
+          ntuplev='v37E'
+          hE,crE=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met%s.root' %(j), ntuplev+'_SR_'+fjvt+'rev_met%s.root' %(j),year=2018)
+          can.Clear()
+          hA.GetYaxis().SetRangeUser(0,5.0)
+          hA.Draw()
+          hD.SetLineColor(2)
+          hD.SetMarkerColor(2)
+          hE.SetLineColor(3)
+          hE.SetMarkerColor(3)
+          hD.Draw('same')
+          hE.Draw('same')
+          WfuncSyst.Draw('same E3')
+          texts=[]
+          if j=='140':
+              texts = getATLASLabels(can, 0.2, 0.88,'%s<MET<150' %(j))
+          if j=='160':
+              texts = getATLASLabels(can, 0.2, 0.88,'150<MET<160')
+          for t in texts:
+              t.Draw()
+          leg.Clear()
+          leg.AddEntry(hA,'2015/6')
+          leg.AddEntry(hD,'2017')
+          leg.AddEntry(hE,'2018')    
+          leg.AddEntry(WfuncSyst,'SystBand')    
+          leg.Draw()
+          can.Update()
+          can.WaitPrimitive()
 
-    # compare the different years in the low MET region
-    num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
-    ntuplev='v37A'
-    hA,crA=GetFJVT(can, num_path, mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_'+fjvt+'rev.root',year=2016)
-    ntuplev='v37D'
-    hD,crD=GetFJVT(can, num_path, mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_'+fjvt+'rev.root',year=2017)
-    ntuplev='v37E'
-    hE,crE=GetFJVT(can, num_path, mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_'+fjvt+'rev.root',year=2018)    
-    can.Clear()
-    hA.GetYaxis().SetRangeUser(0,5.0)
-    hA.Draw()
-    hD.SetLineColor(2)
-    hD.SetMarkerColor(2)
-    hE.SetLineColor(3)
-    hE.SetMarkerColor(3)
-    hD.Draw('same')
-    hE.Draw('same')
-    WfuncSyst.Draw('same E3')
-    texts = getATLASLabels(can, 0.2, 0.88,'Low MET')
-    for t in texts:
-        t.Draw()
-    leg.Clear()
-    leg.AddEntry(hA,'2015/6')
-    leg.AddEntry(hD,'2017')
-    leg.AddEntry(hE,'2018')
-    leg.AddEntry(WfuncSyst,'SystBand')
-    leg.Draw()
-    can.Update()
-    can.WaitPrimitive()
+      # compare the different years in the low MET region
+      num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
+      ntuplev='v37A'
+      hA,crA=GetFJVT(can, num_path, mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_'+fjvt+'rev.root',year=2016)
+      ntuplev='v37D'
+      hD,crD=GetFJVT(can, num_path, mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_'+fjvt+'rev.root',year=2017)
+      ntuplev='v37E'
+      hE,crE=GetFJVT(can, num_path, mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_'+fjvt+'rev.root',year=2018)    
+      can.Clear()
+      hA.GetYaxis().SetRangeUser(0,5.0)
+      hA.Draw()
+      hD.SetLineColor(2)
+      hD.SetMarkerColor(2)
+      hE.SetLineColor(3)
+      hE.SetMarkerColor(3)
+      hD.Draw('same')
+      hE.Draw('same')
+      WfuncSyst.Draw('same E3')
+      texts = getATLASLabels(can, 0.2, 0.88,'Low MET')
+      for t in texts:
+          t.Draw()
+      leg.Clear()
+      leg.AddEntry(hA,'2015/6')
+      leg.AddEntry(hD,'2017')
+      leg.AddEntry(hE,'2018')
+      leg.AddEntry(WfuncSyst,'SystBand')
+      leg.Draw()
+      can.Update()
+      can.WaitPrimitive()
