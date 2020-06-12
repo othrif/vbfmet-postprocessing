@@ -263,15 +263,26 @@ class FitPoint:
         self.neg_2sig = None
         self.neg_1sig = None
         self.xsMap={}
-        self.xsMap[50]=7.4355
-        self.xsMap[75]=5.8396
-        self.xsMap[100]=4.6674
-        self.xsMap[125]=3.782
-        self.xsMap[300]=0.024186
-        self.xsMap[750]=0.00018346
-        self.xsMap[1000]=4.9409e-05
-        self.xsMap[2000]=8.013e-06
-        self.xsMap[3000]=2.4363e-06
+        if options.scaleXS:
+            self.xsMap[50]=(7.4355) #7.627E+00 
+            self.xsMap[75]=(5.8396) #6.016E+00
+            self.xsMap[100]=(4.6674) #4.822E+00
+            self.xsMap[125]=(3.782) #3.925E+00 
+            self.xsMap[300]=(0.024186) #1.256E+00 
+            self.xsMap[750]=(0.00018346) #0.1915
+            self.xsMap[1000]=(4.9409e-05) #0.08732
+            self.xsMap[2000]=(8.013e-06) #0.007052
+            self.xsMap[3000]=(2.4363e-06) #0.0008253
+        else:
+            self.xsMap[50]=(7.4355)/7.627 #7.627E+00 
+            self.xsMap[75]=(5.8396)/6.016 #6.016E+00
+            self.xsMap[100]=(4.6674)/4.822 #4.822E+00
+            self.xsMap[125]=(3.782)/3.925 #3.925E+00 
+            self.xsMap[300]=(0.024186)/1.256 #1.256E+00 
+            self.xsMap[750]=(0.00018346)/0.1915 #0.1915
+            self.xsMap[1000]=(4.9409e-05)/0.08732 #0.08732
+            self.xsMap[2000]=(8.013e-06)/0.007052 #0.007052
+            self.xsMap[3000]=(2.4363e-06)/0.0008253 #0.0008253
     def ScaleXS(self):
         
         if self.mass in self.xsMap:
@@ -762,8 +773,8 @@ def readFitPoints(path):
         fp.neg_1sig = lim.GetBinContent(5)
         fp.neg_2sig = lim.GetBinContent(6)
         fp.signif   = lim.GetBinContent(7) # TODO verify: May be status now.
-        if options.scaleXS:
-            fp.ScaleXS()
+        #if options.scaleXS:
+        fp.ScaleXS()
         if options.debug:
             fp.Print()
 

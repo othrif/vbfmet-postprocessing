@@ -1236,6 +1236,7 @@ def prepareBkgRuns(keys,options=None):
                 #'wewk':bkg_wewkpow,
                 'wqcd':bkg_wqcd,
                 'zewk':bkg_zewk,
+                #'zewk':bkg_wewkpow,
                 #'zewk':bkg_zewkpow,
                 #'top2':bkg_zewkpow,
                 'zqcd':bkg_zqcd,

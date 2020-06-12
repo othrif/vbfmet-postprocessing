@@ -22,9 +22,11 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("doLowNom", doLowNom = false, "isMC flag, true means the sample is MC");
   declareProperty("doTMVA", doTMVA = false, "doTMVA flag, true means use the MVA");
   declareProperty("doDoubleRatio", doDoubleRatio = false, "doDoubleRatio flag, true means use the doDoubleRatio method");
+  declareProperty("doHighDphijj", doHighDphijj = false, "doHighDphijj flag, true means use the doHighDphijj region");  
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
   declareProperty("doPlot", doPlot =false, "doPlot flag, true means the output contains variable distributions");
   declareProperty("doVBFMETGam", doVBFMETGam =false, "doVBFMETGam flag, true means run the VBF+MET+photon analysis");
+  declareProperty("doMTFit", doMTFit =false, "doMTFit flag, true means run the VBF+MET+photon analysis with an MT fit");  
   declareProperty("v26Ntuples", v26Ntuples = false, "v26Ntuples flag, true means the setting for backward compatibility with v26 ntuples");
   declareProperty("doDuplicateCheck", doDuplicateCheck =false, "doDuplicateCheck flag, true means the run and event numbers are printed");
   //declareProperty( "Property", m_nProperty = 0, "My Example Integer Property" ); //example property declaration
@@ -121,6 +123,7 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==13) bins=5; // mjj binning mjj>250
   else if(m_binning==21) bins=14; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800
   else if(m_binning==22) bins=17; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800 + 3 bins low MET
+  else if(m_binning==23) bins=12; // trying new njet binning. mjj binning + 3 njet bin + 3 bins low MET
 
   // multivariate number of bins
   if(doTMVA &&  doVBFMETGam) bins=5;
@@ -226,7 +229,10 @@ vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR, 
   vector <TH1F*> h;
   if(!singleHist){
     h.push_back(new TH1F((name+"_cuts").c_str(), (name+"_cuts;;").c_str(), 1, 0.5, 1.5));
-    if (doPlot) {
+    if (!doPlot && doMTFit) {
+      float binsmt [6] = { 0.0, 90.0, 130.0, 200.0, 300.0, 500.0 };
+      h.push_back(new TH1F((name+"_mtgam").c_str(), (name+"_mtgam;;").c_str(), 5,  binsmt));
+    } else if (doPlot) {
       //h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
       if(doVBFMETGam){
 	float binsjjmass [6] = { 0.0, 250.0, 500.0, 1000.0, 1500.0, 3000.0 };
@@ -239,6 +245,10 @@ vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR, 
       h.push_back(new TH1F((name+"_met_et").c_str(), (name+"_met_et;;").c_str(), 10, 0, 800));
       h.push_back(new TH1F((name+"_lepmet_et").c_str(), (name+"_lepmet_et;;").c_str(), 10, 0, 800));
       if(doTMVA) h.push_back(new TH1F((name+"_tmva").c_str(), (name+"_tmva;;").c_str(), 2000, 0, 1.0));
+      if(doMTFit){
+	float binsmt [6] = { 0.0, 90.0, 130.0, 200.0, 300.0, 500.0 };
+	h.push_back(new TH1F((name+"_mtgam").c_str(), (name+"_mtgam;;").c_str(), 5,  binsmt));
+      }
     }
   }else{
     float maxBin = bins*9.0+0.5;
@@ -251,12 +261,16 @@ vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR, 
 StatusCode HFInputAlg::CheckHists(vector <std::pair<vector <TH1F*>, std::string>> hnames){
   for (auto hname : hnames) {
     CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_cuts", std::get<0>(hname)[0]));
+    if(!doPlot && doMTFit) CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_mtgam", std::get<0>(hname)[1]));
     if (doPlot) {
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_jj_mass", std::get<0>(hname)[1]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_jj_dphi", std::get<0>(hname)[2]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_met_et", std::get<0>(hname)[3]));
       CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_lepmet_et", std::get<0>(hname)[4]));
-      if(doTMVA) CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_tmva", std::get<0>(hname)[5]));
+      if(doTMVA){
+	CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_tmva", std::get<0>(hname)[5]));
+	if(doMTFit) CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_mtgam", std::get<0>(hname)[6]));
+      }else if(doMTFit) CHECK(histSvc()->regHist("/MYSTREAM/"+std::get<1>(hname)+"_mtgam", std::get<0>(hname)[5]));
     }
   }
   return StatusCode::SUCCESS;
@@ -330,14 +344,16 @@ StatusCode HFInputAlg::execute() {
   // Cuts
   float METCut=180.0e3; // 150.0e3
   float jj_DPHICut=1.8;
+  float jj_DPHILowCut=-100.0;
   float METCSTJetCut = 150.0e3; // 120.0e3
   float jj_detaCut = 4.8; // 4.0
   float jj_massCut = 1000.0e3; // 1000.0e3
-  if((m_binning>=7 && m_binning<=12) || m_binning==21 || m_binning==22){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
+  if((m_binning>=7 && m_binning<=12) || m_binning==21 || m_binning==22 || m_binning==23){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
   if(doDoubleRatio) jj_massCut=500.0e3;
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
   bool nbjetCut = (n_bjet < 2); 
-
+  if(doHighDphijj) { jj_DPHICut=10.0; jj_DPHILowCut=2.5; } // adjust cuts for high dphijj
+    
   // decide if this MG or sherpa
   bool passSample=false;
   if(isMadgraph){ //311429 to 311453 MG filtered, 366010 to 366035 Znn rm, 364216 to 364229 PTV ,
@@ -512,6 +528,7 @@ StatusCode HFInputAlg::execute() {
   float met_tst_ph_dphiCut = 1.8;
   bool in_vy_overlapCut=true;
   bool jetPtCuts=(n_jet>1 && (jet_pt->at(0) > 80e3) && (jet_pt->at(1) > 50e3));
+  mtgam=-1.0;
   if(doVBFMETGam){
     jetCut = (n_jet ==2 || n_jet==3);
     jetPtCuts=(n_jet>1 && (jet_pt->at(0) > 60e3) && (jet_pt->at(1) > 50e3));
@@ -519,8 +536,12 @@ StatusCode HFInputAlg::execute() {
     jj_massCut=250.0e3;
     jj_DPHICut=2.0;
     phSelectionCut=(n_ph==1 && ph_pt->at(0)<110e3);
-    if(n_ph>0) phcentrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(ph_eta->at(0) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
-    met_tst_ph_dphi = fabs(GetDPhi(met_tst_nolep_phi, ph_phi->at(0)));
+    if(n_ph>0){
+      phcentrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(ph_eta->at(0) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
+      met_tst_ph_dphi = fabs(GetDPhi(met_tst_nolep_phi, ph_phi->at(0)));
+      if(doMTFit) met_tst_ph_dphi=10.0; // set to pass for the mt fit
+      mtgam = sqrt(2. * ph_pt->at(0) * met_tst_nolep_et * (1. - cos(ph_phi->at(0) - met_tst_nolep_phi)));
+    }
     // if this is a vjets sample and it has a photon overlap, then remove it
     if(isVjets && in_vy_overlap) in_vy_overlapCut=false;
     if(isTop   && in_vy_overlap) in_vy_overlapCut=false;
@@ -530,7 +551,7 @@ StatusCode HFInputAlg::execute() {
   }
 
   // basic selection.
-  if (!((passJetCleanTight == 1) & nbjetCut & jetCut & jetPtCuts & (jj_dphi < jj_DPHICut) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (phSelectionCut) & (phcentrality>phcentralityCut) & (met_tst_ph_dphi>met_tst_ph_dphiCut) & (in_vy_overlapCut))) return StatusCode::SUCCESS; 
+  if (!((passJetCleanTight == 1) & nbjetCut & jetCut & jetPtCuts & (jj_dphi < jj_DPHICut) & (jj_dphi > jj_DPHILowCut) & (jj_deta > jj_detaCut) & ((jet_eta->at(0) * jet_eta->at(1))<0) & (jj_mass > jj_massCut) & (phSelectionCut) & (phcentrality>phcentralityCut) & (met_tst_ph_dphi>met_tst_ph_dphiCut) & (in_vy_overlapCut))) return StatusCode::SUCCESS; 
 
   int passMTCut=0;
   if(n_el==1) { met_significance = met_tst_et/1000/sqrt((el_pt->at(0)+jet_pt->at(0)+jet_pt->at(1))/1000.0); } else {  met_significance = 0; }
@@ -738,23 +759,35 @@ StatusCode HFInputAlg::execute() {
       else if (jj_mass < 1.5e6)   bin = 2;
       //else if (jj_mass < 2.0e6) bin = 3;
       else bin = 3;
-    }else if(m_binning==21 || m_binning==22){
+    }else if(m_binning==21 || m_binning==22 || m_binning==23){
       if(METCutForMETBinning){
 	if      (jj_mass < 1.0e6) bin = 0;
 	else if (jj_mass < 1.5e6) bin = 1;
 	else if (jj_mass < 2e6)   bin = 2;
 	else if (jj_mass < 3.5e6) bin = 3;
 	else bin = 4;
-	if(jj_dphi>1)  bin+=5; // separate dphijj
+	if(jj_dphi>1 && m_binning!=23)  bin+=5; // separate dphijj
 	if(n_jet>2 && !fJVTLeadVeto){
 	  if (jj_mass < 1.5e6) return StatusCode::SUCCESS; // remove njet>2 and mjj<1.5 TeV
-	  else if (jj_mass < 2e6)   bin = 10;
-	  else if (jj_mass < 3.5e6) bin = 11;
-	  else bin = 12;
+	  if(m_binning==23){// high dphijj so no dphijj binning
+	    if (jj_mass < 2e6)   bin = 5;
+	    else if (jj_mass < 3.5e6) bin = 6;
+	    else bin = 7;
+	  }else{
+	    if (jj_mass < 2e6)   bin = 10;
+	    else if (jj_mass < 3.5e6) bin = 11;
+	    else bin = 12;
+	  }
 	}
       }else{// low met
 	if(m_binning==21) return StatusCode::SUCCESS;
-	else{
+	else if(m_binning==23){// high dphijj so no dphijj binning. 
+	  if ((jj_mass < 1.5e6)) return StatusCode::SUCCESS;
+	  else if((n_jet>2) && !fJVTLeadVeto)  return StatusCode::SUCCESS; // allow for the fjvt crs
+	  else if (jj_mass < 2e6)   bin = 8;
+	  else if (jj_mass < 3.5e6) bin = 9;
+	  else bin = 10;
+	}else{
 	  if ((jj_mass < 1.5e6)) return StatusCode::SUCCESS;
 	  else if((n_jet>2) && !fJVTLeadVeto)  return StatusCode::SUCCESS; // allow for the fjvt crs
 	  else if (jj_mass < 2e6)   bin = 13;
@@ -848,12 +881,16 @@ StatusCode HFInputAlg::execute() {
 
 void HFInputAlg::HistoFill(vector<TH1F*> hs, double w){
   hs[0]->Fill(1,w);
+  if(!doPlot && doMTFit) hs[1]->Fill(mtgam/(1e3),w);
   if (doPlot) {
     hs[1]->Fill(jj_mass/(1e3),w);
     hs[2]->Fill(jj_dphi,w);
     hs[3]->Fill(met_tst_et/(1e3),w);
     hs[4]->Fill(met_tst_nolep_et/(1e3),w);
-    if(doTMVA) hs[5]->Fill(tmva,w);
+    if(doTMVA){
+      hs[5]->Fill(tmva,w);
+      if(doMTFit) hs[6]->Fill(mtgam/(1e3),w);
+    }else if(doMTFit) hs[5]->Fill(mtgam/(1e3),w);
   }
   return ;
 }
