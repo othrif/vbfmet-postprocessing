@@ -1313,8 +1313,12 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
         bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
     else:
-        bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
-        bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)
+        if options.OverlapPh:
+            bkg_keys['zgam'].update(bkg_zqcd_sh_ktExt)
+            bkg_keys['wgam'].update(bkg_wqcd_sh_ktExt)
+        else:
+            bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
+            bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)
     bkg_keys['wdpi'].update(bkg_vewkbad)
     if not options.mergePTV:
         #bkg_keys['wdpi'].update(bkg_zqcd_znn)
