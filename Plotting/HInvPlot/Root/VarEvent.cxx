@@ -107,6 +107,7 @@ std::string Msl::Mva::Convert2Str(Var var)
     case baselepPt0:	      return "baselepPt0";
     case baselepCh0:	      return "baselepCh0";
     case mll:	                  return "mll";
+    case mlg:	                  return "mlg";
     case ptll:	                  return "ptll";
     case mllg:	                  return "mllg";
     case ptllg:	                  return "ptllg";
@@ -276,6 +277,7 @@ Msl::Mva::Var Msl::Mva::Convert2Var(const std::string &var)
   if(var == "baselepPt0")        return baselepPt0;
   if(var == "baselepCh0")        return baselepCh0;
   if(var == "mll")               return mll;
+  if(var == "mlg")               return mlg;  
   if(var == "ptll")              return ptll;
   if(var == "mllg")              return mllg;
   if(var == "ptllg")             return ptllg;
@@ -532,6 +534,7 @@ const std::vector<Msl::Mva::Var>& Msl::Mva::GetAllVarEnums()
     vars.push_back(baselepPt0);
     vars.push_back(baselepCh0);
     vars.push_back(mll);
+    vars.push_back(mlg);    
     vars.push_back(ptll);
     vars.push_back(mllg);
     vars.push_back(ptllg);    

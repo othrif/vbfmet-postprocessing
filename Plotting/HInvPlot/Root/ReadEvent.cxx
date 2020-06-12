@@ -1524,11 +1524,21 @@ void Msl::ReadEvent::FillEvent(Event &event)
   }
 
   // MT gamma+met
+  event.AddVar(Mva::mlg, -1.0);
   if(event.photons.size()>0){
     double MT = sqrt(2. * event.photons.at(0).pt * event.met_nolep.Pt() * (1. - cos(event.photons.at(0).phi - event.met_nolep.Phi())));
     event.AddVar(Mva::mtgammet, MT);
+
+    if(event.electrons.size()>0){
+      TLorentzVector tLgam=event.electrons.at(0).GetLVec() +event.photons.at(0).GetLVec();
+      event.RepVar(Mva::mlg, tLgam.M());
+    }
+    else if(event.muons.size()>0){
+      TLorentzVector tLgam=event.muons.at(0).GetLVec() +event.photons.at(0).GetLVec();
+      event.RepVar(Mva::mlg, tLgam.M());
+    }
   }
-  
+
   if(event.electrons.size()>0 && event.muons.size()>0){
 
     TLorentzVector leadL = event.electrons.at(0).GetLVec();
