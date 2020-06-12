@@ -261,10 +261,10 @@ def main():
     if options.analysis=='qcd':
         anas = ['allmjj','mjjLow200','njgt2','deta25','LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','LowMETQCDRevFJVT','nj3','nj2','njgt2','nj2dphijj1','nj2dphijj2','highmjjMidMETnj2']
         chans   = ['nn']
-    if options.analysis=='qcdA':
+    if options.analysis=='qcdB':
         anas = ['allmjj','mjjLow200','LowMETQCDSRFJVT','LowMETQCDSR','LowMETQCDRevFJVT','nj2']
         chans   = ['nn']
-    if options.analysis=='qcdB':
+    if options.analysis=='qcdA':
         anas = ['allmjj','mjjLow200','nj2','nj2dphijj1','nj2dphijj2','dphijj1','dphijj2']
         chans   = ['nn','l','ll']
     if options.analysis=='qcdC':
