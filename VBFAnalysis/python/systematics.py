@@ -71,6 +71,7 @@ class systematics(object):
         self.systematicsList=""
         self.load(mode)
         self.removeList=['TAUS_','PH_','JET_MassRes_','JET_Rtrk_','JET_Comb_','FT_EFF_','eleANTISFEL_EFF_Iso_']#,'nloEWKWeight__1up','nloEWKWeight__1down','xeSFTrigWeight__1up','xeSFTrigWeight__1down']
+        
     def load(self,mode="All"):
         self.removeList=['TAUS_','PH_','JET_MassRes_','JET_Rtrk_','JET_Comb_','FT_EFF_','eleANTISFEL_EFF_Iso_']
         if mode == "All":

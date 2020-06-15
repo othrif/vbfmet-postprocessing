@@ -60,7 +60,8 @@ Msl::ReadEvent::ReadEvent():
   fLoadBaseLep  (false),
   fOverlapPh    (false),
   fIsDDQCD      (false),
-  fIsEFakePh    (false),  
+  fIsEFakePh    (false),
+  fIsJetFakePh  (false),
   fYear         (2016),
   fTheorySystWeight(0),
   genCutFlow    (0),
@@ -250,7 +251,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("vjWeight", &vjWeight);
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
   tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
-  if(fWeightSystName=="Nominal" || fIsDDQCD || fIsEFakePh){
+  if(fWeightSystName=="Nominal" || fIsDDQCD || fIsEFakePh || fIsJetFakePh){
     tree->SetBranchAddress("w",        &fWeight);
     if(fIsDDQCD) tree->SetBranchAddress(fMJTriggerEff.c_str(), &fTriggerEffWeight);
     //if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);        
@@ -610,8 +611,9 @@ void Msl::ReadEvent::Read(const std::string &path)
     // Identify the systematic type
     //
     fIsDDQCD=(fTrees.at(i).find("QCDDD")!=std::string::npos); // QCDDD
-    fIsEFakePh=(fTrees.at(i).find("EFakePh")!=std::string::npos); // EFakePh    
-    if(fTrees.at(i).find(fSystName)==std::string::npos && !fIsDDQCD && !fIsEFakePh) continue;
+    fIsEFakePh=(fTrees.at(i).find("EFakePh")!=std::string::npos); // EFakePh
+    fIsJetFakePh=(fTrees.at(i).find("JetFakePh")!=std::string::npos); // JetFakePh        
+    if(fTrees.at(i).find(fSystName)==std::string::npos && !fIsDDQCD && !fIsEFakePh && !fIsJetFakePh) continue;
 
     log() << "Read - Running systematic: " << fSystName << " on tree: " << fTrees.at(i) << " weight syst: " << fWeightSystName << " is qcd? " << fIsDDQCD <<std::endl;
 
@@ -770,7 +772,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	   event->AddWeight(vvWeightSys);
 	 }
 
-      if(!fIsEFakePh && !fIsDDQCD && fCurrRunNumber!=fRunNumber){
+      if(!fIsEFakePh && !fIsJetFakePh && !fIsDDQCD && fCurrRunNumber!=fRunNumber){
         if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
           log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
           event->sample = Mva::kNone;
@@ -784,7 +786,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         event->sample = fCurrSample;
       }
       if(fIsDDQCD) event->sample=Mva::kQCD;
-      if(fIsEFakePh) event->sample=Mva::kEFakePh;      
+      if(fIsEFakePh) event->sample=Mva::kEFakePh;
+      if(fIsJetFakePh) event->sample=Mva::kJetFakePh;
     }
     // Load XS trigger SF
     event->RepVar(Mva::xeSFTrigWeight,        xeSFTrigWeight);
