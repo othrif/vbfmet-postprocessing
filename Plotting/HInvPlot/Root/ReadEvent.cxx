@@ -60,7 +60,8 @@ Msl::ReadEvent::ReadEvent():
   fLoadBaseLep  (false),
   fOverlapPh    (false),
   fIsDDQCD      (false),
-  fIsEFakePh    (false),  
+  fIsEFakePh    (false),
+  fIsJetFakePh  (false),
   fYear         (2016),
   fTheorySystWeight(0),
   genCutFlow    (0),
@@ -250,7 +251,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("vjWeight", &vjWeight);
   tree->SetBranchAddress("xeSFTrigWeight",&xeSFTrigWeight);
   tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
-  if(fWeightSystName=="Nominal" || fIsDDQCD || fIsEFakePh){
+  if(fWeightSystName=="Nominal" || fIsDDQCD || fIsEFakePh || fIsJetFakePh){
     tree->SetBranchAddress("w",        &fWeight);
     if(fIsDDQCD) tree->SetBranchAddress(fMJTriggerEff.c_str(), &fTriggerEffWeight);
     //if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);        
@@ -610,8 +611,9 @@ void Msl::ReadEvent::Read(const std::string &path)
     // Identify the systematic type
     //
     fIsDDQCD=(fTrees.at(i).find("QCDDD")!=std::string::npos); // QCDDD
-    fIsEFakePh=(fTrees.at(i).find("EFakePh")!=std::string::npos); // EFakePh    
-    if(fTrees.at(i).find(fSystName)==std::string::npos && !fIsDDQCD && !fIsEFakePh) continue;
+    fIsEFakePh=(fTrees.at(i).find("EFakePh")!=std::string::npos); // EFakePh
+    fIsJetFakePh=(fTrees.at(i).find("JetFakePh")!=std::string::npos); // JetFakePh        
+    if(fTrees.at(i).find(fSystName)==std::string::npos && !fIsDDQCD && !fIsEFakePh && !fIsJetFakePh) continue;
 
     log() << "Read - Running systematic: " << fSystName << " on tree: " << fTrees.at(i) << " weight syst: " << fWeightSystName << " is qcd? " << fIsDDQCD <<std::endl;
 
@@ -671,7 +673,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::truth_jj_dphi);  
   fSkipVarsQCD.insert(Mva::truth_jj_mass);  
   fSkipVarsQCD.insert(Mva::truth_j1_pt);  
-  fSkipVarsQCD.insert(Mva::truth_j2_pt);  
+  fSkipVarsQCD.insert(Mva::truth_j2_pt);
 
   for(int i = 0; i < nevent; i++) {
     //
@@ -688,6 +690,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Fill event
     for(unsigned a=0; a<fVarVec.size(); ++a){
       if(fIsDDQCD && fSkipVarsQCD.find(fVarVec.at(a).var)!=fSkipVarsQCD.end()) continue;//skip missing vars in QCD
+      if((fIsEFakePh || fIsJetFakePh) && fVarVec.at(a).var==Mva::met_truth_et) continue;//skip missing vars in fake ntuples
       event->AddVar(fVarVec.at(a).var, fVarVec.at(a).GetVal());
     }
 
@@ -700,6 +703,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->RepVar(Mva::lep_trig_match, 0);
     }
 
+    if(fIsEFakePh || fIsJetFakePh){
+      if(!event->HasVar(Mva::met_truth_et)) event->RepVar(Mva::met_truth_et, 0);
+    }
+    
     event->RunNumber = fRunNumber;
     event->RandomRunNumber = fRandomRunNumber;
     event->EventNumber = fEventNumber;
@@ -770,7 +777,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	   event->AddWeight(vvWeightSys);
 	 }
 
-      if(!fIsEFakePh && !fIsDDQCD && fCurrRunNumber!=fRunNumber){
+      if(!fIsEFakePh && !fIsJetFakePh && !fIsDDQCD && fCurrRunNumber!=fRunNumber){
         if(fSampleMap.find(fRunNumber)==fSampleMap.end()){
           log() << "ERROR - please define sample in Input.py" << fRunNumber << std::endl;
           event->sample = Mva::kNone;
@@ -784,7 +791,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         event->sample = fCurrSample;
       }
       if(fIsDDQCD) event->sample=Mva::kQCD;
-      if(fIsEFakePh) event->sample=Mva::kEFakePh;      
+      if(fIsEFakePh) event->sample=Mva::kEFakePh;
+      if(fIsJetFakePh) event->sample=Mva::kJetFakePh;
     }
     // Load XS trigger SF
     event->RepVar(Mva::xeSFTrigWeight,        xeSFTrigWeight);
@@ -1524,11 +1532,21 @@ void Msl::ReadEvent::FillEvent(Event &event)
   }
 
   // MT gamma+met
+  event.AddVar(Mva::mlg, -1.0);
   if(event.photons.size()>0){
     double MT = sqrt(2. * event.photons.at(0).pt * event.met_nolep.Pt() * (1. - cos(event.photons.at(0).phi - event.met_nolep.Phi())));
     event.AddVar(Mva::mtgammet, MT);
+
+    if(event.electrons.size()>0){
+      TLorentzVector tLgam=event.electrons.at(0).GetLVec() +event.photons.at(0).GetLVec();
+      event.RepVar(Mva::mlg, tLgam.M());
+    }
+    else if(event.muons.size()>0){
+      TLorentzVector tLgam=event.muons.at(0).GetLVec() +event.photons.at(0).GetLVec();
+      event.RepVar(Mva::mlg, tLgam.M());
+    }
   }
-  
+
   if(event.electrons.size()>0 && event.muons.size()>0){
 
     TLorentzVector leadL = event.electrons.at(0).GetLVec();

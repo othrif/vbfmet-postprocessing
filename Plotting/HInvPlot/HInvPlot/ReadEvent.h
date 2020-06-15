@@ -176,7 +176,8 @@ namespace Msl
     bool                        fnoVjWeight;
     bool                        fMergePTV;
     bool                        fIsDDQCD;
-    bool                        fIsEFakePh;    
+    bool                        fIsEFakePh;
+    bool                        fIsJetFakePh;
     // Input vars
     float fWeight;
     float fTriggerEffWeight;
