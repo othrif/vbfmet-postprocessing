@@ -32,7 +32,7 @@ def writeCondorSub(workDir, syst="Nominal", scriptName="ZHDarkPhAnalysisCondorSu
     os.system("echo 'error                   = "+workDir+"/error$(ClusterId).$(ProcId)' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'log                     = "+workDir+"/log$(ClusterId)' >> "+workDir+"/submit_this_python"+syst+".sh")
     os.system("echo 'max_retries = 5' >> "+workDir+"/submit_this_python"+syst+".sh")
-    os.system('''echo "+JobFlavour = 'microcentury'" >> '''+workDir+'''/submit_this_python'''+syst+'''.sh''')
+    os.system('''echo "+JobFlavour = 'longlunch'" >> '''+workDir+'''/submit_this_python'''+syst+'''.sh''')
     os.system("echo '' >> "+workDir+"/submit_this_python"+syst+".sh")
     if syst == "Nominal":
         os.system("echo 'queue arguments from '"+fileForArguments+" >> "+workDir+"/submit_this_python"+syst+".sh")

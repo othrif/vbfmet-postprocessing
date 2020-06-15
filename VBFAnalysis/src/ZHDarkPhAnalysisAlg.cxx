@@ -788,9 +788,11 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
 
 
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
-  bool OneOrMorePhoton = (n_ph>0);
-  if (!(OneOrMorePhoton) && !(m_LooseSkim)) return StatusCode::SUCCESS;
-  ATH_MSG_DEBUG ("Pass n_photon > 0");
+  if(m_PhotonSkim){
+    bool OneOrMorePhoton = (n_ph>0);
+    if (!(OneOrMorePhoton) && !(m_LooseSkim)) return StatusCode::SUCCESS;
+    ATH_MSG_DEBUG ("Pass n_photon > 0");
+  }
 
   if (!(unsigned(n_ph) == ph_pt->size())) ATH_MSG_WARNING("n_ph != ph_pt->size()! n_ph: " <<n_ph << " ph_pt->size(): " << ph_pt->size());
   if (!(unsigned(n_ph) == ph_eta->size())) ATH_MSG_WARNING("n_ph != ph_eta->size()! n_ph: " <<n_ph << " ph_eta->size(): " << ph_eta->size());
