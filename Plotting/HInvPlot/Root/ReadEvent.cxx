@@ -673,7 +673,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
   fSkipVarsQCD.insert(Mva::truth_jj_dphi);  
   fSkipVarsQCD.insert(Mva::truth_jj_mass);  
   fSkipVarsQCD.insert(Mva::truth_j1_pt);  
-  fSkipVarsQCD.insert(Mva::truth_j2_pt);  
+  fSkipVarsQCD.insert(Mva::truth_j2_pt);
 
   for(int i = 0; i < nevent; i++) {
     //
@@ -690,6 +690,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // Fill event
     for(unsigned a=0; a<fVarVec.size(); ++a){
       if(fIsDDQCD && fSkipVarsQCD.find(fVarVec.at(a).var)!=fSkipVarsQCD.end()) continue;//skip missing vars in QCD
+      if((fIsEFakePh || fIsJetFakePh) && fVarVec.at(a).var==Mva::met_truth_et) continue;//skip missing vars in fake ntuples
       event->AddVar(fVarVec.at(a).var, fVarVec.at(a).GetVal());
     }
 
@@ -702,6 +703,10 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       event->RepVar(Mva::lep_trig_match, 0);
     }
 
+    if(fIsEFakePh || fIsJetFakePh){
+      if(!event->HasVar(Mva::met_truth_et)) event->RepVar(Mva::met_truth_et, 0);
+    }
+    
     event->RunNumber = fRunNumber;
     event->RandomRunNumber = fRandomRunNumber;
     event->EventNumber = fEventNumber;
