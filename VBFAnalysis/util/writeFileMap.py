@@ -8,7 +8,7 @@ import sys
 parser = argparse.ArgumentParser( description = "get total Nevent to weight samples", add_help=True , fromfile_prefix_chars='@')
 parser.add_argument( "-l", "--list", type = str, dest = "filelist", default = "filteredSherpa.txt", help = "text file with list of datasets" )
 parser.add_argument( "-o", "--output", type = str, dest = "output", default = "myMap.p", help = "output file name" )
-parser.add_argument( "-s", "--site", type = str, dest = "site", default = "MWT2_UC_LOCALGROUPDISK", help = "grid site: MWT2_UC_LOCALGROUPDISK or DESY-HH_LOCALGROUPDISK" )
+parser.add_argument( "-s", "--site", type = str, dest = "site", default = "CERN-PROD_PHYS-HDBS", help = "grid site: CERN-PROD_PHYS-HDBS or SLACXRD_LOCALGROUPDISK" )
 args, unknown = parser.parse_known_args()
 
 l = open(args.filelist)
