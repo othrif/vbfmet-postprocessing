@@ -45,7 +45,9 @@ class sample(object):
                           'VBFH100':['VBFH100'],
                           'VBFH75':['VBFH75'],
                           'VBFH50':['VBFH50'],
-                          'HZy': ['ggH125Zy','VBFH125Zy','VH125Zy','ttH125Zy']
+                          'HZy': ['ggH125Zy','VBFH125Zy','VH125Zy','ttH125Zy'],
+                          'ZHyy':['ZHyy'],
+                          'HyGr':['HyGr']
                           }
 
     def load(self,samplename,syst,Ext):
@@ -59,7 +61,7 @@ class sample(object):
                     self.runNumber = int(samplesplit[p+1])
                     self.runNumberS = samplesplit[p+1]
                     break
-            #print "RUN: ",self.runNumber
+            print "RUN: ",self.runNumber
             if "MiniNtuple.root/user" in samplename:
                 self.subfileN = samplename.split(".")[-3]
             if "physics_Main" in samplesplit or "debugrec_hlt" in samplesplit:
@@ -78,6 +80,7 @@ class sample(object):
                 self.isMC = False
             else:
                 self.isMC = True
+
         if (self.isMC):
             print "runNumber::: ",self.runNumber
             if (self.runNumber >= 308096 and self.runNumber <= 308098):
@@ -212,7 +215,10 @@ class sample(object):
                 self.sampleType = "VH125Zy"
             elif(self.runNumber == 346198):
                 self.sampleType = "ttH125Zy"
-            
+            elif(self.runNumber == 345319):
+                self.sampleType = "ZHyy"
+            elif(self.runNumber == 600059):
+                self.sampleType = "HyGr"
             else:
                 print "python/sample.py: runNumber "+str(self.runNumber)+" could not be identified as a valid MC :o"
                 self.sampleType = "ERROR"
