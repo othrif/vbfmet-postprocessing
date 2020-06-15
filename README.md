@@ -51,8 +51,9 @@ python source/VBFAnalysis/util/getN.py -p source/VBFAnalysis/data/<your map from
 ```
 
 ## Run ZHDarkPhAnalysisAlg ##
-This generates the micro ntuples (from the MiniNtuples).
-For running locally with athena:
+This generates the micro ntuples from the MiniNtuples.
+
+Instructions for running locally with athena:
 ```bash
 cd run
 # run locally on 10 events over a file
@@ -60,7 +61,8 @@ athena VBFAnalysis/ZHDarkPhAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eo
 # run locally over a dir
 athena VBFAnalysis/ZHDarkPhAnalysisAlgJobOptions.py --evtMax 10 --filesInput /eos/atlas/atlascerngroupdisk/phys-hdbs/hlrs/yyd/nominal-v02/user.ssevova.ZHyyD_v02.700011.Sh_228_eegamma_pty7_EnhMaxpTVpTy.e7947_s3126_r9364_p3916_MiniNtuple.root/* - --currentVariation Nominal
 ```
-For running on condor:
+
+Instructions for running on condor on lxplus:
 ```bash
 # you'll want to generate a list of files, which only has to be done once. give it a comma separated list of input containers
 python VBFAnalysis/util/writeFileMap.py
@@ -75,6 +77,7 @@ submitZHDarkPhAnalysisCondor.py -l <your list> -d dir
 # you'll need a grid proxy, which needs to have global permission. This is in the /tmp/x509*. Use the -p option. -l is for the map of the files at chicago on RUCIO
 submitZHDarkPhAnalysisCondor.py -n -l <your map> -p <your grid proxy cert> -f <your norm file> --TightSkim
 ```
+
 You can change the list of systematics in VBFAnalysis/python/systematics.py.
 To merge the samples, in the dir where microtuples live do:
 ```bash
