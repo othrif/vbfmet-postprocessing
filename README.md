@@ -8,11 +8,11 @@ Algorithms included:
 In order to run the algorithms all the samples should have the name pattern: `user.ANYNAME.vTAG.RUNNUMBER` 
 Data samples should, in addition, contain `physics_Main` in the name.
 
-The list of systematics is defined in VBFAnalysis/python/systematics.py. See VBFAnalysis/scripts/submitHFInputCondor.py as an example of how to use it.
+The list of systematics is defined in [VBFAnalysis/python/systematics.py](https://gitlab.cern.ch/VBFInv/STPostProcessing/-/blob/ZHdarkPhoton/VBFAnalysis/python/systematics.py). See [VBFAnalysis/scripts/submitHFInputCondor.py](https://gitlab.cern.ch/VBFInv/STPostProcessing/-/blob/ZHdarkPhoton/VBFAnalysis/scripts/submitHFInputCondor.py) as an example of how to use it.
 
-The grouping of samples is based on `RUNNUMBER` and `physics_Main`. It is defined in VBFAnalysis/python/sample.py. See VBFAnalysis/share/ZHDarkPhAnalysisAlgJobOptions.py as an example of how to use it.
+The grouping of samples is based on `RUNNUMBER` and `physics_Main`. The samples and groupings are defined in [VBFAnalysis/python/sample.py](https://gitlab.cern.ch/VBFInv/STPostProcessing/-/blob/ZHdarkPhoton/VBFAnalysis/python/sample.py). See [VBFAnalysis/share/ZHDarkPhAnalysisAlgJobOptions.py](https://gitlab.cern.ch/VBFInv/STPostProcessing/-/blob/ZHdarkPhoton/VBFAnalysis/share/ZHDarkPhAnalysisAlgJobOptions.py) as an example of how to use it.
 
-VBFAnalysis/python/job_configurations package allows users to add user-defined flags to Athena job options. See VBFAnalysis/share/HFInputJobOptions.py as an example of how to use it.
+[VBFAnalysis/python/job_configurations](https://gitlab.cern.ch/VBFInv/STPostProcessing/-/tree/ZHdarkPhoton/VBFAnalysis/python/job_configuration) package allows users to add user-defined flags to Athena job options. See [VBFAnalysis/share/ZHDarkPhAnalysisAlgJobOptions.py](https://gitlab.cern.ch/VBFInv/STPostProcessing/-/blob/ZHdarkPhoton/VBFAnalysis/share/ZHDarkPhAnalysisAlgJobOptions.py) as an example of how to use it.
 
 
 ## First time setup ##
