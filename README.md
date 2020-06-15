@@ -31,8 +31,8 @@ acmSetup
 # Create the input files
 Generating a map is the preferred option for listing files:
 ```bash
-# For listing MiniNtuple.root GRID files
-python VBFAnalysis/util/writeFileMap.py 
+# For listing MiniNtuple.root files stored on a GRID diskspace ('CERN-PROD_PHYS-HDBS')
+python VBFAnalysis/util/writeFileMap.py -l <.txt file listing the MiniNtuple.root filenames> -o <output map name> -s <name of GRID diskspace>
 # Copy in a text file with one input file per line. There is an input for text files from the GRID, and these can be overwritten preferring your local files.
 python VBFAnalysis/util/writeFileMapLS.py 
 ```

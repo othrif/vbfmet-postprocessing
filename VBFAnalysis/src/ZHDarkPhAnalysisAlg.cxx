@@ -31,7 +31,7 @@ ZHDarkPhAnalysisAlg::ZHDarkPhAnalysisAlg( const std::string& name, ISvcLocator* 
 
 ZHDarkPhAnalysisAlg::~ZHDarkPhAnalysisAlg() {}
 
-const std::string regions[] = {"Incl","SRmm", "SRee", "SRem"};
+const std::string regions[] = {"Incl","Is_mm", "Is_ee", "Is_em"};
 const std::string variations[] = {"fac_up","fac_down","renorm_up","renorm_down","both_up","both_down"};
 
 StatusCode ZHDarkPhAnalysisAlg::initialize() {
@@ -43,6 +43,8 @@ StatusCode ZHDarkPhAnalysisAlg::initialize() {
 
   cout<<"===== NAME of input tree in intialize: "<<m_currentVariation<<endl;
   cout<< "isMC: " << m_isMC << endl;
+  cout << "runNumber: " << m_runNumberInput << endl;
+  
   cout<<"===== CURRENT  sample: "<< m_currentSample<<endl;
 
   if(m_isMC){
@@ -503,9 +505,9 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   npevents++;
   if( (npevents%10000) ==0) std::cout <<" Processed "<< npevents << " Events"<<std::endl;
 
-  bool SRmm = false;
-  bool SRee = false;
-  bool SRem = false;
+  bool Is_mm = false;
+  bool Is_ee = false;
+  bool Is_em = false;
 
   // MET trigger scale factor
   unsigned metRunNumber = randomRunNumber;
@@ -517,7 +519,7 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   xeSFTrigWeight_nomu__1up=1.0;
   xeSFTrigWeight_nomu__1down=1.0;
 
-  // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
+  // signal electroweak SF -- NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
   //---------------------
   // muon veto systematic
@@ -659,7 +661,7 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   outtau_pt->clear();
   outtau_eta->clear();
   outtau_phi->clear();
-  //  /*
+
   if(m_extraVars || true){
 
     // overlap remove with the photons
@@ -693,7 +695,7 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
       }// end tau loop
     }// end tau overlap removal
   }// end extra variables
-  //    */
+
 
   // -----------------------
   // refill the base leptons
@@ -772,10 +774,10 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   }
 
   // Define loose skimming cuts
-  float METCut = 50.0e3;
+  float METCut = 30.0e3;
   
   if(m_LooseSkim && m_currentVariation=="Nominal"){
-    METCut = 50.0e3;
+    METCut = 30.0e3;
   }
 
   if (!((passGRL == 1) 
@@ -799,38 +801,38 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   bool OneMuon = (n_mu == 1);
   bool VetoLooseElec = (n_baseel == 0);
   bool VetoLooseMuon = (n_basemu == 0);
-  bool passMETNoLepCut = (met_tst_nolep_et > METCut);
+  bool passMETCut = (met_tight_tst_et > METCut);
   bool passLepTrig = trigger_lep > 0;
   bool passMaxNjet = n_jet <= 2;
   
   if(m_LooseSkim){
-    passMETNoLepCut = (met_tst_nolep_et > METCut || met_tenacious_tst_nolep_et > METCut || met_tight_tst_nolep_et > METCut);
+    passMETCut = (met_tst_et > METCut || met_tenacious_tst_et > METCut || met_tight_tst_et > METCut);
     passMaxNjet = n_jet <=3;
     // saving the base leptons for the fake lepton estimate. This is done in the loose skimming
-    TwoElec = (n_el == 2 || n_baseel==2); // n_el should be a subset of baseel 
+    TwoElec = (n_el == 2 || n_baseel==2);// n_el should be a subset of baseel 
     TwoMuon = (n_mu == 2 || n_basemu==2);// n_mu should be a subset of basemu
     VetoLooseElec = true;
     VetoLooseMuon = true;
   }
   bool passPresel=false;
 
-  if ((passLepTrig) && (passMETNoLepCut) && (passMaxNjet)) passPresel = true;
+  if ((passLepTrig) && (passMETCut) && (passMaxNjet)) passPresel = true;
   if (!passPresel) return StatusCode::SUCCESS;
   ATH_MSG_DEBUG ("Pass lep trig, MET > " << METCut << ", n_jets <= 2");
   
   if (passPresel){
-    if      (TwoMuon && VetoLooseElec && (mu_charge->at(0)*mu_charge->at(1) < 0)) SRmm = true;
-    else if (TwoElec && VetoLooseMuon && (el_charge->at(0)*el_charge->at(1) < 0)) SRee = true;
-    else if (OneElec && OneMuon)       SRem = true;
+    if      (TwoMuon && VetoLooseElec && (mu_charge->at(0)*mu_charge->at(1) < 0)) Is_mm = true;
+    else if (TwoElec && VetoLooseMuon && (el_charge->at(0)*el_charge->at(1) < 0)) Is_ee = true;
+    else if (OneElec && OneMuon)       Is_em = true;
   } 
 
   // protect the systematic variations from crashing
   if(n_baseel==1 && n_el==0 && baseel_charge->size()==0) baseel_charge->push_back(-999);
   if(n_basemu==1 && n_mu==0 && basemu_charge->size()==0) basemu_charge->push_back(-999);
 
-  if (SRmm) ATH_MSG_DEBUG ("It's SRmm!"); else ATH_MSG_DEBUG ("It's NOT SRmm");
-  if (SRee) ATH_MSG_DEBUG ("It's SRee!"); else ATH_MSG_DEBUG ("It's NOT SRee");
-  if (SRem) ATH_MSG_DEBUG ("It's SRem!"); else ATH_MSG_DEBUG ("It's NOT SRem");
+  if (Is_mm) ATH_MSG_DEBUG ("It's mumu!"); else ATH_MSG_DEBUG ("It's NOT mumu");
+  if (Is_ee) ATH_MSG_DEBUG ("It's ee!"); else ATH_MSG_DEBUG ("It's NOT ee");
+  if (Is_em) ATH_MSG_DEBUG ("It's emu!"); else ATH_MSG_DEBUG ("It's NOT emu");
   
   // ---------------------------
   // Apply various event weights 
@@ -868,7 +870,7 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   if(m_oneTrigMuon) tmpD_muSFTrigWeight=1.0;
   w = weight*
     mcEventWeight*
-    (met_tst_nolep_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*
+    (met_tst_et>180.0e3 ? fjvtSFWeight : fjvtSFTighterWeight)*
     jvtSFWeight*
     elSFWeight*
     muSFWeight*
@@ -985,7 +987,7 @@ StatusCode ZHDarkPhAnalysisAlg::execute() {
   // ---------------------------------------------
   // Only save events that pass any of the regions
   // ---------------------------------------------
-  if (!(SRee || SRmm || SRem)) return StatusCode::SUCCESS;
+  if (!(Is_ee || Is_mm || Is_em)) return StatusCode::SUCCESS;
   
   double m_met_tenacious_tst_j1_dphi, m_met_tenacious_tst_j2_dphi;
   computeMETj(met_tenacious_tst_phi, jet_phi, m_met_tenacious_tst_j1_dphi,m_met_tenacious_tst_j2_dphi);
@@ -1340,7 +1342,7 @@ StatusCode ZHDarkPhAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_el_baseline_iso",&n_baseel_iso);
   m_tree->SetBranchAddress("n_mu_baseline_iso",&n_basemu_iso);
   m_tree->SetBranchAddress("n_ph",&n_ph);
-  m_tree->SetBranchAddress("n_bjet",            &n_bjet);
+  m_tree->SetBranchAddress("n_bjet",&n_bjet);
   m_tree->SetBranchAddress("lumiBlock",&lumiBlock);
   m_tree->SetBranchAddress("bcid",&bcid);
   m_tree->SetBranchAddress("BCIDDistanceFromFront",&BCIDDistanceFromFront);
