@@ -253,6 +253,8 @@ void makeJetFakePh(std::string treeNmae="data", std::string period="A") {
   TTree *newtree = oldtree->CloneTree(0);
   newtree->SetName("JetFakePhNominal");
   newtree->SetTitle("JetFakePhNominal");
+  float wJetFakePhTight3__1up = 0.0;
+  float wJetFakePhTight5__1up = 0.0;
   float wJetFakePhWindow__1up = 0.0;
   float wJetFakePhWindow__1down = 0.0;
   float wJetFakePhStat__1up = 0.0;
@@ -262,7 +264,9 @@ void makeJetFakePh(std::string treeNmae="data", std::string period="A") {
   float wJetFakePhEn__1up = 0.0;
   float wJetFakePhEn__1down = 0.0;  
     
-  newtree->Branch("wJetFakePhWindow__1up",&wJetFakePhWindow__1up);
+  newtree->Branch("wJetFakePhTight3__1up",&wJetFakePhTight3__1up);
+  newtree->Branch("wJetFakePhTight5__1up",&wJetFakePhTight5__1up);
+  newtree->Branch("wJetFakePhWindow__1up",&wJetFakePhWindow__1up);  
   newtree->Branch("wJetFakePhWindow__1down",&wJetFakePhWindow__1down);
   newtree->Branch("wJetFakePhStat__1up",&wJetFakePhStat__1up);
   newtree->Branch("wJetFakePhStat__1down",&wJetFakePhStat__1down);
@@ -343,6 +347,12 @@ void makeJetFakePh(std::string treeNmae="data", std::string period="A") {
       std::vector<float> new_fake_w=getFakeWeight(ph_pt->at(0),ph_eta->at(0));
       float wold = w*scaleWeight;
       w*=new_fake_w.at(0)*scaleWeight;
+      if(!istight4iso) w=0.0;
+      if(istight5iso) wJetFakePhTight5__1up=wold*(new_fake_w.at(0));
+      else wJetFakePhTight5__1up=0.0;
+      if(istight3iso) wJetFakePhTight3__1up=wold*(new_fake_w.at(0));
+      else wJetFakePhTight3__1up=0.0;
+      
       wJetFakePhWindow__1up   =wold*(new_fake_w.at(0)+new_fake_w.at(1));
       wJetFakePhWindow__1down =wold*(new_fake_w.at(0)-new_fake_w.at(1));
       wJetFakePhStat__1up     =wold*(new_fake_w.at(0)+new_fake_w.at(2));
