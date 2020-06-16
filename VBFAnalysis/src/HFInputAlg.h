@@ -130,6 +130,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t n_jet;
   Int_t n_bjet;
   Int_t n_ph;
+  Int_t n_ph_crackVetoCleaning;  
   Int_t n_el;
   Int_t n_mu;
   Int_t n_el_w;

@@ -134,6 +134,8 @@ void makeJetFakePh(std::string treeNmae="data", std::string period="A") {
     if(period=="A") scaleWeight/=36207.66;
     if(period=="D") scaleWeight/=44307.4;
     if(period=="E") scaleWeight/=58450.1;
+  }else{// subtracting the MC
+    scaleWeight*=-1.0;
   }
   
   std::vector<float> copy_el_pt;
@@ -319,6 +321,10 @@ void makeJetFakePh(std::string treeNmae="data", std::string period="A") {
       bool istight5iso = (baseph_iso->at(iph) && (baseph_isEM_tight5==0) && ((baseph_isEM->at(iph) & tight5Mask) >0));
       // selecting tight4+isolation
       if(!(istight4iso || istight3iso || istight5iso)) continue;
+      // if this is MC, then clean it up to require that it is a real photon. Removing fakes from mesons like pi0->gamgam
+      bool isPromptPhoton = (baseph_truthOrigin->at(iph)==39 || baseph_truthOrigin->at(iph)==40 || baseph_truthOrigin->at(iph)<22); // includes e->gam fakes from MC
+      //bool isPromptPhoton = (baseph_truthType->at(iph)<15);
+      if(scaleWeight<0.0 && !isPromptPhoton) continue;
       unsigned newisEM = 0;
       if(istight3iso) newisEM+=0x1;
       if(istight4iso) newisEM+=0x2;

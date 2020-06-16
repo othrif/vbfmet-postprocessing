@@ -195,6 +195,7 @@ class VBFAnalysisAlg: public ::AthAnalysisAlgorithm {
   Int_t n_el_w;
   Int_t n_mu_w;
   Int_t n_ph;
+  Int_t n_ph_crackVetoCleaning;
   Int_t n_tau;
   Double_t jj_mass;
   Double_t jj_deta;
