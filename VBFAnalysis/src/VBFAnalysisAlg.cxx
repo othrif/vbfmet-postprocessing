@@ -2037,7 +2037,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("ph_truthType",   &ph_truthType);
     m_tree->SetBranchAddress("ph_vtxpos",   &ph_vtxpos);
 
-    if(m_currentVariation=="Nominal" && m_isMC){
+    if(m_currentVariation=="Nominal"){
       m_tree->SetBranchAddress("ph_ptcone20",      &ph_ptcone20);
       m_tree->SetBranchAddress("ph_topoetcone40",  &ph_topoetcone40);
 
