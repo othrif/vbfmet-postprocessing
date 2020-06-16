@@ -319,6 +319,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("n_el_w",&n_el_w);
   m_tree_out->Branch("n_mu_w",&n_mu_w);
   m_tree_out->Branch("n_ph",&n_ph);
+  m_tree_out->Branch("n_ph_crackVetoCleaning",&n_ph_crackVetoCleaning);  
   m_tree_out->Branch("n_tau",&n_tau);
   m_tree_out->Branch("jj_mass",&jj_mass);
   m_tree_out->Branch("jj_deta",&jj_deta);
@@ -1685,6 +1686,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchStatus("n_el_w",1);
   m_tree->SetBranchStatus("n_mu_w",1);
   m_tree->SetBranchStatus("n_ph",1);
+  m_tree->SetBranchStatus("n_ph_crackVetoCleaning",1);  
   m_tree->SetBranchStatus("n_bjet",1);
   m_tree->SetBranchStatus("n_el_baseline",1);
   m_tree->SetBranchStatus("n_mu_baseline",1);
@@ -1919,6 +1921,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_el_baseline_iso",&n_baseel_iso);
   m_tree->SetBranchAddress("n_mu_baseline_iso",&n_basemu_iso);
   m_tree->SetBranchAddress("n_ph",&n_ph);
+  m_tree->SetBranchAddress("n_ph_crackVetoCleaning",&n_ph_crackVetoCleaning);  
   m_tree->SetBranchAddress("n_bjet",            &n_bjet);
   m_tree->SetBranchAddress("lumiBlock",&lumiBlock);
   m_tree->SetBranchAddress("bcid",&bcid);
@@ -2037,7 +2040,7 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
     m_tree->SetBranchAddress("ph_truthType",   &ph_truthType);
     m_tree->SetBranchAddress("ph_vtxpos",   &ph_vtxpos);
 
-    if(m_currentVariation=="Nominal" && m_isMC){
+    if(m_currentVariation=="Nominal"){
       m_tree->SetBranchAddress("ph_ptcone20",      &ph_ptcone20);
       m_tree->SetBranchAddress("ph_topoetcone40",  &ph_topoetcone40);
 

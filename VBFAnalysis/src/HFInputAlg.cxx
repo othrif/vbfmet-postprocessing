@@ -461,6 +461,7 @@ StatusCode HFInputAlg::execute() {
 	fJVTVeto = fabs(jet_fjvt->at(0))>0.4 || fabs(jet_fjvt->at(1))>0.4;
 	fJVTLeadVeto = fabs(jet_fjvt->at(0))>0.4;
 	//if(fabs(ph_pointing_z)>250.0) return StatusCode::SUCCESS;
+	//if(n_ph_crackVetoCleaning>0) return StatusCode::SUCCESS; // met photon cleaning
       }
     }
 
@@ -955,6 +956,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchStatus("n_jet",1);
   m_tree->SetBranchStatus("n_bjet",1);
   m_tree->SetBranchStatus("n_ph",1);
+  m_tree->SetBranchStatus("n_ph_crackVetoCleaning",1);  
   m_tree->SetBranchStatus("n_el",1);
   m_tree->SetBranchStatus("n_mu",1);
   m_tree->SetBranchStatus("n_el_w",1);
@@ -1013,6 +1015,7 @@ StatusCode HFInputAlg::beginInputFile() {
   m_tree->SetBranchAddress("n_jet",&n_jet);
   m_tree->SetBranchAddress("n_bjet",&n_bjet);
   m_tree->SetBranchAddress("n_ph",&n_ph);
+  m_tree->SetBranchAddress("n_ph_crackVetoCleaning",&n_ph_crackVetoCleaning);  
   m_tree->SetBranchAddress("n_el",&n_el);
   m_tree->SetBranchAddress("n_mu",&n_mu);
   m_tree->SetBranchAddress("n_el_w",&n_el_w);
