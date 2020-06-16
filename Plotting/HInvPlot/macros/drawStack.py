@@ -286,6 +286,7 @@ def getHistPars(hist):
         'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',              'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,'xmin':200,  'ymin':50.1,'ymax':25000,
         'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
+        'mlg'    : {'xtitle':'#it{m}_{l#gamma} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},        
         'mllg'    : {'xtitle':'#it{m}_{ll#gamma} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':500.0},
         'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / 500 GeV', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
         'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':200.0, 'xmax':5000.0,    'ymin':0.1,      'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':False, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000, 'ymin':50.1,'ymax':20000,
@@ -2618,7 +2619,7 @@ def main():
         #bkgs = ['zewk', 'zqcd','wewk','wqcd','top2','vvv','dqcd'] #,'mqcd','zldy','vvv'
         if options.ph_ana:
             #bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','zewk', 'zqcd','wewk','wqcd','tall'] #,'mqcd','zldy','vvv'
-            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','tall','efakeph'] #,'mqcd','zldy','vvv'
+            bkgs = ['ttg', 'zgam','wgam','pho','zgamewk','wgamewk','tall','efakeph','jfakeph'] #,'mqcd','zldy','vvv'
     if options.add_fakeE:
         bkgs+=['tth']
     if options.stack_signal:

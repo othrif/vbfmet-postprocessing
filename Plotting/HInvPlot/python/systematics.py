@@ -144,7 +144,14 @@ class systematics(object):
                                     'JET_JER_EffectiveNP_3__1up',
                                     'JET_JER_EffectiveNP_4__1up',
                                     'JET_JER_EffectiveNP_5__1up',
-                                    'JET_JER_EffectiveNP_6__1up','JET_JER_EffectiveNP_7restTerm__1up',
+                                    'JET_JER_EffectiveNP_6__1up',
+                                    'JET_JER_EffectiveNP_7__1up',
+                                        'JET_JER_EffectiveNP_8__1up','JET_JER_EffectiveNP_8__1down',
+                                        'JET_JER_EffectiveNP_9__1up','JET_JER_EffectiveNP_9__1down',
+                                        'JET_JER_EffectiveNP_10__1up','JET_JER_EffectiveNP_10__1down',
+                                        'JET_JER_EffectiveNP_11__1up','JET_JER_EffectiveNP_11__1down',
+                                        'JET_JER_EffectiveNP_12restTerm__1up','JET_JER_EffectiveNP_12restTerm__1down',
+                                        #'JET_JER_EffectiveNP_7restTerm__1up',
                                        'JET_Pileup_OffsetMu__1down','JET_Pileup_OffsetMu__1up','JET_Pileup_OffsetNPV__1down','JET_Pileup_OffsetNPV__1up','JET_Pileup_PtTerm__1down','JET_Pileup_PtTerm__1up','JET_Pileup_RhoTopology__1down','JET_Pileup_RhoTopology__1up','JET_PunchThrough_MC16__1down','JET_PunchThrough_MC16__1up','JET_SingleParticle_HighPt__1down','JET_SingleParticle_HighPt__1up',
                                        'JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up','JET_JvtEfficiency__1down','JET_JvtEfficiency__1up',
                                        'MET_SoftTrk_ResoPara','MET_SoftTrk_ResoPerp','MET_SoftTrk_ScaleDown','MET_SoftTrk_ScaleUp',
@@ -251,7 +258,14 @@ class systematics(object):
                                     'JET_JER_EffectiveNP_3__1up',
                                     'JET_JER_EffectiveNP_4__1up',
                                     'JET_JER_EffectiveNP_5__1up',
-                                    'JET_JER_EffectiveNP_6__1up','JET_JER_EffectiveNP_7restTerm__1up',
+                                    'JET_JER_EffectiveNP_6__1up',
+                                    'JET_JER_EffectiveNP_7__1up',
+                                        'JET_JER_EffectiveNP_8__1up','JET_JER_EffectiveNP_8__1down',
+                                        'JET_JER_EffectiveNP_9__1up','JET_JER_EffectiveNP_9__1down',
+                                        'JET_JER_EffectiveNP_10__1up','JET_JER_EffectiveNP_10__1down',
+                                        'JET_JER_EffectiveNP_11__1up','JET_JER_EffectiveNP_11__1down',
+                                        'JET_JER_EffectiveNP_12restTerm__1up','JET_JER_EffectiveNP_12restTerm__1down',
+                                        #'JET_JER_EffectiveNP_7restTerm__1up',
                                        'JET_Pileup_OffsetMu__1down','JET_Pileup_OffsetMu__1up','JET_Pileup_OffsetNPV__1down','JET_Pileup_OffsetNPV__1up','JET_Pileup_PtTerm__1down','JET_Pileup_PtTerm__1up','JET_Pileup_RhoTopology__1down','JET_Pileup_RhoTopology__1up','JET_PunchThrough_MC16__1down','JET_PunchThrough_MC16__1up','JET_SingleParticle_HighPt__1down','JET_SingleParticle_HighPt__1up',
                                        'JET_fJvtEfficiency__1down','JET_fJvtEfficiency__1up','JET_JvtEfficiency__1down','JET_JvtEfficiency__1up', 
             ]
@@ -286,7 +300,15 @@ class systematics(object):
         elif mode == "ANTISF":            
             self.systematicsList = ['Nominal','eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1down', 'eleANTISFEL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR__1up','muoANTISFEL_EFF_ID__1down','muoANTISFEL_EFF_ID__1up']
         elif mode == "JER":
-            self.systematicsList = ['Nominal', 'JET_JER_DataVsMC_MC16__1up', 'JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up']
+            self.systematicsList = ['Nominal', 'JET_JER_DataVsMC_MC16__1up', 'JET_JER_DataVsMC_MC16__1down', 'JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up',
+                                        'JET_JER_EffectiveNP_7__1up',
+                                        'JET_JER_EffectiveNP_8__1up','JET_JER_EffectiveNP_8__1down',
+                                        'JET_JER_EffectiveNP_9__1up','JET_JER_EffectiveNP_9__1down',
+                                        'JET_JER_EffectiveNP_10__1up','JET_JER_EffectiveNP_10__1down',
+                                        'JET_JER_EffectiveNP_11__1up','JET_JER_EffectiveNP_11__1down',
+                                        'JET_JER_EffectiveNP_12restTerm__1up','JET_JER_EffectiveNP_12restTerm__1down',
+                                        #'JET_JER_EffectiveNP_7restTerm__1up',
+                                        ]
         elif mode == "Pileup":
             self.systematicsList = ['Nominal','JET_Pileup_OffsetMu__1down','JET_Pileup_OffsetMu__1up',
                                     'JET_Pileup_OffsetNPV__1down','JET_Pileup_OffsetNPV__1up',
@@ -315,7 +337,11 @@ class systematics(object):
             self.systematicsList += self.systematicsWstrongTheory
 
         elif mode == "OneSided": # this is used to list all systematics that need to by symmeterized in plotting
-            self.systematicsList = ["MET_SoftTrk_ResoPara", "MET_SoftTrk_ResoPerp",'JET_JER_DataVsMC_MC16__1up','JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up', 'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up', 'JET_JER_EffectiveNP_7restTerm__1up','JET_JER_DataVsMC_MC16__1up','JET_QG_trackFakes','JET_QG_trackeff']
+            self.systematicsList = ["MET_SoftTrk_ResoPara", "MET_SoftTrk_ResoPerp",#'JET_JER_DataVsMC_MC16__1up',
+                                        'JET_JER_DataVsMC__1up', 'JET_JER_EffectiveNP_1__1up', 'JET_JER_EffectiveNP_2__1up', 'JET_JER_EffectiveNP_3__1up',
+                                        'JET_JER_EffectiveNP_4__1up', 'JET_JER_EffectiveNP_5__1up', 'JET_JER_EffectiveNP_6__1up',
+                                        #'JET_JER_EffectiveNP_7restTerm__1up','JET_JER_DataVsMC_MC16__1up',
+                                        'JET_QG_trackFakes','JET_QG_trackeff']
             # add theory systematics
             self.systematicsList += ['ATLAS_PDF4LHC_NLO_30_EV30__1up','ATLAS_PDF4LHC_NLO_30_EV29__1up',
                                      'ATLAS_PDF4LHC_NLO_30_EV28__1up','ATLAS_PDF4LHC_NLO_30_EV27__1up',
@@ -357,7 +383,7 @@ class systematics(object):
                 'JET_JER_EffectiveNP_4__1down':'JET_JER_EffectiveNP_4__1up',
                 'JET_JER_EffectiveNP_5__1down':'JET_JER_EffectiveNP_5__1up',
                 'JET_JER_EffectiveNP_6__1down':'JET_JER_EffectiveNP_6__1up',
-                'JET_JER_EffectiveNP_7restTerm__1down':'JET_JER_EffectiveNP_7restTerm__1up',
+                #'JET_JER_EffectiveNP_7restTerm__1down':'JET_JER_EffectiveNP_7restTerm__1up',
                 'ATLAS_PDF4LHC_NLO_30_EV30__1down':'ATLAS_PDF4LHC_NLO_30_EV30__1up',                
                 'ATLAS_PDF4LHC_NLO_30_EV29__1down':'ATLAS_PDF4LHC_NLO_30_EV29__1up',                
                 'ATLAS_PDF4LHC_NLO_30_EV28__1down':'ATLAS_PDF4LHC_NLO_30_EV28__1up',                

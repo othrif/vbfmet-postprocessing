@@ -71,6 +71,7 @@ namespace Msl
       kWjdte,
       kQFlip,
       kEFakePh,
+      kJetFakePh,      
       kQCD,
       kQCD_MC,
       kZjhf,

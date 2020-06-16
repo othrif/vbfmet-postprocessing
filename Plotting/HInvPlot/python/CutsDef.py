@@ -60,7 +60,10 @@ class BasicCuts:
         self.JetEta = ''
         if Analysis.count('metsf'):
             self.DEtajjLowerCut   = 3.5 # was 3.5
-            self.MjjLowerCut   = 600.0
+            self.MjjLowerCut   = 600.0 # was 600
+            if options.OverlapPh:
+                self.DEtajjLowerCut   = 3.0 
+                self.MjjLowerCut   = 250.0 
             if Analysis.count('VBFTopo'):
                 self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
                 self.DEtajjLowerCut   = 4.2 # was 3.5
@@ -625,9 +628,12 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
     elif basic_cuts.chan=='nn':
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     # cuts
-    cuts += [CutItem('CutPh', 'n_ph==0')]
+    if options.OverlapPh:
+        cuts += [CutItem('CutPh', 'n_ph==1')]        
+    else:
+        cuts += [CutItem('CutPh', 'n_ph==0')]
 
-    cuts += getJetCuts(basic_cuts, options);
+    cuts += getJetCuts(basic_cuts, options, isPh=options.OverlapPh);
     cuts += [CutItem('CutMet',       '%s > 100.0' %(met_choice))]
     cuts += [CutItem('CutFJVT','j0fjvt < 0.5 && j1fjvt < 0.5')]
     # does the vertex matter? does the CST met cut matter? does the fjvt cuts matter?
@@ -642,7 +648,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
 def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR', syst='Nominal'):
 
     cuts = FilterCuts(options)
-    if options.OverlapPh:
+    if options.OverlapPh and not options.v41:
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
         
     if basic_cuts.chan in ['nn']:
@@ -689,6 +695,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
         #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
     cuts += [CutItem('CutPh',       'n_ph==1')]
+    #cuts += [CutItem('CutPhMETCleaning',       'n_ph_crackVetoCleaning>1')]     # photon met cleaning
     #cuts += [CutItem('CutPhPointing','ph_pointing_z<250.0')]    # 250 mm of the primary vertex. variable is not absolute value
     #cutPhPointing = CutItem('CutPhPointing')
     #cutPhPointing.AddCut(CutItem('High',  'ph_pointing_z<250.0'), 'AND')
@@ -992,7 +999,8 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
         bkgs['zgam'] = ['zgam','vgg']
         bkgs['wgamewk'] = ['wgamewk']
         bkgs['zgamewk'] = ['zgamewk']
-        bkgs['efakeph'] = ['efakeph']        
+        bkgs['efakeph'] = ['efakeph']
+        bkgs['jfakeph'] = ['jfakeph']
         del bkgs['wqcd']
         del bkgs['zqcd']
         del bkgs['wewk']
@@ -1029,7 +1037,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     if reg != None and key != None:
         if options.OverlapPh:
             #reg.SetVal(key, 'higgs,tall,wqcd,wewk,zqcd,zewk,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamewk,wgamewk,bkgs,data')
-            reg.SetVal(key, 'higgs,tall,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamewk,wgamewk,efakeph,bkgs,data')
+            reg.SetVal(key, 'higgs,tall,mqcd,ttg,pho,phoAlt,wgam,zgam,zgamewk,wgamewk,efakeph,jfakeph,bkgs,data')
         else:
             if options.mergeMGExt:                            
                 reg.SetVal(key, 'higgs,tall,wqcdMad,wewk,zqcdMad,zewk,dqcd,bkgs,data')

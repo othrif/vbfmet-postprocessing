@@ -1279,10 +1279,16 @@ def prepareBkgRuns(keys,options=None):
                 #'top1':bkg_z_strong_madgraph_znn,
                 }
     if options.OverlapPh:
-        bkg_keys['wgam']=bkg_sherpa_wg # bkg_sherpa_wg_228
-        bkg_keys['zgam']=bkg_sherpa_zg # bkg_sherpa_zg_228
-        bkg_keys['wdpi'].update(bkg_sherpa_wg_228)
-        bkg_keys['wdpi'].update(bkg_sherpa_zg_228)
+        if options.v41:
+            bkg_keys['wgam']=bkg_sherpa_wg_228 # bkg_sherpa_wg_228
+            bkg_keys['zgam']=bkg_sherpa_zg_228 # bkg_sherpa_zg_228
+            bkg_keys['wdpi'].update(bkg_sherpa_wg)
+            bkg_keys['wdpi'].update(bkg_sherpa_zg)
+        else:
+            bkg_keys['wgam']=bkg_sherpa_wg # bkg_sherpa_wg_228
+            bkg_keys['zgam']=bkg_sherpa_zg # bkg_sherpa_zg_228
+            bkg_keys['wdpi'].update(bkg_sherpa_wg_228)
+            bkg_keys['wdpi'].update(bkg_sherpa_zg_228)
         bkg_keys['wgamewk']=bkg_wgewk
         bkg_keys['zgamewk']=bkg_zgewk
         bkg_keys['ttg']=bkg_ttg
@@ -1314,8 +1320,12 @@ def prepareBkgRuns(keys,options=None):
         bkg_keys['wdpi'].update(bkg_zqcd_sh_ktExt)
         bkg_keys['wdpi'].update(bkg_wqcd_sh_ktExt)
     else:
-        bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
-        bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)
+        if options.OverlapPh:
+            bkg_keys['zgam'].update(bkg_zqcd_sh_ktExt)
+            bkg_keys['wgam'].update(bkg_wqcd_sh_ktExt)
+        else:
+            bkg_keys['zqcd'].update(bkg_zqcd_sh_ktExt)
+            bkg_keys['wqcd'].update(bkg_wqcd_sh_ktExt)
     bkg_keys['wdpi'].update(bkg_vewkbad)
     if not options.mergePTV:
         #bkg_keys['wdpi'].update(bkg_zqcd_znn)
