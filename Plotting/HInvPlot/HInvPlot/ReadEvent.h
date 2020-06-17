@@ -171,6 +171,7 @@ namespace Msl
     float                       fBTagCut;
     bool                        fisMC;
     bool                        fLoadBaseLep;
+    bool                        fLoadBaseEl;
     bool                        fOverlapPh;
     bool                        fMergeExt;
     bool                        fnoVjWeight;

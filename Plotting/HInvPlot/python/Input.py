@@ -362,7 +362,9 @@ def prepareBkgRuns(keys,options=None):
                      '346606':'WminclHinv_MET75',
                      '346607':'ZinclHinv_MET75',
                      '345596':'ggZinclHinv_MET75',
-    }
+                     '345319': 'ZHy+MET',
+                     }
+    sig_HyGr      = {'600059':'hyGr'}
 
     sig_ggF125 = {'308284':'ggF125',
                   '346588':'ggF125 reshower',}
@@ -1198,11 +1200,12 @@ def prepareBkgRuns(keys,options=None):
     bkg_keys = {
                 'hvh':sig_VH125,
                 #'whww':sig_VH125v2,
-                'vbfg':sig_vbfgam,
-                'whww':alt_VBF,
-                'hggf':sig_ggF125,
-                'tth':sig_tth125,
-                'hvbf':sig_VBF125,
+                #'vbfg':sig_vbfgam,
+                #'whww':alt_VBF,
+                #'hggf':sig_ggF125,
+                #'tth':sig_tth125,
+                #'hvbf':sig_VBF125,
+                'hyGr':sig_HyGr,
                 'zewk':bkg_zewk,
                 'zqcd':bkg_zqcd,
                 'top1':bkg_top1, # all top

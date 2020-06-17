@@ -58,6 +58,7 @@ Msl::ReadEvent::ReadEvent():
   fLumi         (1.0),
   fBTagCut     (-10),
   fLoadBaseLep  (false),
+  fLoadBaseEl   (false),
   fOverlapPh    (false),
   fIsDDQCD      (false),
   fYear         (2016),
@@ -96,6 +97,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
 
   reg.Get("ReadEvent::JetVetoPt",     fJetVetoPt);
   reg.Get("ReadEvent::LoadBaseLep",   fLoadBaseLep);
+  reg.Get("ReadEvent::LoadBaseEl",    fLoadBaseEl);
   reg.Get("ReadEvent::OverlapPh",     fOverlapPh);
   reg.Get("ReadEvent::mergeExt",      fMergeExt);
   reg.Get("ReadEvent::mergePTV",      fMergePTV);
@@ -791,16 +793,29 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	if(basemu_topoetcone20 && basemu_topoetcone20->size()>iMuo) new_muo.AddVar(Mva::topoetcone20,basemu_topoetcone20->at(iMuo)/basemu_pt->at(iMuo));
 	event->muons.push_back(new_muo);
       }
-    }else{
-      // Fill Electrons
-      for(unsigned iEle=0; iEle<el_pt->size(); ++iEle){
-	RecParticle new_ele;
-	new_ele.pt  = el_pt->at(iEle)/1.0e3;
-	new_ele.eta = el_eta->at(iEle);
-	new_ele.phi = el_phi->at(iEle);
-	new_ele.m   = 0.000511;
-	new_ele.AddVar(Mva::charge,el_charge->at(iEle));
-	event->electrons.push_back(new_ele);
+    }else {
+      if(fLoadBaseEl && false){
+	// Fill Electrons with the baseline electrons for this looser lepton selection
+	for(unsigned iEle=0; iEle<baseel_pt->size(); ++iEle){
+	  RecParticle new_ele;
+	  new_ele.pt  = baseel_pt->at(iEle)/1.0e3;
+	  new_ele.eta = baseel_eta->at(iEle);
+	  new_ele.phi = baseel_phi->at(iEle);
+	  new_ele.m   = 0.000511;
+	  new_ele.AddVar(Mva::charge,baseel_charge->at(iEle));
+	  event->electrons.push_back(new_ele);
+	}
+      } else {
+	// Fill Electrons
+	for(unsigned iEle=0; iEle<el_pt->size(); ++iEle){
+	  RecParticle new_ele;
+	  new_ele.pt  = el_pt->at(iEle)/1.0e3;
+	  new_ele.eta = el_eta->at(iEle);
+	  new_ele.phi = el_phi->at(iEle);
+	  new_ele.m   = 0.000511;
+	  new_ele.AddVar(Mva::charge,el_charge->at(iEle));
+	  event->electrons.push_back(new_ele);
+	}
       }
 
       // Fill Muons

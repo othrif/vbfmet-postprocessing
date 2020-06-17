@@ -170,18 +170,30 @@ def PlotError(h):
     return hnew
 #-----------------------------------------
 def Style():
-    ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasStyle.C')                   
-    ROOT.gROOT.LoadMacro('/Users/schae/testarea/SUSY/JetUncertainties/testingMacros/atlasstyle/AtlasUtils.C')
+    ROOT.gROOT.LoadMacro('/afs/cern.ch/work/s/ssevova/public/dark-photon-atlas/atlasstyle/AtlasStyle.C')                   
+    ROOT.gROOT.LoadMacro('/afs/cern.ch/work/s/ssevova/public/dark-photon-atlas/atlasstyle/AtlasUtils.C')
     ROOT.SetAtlasStyle()
 
-def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
+def Draw(hname,f1,p1,p2,can,GetError=True):
+ 
     can.Clear()
-   
+
+    hname1 = p1+"/"+hname
+    hname2 = p2+"/"+hname
     
-    h1 = f1.Get(hname)
-    h2 = f2.Get(hname)
-    h1.Scale(h1_norm)
-    h2.Scale(h2_norm)
+    h1 = f1.Get(hname1)
+    h2 = f1.Get(hname2)
+
+    if hname == 'ptllg':
+        h1.Rebin(2)
+        h2.Rebin(2)
+    elif hname == 'ptll' or hname == 'mt_mety': 
+        h1.Rebin(5)
+        h2.Rebin(5)
+
+    #h1.Scale(1./h1.Integral())
+    #h2.Scale(1./h2.Integral())
+
     h1.SetStats(0)
     h2.SetStats(0)
     h1.SetLineColor(1)
@@ -199,18 +211,11 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     pad1.Draw();             # Draw the upper pad: pad1
     pad1.cd();               # pad1 becomes the current pad
 
-    if hname.count('ph_pt'):
-        h1.GetXaxis().SetTitle('Photon p_{T} [GeV]')
-    if hname=='ph_pt_lead':
-        h1.Rebin(5)
-        h2.Rebin(5)
-        h1.GetXaxis().SetRangeUser(5.0,1000.0)
-        h2.GetXaxis().SetRangeUser(5.0,1000.0)
+
     if GetError:
         h1.GetYaxis().SetTitle('Relative Error')        
     else:
         h1.GetYaxis().SetTitle('Events')
-
 
     if GetError:
         h1 = PlotError(h1)
@@ -218,12 +223,11 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     h1.Draw()
     h2.Draw('same')
 
-    leg = ROOT.TLegend(0.4,0.5,0.8,0.8)
+    leg = ROOT.TLegend(0.69,0.65,0.9,0.8)
     leg.SetBorderSize(0)
     leg.SetFillColor(0)
-    leg.AddEntry(h1,'Sherpa 2.2.4')
-    leg.AddEntry(h2,'Sherpa 2.2.7 Enhanced Photon p_{T}')
-
+    leg.AddEntry(h1,'ZH(#gamma+Gr) 600059')
+    leg.AddEntry(h2,'ZH(#gamma+invis) 345319')
     leg.Draw()
 
     texts = getATLASLabels(can, 0.6, 0.85, "")
@@ -240,54 +244,33 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
 
     hratio = h1.Clone()
     hratio.Divide(h2)
-    pad1.SetLogy(0)
-    pad2.SetLogy(0)
-    pad1.SetLogx(0)
-    pad2.SetLogx(0)
-    if hname=='ph_pt_lead':
-        hratio.GetXaxis().SetTitle('Lead Photon p_{T} [GeV]')
-        h1.GetXaxis().SetRangeUser(11.0,1000.0)
-        h2.GetXaxis().SetRangeUser(11.0,1000.0)
-        hratio.GetXaxis().SetRangeUser(11.0,1000.0) 
-        if not GetError:
-            pad1.SetLogy(1)
-            #pad2.SetLogy(1)
-            pad1.SetLogx(1)
-            pad2.SetLogx(1)
-    elif hname=='elneg_pt':
-        hratio.GetXaxis().SetTitle('Electron p_{T} [GeV]')
-        if not GetError:
-            pad1.SetLogy(1)
-            #pad2.SetLogy(1)
-            pad1.SetLogx(1)
-            pad2.SetLogx(1)                
-    elif hname=='elpos_pt':
-        hratio.GetXaxis().SetTitle('Electron p_{T} [GeV]')
-        if not GetError:
-            pad1.SetLogy(1)
-            #pad2.SetLogy(1)
-            pad1.SetLogx(1)
-            pad2.SetLogx(1)                
+    #pad1.SetLogy(0)
+    #pad2.SetLogy(0)
+    #pad1.SetLogx(0)
+    #pad2.SetLogx(0)
 
-    elif  hname=='ph_pt':
-        hratio.GetXaxis().SetTitle('Photon p_{T} [GeV]')
-    elif  hname=='ph_eta':
-        hratio.GetXaxis().SetTitle('Photon #eta')
-    elif  hname=='ph_eta_lead':
-        hratio.GetXaxis().SetTitle('Lead Photon #eta')        
-    elif  hname=='boson_eta':
-        hratio.GetXaxis().SetTitle('Boson #eta')        
-    elif  hname=='boson_pt':
-        hratio.GetXaxis().SetTitle('Boson p_{T} [GeV]')        
-    elif  hname=='njet':
-        hratio.GetXaxis().SetTitle('N_{jet}')        
-    elif  hname=='dr_ph_el':
-        hratio.GetXaxis().SetTitle('#DeltaR(#gamma,e)')        
-    elif  hname=='dr_ph_j':
-        hratio.GetXaxis().SetTitle('#DeltaR(#gamma,jet)')        
-    elif  hname=='dr_ph_boson':
-        hratio.GetXaxis().SetTitle('#DeltaR(#gamma,boson)')        
-    hratio.GetYaxis().SetTitle('224 / 227Enh')
+
+    if  hname=='n_jet':
+        hratio.GetXaxis().SetTitle('N(R=0.4 jets)')
+    elif  hname=='n_ph':
+        hratio.GetXaxis().SetTitle('N(photons)')
+    elif  hname=='n_mu':
+        hratio.GetXaxis().SetTitle('N(muons)')        
+    elif  hname=='met_tight_tst_et':
+        hratio.GetXaxis().SetTitle('tight E_{T}^{miss} [GeV]')        
+    elif  hname=='lepPt0':
+        hratio.GetXaxis().SetTitle('leading lepton p_{T} [GeV]')        
+    elif  hname=='lepPt1':
+        hratio.GetXaxis().SetTitle('trailing lepton p_{T} [GeV]')        
+    elif  hname=='phPt':
+        hratio.GetXaxis().SetTitle('photon p_{T} [GeV]')
+    elif  hname=='ptll':
+        hratio.GetXaxis().SetTitle('p_{T}^{ll} [GeV]')        
+    elif  hname=='ptllg':
+        hratio.GetXaxis().SetTitle('p_{T}^{ll#gamma} [GeV]')
+    elif  hname=='mt_mety':
+        hratio.GetXaxis().SetTitle('m_{T}(E_{T}^{miss},p_{T}^{#gamma}) [GeV]')
+    hratio.GetYaxis().SetTitle('Gr / invis')
     hratio.GetYaxis().SetRangeUser(0.5,1.5)       
     hratio.GetYaxis().SetNdivisions(505);
     hratio.GetYaxis().SetTitleSize(20);
@@ -302,34 +285,29 @@ def Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=True):
     hratio.GetXaxis().SetLabelSize(15);    
     hratio.Draw()
     can.Update()
-    can.WaitPrimitive()
-    #raw_input()
+#    can.WaitPrimitive()
     if GetError:
         can.SaveAs(hname+'_err.pdf')
     else:
-        can.SaveAs(hname+'.pdf')
-    
-def Fit(_suffix=''):
+        can.SaveAs(hname+".pdf")
+
+    del pad1
+    del pad2
+    del h1
+    del h2
+    del hratio
+
+def Plot():
 
     can=ROOT.TCanvas('can',"can",600,600)
     Style();
-    #f1 = ROOT.TFile.Open('365500_VBFTruth_out.root')
-    #f2 = ROOT.TFile.Open('365510b_VBFTruth_out.root')
-    f1 = ROOT.TFile.Open('mc.365520_ptgam15_out.root')
-    f2 = ROOT.TFile.Open('mc.366000_ptgam15_out.root')        
-    h3 = f1.Get('njet')
-    h4 = f2.Get('njet')
-    h1_norm = 1000.0*0.000988772/h3.Integral(0,10001)
-    h2_norm = 1000.0*0.000988772/h4.Integral(0,10001)
-    
-    hnames=['elneg_pt','elpos_pt','ph_pt_lead','ph_eta_lead','ph_pt','ph_eta','boson_pt','boson_eta','njet','dr_ph_el','dr_ph_j','dr_ph_boson']
-    for hname in hnames:
-        Draw(hname,f1,f2,can,h1_norm,h2_norm,GetError=False)
-            #xs 00 -> 0.000988772
-            #xs 06 -> 0.00211978
-            #xs 00 -> 0.000988772
+    f1 = ROOT.TFile.Open('outtree_v04_nodata.root')
+    p1 = "pass_sr_all_uu_Nominal/plotEvent_hyGr"
+    p2 = "pass_sr_all_uu_Nominal/plotEvent_hvh"
 
-    #raw_input('a')
+    hnames=['n_ph','n_mu','n_jet','met_tight_tst_et', 'lepPt0', 'lepPt1', 'phPt', 'ptll', 'ptllg', 'mt_mety']
+    for hname in hnames:
+        Draw(hname,f1,p1,p2,can,GetError=False)
 
 setPlotDefaults(ROOT)
-Fit('90V')
+Plot()

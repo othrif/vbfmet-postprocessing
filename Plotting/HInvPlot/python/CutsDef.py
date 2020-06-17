@@ -206,7 +206,8 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     cutNumLep = CutItem('CutNumLep')    
     
     if Region=='SR':
-    
+        cuts += [CutItem('CutNumPho','n_ph == 1')] 
+        
         if basic_cuts.chan=='ee':
             cutNumLep.AddCut(CutItem('CutNumEle','n_el == 2'), 'AND')
         elif basic_cuts.chan=='uu':
@@ -219,6 +220,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutVetoBjets','n_bjet == 0')]
 
     elif Region=='CRtt':
+        cuts += [CutItem('CutNumPho','n_ph == 1')] 
 
         cutNumLep.AddCut(CutItem('CutNumEle','n_el == 1'), 'AND')
         cutNumLep.AddCut(CutItem('CutNumMu','n_mu == 1'), 'AND')
@@ -229,6 +231,17 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cuts += [CutItem('CutMass', 'mll < 116.0 && mll > 66.0')]
         cuts += [CutItem('CutNumBjetsGt1','n_bjet >= 1')]
 
+    elif Region=='CRWZ':
+
+        if basic_cuts.chan=='uu':
+            cutNumLep.AddCut(CutItem('CutNumMu', 'n_mu == 2'), 'AND')
+            #cutNumLep.AddCut(CutItem('CutNumBaseEle', 'n_baseel == 1'), 'AND')
+        
+        cuts += [cutNumLep]
+        cuts += [CutItem('CutL0Pt', 'lepPt0 > 26.0')]
+        cuts += [CutItem('CutL1Pt', 'lepPt1 > 7.0')]
+        cuts += [CutItem('CutMass', 'mll < 116.0 && mll > 66.0')]
+        cuts += [CutItem('CutVetoBjets','n_bjet == 0')]
 
     return GetCuts(cuts)
 
@@ -261,9 +274,10 @@ def GetCuts(cuts):
 def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
 
     sigs = {}
-    sigs['higgs'] = ['hggf','hvh','hvbf','tth']
+    sigs['higgs'] = ['hyGr','hggf','hvh','hvbf','tth']
     sigs['hggf']  = ['hggf']
     sigs['hvh']   = ['hvh']
+    sigs['hyGr']  = ['hyGr']
     sigs['hvbf']  = ['hvbf']
     sigs['tth']  = ['tth']
 
@@ -313,7 +327,7 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
     #
     if reg != None and key != None:
         
-        reg.SetVal(key, 'vvewk,vv,vvv,vvy,zqcd,zewk,zgam,hzy,top,ttv,bkgs,data')
+        reg.SetVal(key, 'hvh,hyGr,vvewk,vv,vvv,vvy,zqcd,zewk,zgam,hzy,top,ttv,bkgs,data')
         
         for k, v in samples.iteritems():
             reg.SetVal(k, ','.join(v))
@@ -373,6 +387,19 @@ def preparePassEventForCRtt(alg_name, options, basic_cuts, cut='BASIC',syst='Nom
     reg  = ROOT.Msl.Registry()
 
     cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, Region='CRtt', syst=syst)
+
+    #
+    # Fill Registry with cuts and samples for cut-flow
+    #
+    _fillPassEventRegistry(reg, cuts, options, basic_cuts, Debug='no', Print='no')
+
+    return ExecBase(alg_name, 'PassEvent', ROOT.Msl.PassEvent(), reg)
+#-------------------------------------------------------------------------
+def preparePassEventForCRWZ(alg_name, options, basic_cuts, cut='BASIC',syst='Nominal'):
+
+    reg  = ROOT.Msl.Registry()
+
+    cuts = getGamCuts(cut, options, basic_cuts, ignore_met=options.ignore_met, Region='CRWZ', syst=syst)
 
     #
     # Fill Registry with cuts and samples for cut-flow

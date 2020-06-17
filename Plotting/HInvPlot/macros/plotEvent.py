@@ -84,6 +84,17 @@ def prepareSeqCRtt(basic_cuts, alg_take=None, syst='Nominal'):
 
     # return normal plotting
     return (pass_alg.GetName(), [pass_alg] + plot_alg)
+#-----------------------------------------------------------------------------------------
+def prepareSeqCRWZ(basic_cuts, alg_take=None, syst='Nominal'):
+
+    selkey = basic_cuts.GetSelKey()
+    region = 'crwz'
+
+    pass_alg = hstudy.preparePassEventForCRWZ('pass_%s_%s_%s' %(region, selkey, syst), options, basic_cuts, cut=options.cut, syst=syst)
+    plot_alg = prepareListPlot              (selkey, alg_take, region=region, syst=syst)
+
+    # return normal plotting
+    return (pass_alg.GetName(), [pass_alg] + plot_alg)
 
 #-----------------------------------------------------------------------------------------
 def prepareSeqMETSF(basic_cuts, alg_take=None, syst='Nominal'):
@@ -195,6 +206,11 @@ def main():
                     #
                     (name_crtt,  alg_crtt)  = prepareSeqCRtt (basic_cuts, alg_take=input_cut, syst=syst)
                     read_alg.AddNormalAlg(name_crtt,  alg_crtt)
+                    #
+                    # CRWZ Cut based regions and algorithms
+                    #
+                    (name_crwz,  alg_crwz)  = prepareSeqCRWZ (basic_cuts, alg_take=input_cut, syst=syst)
+                    read_alg.AddNormalAlg(name_crwz,  alg_crwz)
                     
 
         read_alg.RunConfForAlgs()

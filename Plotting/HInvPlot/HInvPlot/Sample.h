@@ -98,6 +98,7 @@ namespace Msl
       kvv,
       kvvEWK,
       khzy,
+      khyGr,
       kJPsi,
       kUpsl,
       kZqcdPow,

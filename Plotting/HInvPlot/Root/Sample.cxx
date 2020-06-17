@@ -81,6 +81,7 @@ std::string Msl::Mva::Convert2Str(Sample s)
     case kvv:    return "vv";
     case kvvEWK: return "vvewk";
     case khzy:   return "hzy";  
+    case khyGr:  return "hyGr";
     case kJPsi:  return "jpsi";
     case kUpsl:  return "upsl";
     case kZqcdPow:  return "zqcdPow";
@@ -166,6 +167,7 @@ std::string Msl::Mva::Convert2Std(Sample s)
     case kvv:   return "vv";
     case kvvEWK: return "vvewk";
     case khzy: return "hzy";
+    case khyGr: return "hyGr";
     case kJPsi: return "jpsi";
     case kUpsl: return "upsl";
     case kZqcdPow: return "zqcdPow";
@@ -187,7 +189,7 @@ std::string Msl::Mva::Convert2Tex(const SampleSet &s)
   if(s.GetName() == "hvbf1k")  return "HInv VBF";  
   if(s.GetName() == "hvbf3k")  return "HInv VBF";  
   if(s.GetName() == "vbfg")  return "HInv VBFgamma";
-  if(s.GetName() == "hvh")   return "HInv VH";  
+  if(s.GetName() == "hvh")   return "ZH($\\gamma$+invis)";  
   if(s.GetName() == "wewk")  return "W EWK";  
   if(s.GetName() == "wqcd")  return "W QCD";
   if(s.GetName() == "zewk")  return "Z EWK";  
@@ -228,6 +230,7 @@ std::string Msl::Mva::Convert2Tex(const SampleSet &s)
   if(s.GetName() == "vv")    return "VV";
   if(s.GetName() == "vvewk")  return "VV EWK";
   if(s.GetName() == "hzy")  return "$H(Z#it{gamma})$";
+  if(s.GetName() == "hyGr") return "$ZH(#it{gamma}+G)$";
   if(s.GetName() == "jpsi")  return "$J/\\psi$";
   if(s.GetName() == "upsl")  return "$\\upsilon$";
 
@@ -306,6 +309,7 @@ Msl::Mva::Sample Msl::Mva::Convert2Sample(const std::string &s)
   if(s == "vv")   return kvv;
   if(s == "vvewk") return kvvEWK;
   if(s == "hzy") return khzy;
+  if(s == "hyGr") return khyGr;
   if(s == "jpsi") return kJPsi;
   if(s == "upsl") return kUpsl;
   if(s == "zqcdPow") return kZqcdPow;
@@ -394,6 +398,7 @@ const std::vector<Msl::Mva::Sample>& Msl::Mva::GetAllSamples()
     vars.push_back(kvv);
     vars.push_back(kvvEWK);
     vars.push_back(khzy);
+    vars.push_back(khyGr);
     vars.push_back(kJPsi);
     vars.push_back(kUpsl);
     vars.push_back(kZqcdPow);

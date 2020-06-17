@@ -422,6 +422,8 @@ def getLabelSortKey(sample):
     elif sample == 'ttv': return 7
     elif sample == 'hzy': return 2
     elif sample == 'higgs': return 20
+    elif sample == 'hvh': return 20
+    elif sample == 'hyGr': return 20
     elif sample == 'jpsi': return 21
     elif sample == 'upsl': return 22
 
@@ -453,6 +455,8 @@ def getSampleSortKey(sample):
     elif sample == 'ggvv': return 1
     elif sample == 'zldy': return 7
     elif sample == 'higgs': return 8
+    elif sample == 'hvh': return 8
+    elif sample == 'hyGr': return 8
     elif sample == 'hggf': return 8
     elif sample == 'hvbf': return 9
     elif sample == 'data': return -10
@@ -517,6 +521,8 @@ def getSampleLabel(sample):
         'hvbf':  '#it{H} (#it{B}_{inv} = %0.2f)' %options.hscale,
         'ttv' : 't#bar{t}+V',
         'hzy' : 'H#rightarrowZ#gamma',
+        'hvh' : 'ZH(#gamma+invis)',
+        'hyGr': 'ZH(#gamma+Gr)',
         'data': 'Data',
         'bkgs': 'Total SM',
         }
@@ -596,6 +602,8 @@ def getStyle(sample):
     color_hvbf = ROOT.kRed+1 #ROOT.kRed    +0
     color_hggf = ROOT.kRed+1 #ROOT.kRed    +0
     color_higgsall = ROOT.kRed+1 #ROOT.kRed    +0
+    color_hvh = ROOT.kRed+1 #ROOT.kRed    +0
+    color_hyGr = ROOT.kRed+1 
     color_bkgs = ROOT.kBlue   +1
     color_data = ROOT.kBlack
 
@@ -627,9 +635,11 @@ def getStyle(sample):
         'hzy':{'color':color_hzy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zldy':{'color':color_zldy, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'higgs':{'color':color_higgsall, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
+        'hvh':{'color':color_hvh, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
+        'hyGr':{'color':color_hyGr, 'fill_style':0, 'marker_style': 0, 'line_width':5,'line_style':2, 'leg_opt':'f'},
         'hggf':{'color':color_hggf, 'fill_style':0, 'marker_style': 0, 'line_width':5, 'leg_opt':'f'},
         'hvbf':{'color':color_hvbf, 'fill_style':0,    'marker_style': 0, 'line_width':5, 'leg_opt':'f'},
-        'data':{'color':color_data, 'fill_style':0,    'marker_style':20, 'line_width':0, 'leg_opt':'ple'},
+        'data':{'color':color_data, 'fill_style':0,    'marker_style':8, 'line_width':0, 'leg_opt':'ple'},
         'bkgs':{'color':color_bkgs, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         }
 
@@ -1357,6 +1367,7 @@ class DrawStack:
             mydata.SetFillColor(0)
             mydata.SetFillStyle(0)
 
+
         bkg = self.GetTotalBkgHist()
         if isSignal:
             bkg = self.sign.hist.Clone()
@@ -1394,7 +1405,7 @@ class DrawStack:
         bkg.Draw('HIST E0')
         bkg.SetMarkerSize(0)
         if fillData:
-            mydata.SetMarkerSize(0)
+            mydata.SetMarkerSize(0.7)
             mydata.Draw('SAME')
         for s in sys:
             s.SetMarkerSize(0)
@@ -1735,6 +1746,7 @@ class DrawStack:
         if self.data != None and not options.blind:
             #self.data.hist.GetXaxis().SetLabelColor(0)
             self.data.hist.GetXaxis().SetTitle("")
+            self.data.hist.SetMarkerSize(0.7)
             self.data.DrawHist('SAME', None)
 
         if True:
@@ -1815,7 +1827,7 @@ class DrawStack:
         self.error_map['bkg'].SetFillStyle(3345) #3004
         self.error_map['bkg'].SetFillColor(ROOT.kBlack)
         self.error_map['bkg'].SetMarkerColor(1)
-        self.error_map['bkg'].SetMarkerSize(0)
+        self.error_map['bkg'].SetMarkerSize(1)
         self.error_map['bkg'].SetLineColor(1)
         if options.draw_norm: pass #self.error_map['bkg'].DrawNormalized('SAMEE2')
         else: self.error_map['bkg'].Draw('SAMEE2')
@@ -1853,12 +1865,12 @@ class DrawStack:
                 self.signif=self.sign.hist.Clone()
                 self.signifCR=self.sign.hist.Clone()
                 self.signif.SetMinimum(0.0)
-                self.signif.SetMaximum(2.0)
+                self.signif.SetMaximum(1.5)
             else:
                 self.ratio=self.data.hist.Clone()
             self.UpdateHist(self.ratio)
-            self.ratio.SetMinimum(0.25)
-            self.ratio.SetMaximum(1.75)
+            self.ratio.SetMinimum(0.0)
+            self.ratio.SetMaximum(1.5)
 
             if options.do_nf!=None:
                 samples = options.do_nf.split(',')
@@ -2037,7 +2049,7 @@ class DrawStack:
             if 'xtitle' in pars and self.bkg_sum.GetXaxis() != None:
                 self.ratio.GetXaxis().SetTitle(pars['xtitle'])
             if options.blind:
-                self.ratio.GetYaxis().SetTitle('Sig./Bkg ')
+                self.ratio.GetYaxis().SetTitle('Sig. / Bkg ')
             else:
                 self.ratio.GetYaxis().SetTitle('Data / Bkg ')
             #if options.blind:
@@ -2049,21 +2061,21 @@ class DrawStack:
             bx = self.ratio.GetXaxis();
             by = self.ratio.GetYaxis();
             if not options.blind:
-                self.ratio.SetMarkerSize(1.2);
-                self.ratio.SetMarkerStyle(20);
+                self.ratio.SetMarkerSize(0.7);
+                self.ratio.SetMarkerStyle(8);
             else:
                 self.ratio.SetLineStyle(1);
                 self.ratio.SetMarkerSize(0.05);
-                self.signif.SetLineStyle(1);
-                self.signif.SetMarkerSize(0.05);
-                self.signif.SetLineColor(2);
-                self.signif.SetMarkerColor(2);
-                self.signif.SetLineWidth(2);
-                self.signifCR.SetLineStyle(1);
-                self.signifCR.SetMarkerSize(0.05);
-                self.signifCR.SetLineColor(3);
-                self.signifCR.SetMarkerColor(3);
-                self.signifCR.SetLineWidth(2);
+                # self.signif.SetLineStyle(1);
+                # self.signif.SetMarkerSize(0.05);
+                # self.signif.SetLineColor(2);
+                # self.signif.SetMarkerColor(2);
+                # self.signif.SetLineWidth(2);
+                # self.signifCR.SetLineStyle(1);
+                # self.signifCR.SetMarkerSize(0.05);
+                # self.signifCR.SetLineColor(3);
+                # self.signifCR.SetMarkerColor(3);
+                # self.signifCR.SetLineWidth(2);
 
             self.ratio.SetLineColor(ROOT.kBlack);
             self.ratio.SetLineWidth(2);
@@ -2092,8 +2104,8 @@ class DrawStack:
             if options.ph_ana:
                 by.SetRangeUser(0.501, 1.499);
             if options.blind:
-                by.SetRangeUser(0,0.799);
-                by.SetRangeUser(0,1.7999);
+                #by.SetRangeUser(0,0.799);
+                by.SetRangeUser(0,0.999);
             by.SetLabelSize(0.13);
             by.SetLabelOffset(0.0125);
             by.SetTitleSize(0.14);
@@ -2110,6 +2122,7 @@ class DrawStack:
             self.error_map['bkg_ratio'].SetFillStyle(3345) # 3004
             self.error_map['bkg_ratio'].SetFillColor(ROOT.kBlack)
             self.error_map['bkg_ratio'].SetMarkerColor(1)
+            self.error_map['bkg_ratio'].SetMarkerStyle(1)
             self.error_map['bkg_ratio'].SetMarkerSize(0)
             self.error_map['bkg_ratio'].SetLineColor(1)
             self.error_map['bkg_ratio'].Draw('SAME E2')
@@ -2126,14 +2139,14 @@ class DrawStack:
             # Overlay the ratio plot on top of errors
             if options.blind:
                 self.ratio.Draw('same hist')
-                self.signif.Draw('same hist')
-                self.signifCR.GetYaxis().SetRangeUser(0.0,1.5);
-                self.signifCR.Draw('hist same')
-                self.legr.Clear()
-                self.legr.AddEntry(self.ratio,'S/B')
-                self.legr.AddEntry(self.signif,'#sigma_{#mu} Stat 95% CL')
-                self.legr.AddEntry(self.signifCR,'#sigma_{#mu} w/ZCR 95% CL')
-                self.legr.Draw()
+                # self.signif.Draw('same hist')
+                # self.signifCR.GetYaxis().SetRangeUser(0.0,1.5);
+                # self.signifCR.Draw('hist same')
+                # self.legr.Clear()
+                # self.legr.AddEntry(self.ratio,'S/B')
+                # self.legr.AddEntry(self.signif,'#sigma_{#mu} Stat 95% CL')
+                # self.legr.AddEntry(self.signifCR,'#sigma_{#mu} w/ZCR 95% CL')
+                # self.legr.Draw()
                 optv=0.0
                 for i in range(0,self.signifCR.GetNbinsX()+1):
                     print 'Bin:',i,self.signifCR.GetBinContent(i)
@@ -2619,8 +2632,8 @@ def main():
     if options.add_fakeE:
         bkgs+=['tth']
     if options.stack_signal:
-        if not 'higgs' in bkgs: bkgs+=['higgs']
-
+        if not 'hvh' in bkgs: bkgs+=['hvh']
+        
     # Signal events to extract
     extract_sig=[]
     if options.extract_sig!=None:
@@ -2657,7 +2670,7 @@ def main():
 
     for var in vars:
 
-        stack = DrawStack(var, rfile, 'higgs', 'data', bkgs, nf_map, extract_sig)
+        stack = DrawStack(var, rfile, 'hyGr', 'data', bkgs, nf_map, extract_sig)
         #print 'nSYST: ',len(sfiles)
         if options.draw_syst:
             if len(sfiles)>0:
