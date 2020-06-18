@@ -37,6 +37,15 @@ def skipThis(key):
         if "Wg_strong" in key:  toskip=True
         if "SinglePhoton" in key:  toskip=True
         if "VqqGam" in key:  toskip=True
+    else:
+        if "VBFH50" in key:  toskip=True
+        if "VBFH75" in key:  toskip=True
+        if "VBFH100" in key:  toskip=True
+        if "VBFH300" in key:  toskip=True
+        if "VBFH750" in key:  toskip=True
+        if "VBFH1000" in key:  toskip=True
+        if "VBFH2000" in key:  toskip=True
+        if "VBFH3000" in key:  toskip=True
     if "TTH125" in key:  toskip=True
     if "Ext" in key:  toskip=True
     if "Blind" in key:  toskip=True
@@ -89,7 +98,7 @@ def getNF(histDict, nbins, signalKeys=[], NFOnly=False):
         if hkey in signalKeys:
             sigV+=getBinsYield(histDict[hkey], nbins)
             sigE+=(getBinsError(histDict[hkey], nbins))**2
-        elif hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet"]:
+        elif hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet",'ttg','SinglePhoton','efakegam','jfakegam']:
             bkgV+=getBinsYield(histDict[hkey], nbins)
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=(dataV-bkgV)
@@ -108,7 +117,7 @@ def getDataMC(histDict, nbins):
     for hkey,hist in histDict.iteritems():
         if hkey=="signal":
             continue
-        if hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet"]:
+        if hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet",'ttg','SinglePhoton','efakegam','jfakegam']:
             bkgV+=getBinsYield(histDict[hkey], nbins)
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=dataV
@@ -147,23 +156,27 @@ class texTable(object):
         titleKeys={'SR':'SR',
                        'WCRenu':'W$\\rightarrow$e$\\nu$ CR',
                        'WCRmunu':'W$\\rightarrow\\mu\\nu$ CR',
-                       'lowsigWCRen':'Fake-#it{e} CR',
-                       'fakeMu':'Fake-#it{#mu} CR',                       
+                       'lowsigWCRen':'Fake-$e$ CR',
+                       'fakeMu':'Fake-$\\mu$ CR',                       
                        'WCRlnu':'W$\\rightarrow\\ell\\nu$ CR',
                        'ZCRll':'Z$\\rightarrow\\ell\\ell$ CR',
                        }
-        NameDict ={'ttbar':'Top$+$#it{VV}/#it{VVV}',
-                       'eleFakes':'#it{e}-fakes',
-                       'muoFakes':'#it{#mu}-fakes',
-                   'Z_EWK':'#it{Z} EWK',
-                   'W_EWK':'#it{W} EWK',
-                   'Z_strong':'#it{Z} strong',
-                   'W_strong':'#it{W} strong',
-                   'Zg_EWK':'#it{Z+#gamma} EWK',
-                   'Wg_EWK':'#it{W+#gamma} EWK',
-                   'Zg_strong':'#it{Z+#gamma} strong',
-                   'Wg_strong':'#it{W+#gamma} strong',                   
-                   'signal':'#it{H}(#it{B}_{inv} = %0.2f)' %(options.hscale),
+        NameDict ={'ttbar':'Top$+VV/VVV$',
+                       'eleFakes':'$e$-fakes',
+                       'muoFakes':'$\\mu$-fakes',
+                   'Z_EWK':'$Z$ EWK',
+                   'W_EWK':'$W$ EWK',
+                   'Z_strong':'$Z$ strong',
+                   'W_strong':'$W$ strong',
+                   'Zg_EWK':'$Z+\\gamma$ EWK',
+                   'Wg_EWK':'$W+\\gamma$ EWK',
+                   'Zg_strong':'$Z+\\gamma$ strong',
+                   'ttg':'$t\\bar{t}+\\gamma$',
+                   'SinglePhoton':'$\\gamma+$jet',
+                   'efakegam':'$e\\rightarrow\\gamma$',
+                   'jfakegam':'jet$\\rightarrow\\gamma$',
+                   'Wg_strong':'$W+\\gamma$ strong',                   
+                   'signal':'$H(B_{inv} = %0.2f)$' %(options.hscale),
                    'data':'Data',
                    'bkgs':'Total Bkg',
                    'multijet':'Multijet',
@@ -360,7 +373,7 @@ class HistClass(object):
         return True
 
     def isBkg(self):
-        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet","VV","VVV","QCDw"]:
+        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet","VV","VVV","QCDw",'ttg','SinglePhoton','efakegam','jfakegam']:
             return True
         return False
 
@@ -416,7 +429,7 @@ class HistClass(object):
         if options.fakeMu:
             mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","data"]
         elif options.ph_ana:
-            mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","data"]
+            mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar",'ttg','SinglePhoton',"data"] # 'efakegam','jfakegam'
         for p in mysamples:
             LOK=[k.GetName() for k in cls.Irfile.GetListOfKeys() if p in k.GetName()]
             if len(LOK)==0:
@@ -555,6 +568,10 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
                    'W_strong':'#it{W} strong',
                    'Zg_EWK':'#it{Z+#gamma} EWK',                   
                    'Wg_EWK':'#it{W+#gamma} EWK',
+                   'ttg':'#it{t#bar{t}}+#it{#gamma}',
+                   'SinglePhoton':'#it{#gamma}+jet',
+                   'efakegam':'#it{e}#rightarrow#it{#gamma}',
+                   'jfakegam':'jet#rightarrow#it{#gamma}',
                    'Zg_strong':'#it{Z+#gamma} strong',
                    'Wg_strong':'#it{W+#gamma} strong',
                    'signal':'#it{H}(#it{B}_{inv} = %0.2f)' %options.hscale,
@@ -744,6 +761,8 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
     except:
         print "aW,aZ not defined. B_WCR, B_ZCR:",B_WCR, B_ZCR
     doCRScaling=True
+    if options.ph_ana:
+        doCRScaling=False
     for i in range(1,nbins+1):
         tmpNF_fake_ele_neg = getNF(histDict,[i],["eleFakes"])
         tmpNF_fake_ele_pos = getNF(histDict,[nbins+i],["eleFakes"])
@@ -787,7 +806,7 @@ def getNumberOfBins(rfileInput):
     tmpIrfile=ROOT.TFile(rfileInput)
     nbins=0
     LOK=None
-    for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","data"]:
+    for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","Zg_strong","Wg_strong","Zg_EWK",'ttg','SinglePhoton','efakegam','jfakegam',"Wg_EWK","data"]:
         LOK=[k.GetName() for k in tmpIrfile.GetListOfKeys() if p in k.GetName()]
         if len(LOK)==0:
             continue
@@ -855,7 +874,7 @@ def main(options):
     if options.fakeMu:
         histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes","muoFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
     if options.ph_ana:
-        histNames=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong"] 
+        histNames=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'ttg','SinglePhoton']  # 'efakegam','jfakegam'
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
@@ -978,6 +997,12 @@ def main(options):
         Style.setStyles(hDict["Zg_EWK"],Style.styleDict["Z_EWK"])
         Style.setStyles(hDict["Wg_strong"],Style.styleDict["W_strong"])
         Style.setStyles(hDict["Wg_EWK"],Style.styleDict["W_EWK"])
+        Style.setStyles(hDict["SinglePhoton"],Style.styleDict["SinglePhoton"])
+        Style.setStyles(hDict["ttg"],Style.styleDict["ttg"])
+        if 'efakegam' in hDict:
+            Style.setStyles(hDict["efakegam"],Style.styleDict["efakegam"])
+        if 'jfakegam' in hDict:
+            Style.setStyles(hDict["jfakegam"],Style.styleDict["jfakegam"])            
     Style.setStyles(hDict["Z_strong"],Style.styleDict["Z_strong"])
     Style.setStyles(hDict["Z_EWK"],Style.styleDict["Z_EWK"])
     Style.setStyles(hDict["W_strong"],Style.styleDict["W_strong"])
@@ -1120,7 +1145,7 @@ def main(options):
     if options.fakeMu:
         bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","muoFakes","ttbar","multijet"] #+["Others"]
     if options.ph_ana:
-        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong"] #+["Others"]        
+        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'SinglePhoton','ttg']  #+["Others"] 'efakegam','jfakegam'
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
     hDict["bkgs"]=bkgs
     hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
