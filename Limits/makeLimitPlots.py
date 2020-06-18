@@ -74,6 +74,140 @@ if options.style == 'atlas':
     ROOT.SetAtlasStyle()
     ROOT.gStyle.SetFillColor(10)
 
+
+def GetXSLine(arr_mass):
+    xaxis=[10.00  ] ; xss=[1.121E+01   ]
+    xaxis+=[15.00 ] ; xss+=[1.074E+01   ]
+    xaxis+=[20.00 ] ; xss+=[1.025E+01   ]
+    xaxis+=[25.00 ] ; xss+=[9.769E+00   ]
+    xaxis+=[30.00 ] ; xss+=[9.299E+00   ]
+    xaxis+=[35.00 ] ; xss+=[8.847E+00   ]
+    xaxis+=[40.00 ] ; xss+=[8.419E+00   ]
+    xaxis+=[45.00 ] ; xss+=[8.011E+00   ]
+    xaxis+=[50.00 ] ; xss+=[7.627E+00   ]
+    xaxis+=[55.00 ] ; xss+=[7.264E+00   ]
+    xaxis+=[60.00 ] ; xss+=[6.924E+00   ]
+    xaxis+=[65.00 ] ; xss+=[6.603E+00   ]
+    xaxis+=[70.00 ] ; xss+=[6.301E+00   ]
+    xaxis+=[75.00 ] ; xss+=[6.016E+00   ]
+    xaxis+=[80.00 ] ; xss+=[5.748E+00   ]
+    xaxis+=[85.00 ] ; xss+=[5.496E+00   ]
+    xaxis+=[90.00 ] ; xss+=[5.258E+00   ]
+    xaxis+=[95.00 ] ; xss+=[5.034E+00   ]
+    xaxis+=[100.00 ] ; xss+=[	4.822E+00   ]
+    xaxis+=[105.00 ] ; xss+=[	4.623E+00   ]
+    xaxis+=[110.00 ] ; xss+=[	4.434E+00   ]
+    xaxis+=[115.00 ] ; xss+=[	4.255E+00   ]
+    xaxis+=[120.00 ] ; xss+=[	4.086E+00   ]
+    xaxis+=[125.00 ] ; xss+=[	3.925E+00   ]
+    xaxis+=[130.00 ] ; xss+=[	3.773E+00   ]
+    xaxis+=[135.00 ] ; xss+=[	3.629E+00   ]
+    xaxis+=[140.00 ] ; xss+=[	3.492E+00   ]
+    xaxis+=[145.00 ] ; xss+=[	3.362E+00   ]
+    xaxis+=[150.00 ] ; xss+=[	3.239E+00   ]
+    xaxis+=[160.00 ] ; xss+=[	3.010E+00   ]
+    xaxis+=[170.00 ] ; xss+=[	2.802E+00   ]
+    xaxis+=[180.00 ] ; xss+=[	2.612E+00   ]
+    xaxis+=[190.00 ] ; xss+=[	2.440E+00   ]
+    xaxis+=[200.00 ] ; xss+=[	2.282E+00   ]
+    xaxis+=[210.00 ] ; xss+=[	2.138E+00   ]
+    xaxis+=[220.00 ] ; xss+=[	2.006E+00   ]
+    xaxis+=[230.00 ] ; xss+=[	1.884E+00   ]
+    xaxis+=[240.00 ] ; xss+=[	1.772E+00   ]
+    xaxis+=[250.00 ] ; xss+=[	1.669E+00   ]
+    xaxis+=[260.00 ] ; xss+=[	1.573E+00   ]
+    xaxis+=[270.00 ] ; xss+=[	1.485E+00   ]
+    xaxis+=[280.00 ] ; xss+=[	1.403E+00   ]
+    xaxis+=[290.00 ] ; xss+=[	1.326E+00   ]
+    xaxis+=[300.00 ] ; xss+=[	1.256E+00   ]
+    xaxis+=[310.00 ] ; xss+=[	1.190E+00   ]
+    xaxis+=[320.00 ] ; xss+=[	1.128E+00   ]
+    xaxis+=[330.00 ] ; xss+=[	1.071E+00   ]
+    xaxis+=[340.00 ] ; xss+=[	1.017E+00   ]
+    xaxis+=[350.00 ] ; xss+=[	9.666E-01   ]
+    xaxis+=[360.00 ] ; xss+=[	9.194E-01   ]
+    xaxis+=[370.00 ] ; xss+=[	8.752E-01   ]
+    xaxis+=[380.00 ] ; xss+=[	8.337E-01   ]
+    xaxis+=[390.00 ] ; xss+=[	7.947E-01   ]
+    xaxis+=[400.00 ] ; xss+=[	7.580E-01   ]
+    xaxis+=[410.00 ] ; xss+=[	7.235E-01   ]
+    xaxis+=[420.00 ] ; xss+=[	6.909E-01   ]
+    xaxis+=[430.00 ] ; xss+=[	6.602E-01   ]
+    xaxis+=[440.00 ] ; xss+=[	6.312E-01   ]
+    xaxis+=[450.00 ] ; xss+=[	6.038E-01   ]
+    xaxis+=[460.00 ] ; xss+=[	5.778E-01   ]
+    xaxis+=[470.00 ] ; xss+=[	5.533E-01   ]
+    xaxis+=[480.00 ] ; xss+=[	5.301E-01   ]
+    xaxis+=[490.00 ] ; xss+=[	5.081E-01   ]
+    xaxis+=[500.00 ] ; xss+=[	4.872E-01   ]
+    xaxis+=[550.00 ] ; xss+=[	3.975E-01   ]
+    xaxis+=[600.00 ] ; xss+=[	3.274E-01   ]
+    xaxis+=[650.00 ] ; xss+=[	2.719E-01   ]
+    xaxis+=[700.00 ] ; xss+=[	2.275E-01   ]
+    xaxis+=[750.00 ] ; xss+=[	1.915E-01   ]
+    xaxis+=[800.00 ] ; xss+=[	1.622E-01   ]
+    xaxis+=[850.00 ] ; xss+=[	1.380E-01   ]
+    xaxis+=[900.00 ] ; xss+=[	1.180E-01   ]
+    xaxis+=[950.00 ] ; xss+=[	1.013E-01   ]
+    xaxis+=[1000.00 ] ; xss+=[	8.732E-02]	 
+    xaxis+=[1050.00 ] ; xss+=[	7.551E-02]	 
+    xaxis+=[1100.00 ] ; xss+=[	6.550E-02]	 
+    xaxis+=[1150.00 ] ; xss+=[	5.698E-02]	 
+    xaxis+=[1200.00 ] ; xss+=[	4.970E-02]	 
+    xaxis+=[1250.00 ] ; xss+=[	4.345E-02]	 
+    xaxis+=[1300.00 ] ; xss+=[	3.807E-02]	 
+    xaxis+=[1350.00 ] ; xss+=[	3.343E-02]	 
+    xaxis+=[1400.00 ] ; xss+=[	2.941E-02]	 
+    xaxis+=[1450.00 ] ; xss+=[	2.592E-02]	 
+    xaxis+=[1500.00 ] ; xss+=[	2.288E-02]	 
+    xaxis+=[1550.00 ] ; xss+=[	2.023E-02]	 
+    xaxis+=[1600.00 ] ; xss+=[	1.791E-02]	 
+    xaxis+=[1650.00 ] ; xss+=[	1.588E-02]	 
+    xaxis+=[1700.00 ] ; xss+=[	1.410E-02]	 
+    xaxis+=[1750.00 ] ; xss+=[	1.253E-02]	 
+    xaxis+=[1800.00 ] ; xss+=[	1.115E-02]	 
+    xaxis+=[1850.00 ] ; xss+=[	9.926E-03]	 
+    xaxis+=[1900.00 ] ; xss+=[	8.849E-03]	 
+    xaxis+=[1950.00 ] ; xss+=[	7.896E-03]	 
+    xaxis+=[2000.00 ] ; xss+=[	7.052E-03]	 
+    xaxis+=[2050.00 ] ; xss+=[	6.303E-03]	 
+    xaxis+=[2100.00 ] ; xss+=[	5.638E-03]	 
+    xaxis+=[2150.00 ] ; xss+=[	5.046E-03]	 
+    xaxis+=[2200.00 ] ; xss+=[	4.520E-03]	 
+    xaxis+=[2250.00 ] ; xss+=[	4.051E-03]	 
+    xaxis+=[2300.00 ] ; xss+=[	3.633E-03]	 
+    xaxis+=[2350.00 ] ; xss+=[	3.259E-03]	 
+    xaxis+=[2400.00 ] ; xss+=[	2.925E-03]	 
+    xaxis+=[2450.00 ] ; xss+=[	2.627E-03]	 
+    xaxis+=[2500.00 ] ; xss+=[	2.360E-03]	 
+    xaxis+=[2550.00 ] ; xss+=[	2.122E-03]	 
+    xaxis+=[2600.00 ] ; xss+=[	1.908E-03]	 
+    xaxis+=[2650.00 ] ; xss+=[	1.717E-03]	 
+    xaxis+=[2700.00 ] ; xss+=[	1.545E-03]	 
+    xaxis+=[2750.00 ] ; xss+=[	1.391E-03]	 
+    xaxis+=[2800.00 ] ; xss+=[	1.252E-03]	 
+    xaxis+=[2850.00 ] ; xss+=[	1.128E-03]	 
+    xaxis+=[2900.00 ] ; xss+=[	1.016E-03]	 
+    xaxis+=[2950.00 ] ; xss+=[	9.156E-04]	 
+    xaxis+=[3000.00 ] ; xss+=[	8.253E-04]
+    xsMap={}
+    xsMap[50]=7.627 #7.627E+00 
+    xsMap[75]=6.016 #6.016E+00
+    xsMap[100]=4.822 #4.822E+00
+    xsMap[125]=3.925 #3.925E+00 
+    xsMap[300]=1.256 #1.256E+00 
+    xsMap[750]=0.1915 #0.1915
+    xsMap[1000]=0.08732 #0.08732
+    xsMap[2000]=0.007052 #0.007052
+    xsMap[3000]=0.0008253 #0.0008253
+    #h=ROOT.TH1F('exclLine','exclLine',10,0.0,1000.0)
+    #list_obs=[7.627,6.016,4.822,3.925,1.256,0.1915,0.08732,0.007052,0.0008253]
+    arr_xaxis=array('d', xaxis)
+    arr_obs=array('d', xss)
+    h=ROOT.TGraphAsymmErrors(len(arr_xaxis), arr_xaxis, arr_obs)
+    h.SetLineColor(2)
+    return h
+
 def getATLASLabels(pad, x, y, text=None, selkey=None):
     l = ROOT.TLatex(x, y, 'ATLAS')
     l.SetNDC()
@@ -443,6 +577,7 @@ class LimitHists:
         arr_mass     = array('d', list_mass)
         arr_one     = array('d', list_one)        
 
+        self.SMoneLine = GetXSLine(arr_mass)
         self.obs_graph       = ROOT.TGraphAsymmErrors(len(arr_mass), arr_mass, arr_obs)
         self.exp_graph       = ROOT.TGraphAsymmErrors(len(arr_mass), arr_mass, arr_exp)
         self.sig1_err        = ROOT.TGraphAsymmErrors(len(arr_mass), arr_mass, arr_exp, arr_empty, arr_empty, arr_neg_1sig,       arr_pos_1sig)
@@ -555,18 +690,21 @@ class LimitHists:
         #onelin.SetLineColor(2)
         #onelin.SetLineWidth(2)
         #onelin.Draw()
+        
+        self.SMoneLine.Draw('L same')
 
         self.leg4 = GetLegend(None)
 
         self.leg4.SetHeader(GetTypeName(self.name)+'') #options.mva
         if options.draw_obs:
             self.leg4.AddEntry(self.obs, self.obs.GetName(), 'pl')
-            
-        self.leg4.AddEntry(self.exp,      self.exp.GetName(), 'l')
-        self.leg4.AddEntry(self.sig2_err, '#pm2#sigma',       'F')
-        self.leg4.AddEntry(self.sig1_err, '#pm1#sigma',       'F')
+
+        self.leg4.AddEntry(self.SMoneLine,  '#sigma_{SM}^{VBF} with #it{B}_{inv}=1', 'l')
+        self.leg4.AddEntry(self.exp,         self.exp.GetName(), 'l')
+        self.leg4.AddEntry(self.sig2_err,   '#pm2#sigma',       'F')
+        self.leg4.AddEntry(self.sig1_err,   '#pm1#sigma',       'F')
         self.leg4.Draw()
-        labsA=getATLASLabels(None,0.2,0.9)
+        labsA=getATLASLabels(None,0.65,0.9)
         for l in labsA:
             l.Draw()
         #AddAtlasName(self.name)
@@ -592,7 +730,7 @@ class LimitHists:
         self.leg4.AddEntry(self.ratio_sig2_err, '#pm2#sigma',       'F')
         self.leg4.AddEntry(self.ratio_sig1_err, '#pm1#sigma',       'F')
         self.leg4.Draw()
-        labsA=getATLASLabels(None,0.2,0.9)
+        labsA=getATLASLabels(None,0.65,0.9)
         for l in labsA:
             l.Draw()
         #AddAtlasName(self.name)
@@ -820,7 +958,7 @@ def make_limit(name, fit_points, output):
     lh.Draw()
     
     c1.Modified()
-    labsA=getATLASLabels(None,0.2,0.86)
+    labsA=getATLASLabels(None,0.65,0.86)
     for l in labsA:
         l.Draw()
 
@@ -1044,7 +1182,7 @@ if __name__=="__main__":
 
     leg4.Draw()
     #AddAtlasName('')
-    labsA=getATLASLabels(c1,0.2,0.9)
+    labsA=getATLASLabels(c1,0.65,0.9)
     for l in labsA:
         l.Draw()
     c1.Update()
@@ -1167,7 +1305,7 @@ if __name__=="__main__":
 
     leg5.Draw()
     #AddAtlasName('')
-    labsA=getATLASLabels(c1,0.2,0.9)
+    labsA=getATLASLabels(c1,0.65,0.9)
     for l in labsA:
         l.Draw()
     c1.Update()
@@ -1193,7 +1331,7 @@ if __name__=="__main__":
     c1.Clear()
 
     rt.DrawRatio([limit_ratioh])
-    labsA=getATLASLabels(c1,0.2,0.9)
+    labsA=getATLASLabels(c1,0.65,0.9)
     for l in labsA:
         l.Draw()
     c1.Update()

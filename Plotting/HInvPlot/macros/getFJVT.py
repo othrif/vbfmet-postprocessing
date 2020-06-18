@@ -366,10 +366,10 @@ if __name__ == "__main__":
     mvar = args.mvar
     #h1=DrawFJVT(can,trig,lep, mvar, fname,fnameFailfjvt)
     #num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
-    num_path='pass_sr_nj2_nn_Nominal'
-    #num_path='pass_sr_nj2dphijj2_nn_Nominal'
+    #num_path='pass_sr_nj2_nn_Nominal'
+    num_path='pass_sr_nj2dphijj2_nn_Nominal'
     ntuplev='v37ALL'
-    fjvt='fjvt02'
+    fjvt='fjvt05'
     #ntuplev='v37D'
     #h1,cr1=GetFJVT(can, num_path, mvar, fname, fnameFailfjvt)
     h1=None
@@ -379,7 +379,7 @@ if __name__ == "__main__":
     if fjvt=='fjvt05':
         h1,cr1=GetFJVT(can, num_path, mvar, ntuplev+'Loose_SR_'+fjvt+'_met100.root', ntuplev+'Loose_SR_'+fjvt+'rev_met100.root')
         #num_path='pass_sr_nj2dphijj1_nn_Nominal'
-        h3,cr3=GetFJVT(can, 'pass_sr_allmjj_nn_Nominal', mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_SR_'+fjvt+'rev.root')        
+        h3,cr3=GetFJVT(can, 'pass_sr_allmjj_nn_Nominal', mvar, ntuplev+'_'+fjvt+'.root', ntuplev+'_SR_'+fjvt+'rev.root')
     else:
         h1,cr1=GetFJVT(can, num_path, mvar, ntuplev+'_SR_'+fjvt+'_met100.root', ntuplev+'_SR_'+fjvt+'rev_met100.root')    
     #num_path='pass_sr_allmjj_nn_Nominal'

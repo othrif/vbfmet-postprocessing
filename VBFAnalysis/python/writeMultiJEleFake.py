@@ -41,8 +41,8 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
             histcr.SetBinContent(1,0.0)
         if (Binning==21 or Binning==22) and (a==11 or a==12 or a==13):
             histcr.SetBinContent(1,0.0)
-        histHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"TFMJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"TFMJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histHigh.SetBinContent(1,mj*(1.+emjs[a-1]))
         histHigh.SetBinError(1,0.0)
         histLow.SetBinContent(1,mj*(1.-emjs[a-1]))
