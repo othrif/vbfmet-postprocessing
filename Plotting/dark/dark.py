@@ -46,7 +46,7 @@ def plot(mes_type,Nc, eU, eD, qU, qD):
     rand.SetSeed(5);
     
     # scan values of rgg
-    for i in range(0,5000):#50000
+    for i in range(0,50000):#50000
         g=rand.Rndm() # value of 0-1.0
         rggInput=0.1*g
         allowedPoints = isExcl(Nc, eU, eD, qU, qD, rand, rggInput = rggInput)
@@ -268,10 +268,10 @@ leplim.Draw(dopt)
 uphlim.Draw(dopt)
 dwhlim.Draw(dopt)
 updwlim.Draw(dopt)
-char10lim.Draw(dopt)
-char05lim.Draw(dopt)
-emchar05lim.Draw(dopt)
-emchar2lim.Draw(dopt)
+#char10lim.Draw(dopt)
+#char05lim.Draw(dopt)
+#emchar05lim.Draw(dopt)
+#emchar2lim.Draw(dopt)
 
 leg=ROOT.TLegend(0.6,0.6,0.8,0.8)
 leg.SetFillColor(0)
@@ -281,11 +281,12 @@ leg.AddEntry(leplim,'Leptonic Mess.')
 leg.AddEntry(uphlim,'Up Type Mess.')
 leg.AddEntry(dwhlim,'Down Type Mess.')
 leg.AddEntry(updwlim,'Up+Down Type Mess.')
-leg.AddEntry(char10lim,'Generic q=10 Mess.')
-leg.AddEntry(char05lim,'Generic q=0.5 e=1 Mess.')
-leg.AddEntry(emchar05lim,'Generic q=1 e=0.5 Mess.')
-leg.AddEntry(emchar2lim,'Generic q=1 e=2 Mess.')
+#leg.AddEntry(char10lim,'Generic q=10 Mess.')
+#leg.AddEntry(char05lim,'Generic q=0.5 e=1 Mess.')
+#leg.AddEntry(emchar05lim,'Generic q=1 e=0.5 Mess.')
+#leg.AddEntry(emchar2lim,'Generic q=1 e=2 Mess.')
 leg.Draw()
 
 can.Update()
 can.WaitPrimitive()
+raw_input('')
