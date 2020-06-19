@@ -658,6 +658,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         # trigger fix for electron channel
         cutElTrig = CutItem('CutElTrig')
         cutElTrig.AddCut(CutItem('Electron',  'n_el_w > 0 && trigger_lep==1'), 'OR')
+        #cutElTrig.AddCut(CutItem('Electron',  'n_el > 0 && trigger_lep==1'), 'OR')
         cutElTrig.AddCut(CutItem('Muon', 'n_mu>0 || n_mu_w>0'), 'OR')
         cuts += [cutElTrig]
     elif basic_cuts.chan in ['ee','ll','eu']:
@@ -689,8 +690,8 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         if basic_cuts.chan=='u':
             #cuts += [CutItem('CutMu','n_mu_w == 1')]
             cuts += [CutItem('CutMu','n_mu == 1')]
-        cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
-        #cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
+        #cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
+        cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
         cuts += [CutItem('CutBaseLep','n_baselep == 1')]
         cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
         #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        

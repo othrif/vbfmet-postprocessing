@@ -221,8 +221,8 @@ def getATLASLabels(pad, x, y, text=None, selkey=None):
     labs = [l]
 
     if True:
-        #p = ROOT.TLatex(x+0.11, y, ' Internal') #
-        p = ROOT.TLatex(x+0.11, y, ' Preliminary') #
+        p = ROOT.TLatex(x+0.11, y, ' Internal') #
+        #p = ROOT.TLatex(x+0.11, y, ' Preliminary') #
         p.SetNDC()
         p.SetTextFont(42)
         p.SetTextSize(0.065)

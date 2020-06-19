@@ -236,8 +236,8 @@ def getHistPars(hist):
         'jetEta1': {'xtitle':'Sub-Leading jet #it{#eta}'  ,       'ytitle':'Events', 'rebin':5},
         'jet1Phi': {'xtitle':'Sub-Leading jet #it{#phi}'  ,       'ytitle':'Events', 'rebin':2},
         'jetPt1' : {'xtitle':'#it{p}_{T}^{jet 2} [GeV]',          'ytitle':'Events / 10 GeV', 'rebin':5, 'LtoRCut':0},
-        'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'rebin':5, 'logy':True},
-        'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'rebin':5, 'logy':True},
+        'j0jvt' : {'xtitle':'Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'rebin':1, 'logy':True},
+        'j1jvt' : {'xtitle':'sub-Leading jet JVT',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'rebin':1, 'logy':True},
         'j0fjvt' : {'xtitle':'Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
         'j1fjvt' : {'xtitle':'sub-Leading jet f-JVT',          'ytitle':'Events', 'rebin':5,'ymin':0.1, 'logy':True, 'LtoRCut':0},
         'j0timing' : {'xtitle':'Leading jet timing [ns]',          'ytitle':'Events', 'rebin':1,'ymin':0.1, 'logy':True},
@@ -286,7 +286,7 @@ def getHistPars(hist):
         'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',              'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,'xmin':200,  'ymin':50.1,'ymax':25000,
         'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'mll'    : {'xtitle':'#it{m}_{ll} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},
-        'mlg'    : {'xtitle':'#it{m}_{l#gamma} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':150.0},        
+        'mlg'    : {'xtitle':'#it{m}_{l#gamma} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':500.0},        
         'mllg'    : {'xtitle':'#it{m}_{ll#gamma} [GeV]'  ,                    'ytitle':'Events / 5 GeV', 'rebin':4,  'ymin':0.001, 'xmax':500.0},
         'jj_mass'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,                   'ytitle':'Events / 500 GeV', 'rebin':5,  'ymin':1.0,'logy':True, 'LtoRCut':0},
         'jj_mass_variableBin'    : {'xtitle':'#it{m}_{jj} [GeV]'  ,        'xmin':200.0, 'xmax':5000.0,    'ymin':0.1,      'ytitle':'Events / 500 GeV', 'rebin':0, 'logy':False, 'LtoRCut':2}, # #for Z  # for W 'ymin':50.1,'ymax':30000,##'xmin':800.0, 'xmax':5000.0, 'ymin':50.1,'ymax':30000, 'ymin':50.1,'ymax':20000,
@@ -460,6 +460,7 @@ def getSampleSortKey(sample):
     elif sample == 'wgamewk': return 15
     elif sample == 'pho': return 13
     elif sample == 'efakeph': return 13
+    elif sample == 'jfakeph': return 13        
     elif sample == 'gamd': return 14        
 
     log.warning('getLabelSortKey - unknown key: %s' %sample)
@@ -498,7 +499,8 @@ def getSampleLabel(sample):
         'wgas': '#it{W#gamma*}',
         'zgas': '#it{Z#gamma*}',
         'zgam': '#it{Z#gamma} strong',
-        'efakeph': '#it{e}#rightarrow#gamma',        
+        'efakeph': '#it{e}#rightarrow#gamma',
+        'jfakeph': 'jet#rightarrow#gamma',
         'zgamewk': '#it{Z#gamma} EWK',
         'wgamewk': '#it{W#gamma} EWK',
         'ttg': '#it{t#bar{t}#gamma}',
@@ -576,6 +578,7 @@ def getStyle(sample):
     color_wgam = ROOT.kOrange
     color_zgam = ROOT.kOrange-3
     color_efakeph = ROOT.kGreen-2
+    color_jfakeph = ROOT.kGreen-3
     color_wgamewk = ROOT.kOrange-5
     color_zgamewk = ROOT.kOrange-6    
     color_ttg = ROOT.kBlue   -9
@@ -607,6 +610,7 @@ def getStyle(sample):
         'ttg':{'color':color_ttg, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'zgam':{'color':color_zgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'efakeph':{'color':color_efakeph, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
+        'jfakeph':{'color':color_jfakeph, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'wgam':{'color':color_wgam, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
         'zgamewk':{'color':color_zgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},        
         'wgamewk':{'color':color_wgamewk, 'fill_style':1001, 'marker_style': 0, 'line_width':0, 'leg_opt':'f'},
