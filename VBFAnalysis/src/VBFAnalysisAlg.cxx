@@ -319,7 +319,7 @@ StatusCode VBFAnalysisAlg::initialize() {
   m_tree_out->Branch("n_el_w",&n_el_w);
   m_tree_out->Branch("n_mu_w",&n_mu_w);
   m_tree_out->Branch("n_ph",&n_ph);
-  m_tree_out->Branch("n_ph_crackVetoCleaning",&n_ph_crackVetoCleaning);  
+  m_tree_out->Branch("n_ph_crackVetoCleaning",&n_ph_crackVetoCleaning);
   m_tree_out->Branch("n_tau",&n_tau);
   m_tree_out->Branch("jj_mass",&jj_mass);
   m_tree_out->Branch("jj_deta",&jj_deta);
@@ -744,7 +744,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
-  if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567 || runNumber==308276)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
+  if(m_isMC && met_truth_et>-0.5 && (runNumber==313343 || runNumber==346600 || runNumber==308567 || runNumber==308276)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
     //nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;// tighter mjj>1TeV
     nloEWKWeight=1.0 - 0.000350*(met_truth_et/1.0e3) - 0.0430;
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
@@ -791,6 +791,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
     if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights,n_jet_truth,truth_jj_mass, truth_jj_dphi);
+    if(runNumber==313343) my_signalSystHelper.setVBFGamVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights,n_jet_truth,truth_jj_mass, truth_jj_dphi);
     if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 111);
     if(runNumber>=312448 && runNumber<=312531) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 115); // filtered sherpa uses nnpdf
 
@@ -1586,11 +1587,12 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 
       // initialize the VBF & ggF variables
       if(m_runNumberInput==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
+      if(m_runNumberInput==313343) my_signalSystHelper.initVBFGamVars(tMapFloat,tMapFloatW, m_tree_out);      
       if(m_runNumberInput==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out, true); 
       // uncomment if you want to add the nnpdf inputs. would kind of double count
       //if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out, false);// filtered Sherpa samples use nnPDF
 
-      if(m_runNumberInput==346600 || m_runNumberInput==308276 || m_runNumberInput==308567) {
+      if(m_runNumberInput==313343 || m_runNumberInput==346600 || m_runNumberInput==308276 || m_runNumberInput==308567) {
 	if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
 	  tMapFloat["nloEWKWeight__1up"]=1.0;
 	  tMapFloatW["nloEWKWeight__1up"]=1.0;
