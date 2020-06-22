@@ -9,7 +9,7 @@ class sample(object):
         self.load(samplename,syst,Ext)
         self.sampleTypeList = ["W_EWKPow","W_EWKSh","W_EWK","W_strongExt","W_strong","Z_EWKPow","W_EWKSh","Z_EWK", "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strong228", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
                                "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","VBFHAltSignal","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',
-                               'VBFH3000','VBFH2000','VBFH1000','VBFH750','VBFH300','VBFH100','VBFH50','VBFH75','VBFHgamdark125','ggFHgamdark125','gamgamZ',
+                               'VBFH3000','VBFH2000','VBFH1000','VBFH750','VBFH300','VBFH100','VBFH50','VBFH75','VBFHgamdark125','ggFHgamdark125','gamgamZ','EFakePh','JetFakePh',
                                "data"] # do not change order
 
         self.sampleMap = {'data':['data'],
@@ -45,10 +45,12 @@ class sample(object):
                           'VBFH100':['VBFH100'],
                           'VBFH75':['VBFH75'],
                           'VBFH50':['VBFH50'],
+                          'EFakePh':['EFakePh'],
+                          'JetFakePh':['JetFakePh'],
                           }
 
     def load(self,samplename,syst,Ext):
-
+        print 'Loading: ',samplename
         if samplename == "":
             return
         if syst == "":
@@ -77,6 +79,10 @@ class sample(object):
                 self.isMC = False
             else:
                 self.isMC = True
+        if '/EFakePh' in samplename:
+            return 'EFakePh'
+        if '/JetFakePh' in samplename:
+            return 'JetFakePh'
         if (self.isMC):
             print "runNumebr::: ",self.runNumber
             if (self.runNumber >= 308096 and self.runNumber <= 308098):

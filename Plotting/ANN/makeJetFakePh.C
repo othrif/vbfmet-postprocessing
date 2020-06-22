@@ -298,7 +298,7 @@ void makeJetFakePh(std::string treeNmae="data", std::string period="A") {
     oldtree->GetEntry(i);
     // require 0 signal photons
     if (!(n_ph==0 && baseph_pt))  continue;
-    
+
     for(unsigned iph=0; iph<baseph_pt->size(); ++iph){
       //if (n_ph==0 && baseph_pt && baseph_pt->size()==1){// extrapolating from a base photon with selection X
       //ph_pointing_z=0.0;//setting arbitrary 0 because this is an electron with vertex confirmation, so it should pass.. load vtxpos. should already be set to the leading base photon for n_ph=0

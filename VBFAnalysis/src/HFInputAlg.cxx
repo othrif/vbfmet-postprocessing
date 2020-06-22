@@ -564,7 +564,8 @@ StatusCode HFInputAlg::execute() {
     passMTCut=0;
     if(n_el==1) {
       double MT = sqrt(2. * el_pt->at(0) * met_tst_et * (1. - cos(el_phi->at(0) - met_tst_phi)));
-      passMTCut=(MT>20e3) ? 1 : 2;
+      //passMTCut=(MT>40e3) ? 1 : 2;
+      passMTCut=(met_tst_et>80e3) ? 1 : 2;
     }
   }
 

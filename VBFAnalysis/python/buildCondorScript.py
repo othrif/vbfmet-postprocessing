@@ -8,9 +8,11 @@ def writeCondorShell(subDir, buildDir, runCommand, syst, scriptName="VBFAnalysis
     os.system("echo 'source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh --quiet' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'setupATLAS' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
-    os.system("echo 'lsetup rucio'  >> "+subDir+"/"+scriptName+syst+".sh")
+    if slc7:
+        os.system("echo 'lsetup rucio'  >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'asetup AthAnalysis,21.2.101,here' >> "+subDir+"/"+scriptName+syst+".sh")
-    os.system("echo 'voms-proxy-info'  >> "+subDir+"/"+scriptName+syst+".sh")
+    if slc7:
+        os.system("echo 'voms-proxy-info'  >> "+subDir+"/"+scriptName+syst+".sh")
     #os.system("echo 'cd "+buildDir+"; acmSetup; cd -;' >> "+subDir+"/"+scriptName+syst+".sh")
     os.system("echo 'export X509_USER_PROXY="+proxyName+"' >> "+subDir+"/"+scriptName+syst+".sh")
     #if slc7 or True: # until we get an slc7 release
