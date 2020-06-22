@@ -98,7 +98,7 @@ def getNF(histDict, nbins, signalKeys=[], NFOnly=False):
         if hkey in signalKeys:
             sigV+=getBinsYield(histDict[hkey], nbins)
             sigE+=(getBinsError(histDict[hkey], nbins))**2
-        elif hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet",'ttg','SinglePhoton','efakegam','jfakegam']:
+        elif hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet",'ttg','SinglePhoton','EFakePh','JetFakePh']:
             bkgV+=getBinsYield(histDict[hkey], nbins)
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=(dataV-bkgV)
@@ -117,7 +117,7 @@ def getDataMC(histDict, nbins):
     for hkey,hist in histDict.iteritems():
         if hkey=="signal":
             continue
-        if hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet",'ttg','SinglePhoton','efakegam','jfakegam']:
+        if hkey in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet",'ttg','SinglePhoton','EFakePh','JetFakePh']:
             bkgV+=getBinsYield(histDict[hkey], nbins)
             bkgE+=(getBinsError(histDict[hkey], nbins))**2
     nf=dataV
@@ -173,8 +173,8 @@ class texTable(object):
                    'Zg_strong':'$Z+\\gamma$ strong',
                    'ttg':'$t\\bar{t}+\\gamma$',
                    'SinglePhoton':'$\\gamma+$jet',
-                   'efakegam':'$e\\rightarrow\\gamma$',
-                   'jfakegam':'jet$\\rightarrow\\gamma$',
+                   'EFakePh':'$e\\rightarrow\\gamma$',
+                   'JetFakePh':'jet$\\rightarrow\\gamma$',
                    'Wg_strong':'$W+\\gamma$ strong',                   
                    'signal':'$H(B_{inv} = %0.2f)$' %(options.hscale),
                    'data':'Data',
@@ -373,7 +373,7 @@ class HistClass(object):
         return True
 
     def isBkg(self):
-        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet","VV","VVV","QCDw",'ttg','SinglePhoton','efakegam','jfakegam']:
+        if self.proc in ["Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar","eleFakes","muoFakes","multijet","VV","VVV","QCDw",'ttg','SinglePhoton','EFakePh','JetFakePh']:
             return True
         return False
 
@@ -429,7 +429,7 @@ class HistClass(object):
         if options.fakeMu:
             mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","data"]
         elif options.ph_ana:
-            mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar",'ttg','SinglePhoton',"data"] # 'efakegam','jfakegam'
+            mysamples=["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","Zg_strong","Wg_strong","Zg_EWK","Wg_EWK","ttbar",'ttg','SinglePhoton',"data"] # 'EFakePh','JetFakePh'
         for p in mysamples:
             LOK=[k.GetName() for k in cls.Irfile.GetListOfKeys() if p in k.GetName()]
             if len(LOK)==0:
@@ -454,10 +454,11 @@ class HistClass(object):
                 cls.nBins=cls.getNumberOfBins()
             for n in range(1,cls.nBins+1):
                 if options.ph_ana:
-                    cls.regDict["SR{}".format(n)]=cls.nBins*3+n
-                    cls.regDict["oneMuCR{}".format(n)]=cls.nBins+n
-                    cls.regDict["oneEleCR{}".format(n)]=n
-                    cls.regDict["twoLepCR{}".format(n)]=cls.nBins*2+n                    
+                    cls.regDict["SR{}".format(n)]=cls.nBins*4+n
+                    cls.regDict["oneMuCR{}".format(n)]=2*cls.nBins+n
+                    cls.regDict["oneEleCR{}".format(n)]=n+cls.nBins
+                    cls.regDict["oneEleLowSigCR{}".format(n)]=n
+                    cls.regDict["twoLepCR{}".format(n)]=cls.nBins*3+n
                 elif options.combinePlusMinus:
                     cls.regDict["SR{}".format(n)]=cls.nBins*4+n
                     cls.regDict["oneMuCR{}".format(n)]=cls.nBins*2+n
@@ -487,7 +488,8 @@ class HistClass(object):
                 cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
                 cls.regionBins["ZCRll"]=[cls.regDict[k] for k in cls.regDict if "twoLepCR" in k]
                 cls.regionBins["WCRenu"]=[cls.regDict[k] for k in cls.regDict if "oneEleCR" in k]
-                cls.regionBins["WCRmunu"]=[cls.regDict[k] for k in cls.regDict if "oneMuCR" in k]                
+                cls.regionBins["WCRmunu"]=[cls.regDict[k] for k in cls.regDict if "oneMuCR" in k]
+                cls.regionBins["lowsigWCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleLowSigCR" in k]
             elif options.combinePlusMinus:
                 cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
                 cls.regionBins["ZCRll"]=[cls.regDict[k] for k in cls.regDict if "twoLepCR" in k]
@@ -570,8 +572,8 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
                    'Wg_EWK':'#it{W+#gamma} EWK',
                    'ttg':'#it{t#bar{t}}+#it{#gamma}',
                    'SinglePhoton':'#it{#gamma}+jet',
-                   'efakegam':'#it{e}#rightarrow#it{#gamma}',
-                   'jfakegam':'jet#rightarrow#it{#gamma}',
+                   'EFakePh':'#it{e}#rightarrow#it{#gamma}',
+                   'JetFakePh':'jet#rightarrow#it{#gamma}',
                    'Zg_strong':'#it{Z+#gamma} strong',
                    'Wg_strong':'#it{W+#gamma} strong',
                    'signal':'#it{H}(#it{B}_{inv} = %0.2f)' %options.hscale,
@@ -806,7 +808,7 @@ def getNumberOfBins(rfileInput):
     tmpIrfile=ROOT.TFile(rfileInput)
     nbins=0
     LOK=None
-    for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","Zg_strong","Wg_strong","Zg_EWK",'ttg','SinglePhoton','efakegam','jfakegam',"Wg_EWK","data"]:
+    for p in ["VBFH","Z_strong","W_strong","Z_EWK","W_EWK","ttbar","eleFakes","muoFakes","multijet","Zg_strong","Wg_strong","Zg_EWK",'ttg','SinglePhoton','EFakePh','JetFakePh',"Wg_EWK","data"]:
         LOK=[k.GetName() for k in tmpIrfile.GetListOfKeys() if p in k.GetName()]
         if len(LOK)==0:
             continue
@@ -831,7 +833,7 @@ def main(options):
     can=ROOT.TCanvas("c","c",1000,600)
     byNum=9
     if options.ph_ana:
-        byNum=4
+        byNum=5
     elif options.combinePlusMinus:
         byNum=5
         if options.fakeMu:
@@ -874,15 +876,16 @@ def main(options):
     if options.fakeMu:
         histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes","muoFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
     if options.ph_ana:
-        histNames=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'ttg','SinglePhoton']  # 'efakegam','jfakegam'
+        histNames=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'ttg','SinglePhoton']  # 'EFakePh','JetFakePh'
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
         if options.ph_ana:
-            regDict["SR{}".format(n)]=nbins*3+n
-            regDict["oneMuCR{}".format(n)]=nbins+n
-            regDict["oneEleCR{}".format(n)]=n
-            regDict["twoLepCR{}".format(n)]=nbins*2+n            
+            regDict["SR{}".format(n)]=nbins*4+n
+            regDict["oneMuCR{}".format(n)]=2*nbins+n
+            regDict["oneEleCR{}".format(n)]=n+nbins
+            regDict["oneEleLowSigCR{}".format(n)]=n            
+            regDict["twoLepCR{}".format(n)]=nbins*3+n            
         elif options.combinePlusMinus:
             #if not options.cronly:
             regDict["SR{}".format(n)]=nbins*4+n
@@ -914,12 +917,13 @@ def main(options):
     byNum=9
 
     if options.ph_ana:
-        byNum=4
+        byNum=5
         regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
         regionBins["ZCRll"]=[regDict[k] for k in regDict if "twoLepCR" in k]
         regionBins["WCRenu"]=[regDict[k] for k in regDict if "oneEleCR" in k]
         regionBins["WCRmunu"]=[regDict[k] for k in regDict if "oneMuCR" in k]
         regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]
+        regionBins["lowsigWCRen"]=[regDict[k] for k in regDict if "oneEleLowSigCR" in k]
     elif options.combinePlusMinus:
         byNum=5
         regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
@@ -950,8 +954,12 @@ def main(options):
         regionBins["lowsigWCRenu"]=regionBins["lowsigWCRep"]+regionBins["lowsigWCRen"]
 
     #setting dummyHist
+    
     for k in regDict:
-        dummyHist.GetXaxis().SetBinLabel(regDict[k],k)
+        if options.addBinLabel:
+            dummyHist.GetXaxis().SetBinLabel(regDict[k],k)
+        else:
+            dummyHist.GetXaxis().SetBinLabel(regDict[k],'')            
     dummyHist.SetMaximum(2000)
     dummyHist.SetMinimum(1)
     dummyHist.GetYaxis().SetTitle("Events / Bin")
@@ -999,10 +1007,10 @@ def main(options):
         Style.setStyles(hDict["Wg_EWK"],Style.styleDict["W_EWK"])
         Style.setStyles(hDict["SinglePhoton"],Style.styleDict["SinglePhoton"])
         Style.setStyles(hDict["ttg"],Style.styleDict["ttg"])
-        if 'efakegam' in hDict:
-            Style.setStyles(hDict["efakegam"],Style.styleDict["efakegam"])
-        if 'jfakegam' in hDict:
-            Style.setStyles(hDict["jfakegam"],Style.styleDict["jfakegam"])            
+        if 'EFakePh' in hDict:
+            Style.setStyles(hDict["EFakePh"],Style.styleDict["EFakePh"])
+        if 'JetFakePh' in hDict:
+            Style.setStyles(hDict["JetFakePh"],Style.styleDict["JetFakePh"])            
     Style.setStyles(hDict["Z_strong"],Style.styleDict["Z_strong"])
     Style.setStyles(hDict["Z_EWK"],Style.styleDict["Z_EWK"])
     Style.setStyles(hDict["W_strong"],Style.styleDict["W_strong"])
@@ -1145,7 +1153,7 @@ def main(options):
     if options.fakeMu:
         bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","muoFakes","ttbar","multijet"] #+["Others"]
     if options.ph_ana:
-        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'SinglePhoton','ttg']  #+["Others"] 'efakegam','jfakegam'
+        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'SinglePhoton','ttg']  #+["Others"] 'EFakePh','JetFakePh','eleFakes'
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
     hDict["bkgs"]=bkgs
     hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
@@ -1423,13 +1431,18 @@ def main(options):
         rHist.GetYaxis().CenterTitle()
 
 	#Set x axis labels
+        
         for k in regDict:
-	    if options.combinePlusMinus:
-	        index=k.find('R')
-                rHist.GetXaxis().SetBinLabel(regDict[k],k[index+1::])
-	        rHist.GetXaxis().LabelsOption('h')
-	    else:
-                rHist.GetXaxis().SetBinLabel(regDict[k],k)
+            if options.combinePlusMinus:
+                if options.addBinLabel:
+                    index=k.find('R')
+                    rHist.GetXaxis().SetBinLabel(regDict[k],k[index+1::])
+                    rHist.GetXaxis().LabelsOption('h')
+            else:
+                if options.addBinLabel:
+                    rHist.GetXaxis().SetBinLabel(regDict[k],k)
+                else:
+                    rHist.GetXaxis().SetBinLabel(regDict[k],'')
         rHist.GetXaxis().SetLabelSize(0.1)
         rHist.GetYaxis().SetLabelSize(0.1)
 	
@@ -1535,20 +1548,42 @@ def main(options):
                  'Zll':'#it{Z}_{#it{ll}}^{#it{#gamma}} CR',##it{Z}#rightarrow#it{ll}
                  }
         
-        shift=0.01
-        newShift=-0.06
-        line0=ROOT.TLine(0.162+newShift-0.002,0.02,0.162+newShift-0.002,0.11)
+        #shift=0.01
+        #newShift=-0.06
+        #line0=ROOT.TLine(0.162+newShift-0.002,0.02,0.162+newShift-0.002,0.11)
+        #line0.Draw()
+        #labelTxt.DrawLatex(0.20+shift+0.005+newShift,yvallab,nameMap['Wenu'])
+        #line2=ROOT.TLine(0.347+newShift-0.002,0.02,0.347+newShift-0.002,0.11)
+        #line2.Draw()
+        #labelTxt.DrawLatex(0.39+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
+        #line3=ROOT.TLine(0.531+newShift-0.001,0.02,0.531+newShift-0.001,0.11)
+        #line3.Draw()
+        #labelTxt.DrawLatex(0.58+shift+newShift,yvallab,nameMap['Zll'])
+        #line4=ROOT.TLine(0.715+newShift,0.02,0.715+newShift,0.11)
+        #line4.Draw()        
+        #labelTxt.DrawLatex(0.79+newShift,yvallab,"SR")
+        #line5=ROOT.TLine(0.9+newShift,0.02,0.9+newShift,0.11)
+        #line5.Draw()
+        #hline=ROOT.TLine(0.16+newShift,0.08,0.9+newShift,0.08)
+        #hline.Draw()
+        #hline0=ROOT.TLine(0.16+newShift,0.02,0.9+newShift,0.02)
+        #hline0.Draw()
+
+        line00=ROOT.TLine(0.16+newShift,0.02,0.16+newShift,0.11)
+        line00.Draw()
+        labelTxt.DrawLatex(0.17+shift-0.01+newShift,yvallab,nameMap['FakeE'])
+        line0=ROOT.TLine(0.31+newShift-0.002,0.02,0.31+newShift-0.002,0.11)
         line0.Draw()
-        labelTxt.DrawLatex(0.20+shift+0.005+newShift,yvallab,nameMap['Wenu'])
-        line2=ROOT.TLine(0.347+newShift-0.002,0.02,0.347+newShift-0.002,0.11)
+        labelTxt.DrawLatex(0.33+shift+0.005+newShift,yvallab,nameMap['Wenu'])
+        line2=ROOT.TLine(0.458+newShift-0.002,0.02,0.458+newShift-0.002,0.11)
         line2.Draw()
-        labelTxt.DrawLatex(0.39+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
-        line3=ROOT.TLine(0.531+newShift-0.001,0.02,0.531+newShift-0.001,0.11)
+        labelTxt.DrawLatex(0.48+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
+        line3=ROOT.TLine(0.605+newShift-0.001,0.02,0.605+newShift-0.001,0.11)
         line3.Draw()
-        labelTxt.DrawLatex(0.58+shift+newShift,yvallab,nameMap['Zll'])
-        line4=ROOT.TLine(0.715+newShift,0.02,0.715+newShift,0.11)
+        labelTxt.DrawLatex(0.645+shift+newShift,yvallab,nameMap['Zll'])
+        line4=ROOT.TLine(0.752+newShift,0.02,0.752+newShift,0.11)
         line4.Draw()        
-        labelTxt.DrawLatex(0.79+newShift,yvallab,"SR")
+        labelTxt.DrawLatex(0.81+newShift,yvallab,"SR")
         line5=ROOT.TLine(0.9+newShift,0.02,0.9+newShift,0.11)
         line5.Draw()
         hline=ROOT.TLine(0.16+newShift,0.08,0.9+newShift,0.08)
@@ -2394,7 +2429,8 @@ if __name__=='__main__':
     p.add_option('--fakeMu', action='store_true', help='Add Fake muon CR')        
     p.add_option('--stack-signal', action='store_true', help='Stack the signal')
     p.add_option('--cronly', action='store_true', help='Shows the CR only')    
-    p.add_option('--ph-ana', action='store_true', help='Photon analysis')    
+    p.add_option('--ph-ana', action='store_true', help='Photon analysis')
+    p.add_option('--addBinLabel', action='store_true', help='add bin labels?')        
     p.add_option('--debug', action='store_true', help='Print in debug mode')
     p.add_option('--combinePlusMinus', action='store_true', help='Combine the plus and minus')
     p.add_option('-r', '--ratio', action='store_true', help='Draw Data/Bkg ratio in case of -i and adds ratios to tables for both -i and -c')

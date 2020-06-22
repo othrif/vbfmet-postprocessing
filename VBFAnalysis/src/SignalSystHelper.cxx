@@ -165,6 +165,43 @@ void SignalSystHelper::setVBFVars(std::map<TString, Float_t> &tMapFloat, int cat
   tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=mcEventWeights->at(DefaultVal+32)/mcEventWeights->at(DefaultVal);
 }
 
+// set VBF vars
+void SignalSystHelper::setVBFGamVars(std::map<TString, Float_t> &tMapFloat, int category, std::vector<Float_t>* mcEventWeights, Int_t n_jet_truth, Double_t truth_jj_mass, Double_t truth_jj_dphi){
+
+  // scale variations
+  //Scale_up/Nominal
+  float scaleUp = (1.009478) + (-0.000684)*(truth_jj_mass/1e6) + (0.001080)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6);
+  //Scale_down/Nominal
+  float scaleDw = (0.995278) + (0.001302)*(truth_jj_mass/1e6) + (-0.001584)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6);
+  if(fabs(1.0-scaleUp)>0.2) scaleUp=1.2;
+  if(fabs(1.0-scaleDw)>0.2) scaleUp=0.8;
+  tMapFloat["VBF_qqgamH_Scale__1up"]=scaleUp;
+  tMapFloat["VBF_qqgamH_Scale__1down"]=scaleDw;
+  
+  // parton shower models compariing H7/Py8
+  float psvariation = 1.0-(0.790174) + (0.327218)*(truth_jj_mass/1e6) + (-0.169809)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6) + (0.024659)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6);
+  if(psvariation>0.2) psvariation=0.2; // just a sanity check
+  if(psvariation<-0.2) psvariation=-0.2; // just a sanity check
+  tMapFloat["VBF_qqgamH_PSVar__1up"]=1.0+psvariation;
+  tMapFloat["VBF_qqgamH_PSVar__1down"]=1.0-psvariation;
+  
+  // Check the weights are loaded
+  if(mcEventWeights && !mcEventWeights && mcEventWeights->size()<77)
+    std::cout << "SignalSystHelper::setVBFGamVars - Unknown event weights! " << mcEventWeights << std::endl;
+
+  // value is 0
+  unsigned DefaultVal=42;
+  if(mcEventWeights->at(DefaultVal)==0.0){ std::cout << "WANRING - PDF weight is 0" << std::endl; return; }
+  
+  // PDF variations for 90401 nloPDF with 30 variations
+  for(unsigned i=1; i<31; ++i){
+    tMapFloat["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=mcEventWeights->at(DefaultVal+i)/mcEventWeights->at(DefaultVal);
+  }
+  // ATLAS_PDF4LHC_NLO_30_alphaS up 31 and down 32
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]=mcEventWeights->at(DefaultVal+31)/mcEventWeights->at(DefaultVal);
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=mcEventWeights->at(DefaultVal+32)/mcEventWeights->at(DefaultVal);
+}
+
 // set ggF vars
 void SignalSystHelper::setggFVars(std::map<TString, Float_t> &tMapFloat, std::vector<Float_t>* mcEventWeights, unsigned defaultPDFVal = 111){
 
@@ -220,6 +257,36 @@ void SignalSystHelper::initggFVars(std::map<TString, Float_t> &tMapFloat, std::m
     tMapFloatW["ggF_gg2H_PSVarWeights__1down"]=1.0;
     tree->Branch("wggF_gg2H_PSVarWeights__1down",&(tMapFloatW["ggF_gg2H_PSVarWeights__1down"]));
   }
+}
+
+// create variations
+void SignalSystHelper::initVBFGamVars(std::map<TString, Float_t> &tMapFloat, std::map<TString, Float_t> &tMapFloatW, TTree *tree){
+
+  std::string var_name = "";
+  std::vector<std::string> variations = {"VBF_qqgamH_Scale__1up","VBF_qqgamH_Scale__1down",
+					 "VBF_qqgamH_PSVar__1up","VBF_qqgamH_PSVar__1down"};
+  // add the VBFgam scale+PS variations
+  for(unsigned i=0; i<variations.size(); ++i){
+    tMapFloat[variations.at(i)]=1.0;
+    tMapFloatW[variations.at(i)]=1.0;
+    var_name = "w"+variations.at(i);
+    tree->Branch(var_name.c_str(),&(tMapFloatW[variations.at(i)]));
+  }
+
+  // add the VBF PDF variations
+  for(unsigned i=1; i<31; ++i){    
+    tMapFloat["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=1.0;
+    tMapFloatW["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=1.0;
+    var_name="wATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up";
+    tree->Branch(var_name.c_str(),&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]));
+  }
+  // ATLAS_PDF4LHC_NLO_30_alphaS up 31 and down 32
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]=1.0;
+  tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]=1.0;
+  tree->Branch("wATLAS_PDF4LHC_NLO_30_alphaS__1up",&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1up"]));
+  tMapFloat["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=1.0;
+  tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]=1.0;
+  tree->Branch("wATLAS_PDF4LHC_NLO_30_alphaS__1down",&(tMapFloatW["ATLAS_PDF4LHC_NLO_30_alphaS__1down"]));
 }
 
 // create variations

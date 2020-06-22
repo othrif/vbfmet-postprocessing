@@ -360,14 +360,14 @@ if __name__ == "__main__":
             os.mkdir(args.outdir)
     
     Style()
-    can = ROOT.TCanvas('stack', 'stack', 500, 500)
+    can = ROOT.TCanvas('stack', 'stack', 800, 500)
     fname=args.input
     fnameFailfjvt = args.inputfail
     mvar = args.mvar
     #h1=DrawFJVT(can,trig,lep, mvar, fname,fnameFailfjvt)
     #num_path='pass_sr_LowMETQCDSRFJVT_nn_Nominal'
     #num_path='pass_sr_nj2_nn_Nominal'
-    num_path='pass_sr_nj2dphijj2_nn_Nominal'
+    num_path='pass_sr_nj2dphijj1_nn_Nominal'
     ntuplev='v37ALL'
     fjvt='fjvt05'
     #ntuplev='v37D'
@@ -415,10 +415,24 @@ if __name__ == "__main__":
     hA,crA=GetFJVT(can, num_path, mvar, 'v37A_'+fjvt+'.root', 'v37A_SR_'+fjvt+'rev.root')
     hD,crD=GetFJVT(can, num_path, mvar, 'v37D_'+fjvt+'.root', 'v37D_SR_'+fjvt+'rev.root')
     hE,crE=GetFJVT(can, num_path, mvar, 'v37E_'+fjvt+'.root', 'v37E_SR_'+fjvt+'rev.root')
+    if args.mvar=='jj_dphi': # correct for missing Znn mc
+        h1.SetBinContent(1,1.8)
+        h5.SetBinContent(1,1.65)
+        h4.SetBinContent(1,1.44)
+    if args.mvar=='jj_mass_variableBin': # correct for missing Znn mc
+        h1.Scale(0.8)
+    if args.mvar=='jj_mass_variableBin' and True: # correct for missing Znn mc
+        h1.SetBinContent(7,1.2)        
+        h2.SetBinContent(7,1.37)        
+        h5.SetBinContent(6,1.65)
+        h4.SetBinContent(7,1.66)
+        #h4.SetBinContent(7,1.76)                
     #if args.mvar=='met_tst_et':
     #    h1.SetBinContent(11,1.5)
+    #    h1.SetBinContent(12,2.1)        
+    ##    h1.SetBinContent(13,1.8)        
     #    if h5:
-    #        h5.SetBinContent(18,1.55)
+    #        h5.SetBinContent(18,1.65)
     #    if h4:
     #        h4.SetBinContent(17,1.44)
     can.Clear()
@@ -475,7 +489,8 @@ if __name__ == "__main__":
     for i in range(1,h9.GetNbinsX()+2):
         print 'Bin %0.1f Val: %0.3f ' %(h9.GetXaxis().GetBinLowEdge(i),h9.GetBinContent(i))
     # getting the weighted average
-    listofh = [h1,h30,h6,h2,h4,h5,h7,h8]
+    #listofh = [h1,h30,h6,h2,h4,h5,h7,h8]
+    listofh = [h1,h30,h6,h2] # remove 160,170,180,190
     if not h7:
             listofh = [h1,h30,h6,h2]
     allvs=[]
@@ -507,7 +522,10 @@ if __name__ == "__main__":
             #(average, math.sqrt(variance))
             print 'Bin %0.1f Average: %0.3f +/- %0.3f (std dev.) +/- %0.3f (weighted err) relative Error: %0.2f (rel. error on weighted avg)' %(h1.GetXaxis().GetBinLowEdge(i),weightedAvg,avgerr, math.sqrt(variance), (math.sqrt(variance)/weightedAvg))
             WfuncSyst.SetBinContent(i,weightedAvg)
-            WfuncSyst.SetBinError(i,math.sqrt(variance))
+            errt = math.sqrt(variance)
+            if weightedAvg>0.0 and (errt/weightedAvg)<0.2:
+                errt=0.2*weightedAvg
+            WfuncSyst.SetBinError(i,errt)
         else:
             WfuncSyst.SetBinContent(i,0)
             WfuncSyst.SetBinError(i,0)

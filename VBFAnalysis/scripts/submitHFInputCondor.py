@@ -51,6 +51,9 @@ if not args.doVBFMETGam:
         writeMultiJetFJVT(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist, doTMVA=args.doTMVA)    
     writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist,METCut=myMetCut)
     writeFakeMuo(int(args.Binning), args.year, METCut=myMetCut)
+else:
+    myMetCut=int(args.METCut/1e3)
+    writeFakeEleGam(Binning=int(args.Binning), year=args.year, METCut=myMetCut, doTMVA=args.doTMVA)
 
 ### Load systematics list from VBFAnalysis/python/systematics.py ###
 if args.nominal:
