@@ -454,10 +454,11 @@ class HistClass(object):
                 cls.nBins=cls.getNumberOfBins()
             for n in range(1,cls.nBins+1):
                 if options.ph_ana:
-                    cls.regDict["SR{}".format(n)]=cls.nBins*3+n
-                    cls.regDict["oneMuCR{}".format(n)]=cls.nBins+n
-                    cls.regDict["oneEleCR{}".format(n)]=n
-                    cls.regDict["twoLepCR{}".format(n)]=cls.nBins*2+n                    
+                    cls.regDict["SR{}".format(n)]=cls.nBins*4+n
+                    cls.regDict["oneMuCR{}".format(n)]=2*cls.nBins+n
+                    cls.regDict["oneEleCR{}".format(n)]=n+cls.nBins
+                    cls.regDict["oneEleLowSigCR{}".format(n)]=n
+                    cls.regDict["twoLepCR{}".format(n)]=cls.nBins*3+n
                 elif options.combinePlusMinus:
                     cls.regDict["SR{}".format(n)]=cls.nBins*4+n
                     cls.regDict["oneMuCR{}".format(n)]=cls.nBins*2+n
@@ -487,7 +488,8 @@ class HistClass(object):
                 cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
                 cls.regionBins["ZCRll"]=[cls.regDict[k] for k in cls.regDict if "twoLepCR" in k]
                 cls.regionBins["WCRenu"]=[cls.regDict[k] for k in cls.regDict if "oneEleCR" in k]
-                cls.regionBins["WCRmunu"]=[cls.regDict[k] for k in cls.regDict if "oneMuCR" in k]                
+                cls.regionBins["WCRmunu"]=[cls.regDict[k] for k in cls.regDict if "oneMuCR" in k]
+                cls.regionBins["lowsigWCRen"]=[cls.regDict[k] for k in cls.regDict if "oneEleLowSigCR" in k]
             elif options.combinePlusMinus:
                 cls.regionBins["SR"]=[cls.regDict[k] for k in cls.regDict if "SR" in k]
                 cls.regionBins["ZCRll"]=[cls.regDict[k] for k in cls.regDict if "twoLepCR" in k]
@@ -831,7 +833,7 @@ def main(options):
     can=ROOT.TCanvas("c","c",1000,600)
     byNum=9
     if options.ph_ana:
-        byNum=4
+        byNum=5
     elif options.combinePlusMinus:
         byNum=5
         if options.fakeMu:
@@ -879,10 +881,11 @@ def main(options):
     regDict=OrderedDict()
     for n in range(1,nbins+1):
         if options.ph_ana:
-            regDict["SR{}".format(n)]=nbins*3+n
-            regDict["oneMuCR{}".format(n)]=nbins+n
-            regDict["oneEleCR{}".format(n)]=n
-            regDict["twoLepCR{}".format(n)]=nbins*2+n            
+            regDict["SR{}".format(n)]=nbins*4+n
+            regDict["oneMuCR{}".format(n)]=2*nbins+n
+            regDict["oneEleCR{}".format(n)]=n+nbins
+            regDict["oneEleLowSigCR{}".format(n)]=n            
+            regDict["twoLepCR{}".format(n)]=nbins*3+n            
         elif options.combinePlusMinus:
             #if not options.cronly:
             regDict["SR{}".format(n)]=nbins*4+n
@@ -914,12 +917,13 @@ def main(options):
     byNum=9
 
     if options.ph_ana:
-        byNum=4
+        byNum=5
         regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
         regionBins["ZCRll"]=[regDict[k] for k in regDict if "twoLepCR" in k]
         regionBins["WCRenu"]=[regDict[k] for k in regDict if "oneEleCR" in k]
         regionBins["WCRmunu"]=[regDict[k] for k in regDict if "oneMuCR" in k]
         regionBins["WCRlnu"]=regionBins["WCRenu"]+regionBins["WCRmunu"]
+        regionBins["lowsigWCRen"]=[regDict[k] for k in regDict if "oneEleLowSigCR" in k]
     elif options.combinePlusMinus:
         byNum=5
         regionBins["SR"]=[regDict[k] for k in regDict if "SR" in k]
@@ -950,8 +954,12 @@ def main(options):
         regionBins["lowsigWCRenu"]=regionBins["lowsigWCRep"]+regionBins["lowsigWCRen"]
 
     #setting dummyHist
+    
     for k in regDict:
-        dummyHist.GetXaxis().SetBinLabel(regDict[k],k)
+        if options.addBinLabel:
+            dummyHist.GetXaxis().SetBinLabel(regDict[k],k)
+        else:
+            dummyHist.GetXaxis().SetBinLabel(regDict[k],'')            
     dummyHist.SetMaximum(2000)
     dummyHist.SetMinimum(1)
     dummyHist.GetYaxis().SetTitle("Events / Bin")
@@ -1423,13 +1431,18 @@ def main(options):
         rHist.GetYaxis().CenterTitle()
 
 	#Set x axis labels
+        
         for k in regDict:
-	    if options.combinePlusMinus:
-	        index=k.find('R')
-                rHist.GetXaxis().SetBinLabel(regDict[k],k[index+1::])
-	        rHist.GetXaxis().LabelsOption('h')
-	    else:
-                rHist.GetXaxis().SetBinLabel(regDict[k],k)
+            if options.combinePlusMinus:
+                if options.addBinLabel:
+                    index=k.find('R')
+                    rHist.GetXaxis().SetBinLabel(regDict[k],k[index+1::])
+                    rHist.GetXaxis().LabelsOption('h')
+            else:
+                if options.addBinLabel:
+                    rHist.GetXaxis().SetBinLabel(regDict[k],k)
+                else:
+                    rHist.GetXaxis().SetBinLabel(regDict[k],'')
         rHist.GetXaxis().SetLabelSize(0.1)
         rHist.GetYaxis().SetLabelSize(0.1)
 	
@@ -1535,20 +1548,42 @@ def main(options):
                  'Zll':'#it{Z}_{#it{ll}}^{#it{#gamma}} CR',##it{Z}#rightarrow#it{ll}
                  }
         
-        shift=0.01
-        newShift=-0.06
-        line0=ROOT.TLine(0.162+newShift-0.002,0.02,0.162+newShift-0.002,0.11)
+        #shift=0.01
+        #newShift=-0.06
+        #line0=ROOT.TLine(0.162+newShift-0.002,0.02,0.162+newShift-0.002,0.11)
+        #line0.Draw()
+        #labelTxt.DrawLatex(0.20+shift+0.005+newShift,yvallab,nameMap['Wenu'])
+        #line2=ROOT.TLine(0.347+newShift-0.002,0.02,0.347+newShift-0.002,0.11)
+        #line2.Draw()
+        #labelTxt.DrawLatex(0.39+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
+        #line3=ROOT.TLine(0.531+newShift-0.001,0.02,0.531+newShift-0.001,0.11)
+        #line3.Draw()
+        #labelTxt.DrawLatex(0.58+shift+newShift,yvallab,nameMap['Zll'])
+        #line4=ROOT.TLine(0.715+newShift,0.02,0.715+newShift,0.11)
+        #line4.Draw()        
+        #labelTxt.DrawLatex(0.79+newShift,yvallab,"SR")
+        #line5=ROOT.TLine(0.9+newShift,0.02,0.9+newShift,0.11)
+        #line5.Draw()
+        #hline=ROOT.TLine(0.16+newShift,0.08,0.9+newShift,0.08)
+        #hline.Draw()
+        #hline0=ROOT.TLine(0.16+newShift,0.02,0.9+newShift,0.02)
+        #hline0.Draw()
+
+        line00=ROOT.TLine(0.16+newShift,0.02,0.16+newShift,0.11)
+        line00.Draw()
+        labelTxt.DrawLatex(0.17+shift-0.01+newShift,yvallab,nameMap['FakeE'])
+        line0=ROOT.TLine(0.31+newShift-0.002,0.02,0.31+newShift-0.002,0.11)
         line0.Draw()
-        labelTxt.DrawLatex(0.20+shift+0.005+newShift,yvallab,nameMap['Wenu'])
-        line2=ROOT.TLine(0.347+newShift-0.002,0.02,0.347+newShift-0.002,0.11)
+        labelTxt.DrawLatex(0.33+shift+0.005+newShift,yvallab,nameMap['Wenu'])
+        line2=ROOT.TLine(0.458+newShift-0.002,0.02,0.458+newShift-0.002,0.11)
         line2.Draw()
-        labelTxt.DrawLatex(0.39+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
-        line3=ROOT.TLine(0.531+newShift-0.001,0.02,0.531+newShift-0.001,0.11)
+        labelTxt.DrawLatex(0.48+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
+        line3=ROOT.TLine(0.605+newShift-0.001,0.02,0.605+newShift-0.001,0.11)
         line3.Draw()
-        labelTxt.DrawLatex(0.58+shift+newShift,yvallab,nameMap['Zll'])
-        line4=ROOT.TLine(0.715+newShift,0.02,0.715+newShift,0.11)
+        labelTxt.DrawLatex(0.645+shift+newShift,yvallab,nameMap['Zll'])
+        line4=ROOT.TLine(0.752+newShift,0.02,0.752+newShift,0.11)
         line4.Draw()        
-        labelTxt.DrawLatex(0.79+newShift,yvallab,"SR")
+        labelTxt.DrawLatex(0.81+newShift,yvallab,"SR")
         line5=ROOT.TLine(0.9+newShift,0.02,0.9+newShift,0.11)
         line5.Draw()
         hline=ROOT.TLine(0.16+newShift,0.08,0.9+newShift,0.08)
@@ -2394,7 +2429,8 @@ if __name__=='__main__':
     p.add_option('--fakeMu', action='store_true', help='Add Fake muon CR')        
     p.add_option('--stack-signal', action='store_true', help='Stack the signal')
     p.add_option('--cronly', action='store_true', help='Shows the CR only')    
-    p.add_option('--ph-ana', action='store_true', help='Photon analysis')    
+    p.add_option('--ph-ana', action='store_true', help='Photon analysis')
+    p.add_option('--addBinLabel', action='store_true', help='add bin labels?')        
     p.add_option('--debug', action='store_true', help='Print in debug mode')
     p.add_option('--combinePlusMinus', action='store_true', help='Combine the plus and minus')
     p.add_option('-r', '--ratio', action='store_true', help='Draw Data/Bkg ratio in case of -i and adds ratios to tables for both -i and -c')
