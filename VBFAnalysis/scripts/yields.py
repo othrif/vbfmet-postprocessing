@@ -97,7 +97,9 @@ if args.ph_ana:
           'httbar_',
           'httg_',
           'hSinglePhoton_',
-          #'heleFakes_',
+          'EFakePh_',
+          'JetFakePh_',
+          'heleFakes_',
           #'hmultijet_',
           'hdata_',
     ]

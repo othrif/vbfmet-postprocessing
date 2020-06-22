@@ -3,14 +3,15 @@ import ROOT
 import os
 def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False):
     f_multijet = ROOT.TFile("multijetFJVT.root", "recreate")
-    mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 50.0]
-    emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18]    
+    mjs = [2.14, 1.99, 1.53, 1.38, 1.65, 1.97, 1.85, 1.67, 1.30, 1.18, 50.0]
+    emjs = [0.2, 0.2, 0.2, 0.2, 0.2, 0.28, 0.26, 0.22, 0.2, 0.23, 0.18]
+    statemjs = [0.10, 0.18, 0.17, 0.10, 0.27, 0.13, 0.17, 0.19, 0.25, 0.23, 0.18]        
     if Binning==11 or Binning==12 or Binning==13 or Binning==21 or Binning==22: # set for all years
-        mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
-        emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18] 
-        if METCut==160:
-            mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
-            emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18] 
+        #mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
+        #emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18] 
+        #if METCut==160:
+        #    mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
+        #    emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18] 
         if Binning==21 or Binning==22:
             mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 40.0]
             mjs+=[6.6,4.4]
@@ -413,7 +414,25 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             histClosDw[itr].Write()
     #f_multijet.Write()
     f_multijet.Close()
- 
+
+def writeFakeEleGam(Binning=0, year=2016, METCut=150, doTMVA=False):
+    f_fakeele = ROOT.TFile("fakeele.root", "recreate")
+    fakeeles = [10.7, 11.6, 7.0, 5.0]
+    for fakeelep in fakeeles:
+        histLowMT = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histLowMTLow = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"FakeElUncLow_oneEleLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"FakeElUncLow_oneEleLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histLowMTHigh = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"FakeElUncHigh_oneEleLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"FakeElUncHigh_oneEleLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histLowMT.SetBinContent(1, fakeelep)
+        histLowMT.SetBinError(1, fakeelep*0.1)
+        histLowMTLow.SetBinContent(1, fakeelep*1.1)
+        histLowMTHigh.SetBinContent(1, fakeelep/1.1)
+
+        # write out the histograms
+        histLowMT.Write()
+        histLowMTLow.Write()
+        histLowMTHigh.Write()
+        
+    f_fakeele.Close()
 def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, METCut=150):
 
     f_fakeele = ROOT.TFile("fakeele.root", "recreate")

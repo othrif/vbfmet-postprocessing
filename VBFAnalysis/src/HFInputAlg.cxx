@@ -560,7 +560,13 @@ StatusCode HFInputAlg::execute() {
     double MT = sqrt(2. * mu_pt->at(0) * met_tst_et * (1. - cos(mu_phi->at(0) - met_tst_phi)));
     passMTCut=(MT>20e3) ? 1 : 2;
   }
-  if(doVBFMETGam) passMTCut=0;
+  if(doVBFMETGam){
+    passMTCut=0;
+    if(n_el==1) {
+      double MT = sqrt(2. * el_pt->at(0) * met_tst_et * (1. - cos(el_phi->at(0) - met_tst_phi)));
+      passMTCut=(MT>20e3) ? 1 : 2;
+    }
+  }
 
   if(v26Ntuples) lep_trig_match=1;
   bool trigger_lep_bool = ((trigger_lep & 0x1)==0x1) && lep_trig_match>0; // note that lep_trig_match is only computed for signal lepton triggers. We assume it is perfect for dilepton triggers.
@@ -654,10 +660,10 @@ StatusCode HFInputAlg::execute() {
   CRDPHIJETMET=true;// remove these cuts as there is no impact 
   if ((passMETTrig) && !fJVTVeto && (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) SR = true;
   if ((passMETTrig) && fJVTLeadVeto && (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) CRFJVT = true;
-  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?true:(met_significance > 4.0))) CRWep = true;}
-  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?true:(met_significance > 4.0))) CRWen = true;}
-  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) CRWepLowSig = true;}
-  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) CRWenLowSig = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?(passMTCut==0 || passMTCut==1):(met_significance > 4.0))) CRWep = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?(passMTCut==0 || passMTCut==1):(met_significance > 4.0))) CRWen = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?(passMTCut==2):(met_significance <= 4.0))) CRWepLowSig = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?(passMTCut==2):(met_significance <= 4.0))) CRWenLowSig = true;}
   if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
   if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
   if ((trigger_lep_Zee_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
@@ -835,9 +841,9 @@ StatusCode HFInputAlg::execute() {
     if (CRWen){       HistoFill(hCRWe[bin],w_final);                                                 if(hCRWen.size()>bin){       HistoFill(hCRWen[bin],w_final); } }
     if (CRWepLowSig){ HistoFill(hCRWeLowSig[bin],w_final);                                           if(hCRWepLowSig.size()>bin){ HistoFill(hCRWepLowSig[bin],w_final); } }
     if (CRWenLowSig){ HistoFill(hCRWeLowSig[bin],w_final);                                           if(hCRWenLowSig.size()>bin){ HistoFill(hCRWenLowSig[bin],w_final); } }
-    if (CRWmp){       HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu);                             if(hCRWmp.size()>bin){       HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu); } }
+    if (CRWmp && (passMTCut==0 || passMTCut==1)){ HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu); if(hCRWmp.size()>bin){       HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu); } }
     if (CRWmn && (passMTCut==0 || passMTCut==1)){ HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu); if(hCRWmn.size()>bin){       HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu); } }
-    if((CRWmn || CRWmp) && passMTCut==2){ HistoFill(hCRWmMT[bin],w_final*xeSFTrigWeight_nomu); }// low MT
+    if((CRWmn || CRWmp) && passMTCut==2){         HistoFill(hCRWmMT[bin],w_final*xeSFTrigWeight_nomu); }// low MT
     if (CRZee){       HistoFill(hCRZll[bin],w_final);                                                if(hCRZee.size()>bin){       HistoFill(hCRZee[bin],w_final); } }
     if (CRZmm){       HistoFill(hCRZll[bin],w_final*xeSFTrigWeight_nomu);                            if(hCRZmm.size()>bin){       HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu); } }
     if (CRFJVT){      HistoFill(hCRFJVT[bin],w_final*xeSFTrigWeight); }
