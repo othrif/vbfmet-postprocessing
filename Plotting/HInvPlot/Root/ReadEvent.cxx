@@ -902,6 +902,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
 	if(fabs(new_jet.eta)>2.5) jvt=jvt<0? jvt : -0.15;
 	if(fabs(new_jet.eta)<2.5 && fabs(new_jet.pt)<120.0) jvt=jvt>-0.001? jvt : -0.05;	
 	if(fabs(new_jet.pt)>120.0) jvt=-0.2;
+	if(fabs(new_jet.pt)>120.0 && fabs(new_jet.eta)<2.5 && jvt<0.2) jvt=-0.25;
 	new_jet.AddVar(Mva::jvt,jvt);
       }
       if(jet_fjvt && jet_fjvt->size()>iJet)new_jet.AddVar(Mva::fjvt,jet_fjvt->at(iJet));
