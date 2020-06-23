@@ -301,7 +301,7 @@ def getHistPars(hist):
         'jj_deta_abs' : {'xtitle':'|#it{#eta}_{j2}| - |#it{#eta}_{j1}|/#Delta#it{#eta}_{jj}'  ,'ytitle':'Events', 'rebin':0,  'ymin':0.001, 'LtoRCut':0},                
         'ptll'   : {'xtitle':'#it{p}_{T,ll} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
         'ptllg'   : {'xtitle':'#it{p}_{T,ll#gamma} [GeV]',                   'ytitle':'Events / (25 GeV)', 'rebin':5,  'ymin':0.0},
-        'mt'     : {'xtitle':'#it{m}_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':2,  'ymin':0.01,'logy':False},
+        'mt'     : {'xtitle':'#it{m}_{T} [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':4,  'ymin':0.01,'logy':False},
         'mtgammet'     : {'xtitle':'#it{m}_{T} (#gamma,MET) [GeV]'   ,         'ytitle':'Events / (10 GeV)', 'rebin':5,  'ymin':0.01,'logy':False},
         'mtlepgammet'     : {'xtitle':'#it{m}_{T} (Lead Lep+#gamma,MET) [GeV]'   ,'ytitle':'Events / (10 GeV)', 'rebin':10,  'ymin':0.01,'logy':False},
         'met_significance'     : {'xtitle':'#it{S}_{MET} [GeV^{1/2}]'   ,         'ytitle':'Events / GeV^{1/2}', 'rebin':2,  'ymin':0.1,'logy':True},

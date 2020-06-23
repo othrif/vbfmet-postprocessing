@@ -25,7 +25,7 @@ class BasicCuts:
     def __init__(self, Analysis, Chan, options, SameSign=0):
 
         if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
-                            'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2',
+                            'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2','antiEHighMET','antiELowMET',
 
                             'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2',
                                 'njgt2','njgt2lt5','njgt3lt5','nj3','lowmet','revfjvt','njgt3','nj2',
@@ -708,10 +708,16 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutBaseLep','n_baselep == 1')]
             cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
             #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
+
+            if basic_cuts.analysis in ['antiEHighMET']:
+                cuts += [CutItem('CutMETW',  'met_tst_et > 80.0')]
+            elif basic_cuts.analysis in ['antiELowMET']:
+                cuts += [CutItem('CutMETW',  'met_tst_et < 80.0')]
         else:
             cuts += [CutItem('CutSignalWLep','n_siglep == 0')]
             cuts += [CutItem('CutBaseLep','n_baselep == 1')]
             cuts += [CutItem('CutL0Pt',  'baselepPt0 > 30.0')]
+            cuts += [CutItem('CutMETW',  'met_tst_et > 80.0')]
     cuts += [CutItem('CutPh',       'n_ph==1')]
     #cuts += [CutItem('CutPhMETCleaning',       'n_ph_crackVetoCleaning>1')]     # photon met cleaning
     #cuts += [CutItem('CutPhPointing','ph_pointing_z<250.0')]    # 250 mm of the primary vertex. variable is not absolute value

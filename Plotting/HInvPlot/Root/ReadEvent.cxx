@@ -1548,6 +1548,12 @@ void Msl::ReadEvent::FillEvent(Event &event)
     else if(event.muons.size()>0){
       TLorentzVector tLgam=event.muons.at(0).GetLVec() +event.photons.at(0).GetLVec();
       event.RepVar(Mva::mlg, tLgam.M());
+    }else if(event.baseel.size() > 0){
+      TLorentzVector tLgam=event.baseel.at(0).GetLVec() +event.baseel.at(0).GetLVec();
+      event.RepVar(Mva::mlg, tLgam.M());
+    }else if(event.basemu.size() > 0){
+      TLorentzVector tLgam=event.basemu.at(0).GetLVec() +event.basemu.at(0).GetLVec();
+      event.RepVar(Mva::mlg, tLgam.M());
     }
   }
 
