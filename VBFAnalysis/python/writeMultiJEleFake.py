@@ -421,16 +421,20 @@ def writeFakeEleGam(Binning=0, year=2016, METCut=150, doTMVA=False):
     fakeeles = [7.1, 7.1, 7.1, 7.1]
     a=1
     for fakeelep in fakeeles:
+        histSR = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histLowMT = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histLowMTLow = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"FakeElUncLow_oneEleLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"FakeElUncLow_oneEleLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histLowMTHigh = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"FakeElUncHigh_oneEleLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"FakeElUncHigh_oneEleLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histLowMTLow = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"FakeElUncLow_oneEleCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"FakeElUncLow_oneEleCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histLowMTHigh = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"FakeElUncHigh_oneEleCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"FakeElUncHigh_oneEleCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histLowMT.SetBinContent(1, fakeelep)
         histLowMT.SetBinError(1, fakeelep*0.1)
-        histLowMTLow.SetBinContent(1, fakeelep*1.4)
-        histLowMTHigh.SetBinContent(1, fakeelep/1.4)
+        histSR.SetBinContent(1, 1.0)
+        histSR.SetBinError(1, 0.1)
+        histLowMTLow.SetBinContent(1, 1.4)
+        histLowMTHigh.SetBinContent(1, 1.0/1.4)
 
         # write out the histograms
         histLowMT.Write()
+        histSR.Write()
         histLowMTLow.Write()
         histLowMTHigh.Write()
         a+=1
