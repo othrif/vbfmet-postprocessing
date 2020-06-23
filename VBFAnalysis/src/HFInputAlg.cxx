@@ -235,7 +235,7 @@ vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR, 
     } else if (doPlot) {
       //h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
       if(doVBFMETGam){
-	float binsjjmass [6] = { 0.0, 250.0, 500.0, 1000.0, 1500.0, 3000.0 };
+	float binsjjmass [6] = { 0.0, 250.0, 600.0, 1000.0, 1500.0, 3000.0 };
 	h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 5,  binsjjmass));
       }else{
 	float binsjjmass [12] = { 0.0, 500.0, 800.0, 1000.0, 1500.0, 2000.0, 2500.0, 3000.0, 3500.0, 4000.0, 4500.0, 5000.0 };
@@ -762,7 +762,7 @@ StatusCode HFInputAlg::execute() {
       else if (jj_mass < 3.5e6) bin = 3;
       else bin = 4;
     }else if(m_binning==13){
-      if      (jj_mass < 0.5e6) bin = 0;
+      if      (jj_mass < 0.6e6) bin = 0;
       else if (jj_mass < 1.0e6) bin = 1;
       else if (jj_mass < 1.5e6)   bin = 2;
       //else if (jj_mass < 2.0e6) bin = 3;
