@@ -659,7 +659,10 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cutElTrig = CutItem('CutElTrig')
         cutElTrig.AddCut(CutItem('Electron',  'n_el_w > 0 && trigger_lep==1'), 'OR')
         #cutElTrig.AddCut(CutItem('Electron',  'n_el > 0 && trigger_lep==1'), 'OR')
-        cutElTrig.AddCut(CutItem('Muon', 'n_mu>0 || n_mu_w>0'), 'OR')
+        if not options.doAntiID:
+            cutElTrig.AddCut(CutItem('Muon', 'n_mu>0 || n_mu_w>0'), 'OR')
+        else:
+            cutElTrig.AddCut(CutItem('Muon', 'n_basemu>0 || n_mu_w>0'), 'OR')
         cuts += [cutElTrig]
     elif basic_cuts.chan in ['ee','ll','eu']:
         cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
@@ -708,16 +711,16 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutBaseLep','n_baselep == 1')]
             cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
             #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
-
-            if basic_cuts.analysis in ['antiEHighMET']:
-                cuts += [CutItem('CutMETW',  'met_tst_et > 80.0')]
-            elif basic_cuts.analysis in ['antiELowMET']:
-                cuts += [CutItem('CutMETW',  'met_tst_et < 80.0')]
+            cuts += [CutItem('CutMETW',  'met_tst_et > 80.0')]
         else:
             cuts += [CutItem('CutSignalWLep','n_siglep == 0')]
             cuts += [CutItem('CutBaseLep','n_baselep == 1')]
             cuts += [CutItem('CutL0Pt',  'baselepPt0 > 30.0')]
-            cuts += [CutItem('CutMETW',  'met_tst_et > 80.0')]
+            if basic_cuts.analysis in ['antiEHighMET']:
+                cuts += [CutItem('CutMETW',  'met_tst_et > 80.0')]
+            elif basic_cuts.analysis in ['antiELowMET']:
+                cuts += [CutItem('CutMETW',  'met_tst_et < 80.0')]
+                
     cuts += [CutItem('CutPh',       'n_ph==1')]
     #cuts += [CutItem('CutPhMETCleaning',       'n_ph_crackVetoCleaning>1')]     # photon met cleaning
     #cuts += [CutItem('CutPhPointing','ph_pointing_z<250.0')]    # 250 mm of the primary vertex. variable is not absolute value
