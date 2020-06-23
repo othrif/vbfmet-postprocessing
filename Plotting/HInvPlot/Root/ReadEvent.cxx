@@ -1330,7 +1330,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // decode trigger_lep
     int trigger_lep = event->GetVar(Mva::trigger_lep);
     int trigger_lep_new = ((trigger_lep&0x1)>0) ? 1 : 0;
-    if(!fAntiIDEle){
+    if(!fAntiIDEle){ // trigger matching is only done for Z leptons. Not for base leptons
       if( event->GetVar(Mva::lep_trig_match)<0.5) trigger_lep_new=0;
     }
     if(trigger_lep_new==0 && (trigger_lep&0x20)==0x20) trigger_lep_new = 2;

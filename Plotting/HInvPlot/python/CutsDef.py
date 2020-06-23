@@ -668,8 +668,11 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
     if not options.doAntiID:
         cuts += getLepChannelCuts(basic_cuts)
-    else:
+    elif  basic_cuts.chan in ['ee','e','ep','em']:
         cuts += [CutItem('CutLepAntiID',  'n_baseel > 0 && n_basemu == 0')]
+    elif  basic_cuts.chan in ['uu','u','up','um']:
+        cuts += [CutItem('CutLepAntiID',  'n_baseel == 0 && n_basemu > 0')]
+        
     if Region=='SR':
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     elif Region=='ZCR':
@@ -689,10 +692,16 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     elif Region=='WCR':
         if basic_cuts.chan=='e':
             #cuts += [CutItem('CutEl','n_el_w == 1')]
-            cuts += [CutItem('CutEl','n_el == 1')]
+            if not options.doAntiID:
+                cuts += [CutItem('CutEl','n_el == 1')]
+            else:
+                cuts += [CutItem('CutEl','n_baseel == 1')]
         if basic_cuts.chan=='u':
             #cuts += [CutItem('CutMu','n_mu_w == 1')]
-            cuts += [CutItem('CutMu','n_mu == 1')]
+            if not options.doAntiID:
+                cuts += [CutItem('CutMu','n_mu == 1')]
+            else:
+                cuts += [CutItem('CutMu','n_basemu == 1')]                
         #cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
         if not options.doAntiID:
             cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
@@ -702,7 +711,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         else:
             cuts += [CutItem('CutSignalWLep','n_siglep == 0')]
             cuts += [CutItem('CutBaseLep','n_baselep == 1')]
-            cuts += [CutItem('CutL0Pt',  'baselepPt0 > 30.0')]            
+            cuts += [CutItem('CutL0Pt',  'baselepPt0 > 30.0')]
     cuts += [CutItem('CutPh',       'n_ph==1')]
     #cuts += [CutItem('CutPhMETCleaning',       'n_ph_crackVetoCleaning>1')]     # photon met cleaning
     #cuts += [CutItem('CutPhPointing','ph_pointing_z<250.0')]    # 250 mm of the primary vertex. variable is not absolute value
