@@ -178,6 +178,7 @@ namespace Msl
     bool                        fIsDDQCD;
     bool                        fIsEFakePh;
     bool                        fIsJetFakePh;
+    bool                        fAntiIDEle;    
     // Input vars
     float fWeight;
     float fTriggerEffWeight;
