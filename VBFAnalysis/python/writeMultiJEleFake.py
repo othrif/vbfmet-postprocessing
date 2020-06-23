@@ -417,7 +417,8 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
 
 def writeFakeEleGam(Binning=0, year=2016, METCut=150, doTMVA=False):
     f_fakeele = ROOT.TFile("fakeele.root", "recreate")
-    fakeeles = [10.7, 11.6, 7.0, 5.0]
+    #fakeeles = [10.7, 11.6, 7.0, 5.0]
+    fakeeles = [7.1, 7.1, 7.1, 7.1]
     a=1
     for fakeelep in fakeeles:
         histLowMT = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"Nom_oneEleLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
@@ -425,8 +426,8 @@ def writeFakeEleGam(Binning=0, year=2016, METCut=150, doTMVA=False):
         histLowMTHigh = ROOT.TH1F("heleFakes_VBFjetSel_"+str(a)+"FakeElUncHigh_oneEleLowSigCR"+str(a)+"_obs_cuts", "heleFakes_VBFjetSel_"+str(a)+"FakeElUncHigh_oneEleLowSigCR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histLowMT.SetBinContent(1, fakeelep)
         histLowMT.SetBinError(1, fakeelep*0.1)
-        histLowMTLow.SetBinContent(1, fakeelep*1.1)
-        histLowMTHigh.SetBinContent(1, fakeelep/1.1)
+        histLowMTLow.SetBinContent(1, fakeelep*1.4)
+        histLowMTHigh.SetBinContent(1, fakeelep/1.4)
 
         # write out the histograms
         histLowMT.Write()
