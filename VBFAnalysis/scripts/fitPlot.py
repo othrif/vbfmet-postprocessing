@@ -876,7 +876,7 @@ def main(options):
     if options.fakeMu:
         histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes","muoFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
     if options.ph_ana:
-        histNames=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'ttg','SinglePhoton']  # 'EFakePh','JetFakePh'
+        histNames=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'ttg','SinglePhoton','EFakePh','JetFakePh','eleFakes']  # 
 
     regDict=OrderedDict()
     for n in range(1,nbins+1):
@@ -1153,7 +1153,7 @@ def main(options):
     if options.fakeMu:
         bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","muoFakes","ttbar","multijet"] #+["Others"]
     if options.ph_ana:
-        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'SinglePhoton','ttg']  #+["Others"] 'EFakePh','JetFakePh','eleFakes'
+        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'SinglePhoton','ttg','EFakePh','JetFakePh','eleFakes']  #+["Others"] 
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
     hDict["bkgs"]=bkgs
     hDict["bkgsStat"]=bkgs.Clone() # this has the bkg mc stat uncertainty
