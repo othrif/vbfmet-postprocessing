@@ -666,7 +666,10 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     else:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
-    cuts += getLepChannelCuts(basic_cuts)
+    if not options.doAntiID:
+        cuts += getLepChannelCuts(basic_cuts)
+    else:
+        cuts += [CutItem('CutLepAntiID',  'n_baseel > 0 && n_basemu == 0')]
     if Region=='SR':
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     elif Region=='ZCR':
@@ -691,10 +694,15 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             #cuts += [CutItem('CutMu','n_mu_w == 1')]
             cuts += [CutItem('CutMu','n_mu == 1')]
         #cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
-        cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
-        cuts += [CutItem('CutBaseLep','n_baselep == 1')]
-        cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
-        #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
+        if not options.doAntiID:
+            cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
+            cuts += [CutItem('CutBaseLep','n_baselep == 1')]
+            cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+            #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
+        else:
+            cuts += [CutItem('CutSignalWLep','n_lep == 0')]
+            cuts += [CutItem('CutBaseLep','n_baselep == 1')]
+            cuts += [CutItem('CutL0Pt',  'baselepPt > 30.0')]            
     cuts += [CutItem('CutPh',       'n_ph==1')]
     #cuts += [CutItem('CutPhMETCleaning',       'n_ph_crackVetoCleaning>1')]     # photon met cleaning
     #cuts += [CutItem('CutPhPointing','ph_pointing_z<250.0')]    # 250 mm of the primary vertex. variable is not absolute value
