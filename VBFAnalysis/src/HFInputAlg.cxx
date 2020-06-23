@@ -490,6 +490,8 @@ StatusCode HFInputAlg::execute() {
   if(doVBFMETGam){
     METCut=150.0e3;
     METCSTJetCut=120.0e3;
+    // remove single photon from the Wenu CR due to the fake electron prediction.
+    if(isMC && runNumber>=364541 && runNumber<=364547 && n_baseel>0) return StatusCode::SUCCESS;
   }
 
   xeSFTrigWeight=1.0;
