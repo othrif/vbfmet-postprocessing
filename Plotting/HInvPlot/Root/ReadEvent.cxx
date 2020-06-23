@@ -58,6 +58,7 @@ Msl::ReadEvent::ReadEvent():
   fLumi         (1.0),
   fBTagCut     (-10),
   fLoadBaseLep  (false),
+  fAntiIDEle    (false),
   fOverlapPh    (false),
   fIsDDQCD      (false),
   fIsEFakePh    (false),
@@ -90,6 +91,7 @@ void Msl::ReadEvent::Conf(const Registry &reg)
   reg.Get("ReadEvent::Trees",         fTrees);
   reg.Get("ReadEvent::Files",         fFiles);
   reg.Get("ReadEvent::MaxNEvent",     fMaxNEvent);
+  reg.Get("ReadEvent::AntiIDEle",     fAntiIDEle);  
 
   reg.Get("ReadEvent::TMVAWeightPath",     fTMVAWeightPath);
   reg.Get("ReadEvent::MJTriggerEff",       fMJTriggerEff);
@@ -1328,7 +1330,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // decode trigger_lep
     int trigger_lep = event->GetVar(Mva::trigger_lep);
     int trigger_lep_new = ((trigger_lep&0x1)>0) ? 1 : 0;
-    if( event->GetVar(Mva::lep_trig_match)<0.5) trigger_lep_new=0;
+    if(!fAntiIDEle){ // trigger matching is only done for Z leptons. Not for base leptons
+      if( event->GetVar(Mva::lep_trig_match)<0.5) trigger_lep_new=0;
+    }
     if(trigger_lep_new==0 && (trigger_lep&0x20)==0x20) trigger_lep_new = 2;
     if(trigger_lep_new==0 && (trigger_lep&0x400)==0x400) trigger_lep_new = 3;
     event->RepVar(Mva::trigger_lep, trigger_lep_new);
@@ -1543,6 +1547,12 @@ void Msl::ReadEvent::FillEvent(Event &event)
     }
     else if(event.muons.size()>0){
       TLorentzVector tLgam=event.muons.at(0).GetLVec() +event.photons.at(0).GetLVec();
+      event.RepVar(Mva::mlg, tLgam.M());
+    }else if(event.baseel.size() > 0){
+      TLorentzVector tLgam=event.baseel.at(0).GetLVec() +event.baseel.at(0).GetLVec();
+      event.RepVar(Mva::mlg, tLgam.M());
+    }else if(event.basemu.size() > 0){
+      TLorentzVector tLgam=event.basemu.at(0).GetLVec() +event.basemu.at(0).GetLVec();
       event.RepVar(Mva::mlg, tLgam.M());
     }
   }

@@ -161,6 +161,8 @@ def getParser():
     p.add_option('--ignore-met',   action='store_true', default=False,   dest='ignore_met',         help='Ignore MET')
     p.add_option('--LoadBaseLep',  action='store_true', default=False,   dest='LoadBaseLep',        help='Use looser leptons')
     p.add_option('--OverlapPh',    action='store_true', default=False,   dest='OverlapPh',          help='Overlap remove photons')
+    p.add_option('--doAntiID',    action='store_true', default=False,   dest='doAntiID',          help='do antiID for vbfgamma')
+    p.add_option('--nodphimetgam',    action='store_true', default=False,   dest='nodphimetgam',          help='rm dphi(met,gamma) cut for vbfgamma')
     p.add_option('--ReverseFJVT',  action='store_true', default=False,   dest='ReverseFJVT',        help='Reverse the FJVT cuts')
     p.add_option('--ReverseLeadFJVT',  action='store_true', default=False,   dest='ReverseLeadFJVT',        help='Reverse lead jet FJVT cuts')
     p.add_option('--TwoJet',  action='store_true', default=False,   dest='TwoJet',        help='Force only two jets')    

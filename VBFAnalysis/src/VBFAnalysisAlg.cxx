@@ -1482,6 +1482,7 @@ StatusCode VBFAnalysisAlg::execute() {
     else if(it->first.Contains("nloEWKWeight"))   tmp_nloEWKWeight=tMapFloat[it->first];
     else if(it->first.Contains("puSyst2018Weight"))   tmp_puSyst2018Weight=tMapFloat[it->first];
     else if(it->first.Contains("VBF_qqH_"))   tmp_signalTruthSyst=tMapFloat[it->first]; // scale + S-T VBF + PS modelling
+    else if(it->first.Contains("VBF_qqgamH_"))   tmp_signalTruthSyst=tMapFloat[it->first]; // scale + PS modelling + PDF
     else if(it->first.Contains("ggF_gg2H_"))   tmp_signalTruthSyst=tMapFloat[it->first]; // PS modelling
     else if(it->first.Contains("ATLAS_PDF4LHC_NLO_30_"))   tmp_signalTruthSyst=tMapFloat[it->first]; //PDF
     else if(it->first.Contains("JET_QG_"))        tmp_qgTagWeight=tMapFloat[it->first];

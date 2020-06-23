@@ -25,7 +25,7 @@ class BasicCuts:
     def __init__(self, Analysis, Chan, options, SameSign=0):
 
         if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
-                            'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2',
+                            'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2','antiEHighMET','antiELowMET',
 
                             'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2',
                                 'njgt2','njgt2lt5','njgt3lt5','nj3','lowmet','revfjvt','njgt3','nj2',
@@ -659,14 +659,23 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
         cutElTrig = CutItem('CutElTrig')
         cutElTrig.AddCut(CutItem('Electron',  'n_el_w > 0 && trigger_lep==1'), 'OR')
         #cutElTrig.AddCut(CutItem('Electron',  'n_el > 0 && trigger_lep==1'), 'OR')
-        cutElTrig.AddCut(CutItem('Muon', 'n_mu>0 || n_mu_w>0'), 'OR')
+        if not options.doAntiID:
+            cutElTrig.AddCut(CutItem('Muon', 'n_mu>0 || n_mu_w>0'), 'OR')
+        else:
+            cutElTrig.AddCut(CutItem('Muon', 'n_basemu>0 || n_mu_w>0'), 'OR')
         cuts += [cutElTrig]
     elif basic_cuts.chan in ['ee','ll','eu']:
         cuts += [CutItem('CutTrig',      'trigger_lep > 0')]
     else:
         cuts += [CutItem('CutTrig',      'trigger_lep == 1')]
     cuts += [CutItem('CutJetClean',  'passJetCleanTight == 1')]
-    cuts += getLepChannelCuts(basic_cuts)
+    if not options.doAntiID:
+        cuts += getLepChannelCuts(basic_cuts)
+    elif  basic_cuts.chan in ['ee','e','ep','em']:
+        cuts += [CutItem('CutLepAntiID',  'n_baseel > 0 && n_basemu == 0')]
+    elif  basic_cuts.chan in ['uu','u','up','um']:
+        cuts += [CutItem('CutLepAntiID',  'n_baseel == 0 && n_basemu > 0')]
+        
     if Region=='SR':
         cuts += [CutItem('CutBaseLep','n_baselep == 0')]
     elif Region=='ZCR':
@@ -686,15 +695,32 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     elif Region=='WCR':
         if basic_cuts.chan=='e':
             #cuts += [CutItem('CutEl','n_el_w == 1')]
-            cuts += [CutItem('CutEl','n_el == 1')]
+            if not options.doAntiID:
+                cuts += [CutItem('CutEl','n_el == 1')]
+            else:
+                cuts += [CutItem('CutEl','n_baseel == 1')]
         if basic_cuts.chan=='u':
             #cuts += [CutItem('CutMu','n_mu_w == 1')]
-            cuts += [CutItem('CutMu','n_mu == 1')]
+            if not options.doAntiID:
+                cuts += [CutItem('CutMu','n_mu == 1')]
+            else:
+                cuts += [CutItem('CutMu','n_basemu == 1')]                
         #cuts += [CutItem('CutSignalWLep','n_siglep == 1')]
-        cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
-        cuts += [CutItem('CutBaseLep','n_baselep == 1')]
-        cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
-        #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]        
+        if not options.doAntiID:
+            cuts += [CutItem('CutSignalWLep','n_lep_w == 1')]
+            cuts += [CutItem('CutBaseLep','n_baselep == 1')]
+            cuts += [CutItem('CutL0Pt',  'lepPt0 > 30.0')]
+            #cuts += [CutItem('CutL0Pt',  'lepPt0 > 26.0')]
+            cuts += [CutItem('CutMETW',  'met_tst_et > 80.0')]
+        else:
+            cuts += [CutItem('CutSignalWLep','n_siglep == 0')]
+            cuts += [CutItem('CutBaseLep','n_baselep == 1')]
+            cuts += [CutItem('CutL0Pt',  'baselepPt0 > 30.0')]
+            if basic_cuts.analysis in ['antiEHighMET']:
+                cuts += [CutItem('CutMETW',  'met_tst_et > 80.0')]
+            elif basic_cuts.analysis in ['antiELowMET']:
+                cuts += [CutItem('CutMETW',  'met_tst_et < 80.0')]
+                
     cuts += [CutItem('CutPh',       'n_ph==1')]
     #cuts += [CutItem('CutPhMETCleaning',       'n_ph_crackVetoCleaning>1')]     # photon met cleaning
     #cuts += [CutItem('CutPhPointing','ph_pointing_z<250.0')]    # 250 mm of the primary vertex. variable is not absolute value
@@ -738,7 +764,8 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
             cuts += [CutItem('CutMetCST',    'met_cst_jet > 120.0')]
 
-    cuts += [CutItem('CutDPhiMetPh','met_tst_nolep_ph_dphi > 1.8')]
+    if not options.nodphimetgam:
+        cuts += [CutItem('CutDPhiMetPh','met_tst_nolep_ph_dphi > 1.8')]
     cuts += [CutItem('CutPhCentrality','phcentrality > 0.4')]
     # VBF cuts
     cuts += [CutItem('CutOppHemi','etaj0TimesEtaj1 < 0.0')]

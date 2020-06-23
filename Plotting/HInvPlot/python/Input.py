@@ -36,6 +36,7 @@ class ReadEvent:
         self.read_reg.SetVal('ReadEvent::PrintEvent',    options.print_evt)
         self.read_reg.SetVal('ReadEvent::Debug',         options.debug_alg)
         self.read_reg.SetVal('ReadEvent::MaxNEvent',     options.nevent)
+        self.read_reg.SetVal('ReadEvent::AntiIDEle',     options.doAntiID)        
         self.read_reg.SetVal('ReadEvent::Year',          options.year)
         self.read_reg.SetVal('ReadEvent::LumiInt',       options.int_lumi)
         self.read_reg.SetVal('ReadEvent::MCEventCount',  options.mc_evt_count)
