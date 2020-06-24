@@ -359,7 +359,12 @@ def getJetCuts(basic_cuts, options, isPh=False):
             #cuts  = [CutItem('CutNjet',             'n_jet == 2')]
             cuts = basic_cuts.GetNjetCut()
             cuts += basic_cuts.GetLeadJetEtaCut()
-            if basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and basic_cuts.analysis!='nj3':
+            if basic_cuts.analysis=='vbfTrig':
+                cuts += [CutItem('CutMaxCentrality', 'maxCentrality < 0.6')]
+                cuts += [CutItem('CutMaxCentrality', 'maxmj3_over_mjj < 0.05')]
+                cuts += [CutItem('CutJ0Pt', 'jetPt0 > 90.0')]
+                cuts += [CutItem('CutJ1Pt', 'jetPt1 > 90.0')]
+            elif basic_cuts.analysis!='njgt2lt5' and basic_cuts.analysis!='njgt3lt5' and basic_cuts.analysis!='nj3':
                 #cuts += [CutItem('CutJ3Pt',    'jetPt3 < 30.0')]
                 if options.metsf_cuts==0:
                     cuts += [CutItem('CutMaxCentrality',    'maxCentrality <0.6')]
@@ -517,7 +522,8 @@ def getMETTriggerCut(cut = '', options=None, basic_cuts=None, Localsyst=None, OR
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5')]
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11')]
         if basic_cuts.analysis=='vbfTrig':
-            cuts += [CutItem('CutTrig',       'trigger_met_encodedv2 == 11')]
+            #cuts += [CutItem('CutTrig',       'trigger_met_encodedv2 == 11')]
+            return cuts
         elif basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
             cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11 || trigger_met_encodedv2 == 5'+ORTrig)]
         else:
@@ -545,7 +551,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
         return GetCuts(cuts)
     if not ignore_met:
         if basic_cuts.analysis=='vbfTrig':
-            cuts += metCuts(basic_cuts,options,metCut=120.0, cstCut=100.0, maxMET=180.0)
+            cuts += metCuts(basic_cuts,options,metCut=120.0, cstCut=100.0, maxMET=160.0)
         elif basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
             cuts += metCuts(basic_cuts,options,metCut=130.0, cstCut=100.0)#, maxMET=150.0)
         else:

@@ -724,10 +724,11 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
       // There are currently three legal options:
       // "off" (no normalization!), "sr" (normalization for SR), "dphijj3" (normalization for high-dphijj).
       if (fMJNormStrategy == "sr") {
-	float scaledphimj = event->GetVar(Mva::jj_dphi)<1.0 ? 1.22 : 0.82;
+	float scaledphimj = event->GetVar(Mva::jj_dphi)<1.0 ? 0.65 : 0.89;
         if(fYear==2016) MJDDScaling=0.8815*scaledphimj; //0.82109;
         else if(fYear==2017) MJDDScaling=2.6895*scaledphimj;
-        else if(fYear==2018) MJDDScaling=2.10302*scaledphimj;
+        //else if(fYear==2018) MJDDScaling=2.10302*scaledphimj;
+        else if(fYear==2018) MJDDScaling=scaledphimj; //using average of low mjj SFs only
         // MJ systematics (MJClos2016__1up MJClos2017__1up MJClos2018__1up)
         if(fWeightSystName=="MJClos2016__1up" && fYear==2016) MJDDScaling*=1.54;
         if(fWeightSystName=="MJClos2017__1up" && fYear==2017) MJDDScaling*=1.24;
@@ -759,7 +760,8 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
         if(fYear==2017) MJDDScaling*=1.189;
         if(fYear==2018) MJDDScaling*=1.226;
       }
-      if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight*MJDDScaling);
+      if(fIsDDQCD) event->SetWeight(fWeight*MJDDScaling);
+      //if(fIsDDQCD) event->SetWeight(fWeight*fTriggerEffWeight*MJDDScaling);
 
       // define the vv uncertainty
       if(fRunNumber==364250 || (fRunNumber>=364253 && fRunNumber<=364255) || (fRunNumber==363355) || fRunNumber==363489 || fRunNumber==363494
@@ -1328,9 +1330,9 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     // decode trigger_met
     int trigger_met_encodedv2 = event->GetVar(Mva::trigger_met_encodedv2);
     int trigger_met_encodedv2_new=0;
-    if((trigger_met_encodedv2 & 0x2)==0x2) trigger_met_encodedv2_new=1; // HLT_xe110_pufit_L1XE55 2017
-    if((trigger_met_encodedv2 & 0x4)==0x4) trigger_met_encodedv2_new=2; // HLT_xe90_pufit_L1XE50 2017
-    if((trigger_met_encodedv2 & 0x8)==0x8) trigger_met_encodedv2_new=3; // HLT_xe110_pufit_xe70_L1XE50 2018
+    //if((trigger_met_encodedv2 & 0x2)==0x2) trigger_met_encodedv2_new=1; // HLT_xe110_pufit_L1XE55 2017
+    //if((trigger_met_encodedv2 & 0x4)==0x4) trigger_met_encodedv2_new=2; // HLT_xe90_pufit_L1XE50 2017
+    //if((trigger_met_encodedv2 & 0x8)==0x8) trigger_met_encodedv2_new=3; // HLT_xe110_pufit_xe70_L1XE50 2018
 
     // run selected for 2017 => value 4 for 2017
     if(!fisMC) fRandomRunNumber = fRunNumber;
@@ -1338,14 +1340,15 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     //else if(329385<=fRandomRunNumber && fRandomRunNumber<=330470 && ((trigger_met_encodedv2 & 0x40)==0x40)) trigger_met_encodedv2_new=4; //HLT_xe100_pufit_L1XE55;   // period C
     //else if(330857<=fRandomRunNumber && fRandomRunNumber<=331975 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // period D1-D5
     //else if(341649>=fRandomRunNumber && fRandomRunNumber>331975 && ((trigger_met_encodedv2 & 0x80)==0x80))  trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE50;   // period D6-K
-    if(325713<=fRandomRunNumber && fRandomRunNumber<=341649 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // All periods
+    //if(325713<=fRandomRunNumber && fRandomRunNumber<=341649 && ((trigger_met_encodedv2 & 0x2)==0x2))   trigger_met_encodedv2_new=4; //HLT_xe110_pufit_L1XE55;   // All periods
 
-    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
-    if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
+    //if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
+    //if     (fRandomRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
+    if     ((trigger_met_encodedv2 & 0x8000)==0x8000)     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
     // 2018 update trigger for later periods => value 5 for
     //if     (350067>fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50
     //else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe65_L1XE50
-    if(364292>=fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50    
+    //if(364292>=fRandomRunNumber  && fRandomRunNumber>=348197  && ((trigger_met_encodedv2 & 0x8)==0x8))    trigger_met_encodedv2_new=5; // HLT_xe110_pufit_xe70_L1XE50    
     if(fIsDDQCD){
       if(fYear==2017) trigger_met_encodedv2_new=4;
       else if(fYear==2018) trigger_met_encodedv2_new=5;      
