@@ -4,6 +4,7 @@ import numpy.lib.recfunctions as recfn
 import os,sys
 from root_numpy import root2array, tree2array
 from root_numpy import array2tree, array2root
+from custom_loss import *
 
 import ROOT
 from keras.models import Sequential
@@ -14,17 +15,17 @@ from array import array
 ###
 ### the below block should be the only changes that are required
 ###
-RegN='A'
+RegN='E'
 #model_dir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/MVA/models/April15_trainAE/' # directory with the keras model
 model_dir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/MVA/models/' # directory with the keras model
 #name_model='_v37syst' # model partial name
-name_model='_v37syst_noMJ' # model partial name
+name_model='_zstrong_ttbar_wstrong_zewk_qg_v34A_test_4_best' # model partial name
 #idir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37ESyst/' # input directory
 idir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37/v37'+RegN+'Tight/' # input directory
-idir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/VBFHPlots/MJSystKerasv1/v37'+RegN+'MJSyst/'
-idir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37MJSyst/v37'+RegN+'MJSyst/'
+#idir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/VBFHPlots/MJSystKerasv1/v37'+RegN+'MJSyst/'
+#idir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37MJSyst/v37'+RegN+'MJSyst/'
 #idir='/tmp/v37Esyst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
-idir='/tmp/mj_noMJ/'
+#idir='/tmp/mj_noMJ/'
 #idir='/tmp/mj/'
 #idir='/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/v37/v37DTight/'
 #odir='/tmp/v37Esyst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
@@ -32,13 +33,14 @@ idir='/tmp/mj_noMJ/'
 #odir='/tmp/mj/'
 #odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37Esyst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
 odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37TightApr15b/v37'+RegN+'syst'+name_model+'/' # output directory. will copy all files here because we will add a variable to the ntuples. do not want to risk damaging the files
-odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/VBFHPlots/MJSystKerasv1/v37'+RegN+'MJSyst/'
-odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37MJSyst/v37'+RegN+'MJSyst/'
-odir='/tmp/mj_noMJ/'
+#odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/VBFHPlots/MJSystKerasv1/v37'+RegN+'MJSyst/'
+#odir='/eos/atlas/atlascerngroupdisk/penn-ww/schae/v37MJSyst/v37'+RegN+'MJSyst/'
+#odir='/tmp/mj_noMJ/'
 #variables used for training:
 #COLS  = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
 #COLS= ['jj_mass', 'jj_dphi', 'jj_deta', 'jet_pt[0]', 'jet_pt[1]',  'met_tst_et', 'met_tenacious_tst_et',  'met_soft_tst_et', 'met_cst_jet',  'n_jet', 'maxCentrality']
-COLS = ['jj_mass', 'jj_deta','maxCentrality', 'jj_dphi', 'met_soft_tst_et', 'n_jet', 'met_tst_nolep_et', 'met_cst_jet', 'jet_pt[0]', 'jet_pt[1]', 'met_tenacious_tst_nolep_et']
+#COLS = ['jj_mass', 'jj_deta','maxCentrality', 'jj_dphi', 'met_soft_tst_et', 'n_jet', 'met_tst_nolep_et', 'met_cst_jet', 'jet_pt[0]', 'jet_pt[1]', 'met_tenacious_tst_nolep_et'] # ava
+COLS = ['jj_mass', 'jj_dphi', 'jj_deta', 'met_tst_et', 'jet_pt[0]', 'jet_pt[1]', 'met_tenacious_tst_nolep_et', 'met_soft_tst_et', 'met_cst_jet', 'n_jet'] # george
 ###
 ### the above block should be the only changes that are required
 ###
@@ -51,7 +53,7 @@ if not os.path.exists(odir):
 from keras.models import load_model
 
 # load the keras model
-model = load_model(model_dir+'model'+name_model+'.hf')
+model = load_model(model_dir+'model'+name_model+'.hf',custom_objects={'focal_loss': focal_loss, 'sig_eff': sig_eff})
 # load the scaler
 from sklearn.externals import joblib
 scaler = joblib.load(model_dir+'scaler'+name_model+'.save') 
@@ -65,7 +67,7 @@ print(listdir)
 for i in listdir:
     cpcmd='cp '+idir.rstrip('/')+'/'+i+' '+odir.rstrip('/')+'/'+i
     print(cpcmd)
-    #os.system(cpcmd)
+    os.system(cpcmd)
 
 #prepare the list of files
 fs=[] #fs =['/tmp/v37Egam/VBFHgam125.root']
@@ -74,7 +76,8 @@ for i in listdir:
 print(fs)
 
 #branches =  ['w', 'runNumber', 'n_jet']
-branches = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
+#branches = ['jj_mass', 'jj_deta', 'jj_dphi', 'met_tst_et', 'met_soft_tst_et', 'jet_pt[0]', 'jet_pt[1]']
+branches = ['jj_mass', 'jj_dphi', 'jj_deta', 'met_tst_et', 'jet_pt[0]', 'jet_pt[1]', 'met_tenacious_tst_nolep_et', 'met_soft_tst_et', 'met_cst_jet', 'n_jet'] # george
 #branches += ['jet_pt[2]', 'j3_centrality[0]', 'j3_centrality[1]', 'j3_min_mj_over_mjj'] # for n_jet >= 2
 #branches += ['maxCentrality', 'max_mj_over_mjj']
 
@@ -100,8 +103,8 @@ for f in fs:
     # Collect the tree names
     for key in myfile.GetListOfKeys():
         if key.GetClassName()=='TTree':
-            #if not key.GetName().count('Nominal'):
-            #    continue
+            if not key.GetName().count('Nominal'):
+                continue
             print(key.GetName())
             TreeList+=[key.GetName()]
     myfile.Close()
