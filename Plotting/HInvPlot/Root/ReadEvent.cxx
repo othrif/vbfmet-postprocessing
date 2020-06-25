@@ -255,7 +255,7 @@ void Msl::ReadEvent::Init(TTree* tree)
   tree->SetBranchAddress("xeSFTrigWeight_nomu",&xeSFTrigWeight_nomu);
   if(fWeightSystName=="Nominal" || fIsDDQCD || fIsEFakePh || fIsJetFakePh){
     tree->SetBranchAddress("w",        &fWeight);
-    if(fIsDDQCD) tree->SetBranchAddress(fMJTriggerEff.c_str(), &fTriggerEffWeight);
+    if(fIsDDQCD && fMJTriggerEff!="NOSF") tree->SetBranchAddress(fMJTriggerEff.c_str(), &fTriggerEffWeight);
     //if(fIsDDQCD) tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);        
     //if(fIsDDQCD && fMJTriggerEff=="TriggerEffWeightBDT") tree->SetBranchAddress("TriggerEffWeightBDT", &fTriggerEffWeight);    
     //if(fIsDDQCD && fMJTriggerEff=="TriggerEffWeight") tree->SetBranchAddress("TriggerEffWeight", &fTriggerEffWeight);
@@ -1383,6 +1383,7 @@ void Msl::ReadEvent::ReadTree(TTree *rtree)
     if(350067>fRandomRunNumber  && fRandomRunNumber>=348197)      runPeriod = 30; // 2018 xe70 trigger ...348197
     else if(350067<=fRandomRunNumber && fRandomRunNumber<=364292) runPeriod = 31; // 2018 xe65 trigger
     if(fRandomRunNumber>=355529) runPeriod = 20; // 2018 VBF Topo triggers
+    if(fIsDDQCD){ runPeriod = 20; }
 
     int trigger_met_byrun=0; // for the computation of the met trigger SF
     if(fRandomRunNumber<=284484 && (trigger_met_encoded & 0x8))                             { trigger_met_byrun=1;  }// 2015

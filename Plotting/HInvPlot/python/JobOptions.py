@@ -135,7 +135,7 @@ def getParser():
     p.add_option('--lep-sign',     type='string', default='0',           dest='lep_sign',   help='Lepton Sign...0 is opposite sign, 1 is SS')
     p.add_option('--trees',        type='string', default='',      dest='trees',      help='Tree name: QCDunwNominal,VBFH125Nominal,VH125Nominal,VVVNominal,W_strongNominal,Z_strongNominal,Z_strongPTVExtNominal,Z_strong_VBFFiltNominal,ggFH125Nominal,QCDwNominal,VBFHOtherNominal,VVNominal,W_EWKNominal,Z_EWKNominal,Z_strongExtNominal,Z_strong_LowMassNominal,dataNominal,ttbarNominal')
     p.add_option('--trig-name',    type='string', default='',            dest='trig_name',  help='Trigger name if wanted. TRIG_xe80_tclcw, TRIG_lep, TRIG_2mu8_EFxe40_tclcw')
-    p.add_option('--mj-trig-name', type='choice', default='TriggerEffWeightBDT', dest='mj_trigger_name', choices=['TriggerEffWeightBDT', 'TriggerEffWeight'], help='Trigger for multijet.')
+    p.add_option('--mj-trig-name', type='choice', default='TriggerEffWeightBDT', dest='mj_trigger_name', choices=['TriggerEffWeightBDT', 'TriggerEffWeight','NOSF'], help='Trigger for multijet.')
     p.add_option('--mj-norm', type='choice', default="sr", dest="mj_norm", choices=['off', 'dphijj3', 'sr'], help="Normalization for QCD background.")
     p.add_option('--mva-weights-path',    type='string', default='',            dest='mva_weights_path',  help='full path to weights files for tmva')
     p.add_option('--met-choice',         type='string', default='met_tst_et',     dest='met_choice',       help='')
