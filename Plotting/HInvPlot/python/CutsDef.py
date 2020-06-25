@@ -114,7 +114,7 @@ class BasicCuts:
             self.MjjUpperCut   = -1
             self.DEtajjLowerCut = 4.2 # remove
             self.DPhijjUpperCut = 2.0
-            self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2) || (jetEta1 < 3.2 && jetEta1 > -3.2)'
+            self.JetEta = '(jetEta0 < 3.2 && jetEta0 > -3.2)'# || (jetEta1 < 3.2 && jetEta1 > -3.2)'
         if Analysis.count('mjj2000TrigTest'):
             self.MjjLowerCut   = 2000.0
             self.MjjUpperCut   = -1
@@ -376,7 +376,7 @@ def getJetCuts(basic_cuts, options, isPh=False):
                 cuts += [cutCent]
             if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 90.0')]
-                cuts += [CutItem('CutJ1Pt',  'jetPt1 > 70.0')] # move to 50
+                cuts += [CutItem('CutJ1Pt',  'jetPt1 > 80.0')] # move to 50
             else:
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]#80,50
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')] # move to 50
@@ -862,7 +862,7 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
         return GetCuts(cuts)
     if not ignore_met:
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
-            cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=150.0)
+            cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=160.0)
         else:
             #cuts += metCuts(basic_cuts,options, True)
             cuts += metCuts(basic_cuts,options,isLep=True,metCut=options.metCut, cstCut=(options.metCut - 20.0),maxMET=options.maxMET)
