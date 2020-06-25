@@ -24,7 +24,7 @@ class BasicCuts:
 
     def __init__(self, Analysis, Chan, options, SameSign=0):
 
-        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1',
+        if Analysis not in ['LowMETQCDSR','LowMETQCDVR','LowMETQCD','LowMETQCDSRFJVT','LowMETQCDVRFJVT','LowMETQCDFJVT','deta25','LowMETSR','mjjLow200','allmjj','mjj800','mjj1000','mjj1500','mjj2000','mjj3000','mjj3500','mjj1000dphijj1','mjj1500dphijj1','mjj2000dphijj1','mjj1000dphijj2','mjj1500dphijj2','mjj2000dphijj2','mjj1500TrigTest','mjj2000TrigTest','mjj1000TrigTest','mjj800dphijj1','mjj800dphijj2','mjj3000dphijj2','mjj3500dphijj2','mjj3000dphijj1','mjj3500dphijj1','LowMETQCDSRFJVTdphijj2','LowMETQCDSRFJVTdphijj1','mjj1500TrigTestMET',
                             'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2','antiEHighMET','antiELowMET',
 
                             'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2',
@@ -374,9 +374,9 @@ def getJetCuts(basic_cuts, options, isPh=False):
                 cutCent.AddCut(CutItem('Cen',  'maxCentrality >0.6'), 'OR')
                 cutCent.AddCut(CutItem('mjj',  'maxmj3_over_mjj >0.05'), 'OR')
                 cuts += [cutCent]
-            if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
+            if basic_cuts.analysis.count('mjj1500TrigTest') or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 90.0')]
-                cuts += [CutItem('CutJ1Pt',  'jetPt1 > 70.0')] # move to 50
+                cuts += [CutItem('CutJ1Pt',  'jetPt1 > 80.0')] # move to 50
             else:
                 cuts += [CutItem('CutJ0Pt',  'jetPt0 > 80.0')]#80,50
                 cuts += [CutItem('CutJ1Pt',  'jetPt1 > 50.0')] # move to 50
@@ -516,6 +516,7 @@ def getMETTriggerCut(cut = '', options=None, basic_cuts=None, Localsyst=None, OR
         #cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11')]
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
             cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 11 || trigger_met_encodedv2 == 5'+ORTrig)]
+            cuts += [CutItem('CutMETTrigRuns20', 'runPeriod == 20')]
         else:
             cuts += [CutItem('CutTrig',      'trigger_met_encodedv2 == 5'+ORTrig, weight=apply_weight)] # use this one
     else:
@@ -541,7 +542,7 @@ def getSRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='N
         return GetCuts(cuts)
     if not ignore_met:
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
-            cuts += metCuts(basic_cuts,options,metCut=130.0, cstCut=100.0)#, maxMET=150.0)
+            cuts += metCuts(basic_cuts,options,metCut=120.0, cstCut=100.0, maxMET=160.0)
         else:
             #cuts += metCuts(basic_cuts,options,metCut=100.0, cstCut=-1.0)
             #cuts += metCuts(basic_cuts,options,metCut=150.0, cstCut=130.0,maxMET=200.0)
@@ -823,7 +824,7 @@ def getZCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, syst='
         return GetCuts(cuts)
     if not ignore_met:
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
-            cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=150.0)
+            cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=160.0)
         else:
             #cuts += metCuts(basic_cuts, options, True)
             cuts += metCuts(basic_cuts,options,isLep=True,metCut=options.metCut, cstCut=(options.metCut - 20.0),maxMET=options.maxMET)
@@ -862,7 +863,7 @@ def getWCRCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, do_met
         return GetCuts(cuts)
     if not ignore_met:
         if basic_cuts.analysis=='mjj1500TrigTest' or basic_cuts.analysis=='mjj2000TrigTest' or basic_cuts.analysis=='mjj1000TrigTest':
-            cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=150.0)
+            cuts += metCuts(basic_cuts,options, True, metCut=120.0, cstCut=100.0, maxMET=160.0)
         else:
             #cuts += metCuts(basic_cuts,options, True)
             cuts += metCuts(basic_cuts,options,isLep=True,metCut=options.metCut, cstCut=(options.metCut - 20.0),maxMET=options.maxMET)
