@@ -102,7 +102,7 @@ TString procV = "strong";
   else if (region == "Njet")
     legend->SetHeader("Z+jets reno./fact. Njet>2");
   else if (region == "METlow")
-    legend->SetHeader("Z+jets reno./fact. 160 < MET < 200");
+    legend->SetHeader("Z+jets reno./fact. 160 < MET < 200 GeV");
   legend->SetTextFont(62);
   legend->SetTextSize(0.04);
   legend->AddEntry(h_Z_up, "Up variation","l");
@@ -161,7 +161,7 @@ TString procV = "strong";
   else if (region == "Njet")
     legend->SetHeader("W+jets reno./fact. Njet>2");
   else if (region == "METlow")
-    legend->SetHeader("W+jets reno./fact. 160 < MET < 200");
+    legend->SetHeader("W+jets reno./fact. 160 < MET < 200 GeV");
   legend->SetTextFont(62);
   legend->SetTextSize(0.04);
   legend->AddEntry(h_W_up, "Up variation","l");
@@ -169,7 +169,7 @@ TString procV = "strong";
   legend->Draw();
   ATLASLabel(0.2,0.87,"Internal");
   // Write
-  c1->Print("output/"+folder+"/plots/unc/W_"+procV+"_"+region+"_env_tf.pdf");
+  c2->Print("output/"+folder+"/plots/unc/W_"+procV+"_"+region+"_env_tf.pdf");
 
   hList->Write();
   fOut->Close();
