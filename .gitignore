@@ -21,7 +21,12 @@ Plotting/*.pdf
 TheoryUnc/TJV_study/input*/*
 TheoryUnc/TJV_study/processed*/*
 TheoryUnc/TJV_study/*pdf
+TheoryUnc/Scale_OTF/input*/*
 # tmp file
 ._*
 *~
 \#*
+.*DS_Store
+
+TheoryUnc/Scale_OTF/input*/*
+TheoryUnc/Scale_OTF/output*/*

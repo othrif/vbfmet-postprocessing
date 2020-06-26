@@ -9,7 +9,7 @@
 
 #define LINE std::cerr << __FILE__ << "::" << __FUNCTION__ << "::" << __LINE__ << std::endl;
 
-const std::string regions[] = {"Incl_ZCR", "Incl_ZSR", "Incl_WCR", "Incl_WSR","Incl", "SRPhiHigh","CRWPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet","SRMETlow","CRWMETlow","CRZMETlow"};
+const std::string regions[] = {"Incl_ZCR", "Incl_ZSR", "Incl_WCR", "Incl_WSR","Incl", "SRPhi","CRWPhi","CRZPhi", "SRPhiHigh","CRWPhiHigh","CRZPhiHigh","SRPhiLow","CRWPhiLow","CRZPhiLow","SRNjet","CRWNjet","CRZNjet","SRMETlow","CRWMETlow","CRZMETlow", "SRVRPhiHigh","CRZVRPhiHigh","CRWVRPhiHigh"};
 const std::string variations[] = {"fac_up","fac_down","renorm_up","renorm_down","both_up","both_down"};
 
 
@@ -19,7 +19,7 @@ VBFTruthAlg::VBFTruthAlg( const std::string& name, ISvcLocator* pSvcLocator ) : 
   declareProperty( "runNumberInput", m_runNumberInput, "runNumber read from file name");
   declareProperty( "currentVariation", m_currentVariation = "Nominal", "Just truth tree here!" );
   declareProperty( "theoVariation", m_theoVariation = true, "Do theory systematic variations");
-  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v45.root", "path to a file with the number of events processed" );
+  declareProperty( "normFile", m_normFile = "/nfs/dust/atlas/user/othrif/vbf/myPP/source/VBFAnalysis/data/fout_v49.root", "path to a file with the number of events processed" );
   declareProperty( "noSkim", noSkim = false, "No skim");
 }
 
@@ -30,9 +30,9 @@ StatusCode VBFTruthAlg::initialize() {
 
   cout<<"NAME of input tree in intialize ======="<<m_currentVariation<<endl;
   cout<< "CURRENT  sample === "<< m_currentSample<<endl;
- // std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
- // std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
-  std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
+  std::string   xSecFilePath = "dev/PMGTools/PMGxsecDB_mc15.txt";
+ //std::string xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16.txt"; // run from local file
+  //std::string  xSecFilePath = "VBFAnalysis/PMGxsecDB_mc16_replace.txt";
   xSecFilePath = PathResolverFindCalibFile(xSecFilePath);
   my_XsecDB = new SUSY::CrossSectionDB(xSecFilePath);
 
@@ -529,20 +529,15 @@ if(new_nbosons==0){
   new_nbosons++;
 }*/
 
- if ( (364142 <= RunNumber && RunNumber <= 364155) || (362000 <= RunNumber && RunNumber <= 362191)){ //Zvv
+ if ( (364142 <= RunNumber && RunNumber <= 364155) || (362000 <= RunNumber && RunNumber <= 362191) || ( 312484<= RunNumber && RunNumber <= 312495) ){ //Zvv
   new_MV = nu_signal.Mll; new_hasZ = nu_signal.has_Z_OS; new_PTV = nu_signal.PTV;
  }
- else if ( (364114 <= RunNumber && RunNumber <= 364127) || (361372 <= RunNumber && RunNumber <= 361374) ||  (362192 <= RunNumber && RunNumber <= 362383)){ //Zee
+ else if ( (364114 <= RunNumber && RunNumber <= 364127) || (361372 <= RunNumber && RunNumber <= 361374) ||  (362192 <= RunNumber && RunNumber <= 362383) || (312448 <= RunNumber && RunNumber <= 312459)){ //Zee
 new_MV = el_signal.Mll; new_hasZ = el_signal.has_Z_OS; new_PTV = el_signal.PTV;
 
 }
- else if ( ((364170 <= RunNumber && RunNumber <= 364183) ||  (362384 <= RunNumber && RunNumber <= 362575)) && new_nbosons!=0){ //Wenu
+ else if ( ((364170 <= RunNumber && RunNumber <= 364183) ||  (362384 <= RunNumber && RunNumber <= 362575) ||  (312496 <= RunNumber && RunNumber <= 312507)) && new_nbosons!=0){ //Wenu
 new_MV = boson_m->at(0); new_hasZ = false; new_PTV = boson_pt->at(0); // hack for now, need to compute the W boson mass and ptv from e and nu
-}else if  ( ((364170 <= RunNumber && RunNumber <= 364183) ||  (362384 <= RunNumber && RunNumber <= 362575)) && new_nbosons==0){
-  ATH_MSG_DEBUG("Missing TruthBoson record, need to handle this case properly!!");
-}
-else {
-  ATH_MSG_ERROR("MISSED A SAMPLE");
 }
 
   computejj(&jet_signal, new_jj_mass, new_jj_deta, new_jj_dphi);
@@ -606,6 +601,11 @@ bool CRZNjet = false;
 bool SRMETlow = false;
 bool CRWMETlow = false;
 bool CRZMETlow = false;
+bool VRPhiHigh = false;
+
+bool SRVRPhiHigh = false;
+bool CRZVRPhiHigh = false;
+bool CRWVRPhiHigh = false;
 
 // Definiing a loose skimming
 float METCut = 200.0e3;
@@ -642,11 +642,13 @@ if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & ((new_nels == 2 & new_nmus == 0) || (new_nels == 0 & new_nmus == 2)) & new_hasZ) CRZNjet = true;
 if (vbfSkim & (2 < new_njets && new_njets < 5) & (new_jj_dphi < 2.0) & (new_met_nolep_et > METCut) & ((new_nels == 1 & new_nmus == 0) || (new_nels == 0 & new_nmus == 1)))            CRWNjet = true;
 
-
 if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 2.0) & (160e3 < new_met_et & new_met_et < METCut) & (new_nels == 0) & (new_nmus == 0))                                                           SRMETlow = true;
 if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 2.0) & (160e3 < new_met_nolep_et & new_met_nolep_et < METCut) & ((new_nels == 2 & new_nmus == 0) || (new_nels == 0 & new_nmus == 2)) & new_hasZ) CRZMETlow = true;
 if (vbfSkim & (new_njets == 2) & (new_jj_dphi < 2.0) & (160e3 < new_met_nolep_et & new_met_nolep_et < METCut) & ((new_nels == 1 & new_nmus == 0) || (new_nels == 0 & new_nmus == 1)))            CRWMETlow = true;
 
+if (vbfSkim & (2 <= new_jj_dphi && new_jj_dphi < 2.5) & (new_met_et > METCut) & (new_nels == 0) & (new_nmus == 0)) SRVRPhiHigh = true;
+if (vbfSkim & (2 <= new_jj_dphi && new_jj_dphi < 2.5) & (new_met_et > METCut) & ((new_nels == 1 & new_nmus == 0) || (new_nels == 0 & new_nmus == 1))) CRWVRPhiHigh = true;
+if (vbfSkim & (2 <= new_jj_dphi && new_jj_dphi < 2.5) & (new_met_et > METCut) & ((new_nels == 2 & new_nmus == 0) || (new_nels == 0 & new_nmus == 2)) & new_hasZ) CRZVRPhiHigh = true;
 
 if(vbfSkimloose /*&& ( (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127) )*/ ){
 if (new_hasZ) CRZll = true; // (new_nels == 2) & (new_nmus == 0) &
@@ -655,16 +657,16 @@ if (new_hasZ) CRZll = true; // (new_nels == 2) & (new_nmus == 0) &
 
 std::map<TString,bool> regDecision;
 
-bool Zvv = (362000 <= RunNumber && RunNumber <= 362191);
-bool Zee = (362192 <= RunNumber && RunNumber <= 362383);
-bool Wev = (362384 <= RunNumber && RunNumber <= 362575);
+bool Zvv = (362000 <= RunNumber && RunNumber <= 362191) || (364142 <= RunNumber && RunNumber <= 364155);
+bool Zee = (362192 <= RunNumber && RunNumber <= 362383) || (364114 <= RunNumber && RunNumber <= 364127);
+bool Wev = (362384 <= RunNumber && RunNumber <= 362575) || (364170 <= RunNumber && RunNumber <= 364183);
 
 regDecision["Incl_ZSR"]=(vbfSkimloose && Zvv);
 regDecision["Incl_ZCR"]=(vbfSkimloose && Zee);
 regDecision["Incl_WSR"]=(vbfSkimloose && Wev && (new_nels == 0));
 regDecision["Incl_WCR"]=(vbfSkimloose && Wev && (new_nels > 0));
 
-//regDecision["Incl"]=(new_PTV > 100e3);
+regDecision["Incl"]=true;
 //regDecision["SRPhi"]=(SRPhiHigh || SRPhiLow);
 //regDecision["CRZPhi"]=(CRZPhiHigh || CRZPhiLow);
 //regDecision["CRWPhi"]=(CRWPhiHigh || CRWPhiLow);
@@ -682,6 +684,14 @@ regDecision["CRWNjet"]=CRWNjet;
 regDecision["SRMETlow"] =SRMETlow;
 regDecision["CRZMETlow"]=CRZMETlow;
 regDecision["CRWMETlow"]=CRWMETlow;
+regDecision["SRPhi"]=(SRPhiHigh || SRPhiLow);
+regDecision["CRZPhi"]=(CRZPhiHigh || CRZPhiLow);
+regDecision["CRWPhi"]=(CRWPhiHigh || CRWPhiLow);
+
+regDecision["SRVRPhiHigh"]=SRVRPhiHigh;
+regDecision["CRZVRPhiHigh"]=CRZVRPhiHigh;
+regDecision["CRWVRPhiHigh"]=CRWVRPhiHigh;
+
 
 new_w = weight*EventWeight;
 new_w_noxsec = EventWeight;

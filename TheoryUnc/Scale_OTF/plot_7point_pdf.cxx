@@ -2,10 +2,15 @@
 // root plot_7point.cxx
 // Change path
 //strong, EWK
-// PhiHigh, PhiLow, Njet
-void plot_7point_pdf(TString folder= "theoVariation_met160_020220",TString procV = "EWK", TString region = "PhiHigh"){
+// PhiHigh, PhiLow, Njet, METlow
 
-  //  SetAtlasStyle();
+#include "/afs/desy.de/user/o/othrif/atlasrootstyle/AtlasLabels.h"
+#include "/afs/desy.de/user/o/othrif/atlasrootstyle/AtlasLabels.C"
+
+void plot_7point_pdf(TString folder= "allregions_final", TString region = "Njet"){
+
+  SetAtlasStyle();
+
   gStyle->SetMarkerSize(0.9);
   gStyle->SetLegendBorderSize(0);
   gStyle->SetTextSize(0.04);
@@ -14,17 +19,18 @@ void plot_7point_pdf(TString folder= "theoVariation_met160_020220",TString procV
 
   gSystem->Exec("mkdir -p output/"+folder+"/plots/env/");
 
-  const int num = 5;
-  TString Ax_SR[num] = {"0.8 TeV < m_{jj} < 1 TeV","1 TeV < m_{jj} < 1.5 TeV","1.5 TeV < m_{jj} < 2 TeV", "2 < m_{jj} < 3.5 TeV", "m_{jj} > 3.5 TeV"};
+  int num = 5;
+  TString procV = "strong";
+  TString Ax_SR[5] = {"0.8 TeV < m_{jj} < 1 TeV","1 TeV < m_{jj} < 1.5 TeV","1.5 TeV < m_{jj} < 2 TeV", "2 < m_{jj} < 3.5 TeV", "m_{jj} > 3.5 TeV"};
+
   int numfiles;
 
-  double max_def = 2.4;
-  double min_def = 0.65;
+  double max_def = 2.8;
+  double min_def = 0.6;
 
   TString files[] = {"Z_"+procV+"_SR"+region,"Z_"+procV+"_CRZ"+region,"W_"+procV+"_SR"+region,"W_"+procV+"_CRW"+region};
   TString legend_files[] = {"Z "+procV+" SR","Z "+procV+" CRZ","W "+procV+" SR","W "+procV+" CRW"};
   numfiles = 4;
-
 
   for (int ifile =0; ifile< numfiles; ifile++){
     std::cout << files[ifile] << std::endl;
@@ -36,7 +42,7 @@ void plot_7point_pdf(TString folder= "theoVariation_met160_020220",TString procV
     TFile *fIn = new TFile( file_in );
     TFile *fFinal = new TFile( file_out ,"recreate");
 
-    TH1F  *h_Nom   = (TH1F*)fIn->Get( "pdf_up" );
+    TH1F  *h_Nom   = (TH1F*)fIn->Get( "pdf_down" );
     TH1F  *h_FUp   = (TH1F*)fIn->Get( "fac_up" );
     TH1F  *h_FDown = (TH1F*)fIn->Get( "fac_down" );
     TH1F  *h_RUp   = (TH1F*)fIn->Get( "renorm_up" );
@@ -45,7 +51,9 @@ void plot_7point_pdf(TString folder= "theoVariation_met160_020220",TString procV
     TH1F  *h_QDown = (TH1F*)fIn->Get( "both_down" );
     TH1F  *h_EnvUp   = (TH1F*)fIn->Get( "pdf_up" );
     TH1F  *h_EnvDown = (TH1F*)fIn->Get( "pdf_down" );
-    h_Nom->SetLineColor(kBlack);
+    //h_Nom->SetLineColor(kWhite);
+    //h_Nom->SetMarkerColor(kWhite);
+    h_Nom->SetMarkerStyle(1);
     h_FUp->SetLineColor(kRed+1);
     h_FUp->SetMarkerColor(kRed+1);
     h_FDown->SetLineColor(kRed+1);
@@ -119,44 +127,33 @@ void plot_7point_pdf(TString folder= "theoVariation_met160_020220",TString procV
    quadLo->SetMarkerColor(kYellow+2);
    quadLo->SetLineStyle(7);
 
+   h_FDown->Draw("HIST   SAME ");
+   h_RDown->Draw("HIST   SAME ");
+   h_QDown->Draw("HIST   SAME ");
+   h_EnvDown->Draw("HIST SAME ");
 
-   /*envHi->SetLineColor(kGray);
-  //envHi->SetFillColor(kGray);
-   envHi->Draw("hist same");*/
-
-   h_FDown->Draw("HIST  SAME");
-   h_RDown->Draw("HIST  SAME");
-   h_QDown->Draw("HIST  SAME");
-   h_EnvDown->Draw("HIST  SAME");
-
-   /*TH1F* whitearea =  new TH1F("whitearea", "whitearea", num,800 , 2500);;
-   for (int j = 1; j <= num; ++j) {
-     whitearea->SetBinContent(j, h_EnvUp->GetBinContent(j));
-     //cout << whitearea->GetBinContent(j)<< endl;
-   }
-   whitearea->SetFillColorAlpha(kWhite, 0);
-   whitearea->SetFillColor(kWhite);
-   whitearea->SetLineColor(kGray);*/
-//whitearea->Draw("hist same");
-   h_QUp->Draw("HIST  SAME");
-   h_FUp->Draw("HIST  SAME");
-   h_RUp->Draw("HIST  SAME");
-   h_EnvUp->Draw("HIST  SAME");
-   quadUp->Draw("HIST  SAME");
-   quadLo->Draw("HIST  SAME");
+   h_QUp->Draw("HIST    SAME ");
+   h_FUp->Draw("HIST    SAME ");
+   h_RUp->Draw("HIST    SAME ");
+   h_EnvUp->Draw("HIST  SAME ");
+   quadUp->Draw("HIST   SAME ");
+   quadLo->Draw("HIST   SAME ");
 
 
    h_Nom->Draw("AXIS same");
-  //  ATLASLabel(0.20,0.87,true);
+  ATLASLabel(0.2,0.87,"Internal");
 
    TLegend *legend=new TLegend(0.60,0.54,0.89,0.9);
    legend->SetTextFont(62);
    legend->SetTextSize(0.04);
-   legend->SetHeader(legend_files[ifile]);
-     //   legend->SetHeader(files[ifile]);
+   legend->SetHeader(legend_files[ifile]+" " +region);
+  if (region == "VRPhiHigh")
+    legend->SetHeader(legend_files[ifile]+" " +" 2<DPhijj<2.5");
+  else if (region == "Njet")
+  legend->SetHeader(legend_files[ifile]+" " +" Njet>2");
+  else if (region == "METlow")
+  legend->SetHeader(legend_files[ifile]+" " +" 160 < MET < 200");
 
-  //  legend->SetHeader("#splitline{"+Legend+"}{W #rightarrow e#nu}");
-  //  legend->AddEntry(h_Nom, "Nominal","lp");
    legend->AddEntry(h_FUp, "#mu_{F}=2","lp");
    legend->AddEntry(h_FDown, "#mu_{F}=0.5","lp");
    legend->AddEntry(h_RUp, "#mu_{R}=2","lp");
@@ -165,29 +162,15 @@ void plot_7point_pdf(TString folder= "theoVariation_met160_020220",TString procV
    legend->AddEntry(h_QDown, "#mu_{F}=0.5,#mu_{R}=0.5","lp");
    legend->AddEntry(h_EnvUp, "PDF up","lp");
    legend->AddEntry(h_EnvDown, "PDF down","lp");
-   //legend->AddEntry(quadUp, "(#mu_{F},#mu_{R}) quad","lp");
-  //legend->AddEntry(envHi, "Envelope","f");
    legend->Draw();
 
    TF1 *line = new TF1("line","1",-100000,100000);
    line->SetLineColor(kBlack);
    line->SetLineWidth(1);
    line->Draw("same");
-/*
- TLatex *xlabel = new TLatex();
- xlabel-> SetNDC();
- xlabel -> SetTextFont(1);
- xlabel -> SetTextColor(1);
- xlabel -> SetTextSize(0.03);
- xlabel -> SetTextAlign(22);
- xlabel -> SetTextAngle(0);
- xlabel -> DrawText(0.26, 0.88, files[ifile]+", "+region);
 
-*/
   // Write
-   c->Print( "output/"+folder+"/plots/scale_pdf_"+files[ifile]+"_"+region+".pdf");
-  //c->Write();
-  //fFinal->Close();
+   c->Print( "output/"+folder+"/plots/scale_pdf_"+files[ifile]+".pdf");
 
  }
 }
