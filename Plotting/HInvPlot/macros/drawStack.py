@@ -281,7 +281,7 @@ def getHistPars(hist):
         'dphill' : {'xtitle':'#Delta#it{#phi}_{ll}',                 'ytitle':'Events / 0.2 rad', 'rebin':5,  'ymin':0.01},
         'jj_dphi' : {'xtitle':'#Delta#it{#phi}_{jj}',                 'ytitle':'Events / 0.2 rad', 'rebin':2,  'ymin':0.01, 'xmax':2.0}, #,'ymax':2000.01,'ymax':5500.01, 'ymax':4200.01 , 'ymax':239.99 'ymax':2000.01,
         'met_soft_tst_et'    : {'xtitle':'#it{E}_{T}^{miss,soft} [GeV]',                 'ytitle':'Events / 5 GeV', 'rebin':1,  'ymin':0.1, 'logy':True, 'LtoRCut':1},
-        'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / 25 GeV', 'rebin':2,  'ymin':0.1, 'logy':False,'xmin':100,'LtoRCut':0},#'xmax':500, 
+        'met_tst_et'    : {'xtitle':'#it{E}_{T}^{miss} [GeV]',                 'ytitle':'Events / 25 GeV', 'rebin':1,  'ymin':0.1, 'logy':False,'xmin':100,'LtoRCut':0},#'xmax':500, 
         'met_tst_phi'    : {'xtitle':'#it{E}_{T}^{miss} #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},
         'met_tst_nolep_et'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) [GeV]',              'xmax':500,    'ytitle':'Events / 50 GeV', 'rebin':5, 'logy':True}, #'ymin':50.1,'ymax':30000 # for Z 'xmax':500,  'ymin':5.01, 'ymax':3000, ###'xmin':200,  'ymin':50.1,'ymax':30000, 'xmax':500,'xmin':200,  'ymin':50.1,'ymax':25000,
         'met_tst_nolep_phi'    : {'xtitle':'#it{E}_{T}^{miss} (without leptons) #it{#phi}',                 'ytitle':'Events', 'rebin':4,  'ymin':0.01, 'logy':False},

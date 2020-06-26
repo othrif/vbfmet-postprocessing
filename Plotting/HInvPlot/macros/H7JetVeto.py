@@ -273,10 +273,10 @@ if __name__ == "__main__":
     elif options.var=="njets25":
         pvar='njets25'
         xaxis='Truth N_{jets,25}'
-    elif options.var=="jj_dphi":  
+    elif options.var=="jj_dphi":
         pvar='truth_jj_dphi'
         xaxis='Truth #Delta#phi_{jj}'
-    elif options.var=="jj_deta": 
+    elif options.var=="jj_deta":
         pvar='truth_jj_deta'
         xaxis='Truth #Delta#eta_{jj}'
     elif options.var=="bosonpt": 

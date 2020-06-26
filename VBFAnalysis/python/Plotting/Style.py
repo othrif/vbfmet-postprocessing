@@ -84,8 +84,12 @@ styleDict["VH125"]=[2,3,3,0,0,2,0,0]
 
 styleDict["W_strong"]=[ROOT.kGreen  -7,1,1,ROOT.kGreen  -7,1001,ROOT.kGreen  -7,0,0]
 styleDict["Z_strong"]=[ROOT.kGreen  -3,1,1,ROOT.kGreen  -3,1001,ROOT.kGreen  -3,0,0]
+styleDict["Wg_strong"]=[ROOT.kGreen  -7,1,1,ROOT.kGreen  -7,1001,ROOT.kGreen  -7,0,0]
+styleDict["Zg_strong"]=[ROOT.kGreen  -3,1,1,ROOT.kGreen  -3,1001,ROOT.kGreen  -3,0,0]
 styleDict["Z_EWK"]=[ROOT.kBlue-9,1,1,ROOT.kBlue-9,1001,ROOT.kBlue-9,0,0]
 styleDict["W_EWK"]=[ROOT.kCyan   -9,1,1,ROOT.kCyan   -9,1001,ROOT.kCyan   -9,0,0]
+styleDict["Zg_EWK"]=[ROOT.kBlue-9,1,1,ROOT.kBlue-9,1001,ROOT.kBlue-9,0,0]
+styleDict["Wg_EWK"]=[ROOT.kCyan   -9,1,1,ROOT.kCyan   -9,1001,ROOT.kCyan   -9,0,0]
 """
 styleDict["W_EWK"]=[ROOT.kGreen  -7,1,1,ROOT.kGreen  -7,1001,ROOT.kGreen  -7,0,0]
 styleDict["W_strong"]=[ROOT.kGreen  -3,1,1,ROOT.kGreen  -3,1001,ROOT.kGreen  -3,0,0]
