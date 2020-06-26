@@ -8,17 +8,21 @@ The following is needed to calculate truth variations from on-the-fly sherpa sam
 - Run `VBFInvTruth` algorithm from `STAnalysisCode` on input `DAOD_TRUTH3`
 - Run `VBFAnalysisAlg` algorithm from `STPostProcessing` on input `MiniNtuple` from the previous step, then merge outputs
 ``` bash
-submitVBFTruthCondor.py -l input.list -n -p /nfs/dust/atlas/user/othrif/vbf/myPP/run_condor_300919/x509up_u29949 --noSubmit
+submitVBFTruthCondor.py -l input.list -n -p /nfs/dust/atlas/user/othrif/vbf/myPP/run_condor_300919/x509up_u29949
 mergeVBFTruthAlg.sh
 ```
 - Add the variations to the `input` directory in `Scale_OTF`
-- Run the following:
+- Run the following for single tests:
 ``` bash
-python calculateOTFYields.py Z_strong SR # as an example
-python runAllSystematics.py # runs all regions in one go
-root plot_7point_pdf.cxx # visualize the 7 point and pdf variations
-root plot_7point.cxx # visualize the 7 point  variations
-root plot_TF_unc.cxx # visualize the transfer factor uncertainty
+python computeOTFUnc.py Z_strong SR # as an example to run variations for all 16 bins + 1 VR bin with 0 lepton SR selection for QCD Z+jets
+root plot_7point_pdf.cxx'("input directory","PhiLow")' # visualize the 7 point scale and pdf variations for SR/CRZ/CRW PhiLow region
+root plot_TF_binom.cxx'("input directory","PhiLow")' # visualize the transfer factor uncertainty for SR/CRZ/CRW PhiLow region
+```
+- Run the following to reproduce all plots and results:
+``` bash
+python runAllSystematics.py # runs all regions in one go and produce the final theory systematics input for Z and W in all SRs, CRs, and VRs for up and down variations
+./plotAll.sh # make plots for all SR/CRZ/CRW/VR regions
+python plotVar.py listTheorySyst_CONF listTheorySyst_NEW  outputname # compare the transfer factor uncertainty between the old and new setup
 ```
 
 ## ckkw/qsf uncertainties using varied samples ##

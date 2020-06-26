@@ -17,7 +17,8 @@ for channel in channels :
         if ("W_" in channel and "Z" in region) or ("Z_" in channel and "W" in region):
             continue
         print "\nRunning systs for channel:", channel, region
-        os.system("python calculateOTFYields_allvars.py " + channel + " " + region + ">> output.txt")
+        #os.system("python calculateOTFYields.py " + channel + " " + region + ">> output.txt")
+        os.system("python computeOTFUnc.py " + channel + " " + region + ">> output.txt")
 
 
 with open("output.txt") as f:
@@ -29,8 +30,9 @@ content = list(filter(None, content))
 f = open("listTheorySyst", "w")
 varOLD = "old"
 for x in content:
-    if "=" not in x:
+    if "up" not in x and "down" not in x:
         continue
+    print 'after', x
     var = x.split("=")[0]
     if varOLD != var:
         f.write(var+"\n")
