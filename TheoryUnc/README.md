@@ -11,6 +11,7 @@ The following is needed to calculate truth variations from on-the-fly sherpa sam
 submitVBFTruthCondor.py -l input.list -n -p /nfs/dust/atlas/user/othrif/vbf/myPP/run_condor_300919/x509up_u29949
 mergeVBFTruthAlg.sh
 ```
+- The latest version of the variations is located in `/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/vbfinv/truthNtuples/final_scaleOTF_260620`
 - Add the variations to the `input` directory in `Scale_OTF`
 - Run the following for single tests:
 ``` bash
