@@ -753,8 +753,8 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
     if makePDF:
         # texTable1.mirror()
         # texTable2.mirror()
-        texTable1.createPDF(clean=True, fileName="yieldsAllRegions", big=True)
-        texTable2.createPDF(clean=True, fileName="yieldsSummary", big=True)
+        texTable1.createPDF(clean=False, fileName="yieldsAllRegions", big=True)
+        texTable2.createPDF(clean=False, fileName="yieldsSummary", big=True)
 
     # Print transfer factors a=B_SR/B_CR
     B_WSR=(getBinsYield(histDict["W_strong"], regionBinsDict["SR"])+getBinsYield(histDict["W_EWK"], regionBinsDict["SR"]))
@@ -1831,8 +1831,8 @@ def compareMain(options):
             print texTableObj2.getTableString()
             # texTableObj.getStandaloneTable()
             if options.texTables:
-                texTableObj1.createPDF(clean=True, fileName=("table_{}".format(p)).replace("/","_"), big=True)
-                texTableObj2.createPDF(clean=True, fileName=("summaryTable_{}".format(p)).replace("/","_"), big=True)
+                texTableObj1.createPDF(clean=False, fileName=("table_{}".format(p)).replace("/","_"), big=True)
+                texTableObj2.createPDF(clean=False, fileName=("summaryTable_{}".format(p)).replace("/","_"), big=True)
             print "\n##########################\n"
 
 
