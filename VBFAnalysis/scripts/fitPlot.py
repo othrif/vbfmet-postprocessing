@@ -468,10 +468,10 @@ class HistClass(object):
                     if options.fakeMu:
                         cls.regDict["SR{}".format(n)]=cls.nBins*5+n
                         cls.regDict["oneMuCR{}".format(n)]=cls.nBins*3+n
-                        cls.regDict["oneEleCR{}".format(n)]=cls.nBins*2+n
+                        cls.regDict["oneEleCR{}".format(n)]=cls.nBins+n
                         cls.regDict["twoLepCR{}".format(n)]=cls.nBins*4+n
-                        cls.regDict["oneEleLowSigCR{}".format(n)]=cls.nBins+n
-                        cls.regDict["oneMuMTCR{}".format(n)]=n                        
+                        cls.regDict["oneEleLowSigCR{}".format(n)]=n
+                        cls.regDict["oneMuMTCR{}".format(n)]=cls.nBins*2+n                        
                 else:
                     cls.regDict["SR{}".format(n)]=cls.nBins*8+n
                     cls.regDict["oneMuNegCR{}".format(n)]=cls.nBins*4+n
@@ -586,6 +586,7 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
     
     if not options.scaleSig:
         NameDict['signal']='#it{H}(#it{B}_{inv} = %0.2f)' %(options.hscale)
+    inv_NameDict = {v: k for k, v in NameDict.iteritems()}
     listInputs=[]
     legOrder=[]
     for i in leg.GetListOfPrimitives():
@@ -607,7 +608,7 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
             i.GetObject().SetLineWidth(0)
             i.GetObject().SetMarkerColor(0)
 
-    if not options.fakeMu:
+    if True or not options.fakeMu:
         removeLabel(leg, 'dummy')
         removeLabel(leg, 'Others')
         removeLabel(leg, 'multijet')
@@ -615,7 +616,13 @@ def make_legend(can,poskeys=[0.845,0.09,0.991,0.87],ncolumns=1):#[0.0,0.04,0.155
         removeLabel(leg, 'eleFakes')
 
     for i in leg.GetListOfPrimitives():
+        if i.GetLabel() in inv_NameDict and i.GetLabel()!='Uncertainty':
+            ikeythis=inv_NameDict[i.GetLabel()]
+            Style.setStyles(i.GetObject(),Style.styleDict[ikeythis])
+        else:
+            print('missing key! %s' %(i.GetLabel()))
         print 'leg: ',i.GetLabel(),i.GetObject()
+        
         legOrder+=[[i.GetLabel(),i.GetObject()]]
         
     for en in legOrder:
@@ -746,8 +753,8 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
     if makePDF:
         # texTable1.mirror()
         # texTable2.mirror()
-        texTable1.createPDF(clean=True, fileName="yieldsAllRegions", big=True)
-        texTable2.createPDF(clean=True, fileName="yieldsSummary", big=True)
+        texTable1.createPDF(clean=False, fileName="yieldsAllRegions", big=True)
+        texTable2.createPDF(clean=False, fileName="yieldsSummary", big=True)
 
     # Print transfer factors a=B_SR/B_CR
     B_WSR=(getBinsYield(histDict["W_strong"], regionBinsDict["SR"])+getBinsYield(histDict["W_EWK"], regionBinsDict["SR"]))
@@ -872,9 +879,9 @@ def main(options):
        histNames=["signal"]
     else:
         histNamesSig+=["signal"]#,"VBFH125","ggFH125","VH125","VBFHgam125"]
-    histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
+    histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK",  "ttbar", "eleFakes","multijet"] # This order determines the order in which the hists are stacked , "Others"
     if options.fakeMu:
-        histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK", "eleFakes","muoFakes", "ttbar", "multijet"] # This order determines the order in which the hists are stacked , "Others"
+        histNames+=["W_strong", "W_EWK", "Z_strong", "Z_EWK",  "ttbar", "eleFakes","muoFakes","multijet"] # This order determines the order in which the hists are stacked , "Others"
     if options.ph_ana:
         histNames=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'ttg','SinglePhoton','EFakePh','JetFakePh','eleFakes']  # 
 
@@ -896,10 +903,10 @@ def main(options):
             if options.fakeMu:
                 regDict["SR{}".format(n)]=nbins*5+n
                 regDict["oneMuCR{}".format(n)]=nbins*3+n
-                regDict["oneEleCR{}".format(n)]=nbins*2+n
+                regDict["oneEleCR{}".format(n)]=nbins+n
                 regDict["twoLepCR{}".format(n)]=nbins*4+n
-                regDict["oneEleLowSigCR{}".format(n)]=nbins+n
-                regDict["oneMuMTCR{}".format(n)]=n                
+                regDict["oneEleLowSigCR{}".format(n)]=n
+                regDict["oneMuMTCR{}".format(n)]=nbins*2+n
         else:
             #if not options.cronly:
             regDict["SR{}".format(n)]=nbins*8+n
@@ -1149,9 +1156,9 @@ def main(options):
                     ireg+=1
                 
     #defining bkg hist
-    bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","ttbar","multijet"] #+["Others"]
+    bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","eleFakes","multijet"] #+["Others"]
     if options.fakeMu:
-        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","eleFakes","muoFakes","ttbar","multijet"] #+["Others"]
+        bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","eleFakes","muoFakes","multijet"] #+["Others"]
     if options.ph_ana:
         bkgsList=["Z_strong","Z_EWK","W_EWK","W_strong","ttbar","Zg_strong","Zg_EWK","Wg_EWK","Wg_strong",'SinglePhoton','ttg','EFakePh','JetFakePh','eleFakes']  #+["Others"] 
     bkgs=ROOT.TH1F("bkgs","bkgs",nbins*byNum,0,nbins*byNum)
@@ -1593,27 +1600,54 @@ def main(options):
     elif not options.cronly:
         if options.combinePlusMinus:
             labelTxt.SetTextSize(0.04)
-        line00=ROOT.TLine(0.16+newShift,0.02,0.16+newShift,0.11)
-        line00.Draw()
-        labelTxt.DrawLatex(0.19+shift-0.01+newShift,yvallab,nameMap['FakeE'])
-        line0=ROOT.TLine(0.31+newShift-0.002,0.02,0.31+newShift-0.002,0.11)
-        line0.Draw()
-        labelTxt.DrawLatex(0.33+shift+0.005+newShift,yvallab,nameMap['Wenu'])
-        line2=ROOT.TLine(0.458+newShift-0.002,0.02,0.458+newShift-0.002,0.11)
-        line2.Draw()
-        labelTxt.DrawLatex(0.48+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
-        line3=ROOT.TLine(0.605+newShift-0.001,0.02,0.605+newShift-0.001,0.11)
-        line3.Draw()
-        labelTxt.DrawLatex(0.645+shift+newShift,yvallab,nameMap['Zll'])
-        line4=ROOT.TLine(0.752+newShift,0.02,0.752+newShift,0.11)
-        line4.Draw()        
-        labelTxt.DrawLatex(0.81+newShift,yvallab,"SR")
-        line5=ROOT.TLine(0.9+newShift,0.02,0.9+newShift,0.11)
-        line5.Draw()
-        hline=ROOT.TLine(0.16+newShift,0.08,0.9+newShift,0.08)
-        hline.Draw()
-        hline0=ROOT.TLine(0.16+newShift,0.02,0.9+newShift,0.02)
-        hline0.Draw()
+        if options.fakeMu:
+            labelTxt.SetTextSize(0.035)
+            line00=ROOT.TLine(0.16+newShift,0.02,0.16+newShift,0.11)
+            line00.Draw()
+            labelTxt.DrawLatex(0.175+shift-0.01+newShift,yvallab,nameMap['FakeE'])
+            line0=ROOT.TLine(0.285+newShift-0.002,0.02,0.285+newShift-0.002,0.11)
+            line0.Draw()
+            labelTxt.DrawLatex(0.29+shift+0.005+newShift,yvallab,nameMap['Wenu'])
+            line2=ROOT.TLine(0.407+newShift,0.02,0.407+newShift,0.11)
+            line2.Draw()
+            labelTxt.DrawLatex(0.42+shift-0.01+newShift,yvallab,nameMap['FakeM'])
+            line2b=ROOT.TLine(0.53+newShift-0.002,0.02,0.53+newShift-0.002,0.11)
+            line2b.Draw()            
+            labelTxt.DrawLatex(0.54+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
+            line3=ROOT.TLine(0.655+newShift-0.001,0.02,0.655+newShift-0.001,0.11)
+            line3.Draw()
+            labelTxt.DrawLatex(0.68+shift+newShift,yvallab,nameMap['Zll'])
+            line4=ROOT.TLine(0.777+newShift,0.02,0.777+newShift,0.11)
+            line4.Draw()
+            labelTxt.DrawLatex(0.82+newShift,yvallab,"SR")
+            line5=ROOT.TLine(0.9+newShift,0.02,0.9+newShift,0.11)
+            line5.Draw()
+            hline=ROOT.TLine(0.16+newShift,0.08,0.9+newShift,0.08)
+            hline.Draw()
+            hline0=ROOT.TLine(0.16+newShift,0.02,0.9+newShift,0.02)
+            hline0.Draw()
+        else:
+            line00=ROOT.TLine(0.16+newShift,0.02,0.16+newShift,0.11)
+            line00.Draw()
+            labelTxt.DrawLatex(0.19+shift-0.01+newShift,yvallab,nameMap['FakeE'])
+            line0=ROOT.TLine(0.31+newShift-0.002,0.02,0.31+newShift-0.002,0.11)
+            line0.Draw()
+            labelTxt.DrawLatex(0.33+shift+0.005+newShift,yvallab,nameMap['Wenu'])
+            line2=ROOT.TLine(0.458+newShift-0.002,0.02,0.458+newShift-0.002,0.11)
+            line2.Draw()
+            labelTxt.DrawLatex(0.48+shift+0.005+newShift,yvallab,nameMap['Wmunu'])
+            line3=ROOT.TLine(0.605+newShift-0.001,0.02,0.605+newShift-0.001,0.11)
+            line3.Draw()
+            labelTxt.DrawLatex(0.645+shift+newShift,yvallab,nameMap['Zll'])
+            line4=ROOT.TLine(0.752+newShift,0.02,0.752+newShift,0.11)
+            line4.Draw()
+            labelTxt.DrawLatex(0.81+newShift,yvallab,"SR")
+            line5=ROOT.TLine(0.9+newShift,0.02,0.9+newShift,0.11)
+            line5.Draw()
+            hline=ROOT.TLine(0.16+newShift,0.08,0.9+newShift,0.08)
+            hline.Draw()
+            hline0=ROOT.TLine(0.16+newShift,0.02,0.9+newShift,0.02)
+            hline0.Draw()
     else:
         if options.combinePlusMinus:
             labelTxt.SetTextSize(0.045)
@@ -1797,8 +1831,8 @@ def compareMain(options):
             print texTableObj2.getTableString()
             # texTableObj.getStandaloneTable()
             if options.texTables:
-                texTableObj1.createPDF(clean=True, fileName=("table_{}".format(p)).replace("/","_"), big=True)
-                texTableObj2.createPDF(clean=True, fileName=("summaryTable_{}".format(p)).replace("/","_"), big=True)
+                texTableObj1.createPDF(clean=False, fileName=("table_{}".format(p)).replace("/","_"), big=True)
+                texTableObj2.createPDF(clean=False, fileName=("summaryTable_{}".format(p)).replace("/","_"), big=True)
             print "\n##########################\n"
 
 

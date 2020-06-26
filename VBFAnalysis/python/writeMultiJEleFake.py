@@ -250,8 +250,10 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
     if doTMVA:
         #multijets=[293.3,77.9,38.2,38.7,26.7,69.9,13.7,11.9,51.6,7.1,9.1]
         #multijets_statunc=[25.,18.,12.,12.,16.,30.,7.,9.,45.,7.1,9.1]
-        multijets=[534.7,52.3,24.1,34.2,19.1,14.1,25.9,10.5,134.0,10.9,80.2]
-        multijets_statunc=[40.,18.,12.,12.,16.,30.,7.,9.,45.,7.1,9.1]
+        #multijets=[534.7,52.3,24.1,34.2,19.1,14.1,25.9,10.5,134.0,10.9,80.2]
+        #multijets_statunc=[40.,18.,12.,12.,16.,30.,7.,9.,45.,7.1,9.1] # avas
+        multijets=[614.7,152.3,44.1,34.2,19.1,14.1,25.9,10.5,13.0,5.9,5.2] # for george best
+        multijets_statunc=[40.,18.,12.,12.,16.,30.,7.,9.,4.,2.1,2.1]
 
         # divide for the periods
         divideUnit=3.0
