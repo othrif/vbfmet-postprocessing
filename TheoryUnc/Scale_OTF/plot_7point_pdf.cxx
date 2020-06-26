@@ -77,6 +77,7 @@ void plot_7point_pdf(TString folder= "allregions_final", TString region = "Njet"
 
 
     h_Nom->GetXaxis()->SetLabelOffset(0.01);
+    h_Nom->GetXaxis()->SetTitle("");
     //h_Nom->GetXaxis()->SetNdivisions(0);
     //std::cout << h_Nom->GetXaxis()->GetNdivisions() << std::endl;
     h_Nom->SetTitle("");
@@ -143,7 +144,7 @@ void plot_7point_pdf(TString folder= "allregions_final", TString region = "Njet"
    h_Nom->Draw("AXIS same");
   ATLASLabel(0.2,0.87,"Internal");
 
-   TLegend *legend=new TLegend(0.60,0.54,0.89,0.9);
+   TLegend *legend=new TLegend(0.45,0.54,0.89,0.9);
    legend->SetTextFont(62);
    legend->SetTextSize(0.04);
    legend->SetHeader(legend_files[ifile]+" " +region);
@@ -152,7 +153,7 @@ void plot_7point_pdf(TString folder= "allregions_final", TString region = "Njet"
   else if (region == "Njet")
   legend->SetHeader(legend_files[ifile]+" " +" Njet>2");
   else if (region == "METlow")
-  legend->SetHeader(legend_files[ifile]+" " +" 160 < MET < 200");
+  legend->SetHeader(legend_files[ifile]+" " +" 160 < MET < 200 GeV");
 
    legend->AddEntry(h_FUp, "#mu_{F}=2","lp");
    legend->AddEntry(h_FDown, "#mu_{F}=0.5","lp");
