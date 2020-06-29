@@ -55,7 +55,12 @@ if args.pickle==None:
                 print 'zombie file', filepath
                 continue
             h = f.Get("NumberEvents")
-            nevent += h.GetBinContent(args.event_count)
+            #used the wrong central value for 363266-363272, so we update it here. Should use the entry number 2
+            event_count=args.event_count
+            if event_count==2 and dsid_string in ['363266','363267','363268','363269','363270','363271','363272']:
+                print 'This is MG EWK samples:',dsid_string
+                event_count=27
+            nevent += h.GetBinContent(event_count)
             if dsid_string in hmap:
                 hmap[dsid_string].Add(h)
             else:
@@ -95,13 +100,18 @@ else:
             if not h:
 		print 'ERROR - histogram invalid',filepath
 		continue
-	    nevent += h.GetBinContent(args.event_count)
+	    #used the wrong central value for 363266-363272, so we update it here. Should use the entry number 2
+	    event_count=args.event_count
+	    if event_count==2 and dsid_string in ['363266','363267','363268','363269','363270','363271','363272']:
+            print 'This is MG EWK samples:',dsid_string
+            event_count=27
+	    nevent += h.GetBinContent(event_count)
             neventraw += h.GetBinContent(1)
             print 'total events: ',nevent
             if dsid_string in hmap:
                 hmap[dsid_string].Add(h)
             else:
-                hnew = h.Clone()          
+                hnew = h.Clone()
                 hnew.SetDirectory(fout)
                 hnew.SetName('skim_%s' %(dsid_string))
                 hmap[dsid_string]=hnew
