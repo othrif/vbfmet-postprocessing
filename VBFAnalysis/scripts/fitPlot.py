@@ -753,8 +753,8 @@ def make_yieldTable(regionDict, regionBinsDict, histDict, dataHist, nbins, makeP
     if makePDF:
         # texTable1.mirror()
         # texTable2.mirror()
-        texTable1.createPDF(clean=False, fileName="yieldsAllRegions", big=True)
-        texTable2.createPDF(clean=False, fileName="yieldsSummary", big=True)
+        texTable1.createPDF(clean=True, fileName="yieldsAllRegions", big=True)
+        texTable2.createPDF(clean=True, fileName="yieldsSummary", big=True)
 
     # Print transfer factors a=B_SR/B_CR
     B_WSR=(getBinsYield(histDict["W_strong"], regionBinsDict["SR"])+getBinsYield(histDict["W_EWK"], regionBinsDict["SR"]))
@@ -1221,15 +1221,19 @@ def main(options):
         regionItr=0
         print 'syst data_fraction mc_fraction'
         writeLine=''
+        total_bins=getNumberOfBins(options.input)
         for i in range(1,hDict["bkgs"].GetNbinsX()+1):
-            if (i-1)%11==0 and i!=1:
+            if (i-1)%total_bins==0 and i!=1:
                 regionItr+=1
-            binVal=((i)%11)
+            binVal=((i)%total_bins)
+            print 'options.nBin:',options.nBin
             if binVal==0:
                 binVal=11
             nameGamma = regionsList[regionItr].replace('X_','%s_' %(binVal))
             total_bin_err = math.sqrt((data.GetBinError(i))**2+(hDict["bkgs"].GetBinError(i))**2)
             #print 'bin: ',i,nameGamma,' %0.3f %0.3f' %((data.GetBinError(i)/total_bin_err),(hDict["bkgs"].GetBinError(i)/total_bin_err)) #can uncomment to print to command line
+            if total_bin_err<=0.0:
+                total_bin_err=1.0
             writeLine+=nameGamma+' %0.3f %0.3f\n' %((data.GetBinError(i)/total_bin_err),(hDict["bkgs"].GetBinError(i)/total_bin_err))
         statFil=open('statunc.txt','w')
         statFil.write(writeLine)
@@ -1831,8 +1835,8 @@ def compareMain(options):
             print texTableObj2.getTableString()
             # texTableObj.getStandaloneTable()
             if options.texTables:
-                texTableObj1.createPDF(clean=False, fileName=("table_{}".format(p)).replace("/","_"), big=True)
-                texTableObj2.createPDF(clean=False, fileName=("summaryTable_{}".format(p)).replace("/","_"), big=True)
+                texTableObj1.createPDF(clean=True, fileName=("table_{}".format(p)).replace("/","_"), big=True)
+                texTableObj2.createPDF(clean=True, fileName=("summaryTable_{}".format(p)).replace("/","_"), big=True)
             print "\n##########################\n"
 
 

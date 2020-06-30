@@ -250,13 +250,13 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
         multijets=[]
         multijets_statunc=[] # total 150
         if year==2016:
-            multijets=[10.7,7.3,3.7,2.3,0.8]
+            multijets=[7.3,10.7,3.7,2.3,0.8]
             multijets_statunc=[2.0,2.5,1.0,1.5,0.9]
         elif year==2017:
-            multijets=[28.7,14.3,6.7,4.1,0.8]
+            multijets=[14.3,28.7,6.7,4.1,0.8]
             multijets_statunc=[6.0,4.5,2.0,1.5,0.9]
         elif year==2018:
-            multijets=[25.7,14.3,7.7,1.3,0.8]
+            multijets=[14.3,25.7,7.7,1.3,0.8]
             multijets_statunc=[6.0,3.5,2.0,0.5,0.9]
     if doTMVA:
         #multijets=[293.3,77.9,38.2,38.7,26.7,69.9,13.7,11.9,51.6,7.1,9.1]

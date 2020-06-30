@@ -58,7 +58,7 @@ def ReturnNewSystScaleUncor(sysname, vals, listV):
     line+=tmp_line.rstrip(',')
     return line+'\n'
 
-def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False):
+def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False, optn=None):
     line=''
     debug=False
     new_vals = []
@@ -100,9 +100,9 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False):
             deCorrFactor=0.25
     linesys=''
     linesys1=''
-    maxBin=12
+    maxBin=optn.nBin+1
     tot_err=0.0
-    tmp_line=sysname+'_uncbin11 '
+    tmp_line=sysname+'_uncbin%s ' %args.nBin
     if sysname.count('pdf_'):
         for  bin_num1Z in range(0,maxBin-1):
             newSystmig11=new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
@@ -133,7 +133,7 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False):
         line+=tmp_line
         fraction_remaining = abs(1.-math.sqrt(total_uncorr_unc)/total_corr_unc)
         print 'unCorrelated fraction: %0.2f' %(math.sqrt(total_uncorr_unc)/total_corr_unc)
-        tmp_line=sysname+'_corr11 '
+        tmp_line=sysname+'_corr%s ' %optn.nBin
         for  bin_num1Z in range(0,maxBin-1):
             newSystmig11=fraction_remaining*new_vals[bin_num1Z]*listV[bin_num1Z][vsysname]
             newSystmig11=check(1.-newSystmig11/listV[bin_num1Z][vsysname],ispdf=True)
@@ -165,7 +165,7 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False):
             linesys+='%0.4f,' %(sysup)
             #newSystmig23up=new_vals[bin_num-2]*listV[bin_num-2][vsysname]+newSystmig23up
             #newSystmig23dw-=newSystmig23up
-            for  bin_num1 in range(bin_num,11): linesys+='1.0,'
+            for  bin_num1 in range(bin_num,optn.nBin): linesys+='1.0,'
             tmp_line=sysname+('_mig%s_%s ' %(bin_num-1,bin_num))+linesys.rstrip(',')
             line+=tmp_line+'\n'
             print tmp_line
@@ -205,7 +205,7 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False):
             for  bin_num1Z in range(1,bin_num-1): linesys+='1.0,'
             linesys+='%0.4f,' %(sysdwhigh)
             linesys+='%0.4f,' %(sysuphigh)
-            for  bin_numZ in range(bin_num_high+1,11): linesys+='1.0,'
+            for  bin_numZ in range(bin_num_high+1,optn.nBin): linesys+='1.0,'
             tmp_line=sysname+('_mig%s_%s ' %(bin_num-1,bin_num))+linesys.rstrip(',')
             line+=tmp_line+',1.0'+'\n'
             print tmp_line+',1.0'
@@ -222,7 +222,7 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False):
                 for  bin_num1Z in range(1,bin_num-1): linesys_decorr+='1.0,'
                 linesys_decorr+='%0.1f,' %(1.0)
                 linesys_decorr+='%0.4f,' %(sysuphigh_decorr)
-                for  bin_numZ in range(bin_num_high+1,11): linesys_decorr+='1.0,'
+                for  bin_numZ in range(bin_num_high+1,optn.nBin): linesys_decorr+='1.0,'
                 tmp_line_decorr=sysname+('_uncbin%s ' %(bin_num))+linesys_decorr.rstrip(',')
                 print tmp_line_decorr+',1.0'
                 line+=tmp_line_decorr+',1.0'+'\n'
@@ -259,11 +259,11 @@ def ReturnNewSyst(sysname, vals, listV, EWKDecor=True, doUncorr=False):
                 
     return line
 
-def GetBins(fY, l, listV):
+def GetBins(fY, l, listV,optn=None):
     addToList=False
     if len(listV)>0:
         addToList=True
-    for bin_num in range(1,12):
+    for bin_num in range(1,optn.nBin+1):
         r1=l #'VBFjetSel_XNom_SRX_obs_cuts'
         r=r1.replace('X','%s' %bin_num)
         #print r
@@ -288,6 +288,7 @@ parser.add_argument("--output", dest='output', default='listTheorySyst11STv4', h
 parser.add_argument("--inputYields", dest='inputYields', default='/tmp/HF_jan7_mc16all_nom.root', help="Input file with yields")
 parser.add_argument("--uncor", dest='uncor', action = "store_true",  default=True, help="uncorrelate combination")
 parser.add_argument("--corrDPhi", dest='corrDPhi',action = "store_true",  default=True, help="Correlate dphijj bins")
+parser.add_argument("--nBin", dest='nBin', default=11, type=int, help="number of bins")
 parser.add_argument("--scaleUncor", dest='scaleUncor',action = "store_true",  default=False, help="Scale the uncertainties as if uncorrelated to match the correlated syst")
 args, unknown = parser.parse_known_args()
 
@@ -299,13 +300,15 @@ regionYields={}
 regionYields['SR']=[]
 regionYields['ZCR']=[]
 regionYields['WCR']=[]
-GetBins(fY, 'VBFjetSel_XNom_SRX_obs_cuts', regionYields['SR'])
+GetBins(fY, 'VBFjetSel_XNom_SRX_obs_cuts', regionYields['SR'],optn=args)
 
-for l in ['VBFjetSel_XNom_twoEleCRX_obs_cuts','VBFjetSel_XNom_twoMuCRX_obs_cuts',]:
-    GetBins(fY, l, regionYields['ZCR'])
+#for l in ['VBFjetSel_XNom_twoEleCRX_obs_cuts','VBFjetSel_XNom_twoMuCRX_obs_cuts',]:
+for l in ['VBFjetSel_XNom_twoLepCRX_obs_cuts']:
+    GetBins(fY, l, regionYields['ZCR'],optn=args)
 
-for l in ['VBFjetSel_XNom_oneElePosCRX_obs_cuts','VBFjetSel_XNom_oneEleNegCRX_obs_cuts','VBFjetSel_XNom_oneMuPosCRX_obs_cuts','VBFjetSel_XNom_oneMuNegCRX_obs_cuts']:
-    GetBins(fY, l, regionYields['WCR'])
+#for l in ['VBFjetSel_XNom_oneElePosCRX_obs_cuts','VBFjetSel_XNom_oneEleNegCRX_obs_cuts','VBFjetSel_XNom_oneMuPosCRX_obs_cuts','VBFjetSel_XNom_oneMuNegCRX_obs_cuts']:
+for l in ['VBFjetSel_XNom_oneEleCRX_obs_cuts','VBFjetSel_XNom_oneMuCRX_obs_cuts']:
+    GetBins(fY, l, regionYields['WCR'],optn=args)
 
 regions=['SRup','SRdown','ZCRup','ZCRdown','WCRup','WCRdown']
 curr_region=''
@@ -314,6 +317,8 @@ systMap={}
 tot_line=''
 for i in fin:
     curr_line = i.rstrip('\n')
+    if curr_line.find('theor_')>=0:
+        continue
     regionLine=False
     for r in regions:
         if curr_line.count(r):
@@ -341,9 +346,9 @@ for i in fin:
             systMap[entries[0]]=entries[1].split(',')
             print entries[0],systMap[entries[0]]
             if not args.scaleUncor:
-                tot_line+=ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString], EWKDecor=True,doUncorr=args.uncor)
+                tot_line+=ReturnNewSyst(entries[0], systMap[entries[0]],regionYields[yieldRegString], EWKDecor=True,doUncorr=args.uncor,optn=args)
             else:
-                tot_line+=ReturnNewSystScaleUncor(entries[0], systMap[entries[0]],regionYields[yieldRegString],doUncorr=args.uncor)
+                tot_line+=ReturnNewSystScaleUncor(entries[0], systMap[entries[0]],regionYields[yieldRegString],doUncorr=args.uncor,optn=args)
         else:
             print 'ERROR could not parse:',entries
             print curr_line
