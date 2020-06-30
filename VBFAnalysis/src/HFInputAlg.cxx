@@ -14,7 +14,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("isMadgraph", isMadgraph = false, "isMadgraph flag, true means the sample is Madgraph");
   declareProperty("mergeKTPTV", mergeKTPTV = false, "mergeKTPTV flag, true means merge kT Sherpa samples");
   declareProperty("ExtraVars", m_extraVars = 7, "0=20.7 analysis, 1=lepton veto, object def, 2=loose cuts, 3=no met soft cut, 4=no xe SF for muons, 5=lepTrigOnly for muCR, 6=met trig only for muCR, 7=metORLep for muCR (default)" );
-  declareProperty("Binning", m_binning = 11, "0=rel20p7 binning. Other options with >0, 11 is default" );
+  declareProperty("Binning", m_binning = 11, "0=rel20p7 binning. Other options with >0, 11 is default, 30 for dphijj>2.0" );
   declareProperty("METDef", m_metdef = 0, "0=loose. 1=tenacious" );
   declareProperty("METCut", m_METCut = -1, "METCut forced overwrite" );
   declareProperty("singleHist", singleHist = false, "singleHist flag, true for running one histogram with bins for the SRs and CRs");
@@ -124,6 +124,7 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==21) bins=14; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800
   else if(m_binning==22) bins=17; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800 + 3 bins low MET
   else if(m_binning==23) bins=12; // trying new njet binning. mjj binning + 3 njet bin + 3 bins low MET
+  else if(m_binning==30) bins=6; // two jets mjj binning
 
   // multivariate number of bins
   if(doTMVA &&  doVBFMETGam) bins=5;
@@ -348,12 +349,12 @@ StatusCode HFInputAlg::execute() {
   float METCSTJetCut = 150.0e3; // 120.0e3
   float jj_detaCut = 4.8; // 4.0
   float jj_massCut = 1000.0e3; // 1000.0e3
-  if((m_binning>=7 && m_binning<=12) || m_binning==21 || m_binning==22 || m_binning==23){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
+  if((m_binning>=7 && m_binning<=12) || m_binning==21 || m_binning==22 || m_binning==23 || m_binning==30){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
   if(doDoubleRatio) jj_massCut=500.0e3;
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
   bool nbjetCut = (n_bjet < 2); 
-  if(doHighDphijj) { jj_DPHICut=10.0; jj_DPHILowCut=2.5; } // adjust cuts for high dphijj
-    
+  if(doHighDphijj) { jj_DPHICut=2.5; jj_DPHILowCut=2.0; } // adjust cuts for high dphijj
+
   // decide if this MG or sherpa
   bool passSample=false;
   if(isMadgraph){ //311429 to 311453 MG filtered, 366010 to 366035 Znn rm, 364216 to 364229 PTV ,
@@ -758,7 +759,8 @@ StatusCode HFInputAlg::execute() {
       else if (jj_mass < 2e6)   bin = 2;
       else if (jj_mass < 3e6)   bin = 3;
       else bin = 4;
-    }else if(m_binning==11 || m_binning==12){
+    }else if(m_binning==11 || m_binning==12 || m_binning==30){
+      if(m_binning==30 && n_jet>2) return StatusCode::SUCCESS; // remove njet>2
       if      (jj_mass < 1.0e6) bin = 0;
       else if (jj_mass < 1.5e6) bin = 1;
       else if (jj_mass < 2e6)   bin = 2;

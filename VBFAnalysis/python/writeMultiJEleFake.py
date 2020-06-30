@@ -56,7 +56,7 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
         h.Write()
     f_multijet.Close()
 
-def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False):
+def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False, doHighDphijj=False):
     multijets = [7.13, 2.24, 0.45]
     #multijets = [3.0, 0.5, 0.1]
     #multijets = [58.+3.0, 28.0+0.5, 26.0+0.1]
@@ -246,7 +246,18 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
             if Binning==22: # for 160-200. 150 to 160 efficiency is 0.67
                 multijets+=[76.7,57.3,1.8]
                 multijets_statunc+=[10.0,13.5,0.9]
-
+    if doHighDphijj and Binning==30:
+        multijets=[]
+        multijets_statunc=[] # total 150
+        if year==2016:
+            multijets=[10.7,7.3,3.7,2.3,0.8]
+            multijets_statunc=[2.0,2.5,1.0,1.5,0.9]
+        elif year==2017:
+            multijets=[28.7,14.3,6.7,4.1,0.8]
+            multijets_statunc=[6.0,4.5,2.0,1.5,0.9]
+        elif year==2018:
+            multijets=[25.7,14.3,7.7,1.3,0.8]
+            multijets_statunc=[6.0,3.5,2.0,0.5,0.9]
     if doTMVA:
         #multijets=[293.3,77.9,38.2,38.7,26.7,69.9,13.7,11.9,51.6,7.1,9.1]
         #multijets_statunc=[25.,18.,12.,12.,16.,30.,7.,9.,45.,7.1,9.1]
@@ -488,6 +499,9 @@ def writeFakeEle(Binning=0, year=2016, doDoubleRatio=False, singleHist=False, ME
     if Binning==23: # drop the dphijj binning
         fakeelesp = [4.3, 6.4, 10.6, 5.1, 5.7, 4.3, 4.3, 4.3, 6.6, 3.9, 4.0]
         fakeelesm = [4.3, 6.4, 10.6, 5.1, 5.7, 4.3, 4.3, 4.3, 6.6, 3.9, 4.0]
+    if Binning==30: # drop the dphijj binning
+        fakeelesp = [4.3, 6.4, 10.6, 5.1, 5.7]
+        fakeelesm = [4.3, 6.4, 10.6, 5.1, 5.7]
     fakeInit = [9.0238,7.4043,3.1402,3.5567,1.5765,8.6259,7.2854,3.5912,5.6147,0.8996,8.44,1.0,1.0,1.0,1.0,1.0,1.0]
     if doDoubleRatio:
         fakeelesp+=[12.5]
@@ -625,6 +639,8 @@ def writeFakeMuo(Binning=0, year=2016, METCut=150):
             fakemuos+=[3.0,3.0,3.0]
     if Binning==23:
         fakemuos = [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,3.0, 3.0, 3.0, 3.0]
+    if Binning==30:
+        fakemuos = [3.0, 3.0, 3.0, 3.0, 3.0]
             
     a=1
     hists=[]

@@ -19,7 +19,7 @@ parser.add_argument( "-d", "--submitDir",  type = str, dest = "submitDir", defau
 parser.add_argument( "-i", "--inputDir",  type = str, dest = "inputDir", default = "/eos/user/r/rzou/v04/microtuples/", help = "dir for input file")
 parser.add_argument( "--noSubmit", dest = "noSubmit", action="store_true", default = False, help = "Dont submit jobs" )
 parser.add_argument("--extraVars", dest='extraVars', default="7", help="extraVars, 1=cut on the new variables for leptons veto, 2=loosen cuts, 3=no soft met cut default: 7, 5=met OR lep trig CR, 6=met trig CR, 7=corrected SF for v31")
-parser.add_argument("--Binning", dest='Binning', default="11", help="Binning, 11=default, 0=Mjj binning, 1=low MET bin, 2=njet>2 binning, 3=met binning, 4=3bins for nj>2, 5=3dphibin, 6= dphi by mjj+nj>2, 7=800mjj withdphi, 8=mjj 8bins")
+parser.add_argument("--Binning", dest='Binning', default="11", help="Binning, 11=default, 0=Mjj binning, 1=low MET bin, 2=njet>2 binning, 3=met binning, 4=3bins for nj>2, 5=3dphibin, 6= dphi by mjj+nj>2, 7=800mjj withdphi, 8=mjj 8bins, 30=5mjj bins for high mjj")
 parser.add_argument( "--isMadgraph", dest = "isMadgraph", action="store_true", default = False, help = "Use the madgraph samples" )
 parser.add_argument( "--mergeKTPTV", dest = "mergeKTPTV", action="store_true", default = False, help = "Use the kt filtered sherpa samples" )
 parser.add_argument( "--doTMVA", dest = "doTMVA", action="store_true", default = False, help = "Use the variable filled as tmva for the fitting" )
@@ -29,12 +29,16 @@ parser.add_argument( "--doFJVTCR", dest = "doFJVTCR", action="store_true", defau
 parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
 parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis, set --Binning=13")
 parser.add_argument( "--doMTFit", dest = "doMTFit", action="store_true", default = False, help = "VBF + MET + photon analysis with an mt fit, set --Binning=13")
-parser.add_argument( "--doHighDphijj", dest = "doHighDphijj", action="store_true", default = False, help = "Fit dphijj>2.5 analysis with no dphijj binning, set --Binning=23")
+parser.add_argument( "--doHighDphijj", dest = "doHighDphijj", action="store_true", default = False, help = "Fit dphijj>2.5 analysis with no dphijj binning, set --Binning=23 or 30")
 parser.add_argument( "--singleHist", dest = "singleHist", action="store_true", default = False, help = "Runs VBF + MET in one histogram when true")
 parser.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
 parser.add_argument("--METCut", type=int, dest='METCut', default=200e3, help="METCut, default: 200e3 MeV")
 parser.add_argument("--METDef", dest='METDef', default='0', help="met definition, default: 0=loose, 1=tenacious")
 args, unknown = parser.parse_known_args()
+
+# set the binning for dphijj>2.0
+if args.doHighDphijj:
+    args.Binning=30
 
 if not args.doVBFMETGam:
     myMetCut=int(args.METCut/1e3)
@@ -46,7 +50,7 @@ if not args.doVBFMETGam:
 
         myMetCut=200 # only setup for this value now for the fakes and mj. this is only for python
     if not args.doFJVTCR:
-        writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist, doTMVA=args.doTMVA)
+        writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist, doTMVA=args.doTMVA, doHighDphijj=args.doHighDphijj)
     else:
         writeMultiJetFJVT(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist, doTMVA=args.doTMVA)    
     writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist,METCut=myMetCut)

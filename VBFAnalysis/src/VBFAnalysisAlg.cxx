@@ -807,6 +807,8 @@ StatusCode VBFAnalysisAlg::execute() {
     // the event weights seem wrong for these three samples. this is a HACK to fix it
     //if( metRunNumber>=348197 && runNumber==364542) mcEventWeight*=-1.0;
     //if( metRunNumber>=325713 && metRunNumber<348197 && (runNumber==364541 || runNumber==364542)) mcEventWeight*=-1.0;
+    // these are stored incorrectly
+    //if(runNumber>=363266 && runNumber<=363272)  mcEventWeight=mcEventWeights->at(85); // default value is number 85
   }
 
   // applying a pileup weight for 2018 data
