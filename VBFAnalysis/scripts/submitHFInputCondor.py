@@ -38,7 +38,7 @@ args, unknown = parser.parse_known_args()
 
 # set the binning for dphijj>2.0
 if args.doHighDphijj:
-    args.Binning=30
+    args.Binning="30"
 
 if not args.doVBFMETGam:
     myMetCut=int(args.METCut/1e3)
