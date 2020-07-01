@@ -52,6 +52,10 @@ def sampleDataframe(infiles,treename):
                 "met_tight_tst_et", "met_tight_tst_phi",
                 "mu_pt","mu_eta", "mu_phi",
                 "eventNumber"]
+<<<<<<< HEAD
+=======
+    
+>>>>>>> e0a52ad2fef5202459a18317778777d168792524
     for path, file, start, stop, entry in up.iterate(
             infiles+"*.root",
             treename,
@@ -60,6 +64,7 @@ def sampleDataframe(infiles,treename):
 
         print('==> Processing sample: %s ...'%path)
         tree = up.open(path)[treename]
+<<<<<<< HEAD
         
         df_sample = tree.pandas.df(branches,flatten=False)
         return df_sample
@@ -116,6 +121,16 @@ def calcVars(df):
 def main(): 
     """ Run script"""
     options = getArgumentParser().parse_args()
+=======
+
+        df_sample = tree.pandas.df(branches,flatten=False)
+        return df_sample
+
+def main(): 
+    """ Run script"""
+    options = getArgumentParser().parse_args()
+
+>>>>>>> e0a52ad2fef5202459a18317778777d168792524
     ### Make all the bkg and signal dataframes!
 
     ## Z+jets
@@ -163,7 +178,12 @@ def main():
                     (df_bkg['n_bjet']==0)]
     
     ## blegh this needs to be fixed    
+<<<<<<< HEAD
     df_bkg['mu_mass'] = list(np.full((len(df_bkg),2),105.6))
+=======
+    df_bkg['mu_mass'] = pd.array([105.6,105.6])
+
+>>>>>>> e0a52ad2fef5202459a18317778777d168792524
     df_sig = df_sig[(df_sig['trigger_lep']>0) &
                     (df_sig['passJetCleanTight']==1) &
                     (df_sig['n_ph']==1) & 
@@ -171,13 +191,18 @@ def main():
                     (df_sig['n_bjet']==0)]
     
     #    print(df_sig['mu_pt[0]'])
+<<<<<<< HEAD
     # Seems like signal and background should have the same quantities b/c we're testing
     # how cuts can distinguish between signal and background
     df_sig['mu_mass'] = list(np.full((len(df_sig),2),105.6))
+=======
+
+>>>>>>> e0a52ad2fef5202459a18317778777d168792524
     ## Compute compound variables, like mll, mT(met,ph_pt)...
     ## Info on how to use TLorentzVectors in uproot: https://github.com/scikit-hep/uproot#special-physics-objects-lorentz-vectors
     ## The TLorentzVector class contains a method called "from_ptetaphim": 
     ## https://github.com/scikit-hep/uproot-methods/blob/master/uproot_methods/classes/TLorentzVector.py#L978
+<<<<<<< HEAD
     df_bkg = calcVars(df_bkg)
 
     df_sig = calcVars(df_sig)
@@ -186,5 +211,20 @@ def main():
     
     #lep1 = uproot_methods.TLorentzVectorArray.from_ptetaphim()
     ## Implement Ahoi stuff...
+=======
+    #MUON_MASS = 
+    vLep = uproot_methods.TLorentzVectorArray.from_ptetaphim(df_bkg['mu_pt'].to_numpy(),
+                                                                df_bkg['mu_eta'].to_numpy(),
+                                                                df_bkg['mu_phi'].to_numpy(),
+                                                                df_bkg['mu_mass'].to_numpy())
+    print(vLep.pt)
+    print(vLep.eta)
+    print(vLep.phi)
+    print(vLep.mass)
+    #lep1 = uproot_methods.TLorentzVectorArray.from_ptetaphim()
+    ## Implement Ahoi stuff...
+
+    
+>>>>>>> e0a52ad2fef5202459a18317778777d168792524
 if __name__ == '__main__':
     main()
