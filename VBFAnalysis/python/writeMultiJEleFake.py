@@ -79,7 +79,7 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
         # integral of these needs to be that of the bin 6 fjvt transfer. will be normalized later
         mjshape = [0.31238394,0.43419236,0.13576130,0.11622656,0.0014358363]
         mjshape_staterr = [0.22,0.15,0.31,0.25,0.97]
-        mjshape_syserr = [0.2,0.15,0.11,0.08,0.02]
+        mjshape_syserr = [0.04,0.17,0.11,0.26,0.29]
         
     a=1
     hists=[]
