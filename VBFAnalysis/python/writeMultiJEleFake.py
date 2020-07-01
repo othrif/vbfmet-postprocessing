@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import ROOT
 import os
-def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False):
+def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False, doOneHighFJVTCR=False):
     f_multijet = ROOT.TFile("multijetFJVT.root", "recreate")
     mjs = [2.14, 1.99, 1.53, 1.38, 1.65, 1.97, 1.85, 1.67, 1.30, 1.18, 50.0]
-    emjs = [0.2, 0.2, 0.2, 0.2, 0.2, 0.28, 0.26, 0.22, 0.2, 0.23, 0.18]
-    statemjs = [0.10, 0.18, 0.17, 0.10, 0.27, 0.13, 0.17, 0.19, 0.25, 0.23, 0.18]        
+    emjs = [0.2, 0.2, 0.2, 0.2, 0.2, 0.28, 0.26, 0.22, 0.2, 0.23, 0.36]
+    statemjs = [0.10, 0.18, 0.17, 0.10, 0.27, 0.13, 0.17, 0.19, 0.25, 0.23, 0.36]        
     if Binning==11 or Binning==12 or Binning==13 or Binning==21 or Binning==22: # set for all years
         #mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
         #emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18] 
@@ -13,14 +13,16 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
         #    mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 2.0]
         #    emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.12, 0.15, 0.18, 0.32, 0.25, 0.18] 
         if Binning==21 or Binning==22:
-            mjs = [2.32, 2.03, 2.0, 1.28, 1.84, 5.87, 5.06, 5.0, 3.24, 4.66, 40.0]
-            mjs+=[6.6,4.4]
-            emjs += [0.25, 0.25]
+            mjs = [2.35, 2.19, 1.57, 1.52, 1.82, 2.17, 2.04, 1.84, 1.43, 1.30, 30.5]
+            mjs+=[15.0,1.3] # these are from the R&S
+            emjs += [0.36, 0.36]
+            statemjs+=[0.48, 0.8]
         if Binning==22:
             #mjs+=[1.04,0.9,0.95] # these were guesses
             #emjs += [0.1, 0.12, 0.15]
-            mjs+=[0.55,0.63,0.46]
-            emjs += [0.10, 0.09, 0.24]
+            mjs+=[0.37,0.32,0.36]
+            emjs += [0.27, 0.20, 0.23]
+            statemjs+=[0.1, 0.1,.18]
         if Binning==23: # drops the dphijj binning
             mjs = [2.7, 2.3, 2.3, 1.45, 2.0, 40.0, 6.6, 4.4]
             emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.25, 0.25, 0.25 ]
@@ -37,7 +39,8 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
         histcr.SetBinContent(1,1.0)
         histcr.SetBinError(1,0.05)
         hist.SetBinContent(1,mj)
-        hist.SetBinError(1,mj*0.07)
+        #hist.SetBinError(1,mj*0.07)
+        hist.SetBinError(1,mj*statemjs[a-1])
         if Binning==11 and a==11:
             histcr.SetBinContent(1,0.0)
         if (Binning==21 or Binning==22) and (a==11 or a==12 or a==13):

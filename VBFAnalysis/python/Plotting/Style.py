@@ -80,7 +80,8 @@ styleDict["VBFH125"]=[2,1,3,0,0,2,0,0]
 styleDict["GGFH125"]=[2,2,3,0,0,2,0,0]
 styleDict["ggFH125"]=[2,2,3,0,0,2,0,0]
 styleDict["VH125"]=[2,3,3,0,0,2,0,0]
-
+styleDict["VBFHgamdark125"]=[2,1,3,0,0,2,0,0]
+styleDict["ggFHgamdark125"]=[2,2,3,0,0,2,0,0]
 
 styleDict["W_strong"]=[ROOT.kGreen  -7,1,1,ROOT.kGreen  -7,1001,ROOT.kGreen  -7,0,0]
 styleDict["Z_strong"]=[ROOT.kGreen  -3,1,1,ROOT.kGreen  -3,1001,ROOT.kGreen  -3,0,0]

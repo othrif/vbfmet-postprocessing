@@ -15,6 +15,7 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("mergeKTPTV", mergeKTPTV = false, "mergeKTPTV flag, true means merge kT Sherpa samples");
   declareProperty("ExtraVars", m_extraVars = 7, "0=20.7 analysis, 1=lepton veto, object def, 2=loose cuts, 3=no met soft cut, 4=no xe SF for muons, 5=lepTrigOnly for muCR, 6=met trig only for muCR, 7=metORLep for muCR (default)" );
   declareProperty("Binning", m_binning = 11, "0=rel20p7 binning. Other options with >0, 11 is default, 30 for dphijj>2.0" );
+  declareProperty("doOneHighFJVTCR", m_doOneHighFJVTCR = false, "do one high dphijj fjvt cr" );  
   declareProperty("METDef", m_metdef = 0, "0=loose. 1=tenacious" );
   declareProperty("METCut", m_METCut = -1, "METCut forced overwrite" );
   declareProperty("singleHist", singleHist = false, "singleHist flag, true for running one histogram with bins for the SRs and CRs");
@@ -84,6 +85,7 @@ StatusCode HFInputAlg::initialize() {
   std::cout << "Running Extra Veto? " << m_extraVars << std::endl;
   std::cout << "is a weightSyst? " << weightSyst << std::endl;
   std::cout << "binning? " << m_binning << std::endl;
+  std::cout << "doOneHighFJVTCR? " << m_doOneHighFJVTCR << std::endl;
 
   std::string syst;
   bool replacedHigh = false;
@@ -779,7 +781,8 @@ StatusCode HFInputAlg::execute() {
 	else if (jj_mass < 2e6)   bin = 2;
 	else if (jj_mass < 3.5e6) bin = 3;
 	else bin = 4;
-	if(jj_dphi>1 && m_binning!=23)  bin+=5; // separate dphijj
+	if(jj_dphi>1 && (m_binning!=23))  bin+=5; // separate dphijj
+	if(m_doOneHighFJVTCR && jj_dphi>1 && fJVTLeadVeto) bin=6;// setup 1 bin for lead fjvt CR
 	if(n_jet>2 && !fJVTLeadVeto){
 	  if (jj_mass < 1.5e6) return StatusCode::SUCCESS; // remove njet>2 and mjj<1.5 TeV
 	  if(m_binning==23){// high dphijj so no dphijj binning

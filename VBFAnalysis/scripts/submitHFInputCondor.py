@@ -29,6 +29,7 @@ parser.add_argument( "--doFJVTCR", dest = "doFJVTCR", action="store_true", defau
 parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
 parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis, set --Binning=13")
 parser.add_argument( "--doMTFit", dest = "doMTFit", action="store_true", default = False, help = "VBF + MET + photon analysis with an mt fit, set --Binning=13")
+parser.add_argument( "--doOneHighFJVTCR", dest = "doOneHighFJVTCR", action="store_true", default = False, help = "VBF + MET to be used with option 22. has one fjvt cr for high dphijj")
 parser.add_argument( "--doHighDphijj", dest = "doHighDphijj", action="store_true", default = False, help = "Fit dphijj>2.5 analysis with no dphijj binning, set --Binning=23 or 30")
 parser.add_argument( "--singleHist", dest = "singleHist", action="store_true", default = False, help = "Runs VBF + MET in one histogram when true")
 parser.add_argument("--year", type=int, dest='year', default=2016, help="year, default: 2016 - 2017 or 2018 for those years")
@@ -52,7 +53,7 @@ if not args.doVBFMETGam:
     if not args.doFJVTCR:
         writeMultiJet(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist, doTMVA=args.doTMVA, doHighDphijj=args.doHighDphijj)
     else:
-        writeMultiJetFJVT(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist, doTMVA=args.doTMVA)    
+        writeMultiJetFJVT(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, METCut=myMetCut, singleHist=args.singleHist, doTMVA=args.doTMVA, doOneHighFJVTCR=args.doOneHighFJVTCR)    
     writeFakeEle(int(args.Binning), args.year, doDoubleRatio=args.doDoubleRatio, singleHist=args.singleHist,METCut=myMetCut)
     writeFakeMuo(int(args.Binning), args.year, METCut=myMetCut)
 else:
@@ -166,6 +167,8 @@ if args.doHighDphijj:
     extraCommand+=' --doHighDphijj '
 if args.doMTFit:
     extraCommand+=' --doMTFit '
+if args.doOneHighFJVTCR:
+    extraCommand+=' --doOneHighFJVTCR '
 if args.doPlot:
     extraCommand+=' --doPlot '
 extraCommand+=' --Binning '+args.Binning

@@ -109,6 +109,7 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Int_t m_metdef = 0;
   Float_t m_METCut=-1.0;
   Bool_t v26Ntuples=false;
+  Bool_t m_doOneHighFJVTCR=false;  
 
   Double_t xeSFTrigWeight;
   Double_t xeSFTrigWeight_nomu;

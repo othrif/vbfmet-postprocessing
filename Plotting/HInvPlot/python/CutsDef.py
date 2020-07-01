@@ -1035,10 +1035,12 @@ def fillSampleList(reg=None, key=None,options=None, basic_cuts=None):
         del bkgs['wewk']
         del bkgs['zewk']
     other={}
-    other['dqcd']    = ['dqcd']
+    #other['dqcd']    = ['dqcd']
     other['zqcdMad'] = ['zqcdMad']
     other['wqcdMad'] = ['wqcdMad']
     other['zqcdPow'] = ['zqcdPow']
+    if options.OverlapPh:
+        other['gamd'] = ['gamd']
     #if not options.OverlapPh:
     #    other['ttg']  = ['ttg']
     #    other['pho']  = ['pho']
