@@ -18,6 +18,11 @@ from tqdm.notebook import tqdm
 ahoi.tqdm = tqdm # use notebook progress bars in ahoi
 import matplotlib.pyplot as plt
 import math
+# import atlas_mpl_style as ampl
+# # Set ATLAS style
+# ampl.use_atlas_style()
+# ampl.set_color_cycle(pal='ATLAS')
+# plt.rcParams["font.size"] = 11
 ###############################################################################                                   
 # Command line arguments
 ######################## 
@@ -127,12 +132,14 @@ def calcVars(df):
 
 def makePlots(df_bkg,df_sig):
     ### Plot some of the distributions for the signal and bkg
-    plt.hist(df_bkg['mT'], bins=50, range=(0, 250), histtype='step', color='Red')
-    plt.hist(df_sig['mT'], bins=50, range=(0, 250), histtype='step', color='Blue')
-    plt.xlabel('mT [GeV]')
-    plt.ylabel('Events')
-    plt.yscale('log')
-    plt.show()
+    fig,ax = plt.subplots(1,1)
+    ax.hist(df_bkg['mT'], bins=50, range=(0, 250), histtype='step', color='Red',label='bkg')
+    ax.hist(df_sig['mT'], bins=50, range=(0, 250), histtype='step', color='Blue',label='sig')
+    ax.set_xlabel('mT [GeV]')
+    ax.set_ylabel('Events'  )
+    ax.set_yscale('log')
+    ax.legend()
+    plt.savefig("mt.pdf",format="pdf")
 
 def main(): 
     """ Run script"""
