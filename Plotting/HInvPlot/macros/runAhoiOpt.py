@@ -67,10 +67,13 @@ def sampleDataframe(infiles,treename):
 def calcmT(met,ph):
     #ph_pt = np.concatenate(ph.pt).ravel()
     #ph_phi = np.concatenate(ph.phi).ravel()
-    # Can't multiply two lorentz vectors?
+    # Can't multiply two lorentz vectors? --> SS: yes, you don't necessarily what to multiply the lorentz vectors but rather take their dot product as you have done below
+    # SS: one suggestion I have is to use delta_phi function from https://github.com/scikit-hep/uproot-methods/blob/master/uproot_methods/classes/TLorentzVector.py#L82
+    # so then your calculation becomes np.sqrt(2*met.pt*ph.pt(1-np.cos(delta_phi(ph,met))))
     return np.sqrt(2*met.pt*ph.pt*(1-np.cos(ph.phi-met.phi)))
 
 def calcPhiLepMet(lep1,lep2,met,ph):
+    #SS: same suggestion as above --> change to delta_phi(lep1+lep2,met+phi)
     phi_lep = (lep1+lep2).phi
     phi_ph_met = (met+ph).phi
     return phi_ph_met-phi_lep
@@ -81,22 +84,32 @@ def calcAbsPt(lep1,lep2,met,ph):
     return np.abs(pt_ph_met-pt_lep)/pt_lep
 
 def getLorentzVec(df):
-    """ Calculates Lorentz vectors for the leptons and photons for bkg/sig"""
-    mu_pt = np.asarray(df.mu_pt.values.tolist())
-    mu_eta = np.asarray(df.mu_eta.values.tolist())
-    mu_phi = np.asarray(df.mu_phi.values.tolist())
+    """ Calculates Lorentz vectors for the leptons and photons for bkg/sig:
+    but first converts all pTs and masses from MeV to GeV"""
+
+    df['mu_pt']   = df['mu_pt'].truediv(1000)
+    df['mu_mass'] = df['mu_mass'].truediv(1000)
+    df['ph_pt']   = df['ph_pt'].truediv(1000)
+    df['met_tight_tst_et'] = df['met_tight_tst_et'].truediv(1000)
+    
+    mu_pt   = np.asarray(df.mu_pt.values.tolist())
+    mu_eta  = np.asarray(df.mu_eta.values.tolist())
+    mu_phi  = np.asarray(df.mu_phi.values.tolist())
     mu_mass = np.asarray(df.mu_mass.values.tolist())
 
     lep1 = uproot_methods.TLorentzVectorArray.from_ptetaphim(mu_pt[:,0],mu_eta[:,0],mu_phi[:,0],
                                                              mu_mass[:,0])
     lep2 = uproot_methods.TLorentzVectorArray.from_ptetaphim(mu_pt[:,1],mu_eta[:,1],mu_phi[:,1],
                                                              mu_mass[:,1])
-    # Need to fix this -> gives an error when trying to add to lepton vectors                                                                  
-    # Had to change to types for the photon variables                                                                                          
+    
+ 
+    # Need to fix this -> gives an error when trying to add to lepton vectors                             
+    # Had to change to types for the photon variables --> SS: weird but good work on the fix!!
     vPh = uproot_methods.TLorentzVectorArray.from_ptetaphim(df['ph_pt'].to_numpy().astype(float),
-                                                                df['ph_eta'].to_numpy().astype(float),
-                                                                df['ph_phi'].to_numpy().astype(float),
-                                                                0.00)
+                                                            df['ph_eta'].to_numpy().astype(float),
+                                                            df['ph_phi'].to_numpy().astype(float),
+                                                            0.00)
+
     met = uproot_methods.TLorentzVectorArray.from_ptetaphim(df['met_tight_tst_et'].to_numpy(),
                                                             0.00, df['met_tight_tst_phi'].to_numpy(), 0.00)
     return lep1,lep2,vPh,met
@@ -109,9 +122,17 @@ def calcVars(df):
     df['dPhiLepMet'] = calcPhiLepMet(vLep_bkg1,vLep_bkg2,vMET_bkg,vPh_bkg)
     df['AbsPt'] = calcAbsPt(vLep_bkg1,vLep_bkg2,vMET_bkg,vPh_bkg)
     df['Ptll'] = (vLep_bkg1 + vLep_bkg2).pt
-    print((vLep_bkg1 + vLep_bkg2).pt)
     df['mllg'] = (vLep_bkg1+vLep_bkg2+vPh_bkg).mass
     return df
+
+def makePlots(df_bkg,df_sig):
+    ### Plot some of the distributions for the signal and bkg
+    plt.hist(df_bkg['mT'], bins=50, range=(0, 250), histtype='step', color='Red')
+    plt.hist(df_sig['mT'], bins=50, range=(0, 250), histtype='step', color='Blue')
+    plt.xlabel('mT [GeV]')
+    plt.ylabel('Events')
+    plt.yscale('log')
+    plt.show()
 
 def main(): 
     """ Run script"""
@@ -170,10 +191,10 @@ def main():
                     (df_sig['n_mu']==2) &
                     (df_sig['n_bjet']==0)]
     
-    #    print(df_sig['mu_pt[0]'])
     # Seems like signal and background should have the same quantities b/c we're testing
-    # how cuts can distinguish between signal and background
+    # how cuts can distinguish between signal and background --> SS: yes absolutely correct! :)
     df_sig['mu_mass'] = list(np.full((len(df_sig),2),105.6))
+
     ## Compute compound variables, like mll, mT(met,ph_pt)...
     ## Info on how to use TLorentzVectors in uproot: https://github.com/scikit-hep/uproot#special-physics-objects-lorentz-vectors
     ## The TLorentzVector class contains a method called "from_ptetaphim": 
@@ -181,10 +202,14 @@ def main():
     df_bkg = calcVars(df_bkg)
 
     df_sig = calcVars(df_sig)
+
+    ## Plot some of the variables you calculated to see if they make sense
+    ## including lep1.pt, lep2.pt, ph.pt, etc
+    makePlots(df_bkg,df_sig)
+
     # Calculate quantities of interest and put in dataframe for signal dataframe
     # See about other quantities eg mllg
     
-    #lep1 = uproot_methods.TLorentzVectorArray.from_ptetaphim()
     ## Implement Ahoi stuff...
 if __name__ == '__main__':
     main()
