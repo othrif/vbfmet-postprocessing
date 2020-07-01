@@ -121,6 +121,7 @@ StatusCode HFInputAlg::initialize() {
   else if(m_binning==13) bins=5; // mjj binning mjj>250
   else if(m_binning==21) bins=14; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800
   else if(m_binning==22) bins=17; // trying new njet binning. mjj binning + 3 njet bin + dphijj by 2 mjj>800 + 3 bins low MET
+  else if(m_binning==23) bins=18; // like binning=22 but add a bin for the vbf trigger
 
   // multivariate number of bins
   if(doTMVA &&  doVBFMETGam) bins=5;
@@ -293,6 +294,17 @@ StatusCode HFInputAlg::execute() {
   bool CRZmm = false;
   bool CRFJVT = false;
 
+  bool vbfSR = false;
+  bool vbfCRWep = false;
+  bool vbfCRWen = false;
+  bool vbfCRWepLowSig = false;
+  bool vbfCRWenLowSig = false;
+  bool vbfCRWmp = false;
+  bool vbfCRWmn = false;
+  bool vbfCRZee = false;
+  bool vbfCRZmm = false;
+  bool vbfCRFJVT = false;
+
   m_tree->GetEntry(m_tree->GetReadEntry());
   // check if we need to output the physics tree for signal overlap
   if(isMC && (runNumber==308276 || runNumber==346588 || runNumber==346600 || runNumber==312243 || runNumber==346605 || runNumber==346606 || runNumber==346607 || runNumber==345596 || runNumber==346632 || runNumber==346633 || runNumber==346634 || runNumber==346693 || runNumber==346694 || runNumber==345596 || runNumber==600069 || runNumber==600070 || runNumber==313343)){
@@ -333,7 +345,7 @@ StatusCode HFInputAlg::execute() {
   float METCSTJetCut = 150.0e3; // 120.0e3
   float jj_detaCut = 4.8; // 4.0
   float jj_massCut = 1000.0e3; // 1000.0e3
-  if((m_binning>=7 && m_binning<=12) || m_binning==21 || m_binning==22){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
+  if((m_binning>=7 && m_binning<=12) || m_binning==21 || m_binning==22 || m_binning==23){ jj_massCut = 800.0e3; jj_DPHICut=2.0; } // 1000.0e3 
   if(doDoubleRatio) jj_massCut=500.0e3;
   bool jetCut = (n_jet ==2); //  (n_jet>1 && n_jet<5 && max_centrality<0.6 && maxmj3_over_mjj<0.05)
   bool nbjetCut = (n_bjet < 2); 
@@ -488,6 +500,7 @@ StatusCode HFInputAlg::execute() {
 
   // Choose the met trigger
   bool passMETTrig = ((trigger_met &0x1) == 0x1);
+  bool passVBFTrig = 0;
   if(year==2017){
     //passMETTrig=0;
     //if     (325713<=metRunNumber && metRunNumber<=328393 && ((trigger_met_encodedv2 & 0x4)==0x4))   passMETTrig=1; //HLT_xe90_pufit_L1XE50;    // period B
@@ -501,7 +514,14 @@ StatusCode HFInputAlg::execute() {
     //else if(350067<=metRunNumber && metRunNumber<=364292 && ((trigger_met_encodedv2 & 0x800)==0x800)) passMETTrig=1; // HLT_xe110_pufit_xe65_L1XE50
     //if     (metRunNumber>=355529  && ((trigger_met_encodedv2 & 0x4000)==0x4000))     trigger_met_encodedv2_new=10; // HLT_j70_j50_0eta490_invm1000j50_dphi24_xe90_pufit_xe50_L1MJJ-500-NFF
     //if     (metRunNumber>=355529  && ((trigger_met_encodedv2 & 0x8000)==0x8000))     trigger_met_encodedv2_new=11; // HLT_j70_j50_0eta490_invm1100j70_dphi20_deta40_L1MJJ-500-NFF
-    passMETTrig=0; if(((trigger_met_encodedv2 & 0x8)==0x8))    passMETTrig=1;
+    if(m_binning==23){
+      passVBFTrig=0; 
+      if(((trigger_met_encodedv2 & 0x8000)==0x8000)) passVBFTrig=1;
+    }
+    else{
+      passMETTrig=0; 
+      if(((trigger_met_encodedv2 & 0x8)==0x8))    passMETTrig=1;
+    }
   }
 
   // setup the photon + MET+ VBF analysis
@@ -641,6 +661,19 @@ StatusCode HFInputAlg::execute() {
   if ((trigger_lep_Zee_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
   if ((trigger_lep_Zmm_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
 
+  //vbf trigger regions
+  if ((passVBFTrig) && !fJVTVeto && (met_tst_et > 120e3 && met_tst_et < 160e3) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) vbfSR = true;
+  if ((passVBFTrig) && fJVTLeadVeto && (met_tst_et > 120e3 && met_tst_et < 160e3) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) vbfCRFJVT = true;
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > 120e3 && met_tst_nolep_et < 160e3) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?true:(met_significance> 4.0))) vbfCRWep = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > 120e3 && met_tst_nolep_et < 160e3) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?true:(met_significance > 4.0))) vbfCRWen = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > 120e3 && met_tst_nolep_et < 160e3) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) vbfCRWepLowSig = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > 120e3 && met_tst_nolep_et < 160e3) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?false:(met_significance <= 4.0))) vbfCRWenLowSig = true;}
+  if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > 120e3 && met_tst_nolep_et < 160e3) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) vbfCRWmp = true;}
+  if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > 120e3 && met_tst_nolep_et < 160e3) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) vbfCRWmn = true;}
+  if ((trigger_lep_Zee_bool) && !fJVTVeto && (met_tst_nolep_et > 120e3 && met_tst_nolep_et < 160e3) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) vbfCRZee = true;}
+  if ((trigger_lep_Zmm_bool) && !fJVTVeto && (met_tst_nolep_et > 120e3 && met_tst_nolep_et < 160e3) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) vbfCRZmm = true;}
+
+
   // do duplicate check
   if(doDuplicateCheck){
     if(CRZee || CRZmm) std::cout << "ZCR " << runNumber << " " << eventNumber << std::endl;
@@ -651,6 +684,7 @@ StatusCode HFInputAlg::execute() {
   if(year==2017)      lumi = 44.3074;
   else if(year==2018) lumi = 58.4501; //59.9372;
   if (isMC) w_final = w*1000.0*lumi;
+  bool vbfTrig=0;
   // reweight
   //if(isMC && year==2018){
   //  if(averageIntPerXing>39.0 && averageIntPerXing<52.1){
@@ -760,8 +794,17 @@ StatusCode HFInputAlg::execute() {
 	  else if (jj_mass < 2e6)   bin = 13;
 	  else if (jj_mass < 3.5e6) bin = 14;
 	  else bin = 15;
+
 	}
       }
+    }
+
+    if(m_binning==23){
+      vbfTrig = (jj_mass > 1.5e6) && ((met_tst_et > 120e3 && met_tst_et < 160e3) || (met_tst_nolep_et > 120e3 && met_tst_nolep_et < 160e3)) && (jj_deta > 4.2) && (jj_dphi < 2.0) && (jet_pt->at(0) > 90e3) && (fabs(jet_eta->at(0)) < 3.2) && (jet_pt->at(1) > 90e3) && (jetCut && n_jet == 2);
+
+      if(vbfTrig) bin = 16;
+      else return StatusCode::SUCCESS;
+      std::cout<<"VBF bin? "<<vbfTrig<<", bin , "<<bin<<" Triggered: "<<passVBFTrig<<std::endl;
     }
 
     // alternative binning approaches
@@ -796,32 +839,32 @@ StatusCode HFInputAlg::execute() {
   if(isnan(xeSFTrigWeight)) std::cout << "isnan xeSFTrigWeight? " << xeSFTrigWeight << std::endl;
 
   if(!singleHist){
-    if (SR) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
-    if (CRWep){       HistoFill(hCRWe[bin],w_final);                                                 if(hCRWep.size()>bin){       HistoFill(hCRWep[bin],w_final); } }
-    if (CRWen){       HistoFill(hCRWe[bin],w_final);                                                 if(hCRWen.size()>bin){       HistoFill(hCRWen[bin],w_final); } }
-    if (CRWepLowSig){ HistoFill(hCRWeLowSig[bin],w_final);                                           if(hCRWepLowSig.size()>bin){ HistoFill(hCRWepLowSig[bin],w_final); } }
-    if (CRWenLowSig){ HistoFill(hCRWeLowSig[bin],w_final);                                           if(hCRWenLowSig.size()>bin){ HistoFill(hCRWenLowSig[bin],w_final); } }
-    if (CRWmp){       HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu);                             if(hCRWmp.size()>bin){       HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu); } }
-    if (CRWmn && (passMTCut==0 || passMTCut==1)){ HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu); if(hCRWmn.size()>bin){       HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu); } }
-    if((CRWmn || CRWmp) && passMTCut==2){ HistoFill(hCRWmMT[bin],w_final*xeSFTrigWeight_nomu); }// low MT
-    if (CRZee){       HistoFill(hCRZll[bin],w_final);                                                if(hCRZee.size()>bin){       HistoFill(hCRZee[bin],w_final); } }
-    if (CRZmm){       HistoFill(hCRZll[bin],w_final*xeSFTrigWeight_nomu);                            if(hCRZmm.size()>bin){       HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu); } }
-    if (CRFJVT){      HistoFill(hCRFJVT[bin],w_final*xeSFTrigWeight); }
+    if (SR || (vbfTrig && vbfSR)) HistoFill(hSR[bin],w_final*xeSFTrigWeight); // only apply the trigger SF to the SR. It is only where the MET trigger is used
+    if (CRWep || (vbfTrig && vbfCRWep)){       HistoFill(hCRWe[bin],w_final);                                                 if(hCRWep.size()>bin){       HistoFill(hCRWep[bin],w_final); } }
+    if (CRWen || (vbfTrig && vbfCRWen)){       HistoFill(hCRWe[bin],w_final);                                                 if(hCRWen.size()>bin){       HistoFill(hCRWen[bin],w_final); } }
+    if (CRWepLowSig || (vbfTrig && vbfCRWepLowSig)){ HistoFill(hCRWeLowSig[bin],w_final);                                     if(hCRWepLowSig.size()>bin){ HistoFill(hCRWepLowSig[bin],w_final); } }
+    if (CRWenLowSig || (vbfTrig && vbfCRWenLowSig)){ HistoFill(hCRWeLowSig[bin],w_final);                                     if(hCRWenLowSig.size()>bin){ HistoFill(hCRWenLowSig[bin],w_final); } }
+    if (CRWmp || (vbfTrig && vbfCRWmp)){       HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu);                             if(hCRWmp.size()>bin){       HistoFill(hCRWmp[bin],w_final*xeSFTrigWeight_nomu); } }
+    if (CRWmn && (passMTCut==0 || passMTCut==1) ||(vbfTrig && vbfCRWmn)){ HistoFill(hCRWm[bin],w_final*xeSFTrigWeight_nomu);  if(hCRWmn.size()>bin){       HistoFill(hCRWmn[bin],w_final*xeSFTrigWeight_nomu); } }
+    if((CRWmn || CRWmp ||(vbfTrig && (vbfCRWmn || vbfCRWmp))) && passMTCut==2){ HistoFill(hCRWmMT[bin],w_final*xeSFTrigWeight_nomu); }// low MT
+    if (CRZee || (vbfTrig && vbfCRZee)){       HistoFill(hCRZll[bin],w_final);                                                if(hCRZee.size()>bin){       HistoFill(hCRZee[bin],w_final); } }
+    if (CRZmm || (vbfTrig && vbfCRZmm)){       HistoFill(hCRZll[bin],w_final*xeSFTrigWeight_nomu);                            if(hCRZmm.size()>bin){       HistoFill(hCRZmm[bin],w_final*xeSFTrigWeight_nomu); } }
+    if (CRFJVT || (vbfTrig && vbfCRFJVT)){      HistoFill(hCRFJVT[bin],w_final*xeSFTrigWeight); }
   }else{// one histogram, so need to find the real bin number
     float myWeight=w_final;
-    if (CRWmp && CRWmn && CRZmm) myWeight=w_final*xeSFTrigWeight_nomu;
-    if (SR) myWeight=w_final*xeSFTrigWeight;
+    if ((CRWmp && CRWmn && CRZmm) || (vbfCRWmp && vbfCRWmn && vbfCRZmm)) myWeight=w_final*xeSFTrigWeight_nomu;
+    if (SR || vbfSR) myWeight=w_final*xeSFTrigWeight;
     
     int nRegion = -1;
-    if(SR) nRegion=8;
-    if(CRZmm) nRegion=7;
-    if(CRZee) nRegion=6;
-    if(CRWmp) nRegion=5;
-    if(CRWmn) nRegion=4;
-    if(CRWep) nRegion=3;
-    if(CRWen) nRegion=2;
-    if(CRWepLowSig) nRegion=1;
-    if(CRWenLowSig) nRegion=0;
+    if(SR || vbfSR) nRegion=8;
+    if(CRZmm || vbfCRZmm) nRegion=7;
+    if(CRZee || vbfCRZee) nRegion=6;
+    if(CRWmp || vbfCRWmp) nRegion=5;
+    if(CRWmn || vbfCRWmn) nRegion=4;
+    if(CRWep || vbfCRWep) nRegion=3;
+    if(CRWen || vbfCRWen) nRegion=2;
+    if(CRWepLowSig || vbfCRWepLowSig) nRegion=1;
+    if(CRWenLowSig || vbfCRWenLowSig) nRegion=0;
     if(nRegion>-0.5){
       float binVal = totalBins*float(nRegion)+bin+1.0; // should start from 1
       hSR[0][0]->Fill(binVal,myWeight);
