@@ -1,6 +1,50 @@
 #!/usr/bin/env python
 import ROOT
 import os
+
+def getMJRandSUncInputs(year, mjyield, a, doClos=True):
+
+    hist_list=[]
+    histClosUp=[]
+    histClosDw=[]
+    for yea in [2016, 2017, 2018]:
+        histClosUp += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncHigh_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)]
+        histClosDw += [ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJClos%sUncLow_SR" %yea+str(a)+"_obs_cuts;;", 1, 0.5, 1.5) ]
+
+    histUp = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+    histDw = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+
+    # apply the systematic uncertainties
+    histUp.SetBinContent(1,mjyield*1.387)
+    histUp.SetBinError(1,0.0)
+    histDw.SetBinContent(1,mjyield/1.387)
+    histDw.SetBinError(1,0.0)
+    # setting the default value
+    for itr in range(0,len(histClosUp)):
+        histClosUp[itr].SetBinContent(1,mjyield)
+        histClosUp[itr].SetBinError(1,0.0)
+        histClosDw[itr].SetBinContent(1,mjyield)
+        histClosDw[itr].SetBinError(1,0.0)                    
+        if  year==2016:
+            histClosUp[0].SetBinContent(1,mjyield*1.8) # set to 100%. total is 2813, so need 675/2813. this is not correlated.
+            histClosDw[0].SetBinContent(1,mjyield/1.8)
+        elif  year==2017:
+            histUp.SetBinContent(1,mjyield*1.189)
+            histDw.SetBinContent(1,mjyield/1.189)
+            histClosUp[1].SetBinContent(1,mjyield*1.36) # set to 100%. total is 2813, so need 421/2813. this is not correlated.
+            histClosDw[1].SetBinContent(1,mjyield/1.36)
+        elif  year==2018:
+            histUp.SetBinContent(1,mjyield*1.226)
+            histDw.SetBinContent(1,mjyield/1.226)
+            histClosUp[2].SetBinContent(1,mjyield*1.32) # set to 100%. total is 2813, so need 401/2813. this is not correlated.
+            histClosDw[2].SetBinContent(1,mjyield/1.32)
+    
+    hist_list+=[histUp,histDw]
+    if doClos:
+        for c in (histClosUp+histClosDw):
+            hist_list+=[c]
+    return hist_list
+
 def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleHist=False, doTMVA=False, doOneHighFJVTCR=False):
     f_multijet = ROOT.TFile("multijetFJVT.root", "recreate")
     mjs = [2.14, 1.99, 1.53, 1.38, 1.65, 1.97, 1.85, 1.67, 1.30, 1.18, 50.0]
@@ -28,7 +72,15 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
             emjs = [0.12, 0.15, 0.18, 0.32, 0.25, 0.25, 0.25, 0.25 ]
             mjs+=[0.55,0.63,0.46]
             emjs += [0.10, 0.09, 0.24]
-            
+    mjshape=[]
+    mjshape_staterr=[]
+    mjshape_syserr=[]
+    if doOneHighFJVTCR:
+        # integral of these needs to be that of the bin 6 fjvt transfer. will be normalized later
+        mjshape = [0.31238394,0.43419236,0.13576130,0.11622656,0.0014358363]
+        mjshape_staterr = [0.22,0.15,0.31,0.25,0.97]
+        mjshape_syserr = [0.2,0.15,0.11,0.08,0.02]
+        
     a=1
     hists=[]
     histcr=None
@@ -41,19 +93,69 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
         hist.SetBinContent(1,mj)
         #hist.SetBinError(1,mj*0.07)
         hist.SetBinError(1,mj*statemjs[a-1])
-        if Binning==11 and a==11:
-            histcr.SetBinContent(1,0.0)
-        if (Binning==21 or Binning==22) and (a==11 or a==12 or a==13):
-            histcr.SetBinContent(1,0.0)
-        histHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"TFMJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-        histLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"TFMJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"TFMJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"TFMJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+        histLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"TFMJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"TFMJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
         histHigh.SetBinContent(1,mj*(1.+emjs[a-1]))
         histHigh.SetBinError(1,0.0)
         histLow.SetBinContent(1,mj*(1.-emjs[a-1]))
         histLow.SetBinError(1,0.0)
-        
-        hists+=[histcr,hist,histHigh,histLow]
+        # these are the R&S, so remove them
+        if Binning==11 and a==11:
+            histcr.SetBinContent(1,0.0)
+            hists+=[hist]
+            hists+=getMJRandSUncInputs(year, mj, a)
+        elif (Binning==21 or Binning==22) and (a==11 or a==12 or a==13):
+            histcr.SetBinContent(1,0.0)
+            hists+=[hist]
+            hists+=getMJRandSUncInputs(year, mj, a)
+        elif (Binning==21 or Binning==22) and doOneHighFJVTCR and (a>=6 and a<=10):
+
+            # hard coding the fjvt transfer for one bin
+            entrynum = a-6
+            mjvalFJVT = 1.82
+            total_mj_int = sum(mjshape) # total integral
+            scale_factor_mj = mjvalFJVT/total_mj_int # apply this bin by bin
+            mjvalone = scale_factor_mj*mjshape[entrynum]
+            hist.SetBinContent(1,mjvalone)
+            hist.SetBinError(1,mjvalone*0.0) # setup later to correlate correctly
+            histLow.SetBinContent(1,mjvalone*0.8)
+            histHigh.SetBinContent(1,mjvalone*(1.+0.2))
+
+            # stat uncertainty on the TF is propagated to all bins
+            histStatHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"TFStatMJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"TFStatMJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histStatLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"TFStatMJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"TFStatMJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histStatHigh.SetBinContent(1,1.11*mjvalone)
+            histStatHigh.SetBinError(1,0.0)
+            histStatLow.SetBinContent(1,(1.-0.11)*mjvalone)
+            histStatLow.SetBinError(1,0.0)
+            # rebalance and smear stats
+            strname='one'
+            if a==7: strname='two'
+            if a==8: strname='thr'
+            if a==9: strname='fou'
+            if a==10: strname='fiv'
+            histRandSStatHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"RSStat"+strname+"MJUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"RSStat"+strname+"MJUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histRandSStatLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"RSStat"+strname+"MJUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"RSStat"+strname+"MJUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histRandSStatHigh.SetBinContent(1,(1.+mjshape_staterr[entrynum])*mjvalone)
+            histRandSStatHigh.SetBinError(1,0.0)
+            histRandSStatLow.SetBinContent(1,(1.-mjshape_staterr[entrynum])*mjvalone)
+            histRandSStatLow.SetBinError(1,0.0)
+            # rebalance and smear core variation
+            histRandSCoreHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histRandSCoreLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histRandSCoreHigh.SetBinContent(1,(1.+mjshape_syserr[entrynum])*mjvalone)
+            histRandSCoreHigh.SetBinError(1,0.0)
+            histRandSCoreLow.SetBinContent(1,(1.-mjshape_syserr[entrynum])*mjvalone)
+            histRandSCoreLow.SetBinError(1,0.0)
+            if a!=6:
+                histcr.SetBinContent(1,0.0)
+                hists+=[hist,histHigh,histLow,histStatHigh,histStatLow,histRandSStatLow,histRandSStatHigh,histRandSCoreLow,histRandSCoreHigh]
+            else:
+                hists+=[histcr,hist,histHigh,histLow,histStatHigh,histStatLow,histRandSStatLow,histRandSStatHigh,histRandSCoreLow,histRandSCoreHigh]
+        else:  
+            hists+=[histcr,hist,histHigh,histLow]
         a += 1
+
     f_multijet.cd()
     for h in hists:
         h.Write()
