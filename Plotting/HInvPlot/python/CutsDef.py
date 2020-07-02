@@ -28,7 +28,7 @@ class BasicCuts:
                             'mjj800dphijj1nj2','mjj1000dphijj1nj2','mjj1500dphijj1nj2','mjj2000dphijj1nj2','mjj3500dphijj1nj2','mjj800dphijj2nj2','mjj1000dphijj2nj2','mjj1500dphijj2nj2','mjj2000dphijj2nj2','mjj3500dphijj2nj2','antiEHighMET','antiELowMET',
 
                             'mjj800nj2', 'mjj1000nj2', 'mjj1500nj2', 'mjj2000nj2', 'mjj3500nj2',
-                                'njgt2','njgt2lt5','njgt3lt5','nj3','lowmet','revfjvt','njgt3','nj2',
+                                'njgt2','njgt2lt5','njgt3lt5','nj3','lowmet','revfjvt','njgt3','nj2','nodphi',
                                 'nj2dphijj1','nj2dphijj2','dphijj1','dphijj2',
                                 'LowMETQCDRevFJVT','highmjjMidMETnj2',
                                 'metsf','metsfxe70','metsfxe90','metsfxe110','metsftrig','metsftrigxe70','metsftrigxe90','metsftrigxe70J400','metsftrigxe110','metsftrigxe110J400','metsftrigxe90J400',
@@ -765,7 +765,7 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
             cuts += [CutItem('CutMet',       '%s > 150.0' %(met_choice))]
             cuts += [CutItem('CutMetCST',    'met_cst_jet > 120.0')]
 
-    if not options.nodphimetgam:
+    if not options.nodphimetgam and not basic_cuts.analysis.count('nodphi'):
         cuts += [CutItem('CutDPhiMetPh','met_tst_nolep_ph_dphi > 1.8')]
     cuts += [CutItem('CutPhCentrality','phcentrality > 0.4')]
     # VBF cuts

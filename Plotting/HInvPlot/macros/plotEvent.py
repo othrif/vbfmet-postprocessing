@@ -222,7 +222,7 @@ def main():
     elif options.analysis!='all':
         anas = [options.analysis]
     if options.OverlapPh:
-        anas    = ['allmjj','lowmet','revfjvt']
+        anas    = ['allmjj','lowmet','revfjvt','nodphi']
         chans   = ['nn','ee','uu','ll','l','e','u']
         if options.doAntiID:
             anas    = ['allmjj','antiEHighMET','antiELowMET']
@@ -350,8 +350,9 @@ def main():
                         #
                         # SR Cut based regions and algorithms
                         #
-                        (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
-                        read_alg.AddNormalAlg(name_sr,  alg_sr)
+                        if not options.OverlapPh:
+                            (name_sr,  alg_sr)  = prepareSeqSR (basic_cuts, alg_take=input_cut, syst=syst)
+                            read_alg.AddNormalAlg(name_sr,  alg_sr)
 
                         #
                         # SR Cut based regions and algorithms with photon
