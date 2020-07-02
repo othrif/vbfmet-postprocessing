@@ -58,7 +58,7 @@ if args.pickle==None:
             #used the wrong central value for 363266-363272, so we update it here. Should use the entry number 2
             event_count=args.event_count
             if event_count==2 and dsid_string in ['363266','363267','363268','363269','363270','363271','363272']:
-                print 'This is MG EWK samples:',dsid_string
+                print 'This is MG EWK samples:',dsid_string,h.GetBinContent(event_count),' for entry 27: ',h.GetBinContent(27)
                 event_count=27
             nevent += h.GetBinContent(event_count)
             if dsid_string in hmap:
@@ -91,19 +91,19 @@ else:
             print filepath
             f = ROOT.TFile.Open(filepath)
             if not f:
-                print 'ERROR - bad file. continuing',filepath
+                print 'ERROR - bad file. continuing',filepath,dsid_string
                 continue
             if f.IsZombie():
-                print 'ERROR - zombie file', filepath
+                print 'ERROR - zombie file', filepath,dsid_string
                 continue
             h = f.Get("NumberEvents")
             if not h:
-		print 'ERROR - histogram invalid',filepath
+		print 'ERROR - histogram invalid',filepath,dsid_string
 		continue
 	    #used the wrong central value for 363266-363272, so we update it here. Should use the entry number 2
 	    event_count=args.event_count
 	    if event_count==2 and dsid_string in ['363266','363267','363268','363269','363270','363271','363272']:
-                print 'This is MG EWK samples:',dsid_string
+                print 'This is MG EWK samples:',dsid_string,h.GetBinContent(event_count),' for entry 27: ',h.GetBinContent(27)
                 event_count=27
 	    nevent += h.GetBinContent(event_count)
             neventraw += h.GetBinContent(1)
