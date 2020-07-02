@@ -1182,9 +1182,14 @@ StatusCode VBFAnalysisAlg::execute() {
     if(ph_vtxpos->size()>0) ph_pointing_z=ph_vtxpos->at(0);
     if(ph_vtxpos->size()==0 && baseph_vtxpos && baseph_vtxpos->size()>0) ph_pointing_z=baseph_vtxpos->at(0);
   }
-  // setting n_ph to 15 GeV. set to 10 in the MiniNtuples
-  if(ph_pt && ph_pt->size()>0 && n_ph>0 && ph_pt->at(0)<15e3) n_ph=0;
-
+  // setting n_ph to 15 GeV. set to 20 in the MiniNtuples
+  //if(ph_pt && ph_pt->size()>0 && n_ph>0 && ph_pt->at(0)<15e3) n_ph=0;
+  if(ph_pt && ph_pt->size()>0){
+    n_ph=0;
+    for(unsigned iterPh=0; iterPh<ph_pt->size(); ++iterPh){
+      if(ph_pt->at(iterPh)>15e3) ++n_ph;
+    }
+  }
   // Definiing a loose skimming
   float METCut = 150.0e3;
   float LeadJetPtCut = 80.0e3;
