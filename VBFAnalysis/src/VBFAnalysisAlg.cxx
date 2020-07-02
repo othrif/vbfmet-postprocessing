@@ -1903,7 +1903,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
   m_tree->SetBranchAddress("passVjetsPTV", &passVjetsPTV);
   m_tree->SetBranchAddress("MGVTruthPt", &MGVTruthPt);
   m_tree->SetBranchAddress("SherpaVTruthPt", &SherpaVTruthPt);
-  m_tree->SetBranchAddress("in_vy_overlap", &in_vy_overlap);
+  //m_tree->SetBranchAddress("in_vy_overlap", &in_vy_overlap);
+  m_tree->SetBranchAddress("in_vy_overlap10", &in_vy_overlap); // lower overlap to 10 GeV
   m_tree->SetBranchAddress("in_vy_overlap_iso", &in_vy_overlap_iso);
   m_tree->SetBranchAddress("FlavourFilter", &FlavourFilter);
   m_tree->SetBranchAddress("passGRL", &passGRL);
