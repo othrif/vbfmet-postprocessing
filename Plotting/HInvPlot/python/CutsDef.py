@@ -649,7 +649,7 @@ def getMETSFCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Regi
 def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region='SR', syst='Nominal'):
 
     cuts = FilterCuts(options)
-    if options.OverlapPh and not options.v41:
+    if options.OverlapPh and options.v41older:
         cuts += [CutItem('CutMCOverlap','in_vy_overlapCut > 0')]
         
     if basic_cuts.chan in ['nn']:
@@ -725,10 +725,10 @@ def getGamCuts(cut = '', options=None, basic_cuts=None, ignore_met=False, Region
     cuts += [CutItem('CutPh',       'n_ph==1')]
     #cuts += [CutItem('CutPhMETCleaning',       'n_ph_crackVetoCleaning>1')]     # photon met cleaning
     #cuts += [CutItem('CutPhPointing','ph_pointing_z<250.0')]    # 250 mm of the primary vertex. variable is not absolute value
-    #cutPhPointing = CutItem('CutPhPointing')
-    #cutPhPointing.AddCut(CutItem('High',  'ph_pointing_z<250.0'), 'AND')
-    #cutPhPointing.AddCut(CutItem('Low', 'ph_pointing_z>-250.0'), 'AND')
-    #cuts += [cutPhPointing]
+    cutPhPointing = CutItem('CutPhPointing')
+    cutPhPointing.AddCut(CutItem('High',  'ph_pointing_z<250.0'), 'AND')
+    cutPhPointing.AddCut(CutItem('Low', 'ph_pointing_z>-250.0'), 'AND')
+    cuts += [cutPhPointing]
     cuts += [CutItem('CutPhPt', 'phPt>15.0')] 
     if basic_cuts.analysis not in ['lowmet']:
         cuts += [CutItem('CutPhPtHig', 'phPt<110.0')] 

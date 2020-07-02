@@ -1280,7 +1280,7 @@ def prepareBkgRuns(keys,options=None):
                 #'top1':bkg_z_strong_madgraph_znn,
                 }
     if options.OverlapPh:
-        if options.v41:
+        if not options.v41older:
             bkg_keys['wgam']=bkg_sherpa_wg_228 # bkg_sherpa_wg_228
             bkg_keys['zgam']=bkg_sherpa_zg_228 # bkg_sherpa_zg_228
             bkg_keys['wdpi'].update(bkg_sherpa_wg)
