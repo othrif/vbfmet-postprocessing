@@ -7,9 +7,14 @@ class sample(object):
         self.runNumberS=""
         self.subfileN=""
         self.load(samplename,syst,Ext)
-        self.sampleTypeList = ["W_EWKPow","W_EWKSh","W_EWK","W_strongExt","W_strong","Z_EWKPow","W_EWKSh","Z_EWK", "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strong228", "Z_strongPTVExt", "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
-                               "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","VBFHAltSignal","QCDw","QCDunw","VVV","VV",'Zg_strong','Wg_strong','ttg','SinglePhoton','SinglePhotonBCL','VqqGam',
-                               'VBFH3000','VBFH2000','VBFH1000','VBFH750','VBFH300','VBFH100','VBFH50','VBFH75','VBFHgamdark125','ggFHgamdark125','gamgamZ','EFakePh','JetFakePh',
+        self.sampleTypeList = ["W_EWKPow","W_EWKSh","W_EWK","W_strongExt","W_strong","Z_EWKPow","W_EWKSh","Z_EWK",
+                                "Wg_EWK", "Zg_EWK", "Z_strongmVBFFilt", "Z_strongPow", "Z_strongExt", "Z_strong228", "Z_strongPTVExt",
+                                "Z_strong_VBFFilt","Z_strong_LowMass","Z_strong","ttbar","VBFH125Old","ggFH125Old","VH125Old",
+                               "VBFH125","ggFH125","VH125","TTH125",'VBFHgam125',"VBFHOther","VBFHAltSignal","QCDw","QCDunw","VVV","VV",
+                               "Zg_strongFxFx","Zg_strong222",'Zg_strong',"Wg_strong222",'Wg_strong','ttg','SinglePhoton',
+                               'SinglePhotonBCL','VqqGam',
+                               'VBFH3000','VBFH2000','VBFH1000','VBFH750','VBFH300','VBFH100','VBFH50','VBFH75','VBFHgamdark125',
+                               'ggFHgamdark125','gamgamZ','EFakePh','JetFakePh',
                                "data"] # do not change order
 
         self.sampleMap = {'data':['data'],
@@ -35,6 +40,9 @@ class sample(object):
                           'signaldark':['VBFHgamdark125','ggFHgamdark125'],
                           'signalOld':['VBFH125Old','ggFH125Old','VH125Old'],
                           'VBFHOther':['VBFHOther'],
+                          'Wg_strong222':['Wg_strong222'],
+                          'Zg_strong222':['Zg_strong222'],
+                          'Zg_strongFxFx':['Zg_strongFxFx'],
                           'VBFHAltSignal':['VBFHAltSignal'],
                           'QCD':['QCDw','QCDunw'],
                           'VBFH3000':['VBFH3000'],
@@ -87,10 +95,16 @@ class sample(object):
             print "runNumebr::: ",self.runNumber
             if (self.runNumber >= 308096 and self.runNumber <= 308098):
                 self.sampleType = "W_EWKSh"
-            elif (self.runNumber >= 364500 and self.runNumber <= 364519) or (self.runNumber>=345775 and self.runNumber<=345784) or (self.runNumber>=364550 and self.runNumber<=364584) or (self.runNumber>=700011 and self.runNumber<=700014) or (self.runNumber>=700018 and self.runNumber<=700021):
+            elif (self.runNumber>=345775 and self.runNumber<=345784):
+                self.sampleType = "Zg_strongFxFx"
+            elif (self.runNumber>=364550 and self.runNumber<=364584) or (self.runNumber>=700011 and self.runNumber<=700014) or (self.runNumber>=700018 and self.runNumber<=700021):
                 self.sampleType = "Zg_strong"
-            elif (self.runNumber >= 364520 and self.runNumber <= 364535) or (self.runNumber >= 700015 and self.runNumber <= 700017) or (self.runNumber >= 700022 and self.runNumber <= 700024):
+            elif (self.runNumber >= 364500 and self.runNumber <= 364519):
+                self.sampleType = "Zg_strong222"                
+            elif (self.runNumber >= 700015 and self.runNumber <= 700017) or (self.runNumber >= 700022 and self.runNumber <= 700024):
                 self.sampleType = "Wg_strong"
+            elif (self.runNumber >= 364520 and self.runNumber <= 364535):
+                self.sampleType = "Wg_strong222"                
             elif (self.runNumber >= 363270 and self.runNumber <= 363272):
                 self.sampleType = "Wg_EWK"
             elif (self.runNumber >= 363266 and self.runNumber <= 363269):

@@ -28,7 +28,7 @@ parser.add_argument( "--AltSkim", dest = "AltSkim", action="store_true", default
 parser.add_argument( "--MJSkim", dest = "MJSkim", action="store_true", default = False, help = "Use MJ skimming. low met or low mjj" )
 parser.add_argument( "--PhotonSkim", dest = "PhotonSkim", action="store_true", default = False, help = "Use photon skimming mjj>200, n_ph>0" )
 parser.add_argument( "--QGTagger", dest = "QGTagger", action="store_true", default = False, help = "Use qgtagger. available in releases newer than 21.2.76" )
-parser.add_argument( "--useTrigMuonSF", dest = "useTrigMuonSF", action="store_false", default = True, help = "Uses muon trigger SF instead of 1 when called ")
+parser.add_argument( "--useTrigMuonSF", dest = "useTrigMuonSF", action="store_false", default = True, help = "Uses muon trigger SF instead of 1 when called. set true by default. ")
 parser.add_argument( "--theoVariation", dest = "theoVariation", action="store_true", default = False, help = "Run Theory uncertainties ")
 parser.add_argument("--doVjetRW", dest = "doVjetRW", action="store_true", default = False, help = "apply V+jets theory reweighing" )
 args, unknown = parser.parse_known_args()
