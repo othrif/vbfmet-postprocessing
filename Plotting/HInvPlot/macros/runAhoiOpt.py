@@ -18,6 +18,7 @@ from tqdm.notebook import tqdm
 #ahoi.tqdm = tqdm # use notebook progress bars in ahoi
 import matplotlib.pyplot as plt
 import math
+import glob
 # import atlas_mpl_style as ampl
 # # Set ATLAS style
 # ampl.use_atlas_style()
@@ -57,21 +58,21 @@ def sampleDataframe(infiles,treename):
                 "met_tight_tst_et", "met_tight_tst_phi",
                 "mu_pt","mu_eta", "mu_phi",
                 "eventNumber"]
+    df_sample = []
     for path, file, start, stop, entry in up.iterate(
-            infiles+"*.root",
+            infiles+treename+"*.root",
             treename,
             branches=branches,
             reportpath=True, reportfile=True, reportentries=True):
 
         print('==> Processing sample: %s ...'%path)
         tree = up.open(path)[treename]
-        
-        df_sample = tree.pandas.df(branches,flatten=False)
-        return df_sample
+
+        df_sample.append(tree.pandas.df(branches,flatten=False))
+    df_sample = pd.concat(df_sample)
+    return df_sample
 
 def calcmT(met,ph):
-    # SS: one suggestion I have is to use delta_phi function from https://github.com/scikit-hep/uproot-methods/blob/master/uproot_methods/classes/TLorentzVector.py#L82
-    # so then your calculation becomes np.sqrt(2*met.pt*ph.pt(1-np.cos(delta_phi(ph,met))))
     return np.sqrt(2*met.pt*ph.pt*(1-np.cos(ph.delta_phi(met))))
 
 def calcPhiLepMet(lep1,lep2,met,ph):
@@ -85,7 +86,8 @@ def calcAbsPt(lep1,lep2,met,ph):
 def getLorentzVec(df):
     """ Calculates Lorentz vectors for the leptons and photons for bkg/sig:
     but first converts all pTs and masses from MeV to GeV"""
-
+    # Converting weights to true yield
+    #df['w'] = df['w'].truediv(36000)
     df['mu_pt']   = df['mu_pt'].truediv(1000)
     df['mu_mass'] = df['mu_mass'].truediv(1000)
     df['ph_pt']   = df['ph_pt'].truediv(1000)
@@ -95,7 +97,7 @@ def getLorentzVec(df):
     mu_eta  = np.asarray(df.mu_eta.values.tolist())
     mu_phi  = np.asarray(df.mu_phi.values.tolist())
     mu_mass = np.asarray(df.mu_mass.values.tolist())
-
+    
     lep1 = uproot_methods.TLorentzVectorArray.from_ptetaphim(mu_pt[:,0],mu_eta[:,0],mu_phi[:,0],
                                                              mu_mass[:,0])
     lep2 = uproot_methods.TLorentzVectorArray.from_ptetaphim(mu_pt[:,1],mu_eta[:,1],mu_phi[:,1],
@@ -131,14 +133,17 @@ def makePlots(df_bkg,df_sig,var,units):
     if var == 'ph_pt':
         bkg = np.concatenate(np.asarray(df_bkg[var])).ravel()
         sig = np.concatenate(np.asarray(df_sig[var])).ravel()
-    max_val = max(np.concatenate([bkg,sig]))
-    ax.hist(bkg, bins=50, range=(0, max_val), histtype='step', color='Red',label='bkg')
-    ax.hist(sig, bins=50, range=(0, max_val), histtype='step', color='Blue',label='sig')
+    #max_val = max(np.concatenate([bkg,sig]))
+    # scaling based on signal data
+    max_val = max(sig)
+    #print(var,min(sig),max_val)
+    ax.hist(bkg, weights = df_bkg['w'].to_numpy(), bins=50, range=(0, max_val), histtype='step', color='Red',label='bkg')
+    ax.hist(sig, weights = df_sig['w'].to_numpy(), bins=50, range=(0, max_val), histtype='step', color='Blue',label='sig')
     ax.set_xlabel(var+' [' + units + ']')
     ax.set_ylabel('Events')
     ax.set_yscale('log')
     ax.legend()
-    plt.savefig("hist_" + var+ ".pdf",format="pdf")
+    plt.savefig("w_hist_" + var+ ".pdf",format="pdf")
 
 def get_selection(multi_index,cuts):
     ## Selects the cut values from the list of cuts after ahoi optimization 
@@ -149,9 +154,18 @@ def get_selection(multi_index,cuts):
         expr_list.append("({})".format(expr.format(vals[i-1])))
     return expr_list
 
-def get_ams(s, b):
-    ## Metric that the ahoi optimization tutorial used, could change this
-    return np.sqrt(2*((s+b+10)*np.log(1+s/(b+10))-s))
+def get_metric(s, b,metric):
+    ## Metric for optimization, variety of different options
+    if metric == "reg":
+        return np.sqrt(2*((s+b)*np.log(1+s/b)-s))
+    # Adding 10 for regularization, not sure why
+    if metric == "ams":
+        return np.sqrt(2*((s+b+10)*np.log(1+s/(b+10))-s))
+    if metric == "sb":
+        return s/b
+    if metric == "ssqrt(b)":
+        # added absolute value b/c this is apparently negative?
+        return s/np.sqrt(np.abs(b))
 
 def ahoi_opt(cuts,df_sig,df_bkg):
     ## Implements ahoi optimization given cuts, signal, background
@@ -160,12 +174,8 @@ def ahoi_opt(cuts,df_sig,df_bkg):
     df_sig['Label'] = np.full(len(df_sig),"s")
     
     df = pd.concat([df_bkg,df_sig])
-    # Train/testing data
-    random_selection = np.random.rand(len(df)) > 0.5
     # masks_list is a 2D array of booleans that tells us if sig/bkg passes cut
     masks_list = []
-    # first selection is defined so that all variables pass
-    masks_list.insert(0, np.array([random_selection, ~random_selection]))
     # tell if signal or background
     masks_list.insert(1, np.array([(df.Label=="b").values, (df.Label=="s").values]))
     for expr, vals in cuts:
@@ -176,81 +186,63 @@ def ahoi_opt(cuts,df_sig,df_bkg):
         masks_list.append(np.array(masks, dtype=np.bool))
     # Using w for the weights
     counts, sumw, sumw2 = ahoi.scan(masks_list, weights=df.w.values)
-    # Sum for signal/background/train/test
-    sumw_train_b = sumw[0][0]
-    sumw_train_s = sumw[0][1]
-    sumw_test_b = sumw[1][0]
-    sumw_test_s = sumw[1][1]
-
-    # Filling ROC curve for trail/test
+    sumw_s = sumw[1]
+    sumw_b = sumw[0]
+    # Filling ROC curve for accuracy
     base_b = df[(df.Label=="b")].w.sum()
     base_s = df[(df.Label=="s")].w.sum()
-    train_factor = np.count_nonzero(random_selection) / len(df) # we only selected a random subset
-    base_b_train = base_b * train_factor
-    base_s_train = base_s * train_factor
-    fpr_train, tpr_train, roc_ids = ahoi.roc_curve(sumw[0], base_b_train, base_s_train, bins=100)
+    fpr, tpr, roc_ids = ahoi.roc_curve(sumw, base_b, base_s, bins=100)
+    # total rates for signal and background on the ROC curve
+    sumw_s_roc = sumw_s.ravel()[roc_ids]
+    sumw_b_roc = sumw_b.ravel()[roc_ids]
 
-    test_factor = np.count_nonzero(~random_selection) / len(df)
-    base_b_test = base_b * test_factor
-    base_s_test = base_s * test_factor
-    fpr_test = (sumw_test_b / base_b_test).ravel()[roc_ids]
-    tpr_test = (sumw_test_s / base_s_test).ravel()[roc_ids]
+    metrics = ["reg","ams","sb","ssqrt(b)"]
+    selections = []
 
-    # correctly weighted total rates for signal and background on the ROC curve
-    sumw_train_s_roc = sumw_train_s.ravel()[roc_ids] / train_factor
-    sumw_train_b_roc = sumw_train_b.ravel()[roc_ids] / train_factor
-    sumw_test_s_roc = sumw_test_s.ravel()[roc_ids] / test_factor
-    sumw_test_b_roc = sumw_test_b.ravel()[roc_ids] / test_factor
+    for m in metrics:
+        vals = get_metric(sumw_s_roc, sumw_b_roc, m)
+        argmax = np.argmax(vals)
+        cut_indices = np.unravel_index(roc_ids[argmax], counts.shape)[2:]
+        selections.append(get_selection(cut_indices,cuts))
+        # Plotting metric
+        fig,ax = plt.subplots(1,1)
+        ax.plot(tpr, get_metric(sumw_s_roc, sumw_b_roc,m))
+        ax.set_xlabel("True Positive Rate")
+        ax.set_ylabel(m)
+        #ax.legend()
+        plt.savefig("cuts_"+ m + ".pdf", format = "pdf")
     
-    # Plotting ams
-    plt.plot(tpr_train, get_ams(sumw_train_s_roc, sumw_train_b_roc), label="train")
-    plt.plot(tpr_test, get_ams(sumw_test_s_roc, sumw_test_b_roc), label="test")
-    plt.xlabel("true positive rate")
-    plt.ylabel("AMS")
-    plt.legend()
-    plt.savefig("cuts_ams.pdf",format="pdf")
-    
-    # getting best ams values/cuts
-    ## NOTE we may want to use a different metric
-    ams_values = get_ams(sumw_test_s_roc, sumw_test_b_roc)
-    ams_argmax = np.argmax(ams_values)
-    print(ams_values.max)
-    print(ams_argmax)
-    cut_indices = np.unravel_index(roc_ids[ams_argmax], counts.shape)[2:]
-    print(cut_indices)
-    return  get_selection(cut_indices,cuts)
-
+    return selections
+        
 def main(): 
     """ Run script"""
     options = getArgumentParser().parse_args()
-    ### Make all the bkg and signal dataframes!
-
+    ### Make all the bkg and signal dataframes
     ## Z+jets
     df_zjets  = sampleDataframe(options.indir,"Z_strongNominal")
     df_zjets  = df_zjets.append(sampleDataframe(options.indir,"Z_EWKNominal"))
-
     ## Z+photon
     df_zgamma = sampleDataframe(options.indir,"Zg_strongNominal")
 
     # ## ttbar/single top/Wt/ttbar+V
-    # df_top    = sampleDataframe(options.indir,"ttbarNominal")
-    # df_top    = df_top.append(sampleDataframe(options.indir,"ttVNominal"))
+    df_top    = sampleDataframe(options.indir,"ttbarNominal")
+    df_top    = df_top.append(sampleDataframe(options.indir,"ttVNominal"))
 
     # ## Triboson
-    # df_VVV    = sampleDataframe(options.indir,"VVVNominal")
-    # df_VVV    = df_VVV.append(sampleDataframe(options.indir,"VVyNominal"))
+    df_VVV    = sampleDataframe(options.indir,"VVVNominal")
+    df_VVV    = df_VVV.append(sampleDataframe(options.indir,"VVyNominal"))
 
     # ## Diboson
-    # df_VV     = sampleDataframe(options.indir,"VVNominal")
-    # df_VV     = df_VV.append(sampleDataframe(options.indir,"VV_ewkNominal"))
-    # df_VV     = df_VV.append(sampleDataframe(options.indir,"ggZZNominal"))
-    # df_VV     = df_VV.append(sampleDataframe(options.indir,"ggWWNominal"))
+    df_VV     = sampleDataframe(options.indir,"VVNominal")
+    df_VV     = df_VV.append(sampleDataframe(options.indir,"VV_ewkNominal"))
+    df_VV     = df_VV.append(sampleDataframe(options.indir,"ggZZNominal"))
+    df_VV     = df_VV.append(sampleDataframe(options.indir,"ggWWNominal"))
 
     # ## H->Zy
-    # df_HZy    = sampleDataframe(options.indir,"ggH125ZyNominal")
-    # df_HZy    = df_HZy.append(sampleDataframe(options.indir,"ttH125ZyNominal"))
-    # df_HZy    = df_HZy.append(sampleDataframe(options.indir,"VBFH125ZyNominal"))
-    # df_HZy    = df_HZy.append(sampleDataframe(options.indir,"VH125ZyNominal"))
+    df_HZy    = sampleDataframe(options.indir,"ggH125ZyNominal")
+    df_HZy    = df_HZy.append(sampleDataframe(options.indir,"ttH125ZyNominal"))
+    df_HZy    = df_HZy.append(sampleDataframe(options.indir,"VBFH125ZyNominal"))
+    df_HZy    = df_HZy.append(sampleDataframe(options.indir,"VH125ZyNominal"))
 
     ## signal
     df_sig = sampleDataframe(options.indir,"HyGrNominal")
@@ -260,8 +252,8 @@ def main():
     df_zjets = df_zjets[df_zjets['in_vy_overlap'] > 0]
     ## Make collective Z+jets/Z+photon bkg dataframe
     df_bkg = df_zjets 
-    df_bkg = df_bkg.append(df_zgamma)
-    
+    df_bkg = df_bkg.append(df_zgamma).append(df_top).append(df_VVV).append(df_VV).append(df_HZy)
+    #df_bkg = pd.concat(df_bkg,df_top,df_VVV,df_VV,df_HZy)
     ## Apply cuts 
     df_bkg = df_bkg[(df_bkg['trigger_lep']>0) &
                     (df_bkg['passJetCleanTight']==1) &
@@ -275,26 +267,24 @@ def main():
                     (df_sig['n_ph']==1) & 
                     (df_sig['n_mu']==2) &
                     (df_sig['n_bjet']==0)]
-    
-    # Seems like signal and background should have the same quantities b/c we're testing
-    # how cuts can distinguish between signal and background --> SS: yes absolutely correct! :)
     df_sig['mu_mass'] = list(np.full((len(df_sig),2),105.6))
-
-    ## Compute compound variables, like mll, mT(met,ph_pt)...
-    ## Info on how to use TLorentzVectors in uproot: https://github.com/scikit-hep/uproot#special-physics-objects-lorentz-vectors
     ## The TLorentzVector class contains a method called "from_ptetaphim": 
     ## https://github.com/scikit-hep/uproot-methods/blob/master/uproot_methods/classes/TLorentzVector.py#L978
+    # Apply more preliminary cuts
     df_bkg = calcVars(df_bkg)
-
+    df_bkg = df_bkg[(df_bkg['mll'] > 66) &
+                    (df_bkg['mll'] < 116) &
+                    (df_bkg['lep1pt'] > 26)]
     df_sig = calcVars(df_sig)
+    df_sig = df_sig[(df_sig['mll'] > 66) &
+                    (df_sig['mll'] < 116) &
+                    (df_sig['lep1pt'] > 26)]
 
-    ## Plot some of the variables you calculated to see if they make sense
-    ## including lep1.pt, lep2.pt, ph.pt, etc
     # list of variables to make histograms of
     varCuts = ['met_tight_tst_et','met_tight_tst_phi','ph_pt','mT','dPhiLepMet','AbsPt','Ptll','mllg','lep1pt','lep2pt','mll']
-    #units = ['GeV','Radians','GeV','GeV','Radians','GeV','GeV','GeV','GeV','GeV']
+    units = ['GeV','Radians','GeV','GeV','Radians','GeV','GeV','GeV','GeV','GeV','GeV']
     #for i in range(0,len(varCuts)):
-    #makePlots(df_bkg,df_sig,'mll','GeV')
+    #    makePlots(df_bkg,df_sig,varCuts[i],units[i])
     
     # Ahoi -> stores large numpy arrays in memory so can't do large combinations locally
     # More systematic way to actually define cuts?
@@ -314,18 +304,17 @@ def main():
         ("mll < {}", list(np.linspace(110,200,ncuts)))
         ]
     # Testing a few cuts
-    ncuts = 20
+    ncuts = 10
     cuts_test = [
-        ("lep1pt > {}", list(np.linspace(0,50,ncuts,dtype=int))),
-        ("lep2pt > {}", list(np.linspace(0,50,ncuts,dtype=int))),
-        ("mll > {}", list(np.linspace(10,70,ncuts,dtype=int))),
-        ("mll < {}", list(np.linspace(110,200,ncuts,dtype=int))),
-        ("mllg > {}", list(np.linspace(25,200,ncuts,dtype=int)))
+        ("lep1pt > {}", list(np.linspace(30,40,ncuts,dtype=int))),
+        ("lep2pt > {}", list(np.linspace(5,15,ncuts,dtype=int))),
+        ("mll > {}", list(np.linspace(80,90,ncuts,dtype=int))),
+        ("mll < {}", list(np.linspace(100,110,ncuts,dtype=int))),
+        ("mllg > {}", list(np.linspace(85,100,ncuts,dtype=int))),
+        ("AbsPt < {}", list(np.linspace(27,37,ncuts,dtype=int)))
         ]
     ahoi_test = ahoi_opt(cuts_test,df_sig,df_bkg)
     print(ahoi_test)
-    # implementing ahoi
-    # randomly select 50% of signal and background for train/test data
     
 if __name__ == '__main__':
     main()
