@@ -743,8 +743,8 @@ StatusCode VBFAnalysisAlg::execute() {
     xeSFTrigWeight_nomu__1down = weightXETrigSF(met_tst_nolep_et, metRunNumber, 2);
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
-  nloEWKWeight=1.0;
-  if(m_isMC && met_truth_et>-0.5 && (runNumber==312243 || runNumber==313343 || runNumber==346600 || runNumber==308567 || runNumber==308276)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
+  nloEWKWeight=1.0; //runNumber==312243 || runNumber==313343 || apply to photon samples?
+  if(m_isMC && met_truth_et>-0.5 && (runNumber==346600 || runNumber==308567 || runNumber==308276)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
     //nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;// tighter mjj>1TeV
     nloEWKWeight=1.0 - 0.000350*(met_truth_et/1.0e3) - 0.0430;
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
@@ -1599,8 +1599,8 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
       if(m_runNumberInput==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out, true); 
       // uncomment if you want to add the nnpdf inputs. would kind of double count
       //if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out, false);// filtered Sherpa samples use nnPDF
-
-      if(m_runNumberInput==312243 || m_runNumberInput==313343 || m_runNumberInput==346600 || m_runNumberInput==308276 || m_runNumberInput==308567) {
+      //m_runNumberInput==312243 || m_runNumberInput==313343 ||  do we want to apply this to the photon samples
+      if(m_runNumberInput==346600 || m_runNumberInput==308276 || m_runNumberInput==308567) {
 	if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
 	  tMapFloat["nloEWKWeight__1up"]=1.0;
 	  tMapFloatW["nloEWKWeight__1up"]=1.0;
