@@ -270,7 +270,7 @@ StatusCode VBFAnalysisAlg::initialize() {
     if(m_currentSample=="W_strong") treeSName="Wg_strong";
     if(m_currentSample=="Z_strongExt") treeSName="Zg_strong";
     if(m_currentSample=="W_strongExt") treeSName="Wg_strong";
-    if(m_currentSample=="VBFH125") treeSName="VBFgamH125";
+    if(m_currentSample=="VBFH125") treeSName="VBFHgam125";
     if(m_currentSample=="ttg") treeSName="ttbar";
     treeTitleOut= treeSName+m_currentVariation;
     treeNameOut = treeSName+m_currentVariation;
@@ -744,7 +744,7 @@ StatusCode VBFAnalysisAlg::execute() {
   }
   // signal electroweak SF -NOTE: these numbers need to be updated for new cuts, mjj bins, and different mediator mass!!!
   nloEWKWeight=1.0;
-  if(m_isMC && met_truth_et>-0.5 && (runNumber==313343 || runNumber==346600 || runNumber==308567 || runNumber==308276)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
+  if(m_isMC && met_truth_et>-0.5 && (runNumber==312243 || runNumber==313343 || runNumber==346600 || runNumber==308567 || runNumber==308276)){ // || (runNumber>=308275 && runNumber<=308283))){ // only applying to H125
     //nloEWKWeight=1.0 - 0.000342*(met_truth_et/1.0e3) - 0.0708;// tighter mjj>1TeV
     nloEWKWeight=1.0 - 0.000350*(met_truth_et/1.0e3) - 0.0430;
     nloEWKWeight/=0.947; // the inclusive NLO EWK correction is already applied. Removing this here.
@@ -791,7 +791,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_isMC && m_currentVariation=="Nominal"){// initialize
     // set the VBF variables systematics
     if(runNumber==346600) my_signalSystHelper.setVBFVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights,n_jet_truth,truth_jj_mass, truth_jj_dphi);
-    if(runNumber==313343) my_signalSystHelper.setVBFGamVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights,n_jet_truth,truth_jj_mass, truth_jj_dphi);
+    if(runNumber==313343 || runNumber==312243) my_signalSystHelper.setVBFGamVars(tMapFloat,HTXS_Stage1_1_Fine_Category_pTjet25,mcEventWeights,n_jet_truth,truth_jj_mass, truth_jj_dphi);
     if(runNumber==346588) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 111);
     if(runNumber>=312448 && runNumber<=312531) my_signalSystHelper.setggFVars(tMapFloat,mcEventWeights, 115); // filtered sherpa uses nnpdf
 
@@ -1266,7 +1266,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if(m_PhotonSkim && m_isMC){
     TruthSkim=false;
     bool isVjets = (m_currentSample.find("Z_strong") != std::string::npos || m_currentSample.find("W_strong")!= std::string::npos || m_currentSample.find("Z_EWK") != std::string::npos || m_currentSample.find("W_EWK") != std::string::npos );
-    bool isVgjets = (m_currentSample.find("Zg_strong")!= std::string::npos || m_currentSample.find("Wg_strong")!= std::string::npos || m_currentSample.find("Wg_EWK")!= std::string::npos || m_currentSample.find("Zg_EWK") != std::string::npos || m_currentSample.find("VBFgamH125")!= std::string::npos || m_currentSample.find("ttg")!= std::string::npos || m_currentSample.find("VqqGam")!= std::string::npos);
+    bool isVgjets = (m_currentSample.find("Zg_strong")!= std::string::npos || m_currentSample.find("Wg_strong")!= std::string::npos || m_currentSample.find("Wg_EWK")!= std::string::npos || m_currentSample.find("Zg_EWK") != std::string::npos || m_currentSample.find("VBFHgam")!= std::string::npos || m_currentSample.find("ttg")!= std::string::npos || m_currentSample.find("VqqGam")!= std::string::npos);
     bool isTop = m_currentSample.find("ttbar")!= std::string::npos;
     bool isH =  m_currentSample.find("VBFH125")!= std::string::npos;
     ATH_MSG_DEBUG("isVjets: " << isVjets << " isH: " << isH << " isTop: " << isTop << " isVgjets: " << isVgjets << " passVjetsFilterTauEl: " << passVjetsFilterTauEl);
@@ -1595,12 +1595,12 @@ StatusCode VBFAnalysisAlg::beginInputFile() {
 
       // initialize the VBF & ggF variables
       if(m_runNumberInput==346600) my_signalSystHelper.initVBFVars(tMapFloat,tMapFloatW, m_tree_out);
-      if(m_runNumberInput==313343) my_signalSystHelper.initVBFGamVars(tMapFloat,tMapFloatW, m_tree_out);      
+      if(m_runNumberInput==313343 || m_runNumberInput==312243) my_signalSystHelper.initVBFGamVars(tMapFloat,tMapFloatW, m_tree_out);      
       if(m_runNumberInput==346588) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out, true); 
       // uncomment if you want to add the nnpdf inputs. would kind of double count
       //if(m_runNumberInput>=312448 && m_runNumberInput<=312531) my_signalSystHelper.initggFVars(tMapFloat,tMapFloatW, m_tree_out, false);// filtered Sherpa samples use nnPDF
 
-      if(m_runNumberInput==313343 || m_runNumberInput==346600 || m_runNumberInput==308276 || m_runNumberInput==308567) {
+      if(m_runNumberInput==312243 || m_runNumberInput==313343 || m_runNumberInput==346600 || m_runNumberInput==308276 || m_runNumberInput==308567) {
 	if(tMapFloat.find("nloEWKWeight__1up")==tMapFloat.end()){
 	  tMapFloat["nloEWKWeight__1up"]=1.0;
 	  tMapFloatW["nloEWKWeight__1up"]=1.0;
