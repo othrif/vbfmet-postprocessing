@@ -499,7 +499,8 @@ StatusCode HFInputAlg::execute() {
   }
 
   // Choose the met trigger
-  bool passMETTrig = ((trigger_met &0x1) == 0x1);
+  bool passMETTrig = 0;
+  if(m_binning!=23) passMETTrig = ((trigger_met &0x1) == 0x1);
   bool passVBFTrig = 0;
   if(year==2017){
     //passMETTrig=0;
