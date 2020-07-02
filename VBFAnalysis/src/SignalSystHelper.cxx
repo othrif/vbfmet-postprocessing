@@ -274,7 +274,7 @@ void SignalSystHelper::initVBFGamVars(std::map<TString, Float_t> &tMapFloat, std
   }
 
   // add the VBF PDF variations
-  for(unsigned i=1; i<31; ++i){    
+  for(unsigned i=1; i<31; ++i){
     tMapFloat["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=1.0;
     tMapFloatW["ATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up"]=1.0;
     var_name="wATLAS_PDF4LHC_NLO_30_EV"+std::to_string(i)+"__1up";
