@@ -377,9 +377,9 @@ def prepareBkgRuns(keys,options=None):
                       '308567':'VBF125 - all',
                       '346600':'VBF125 - met>75',
                           }
-    sig_vbfgam = {'312243':'vbf gamma',
-                      '313343':'vbf gamma high stats',
-                      }
+    sig_vbfgam_old = {'312243':'vbf gamma',}
+    sig_vbfgam = {'313343':'vbf gamma high stats',}
+
     alt_VBF = {'308275':'VBF125 - H75',
                '308277':'VBF125 - H200',
                '308278':'VBF125 - H300',
@@ -1285,11 +1285,14 @@ def prepareBkgRuns(keys,options=None):
             bkg_keys['zgam']=bkg_sherpa_zg_228 # bkg_sherpa_zg_228
             bkg_keys['wdpi'].update(bkg_sherpa_wg)
             bkg_keys['wdpi'].update(bkg_sherpa_zg)
+            bkg_keys['wdpi'].update(sig_vbfgam_old)
         else:
             bkg_keys['wgam']=bkg_sherpa_wg # bkg_sherpa_wg_228
             bkg_keys['zgam']=bkg_sherpa_zg # bkg_sherpa_zg_228
             bkg_keys['wdpi'].update(bkg_sherpa_wg_228)
             bkg_keys['wdpi'].update(bkg_sherpa_zg_228)
+            bkg_keys['wdpi'].update(sig_vbfgam)
+            bkg_keys['vbfg'].update(sig_vbfgam_old)
         bkg_keys['wgamewk']=bkg_wgewk
         bkg_keys['zgamewk']=bkg_zgewk
         bkg_keys['ttg']=bkg_ttg
