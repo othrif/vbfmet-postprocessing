@@ -331,10 +331,12 @@ def main():
         ("met_tight_tst_et > {}", list(np.linspace(50,110,ncuts,dtype=int))),
         ("mll > {}", list(np.linspace(66,80,ncuts,dtype=int))),   
         ("mllg > {}", list(np.linspace(85,100,ncuts,dtype=int))),   
-        ("dPhiLepMet > {}", list(np.linspace(0,1.5,ncuts,dtype=int))),
+        ("dPhiLepMet > {}", list(np.linspace(0,2.0,ncuts,dtype=float))),
         ("Ptll > {}", list(np.linspace(0,100,ncuts,dtype=int))),
-        ("AbsPt < {}", list(np.linspace(10,30,ncuts,dtype=int)))        
+        ("AbsPt < {}", list(np.linspace(10,30,ncuts,dtype=int))),
+        ("ph_pt > {}", list(np.linspace(25,45,ncuts,dtype=int)))
     ]
+    print(cuts_test2)
     for i in range(0,len(varCuts)):
         makePlots(df_bkg,df_sig,varCuts[i],units[i],cuts=cuts_test2)
 
