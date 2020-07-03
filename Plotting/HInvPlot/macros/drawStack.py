@@ -22,6 +22,7 @@ p.add_option('--outdir',       type='string', default=None,          dest='outdi
 
 p.add_option('--pref',         type='string', default=None,          dest='pref')
 p.add_option('--signal',       type='string', default='higgs',       dest='signal',help='options: higgs or gamd')
+p.add_option('--extrasignal',  type='string', default=None,          dest='extrasignal',help='options: higgs or gamd')
 p.add_option('--syst',         type='string', default='Nominal',     dest='syst')
 p.add_option('--syst-sel',     type='string', default='Nominal',     dest='syst_sel')
 p.add_option('--syst-see',     type='string', default=None,          dest='syst_see')
@@ -877,7 +878,7 @@ def getSystSumSortKey(value):
 class DrawStack:
     """DrawStack - a set of histograms for one stacked plot"""
 
-    def __init__(self, name, file, sign, data, bkgs, nf_map, extract_sig, selkey=options.selkey):
+    def __init__(self, name, file, sign, data, bkgs, nf_map, extract_sig, selkey=options.selkey, extrasignal=None):
 
         self.name   = name
         self.selkey = selkey
@@ -897,8 +898,13 @@ class DrawStack:
             self.wcr_stack = DrawStack(zcr_name, file, sign, data, bkgs, nf_map, extract_sig, selkey='pass_wcr_'+replace_sr_name+'_l_'+systName)            
             
         self.sign = self.ReadSample(file, sign)
+        self.signextra=None
+        if extrasignal:
+            self.signextra = self.ReadSample(file, extrasignal)        
         if options.hscale!=None:
             self.sign.hist.Scale(float(options.hscale))
+            if extrasignal:
+                self.signextra.hist.Scale(float(options.hscale))                
         self.data = self.ReadSample(file, data)
         self.abkg = None
         self.bkgs = {}
@@ -927,6 +933,9 @@ class DrawStack:
         sum = 0.0
 
         self.sign.hist.SetLineWidth(2)
+        if self.signextra:
+            self.signextra.hist.SetLineWidth(2)
+            log.info('DrawStack  - integral=%5.2f sample=%s' %(self.signextra.hist.Integral(), 'extrasignal'))
         log.info('DrawStack  - integral=%5.2f sample=%s' %(self.data.hist.Integral(), 'data'))
         log.info('DrawStack  - integral=%5.2f sample=%s' %(self.sign.hist.Integral(), 'signal'))
 
@@ -1571,6 +1580,8 @@ class DrawStack:
 
         if self.sign != None and self.sign.logy:
             return True
+        if self.signextra != None and self.signextra.logy:
+            return True
         if self.data != None and self.data.logy:
             return True
 
@@ -1696,6 +1707,9 @@ class DrawStack:
         if not options.stack_signal and not options.no_signal:
             self.UpdateHist(self.sign.hist,self.sign.sample)
             self.sign.DrawHist('SAME HIST', self.leg, True)
+        if self.signextra:
+            self.UpdateHist(self.signextra.hist,self.signextra.sample)
+            self.signextra.DrawHist('SAME HIST', self.leg, True)
         self.UpdateStack()
         if options.do_ratio or options.force_ratio:
             #self.UpdateStack()
@@ -2665,7 +2679,7 @@ def main():
 
     for var in vars:
 
-        stack = DrawStack(var, rfile, options.signal, 'data', bkgs, nf_map, extract_sig)
+        stack = DrawStack(var, rfile, options.signal, 'data', bkgs, nf_map, extract_sig, extrasignal=options.extrasignal)
         print 'nSYST: ',len(sfiles)
         if options.draw_syst:
             if len(sfiles)>0:
