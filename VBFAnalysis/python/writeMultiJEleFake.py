@@ -74,12 +74,14 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
             emjs += [0.10, 0.09, 0.24]
     mjshape=[]
     mjshape_staterr=[]
-    mjshape_syserr=[]
+    mjshape_coresyserr=[]
+    mjshape_tailsyserr=[]
     if doOneHighFJVTCR:
         # integral of these needs to be that of the bin 6 fjvt transfer. will be normalized later
         mjshape = [0.31238394,0.43419236,0.13576130,0.11622656,0.0014358363]
         mjshape_staterr = [0.22,0.15,0.31,0.25,0.97]
-        mjshape_syserr = [0.04,0.17,0.11,0.26,0.29]
+        mjshape_coresyserr = [0.10,0.09,0.08,-0.2,-0.27]
+        mjshape_tailsyserr = [-0.07,0.06,0.02,0.11,0.15]        
         
     a=1
     hists=[]
@@ -143,15 +145,22 @@ def writeMultiJetFJVT(Binning=0, year=2016, METCut=150, doDoubleRatio=False, sin
             # rebalance and smear core variation
             histRandSCoreHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
             histRandSCoreLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJCoreUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
-            histRandSCoreHigh.SetBinContent(1,(1.+mjshape_syserr[entrynum])*mjvalone)
+            histRandSCoreHigh.SetBinContent(1,(1.+mjshape_coresyserr[entrynum])*mjvalone)
             histRandSCoreHigh.SetBinError(1,0.0)
-            histRandSCoreLow.SetBinContent(1,(1.-mjshape_syserr[entrynum])*mjvalone)
+            histRandSCoreLow.SetBinContent(1,(1.-mjshape_coresyserr[entrynum])*mjvalone)
             histRandSCoreLow.SetBinError(1,0.0)
+            # rebalance and smear tail variation
+            histRandSTailHigh = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJTailUncHigh_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJTailUncHigh_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histRandSTailLow = ROOT.TH1F("hmultijet_VBFjetSel_"+str(a)+"MJTailUncLow_SR"+str(a)+"_obs_cuts", "hmultijet_VBFjetSel_"+str(a)+"MJTailUncLow_SR"+str(a)+"_obs_cuts;;", 1, 0.5, 1.5)
+            histRandSTailHigh.SetBinContent(1,(1.+mjshape_tailsyserr[entrynum])*mjvalone)
+            histRandSTailHigh.SetBinError(1,0.0)
+            histRandSTailLow.SetBinContent(1,(1.-mjshape_tailsyserr[entrynum])*mjvalone)
+            histRandSTailLow.SetBinError(1,0.0)
             if a!=6:
                 histcr.SetBinContent(1,0.0)
-                hists+=[hist,histHigh,histLow,histStatHigh,histStatLow,histRandSStatLow,histRandSStatHigh,histRandSCoreLow,histRandSCoreHigh]
+                hists+=[hist,histHigh,histLow,histStatHigh,histStatLow,histRandSStatLow,histRandSStatHigh,histRandSCoreLow,histRandSCoreHigh,histRandSTailLow,histRandSTailHigh]
             else:
-                hists+=[histcr,hist,histHigh,histLow,histStatHigh,histStatLow,histRandSStatLow,histRandSStatHigh,histRandSCoreLow,histRandSCoreHigh]
+                hists+=[histcr,hist,histHigh,histLow,histStatHigh,histStatLow,histRandSStatLow,histRandSStatHigh,histRandSCoreLow,histRandSCoreHigh,histRandSTailLow,histRandSTailHigh]
         else:  
             hists+=[histcr,hist,histHigh,histLow]
         a += 1
