@@ -357,7 +357,7 @@ def main():
                         #
                         # SR Cut based regions and algorithms with photon
                         #
-                        if a in ['allmjj','lowmet','revfjvt', 'antiEHighMET','antiELowMET'] and options.OverlapPh:
+                        if a in ['allmjj','lowmet','revfjvt', 'nodphi', 'antiEHighMET','antiELowMET'] and options.OverlapPh:
                             (name_sr_gam,  alg_sr_gam)  = prepareSeqGamSR (basic_cuts, alg_take=input_cut, syst=syst)
                             read_alg.AddNormalAlg(name_sr_gam,  alg_sr_gam)
                             (name_zcr_gam,  alg_zcr_gam)  = prepareSeqGamZCR (basic_cuts, alg_take=input_cut, syst=syst)
