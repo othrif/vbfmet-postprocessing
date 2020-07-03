@@ -364,14 +364,14 @@ def writeMultiJet(Binning=0, year=2016, METCut=150, doDoubleRatio=False, singleH
         multijets=[]
         multijets_statunc=[] # total 150
         if year==2016:
-            multijets=[7.3,10.7,3.7,2.3,0.8]
-            multijets_statunc=[2.0,2.5,1.0,1.5,0.9]
+            multijets=[1.8,20.4,12.3,20.1,0.0]
+            multijets_statunc=[1.8,6.2,4.7,6.1,0.0]
         elif year==2017:
-            multijets=[14.3,28.7,6.7,4.1,0.8]
-            multijets_statunc=[6.0,4.5,2.0,1.5,0.9]
+            multijets=[121.1,17.0,10.0,10.8,2.3]
+            multijets_statunc=[65.2,4.4,3.4,3.6,1.6]
         elif year==2018:
-            multijets=[14.3,25.7,7.7,1.3,0.8]
-            multijets_statunc=[6.0,3.5,2.0,0.5,0.9]
+            multijets=[7.9,22.0,24.1,21.5,0.0]
+            multijets_statunc=[3.2,5.9,6.2,5.7,0.0]
     if doTMVA:
         #multijets=[293.3,77.9,38.2,38.7,26.7,69.9,13.7,11.9,51.6,7.1,9.1]
         #multijets_statunc=[25.,18.,12.,12.,16.,30.,7.,9.,45.,7.1,9.1]
