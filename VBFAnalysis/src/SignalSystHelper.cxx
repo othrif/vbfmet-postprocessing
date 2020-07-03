@@ -180,7 +180,7 @@ void SignalSystHelper::setVBFGamVars(std::map<TString, Float_t> &tMapFloat, int 
   tMapFloat["VBF_qqgamH_Scale__1down"]=scaleDw;
   
   // parton shower models compariing H7/Py8
-  float psvariation = 1.0-(0.790174) + (0.327218)*(truth_jj_mass/1e6) + (-0.169809)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6) + (0.024659)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6);
+  float psvariation = 1.0-((0.790174) + (0.327218)*(truth_jj_mass/1e6) + (-0.169809)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6) + (0.024659)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6)*(truth_jj_mass/1e6));
   if(psvariation>0.2) psvariation=0.2; // just a sanity check
   if(psvariation<-0.2) psvariation=-0.2; // just a sanity check
   tMapFloat["VBF_qqgamH_PSVar__1up"]=1.0+psvariation;
