@@ -1,7 +1,7 @@
 #!/bin/bash                                                                                                                                                                                                       
 #OUTDIRM=/share/t3data2/schae/v32ETight
 #OUTDIRM=${1:-v34mc16a}
-OUTDIRM=v37ALoose
+OUTDIRM=v45ETight
 mkdir $OUTDIRM
 hadd $OUTDIRM/data.root data*root
 #hadd $OUTDIRM/VVV.root VVV*root
@@ -39,6 +39,10 @@ rm VBFH50*root
 #hadd $OUTDIRM/VV.root VV*root
 hadd $OUTDIRM/W_strong.root W_strong*root
 hadd $OUTDIRM/Z_strong.root Z_strong*root
+hadd $OUTDIRM/W_EWKSh.root W_EWKSh*root
+hadd $OUTDIRM/Z_EWKSh.root Z_EWKSh*root
+rm W_EWKSh*root
+rm Z_EWKSh*root
 hadd $OUTDIRM/W_EWK.root W_EWK*root
 hadd $OUTDIRM/Z_EWK.root Z_EWK*root
 hadd $OUTDIRM/ttbar.root ttbar*root
@@ -48,7 +52,9 @@ hadd $OUTDIRM/ttbar.root ttbar*root
 #hadd $OUTDIRM/VBFH125Old.root  VBFH125Old*.root
 rm VBFH125Old*.root
 hadd $OUTDIRM/VBFH125.root  VBFH125*.root
-#hadd $OUTDIRM/VBFHgam125.root  VBFHgam125*.root
+hadd $OUTDIRM/VBFHgam125Old.root  VBFHgam125*312243.root
+rm VBFHgam125*312243.root
+hadd $OUTDIRM/VBFHgam125.root  VBFHgam125*.root
 hadd $OUTDIRM/VBFHOther.root  VBFHOther*.root
 hadd $OUTDIRM/VBFHAltSignal.root  VBFHAltSignal*.root
 #hadd $OUTDIRM/ggFH125Old.root  ggFH125Old*.root
@@ -59,12 +65,22 @@ rm  VH125Old*.root
 hadd $OUTDIRM/VH125.root  VH125*.root
 hadd $OUTDIRM/TTH125.root  TTH125*.root
 
-#hadd $OUTDIRM/Zg_EWK.root  Zg_EWK*.root
-#hadd $OUTDIRM/Wg_EWK.root  Wg_EWK*.root
-#hadd $OUTDIRM/Wg_strong.root Wg_strong*root
-#hadd $OUTDIRM/Zg_strong.root Zg_strong*root
-#hadd $OUTDIRM/ttg.root ttg*root
+hadd $OUTDIRM/Zg_EWK.root  Zg_EWK*.root
+hadd $OUTDIRM/Wg_EWK.root  Wg_EWK*.root
+
+hadd $OUTDIRM/Wg_strong222.root Wg_strong222*root
+hadd $OUTDIRM/Zg_strong222.root Zg_strong222*root
+rm Wg_strong222*root
+rm Zg_strong222*root
+hadd $OUTDIRM/Zg_strongFxFx.root Zg_strongFxFx*root
+rm Zg_strongFxFx*root
+
+hadd $OUTDIRM/Wg_strong.root Wg_strong*root
+hadd $OUTDIRM/Zg_strong.root Zg_strong*root
+hadd $OUTDIRM/ttg.root ttg*root
 ##hadd $OUTDIRM/SinglePhotonBCL.root SinglePhotonBCL*root
 ##rm SinglePhotonBCL*root
-#hadd $OUTDIRM/SinglePhoton.root SinglePhoton*root
-#hadd $OUTDIRM/VqqGam.root VqqGam*root
+hadd $OUTDIRM/SinglePhoton.root SinglePhoton*root
+hadd $OUTDIRM/VqqGam.root VqqGam*root
+hadd $OUTDIRM/ggFHgamdark125.root ggFHgamdark125*root
+hadd $OUTDIRM/VBFHgamdark125.root VBFHgamdark125*root

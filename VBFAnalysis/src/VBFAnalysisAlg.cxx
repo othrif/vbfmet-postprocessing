@@ -1162,12 +1162,13 @@ StatusCode VBFAnalysisAlg::execute() {
     passVjetsPTV=true; // these are the Vgamma with pTV>90 GeV
     passVjetsFilterTauEl=true;
     passVjetsFilter=true;
+    //if(SherpaVTruthPt<90.0e3){ passVjetsFilterTauEl=false; }
   }else if((runNumber>=700011 && runNumber<=700017)){
     if(SherpaVTruthPt<90.0e3){
       passVjetsPTV=true; // these are the inclusive QCD Vgamma samples
       passVjetsFilterTauEl=true;
       passVjetsFilter=true;
-    }
+    }else{ passVjetsFilterTauEl=false; }
   }
   
   // Fixing a bug in the variables
