@@ -8,8 +8,11 @@ __author__ = "Stanislava Sevova, Elyssa Hofgard"
 ################## 
 import argparse
 import ahoi
+import sys
 import os
 import re
+import glob
+import shutil
 import uproot as up
 import uproot_methods
 import pandas as pd
@@ -19,6 +22,7 @@ from tqdm.notebook import tqdm
 import matplotlib.pyplot as plt
 import math
 import glob
+from plotUtils import makeHTML
 # import atlas_mpl_style as ampl
 # # Set ATLAS style
 # ampl.use_atlas_style()
@@ -38,8 +42,8 @@ def getArgumentParser():
     parser.add_argument('-o',
                         '--output',
                         dest='outdir',
-                        help='Output directory to put file list(s) into',
-                        default=os.path.join(os.path.dirname(os.path.realpath(__file__)),'outdir'))
+                        help='Output directory for plots, selection lists, etc',
+                        default='outdir')
     
     return parser
 ###############################################################################                                   
@@ -231,6 +235,16 @@ def ahoi_opt(cuts,df_sig,df_bkg):
 def main(): 
     """ Run script"""
     options = getArgumentParser().parse_args()
+
+    ### Make output dir
+    dir_path = os.getcwd()
+    out_dir = options.outdir
+    path = os.path.join(dir_path, out_dir)
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    os.makedirs(path)
+    os.chdir(path)
+
     ### Make all the bkg and signal dataframes
     ## Z+jets
     df_zjets  = sampleDataframe(options.indir,"Z_strongNominal")
@@ -336,12 +350,18 @@ def main():
         ("AbsPt < {}", list(np.linspace(10,30,ncuts,dtype=int))),
         ("ph_pt > {}", list(np.linspace(25,45,ncuts,dtype=int)))
     ]
+    sys.stdout = open('ahoi_cuts_test.txt','wt')
     print(cuts_test2)
+    
     for i in range(0,len(varCuts)):
         makePlots(df_bkg,df_sig,varCuts[i],units[i],cuts=cuts_test2)
 
+    makeHTML("ahoi_input_vars.html","ZH Dark Photon SR Optimization") 
+    
     ahoi_test = ahoi_opt(cuts_test2,df_sig,df_bkg)
     print(ahoi_test)
+
+    fcuts.close()
     
 if __name__ == '__main__':
     main()
