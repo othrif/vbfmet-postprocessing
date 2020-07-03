@@ -87,7 +87,7 @@ def getLorentzVec(df):
     """ Calculates Lorentz vectors for the leptons and photons for bkg/sig:
     but first converts all pTs and masses from MeV to GeV"""
     # Converting weights to true yield
-    #df['w'] = df['w'].truediv(36000)
+    df['w'] = df['w'] * 36000
     df['mu_pt']   = df['mu_pt'].truediv(1000)
     df['mu_mass'] = df['mu_mass'].truediv(1000)
     df['ph_pt']   = df['ph_pt'].truediv(1000)
@@ -125,7 +125,7 @@ def calcVars(df):
     df['lep2pt'] = vLep2.pt
     return df
 
-def makePlots(df_bkg,df_sig,var,units):
+def makePlots(df_bkg,df_sig,var,units,cuts):
     ### Plot some of the distributions for the signal and bkg
     fig,ax = plt.subplots(1,1)
     bkg = np.array(df_bkg[var])
@@ -137,12 +137,26 @@ def makePlots(df_bkg,df_sig,var,units):
     # scaling based on signal data
     max_val = max(sig)
     #print(var,min(sig),max_val)
-    ax.hist(bkg, weights = df_bkg['w'].to_numpy(), bins=50, range=(0, max_val), histtype='step', color='Red',label='bkg')
-    ax.hist(sig, weights = df_sig['w'].to_numpy(), bins=50, range=(0, max_val), histtype='step', color='Blue',label='sig')
+    if var == 'mll':
+        xmin = 60
+        xmax = 120
+    else: 
+        xmin = 0
+        xmax = max_val
+    
+    if cuts is not None:
+        for cut in cuts:
+            if var == cut[0].split()[0]: 
+                is_lowerbound = ">" in cut[0]
+                for v in cut[1]:
+                    line = ax.axvline(v,color='black',linestyle='--')
+                    ax.legend([line], ["lower bound" if is_lowerbound else "upper bound"])
+            
+    ax.hist(bkg, weights = df_bkg['w'].to_numpy(), bins=50, range=(xmin, xmax), histtype='step', color='Red',label='bkg')
+    ax.hist(sig, weights = df_sig['w'].to_numpy(), bins=50, range=(xmin, xmax), histtype='step', color='Blue',label='sig')
     ax.set_xlabel(var+' [' + units + ']')
     ax.set_ylabel('Events')
     ax.set_yscale('log')
-    ax.legend()
     plt.savefig("w_hist_" + var+ ".pdf",format="pdf")
 
 def get_selection(multi_index,cuts):
@@ -224,21 +238,21 @@ def main():
     ## Z+photon
     df_zgamma = sampleDataframe(options.indir,"Zg_strongNominal")
 
-    # ## ttbar/single top/Wt/ttbar+V
+    ## ttbar/single top/Wt/ttbar+V
     df_top    = sampleDataframe(options.indir,"ttbarNominal")
     df_top    = df_top.append(sampleDataframe(options.indir,"ttVNominal"))
 
-    # ## Triboson
+    ## Triboson
     df_VVV    = sampleDataframe(options.indir,"VVVNominal")
     df_VVV    = df_VVV.append(sampleDataframe(options.indir,"VVyNominal"))
 
-    # ## Diboson
+    ## Diboson
     df_VV     = sampleDataframe(options.indir,"VVNominal")
     df_VV     = df_VV.append(sampleDataframe(options.indir,"VV_ewkNominal"))
     df_VV     = df_VV.append(sampleDataframe(options.indir,"ggZZNominal"))
     df_VV     = df_VV.append(sampleDataframe(options.indir,"ggWWNominal"))
 
-    # ## H->Zy
+    ## H->Zy
     df_HZy    = sampleDataframe(options.indir,"ggH125ZyNominal")
     df_HZy    = df_HZy.append(sampleDataframe(options.indir,"ttH125ZyNominal"))
     df_HZy    = df_HZy.append(sampleDataframe(options.indir,"VBFH125ZyNominal"))
@@ -251,9 +265,9 @@ def main():
     ## Remove overlapping Z+jets events
     df_zjets = df_zjets[df_zjets['in_vy_overlap'] > 0]
     ## Make collective Z+jets/Z+photon bkg dataframe
-    df_bkg = df_zjets 
+    df_bkg = df_zjets
     df_bkg = df_bkg.append(df_zgamma).append(df_top).append(df_VVV).append(df_VV).append(df_HZy)
-    #df_bkg = pd.concat(df_bkg,df_top,df_VVV,df_VV,df_HZy)
+    ##df_bkg = pd.concat(df_bkg,df_top,df_VVV,df_VV,df_HZy)
     ## Apply cuts 
     df_bkg = df_bkg[(df_bkg['trigger_lep']>0) &
                     (df_bkg['passJetCleanTight']==1) &
@@ -283,8 +297,6 @@ def main():
     # list of variables to make histograms of
     varCuts = ['met_tight_tst_et','met_tight_tst_phi','ph_pt','mT','dPhiLepMet','AbsPt','Ptll','mllg','lep1pt','lep2pt','mll']
     units = ['GeV','Radians','GeV','GeV','Radians','GeV','GeV','GeV','GeV','GeV','GeV']
-    #for i in range(0,len(varCuts)):
-    #    makePlots(df_bkg,df_sig,varCuts[i],units[i])
     
     # Ahoi -> stores large numpy arrays in memory so can't do large combinations locally
     # More systematic way to actually define cuts?
@@ -313,7 +325,20 @@ def main():
         ("mllg > {}", list(np.linspace(85,100,ncuts,dtype=int))),
         ("AbsPt < {}", list(np.linspace(27,37,ncuts,dtype=int)))
         ]
-    ahoi_test = ahoi_opt(cuts_test,df_sig,df_bkg)
+    
+    cuts_test2 = [
+        ("lep2pt > {}", list(np.linspace(7,15,ncuts,dtype=int))),
+        ("met_tight_tst_et > {}", list(np.linspace(50,110,ncuts,dtype=int))),
+        ("mll > {}", list(np.linspace(66,80,ncuts,dtype=int))),   
+        ("mllg > {}", list(np.linspace(85,100,ncuts,dtype=int))),   
+        ("dPhiLepMet > {}", list(np.linspace(0,1.5,ncuts,dtype=int))),
+        ("Ptll > {}", list(np.linspace(0,100,ncuts,dtype=int))),
+        ("AbsPt < {}", list(np.linspace(10,30,ncuts,dtype=int)))        
+    ]
+    for i in range(0,len(varCuts)):
+        makePlots(df_bkg,df_sig,varCuts[i],units[i],cuts=cuts_test2)
+
+    ahoi_test = ahoi_opt(cuts_test2,df_sig,df_bkg)
     print(ahoi_test)
     
 if __name__ == '__main__':
