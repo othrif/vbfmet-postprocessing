@@ -1246,7 +1246,7 @@ StatusCode VBFAnalysisAlg::execute() {
   if (!((passGRL == 1) & (passPV == 1) & (passDetErr == 1) & (passJetCleanLoose == 1))) return StatusCode::SUCCESS;
   if(!passMJSkim) return StatusCode::SUCCESS;
   bool GammaMETSR = (n_ph>0 || n_el>0 || (m_currentVariation=="Nominal" ? (baseph_pt && baseph_pt->size()>0): false)) && (jj_deta>2.5) && (jj_mass>200.0e3);
-  if(m_currentVariation!="Nominal") GammaMETSR = (n_ph>0) && (jj_deta>2.5) && (jj_mass>200.0e3);
+  if(m_currentVariation!="Nominal") GammaMETSR = (n_ph>0) && (jj_deta>3.0) && (jj_mass>200.0e3) && (n_jet>1) && (jet_pt->at(0) > 60e3) && (jet_pt->at(1) > 50e3);
   ATH_MSG_DEBUG ("Pass GRL, PV, DetErr, JetCleanLoose");
   if (n_jet < 2 && !TruthSkim) return StatusCode::SUCCESS;
   if (!(n_jet < 5) && !(m_LooseSkim || m_AltSkim)) return StatusCode::SUCCESS;

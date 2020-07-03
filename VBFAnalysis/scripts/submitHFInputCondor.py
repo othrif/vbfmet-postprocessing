@@ -29,6 +29,8 @@ parser.add_argument( "--doFJVTCR", dest = "doFJVTCR", action="store_true", defau
 parser.add_argument( "--v26Ntuples", dest = "v26Ntuples", action="store_true", default = False, help = "Run version 26 style ntuples. important for lepton selection")
 parser.add_argument( "--doVBFMETGam", dest = "doVBFMETGam", action="store_true", default = False, help = "VBF + MET + photon analysis, set --Binning=13")
 parser.add_argument( "--doMTFit", dest = "doMTFit", action="store_true", default = False, help = "VBF + MET + photon analysis with an mt fit, set --Binning=13")
+parser.add_argument( "--doLooseCR", dest = "doLooseCR", action="store_true", default = False, help = "VBF + MET + photon analysis do loose CR, set --Binning=13")
+parser.add_argument( "--rmDPhiMETPh", dest = "rmDPhiMETPh", action="store_true", default = False, help = "VBF + MET + photon analysis remove dphi(MET,ph), set --Binning=13")
 parser.add_argument( "--doOneHighFJVTCR", dest = "doOneHighFJVTCR", action="store_true", default = False, help = "VBF + MET to be used with option 22. has one fjvt cr for high dphijj")
 parser.add_argument( "--doHighDphijj", dest = "doHighDphijj", action="store_true", default = False, help = "Fit dphijj>2.5 analysis with no dphijj binning, set --Binning=23 or 30")
 parser.add_argument( "--singleHist", dest = "singleHist", action="store_true", default = False, help = "Runs VBF + MET in one histogram when true")
@@ -167,6 +169,10 @@ if args.doHighDphijj:
     extraCommand+=' --doHighDphijj '
 if args.doMTFit:
     extraCommand+=' --doMTFit '
+if args.rmDPhiMETPh:
+    extraCommand+=' --rmDPhiMETPh '    
+if args.doLooseCR:
+    extraCommand+=' --doLooseCR '    
 if args.doOneHighFJVTCR:
     extraCommand+=' --doOneHighFJVTCR '
 if args.doPlot:

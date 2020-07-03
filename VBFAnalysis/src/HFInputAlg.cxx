@@ -27,6 +27,8 @@ HFInputAlg::HFInputAlg( const std::string& name, ISvcLocator* pSvcLocator ) : At
   declareProperty("weightSyst", weightSyst = false, "weightSyst flag, true for weight systematics");
   declareProperty("doPlot", doPlot =false, "doPlot flag, true means the output contains variable distributions");
   declareProperty("doVBFMETGam", doVBFMETGam =false, "doVBFMETGam flag, true means run the VBF+MET+photon analysis");
+  declareProperty("doLooseCR", doLooseCR =false, "doLooseCR flag, true means run Loosened CR selection the VBF+MET+photon analysis");
+  declareProperty("rmDPhiMETPh", rmDPhiMETPh =false, "rmDPhiMETPh flag, true means remove dphi(met,ph) selection the VBF+MET+photon analysis");  
   declareProperty("doMTFit", doMTFit =false, "doMTFit flag, true means run the VBF+MET+photon analysis with an MT fit");  
   declareProperty("v26Ntuples", v26Ntuples = false, "v26Ntuples flag, true means the setting for backward compatibility with v26 ntuples");
   declareProperty("doDuplicateCheck", doDuplicateCheck =false, "doDuplicateCheck flag, true means the run and event numbers are printed");
@@ -233,8 +235,8 @@ vector <TH1F*> HFInputAlg::HistoAppend(std::string name, std::string currentCR, 
   if(!singleHist){
     h.push_back(new TH1F((name+"_cuts").c_str(), (name+"_cuts;;").c_str(), 1, 0.5, 1.5));
     if (!doPlot && doMTFit) {
-      float binsmt [6] = { 0.0, 90.0, 130.0, 200.0, 300.0, 500.0 };
-      h.push_back(new TH1F((name+"_mtgam").c_str(), (name+"_mtgam;;").c_str(), 5,  binsmt));
+      float binsmt [7] = { 0.0, 90.0, 130.0, 200.0, 300.0, 500.0, 3000.0 };
+      h.push_back(new TH1F((name+"_mtgam").c_str(), (name+"_mtgam;;").c_str(), 6,  binsmt));
     } else if (doPlot) {
       //h.push_back(new TH1F((name+"_jj_mass").c_str(), (name+"_jj_mass;;").c_str(), 10, 0, 5000));
       if(doVBFMETGam){
@@ -545,7 +547,7 @@ StatusCode HFInputAlg::execute() {
     if(n_ph>0){
       phcentrality = exp(-4.0/std::pow(jj_deta,2) * std::pow(ph_eta->at(0) - (jet_eta->at(0)+jet_eta->at(1))/2.0,2));
       met_tst_ph_dphi = fabs(GetDPhi(met_tst_nolep_phi, ph_phi->at(0)));
-      if(doMTFit) met_tst_ph_dphi=10.0; // set to pass for the mt fit
+      if(doMTFit || rmDPhiMETPh) met_tst_ph_dphi=10.0; // set to pass for the mt fit
       mtgam = sqrt(2. * ph_pt->at(0) * met_tst_nolep_et * (1. - cos(ph_phi->at(0) - met_tst_nolep_phi)));
     }
     // if this is a vjets sample and it has a photon overlap, then remove it
@@ -572,6 +574,12 @@ StatusCode HFInputAlg::execute() {
       //passMTCut=(MT>40e3) ? 1 : 2;
       passMTCut=(met_tst_et>80e3) ? 1 : 2;
     }
+  }
+  float METCSTJetCutCR = METCSTJetCut;
+  float METCutCR = METCut;
+  if(doLooseCR){
+    METCSTJetCutCR = 80.0e3;
+    METCutCR = 100.0e3;
   }
 
   if(v26Ntuples) lep_trig_match=1;
@@ -641,7 +649,7 @@ StatusCode HFInputAlg::execute() {
       ZelPtCut = n_baseel>0 ? (baseel_pt->at(0)>30.0e3): false;
       ZmuPtCut = n_basemu>0 ? (basemu_pt->at(0)>30.0e3): false;
       elSubPtCut = n_baseel>1 ? (baseel_pt->at(1)>7.0e3): false;
-      muSubPtCut = n_basemu>1 ? (basemu_pt->at(1)>7.0e3): false;    
+      muSubPtCut = n_basemu>1 ? (basemu_pt->at(1)>7.0e3): false;
       Zee_lepVeto = ((n_baseel == 2) && (n_basemu == 0));
       Zmm_lepVeto = ((n_baseel == 0) && (n_basemu == 2)); 
       OppSignElCut = n_baseel>1 ? (baseel_charge->at(0)*baseel_charge->at(1) < 0) : false;
@@ -666,14 +674,14 @@ StatusCode HFInputAlg::execute() {
   CRDPHIJETMET=true;// remove these cuts as there is no impact 
   if ((passMETTrig) && !fJVTVeto && (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) SR = true;
   if ((passMETTrig) && fJVTLeadVeto && (met_tst_et > METCut) & (met_cst_jet > METCSTJetCut) & SRDPHIJETMET & (SR_lepVeto)) CRFJVT = true;
-  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?(passMTCut==0 || passMTCut==1):(met_significance > 4.0))) CRWep = true;}
-  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?(passMTCut==0 || passMTCut==1):(met_significance > 4.0))) CRWen = true;}
-  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?(passMTCut==2):(met_significance <= 4.0))) CRWepLowSig = true;}
-  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?(passMTCut==2):(met_significance <= 4.0))) CRWenLowSig = true;}
-  if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
-  if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
-  if ((trigger_lep_Zee_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
-  if ((trigger_lep_Zmm_bool) && !fJVTVeto && (met_tst_nolep_et > METCut) && (met_cst_jet > METCSTJetCut) && CRDPHIJETMET && Zll_METVETO && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCutCR) && (met_cst_jet > METCSTJetCutCR) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?(passMTCut==0 || passMTCut==1):(met_significance > 4.0))) CRWep = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCutCR) && (met_cst_jet > METCSTJetCutCR) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?(passMTCut==0 || passMTCut==1):(met_significance > 4.0))) CRWen = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCutCR) && (met_cst_jet > METCSTJetCutCR) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((elChPos) & (doVBFMETGam?(passMTCut==2):(met_significance <= 4.0))) CRWepLowSig = true;}
+  if ((trigger_lep_bool) && !fJVTVeto && (met_tst_nolep_et > METCutCR) && (met_cst_jet > METCSTJetCutCR) && CRDPHIJETMET && (We_lepVeto) && (elPtCut)){ if ((!elChPos) & (doVBFMETGam?(passMTCut==2):(met_significance <= 4.0))) CRWenLowSig = true;}
+  if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > METCutCR) && (met_cst_jet > METCSTJetCutCR) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((muChPos)) CRWmp = true;}
+  if ((trigger_lep_Wmu_bool) && !fJVTVeto && (met_tst_nolep_et > METCutCR) && (met_cst_jet > METCSTJetCutCR) && CRDPHIJETMET && (Wm_lepVeto) && (muPtCut)){ if ((!muChPos)) CRWmn = true;}
+  if ((trigger_lep_Zee_bool) && !fJVTVeto && (met_tst_nolep_et > METCutCR) && (met_cst_jet > METCSTJetCutCR) && CRDPHIJETMET && Zll_METVETO && (Zee_lepVeto) && (ZelPtCut) && (elSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignElCut)) CRZee = true;}
+  if ((trigger_lep_Zmm_bool) && !fJVTVeto && (met_tst_nolep_et > METCutCR) && (met_cst_jet > METCSTJetCutCR) && CRDPHIJETMET && Zll_METVETO && (Zmm_lepVeto) && (ZmuPtCut) && (muSubPtCut) && (mll> 66.0e3 && mll<116.0e3)){ if ((OppSignMuCut)) CRZmm = true;}
 
   // do duplicate check
   if(doDuplicateCheck){

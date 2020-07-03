@@ -29,6 +29,8 @@ arg_group.add_argument("--weightSyst", action="store_true", dest='weightSyst', d
 arg_group.add_argument("--v26Ntuples", action="store_true", dest='v26Ntuples', default=False, help="run v26 style ntuples, default: False")
 arg_group.add_argument("--doVBFMETGam", action="store_true", dest='doVBFMETGam', default=False, help="run VBF+MET+gamma analysis, default: False")
 arg_group.add_argument("--doMTFit", action="store_true", dest='doMTFit', default=False, help="run VBF+MET+gamma with an MT Fit analysis, default: False")
+arg_group.add_argument("--doLooseCR", action="store_true", dest='doLooseCR', default=False, help="run VBF+MET+gamma with a loose CR analysis, default: False")
+arg_group.add_argument("--rmDPhiMETPh", action="store_true", dest='rmDPhiMETPh', default=False, help="run VBF+MET+gamma remvove dphi(met,ph) cut, default: False")
 arg_group.add_argument("--doHighDphijj", action="store_true", dest='doHighDphijj', default=False, help="run dphijj>2.5 Fit analysis, drops the dphijj binning, default: False")
 arg_group.add_argument("--singleHist", action="store_true", dest='singleHist', default=False, help="run VBF+MET into a single histogram, default: True")
 arg_group.add_argument("--oldInput", action="store_true", dest='oldInput', default=False, help="if oldInput, switch to HFInputOldInput")
@@ -107,6 +109,8 @@ if True:
                                        singleHist = args.singleHist,
                                        doVBFMETGam = args.doVBFMETGam,
                                        doMTFit = args.doMTFit,
+                                       doLooseCR = args.doLooseCR,
+                                       rmDPhiMETPh = args.rmDPhiMETPh,
                                        doHighDphijj = args.doHighDphijj);
     else:
         if args.currentSample == "physics_micro":
@@ -133,6 +137,8 @@ if True:
                                                v26Ntuples = args.v26Ntuples,
                                                doVBFMETGam = args.doVBFMETGam,
                                                doMTFit = args.doMTFit,
+                                               doLooseCR = args.doLooseCR,
+                                               rmDPhiMETPh = args.rmDPhiMETPh,
                                                doHighDphijj = args.doHighDphijj);
     
     include("AthAnalysisBaseComps/SuppressLogging.py")              #Optional include to suppress as much athena output as possible. Keep at bottom of joboptions so that it doesn't suppress the logging of the things you have configured above

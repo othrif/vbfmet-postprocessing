@@ -62,6 +62,8 @@ class HFInputAlg: public ::AthAnalysisAlgorithm {
   Bool_t singleHist = false;
   Bool_t doVBFMETGam = false;
   Bool_t doMTFit = false;  
+  Bool_t rmDPhiMETPh = false;  
+  Bool_t doLooseCR = false;  
   Bool_t doDuplicateCheck = false;
   Bool_t doDoubleRatio = false;
   Bool_t doHighDphijj = false;  
