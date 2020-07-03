@@ -58,7 +58,7 @@ Msl::PlotEvent::PlotEvent():      fPassAlg(0),
 				  hZMCIDQCD(0), hWMCIDQCD(0),hZPTVMCIDQCD(0),
 				  hZMadMCIDQCD(0), hZMad2MCIDQCD(0),hZMadFMCIDQCD(0),
 				  hWMadMCIDQCD(0),
-				  hZPowMCIDQCD(0),hZShMCIDQCD(0)
+				  hZPowMCIDQCD(0),hZShMCIDQCD(0),hVgamMCIDQCD(0),hVgamMCIDEWK(0)
 {
 }
 
@@ -160,7 +160,9 @@ void Msl::PlotEvent::DoConf(const Registry &reg)
     hZMadFMCIDQCD= GetTH1("ZMadFMCIDQCD", 25, 311428.5,311453.5);    
     hWMadMCIDQCD = GetTH1("WMadMCIDQCD",  74,  363599.5,363673.5);
     hZPowMCIDQCD = GetTH1("ZPowMCIDQCD",  19,  301019.5,301038.5);
-    hZShMCIDQCD  = GetTH1("ZShMCIDQCD",   84,  312447.5,312531.5);   
+    hZShMCIDQCD  = GetTH1("ZShMCIDQCD",   84,  312447.5,312531.5);
+    hVgamMCIDQCD  = GetTH1("VgamMCIDQCD",   18,  700010.5,700028.5);
+    hVgamMCIDEWK  = GetTH1("VgamMCIDEWK",   10,  363265.5,363275.5);    
     }
 
   // jj_mass limits
@@ -239,6 +241,8 @@ bool Msl::PlotEvent::DoExec(Event &event)
   if(hWMadMCIDQCD)  hWMadMCIDQCD->Fill(event.RunNumber, weight);  
   if(hZPowMCIDQCD)  hZPowMCIDQCD->Fill(event.RunNumber, weight);
   if(hZShMCIDQCD)   hZShMCIDQCD->Fill(event.RunNumber, weight);  
+  if(hVgamMCIDQCD)  hVgamMCIDQCD->Fill(event.RunNumber, weight);
+  if(hVgamMCIDEWK)  hVgamMCIDEWK->Fill(event.RunNumber, weight);
   float jj_deta = event.GetVar(Mva::jj_deta);
   if(hjj_deta_signed) hjj_deta_signed->Fill(( fabs(event.GetVar(Mva::jetEta0)) > fabs(event.GetVar(Mva::jetEta1)) ? -1.0*jj_deta : jj_deta), weight);
   if(hjj_deta_diff) hjj_deta_diff->Fill(( fabs(event.GetVar(Mva::jetEta0)) - fabs(event.GetVar(Mva::jetEta1))), weight);
